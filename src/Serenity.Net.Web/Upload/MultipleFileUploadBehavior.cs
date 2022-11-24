@@ -2,8 +2,13 @@
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior class that handles <see cref="MultipleFileUploadEditorAttribute"/> and
+    /// <see cref="MultipleImageUploadEditorAttribute"/>.
+    /// </summary>
     public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
+        /// <inheritdoc/>
         public Field Target { get; set; }
 
         private IUploadEditor editorAttr;
@@ -14,6 +19,13 @@ namespace Serenity.Services
         private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage storage;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="uploadValidator">Upload validator</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="storage">Upload storage</param>
+        /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
             IUploadStorage storage)
         {
@@ -22,6 +34,7 @@ namespace Serenity.Services
             this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             if (Target is null)
@@ -74,6 +87,7 @@ namespace Serenity.Services
             return list;
         }
 
+        /// <inheritdoc/>
         public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
         {
             base.OnPrepareQuery(handler, query);
@@ -90,6 +104,7 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             var field = (StringField)Target;
@@ -133,6 +148,7 @@ namespace Serenity.Services
                 field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList, filesToDelete);
         }
 
+        /// <inheritdoc/>
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
             if (ServiceQueryHelper.UseSoftDelete(handler.Row))
@@ -162,7 +178,7 @@ namespace Serenity.Services
                 if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr, uploadValidator, imageProcessor,
+                FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr as IUploadOptions, uploadValidator, imageProcessor,
                     storage, ref filename);
 
                 var idField = ((IIdRow)handler.Row).IdField;
@@ -187,6 +203,7 @@ namespace Serenity.Services
             return JSON.Stringify(newFileList);
         }
 
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             if (handler.IsUpdate)

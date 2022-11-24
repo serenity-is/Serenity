@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 namespace Serenity.Web
 {
     /// <summary>
-    /// 
+    /// Default <see cref="IContentHashCache"/> implementation
     /// </summary>
     public class ContentHashCache : IContentHashCache
     {
@@ -20,15 +20,44 @@ namespace Serenity.Web
         private readonly IWebHostEnvironment hostEnvironment;
         private readonly IHttpContextAccessor httpContextAccessor;
 
+        /// <summary>
+        /// CDN settings for content hash cache
+        /// </summary>
         public class CDNSettings
         {
+            /// <summary>
+            /// Is CDN enabled
+            /// </summary>
             public bool? Enabled { get; set; }
+
+            /// <summary>
+            /// The CDN URL
+            /// </summary>
             public string Url { get; set; }
+
+            /// <summary>
+            /// HTTPS URL for the CDN
+            /// </summary>
             public string HttpsUrl { get; set; }
+
+            /// <summary>
+            /// List of include patterns
+            /// </summary>
             public List<string> Include { get; set; }
+
+            /// <summary>
+            /// List of exclude patterns
+            /// </summary>
             public List<string> Exclude { get; set; }
         }
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="cdnSettings">CDN settings</param>
+        /// <param name="hostEnvironment">Host environment</param>
+        /// <param name="httpContextAccessor">HTTP context accessor</param>
+        /// <exception cref="ArgumentNullException">hostEnvironment of httpContextAccessor is null</exception>
         public ContentHashCache(IOptions<CDNSettings> cdnSettings,
             IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor = null)
         {
@@ -47,6 +76,7 @@ namespace Serenity.Web
             cdnFilter = new IO.GlobFilter(cdn.Include, cdn.Exclude);
         }
 
+        /// <inheritdoc/>
         public void ScriptsChanged()
         {
             hashByContentPath.Clear();
@@ -71,6 +101,7 @@ namespace Serenity.Web
             return WebEncoders.Base64UrlEncode(hash);
         }
 
+        /// <inheritdoc/>
         public string ResolvePath(PathString pathBase, string contentPath)
         {
             if (contentPath.IsNullOrEmpty())
@@ -90,6 +121,7 @@ namespace Serenity.Web
             return UriHelper.Combine(cdnRoot, contentPath);
         }
 
+        /// <inheritdoc/>
         public string ResolveWithHash(PathString pathBase, string contentUrl)
         {
             if (contentUrl.IsNullOrEmpty())

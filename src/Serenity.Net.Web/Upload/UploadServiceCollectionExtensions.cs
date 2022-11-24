@@ -4,8 +4,18 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// DI extension methods related to upload services
+    /// </summary>
     public static class UploadServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers the default implementations of <see cref="IUploadStorage"/>,
+        /// <see cref="IUploadValidator"/>, <see cref="IImageProcessor"/> and
+        /// <see cref="IUploadProcessor"/> interfaces.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddUploadStorage(this IServiceCollection collection)
         {
             if (collection == null)
@@ -18,6 +28,14 @@ namespace Serenity.Web
             collection.TryAddSingleton<IUploadProcessor, DefaultUploadProcessor>();
         }
 
+        /// <summary>
+        /// Registers the default implementations of <see cref="IUploadStorage"/>,
+        /// <see cref="IUploadValidator"/>, <see cref="IImageProcessor"/> and
+        /// <see cref="IUploadProcessor"/> interfaces.
+        /// </summary>
+        /// <param name="collection">Service collection</param>
+        /// <param name="setupAction">Callback to edit options</param>
+        /// <exception cref="ArgumentNullException">Collection is null</exception>
         public static void AddUploadStorage(this IServiceCollection collection,
             Action<UploadSettings> setupAction)
         {

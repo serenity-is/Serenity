@@ -75,7 +75,7 @@ namespace Serenity.Web
 
             var imageProcessor = new DefaultImageProcessor();
             var uploadProcessor = new DefaultUploadProcessor(new DefaultImageProcessor(),
-                storage, new DefaultUploadValidator(imageProcessor, localizer, logger), localizer, logger);
+                storage, new DefaultUploadValidator(imageProcessor, localizer, logger), logger);
 
             var result = uploadProcessor.Process(fileContent, "___tempfile__" + extension, options);
             ErrorMessage = result.ErrorMessage;

@@ -4,6 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="ICssBundleManager"/>
+    /// </summary>
     public class CssBundleManager : ICssBundleManager
     {
         private readonly object sync = new();
@@ -24,6 +27,15 @@ namespace Serenity.Web
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <param name="scriptManager">Dynamic script manager</param>
+        /// <param name="hostEnvironment">Web host environment</param>
+        /// <param name="contextAccessor">HTTP context accessor</param>
+        /// <param name="logger">Exception logger</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public CssBundleManager(IOptions<CssBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
             IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
         {
@@ -50,6 +62,7 @@ namespace Serenity.Web
             };
         }
 
+        /// <inheritdoc/>
         public void Reset()
         {
             lock (sync)
@@ -284,7 +297,8 @@ namespace Serenity.Web
                 isEnabled = true;
             }
         }
-
+        
+        /// <inheritdoc/>
         public bool IsEnabled
         {
             get
@@ -294,6 +308,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public void CssChanged()
         {
             BundleUtils.ClearVersionCache();
@@ -310,6 +325,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> GetBundleIncludes(string bundleKey)
         {
             lock (sync)
@@ -378,6 +394,7 @@ namespace Serenity.Web
                 match.Groups["suffix"].Value + ")");
         }
 
+        /// <inheritdoc/>
         public string GetCssBundle(string cssUrl)
         {
             Dictionary<string, string> bySrcUrl;

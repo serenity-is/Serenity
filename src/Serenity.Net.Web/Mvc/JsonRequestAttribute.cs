@@ -174,9 +174,9 @@ namespace Serenity.Services
     }
 
     /// <summary>
-    /// Obsolete version of <see cref="JsonRequest"/> attribute.
+    /// Obsolete version of <see cref="JsonRequestAttribute"/> attribute.
     /// </summary>
-    [Obsolete("Prefer [JsonRequest] attribute")]
+    [Obsolete("Prefer [JsonRequestAttribute]")]
     public class JsonFilter : JsonRequestAttribute
     {
     }

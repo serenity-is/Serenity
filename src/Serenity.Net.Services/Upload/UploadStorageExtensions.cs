@@ -300,6 +300,17 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Depending on the image upload options, scales image, creates default and
+        /// additional thumbs and saves them to the upload storage files.
+        /// </summary>
+        /// <param name="image">Input image</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="options">Upload image options</param>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="temporaryFile">Temporary file</param>
+        /// <param name="overwrite">Overwrite option</param>
+        /// <returns>Temporary file</returns>
         public static string ScaleImageAndCreateAllThumbs(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
             IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)

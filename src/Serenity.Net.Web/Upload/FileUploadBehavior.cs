@@ -4,8 +4,13 @@ using System;
 
 namespace Serenity.Services
 {
+    /// <summary>
+    /// Behavior class that handles <see cref="FileUploadEditorAttribute"/> and
+    /// <see cref="ImageUploadEditorAttribute"/>.
+    /// </summary>
     public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
+        /// <inheritdoc/>
         public Field Target { get; set; }
 
         private IUploadEditor editorAttr;
@@ -17,6 +22,13 @@ namespace Serenity.Services
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
+        /// <summary>
+        /// Creates a new instance of the class.
+        /// </summary>
+        /// <param name="uploadValidator">Upload validator</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="storage">Upload storage</param>
+        /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
             IUploadStorage storage)
         {
@@ -25,6 +37,7 @@ namespace Serenity.Services
             this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
         }
 
+        /// <inheritdoc/>
         public bool ActivateFor(IRow row)
         {
             if (Target is null)
@@ -177,6 +190,7 @@ namespace Serenity.Services
             return s;
         }
 
+        /// <inheritdoc/>
         public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
         {
             base.OnPrepareQuery(handler, query);
@@ -193,6 +207,7 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             var filesToDelete = new FilesToDelete(storage);
@@ -256,6 +271,7 @@ namespace Serenity.Services
             }
         }
 
+        /// <inheritdoc/>
         public override void OnAfterDelete(IDeleteRequestHandler handler)
         {
             if (handler.Row is IIsActiveDeletedRow or IIsDeletedRow or IDeleteLogRow)
@@ -274,7 +290,7 @@ namespace Serenity.Services
         {
             var fileName = (StringField)Target;
             var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-            CheckUploadedImageAndCreateThumbs(editorAttr, uploadValidator, imageProcessor, 
+            CheckUploadedImageAndCreateThumbs(editorAttr as IUploadOptions, uploadValidator, imageProcessor, 
                 storage, ref newFilename);
 
             var idField = ((IIdRow)handler.Row).IdField;
@@ -295,6 +311,7 @@ namespace Serenity.Services
             return copyResult;
         }
 
+        /// <inheritdoc/>
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             var filename = (StringField)Target;
@@ -318,8 +335,17 @@ namespace Serenity.Services
             filename[handler.Row] = copyResult.Path;
         }
 
+        /// <summary>
+        /// Checks the uploaded image and creates thumbs if required based on options
+        /// </summary>
+        /// <param name="uploadOptions">Upload options</param>
+        /// <param name="validator">Upload validator</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="storage">Upload storage</param>
+        /// <param name="temporaryFile">Temporary file</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void CheckUploadedImageAndCreateThumbs(
-            IUploadEditor attr, IUploadValidator validator, IImageProcessor imageProcessor,
+            IUploadOptions uploadOptions, IUploadValidator validator, IImageProcessor imageProcessor,
             IUploadStorage storage, ref string temporaryFile)
         {
             if (storage == null)
@@ -331,13 +357,13 @@ namespace Serenity.Services
 
             storage.PurgeTemporaryFiles();
 
-            validator.ValidateFile(attr as IUploadFileConstraints ?? new UploadOptions(), 
+            validator.ValidateFile(uploadOptions as IUploadFileConstraints ?? new UploadOptions(), 
                 fs, temporaryFile, out bool isImageExtension);
 
             if (!isImageExtension)
                 return;
 
-            validator.ValidateImage(attr as IUploadImageContrains ?? new UploadOptions(),
+            validator.ValidateImage(uploadOptions as IUploadImageContrains ?? new UploadOptions(),
                 fs, temporaryFile, out object image);
 
             if (image != null)
@@ -347,7 +373,7 @@ namespace Serenity.Services
 
                     fs.Close();
                     temporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
-                        attr as IUploadImageOptions ?? new UploadOptions(), 
+                        uploadOptions as IUploadImageOptions ?? new UploadOptions(), 
                         storage, temporaryFile, OverwriteOption.Overwrite);
                 }
                 finally

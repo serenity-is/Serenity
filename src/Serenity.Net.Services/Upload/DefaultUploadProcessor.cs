@@ -3,24 +3,34 @@ using System.IO;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="IUploadProcessor"/>
+    /// </summary>
     public class DefaultUploadProcessor : IUploadProcessor
     {
         private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage uploadStorage;
         private readonly IUploadValidator uploadValidator;
-        private readonly ITextLocalizer localizer;
         private readonly IExceptionLogger logger;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="uploadValidator">Upload validator</param>
+        /// <param name="logger">Exception logger</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
-            ITextLocalizer localizer, IExceptionLogger logger = null)
+            IExceptionLogger logger = null)
         {
             this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
             this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
             this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-            this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public ProcessedUploadInfo Process(Stream stream, string filename, IUploadOptions options)
         {
             if (stream is null)

@@ -21,6 +21,17 @@ public sealed class NodeScriptRunner : IDisposable
 
     private static readonly Regex AnsiColorRegex = new("\x001b\\[[0-9;]*m", RegexOptions.None, TimeSpan.FromSeconds(1));
 
+    /// <summary>
+    /// Creates a new instance of the class
+    /// </summary>
+    /// <param name="scriptName">Script name</param>
+    /// <param name="arguments">Arguments</param>
+    /// <param name="workingDirectory">Working directory</param>
+    /// <param name="envVars">Environment variables</param>
+    /// <param name="pkgManagerCommand">Package manager command. Defaul is "npm"</param>
+    /// <param name="diagnosticSource">Diagnostics source</param>
+    /// <param name="applicationStoppingToken">Application stopping token</param>
+    /// <exception cref="ArgumentException">One of arguments is null</exception>
     public NodeScriptRunner(string scriptName, 
         string arguments = null, string workingDirectory = null,
         IDictionary<string, string> envVars = null, string pkgManagerCommand = "npm", 
@@ -83,7 +94,7 @@ public sealed class NodeScriptRunner : IDisposable
                 "Microsoft.AspNetCore.NodeServices.Npm.NpmStarted",
                 new
                 {
-                    processStartInfo = processStartInfo,
+                    processStartInfo,
                     process = npmProcess
                 });
         }
@@ -94,8 +105,13 @@ public sealed class NodeScriptRunner : IDisposable
             => diagnosticSource.Write(name, value);
     }
 
+    /// <summary>
+    /// Attaches to the logger
+    /// </summary>
+    /// <param name="logger">Logger</param>
     public void AttachToLogger(ILogger logger)
     {
+#pragma warning disable CA2254 // Template should be a static expression
         // When the node task emits complete lines, pass them through to the real logger
         StdOut.OnReceivedLine += line =>
         {
@@ -118,6 +134,7 @@ public sealed class NodeScriptRunner : IDisposable
                     logger.LogError(StripAnsiColors(line));
             }
         };
+#pragma warning restore CA2254 // Template should be a static expression
 
         /*
         // But when it emits incomplete lines, assume this is progress information and

@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Title>Serenity Platform - Asp.Net Core Web Library</Title>
     <Description>Contains Web application related types...</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
