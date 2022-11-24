@@ -3,10 +3,21 @@ using Path = System.IO.Path;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Contains helper methods for upload file name formatting
+    /// </summary>
     public static class UploadFormatting
     {
+        /// <summary>
+        /// Formats file name
+        /// </summary>
+        /// <param name="options">Formatting options</param>
+        /// <exception cref="ArgumentNullException">options or options.OriginalName is null</exception>
         public static string FormatFilename(FormatFilenameOptions options)
         {
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+
             object groupKey;
             string s;
             object identity = options.EntityId;
@@ -43,11 +54,20 @@ namespace Serenity.Web
             return formatted;
         }
 
+        /// <summary>
+        /// Gets a display string for file name and size
+        /// </summary>
+        /// <param name="name">File name</param>
+        /// <param name="bytes">Size in bytes</param>
         public static string FileNameSizeDisplay(string name, int bytes)
         {
             return name + " (" + FileSizeDisplay(bytes) + ')';
         }
 
+        /// <summary>
+        /// Gets a display string for a file size
+        /// </summary>
+        /// <param name="bytes">File size in bytes</param>
         public static string FileSizeDisplay(int bytes)
         {
             var byteSize = (Math.Round(bytes * 100m / 1024m) * 0.01m);

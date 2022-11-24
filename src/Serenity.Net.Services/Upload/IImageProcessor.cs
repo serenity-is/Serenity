@@ -1,8 +1,16 @@
 ﻿using Serenity.Web;
 using System.IO;
 
+/// <summary>
+/// Image processor abstraction
+/// </summary>
 public interface IImageProcessor
 {
+    /// <summary>
+    /// Gets the size for an image
+    /// </summary>
+    /// <param name="image">Image</param>
+    /// <returns>Image size as (width, height) tuple</returns>
     (int width, int height) GetImageSize(object image);
 
     /// <summary>
@@ -34,10 +42,18 @@ public interface IImageProcessor
     ///   source aspect ratio is different than thumbnail (see <see cref="ImageScaleMode"/>).</param>
     /// <param name="backgroundColor">
     ///   Specifies fill color for PreserveRatioWithFill mode.</param>
+    /// <param name="inplace">True if the original image should be modified inplace</param>
     /// <returns>
     ///   Generated thumbnail image. Should be disposed by caller.</returns>
     object Scale(object image, int width, int height,
         ImageScaleMode mode, string backgroundColor, bool inplace);
 
+    /// <summary>
+    /// Saves the image to target stream
+    /// </summary>
+    /// <param name="image">Image object</param>
+    /// <param name="target">Target stream</param>
+    /// <param name="mimeType">Mime type like "image/jpeg"</param>
+    /// <param name="encoderParams">Encoder parameters</param>
     void Save(object image, Stream target, string mimeType, ImageEncoderParams encoderParams);
 }

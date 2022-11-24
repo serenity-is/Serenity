@@ -2,11 +2,14 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Contains set of known popular mime types
+    /// </summary>
     public static class KnownMimeTypes
     {
         /// <summary>
         ///   (extension -> mime type) pairs for known mime types.</summary>
-        private static readonly Dictionary<string, string> knownMimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> knownMimeTypes = new(StringComparer.OrdinalIgnoreCase)
         {
             { ".bmp", "image/bmp" },
             { ".css", "text/css" },
@@ -37,8 +40,7 @@ namespace Serenity.Web
         }
 
         /// <summary>
-        ///   Gets MIME type for a given file using information in Win32 HKEY_CLASSES_ROOT 
-        ///   registry key.</summary>
+        ///   Gets MIME type for a given file</summary>
         /// <param name="path">
         ///   File name whose MIME type will be determined. Its only extension part will be used.</param>
         /// <returns>

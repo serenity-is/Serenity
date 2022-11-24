@@ -1,9 +1,16 @@
-﻿using Serenity.IO;
-
-namespace Serenity.Web
+﻿namespace Serenity.Web
 {
+    /// <summary>
+    /// A subclass of <see cref="DiskUploadStorage"/> specialized for the temporary upload folder,
+    /// allowing to purge temporary files
+    /// </summary>
     public class TempUploadStorage : DiskUploadStorage
     {
+        /// <summary>
+        /// Creates an instance of the class
+        /// </summary>
+        /// <param name="options">Upload storage options</param>
+        /// <param name="fileSystem">File system</param>
         public TempUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
             : base(options, fileSystem)
         {
@@ -23,6 +30,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public override void PurgeTemporaryFiles()
         {
             fileSystem.PurgeDirectory(RootPath);

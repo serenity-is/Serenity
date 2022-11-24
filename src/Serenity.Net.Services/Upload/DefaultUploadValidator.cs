@@ -2,12 +2,22 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for <see cref="IUploadValidator"/>
+    /// </summary>
     public class DefaultUploadValidator : IUploadValidator
     {
         private readonly IImageProcessor imageProcessor;
         private readonly ITextLocalizer localizer;
         private readonly IExceptionLogger logger;
 
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="localizer">Text localizer</param>
+        /// <param name="logger">Exception logger</param>
+        /// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
         public DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer, IExceptionLogger logger = null)
         {
             this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
@@ -15,6 +25,7 @@ namespace Serenity.Web
             this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public void ValidateFile(IUploadFileConstraints constraints, 
             Stream stream, string filename, out bool isImageExtension)
         {
@@ -82,6 +93,7 @@ namespace Serenity.Web
             isImageExtension = true;
         }
 
+        /// <inheritdoc/>
         public void ValidateImage(IUploadImageContrains constraints, Stream stream, 
             string filename, out object image)
         {

@@ -2,13 +2,32 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// A file system based upload storage implementation
+    /// </summary>
     public class DiskUploadStorage : IUploadStorage
     {
+        /// <summary>
+        /// File system
+        /// </summary>
         protected readonly IDiskUploadFileSystem fileSystem;
 
+        /// <summary>
+        /// Root path for the uploads
+        /// </summary>
         public string RootPath { get; private set; }
+
+        /// <summary>
+        /// Root URL for the uploads
+        /// </summary>
         public string RootUrl { get; private set; }
         
+        /// <summary>
+        /// Creates a new instance of the class
+        /// </summary>
+        /// <param name="options">Upload options</param>
+        /// <param name="fileSystem">File system to use</param>
+        /// <exception cref="ArgumentNullException">Options is null</exception>
         public DiskUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
         {
             this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
@@ -27,11 +46,16 @@ namespace Serenity.Web
                 RootPath = this.fileSystem.Combine(AppContext.BaseDirectory, PathHelper.ToPath(RootPath));
         }
 
+        /// <summary>
+        /// Gets the full path for the file
+        /// </summary>
+        /// <param name="path">File path</param>
         protected string FilePath(string path)
         {
             return PathHelper.SecureCombine(RootPath, PathHelper.ToPath(path));
         }
 
+        /// <inheritdoc/>
         public string GetFileUrl(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -48,11 +72,13 @@ namespace Serenity.Web
             return path != null && fileSystem.GetExtension(path)?.ToLowerInvariant()?.Trim() == ".meta";
         }
 
+        /// <inheritdoc/>
         public bool FileExists(string path)
         {
             return fileSystem.FileExists(FilePath(path)) && !IsInternalFile(path);
         }
 
+        /// <inheritdoc/>
         public virtual IDictionary<string, string> GetFileMetadata(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -77,6 +103,7 @@ namespace Serenity.Web
             return new Dictionary<string, string>();
         }
 
+        /// <inheritdoc/>
         public virtual void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
         {
             if (string.IsNullOrEmpty(path))
@@ -110,6 +137,7 @@ namespace Serenity.Web
             fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
+        /// <inheritdoc/>
         public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, 
             OverwriteOption overwrite)
         {
@@ -154,6 +182,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public string ArchiveFile(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -168,6 +197,7 @@ namespace Serenity.Web
             return dbHistoryFile;
         }
 
+        /// <inheritdoc/>
         public void DeleteFile(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -195,6 +225,7 @@ namespace Serenity.Web
             fileSystem.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
         }
 
+        /// <inheritdoc/>
         public long GetFileSize(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -206,6 +237,7 @@ namespace Serenity.Web
             return fileSystem.GetFileSize(FilePath(path));
         }
 
+        /// <inheritdoc/>
         public string[] GetFiles(string path, string searchPattern)
         {
             return fileSystem.GetFiles(FilePath(path), searchPattern, recursive: true)
@@ -214,15 +246,18 @@ namespace Serenity.Web
                 .ToArray();
         }
 
+        /// <inheritdoc/>
         public System.IO.Stream OpenFile(string path)
         {
             return fileSystem.OpenRead(FilePath(path));
         }
 
+        /// <inheritdoc/>
         public virtual void PurgeTemporaryFiles()
         {
         }
 
+        /// <inheritdoc/>
         public string WriteFile(string path, System.IO.Stream source, OverwriteOption overwrite)
         {
             if (string.IsNullOrEmpty(path))

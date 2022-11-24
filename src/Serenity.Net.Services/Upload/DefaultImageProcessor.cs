@@ -10,8 +10,12 @@ using System.IO;
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Default implementation for the <see cref="IImageProcessor"/>
+    /// </summary>
     public class DefaultImageProcessor : IImageProcessor
     {
+        /// <inheritdoc/>
         public (int width, int height) GetImageSize(object imageObj)
         {
             if (imageObj == null)
@@ -23,6 +27,7 @@ namespace Serenity.Web
             return (image.Width, image.Height);
         }
 
+        /// <inheritdoc/>
         public object Load(Stream source, out ImageFormatInfo formatInfo)
         {
             formatInfo = null;
@@ -43,6 +48,7 @@ namespace Serenity.Web
             }
         }
 
+        /// <inheritdoc/>
         public void Save(object imageObj, Stream target, string mimeType, ImageEncoderParams encoderParams)
         {
             if (imageObj == null)
@@ -69,6 +75,7 @@ namespace Serenity.Web
             image.Save(target, encoder);
         }
 
+        /// <inheritdoc/>
         public object Scale(object imageObj, int scaleWidth, int scaleHeight, ImageScaleMode mode, string backgroundColor, bool inplace)
         {
             if (imageObj == null)

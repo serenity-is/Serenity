@@ -3,22 +3,24 @@
 namespace Serenity.Web
 {
     /// <summary>
-    ///   checks stream data if valid image file and validate required conditions.
-    ///   </summary>
+    /// Checks stream data if valid image file and validate required conditions.
+    /// </summary>
     public class ImageChecker
     {
-        /// <summary>
-        ///   Checks if the given image if it is a valid or not. If so, controls its compliance to constraints</summary> 
-        /// <param name="inputStream">
-        ///   Stream which contains image data</param>
-        /// <param name="returnImage">
-        ///   Does image required to be returned? If not requested, it will be disposed at the end of processing</param>
-        /// <param name="image">
-        ///   When method returns contains the image object. If returnImage false it will contain null</param>
-        /// <returns>
-        ///   Image validation result. One of <see cref="ImageCheckResult"/> values. If the result is one of
-        ///   GIFImage, JPEGImage, PNGImage, the checking is successful. Rest of results are invalid.</returns>
-        public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage, 
+        /// <summary>Checks if the given image if it is a valid or not. 
+        /// If so, controls its compliance to constraints</summary> 
+        /// <param name="inputStream">Stream which contains image data</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="returnImage">Does image required to be returned? 
+        /// If not requested, it will be disposed at the end of processing</param>
+        /// <param name="image">When method returns contains the image object. 
+        /// If returnImage false it will contain null</param>
+        /// <param name="formatInfo">Contains image format info on return</param>
+        /// <param name="exLogger">Exception logger</param>
+        /// <returns>Image validation result. One of <see cref="ImageCheckResult"/> values. 
+        /// If the result is one of GIFImage, JPEGImage, PNGImage, the checking is successful. 
+        /// Rest of results are invalid.</returns>
+        public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage,
             out object image, out ImageFormatInfo formatInfo, IExceptionLogger exLogger = null)
         {
             if (inputStream is null)
@@ -88,7 +90,7 @@ namespace Serenity.Web
 
                 TimeSpan span = DateTime.Now.Subtract(startTime);
                 Milliseconds = span.TotalMilliseconds;
-                
+
                 isImageOK = true;
 
                 return ImageCheckResult.Valid;
@@ -104,13 +106,11 @@ namespace Serenity.Web
         }
 
         /// <summary>
-        ///   Checks an image width and height against size constraints</summary>
-        /// <param name="width">
-        ///   Image width.</param>
-        /// <param name="height">
-        ///   Image height.</param>
-        /// <returns>
-        ///   One of ImageCheckResult values. ImageCheckResult.JPEGImage if image size is validated.</returns>
+        /// Checks an image width and height against size constraints
+        /// </summary>
+        /// <param name="width">Image width.</param>
+        /// <param name="height">Image height.</param>
+        /// <returns>One of ImageCheckResult values. ImageCheckResult.JPEGImage if image size is validated.</returns>
         public ImageCheckResult CheckSizeConstraints(int width, int height)
         {
             // raise an error if width or height is zero
@@ -149,42 +149,38 @@ namespace Serenity.Web
             return ImageCheckResult.Valid;
         }
 
-        /// <summary>
-        ///   Gets data size of the validated image</summary>
+        /// <summary>Gets data size of the validated image</summary>
         public long DataSize { get; private set; }
 
-        /// <summary>
-        ///   Gets width of the validated image</summary>
+        /// <summary>Gets width of the validated image</summary>
         public int Width { get; private set; }
 
-        /// <summary>
-        ///   Gets height of the validate image</summary>
+        /// <summary>Gets height of the validate image</summary>
         public int Height { get; private set; }
 
-        /// <summary>
-        ///   Gets the time passed during validating the image</summary>
+        /// <summary>Gets the time passed during validating the image</summary>
         public double Milliseconds { get; private set; }
 
-        /// <summary>
-        ///   Gets/sets maximum file size allowed</summary>
+        /// <summary>Gets/sets maximum file size allowed</summary>
         public int MaxDataSize { get; set; }
 
-        /// <summary>
-        ///   Gets/sets maximum width allowed. 0 means any width.</summary>
+        /// <summary>Gets/sets maximum width allowed. 0 means any width.</summary>
         public int MaxWidth { get; set; }
 
-        /// <summary>
-        ///   Gets/sets maximum height allowed. 0 means any height.</summary>
+        /// <summary>Gets/sets maximum height allowed. 0 means any height.</summary>
         public int MaxHeight { get; set; }
 
-        /// <summary>
-        ///   Gets/sets minimum width allowed. 0 means any width.</summary>
+        /// <summary>Gets/sets minimum width allowed. 0 means any width.</summary>
         public int MinWidth { get; set; }
 
-        /// <summary>
-        ///   Gets/sets minimum height allowed. 0 means any height.</summary>
+        /// <summary>Gets/sets minimum height allowed. 0 means any height.</summary>
         public int MinHeight { get; set; }
 
+        /// <summary>
+        /// Formats an <see cref="ImageCheckResult"/> error message
+        /// </summary>
+        /// <param name="result">Error result</param>
+        /// <param name="localizer">Text localizer</param>
         public string FormatErrorMessage(ImageCheckResult result, ITextLocalizer localizer)
         {
             var format = localizer.Get("Enums.ImageCheckResult." + Enum.GetName(typeof(ImageCheckResult), result));

@@ -2,8 +2,17 @@
 
 namespace Serenity.Web
 {
+    /// <summary>
+    /// Extension methods for <see cref="IUploadStorage"/> and related classes
+    /// </summary>
     public static class UploadStorageExtensions
     {
+        /// <summary>
+        /// Gets thumbnail URL for the file path
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">Path</param>
+        /// <returns></returns>
         public static string GetThumbnailUrl(this IUploadStorage uploadStorage, string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -14,11 +23,20 @@ namespace Serenity.Web
             return uploadStorage.GetFileUrl(thumb);
         }
       
+        /// <summary>
+        /// Copies a temporary file to its target location
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="options">Copy options</param>
+        /// <exception cref="ArgumentNullException">uploadStorage is null</exception>
         public static CopyTemporaryFileResult CopyTemporaryFile(this IUploadStorage uploadStorage, 
             CopyTemporaryFileOptions options)
         {
             if (uploadStorage is null)
                 throw new ArgumentNullException(nameof(uploadStorage));
+
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
 
             long size = uploadStorage.GetFileSize(options.TemporaryFile);
             string path = PathHelper.ToUrl(UploadFormatting.FormatFilename(options));
@@ -38,6 +56,12 @@ namespace Serenity.Web
             return result;
         }
 
+        /// <summary>
+        /// Reads all file bytes
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">File path</param>
+        /// <exception cref="ArgumentNullException">Upload storage is null</exception>
         public static byte[] ReadAllFileBytes(this IUploadStorage uploadStorage, string path)
         {
             if (uploadStorage is null)
@@ -50,6 +74,12 @@ namespace Serenity.Web
             return ms.ToArray();
         }
 
+        /// <summary>
+        /// Gets original name of a file
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">File path</param>
+        /// <exception cref="ArgumentNullException">uploadStorage is null</exception>
         public static string GetOriginalName(this IUploadStorage uploadStorage, string path)
         {
             if (uploadStorage is null)
@@ -63,6 +93,13 @@ namespace Serenity.Web
             return null;
         }
 
+        /// <summary>
+        /// Sets original name for a file
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">File path</param>
+        /// <param name="originalName">Original name</param>
+        /// <exception cref="ArgumentNullException">Upload storage is null</exception>
         public static void SetOriginalName(this IUploadStorage uploadStorage, string path, string originalName)
         {
             if (uploadStorage is null)
@@ -76,6 +113,22 @@ namespace Serenity.Web
             uploadStorage.SetFileMetadata(path, metadata, overwriteAll: false);
         }
 
+        /// <summary>
+        /// Scales an image and saves it to an upload storage file
+        /// </summary>
+        /// <param name="image">Source image</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="width">Target width</param>
+        /// <param name="height">Target height</param>
+        /// <param name="mode">Scale mode</param>
+        /// <param name="backgroundColor">Pad color</param>
+        /// <param name="mimeType">Mime type of target image file</param>
+        /// <param name="encoderParams">Encoder parameters for target image</param>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">Path</param>
+        /// <param name="overwrite">Overwrite option</param>
+        /// <exception cref="ArgumentNullException">One of inputs is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Width or height is less than zero</exception>
         public static string ScaleImageAs(object image, IImageProcessor imageProcessor,
             int width, int height, ImageScaleMode mode, string backgroundColor, 
             string mimeType, ImageEncoderParams encoderParams,
@@ -113,6 +166,18 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Scales the temporary image with provided upload image options if required 
+        /// based on the options and saves the result to the target upload storage file
+        /// </summary>
+        /// <param name="image">Image object</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="options">Image upload options</param>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="temporaryFile">Temporary input file</param>
+        /// <param name="overwrite">Overwrite </param>
+        /// <returns>The resulting image file path</returns>
+        /// <exception cref="ArgumentNullException">image or options is null</exception>
         public static string ScaleImage(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
             IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
@@ -146,6 +211,17 @@ namespace Serenity.Web
             return temporaryFile;
         }
 
+        /// <summary>
+        /// Creates the default thumbnail for image if the size is provided
+        /// in the upload image options (ThumbWidth and ThumbHeight >= 0) and saves it to the target upload storage file
+        /// </summary>
+        /// <param name="image">Image</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="options">Upload image options</param>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="temporaryFile">Input temporary file</param>
+        /// <param name="overwrite">Overwrite option</param>
+        /// <exception cref="ArgumentNullException">image, options or temporaryFile is null</exception>
         public static string CreateDefaultThumb(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
             IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
@@ -171,6 +247,18 @@ namespace Serenity.Web
             return null;
         }
 
+        /// <summary>
+        /// Creates additional thumbs if specified in the upload image options,
+        /// and saves them to the target upload storage
+        /// </summary>
+        /// <param name="image">Image</param>
+        /// <param name="imageProcessor">Image processor</param>
+        /// <param name="options">Upload image options</param>
+        /// <param name="uploadStorage">Target upload storage</param>
+        /// <param name="temporaryFile">Input temporary file</param>
+        /// <param name="overwrite">Overwrite option</param>
+        /// <exception cref="ArgumentNullException">image, options or temporaryFile is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">options.ThumbSizes contains invalid values</exception>
         public static void CreateAdditionalThumbs(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
             IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
@@ -256,7 +344,7 @@ namespace Serenity.Web
         {
             return autoRename == null ? OverwriteOption.Overwrite :
                 autoRename == true ? OverwriteOption.AutoRename :
-                OverwriteOption.Disallowed;
+                OverwriteOption.Disallowed; 
         }
     }
 }

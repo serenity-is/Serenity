@@ -29,6 +29,7 @@ namespace Serenity.Web
         ///   source aspect ratio is different than thumbnail (see <see cref="ImageScaleMode"/>).</param>
         /// <param name="backgroundColor">
         ///   Specifies fill color for PreserveRatioWithFill mode.</param>
+        /// <param name="inplace">True if the original image should be modified inplace</param>
         /// <returns>
         ///   Generated thumbnail image. Should be disposed by caller.</returns>
         [Obsolete("Please inject IImageProcessor from services and use that instead")]
@@ -38,6 +39,13 @@ namespace Serenity.Web
             return (Image)new DefaultImageProcessor().Scale(image, thumbWidth, thumbHeight, mode, backgroundColor?.ToHex(), inplace);
         }
 
+        /// <summary>
+        /// Generates an empty bitmap
+        /// </summary>
+        /// <param name="width">Width</param>
+        /// <param name="height">Height</param>
+        /// <param name="color">Background color</param>
+        /// <returns></returns>
         public static Image GenerateEmptyBitmap(int width, int height, Color color)
         {
             return new Image<Rgb24>(width, height, color);
