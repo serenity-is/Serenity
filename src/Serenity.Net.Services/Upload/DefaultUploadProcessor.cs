@@ -55,7 +55,7 @@ namespace Serenity.Web
                         var basePath = "temporary/" + Guid.NewGuid().ToString("N");
                         stream.Seek(0, SeekOrigin.Begin);
                         result.TemporaryFile = uploadStorage.WriteFile(basePath + Path.GetExtension(filename), 
-                            stream, autoRename: false);
+                            stream, OverwriteOption.Disallowed);
                         result.IsImage = isImageExtension && image != null;
                         if (result.IsImage)
                         {
@@ -65,7 +65,7 @@ namespace Serenity.Web
                             stream.Close();
                             result.TemporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
                                 options as IUploadImageOptions ?? new UploadOptions(),
-                                uploadStorage, result.TemporaryFile);
+                                uploadStorage, result.TemporaryFile, OverwriteOption.Overwrite);
                         }
                         result.Success = true;
                     }

@@ -22,7 +22,7 @@ namespace Serenity.Web
 
             long size = uploadStorage.GetFileSize(options.TemporaryFile);
             string path = PathHelper.ToUrl(UploadFormatting.FormatFilename(options));
-            path = uploadStorage.CopyFrom(uploadStorage, options.TemporaryFile, path, autoRename: true);
+            path = uploadStorage.CopyFrom(uploadStorage, options.TemporaryFile, path, OverwriteOption.AutoRename);
             bool hasThumbnail = uploadStorage.FileExists(UploadPathHelper.GetThumbnailName(options.TemporaryFile));
 
             var result = new CopyTemporaryFileResult()
@@ -79,7 +79,7 @@ namespace Serenity.Web
         public static string ScaleImageAs(object image, IImageProcessor imageProcessor,
             int width, int height, ImageScaleMode mode, string backgroundColor, 
             string mimeType, ImageEncoderParams encoderParams,
-            IUploadStorage uploadStorage, string path, bool? autoRename)
+            IUploadStorage uploadStorage, string path, OverwriteOption overwrite)
         {
             if (image is null)
                 throw new ArgumentNullException(nameof(image));
@@ -105,7 +105,7 @@ namespace Serenity.Web
                 using var ms = new MemoryStream();
                 imageProcessor.Save(scaledImage, ms, mimeType, encoderParams);
                 ms.Seek(0, SeekOrigin.Begin);
-                return uploadStorage.WriteFile(path, ms, autoRename: autoRename);
+                return uploadStorage.WriteFile(path, ms, overwrite);
             }
             finally
             {
@@ -115,7 +115,7 @@ namespace Serenity.Web
 
         public static string ScaleImage(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
-            IUploadStorage uploadStorage, string temporaryFile, bool? autoRename = null)
+            IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
         {
             if (image is null)
                 throw new ArgumentNullException(nameof(image));
@@ -139,7 +139,7 @@ namespace Serenity.Web
                 temporaryFile = ScaleImageAs(image, imageProcessor,
                     options.ScaleWidth, options.ScaleHeight, options.ScaleMode, options.ScaleBackColor,
                     mimeType: "image/jpeg", new ImageEncoderParams { Quality = options.ScaleQuality },
-                    uploadStorage, baseFile + ".jpg", autoRename);
+                    uploadStorage, baseFile + ".jpg", overwrite);
                 if (!string.IsNullOrEmpty(originalName))
                     uploadStorage.SetOriginalName(temporaryFile, Path.ChangeExtension(originalName, ".jpg"));
             }
@@ -148,7 +148,7 @@ namespace Serenity.Web
 
         public static string CreateDefaultThumb(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
-            IUploadStorage uploadStorage, string temporaryFile, bool? autoRename = null)
+            IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
         {
             if (image is null)
                 throw new ArgumentNullException(nameof(image));
@@ -165,7 +165,7 @@ namespace Serenity.Web
                 return ScaleImageAs(image, imageProcessor,
                     options.ThumbWidth, options.ThumbHeight, options.ThumbMode, options.ThumbBackColor,
                     mimeType: "image/jpeg", new ImageEncoderParams { Quality = options.ThumbQuality },
-                    uploadStorage, Path.ChangeExtension(temporaryFile, null) + "_t.jpg", autoRename);
+                    uploadStorage, Path.ChangeExtension(temporaryFile, null) + "_t.jpg", overwrite);
             }
 
             return null;
@@ -173,7 +173,7 @@ namespace Serenity.Web
 
         public static void CreateAdditionalThumbs(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
-            IUploadStorage uploadStorage, string temporaryFile, bool? autoRename = null)
+            IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
         {
             if (image is null)
                 throw new ArgumentNullException(nameof(image));
@@ -208,19 +208,55 @@ namespace Serenity.Web
                 ScaleImageAs(image, imageProcessor,
                     w, h, options.ThumbMode, options.ThumbBackColor,
                     mimeType: "image/jpeg", new ImageEncoderParams { Quality = options.ThumbQuality },
-                    uploadStorage, thumbFile, autoRename);
+                    uploadStorage, thumbFile, overwrite);
             }
         }
 
         public static string ScaleImageAndCreateAllThumbs(object image,
             IImageProcessor imageProcessor, IUploadImageOptions options,
-            IUploadStorage uploadStorage, string temporaryFile, bool? autoRename = null)
+            IUploadStorage uploadStorage, string temporaryFile, OverwriteOption overwrite)
         {
             var orgTempFile = temporaryFile;
-            temporaryFile = ScaleImage(image, imageProcessor, options, uploadStorage, temporaryFile, autoRename);
-            CreateDefaultThumb(image, imageProcessor, options, uploadStorage, orgTempFile, autoRename);
-            CreateAdditionalThumbs(image, imageProcessor, options, uploadStorage, orgTempFile, autoRename);
+            temporaryFile = ScaleImage(image, imageProcessor, options, uploadStorage, temporaryFile, overwrite);
+            CreateDefaultThumb(image, imageProcessor, options, uploadStorage, orgTempFile, overwrite);
+            CreateAdditionalThumbs(image, imageProcessor, options, uploadStorage, orgTempFile, overwrite);
             return temporaryFile;
+        }
+
+        /// <summary>
+        /// Copies a file from another upload storage and returns the resulting file path
+        /// </summary>
+        /// <param name="targetStorage">Target upload storage</param>
+        /// <param name="sourceStorage">Source upload storage</param>
+        /// <param name="sourcePath">Source file path</param>
+        /// <param name="targetPath">Target file path</param>
+        /// <param name="autoRename">If a file exists at target, true to auto rename,
+        /// false to raise an error, and null to overwrite</param>
+        [Obsolete("Please use the method with OverwriteOption enumeration")]
+        public static string CopyFrom(this IUploadStorage targetStorage, IUploadStorage sourceStorage, string sourcePath, string targetPath, bool? autoRename)
+        {
+            return targetStorage.CopyFrom(sourceStorage, sourcePath, targetPath, ToOverwriteOption(autoRename));
+        }
+
+        /// <summary>
+        /// Writes a file
+        /// </summary>
+        /// <param name="uploadStorage">Upload storage</param>
+        /// <param name="path">File path</param>
+        /// <param name="source">Source stream</param>
+        /// <param name="autoRename">If a file exists at target, true to auto rename,
+        /// false to raise an error, and null to overwrite</param>
+        [Obsolete("Please use the method with OverwriteOption enumeration")]
+        public static string WriteFile(this IUploadStorage uploadStorage, string path, Stream source, bool? autoRename)
+        {
+            return uploadStorage.WriteFile(path, source, ToOverwriteOption(autoRename));
+        }
+
+        private static OverwriteOption ToOverwriteOption(bool? autoRename)
+        {
+            return autoRename == null ? OverwriteOption.Overwrite :
+                autoRename == true ? OverwriteOption.AutoRename :
+                OverwriteOption.Disallowed;
         }
     }
 }

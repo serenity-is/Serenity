@@ -48,9 +48,9 @@ namespace Serenity.Web
             return combined.ArchiveFile(path);
         }
 
-        public string CopyFrom(IUploadStorage sourceStorage, string sourcePath, string targetPath, bool? autoRename)
+        public string CopyFrom(IUploadStorage sourceStorage, string sourcePath, string targetPath, OverwriteOption overwrite)
         {
-            return combined.CopyFrom(sourceStorage, sourcePath, targetPath, autoRename);
+            return combined.CopyFrom(sourceStorage, sourcePath, targetPath, overwrite);
         }
 
         public void DeleteFile(string path)
@@ -88,9 +88,9 @@ namespace Serenity.Web
             combined.PurgeTemporaryFiles();
         }
 
-        public string WriteFile(string path, Stream source, bool? autoRename)
+        public string WriteFile(string path, Stream source, OverwriteOption overwrite)
         {
-            return combined.WriteFile(path, source, autoRename);
+            return combined.WriteFile(path, source, overwrite);
         }
 
         public IDictionary<string, string> GetFileMetadata(string path)

@@ -110,7 +110,8 @@ namespace Serenity.Web
             fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
         }
 
-        public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, bool? autoRename)
+        public string CopyFrom(IUploadStorage store, string sourcePath, string targetPath, 
+            OverwriteOption overwrite)
         {
             if (string.IsNullOrEmpty(sourcePath))
                 throw new ArgumentNullException(sourcePath);
@@ -126,7 +127,7 @@ namespace Serenity.Web
 
             var newFiles = new List<string>();
             using var source = store.OpenFile(sourcePath);
-            targetPath = WriteFile(targetPath, source, autoRename);
+            targetPath = WriteFile(targetPath, source, overwrite);
             newFiles.Add(targetPath);
             try
             {
@@ -140,7 +141,7 @@ namespace Serenity.Web
                 {
                     string thumbSuffix = fileSystem.GetFileName(f)[sourceBaseName.Length..];
                     using var src = store.OpenFile(f);
-                    newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, autoRename: null));
+                    newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, OverwriteOption.Overwrite));
                 }
 
                 return targetPath;
@@ -163,7 +164,7 @@ namespace Serenity.Web
 
             string date = DateTime.UtcNow.ToString("yyyyMMdd", Invariants.DateTimeFormat);
             string dbHistoryFile = "history/" + date + "/" + Guid.NewGuid().ToString("N") + fileSystem.GetExtension(path);
-            CopyFrom(this, path, dbHistoryFile, autoRename: false);
+            CopyFrom(this, path, dbHistoryFile, OverwriteOption.Disallowed);
             return dbHistoryFile;
         }
 
@@ -222,7 +223,7 @@ namespace Serenity.Web
         {
         }
 
-        public string WriteFile(string path, System.IO.Stream source, bool? autoRename)
+        public string WriteFile(string path, System.IO.Stream source, OverwriteOption overwrite)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
@@ -234,10 +235,10 @@ namespace Serenity.Web
 
             if (fileSystem.FileExists(targetFullPath))
             {
-                if (autoRename == false)
+                if (overwrite == OverwriteOption.Disallowed)
                     throw new System.IO.IOException($"Target file {path} exists in storage {GetType().FullName}");
 
-                if (autoRename == true)
+                if (overwrite == OverwriteOption.AutoRename)
                 {
                     path = UploadPathHelper.FindAvailableName(path, FileExists);
                     targetFullPath = FilePath(path);
@@ -248,7 +249,8 @@ namespace Serenity.Web
             if (!fileSystem.DirectoryExists(targetDir))
                 fileSystem.CreateDirectory(targetDir);
 
-            using var targetStream = fileSystem.CreateFile(targetFullPath, overwrite: autoRename == null);
+            using var targetStream = fileSystem.CreateFile(targetFullPath, 
+                overwrite: overwrite == OverwriteOption.Overwrite);
             source.CopyTo(targetStream);
 
             return path;

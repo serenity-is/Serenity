@@ -1,5 +1,6 @@
 ﻿using Serenity.Web;
 using System.IO;
+using System;
 
 namespace Serenity.Services
 {
@@ -95,7 +96,7 @@ namespace Serenity.Services
                 var actualName = fieldName;
                 var colon = fieldName.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
-                    actualName = fieldName.Substring(0, colon);
+                    actualName = fieldName[..colon];
 
                 var replaceField = row.FindFieldByPropertyName(actualName) ??
                     row.FindField(actualName);
@@ -156,7 +157,7 @@ namespace Serenity.Services
 
                 var colon = p.Key.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
-                    str = string.Format(CultureInfo.InvariantCulture, "{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
+                    str = string.Format(CultureInfo.InvariantCulture, string.Concat("{0:", p.Key.AsSpan(colon + 1, p.Key.Length - colon - 2), "}"), val);
                 else
                     str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
@@ -347,7 +348,7 @@ namespace Serenity.Services
                     fs.Close();
                     temporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
                         attr as IUploadImageOptions ?? new UploadOptions(), 
-                        storage, temporaryFile);
+                        storage, temporaryFile, OverwriteOption.Overwrite);
                 }
                 finally
                 {
