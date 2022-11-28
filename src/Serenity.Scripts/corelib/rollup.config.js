@@ -1,10 +1,11 @@
 ﻿import typescript from '@rollup/plugin-typescript';
 import { minify } from "terser";
 import fs from 'fs';
-import pkg from "./package.json";
 import { builtinModules } from "module";
 import dts from "rollup-plugin-dts";
 import { basename, resolve } from "path";
+
+var pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 var globals = {
     'jquery': '$',

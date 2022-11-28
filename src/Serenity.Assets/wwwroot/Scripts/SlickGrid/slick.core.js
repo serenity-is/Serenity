@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/index.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/index.ts
   var core_exports = {};
   __export(core_exports, {
     EditorLock: () => EditorLock,
@@ -48,7 +48,7 @@ Slick._ = (() => {
     titleize: () => titleize
   });
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/base.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/base.ts
   var NonDataRow = class {
     constructor() {
       this.__nonDataRow = true;
@@ -57,7 +57,7 @@ Slick._ = (() => {
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/column.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/column.ts
   var columnDefaults = {
     nameIsHtml: false,
     resizable: true,
@@ -105,7 +105,7 @@ Slick._ = (() => {
     return underscore(str).replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
   }
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/event.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/event.ts
   var EventData = class {
     constructor() {
       this._isPropagationStopped = false;
@@ -230,7 +230,7 @@ Slick._ = (() => {
     return e;
   }
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/editing.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/editing.ts
   var EditorLock = class {
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
@@ -265,7 +265,7 @@ Slick._ = (() => {
   };
   var GlobalEditorLock = new EditorLock();
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/util.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/util.ts
   function addClass(el, cls) {
     if (cls == null || !cls.length)
       return;
@@ -342,7 +342,7 @@ Slick._ = (() => {
     return value;
   }
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/formatting.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/formatting.ts
   function defaultColumnFormat(ctx) {
     return escape(ctx.value);
   }
@@ -397,7 +397,7 @@ Slick._ = (() => {
     }
   }
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/group.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/group.ts
   var Group = class extends NonDataRow {
     constructor() {
       super(...arguments);
@@ -419,7 +419,7 @@ Slick._ = (() => {
     }
   };
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.1/node_modules/@serenity-is/sleekgrid/src/core/range.ts
+  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/core/range.ts
   var Range = class {
     constructor(fromRow, fromCell, toRow, toCell) {
       if (toRow === void 0 && toCell === void 0) {

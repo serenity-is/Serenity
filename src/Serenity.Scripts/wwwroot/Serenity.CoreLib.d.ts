@@ -1139,20 +1139,20 @@ declare namespace Slick {
     	/** when returning a formatter result, prefer ctx.escape() to avoid html injection attacks! */
     	value?: any;
     }
-    type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => string;
     interface CompatFormatterResult {
     	addClasses?: string;
     	text?: string;
     	toolTip?: string;
     }
-    type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
     interface FormatterFactory<TItem = any> {
     	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
     	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
     }
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    type CellStylesHash = {
+    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    export type CellStylesHash = {
     	[row: number]: {
     		[columnId: string]: string;
     	};
@@ -1269,7 +1269,7 @@ declare namespace Slick {
     	 */
     	max?: any;
     }
-    type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
+    export type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     interface IEventData {
     	readonly type?: string;
     	currentTarget?: EventTarget | null;
@@ -2120,7 +2120,7 @@ declare namespace Slick {
     interface ArgsColumnNode extends ArgsColumn {
     	node: HTMLElement;
     }
-    type ArgsSortCol = {
+    export type ArgsSortCol = {
     	sortCol: Column;
     	sortAsc: boolean;
     };
