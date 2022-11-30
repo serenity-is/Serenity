@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@rollup/plugin-typescript': 8.5.0
-  '@serenity-is/sleekgrid': 1.4.2
+  '@serenity-is/sleekgrid': 1.4.3
   '@types/jest': 29.2.3
   '@types/jquery': 2.0.48
   '@types/jquery.validation': 1.16.7
@@ -23,7 +23,7 @@ specifiers:
   typescript: 4.9.3
 
 dependencies:
-  '@serenity-is/sleekgrid': 1.4.2
+  '@serenity-is/sleekgrid': 1.4.3
   '@types/jquery': 2.0.48
   '@types/jquery.validation': 1.16.7
   '@types/jqueryui': 1.12.6
@@ -720,8 +720,8 @@ packages:
       rollup: 2.79.1
     dev: true
 
-  /@serenity-is/sleekgrid/1.4.2:
-    resolution: {integrity: sha512-c9qS8/YMGKbIukLn5sBP/50M2qsIoOahBRDsaH2BvKIGXmYVLTdYHh4cZhlMbDbrRupvD6WBo1zmST6awkh10w==}
+  /@serenity-is/sleekgrid/1.4.3:
+    resolution: {integrity: sha512-PxcR5KJY18GTzxWh+KdN4En8B3UdqgLJ/5Qb1OQBU6wUDX5+EG2MF6B451RrfLfP+FGtYAOPxh27JdzomzO9YA==}
     dev: false
 
   /@sinclair/typebox/0.24.51:

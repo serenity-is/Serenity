@@ -12,9 +12,9 @@ const sleekSrc = resolve(join(require.resolve('@serenity-is/sleekgrid/build/defi
 const assetsSlick = resolve(join(root, '..', '..', 'Serenity.Assets', 'wwwroot', 'Scripts', 'SlickGrid'));
 
 for (var esmOpt of [
-    { ...compatCore, entryPoints: [`${sleekSrc}/core/index.ts`], outfile: `${assetsSlick}/slick.core.js`, sourcemap: false },
-    { ...compatGrid, entryPoints: [`${sleekSrc}/grid/index.ts`], outfile: `${assetsSlick}/slick.grid.js`, sourcemap: false },
-    { ...compatLayoutsFrozen, entryPoints: [`${sleekSrc}/layouts/frozenlayout.ts`], outfile: `${assetsSlick}/layouts/slick.frozenlayout.js`, sourcemap: false }
+    { ...compatCore, absWorkingDir: sleekSrc, entryPoints: [`core/index.ts`], outfile: `${assetsSlick}/slick.core.js`, sourcemap: false },
+    { ...compatGrid, absWorkingDir: sleekSrc, entryPoints: [`grid/index.ts`], outfile: `${assetsSlick}/slick.grid.js`, sourcemap: false },
+    { ...compatLayoutsFrozen, absWorkingDir: sleekSrc, entryPoints: [`layouts/frozenlayout.ts`], outfile: `${assetsSlick}/layouts/slick.frozenlayout.js`, sourcemap: false }
 ]) {
     esbuild.build(esmOpt).catch(() => process.exit());
 }

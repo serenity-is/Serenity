@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/layouts/frozenlayout.ts
+  // layouts/frozenlayout.ts
   var frozenlayout_exports = {};
   __export(frozenlayout_exports, {
     FrozenLayout: () => FrozenLayout
@@ -27,7 +27,7 @@ Slick._ = (() => {
   // global-externals:_
   var { disableSelection, H, parsePx, spacerDiv } = Slick;
 
-  // node_modules/.pnpm/@serenity-is+sleekgrid@1.4.2/node_modules/@serenity-is/sleekgrid/src/layouts/frozenlayout.ts
+  // layouts/frozenlayout.ts
   var FrozenLayout = function() {
     var canvasWidth;
     var canvasWidthL;
