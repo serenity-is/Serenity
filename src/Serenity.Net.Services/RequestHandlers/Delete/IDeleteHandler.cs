@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Interface for delete request handlers with custom delete request / response types.
@@ -18,6 +21,14 @@
         /// <param name="uow">Unit of work</param>
         /// <param name="request">The delete request</param>
         TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request);
+
+        /// <summary>
+        /// Processes a delete request
+        /// </summary>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="request">The delete request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        Task<TDeleteResponse> DeleteAsync(IUnitOfWork uow, TDeleteRequest request, CancellationToken cancellationToken);
     }
 
     /// <summary>

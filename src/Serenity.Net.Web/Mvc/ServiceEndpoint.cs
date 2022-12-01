@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +36,10 @@ namespace Serenity.Services
         /// <inheritdoc/>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            var ctsParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(CancellationToken));
+            if (ctsParam != null)
+                context.ActionArguments[ctsParam.Name] = HttpContext.RequestAborted;
+
             var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
             if (uowParam != null)
             {
@@ -76,7 +81,7 @@ namespace Serenity.Services
             {
                 try
                 {
-                    if (context != null && context.Exception != null)
+                    if (context != null && context.Exception != null || HttpContext.RequestAborted.IsCancellationRequested)
                         unitOfWork.Dispose();
                     else
                         unitOfWork.Commit();

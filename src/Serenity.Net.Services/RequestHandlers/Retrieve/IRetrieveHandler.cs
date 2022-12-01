@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Interface for retrieve request handlers with custom retrieve request / response types.
@@ -17,7 +20,14 @@
         /// </summary>
         /// <param name="connection">Connection</param>
         /// <param name="request">Retrieve request</param>
-        /// <returns></returns>
         TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request);
+
+        /// <summary>
+        /// Processes a Retrieve request
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">Retrieve request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        Task<TRetrieveResponse> RetrieveAsync(IDbConnection connection, TRetrieveRequest request, CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Interface for update request handlers with custom request / response types.
@@ -18,5 +21,13 @@
         /// <param name="uow">Unit of work</param>
         /// <param name="request">Save request</param>
         TSaveResponse Update(IUnitOfWork uow, TSaveRequest request);
+
+        /// <summary>
+        /// Processes an Update request
+        /// </summary>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="request">Save request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task<TSaveResponse> UpdateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Serenity.Data
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Data
 {
     /// <summary>
     /// Contains extension methods to perform entity CRUD operations directly on connections.
@@ -400,6 +403,20 @@
         }
 
         /// <summary>
+        /// Inserts the specified entity. Note that this operates at a low level,
+        /// it does not perform any validation or permission check, and does not call service behaviors / handlers.
+        /// </summary>
+        /// <typeparam name="TRow">The type of the row.</typeparam>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        public static Task InsertAsync<TRow>(this IDbConnection connection, TRow row, CancellationToken cancellationToken)
+            where TRow : class, IRow
+        {
+            return ToSqlInsert(row).ExecuteAsync(connection, cancellationToken);
+        }
+
+        /// <summary>
         /// Inserts the specified entity and returns the ID of record inserted.
         /// Only works for identity columns of integer type. Note that this operates at a low level,
         /// it does not perform any validation or permission check and does not call service behaviors / handlers.
@@ -412,6 +429,22 @@
             where TRow : IRow
         {
             return ToSqlInsert(row).ExecuteAndGetID(connection);
+        }
+
+        /// <summary>
+        /// Inserts the specified entity and returns the ID of record inserted.
+        /// Only works for identity columns of integer type. Note that this operates at a low level,
+        /// it does not perform any validation or permission check and does not call service behaviors / handlers.
+        /// </summary>
+        /// <typeparam name="TRow">The type of the row.</typeparam>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>The ID of the record inserted.</returns>
+        public static Task<long?> InsertAndGetIDAsync<TRow>(this IDbConnection connection, TRow row, CancellationToken cancellationToken)
+            where TRow : IRow
+        {
+            return ToSqlInsert(row).ExecuteAndGetIDAsync(connection, cancellationToken);
         }
 
         /// <summary>
@@ -435,6 +468,31 @@
 
             row.ToSqlUpdateById()
                 .Execute(connection, expectedRows);
+        }
+
+        /// <summary>
+        /// Updates the entity by its identifier. Note that this operates at a low level,
+        /// it does not perform any validation or permission check and does not call service behaviors / handlers.
+        /// </summary>
+        /// <typeparam name="TRow">The type of the row.</typeparam>
+        /// <param name="connection">The connection.</param>
+        /// <param name="row">The row.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="expectedRows">The expected number of rows to be updated, by default 1.</param>
+        /// <exception cref="InvalidOperationException">ID field of row has null value!</exception>
+        /// <exception cref="InvalidOperationException">Expected rows and number of updated rows does not match!</exception>
+        public static async Task UpdateByIdAsync<TRow>(this IDbConnection connection, TRow row, CancellationToken cancellationToken,
+            ExpectedRows expectedRows = ExpectedRows.One)
+            where TRow : IIdRow
+        {
+            var idField = row.IdField;
+            var r = (IRow)(object)row;
+
+            if (idField.IsNull(r))
+                throw new InvalidOperationException("ID field of row has null value!");
+
+            await row.ToSqlUpdateById()
+                .ExecuteAsync(connection, cancellationToken, expectedRows);
         }
 
         /// <summary>

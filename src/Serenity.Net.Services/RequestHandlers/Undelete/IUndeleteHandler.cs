@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Interface for undelete request handlers with custom undelete request / response types.
@@ -18,6 +21,14 @@
         /// <param name="uow">Unit of work</param>
         /// <param name="request">The undelete request</param>
         TUndeleteResponse Undelete(IUnitOfWork uow, TUndeleteRequest request);
+
+        /// <summary>
+        /// Processes a undelete request
+        /// </summary>
+        /// <param name="uow">Unit of work</param>
+        /// <param name="request">The undelete request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        Task<TUndeleteResponse> UndeleteAsync(IUnitOfWork uow, TUndeleteRequest request, CancellationToken cancellationToken);
     }
 
     /// <summary>

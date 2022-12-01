@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Generic base class for retrieve request handlers
@@ -250,13 +253,7 @@
             return query;
         }
 
-        /// <summary>
-        /// Processes the retrieve request. This is the entry point for the handler.
-        /// </summary>
-        /// <param name="connection">Connection</param>
-        /// <param name="request">Request</param>
-        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
-        public TRetrieveResponse Process(IDbConnection connection, TRetrieveRequest request)
+        private void BeforeProcess(IDbConnection connection, TRetrieveRequest request)
         {
             StateBag.Clear();
 
@@ -276,15 +273,51 @@
             PrepareQuery(Query);
 
             OnBeforeExecuteQuery();
+        }
+
+        private void AfterProcess()
+        {
+            OnAfterExecuteQuery();
+
+            OnReturn();
+        }
+
+        /// <summary>
+        /// Processes the retrieve request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">Request</param>
+        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+        public TRetrieveResponse Process(IDbConnection connection, TRetrieveRequest request)
+        {
+            BeforeProcess(connection, request);
 
             if (Query.GetFirst(Connection))
                 Response.Entity = Row;
             else
                 throw DataValidation.EntityNotFoundError(Row, request.EntityId, Localizer);
 
-            OnAfterExecuteQuery();
+            AfterProcess();
+            return Response;
+        }
 
-            OnReturn();
+        /// <summary>
+        /// Processes the retrieve request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">Request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+        public async Task<TRetrieveResponse> ProcessAsync(IDbConnection connection, TRetrieveRequest request, CancellationToken cancellationToken)
+        {
+            BeforeProcess(connection, request);
+
+            if (await Query.GetFirstAsync(Connection, cancellationToken))
+                Response.Entity = Row;
+            else
+                throw DataValidation.EntityNotFoundError(Row, request.EntityId, Localizer);
+
+            AfterProcess();
             return Response;
         }
 
@@ -292,11 +325,22 @@
         {
             return Process(connection, (TRetrieveRequest)request);
         }
+
+        async Task<IRetrieveResponse> IRetrieveRequestProcessor.ProcessAsync(IDbConnection connection, RetrieveRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(connection, (TRetrieveRequest)request, cancellationToken);
+        }
         
         /// <inheritdoc/>
         public TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request)
         {
             return Process(connection, request);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TRetrieveResponse> RetrieveAsync(IDbConnection connection, TRetrieveRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(connection, request, cancellationToken);
         }
 
         /// <summary>

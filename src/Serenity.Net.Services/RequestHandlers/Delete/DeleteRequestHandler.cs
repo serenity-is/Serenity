@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Generic base class for delete request handlers
@@ -135,6 +138,25 @@
         }
 
         /// <summary>
+        /// Invokes the passed delete action method
+        /// </summary>
+        /// <param name="action">Delete action method</param>
+        protected virtual async Task InvokeDeleteActionAsync(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception exception)
+            {
+                foreach (var behavior in behaviors.Value.OfType<IDeleteExceptionBehavior>())
+                    behavior.OnException(this, exception);
+
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Executes the actual SQL delete operation
         /// </summary>
         protected virtual void ExecuteDelete()
@@ -213,6 +235,84 @@
         }
 
         /// <summary>
+        /// Executes the actual SQL delete operation
+        /// </summary>
+        protected virtual async Task ExecuteDeleteAsync(CancellationToken cancellationToken)
+        {
+            var isActiveDeletedRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsDeletedRow;
+            var deleteLogRow = Row as IDeleteLogRow;
+            var idField = Row.IdField;
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+
+            if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
+            {
+                var delete = new SqlDelete(Row.Table)
+                    .WhereEqual(idField, id);
+
+                await InvokeDeleteActionAsync(async () =>
+                {
+                    if (await delete.ExecuteAsync(Connection, cancellationToken) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                });
+            }
+            else
+            {
+                if (isDeletedRow != null || isActiveDeletedRow != null)
+                {
+                    var update = new SqlUpdate(Row.Table)
+                        .WhereEqual(idField, id)
+                        .Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
+
+                    if (isActiveDeletedRow != null)
+                    {
+                        update.Set(isActiveDeletedRow.IsActiveField, -1);
+                    }
+                    else
+                    {
+                        update.Set(isDeletedRow.IsDeletedField, true);
+                    }
+
+                    if (deleteLogRow != null)
+                    {
+                        update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                                        deleteLogRow.DeleteDateField.DateTimeKind))
+                              .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
+                    }
+                    else if (Row is IUpdateLogRow updateLogRow)
+                    {
+                        update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                                        updateLogRow.UpdateDateField.DateTimeKind))
+                              .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
+                    }
+
+                    await InvokeDeleteActionAsync(async () =>
+                    {
+                        if (await update.ExecuteAsync(Connection, cancellationToken) != 1)
+                            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    });
+                }
+                else //if (deleteLogRow != null)
+                {
+                    var update = new SqlUpdate(Row.Table)
+                        .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                                    deleteLogRow.DeleteDateField.DateTimeKind))
+                        .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
+                        .WhereEqual(idField, id)
+                        .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull());
+
+                    await InvokeDeleteActionAsync(async () =>
+                    {
+                        if (await update.ExecuteAsync(Connection, cancellationToken) != 1)
+                            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+                    });
+                }
+            }
+
+            InvalidateCacheOnCommit();
+        }
+
+        /// <summary>
         /// Attaches a cache invalidation call to to OnCommit 
         /// callback of the current unit of work. This would clear
         /// cached items related to this row type.
@@ -267,13 +367,7 @@
                 (deleteLogRow != null && !deleteLogRow.DeleteUserIdField.IsNull(Row)));
         }
 
-        /// <summary>
-        /// Processes the delete request. This is the entry point for the handler.
-        /// </summary>
-        /// <param name="unitOfWork">Unit of work</param>
-        /// <param name="request">Request</param>
-        /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
-        public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
+        private void BeforeProcess(IUnitOfWork unitOfWork, TDeleteRequest request)
         {
             StateBag.Clear();
             UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -288,6 +382,17 @@
             LoadEntity();
             ValidatePermissions();
             ValidateRequest();
+        }
+
+        /// <summary>
+        /// Processes the delete request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
+        public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
+        {
+            BeforeProcess(unitOfWork, request);
 
             if (IsDeleted())
                 Response.WasAlreadyDeleted = true;
@@ -307,15 +412,55 @@
             return Response;
         }
 
+        /// <summary>
+        /// Processes the delete request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
+        public async Task<TDeleteResponse> ProcessAsync(IUnitOfWork unitOfWork, TDeleteRequest request, CancellationToken cancellationToken)
+        {
+            BeforeProcess(unitOfWork, request);
+
+            if (IsDeleted())
+                Response.WasAlreadyDeleted = true;
+            else
+            {
+                OnBeforeDelete();
+
+                await ExecuteDeleteAsync(cancellationToken);
+
+                OnAfterDelete();
+
+                DoAudit();
+            }
+
+            OnReturn();
+
+            return Response;
+        }
+
         DeleteResponse IDeleteRequestProcessor.Process(IUnitOfWork uow, DeleteRequest request)
         {
             return Process(uow, (TDeleteRequest)request);
+        }
+
+        async Task<DeleteResponse> IDeleteRequestProcessor.ProcessAsync(IUnitOfWork uow, DeleteRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, (TDeleteRequest)request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
         {
             return Process(uow, request);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TDeleteResponse> DeleteAsync(IUnitOfWork uow, TDeleteRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, request, cancellationToken);
         }
 
         /// <summary>

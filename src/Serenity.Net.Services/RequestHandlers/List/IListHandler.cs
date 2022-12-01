@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Interface for list request handlers with custom list request / response types.
@@ -18,5 +21,13 @@
         /// <param name="connection">Connection</param>
         /// <param name="request">List request</param>
         TListResponse List(IDbConnection connection, TListRequest request);
+
+        /// <summary>
+        /// Processes a List request
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">List request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken);
     }
 }

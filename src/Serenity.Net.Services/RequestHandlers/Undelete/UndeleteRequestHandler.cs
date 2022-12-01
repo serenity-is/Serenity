@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Generic base class for undelete request handlers
@@ -136,9 +139,25 @@
         }
 
         /// <summary>
-        /// Executes the actual SQL undelete/update operation
+        /// Invokes the passed undelete action method
         /// </summary>
-        protected virtual void ExecuteUndelete()
+        /// <param name="action">Undelete action method</param>
+        protected virtual async Task InvokeUndeleteActionAsync(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception exception)
+            {
+                foreach (var behavior in behaviors.Value.OfType<IUndeleteExceptionBehavior>())
+                    behavior.OnException(this, exception);
+
+                throw;
+            }
+        }
+
+        private (SqlUpdate update, object id) CreateUndeleteQuery()
         {
             var idField = Row.IdField;
             var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
@@ -169,9 +188,35 @@
                     update.Where(deleteLogRow.DeleteUserIdField.IsNotNull());
             }
 
+            return (update, id);
+        }
+
+        /// <summary>
+        /// Executes the actual SQL undelete/update operation
+        /// </summary>
+        protected virtual void ExecuteUndelete()
+        {
+            var (update, id) = CreateUndeleteQuery();
+
             InvokeUndeleteAction(() =>
             {
                 if (update.Execute(Connection) != 1)
+                    throw DataValidation.EntityNotFoundError(Row, id, Localizer);
+            });
+
+            InvalidateCacheOnCommit();
+        }
+
+        /// <summary>
+        /// Executes the actual SQL undelete/update operation
+        /// </summary>
+        protected virtual async Task ExecuteUndeleteAsync(CancellationToken cancellationToken)
+        {
+            var (update, id) = CreateUndeleteQuery();
+
+            await InvokeUndeleteActionAsync(async () =>
+            {
+                if (await update.ExecuteAsync(Connection, cancellationToken) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id, Localizer);
             });
 
@@ -238,13 +283,7 @@
                 Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
         }
 
-        /// <summary>
-        /// Processes the undelete request. This is the entry point for the handler.
-        /// </summary>
-        /// <param name="unitOfWork">Unit of work</param>
-        /// <param name="request">Request</param>
-        /// <exception cref="ArgumentNullException">unitofWork is null</exception>
-        public TUndeleteResponse Process(IUnitOfWork unitOfWork, TUndeleteRequest request)
+        private void BeforeProcess(IUnitOfWork unitOfWork, TUndeleteRequest request)
         {
             StateBag.Clear();
             UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
@@ -259,6 +298,17 @@
             LoadEntity();
             ValidatePermissions();
             ValidateRequest();
+        }
+
+        /// <summary>
+        /// Processes the undelete request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <exception cref="ArgumentNullException">unitofWork is null</exception>
+        public TUndeleteResponse Process(IUnitOfWork unitOfWork, TUndeleteRequest request)
+        {
+            BeforeProcess(unitOfWork, request);
 
             if (!IsDeleted())
                 Response.WasNotDeleted = true;
@@ -278,15 +328,55 @@
             return Response;
         }
 
+        /// <summary>
+        /// Processes the undelete request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <exception cref="ArgumentNullException">unitofWork is null</exception>
+        public async Task<TUndeleteResponse> ProcessAsync(IUnitOfWork unitOfWork, TUndeleteRequest request, CancellationToken cancellationToken)
+        {
+            BeforeProcess(unitOfWork, request);
+
+            if (!IsDeleted())
+                Response.WasNotDeleted = true;
+            else
+            {
+                OnBeforeUndelete();
+
+                await ExecuteUndeleteAsync(cancellationToken);
+
+                OnAfterUndelete();
+
+                DoAudit();
+            }
+
+            OnReturn();
+
+            return Response;
+        }
+
         UndeleteResponse IUndeleteRequestProcessor.Process(IUnitOfWork uow, UndeleteRequest request)
         {
             return Process(uow, (TUndeleteRequest)request);
+        }
+
+        async Task<UndeleteResponse> IUndeleteRequestProcessor.ProcessAsync(IUnitOfWork uow, UndeleteRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, (TUndeleteRequest)request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public TUndeleteResponse Undelete(IUnitOfWork uow, TUndeleteRequest request)
         {
             return Process(uow, request);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TUndeleteResponse> UndeleteAsync(IUnitOfWork uow, TUndeleteRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, request, cancellationToken);
         }
 
         /// <summary>

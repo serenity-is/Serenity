@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
         : IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
@@ -19,6 +22,11 @@
         public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
         {
             return handler.Delete(uow, request);
+        }
+
+        public Task<TDeleteResponse> DeleteAsync(IUnitOfWork uow, TDeleteRequest request, CancellationToken cancellationToken)
+        {
+            return handler.DeleteAsync(uow, request, cancellationToken);
         }
     }
 

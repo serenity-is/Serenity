@@ -1,4 +1,6 @@
-﻿using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
 {
@@ -24,6 +26,24 @@ namespace Serenity.Data
             }
             else
                 return false;
+        }
+
+        /// <summary>
+        /// Gets the first entity returned by executing the query.
+        /// The result is loaded into the loader row of the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>True if any rows returned</returns>
+        public static async Task<bool> GetFirstAsync(this SqlQuery query, IDbConnection connection, CancellationToken cancellationToken)
+        {
+            using var reader = await SqlHelper.ExecuteReaderAsync(connection, query, cancellationToken);
+            if (!reader.Read())
+                return false;
+
+            query.GetFromReader(reader);
+            return true;
         }
 
         /// <summary>
@@ -169,6 +189,40 @@ namespace Serenity.Data
 
                 using IDataReader reader = SqlHelper.ExecuteReader(connection, queries[0], query.Params);
                 while (reader.Read())
+                {
+                    query.GetFromReader(reader);
+                    callBack();
+                }
+            }
+
+            return count;
+        }
+
+        public static async Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
+            Action callBack, CancellationToken cancellationToken)
+        {
+            var count = 0;
+
+            if (connection.GetDialect().MultipleResultsets)
+            {
+                using var reader = await SqlHelper.ExecuteReaderAsync(connection, query, cancellationToken);
+                while (!cancellationToken.IsCancellationRequested && reader.Read())
+                {
+                    query.GetFromReader(reader);
+                    callBack();
+                }
+
+                if (query.CountRecords && reader.NextResult() && reader.Read())
+                    return Convert.ToInt32(reader.GetValue(0));
+            }
+            else
+            {
+                var queries = query.ToString().Split(new [] { "\n---\n" }, StringSplitOptions.RemoveEmptyEntries);
+                if (queries.Length > 1)
+                    count = Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection, queries[1], query.Params, cancellationToken));
+
+                using var reader = await SqlHelper.ExecuteReaderAsync(connection, queries[0], query.Params, cancellationToken);
+                while (!cancellationToken.IsCancellationRequested && reader.Read())
                 {
                     query.GetFromReader(reader);
                     callBack();

@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     internal class ListHandlerProxy<TRow, TListRequest, TListResponse>
         : IListHandler<TRow, TListRequest, TListResponse>
@@ -19,6 +22,11 @@
         public TListResponse List(IDbConnection connection, TListRequest request)
         {
             return handler.List(connection, request);
+        }
+
+        public Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken)
+        {
+            return handler.ListAsync(connection, request, cancellationToken);
         }
     }
 

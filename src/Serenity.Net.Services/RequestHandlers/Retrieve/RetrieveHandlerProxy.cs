@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     internal class RetrieveHandlerProxy<TRow, TRetrieveRequest, TRetrieveResponse>
         : IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>
@@ -19,6 +22,11 @@
         public TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request)
         {
             return handler.Retrieve(connection, request);
+        }
+
+        public Task<TRetrieveResponse> RetrieveAsync(IDbConnection connection, TRetrieveRequest request, CancellationToken cancellationToken)
+        {
+            return handler.RetrieveAsync(connection, request, cancellationToken);
         }
     }
 

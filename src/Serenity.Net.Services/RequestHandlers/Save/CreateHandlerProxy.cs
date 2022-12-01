@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     internal class CreateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
         : ICreateHandler<TRow, TSaveRequest, TSaveResponse>
@@ -19,6 +22,11 @@
         public TSaveResponse Create(IUnitOfWork uow, TSaveRequest request)
         {
             return handler.Create(uow, request);
+        }
+
+        public Task<TSaveResponse> CreateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken)
+        {
+            return handler.CreateAsync(uow, request, cancellationToken);
         }
     }
 

@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Serenity.Services
 {
@@ -733,13 +735,7 @@ namespace Serenity.Services
             return null;
         }
 
-        /// <summary>
-        /// Processes the list request. This is the entry point for the handler.
-        /// </summary>
-        /// <param name="connection">Connection</param>
-        /// <param name="request">Request</param>
-        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
-        public TListResponse Process(IDbConnection connection, TListRequest request)
+        private void BeforeProcess(IDbConnection connection, TListRequest request)
         {
             StateBag.Clear();
             lookupAccessMode = false;
@@ -778,24 +774,30 @@ namespace Serenity.Services
             ApplyFilters(query);
 
             OnBeforeExecuteQuery();
+        }
+
+        private void AfterProcess(SqlQuery query)
+        {
+            Response.SetSkipTakeTotal(query);
+
+            OnAfterExecuteQuery();
+
+            OnReturn();
+        }
+
+        /// <summary>
+        /// Processes the list request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">Request</param>
+        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+        public TListResponse Process(IDbConnection connection, TListRequest request)
+        {
+            BeforeProcess(connection, request);
 
             if (DistinctFields == null || DistinctFields.Length > 0)
             {
-                Response.TotalCount = query.ForEach(Connection, delegate ()
-                {
-                    var clone = ProcessEntity(Row.Clone());
-
-                    if (clone != null)
-                    {
-                        if (DistinctFields != null)
-                        {
-                            foreach (var field in DistinctFields)
-                                Response.Values.Add(field.AsObject(clone));
-                        }
-                        else
-                            Response.Entities.Add(clone);
-                    }
-                });
+                Response.TotalCount = Query.ForEach(Connection, ProcessQueryEntities);
             }
             else
             {
@@ -803,24 +805,73 @@ namespace Serenity.Services
                 Response.Values = null;
             }
 
-            Response.SetSkipTakeTotal(query);
-
-            OnAfterExecuteQuery();
-
-            OnReturn();
+            AfterProcess(Query);
 
             return Response;
         }
-        
+
+        /// <summary>
+        /// Processes the list request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="connection">Connection</param>
+        /// <param name="request">Request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+        public async Task<TListResponse> ProcessAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken)
+        {
+            BeforeProcess(connection, request);
+
+            if (DistinctFields == null || DistinctFields.Length > 0)
+            {
+                Response.TotalCount = await Query.ForEachAsync(Connection, ProcessQueryEntities, cancellationToken);
+            }
+            else
+            {
+                // mark response to specify that one or more fields are invalid
+                Response.Values = null;
+            }
+
+            AfterProcess(Query);
+
+            return Response;
+        }
+
+        private void ProcessQueryEntities()
+        {
+            var clone = ProcessEntity(Row.Clone());
+
+            if (clone == null)
+                return;
+
+            if (DistinctFields != null)
+            {
+                foreach (var field in DistinctFields)
+                    Response.Values.Add(field.AsObject(clone));
+            }
+            else
+                Response.Entities.Add(clone);
+        }
+
         IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
         {
             return Process(connection, (TListRequest)request);
+        }
+
+        async Task<IListResponse> IListRequestProcessor.ProcessAsync(IDbConnection connection, ListRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(connection, (TListRequest)request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public TListResponse List(IDbConnection connection, TListRequest request)
         {
             return Process(connection, request);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(connection, request, cancellationToken);
         }
 
         /// <summary>

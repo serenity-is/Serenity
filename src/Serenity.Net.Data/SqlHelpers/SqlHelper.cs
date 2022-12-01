@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
@@ -293,6 +295,70 @@ namespace Serenity.Data
             }
         }
 
+        /// <summary>
+        /// Executes the SQL statement, and returns affected rows.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// command is null or command.Connection is null.
+        /// </exception>
+        public static async Task<int> ExecuteNonQueryAsync(IDbCommand command, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            if (command == null)
+                throw new ArgumentNullException("command");
+
+            if (command.Connection == null)
+                throw new ArgumentNullException("command.Connection");
+
+            ValueStopwatch stopwatch = default;
+
+            try
+            {
+                int result;
+                command.Connection.EnsureOpen();
+                var dbCommand = (DbCommand)command;
+                stopwatch = ValueStopwatch.StartNew();
+                try
+                {
+                    logger ??= command.Connection.GetLogger();
+
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommand("ExecuteNonQuery", command, logger);
+
+                    result = await dbCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+                catch (SqlException ex)
+                {
+                    if (CheckConnectionPoolException(command.Connection, ex))
+                        return await dbCommand.ExecuteNonQueryAsync(cancellationToken);
+
+                    throw;
+                }
+
+                if (logger?.IsEnabled(LogLevel.Debug) == true)
+                    logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                        "ExecuteNonQuery", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                if (logger?.IsEnabled(LogLevel.Debug) == true)
+                    logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
+                        "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                ex.SetData("sql_command_text", command.CommandText);
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Executes the statement.
@@ -308,6 +374,20 @@ namespace Serenity.Data
         }
 
         /// <summary>
+        /// Executes the statement.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>Number of affected rows</returns>
+        public static Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            using IDbCommand command = NewCommand(connection, commandText);
+            return ExecuteNonQueryAsync(command, cancellationToken, logger);
+        }
+
+        /// <summary>
         /// Executes the statement
         /// </summary>
         /// <param name="connection">The connection.</param>
@@ -319,6 +399,21 @@ namespace Serenity.Data
         {
             using IDbCommand command = NewCommand(connection, commandText, param);
             return ExecuteNonQuery(command, logger);
+        }
+
+        /// <summary>
+        /// Executes the statement
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>Number of affected rows</returns>
+        public static Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            using IDbCommand command = NewCommand(connection, commandText, param);
+            return ExecuteNonQueryAsync(command, cancellationToken, logger);
         }
 
         /// <summary>
@@ -372,6 +467,58 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
+                /// <summary>
+        /// Executes the query and returns the generated identity value.
+        /// Only works for auto incremented fields, not GUIDs.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">query.IdentityColumn is null</exception>
+        /// <exception cref="NotImplementedException">The connection dialect doesn't support returning inserted identity.</exception>
+        public static async Task<long?> ExecuteAndGetIDAsync(this SqlInsert query, IDbConnection connection, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            string queryText = query.ToString();
+            var dialect = connection.GetDialect();
+            if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
+            {
+                string identityColumn = query.IdentityColumn();
+                if (identityColumn == null)
+                    throw new ArgumentNullException("query.IdentityColumn");
+
+                queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
+
+                if (dialect.UseReturningIntoVar)
+                    queryText += " INTO " + dialect.ParameterPrefix + identityColumn;
+
+                using var command = NewCommand(connection, queryText, query.Params);
+                var param = command.CreateParameter();
+                param.Direction = dialect.UseReturningIntoVar ? ParameterDirection.ReturnValue : ParameterDirection.Output;
+                param.ParameterName = identityColumn;
+                param.DbType = DbType.Int64;
+                command.Parameters.Add(param);
+                await ExecuteNonQueryAsync(command, cancellationToken, logger);
+                return Convert.ToInt64(param.Value);
+            }
+
+            if (dialect.UseScopeIdentity)
+            {
+                var scopeIdentityExpression = dialect.ScopeIdentityExpression;
+
+                queryText += ";\nSELECT " + scopeIdentityExpression + " AS IDCOLUMNVALUE";
+
+                using IDataReader reader = await ExecuteReaderAsync(connection, queryText, query.Params, cancellationToken, logger);
+                if (reader.Read() &&
+                    !reader.IsDBNull(0))
+                    return Convert.ToInt64(reader.GetValue(0));
+                return null;
+            }
+
+            throw new NotImplementedException();
+        }
+
 
         const string ExpectedRowsError = "Query affected {0} rows while {1} expected! " +
             "This might mean that your query lacks a proper WHERE statement " +
@@ -404,6 +551,18 @@ namespace Serenity.Data
         }
 
         /// <summary>
+        /// Executes the specified query on connection.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        public static Task ExecuteAsync(this SqlInsert query, IDbConnection connection, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            return ExecuteNonQueryAsync(connection, query.ToString(), query.Params, cancellationToken, logger);
+        }
+
+        /// <summary>
         /// Executes the query on connection with specified params.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -413,6 +572,19 @@ namespace Serenity.Data
         public static void Execute(this SqlInsert query, IDbConnection connection, Dictionary param, ILogger logger = null)
         {
             ExecuteNonQuery(connection, query.ToString(), param, logger);
+        }
+
+        /// <summary>
+        /// Executes the query on connection with specified params.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        public static Task Execute(this SqlInsert query, IDbConnection connection, Dictionary param, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            return ExecuteNonQueryAsync(connection, query.ToString(), param, cancellationToken, logger);
         }
 
         /// <summary>
@@ -429,6 +601,20 @@ namespace Serenity.Data
         }
 
         /// <summary>
+        /// Executes the specified update query on connection and returns number of affected rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>Number of affected rows.</returns>
+        public static async Task<int> ExecuteAsync(this SqlUpdate query, IDbConnection connection, CancellationToken cancellationToken, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
+        {
+            return CheckExpectedRows(expectedRows, await ExecuteNonQueryAsync(connection, query.ToString(), query.Params, cancellationToken, logger));
+        }
+
+        /// <summary>
         /// Executes the specified delete query on connection and returns number of affected rows.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -441,6 +627,22 @@ namespace Serenity.Data
         public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
         {
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params, logger));
+        }
+
+        /// <summary>
+        /// Executes the specified delete query on connection and returns number of affected rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>
+        /// Number of affected rows.
+        /// </returns>
+        public static async Task<int> ExecuteAsync(this SqlDelete query, IDbConnection connection, CancellationToken cancellationToken, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
+        {
+            return CheckExpectedRows(expectedRows, await ExecuteNonQueryAsync(connection, query.ToString(), query.Params, cancellationToken, logger));
         }
 
         /// <summary>
@@ -502,6 +704,66 @@ namespace Serenity.Data
                         return command.ExecuteReader();
                     else
                         throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.SetData("sql_command_text", commandText);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Executes the command returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">connection is null</exception>
+        public static async Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, string commandText,
+            IDictionary<string, object> param, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            connection.EnsureOpen();
+
+            try
+            {
+                var command = (DbCommand)NewCommand(connection, commandText, param);
+                var stopwatch = ValueStopwatch.StartNew();
+                try
+                {
+                    logger ??= connection.GetLogger();
+
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommand("ExecuteReader", command, logger);
+
+                    var result = await command.ExecuteReaderAsync(cancellationToken);
+
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                            "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                    return result;
+                }
+                catch (SqlException ex)
+                {
+                    if (CheckConnectionPoolException(connection, ex))
+                        return await command.ExecuteReaderAsync(cancellationToken);
+
+                    throw;
+                }
+                catch (OperationCanceledException)
+                {
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
+                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                    throw;
                 }
             }
             catch (Exception ex)
@@ -591,6 +853,65 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">connection</exception>
+        public static async Task<object> ExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            connection.EnsureOpen();
+
+            await using var command = (DbCommand)NewCommand(connection, commandText, param);
+            try
+            {
+                var stopwatch = ValueStopwatch.StartNew();
+                try
+                {
+                    logger ??= connection.GetLogger();
+
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommand("ExecuteScalar", command, logger);
+
+                    var result = command.ExecuteScalar();
+
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                    return result;
+                }
+                catch (SqlException ex)
+                {
+                    if (CheckConnectionPoolException(connection, ex))
+                        return command.ExecuteScalar();
+
+                    throw;
+                }
+                catch (OperationCanceledException)
+                {
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
+                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.SetData("sql_command_text", commandText);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Executes the statement returning a scalar value.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="commandText">The command text.</param>
         /// <param name="logger">Logger</param>
         /// <returns>Scalar value</returns>
         public static object ExecuteScalar(IDbConnection connection, string commandText, ILogger logger = null)
@@ -657,6 +978,21 @@ namespace Serenity.Data
         public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, ILogger logger = null)
         {
             return ExecuteReader(connection, query.ToString(), query.Params, logger);
+        }
+
+        /// <summary>
+        /// Executes the statement returning a data reader.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>
+        /// Data reader with results
+        /// </returns>
+        public static Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, SqlQuery query, CancellationToken cancellationToken, ILogger logger = null)
+        {
+            return ExecuteReaderAsync(connection, query.ToString(), query.Params, cancellationToken, logger);
         }
 
         /// <summary>

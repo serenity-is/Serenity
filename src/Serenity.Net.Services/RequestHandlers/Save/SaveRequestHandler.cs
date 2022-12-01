@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// Generic base class for save request handlers
@@ -101,6 +104,25 @@
         }
 
         /// <summary>
+        /// Invokes the passed save action method
+        /// </summary>
+        /// <param name="action">Save action method</param>
+        protected virtual async Task InvokeSaveActionAsync(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception exception)
+            {
+                foreach (var behavior in behaviors.Value.OfType<ISaveExceptionBehavior>())
+                    behavior.OnException(this, exception);
+
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Executes the actual SQL save operation
         /// </summary>
         protected virtual void ExecuteSave()
@@ -145,6 +167,62 @@
                     InvokeSaveAction(() =>
                     {
                         Connection.Insert(Row);
+                    });
+
+                    if (idField is not null)
+                        Response.EntityId = idField.AsObject(Row);
+                }
+
+                InvalidateCacheOnCommit();
+            }
+        }
+
+        /// <summary>
+        /// Executes the actual SQL save operation
+        /// </summary>
+        protected virtual async Task ExecuteSaveAsync(CancellationToken cancellationToken)
+        {
+            if (IsUpdate)
+            {
+                if (Row.IsAnyFieldAssigned)
+                {
+                    var idField = Row.IdField;
+
+                    if (idField.IndexCompare(Old, Row) != 0)
+                    {
+                        var update = new SqlUpdate(Row.Table);
+                        update.Set(Row);
+                        update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old)));
+
+                        await InvokeSaveActionAsync(() => update.ExecuteAsync(Connection, cancellationToken, ExpectedRows.One));
+                    }
+                    else
+                    {
+                        await InvokeSaveActionAsync(() => Connection.UpdateByIdAsync(Row, cancellationToken));
+                    }
+
+                    Response.EntityId = idField.AsObject(Row);
+                    InvalidateCacheOnCommit();
+                }
+            }
+            else if (IsCreate)
+            {
+                var idField = Row.IdField;
+                if (idField is not null &&
+                    idField.Flags.HasFlag(FieldFlags.AutoIncrement))
+                {
+                    await InvokeSaveActionAsync(async () =>
+                    {
+                        var entityId = await Connection.InsertAndGetIDAsync(Row, cancellationToken);
+                        Response.EntityId = entityId;
+                        Row.IdField.AsObject(Row, Row.IdField.ConvertValue(entityId, CultureInfo.InvariantCulture));
+                    });
+                }
+                else
+                {
+                    await InvokeSaveActionAsync(async () =>
+                    {
+                        await Connection.InsertAsync(Row, cancellationToken);
                     });
 
                     if (idField is not null)
@@ -335,15 +413,8 @@
             return query;
         }
 
-        /// <summary>
-        /// Processes the save request. This is the entry point for the handler.
-        /// </summary>
-        /// <param name="unitOfWork">Unit of work</param>
-        /// <param name="request">Request</param>
-        /// <param name="requestType">Type of request, Create, Update or Auto</param>
-        /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
-        public TSaveResponse Process(IUnitOfWork unitOfWork, TSaveRequest request,
-            SaveRequestType requestType = SaveRequestType.Auto)
+        private void BeforeProcess(IUnitOfWork unitOfWork, TSaveRequest request,
+            SaveRequestType requestType)
         {
             StateBag.Clear();
 
@@ -376,13 +447,49 @@
             BeforeSave();
 
             ClearNonTableAssignments();
-            ExecuteSave();
+        }
 
+        private void AfterProcess()
+        {
             AfterSave();
 
             PerformAuditing();
 
             OnReturn();
+        }
+
+        /// <summary>
+        /// Processes the save request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <param name="requestType">Type of request, Create, Update or Auto</param>
+        /// <exception cref="ArgumentNullException">unitOfWork or request is null</exception>
+        public TSaveResponse Process(IUnitOfWork unitOfWork, TSaveRequest request,
+            SaveRequestType requestType = SaveRequestType.Auto)
+        {
+            BeforeProcess(unitOfWork, request, requestType);
+            ExecuteSave();
+            AfterProcess();
+
+            return Response;
+        }
+
+        /// <summary>
+        /// Processes the save request. This is the entry point for the handler.
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="request">Request</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <param name="requestType">Type of request, Create, Update or Auto</param>
+        /// <exception cref="ArgumentNullException">unitOfWork or request is null</exception>
+        public async Task<TSaveResponse> ProcessAsync(IUnitOfWork unitOfWork, TSaveRequest request, CancellationToken cancellationToken,
+            SaveRequestType requestType = SaveRequestType.Auto)
+        {
+            BeforeProcess(unitOfWork, request, requestType);
+            await ExecuteSaveAsync(cancellationToken);
+            AfterProcess();
+
             return Response;
         }
 
@@ -623,6 +730,11 @@
             return Process(uow, (TSaveRequest)request, type);
         }
 
+        async Task<SaveResponse> ISaveRequestProcessor.ProcessAsync(IUnitOfWork uow, ISaveRequest request, SaveRequestType type, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, (TSaveRequest)request, cancellationToken, type);
+        }
+
         /// <inheritdoc/>
         public TSaveResponse Create(IUnitOfWork uow, TSaveRequest request)
         {
@@ -630,9 +742,21 @@
         }
 
         /// <inheritdoc/>
+        public async Task<TSaveResponse> CreateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, request, cancellationToken, SaveRequestType.Create);
+        }
+
+        /// <inheritdoc/>
         public TSaveResponse Update(IUnitOfWork uow, TSaveRequest request)
         {
             return Process(uow, request, SaveRequestType.Update);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TSaveResponse> UpdateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken)
+        {
+            return await ProcessAsync(uow, request, cancellationToken, SaveRequestType.Update);
         }
 
         /// <summary>

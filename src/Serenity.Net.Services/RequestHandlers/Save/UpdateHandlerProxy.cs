@@ -1,4 +1,7 @@
-﻿namespace Serenity.Services
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Serenity.Services
 {
     internal class UpdateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
         : IUpdateHandler<TRow, TSaveRequest, TSaveResponse>
@@ -19,6 +22,11 @@
         public TSaveResponse Update(IUnitOfWork uow, TSaveRequest request)
         {
             return handler.Update(uow, request);
+        }
+
+        public Task<TSaveResponse> UpdateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken)
+        {
+            return handler.UpdateAsync(uow, request, cancellationToken);
         }
     }
 
