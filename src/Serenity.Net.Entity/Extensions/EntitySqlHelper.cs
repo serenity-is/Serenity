@@ -198,6 +198,14 @@ namespace Serenity.Data
             return count;
         }
 
+        /// <summary>
+        /// Executes the specified callback for all rows returned from executing the query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection.</param>
+        /// <param name="callBack">The call back.</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Number of returned results.</returns>
         public static async Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
             Action callBack, CancellationToken cancellationToken)
         {
