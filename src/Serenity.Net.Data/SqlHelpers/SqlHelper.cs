@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.IO;
@@ -111,6 +111,12 @@ namespace Serenity.Data
             {
                 logger.LogDebug("Error logging command: ", ex);
             }
+        }
+
+        private static void LogCommandEnd(ILogger logger, string method, int uid, string status, double elapsedMilliseconds)
+        {
+            logger.LogDebug("SQL - {method}[{uid}] - {status} - {ElapsedMilliseconds} ms",
+                method, uid, status, elapsedMilliseconds);
         }
 
         /// <summary>
@@ -335,20 +341,21 @@ namespace Serenity.Data
                     if (CheckConnectionPoolException(command.Connection, ex))
                         return await dbCommand.ExecuteNonQueryAsync(cancellationToken);
 
+                    if (ex.Number == 0 && cancellationToken.IsCancellationRequested && logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommandEnd(logger, "ExecuteNonQuery", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
+
                     throw;
                 }
 
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
-                        "ExecuteNonQuery", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                    LogCommandEnd(logger, "ExecuteNonQuery", command.GetHashCode(), "END", stopwatch.ElapsedMilliseconds);
 
                 return result;
             }
             catch (OperationCanceledException)
             {
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
-                        "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                    LogCommandEnd(logger, "ExecuteNonQuery", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
 
                 throw;
             }
@@ -745,8 +752,7 @@ namespace Serenity.Data
                     var result = await command.ExecuteReaderAsync(cancellationToken);
 
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
-                            "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                        LogCommandEnd(logger, "ExecuteReader", command.GetHashCode(), "END", stopwatch.ElapsedMilliseconds);
 
                     return result;
                 }
@@ -755,13 +761,15 @@ namespace Serenity.Data
                     if (CheckConnectionPoolException(connection, ex))
                         return await command.ExecuteReaderAsync(cancellationToken);
 
+                    if (ex.Number == 0 && cancellationToken.IsCancellationRequested && logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommandEnd(logger, "ExecuteReader", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
+
                     throw;
                 }
                 catch (OperationCanceledException)
                 {
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
-                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                        LogCommandEnd(logger, "ExecuteReader", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
 
                     throw;
                 }
@@ -876,26 +884,27 @@ namespace Serenity.Data
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
                         LogCommand("ExecuteScalar", command, logger);
 
-                    var result = command.ExecuteScalar();
+                    var result = await command.ExecuteScalarAsync(cancellationToken);
 
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
-                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                        LogCommandEnd(logger, "ExecuteScalar", command.GetHashCode(), "END", stopwatch.ElapsedMilliseconds);
 
                     return result;
                 }
                 catch (SqlException ex)
                 {
                     if (CheckConnectionPoolException(connection, ex))
-                        return command.ExecuteScalar();
+                        return await command.ExecuteScalarAsync(cancellationToken);
+
+                    if (ex.Number == 0 && cancellationToken.IsCancellationRequested && logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommandEnd(logger, "ExecuteScalar", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
 
                     throw;
                 }
                 catch (OperationCanceledException)
                 {
                     if (logger?.IsEnabled(LogLevel.Debug) == true)
-                        logger.LogDebug("SQL - {method}[{uid}] - CANCELED - {ElapsedMilliseconds} ms",
-                            "ExecuteScalar", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                        LogCommandEnd(logger, "ExecuteScalar", command.GetHashCode(), "CANCELED", stopwatch.ElapsedMilliseconds);
 
                     throw;
                 }
