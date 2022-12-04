@@ -168,7 +168,7 @@
                     {
                         update.Set(isActiveDeletedRow.IsActiveField, -1);
                     }
-                    else if (isDeletedRow != null)
+                    else
                     {
                         update.Set(isDeletedRow.IsDeletedField, true);
                     }

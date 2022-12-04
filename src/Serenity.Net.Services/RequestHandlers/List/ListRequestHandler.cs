@@ -334,7 +334,7 @@ namespace Serenity.Services
                     }
                     else if (field is Int64Field)
                     {
-                        if (id == null || id < long.MinValue || id > long.MaxValue)
+                        if (id == null)
                         {
                             orFalse = true;
                             return;
