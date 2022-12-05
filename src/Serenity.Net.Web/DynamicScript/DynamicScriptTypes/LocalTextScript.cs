@@ -1,4 +1,5 @@
 ﻿using Serenity.Localization;
+using SerenityIs.Administration;
 using System.IO;
 
 namespace Serenity.Web
@@ -79,22 +80,10 @@ namespace Serenity.Web
         /// <param name="languageId">Language ID</param>
         /// <param name="isPending">True to include pending text</param>
         /// <exception cref="ArgumentNullException">Registry is null</exception>
-        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
+            string includes, string languageId, bool isPending)
         {
-            if (registry == null)
-                throw new ArgumentNullException(nameof(registry));
-
-            var list = new List<KeyValuePair<string, string>>();
-
-            if (!string.IsNullOrEmpty(includes))
-            {
-                var regex = new Regex(includes, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                var texts = registry is LocalTextRegistry ltr ? ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
-
-                foreach (var pair in texts)
-                    if (regex.IsMatch(pair.Key))
-                        list.Add(pair);
-            }
+            var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending).ToList();
             list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
             StringBuilder jwBuilder = new("Q.LT.add(");
