@@ -1,3 +1,40 @@
+## 6.4.0 (2022-12-05)
+
+Features:
+  - switch to pnpm for Serenity and feature projects (Serene / StartSharp still use npm)
+  - also use state store for script type registry
+  - allow mocking Q.debounce function in corelib for testing purposes
+  - use jquery event bindings in SleekGrid where possible for better compatibility with legacy plugins
+  - make sure interface checks via Q.isAssignableFrom etc. succeed by checking via __typeName even if the same interface is bundled into multiple scripts
+  - abstracted SixLabors.ImageSharp dependency via new IImageProcessor interface, that might allow replacing that library with another in the future
+  - ThumbnailGenerator class is now obsolete, use it via DI by IImageProcessor interface
+  - abstracted upload processor via IUploadProcessor interface
+  - UploadProcessor is now obsolete, inject and use IUploadProcessor interface via DI
+  - abstracted upload file and image validation with new IUploadValidator interface.
+  - introduced IUploadOptions interface and UploadOptions class for keeping default upload options and using in FilePage
+  - reorganized upload editor attributes through new abstract class BaseUploadEditorAttribute
+  - image validation is now only performed for the extensions specified in ImageExtensions which is ".gif;.jpg;.jpeg;.png;" by default
+  - default extension black list can now be modified via ExtensionBlackList property of upload editor attributes
+  - added UploadIntent property to upload editor attributes, which is a string that is passed to the upload editors and as a query string back to FilePage during temporary upload. This can be used to customize default thumbnail size, validations etc. in upload method based on intent.
+  - [BREAKING CHANGE] IUploadStorage.CopyFrom and IUploadStorage.WriteFile methods accept OverwriteOption enum instead of bool? autoRename flag which was confusing
+  - introduced full set of undelete handler related types and behaviors
+  - completed XML documentation for Serenity.Services and Serenity.Web
+  - switched to typescript modules also in Serene
+  - update bootstrap, bootstrap-icons and jquery. 
+  - updated sleekgrid to 1.4.4
+  - jquery is now at Serenity.Assets/jquery/jquery.js instead of Serenity.Assets/Scripts/jquery-3.5.1.js, you should update your includes in appsettings.bundles.json
+  - updated movie tutorial for typescript modules
+  - updated serenity docs like introduction, di, configuration, authentication, localization, caching for latest serenity version
+  - updated serenity docs api reference to include descriptions for all serenity libs
+
+Bugfixes:
+  - fix row selection mixin select all button state not updated for some cases
+  - corelib/slick had an embedded corelib/q copy because of esbuild configuration issue
+  - initially generated modular ServiceTyping by sergen contained invalid method URLs with Administration/User
+  - sleekgrid: auto column hints plugin were not working properly because of jquery event binding difference
+  - sleekgrid: fix rtl mode scroll column rendering
+  - sleekgrid: old column filter row headers are not deleted before creating new ones
+
 ## 6.3.6 (2022-11-15)
 
 Bugfixes:
