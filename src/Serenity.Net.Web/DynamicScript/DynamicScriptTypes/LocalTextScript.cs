@@ -6,7 +6,7 @@ namespace Serenity.Web
     /// <summary>
     /// Local text dynamic script
     /// </summary>
-    public class LocalTextScript : DynamicScript, INamedDynamicScript
+    public class LocalTextScript : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         private readonly string scriptName;
         private readonly string languageId;
@@ -72,14 +72,14 @@ namespace Serenity.Web
         }
 
         /// <summary>
-        /// Gets a local text package script content
+        /// Gets a local text package script data in json format
         /// </summary>
         /// <param name="registry">Text registry</param>
         /// <param name="includes">Includes regex</param>
         /// <param name="languageId">Language ID</param>
         /// <param name="isPending">True to include pending text</param>
         /// <exception cref="ArgumentNullException">Registry is null</exception>
-        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
+        public static object GetLocalTextPackageScriptData(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
         {
             if (registry == null)
                 throw new ArgumentNullException(nameof(registry));
@@ -97,9 +97,9 @@ namespace Serenity.Web
             }
             list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
-            StringBuilder jwBuilder = new("Q.LT.add(");
+            StringBuilder jwBuilder = new("");
             JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
-                
+
             jw.WriteStartObject();
             List<string> stack = new();
             int stackCount = 0;
@@ -176,15 +176,34 @@ namespace Serenity.Web
             for (int i = 0; i < stackCount; i++)
                 jw.WriteEndObject();
             jw.WriteEndObject();
-            jwBuilder.Append(");");
 
             return jwBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Gets a local text package script content
+        /// </summary>
+        /// <param name="registry">Text registry</param>
+        /// <param name="includes">Includes regex</param>
+        /// <param name="languageId">Language ID</param>
+        /// <param name="isPending">True to include pending text</param>
+        /// <exception cref="ArgumentNullException">Registry is null</exception>
+        public static string GetLocalTextPackageScript(ILocalTextRegistry registry, string includes, string languageId, bool isPending)
+        {
+            var jsFormat = string.Format("Q.LT.add({0});", GetLocalTextPackageScriptData(registry, includes, languageId, isPending));
+            return jsFormat;
+        }
+
+        /// <inheritdoc/>
+        public object GetScriptData()
+        {
+            return GetLocalTextPackageScriptData(registry, includes, languageId, isPending);
         }
 
         /// <inheritdoc/>
         public override string GetScript()
         {
             return GetLocalTextPackageScript(registry, includes, languageId, isPending);
-        }  
+        }
     }
 }

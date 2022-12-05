@@ -152,7 +152,11 @@
                 {
                     if (script is IGetScriptData scriptData)
                     {
-                        content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
+                        var data = scriptData.GetScriptData();
+                        if (data is String stringData)
+                            content = utf8Encoding.GetBytes(stringData); 
+                        else
+                            content = utf8Encoding.GetBytes(data.ToJson());
                     }
                     else
                     {
