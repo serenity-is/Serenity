@@ -1451,6 +1451,24 @@ Slick._ = (() => {
         }
       });
       this._layout.updateHeadersWidth();
+      const headerRowCols = this._layout.getHeaderRowCols();
+      headerRowCols.forEach((hrc) => {
+        hrc.querySelectorAll(".slick-headerrow-column").forEach((el) => {
+          var columnDef = this.getColumnFromNode(el);
+          if (columnDef) {
+            this.trigger(this.onBeforeHeaderRowCellDestroy, {
+              node: el,
+              column: columnDef,
+              grid: this
+            });
+          }
+        });
+        if (this._jQuery) {
+          this._jQuery(hrc).empty();
+        } else {
+          hrc.innerHTML = "";
+        }
+      });
       var cols = this._cols, frozenCols = this._layout.getFrozenCols();
       for (var i = 0; i < cols.length; i++) {
         var m = cols[i];
