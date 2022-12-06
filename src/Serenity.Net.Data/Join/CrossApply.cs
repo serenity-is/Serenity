@@ -12,7 +12,7 @@
         /// <param name="subQuery">Subquery.</param>
         /// <param name="alias">The alias.</param>
         public CrossApply(string subQuery, string alias)
-            : base(null, string.IsNullOrEmpty(subQuery) ? subQuery : "(" + subQuery + ")", alias, null)
+            : base(null, subQuery, alias, null)
         {
         }
 
@@ -23,7 +23,7 @@
         /// <param name="subQuery">Subquery.</param>
         /// <param name="alias">The alias.</param>
         public CrossApply(IDictionary<string, Join> joins, string subQuery, string alias)
-            : base(joins, string.IsNullOrEmpty(subQuery) ? subQuery : "(" + subQuery + ")", alias, null)
+            : base(joins, subQuery, alias, null)
         {
         }
 

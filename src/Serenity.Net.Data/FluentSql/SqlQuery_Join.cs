@@ -286,5 +286,32 @@
 
             return Join(join);
         }
+
+        /// <summary>
+        /// Adds a CROSS APPLY to the query
+        /// </summary>
+        /// <param name="subquery">The subquery.</param>
+        /// <param name="alias">The alias.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// alias is null or alias.name is null or empty.
+        /// </exception>
+        public SqlQuery CrossApply(string subquery, IAlias alias)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (string.IsNullOrEmpty(alias.Name))
+                throw new ArgumentNullException("alias.name");
+
+            var join = new CrossApply(subquery, alias.Name);
+
+            Join(join);
+
+            if (alias as IHaveJoins != null)
+                AliasWithJoins[alias.Name] = alias as IHaveJoins;
+
+            return this;
+        }
     }
 }
