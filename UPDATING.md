@@ -4,7 +4,7 @@ This document outlines steps required to update an existing Serene based project
 
 If you are looking to update a StartSharp project please see this document (requires access to StartSharp repository):
 
-https://github.com/volkanceylan/StartSharp/blob/master/docs/updating-startsharp.md
+https://github.com/serenity-premium/startsharp/blob/master/docs/updating-startsharp.md
 
 > ### Warning
 >
