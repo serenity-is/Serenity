@@ -25,7 +25,7 @@ See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/do
 
 ## Online Demo
 
-http://serenity.is/demo/
+https://demo.serenity.is
 
 ## Contribute / Spread the Word
 
