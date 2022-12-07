@@ -1482,7 +1482,7 @@ Bugfixes:
 ## 3.3.4 (2017-10-14)
 
 Features:
-  - easy to configure cdn support (experimental, in use at serenity.is/demo)
+  - easy to configure cdn support (experimental, in use at demo.serenity.is)
   - allow cdns to cache dynamic scripts for anonymous access
   - check bundled script rights also when checkRights() on concatenated script is called
   - increase scriban template loop limits as some users has tables with many columns (300+)
