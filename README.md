@@ -18,7 +18,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/docs/) for documentation, and step by step tutorials.
 
 **Serenity Blog:**
-- http://serenity.is/blog/
+- https://serenity.is/blog/
 
 **Check out the Visual Studio Toolbox Presentation:**
 - [Building Web Apps with the Serenity Platform](https://docs.microsoft.com/en-us/shows/visual-studio-toolbox/building-web-apps-with-the-serenity-platform)
@@ -39,7 +39,7 @@ Serenity (including it's application template Serene) is a free and open source 
 
 ## Premium Packages
 
-We offer premium support packages at http://serenity.is. They also include *StartSharp* template with advanced samples, features and modules. 
+We offer premium support packages at https://serenity.is. They also include *StartSharp* template with advanced samples, features and modules. 
 
 Visit [this document](https://serenity.is/docs/startsharp/README) for more information about what is available in premium support and *StartSharp*.
 
