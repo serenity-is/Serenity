@@ -180,15 +180,19 @@ namespace Serenity.Services
                 var val = p.Value.AsObject(row);
                 string value;
 
-                var colon = p.Key.IndexOf(":", StringComparison.Ordinal);
+                string key = p.Key;
+                var colon = key.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
+                {
+                    key = key[..colon];
                     value = string.Format(CultureInfo.InvariantCulture, string.Concat("{0:", p.Key.AsSpan(colon + 1, p.Key.Length - colon - 2), "}"), val);
+                }
                 else
                     value = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
                 value = formatSanitizer.SanitizePlaceholder(p.Key, value);
 
-                result = result.Replace(p.Key, value, StringComparison.Ordinal);
+                result = result.Replace(key, value, StringComparison.Ordinal);
             }
 
             result = formatSanitizer.SanitizeResult(result);
