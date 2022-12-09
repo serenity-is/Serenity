@@ -8,7 +8,7 @@ namespace Serenity.ComponentModel;
 public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUploadImageContrains, IUploadImageOptions
 {
     /// <inheritdoc/>
-    public bool AllowNonImage { get; set; }
+    public bool AllowNonImage { get; set; } = true;
     
     /// <inheritdoc/>
     public int MaxSize { get; set; }
