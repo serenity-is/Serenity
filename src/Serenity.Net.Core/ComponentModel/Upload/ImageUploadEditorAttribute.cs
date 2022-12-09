@@ -20,6 +20,7 @@
         public ImageUploadEditorAttribute()
             : base(Key)
         {
+            AllowNonImage = false;
         }
 
         /// <inheritdoc/>

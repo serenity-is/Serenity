@@ -18,6 +18,7 @@
         public MultipleImageUploadEditorAttribute()
             : base(Key)
         {
+            AllowNonImage = false;
             JsonEncodeValue = true;
         }
 
