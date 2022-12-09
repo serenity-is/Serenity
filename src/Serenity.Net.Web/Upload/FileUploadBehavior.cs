@@ -184,15 +184,18 @@ namespace Serenity.Services
                 var colon = key.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
                 {
-                    key = key[..colon];
+                    key = key[1..colon];
                     value = string.Format(CultureInfo.InvariantCulture, string.Concat("{0:", p.Key.AsSpan(colon + 1, p.Key.Length - colon - 2), "}"), val);
                 }
                 else
+                {
+                    key = key[1..^1];
                     value = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
+                }
 
-                value = formatSanitizer.SanitizePlaceholder(p.Key, value);
+                value = formatSanitizer.SanitizePlaceholder(key, value);
 
-                result = result.Replace(key, value, StringComparison.Ordinal);
+                result = result.Replace(p.Key, value, StringComparison.Ordinal);
             }
 
             result = formatSanitizer.SanitizeResult(result);

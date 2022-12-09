@@ -300,7 +300,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             .addClass('upload-progress')
             .prependTo(this.toolbar.element);
 
-        UploadHelper.addUploadInput(this.getUploadInputOptions());
+        this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
         this.fileSymbols = $('<ul/>').appendTo(this.element);
         if (!this.element.attr('id')) {

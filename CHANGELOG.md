@@ -1,3 +1,10 @@
+## 6.4.2 (2022-12-09)
+
+Bugfixes:
+  - fix script null reference issue with MultipleFileUploadEditors
+  - include source maps for some pro nuget packages in static web assets which were missing them (StartSharp)
+  - the key sent to IFilenameFormatSanitizer contained "|" chars
+
 ## 6.4.1 (2022-12-09)
 
 Features:
