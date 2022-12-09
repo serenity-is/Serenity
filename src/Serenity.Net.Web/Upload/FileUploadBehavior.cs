@@ -1,6 +1,7 @@
 ﻿using Serenity.Web;
 using System.IO;
 using System;
+using Serenity.ComponentModel;
 
 namespace Serenity.Services
 {
@@ -19,6 +20,7 @@ namespace Serenity.Services
         private readonly IUploadValidator uploadValidator;
         private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage storage;
+        private readonly IFilenameFormatSanitizer formatSanitizer;
         private StringField originalNameField;
         private Dictionary<string, Field> replaceFields;
 
@@ -28,13 +30,16 @@ namespace Serenity.Services
         /// <param name="uploadValidator">Upload validator</param>
         /// <param name="imageProcessor">Image processor</param>
         /// <param name="storage">Upload storage</param>
+        /// <param name="formatSanitizer">Filename format sanitizer</param>
         /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-            IUploadStorage storage)
+            IUploadStorage storage, 
+            IFilenameFormatSanitizer formatSanitizer = null)
         {
             this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
             this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
             this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
+            this.formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
         }
 
         /// <inheritdoc/>
@@ -82,7 +87,6 @@ namespace Serenity.Services
 
             fileNameFormat = format.Replace("~", SplittedFormat, StringComparison.Ordinal);
             replaceFields = ParseReplaceFields(fileNameFormat, row, Target);
-
             return true;
         }
 
@@ -132,13 +136,18 @@ namespace Serenity.Services
             return replaceFields;
         }
 
-        internal static string ProcessReplaceFields(string s, 
+        internal static string ProcessReplaceFields(string s,
             Dictionary<string, Field> replaceFields, 
             ISaveRequestHandler handler,
-            ISanitizeFilenamePlaceholder sanitizePlaceholder)
+            IFilenameFormatSanitizer formatSanitizer)
         {
+            var result = s;
+
             if (replaceFields == null)
-                return s;
+                return result;
+
+            if (formatSanitizer is null)
+                throw new ArgumentNullException(nameof(formatSanitizer));
 
             var row = handler.Row;
 
@@ -169,26 +178,22 @@ namespace Serenity.Services
             foreach (var p in replaceFields)
             {
                 var val = p.Value.AsObject(row);
-                string str;
+                string value;
 
                 var colon = p.Key.IndexOf(":", StringComparison.Ordinal);
                 if (colon >= 0)
-                    str = string.Format(CultureInfo.InvariantCulture, string.Concat("{0:", p.Key.AsSpan(colon + 1, p.Key.Length - colon - 2), "}"), val);
+                    value = string.Format(CultureInfo.InvariantCulture, string.Concat("{0:", p.Key.AsSpan(colon + 1, p.Key.Length - colon - 2), "}"), val);
                 else
-                    str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
+                    value = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
-                if (sanitizePlaceholder != null)
-                    str = sanitizePlaceholder.Sanitize(p.Key, str);
-                else
-                    str = UploadFormatting.SanitizePlaceholder(str);
+                value = formatSanitizer.SanitizePlaceholder(p.Key, value);
 
-                s = s.Replace(p.Key, str, StringComparison.Ordinal);
+                result = result.Replace(p.Key, value, StringComparison.Ordinal);
             }
 
-            while (s.IndexOf("//", StringComparison.Ordinal) > 0)
-                s = s.Replace("//", "/_/", StringComparison.Ordinal);
+            result = formatSanitizer.SanitizeResult(result);
 
-            return s;
+            return result;
         }
 
         /// <inheritdoc/>
@@ -302,8 +307,8 @@ namespace Serenity.Services
             var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
             {
                 Format = fileNameFormat,
-                PostFormat = s => ProcessReplaceFields(s, replaceFields, handler, 
-                    editorAttr as ISanitizeFilenamePlaceholder),
+                PostFormat = s => ProcessReplaceFields(s, replaceFields, handler,
+                    editorAttr as IFilenameFormatSanitizer ?? formatSanitizer),
                 TemporaryFile = newFilename,
                 EntityId = idField.AsObject(handler.Row),
                 FilesToDelete = filesToDelete,

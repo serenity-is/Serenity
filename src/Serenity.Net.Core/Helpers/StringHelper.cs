@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO;
 
 namespace Serenity
 {
@@ -300,22 +301,67 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sanitizes the filename by removing diacritics, ı with i and replacing /, :, &amp;, 
-        /// with underscore.
+        /// A regex to remove invalid file name characters
         /// </summary>
-        /// <param name="s">The string.</param>
-        /// <exception cref="ArgumentNullException">s is null</exception>
-        public static string SanitizeFilename(string s)
-        {
-            if (s == null)
-                throw new ArgumentNullException("s");
+        public static readonly Regex InvalidFilenameCharsRegex = 
+            new ($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
+                RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-            s = RemoveDiacritics(s);
-            s = s.Replace("/", "_");
-            s = s.Replace(":", "_");
-            s = s.Replace("&", "_");
-            s = s.Replace("ı", "i");
-            return s.TrimToEmpty();
+        /// <summary>
+        /// Sanitizes the filename by removing diacritics, ı with i and replacing any
+        /// invalid filename characters with underscore.
+        /// </summary>
+        /// <param name="filename">The string.</param>
+        /// <param name="replacement">Replacement string for invalid characters</param>
+        /// <param name="removeDiacritics">True to remove diacritics</param>
+        /// <exception cref="ArgumentNullException">s is null</exception>
+        public static string SanitizeFilename(string filename, 
+            string replacement = "_", bool removeDiacritics = true)
+        {
+            if (filename == null)
+                throw new ArgumentNullException(nameof(filename));
+
+            if (removeDiacritics)
+            {
+                RemoveDiacritics(filename);
+                filename = filename.Replace("ı", "i");
+            }
+
+            filename = InvalidFilenameCharsRegex.Replace(filename, replacement);
+
+            return filename.TrimToEmpty();
+        }
+
+        /// <summary>
+        /// A regex to remove invalid file path characters
+        /// </summary>
+        public static readonly Regex InvalidPathCharsRegex =
+            new($"[{Regex.Escape(new string(Path.GetInvalidPathChars()))}]",
+                RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Sanitizes the path by removing diacritics, ı with i and replacing any
+        /// invalid file path characters with underscore.
+        /// </summary>
+        /// <param name="filename">The string.</param>
+        /// <param name="replacement">Replacement string for invalid characters</param>
+        /// <param name="removeDiacritics">True to remove diacritics</param>
+        /// <exception cref="ArgumentNullException">s is null</exception>
+        public static string SanitizeFilePath(string filename,
+            string replacement = "_", bool removeDiacritics = true)
+        {
+            if (filename == null)
+                throw new ArgumentNullException(nameof(filename));
+
+            if (removeDiacritics)
+            {
+                RemoveDiacritics(filename);
+                filename = filename.Replace("ı", "i");
+            }
+
+            filename = InvalidPathCharsRegex.Replace(filename, replacement);
+
+            return filename.TrimToEmpty();
         }
 
         /// <summary>

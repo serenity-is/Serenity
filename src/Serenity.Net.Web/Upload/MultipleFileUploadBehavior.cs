@@ -15,6 +15,7 @@ namespace Serenity.Services
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private Dictionary<string, Field> replaceFields;
+        private readonly IFilenameFormatSanitizer formatSanitizer;
         private readonly IUploadValidator uploadValidator;
         private readonly IImageProcessor imageProcessor;
         private readonly IUploadStorage storage;
@@ -25,13 +26,16 @@ namespace Serenity.Services
         /// <param name="uploadValidator">Upload validator</param>
         /// <param name="imageProcessor">Image processor</param>
         /// <param name="storage">Upload storage</param>
+        /// <param name="formatSanitizer">Filename format sanitizer</param>
         /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
         public MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-            IUploadStorage storage)
+            IUploadStorage storage,
+            IFilenameFormatSanitizer formatSanitizer = null)
         {
             this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
             this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
             this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
+            this.formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
         }
 
         /// <inheritdoc/>
@@ -191,7 +195,7 @@ namespace Serenity.Services
                 {
                     Format = fileNameFormat,
                     PostFormat = s => FileUploadBehavior.ProcessReplaceFields(s, replaceFields, handler,
-                        editorAttr as ISanitizeFilenamePlaceholder),
+                        editorAttr as IFilenameFormatSanitizer ?? formatSanitizer),
                     TemporaryFile = filename,
                     EntityId = idField.AsObject(handler.Row),
                     FilesToDelete = filesToDelete,

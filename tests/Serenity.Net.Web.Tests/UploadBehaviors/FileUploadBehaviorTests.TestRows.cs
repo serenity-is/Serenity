@@ -129,6 +129,12 @@ public partial class FileUploadBehaviorTests
             set => fields.ImageUploadEditorCopyToHistory[this] = value;
         }
 
+        public string Empty
+        {
+            get => fields.Empty[this];
+            set => fields.Empty[this] = value;
+        }
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
@@ -144,6 +150,7 @@ public partial class FileUploadBehaviorTests
             public StringField ImageUploadEditorOriginalNameIntegerField;
             public StringField ImageUploadEditorOriginalNameNoField;
             public StringField ImageUploadEditorCopyToHistory;
+            public StringField Empty;
         }
     }
 

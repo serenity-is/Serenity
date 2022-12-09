@@ -1,3 +1,15 @@
+## 6.4.1 (2022-12-09)
+
+Features:
+  - added AutoValidateAntiforgeryIgnoreBearerAttribute which can be used instead of AutoValidateAntiforgeryTokenAttribute to skip AntiForgery validation when cookie header is not present and Authorization header is Bearer (e.g. JWT etc). use it in place of AutoValidateAntiforgeryTokenAttribute in Startup.cs to try.
+  - implemented OpenIddict integration for OpenID / JWT authentication schemes in Serenity.Pro.OpenIddict (StartSharp)
+  - added LocalTextDataScript to access local text as a JSON object from mobile apps etc. by specifying package name with "pack" and language ID with "lang" query string parameters via DynJS.axd/RemoteData.LocalText or DynamicData/RemoteData.LocalText
+  - serenity demo is moved to https://demo.serenity.is, old https://serenity.is/demo urls are redirected so it is not expected to cause a problem
+  - StartSharp repository is moved to https://github.com/serenity-premium/startsharp
+
+Bugfixes:
+  - AllowNonImage in UploadOptions should be true, as it is mainly used for temporary uploads
+
 ## 6.4.0 (2022-12-05)
 
 Features:

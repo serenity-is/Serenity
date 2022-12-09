@@ -22,6 +22,7 @@ namespace Serenity.Web
                 throw new ArgumentNullException(nameof(collection));
 
             collection.AddOptions();
+            collection.TryAddSingleton<IFilenameFormatSanitizer, DefaultFilenameFormatSanitizer>();
             collection.TryAddSingleton<IUploadStorage, DefaultUploadStorage>();
             collection.TryAddSingleton<IUploadValidator, DefaultUploadValidator>();
             collection.TryAddSingleton<IImageProcessor, DefaultImageProcessor>();

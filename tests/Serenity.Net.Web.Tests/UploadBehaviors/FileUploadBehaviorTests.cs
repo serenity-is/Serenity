@@ -3,6 +3,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Text.RegularExpressions;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;
@@ -1091,7 +1092,42 @@ public partial class FileUploadBehaviorTests
         Assert.Equal("a-test-\\_\\.jpg", processResult);
     }
 
-    private string TestProcessReplaceFields(string fileNameFormat, IDictionary<string, object> foreignFieldQueryResults = null, TestIIdRow  row = null, bool? isUpdate = null)
+    private class IgnoreSlashEmptySanitizer : IFilenameFormatSanitizer
+    {
+        public string SanitizePlaceholder(string key, string value)
+        {
+            value = StringHelper.SanitizeFilePath((value ?? "").Replace('\\', '/'));
+            value = value.Replace("..", "_", StringComparison.Ordinal);
+            return value;
+        }
+
+        public string SanitizeResult(string result)
+        {
+            if (string.IsNullOrEmpty(result))
+                return result;
+
+            result = result.Replace('\\', '/');
+
+            while (result.Contains("//"))
+                result = result.Replace("//", "/", StringComparison.Ordinal);
+
+            return result;
+        }
+    }
+
+    [Fact]
+    public void ProcessReplaceFields_Uses_Registered_IgnoreSlashSanitizer()
+    {
+        var processResult = TestProcessReplaceFields("x/|Name|/|Empty|/y", row: new TestIIdRow
+        {
+            Name = "a/b/c/d"
+        }, sanitizer: new IgnoreSlashEmptySanitizer());
+
+        Assert.Equal("x/a/b/c/d/y.jpg", processResult);
+    }
+
+    private string TestProcessReplaceFields(string fileNameFormat, IDictionary<string, object> foreignFieldQueryResults = null, TestIIdRow  row = null, bool? isUpdate = null,
+        IFilenameFormatSanitizer sanitizer = null)
     {
         isUpdate ??= foreignFieldQueryResults == null;
         
@@ -1102,59 +1138,68 @@ public partial class FileUploadBehaviorTests
 
         row.StringFieldImageUploadEditor ??= "temporary/new.jpg";
 
-        row.GetFields().StringFieldImageUploadEditor.GetAttribute<ImageUploadEditorAttribute>()
-            .FilenameFormat = fileNameFormat;
-        
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
-
-        var sut = new FileUploadBehavior(new MockUploadValidator(), new MockImageProcessor(), mockUploadStorage)
+        var attr = row.GetFields().StringFieldImageUploadEditor.GetAttribute<ImageUploadEditorAttribute>();
+        var oldFormat = attr.FilenameFormat;
+        try
         {
-            Target = TestIIdRow.Fields.StringFieldImageUploadEditor
-        };
-        
-        mockFileSystem.AddFile(row.StringFieldImageUploadEditor, new MockFileData(CreateImage(1000, 1000)));
+            attr.FilenameFormat = fileNameFormat;
 
-        sut.ActivateFor(row);
+            var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+            var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
-        var dbConnection = new MockDbConnection();
-        dbConnection.OnExecuteReader(command =>
-        {
-            var selectFields = MockDbDataReader.ParseSelectFieldAliases(command.CommandText).ToList();
-            var retRow = new TestIIdRow();
-
-            foreach (var field in selectFields)
+            var sut = new FileUploadBehavior(new MockUploadValidator(), new MockImageProcessor(), mockUploadStorage,
+                formatSanitizer: sanitizer)
             {
-                object value = field + "_value";
-                
-                if (foreignFieldQueryResults?.TryGetValue(field, out var dictValue) == true)
-                    value = dictValue;
-            
-                retRow[field] = value;
-            }
+                Target = TestIIdRow.Fields.StringFieldImageUploadEditor
+            };
 
-            return new MockDbDataReader(command.CommandText, retRow);
-        });
-        
-        var uow = new MockUnitOfWork(dbConnection);
-        var requestHandler = new MockSaveHandler<TestIIdRow>
+            mockFileSystem.AddFile(row.StringFieldImageUploadEditor, new MockFileData(CreateImage(1000, 1000)));
+
+            sut.ActivateFor(row);
+
+            var dbConnection = new MockDbConnection();
+            dbConnection.OnExecuteReader(command =>
+            {
+                var selectFields = MockDbDataReader.ParseSelectFieldAliases(command.CommandText).ToList();
+                var retRow = new TestIIdRow();
+
+                foreach (var field in selectFields)
+                {
+                    object value = field + "_value";
+
+                    if (foreignFieldQueryResults?.TryGetValue(field, out var dictValue) == true)
+                        value = dictValue;
+
+                    retRow[field] = value;
+                }
+
+                return new MockDbDataReader(command.CommandText, retRow);
+            });
+
+            var uow = new MockUnitOfWork(dbConnection);
+            var requestHandler = new MockSaveHandler<TestIIdRow>
+            {
+                IsCreate = !isUpdate.Value,
+                IsUpdate = isUpdate.Value,
+                Old = isUpdate.Value ? new TestIIdRow { Id = 1234 } : null,
+                Row = row,
+                UnitOfWork = uow,
+                Connection = uow.Connection
+            };
+
+            sut.OnBeforeSave(requestHandler);
+            if (!isUpdate.Value)
+                row.Id = 1234;
+            sut.OnAfterSave(requestHandler);
+            uow.Commit();
+
+            var file = Assert.Single(mockFileSystem.AllFiles);
+            return file[mockFileSystem.Path.GetPathRoot(file).Length..].Replace('\\', '/'); // remove drive letter
+        }
+        finally
         {
-            IsCreate = !isUpdate.Value,
-            IsUpdate = isUpdate.Value,
-            Old = isUpdate.Value ? new TestIIdRow { Id = 1234 } : null,
-            Row = row,
-            UnitOfWork = uow,
-            Connection = uow.Connection
-        };
-
-        sut.OnBeforeSave(requestHandler);
-        if (!isUpdate.Value)
-            row.Id = 1234;
-        sut.OnAfterSave(requestHandler);
-        uow.Commit();
-
-        var file = Assert.Single(mockFileSystem.AllFiles);
-        return file[mockFileSystem.Path.GetPathRoot(file).Length..]; // remove drive letter
+            attr.FilenameFormat = oldFormat;
+        }
     }
     
     private static byte[] CreateImage(int width, int height, IImageFormat format = null, Configuration configuration = null, Rgba32? color = null)
