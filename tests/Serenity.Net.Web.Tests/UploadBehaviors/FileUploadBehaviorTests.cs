@@ -1022,7 +1022,7 @@ public partial class FileUploadBehaviorTests
             Id = 200_000
         });
         
-        Assert.Matches(@"^TestIId\\00200\\00200000_[\d\D]{13}.jpg$", processResult);
+        Assert.Matches(@"^TestIId/00200/00200000_[\d\D]{13}.jpg$", processResult);
     }
     
     [Fact]
@@ -1033,7 +1033,7 @@ public partial class FileUploadBehaviorTests
             Id = 200_000
         });
         
-        Assert.Matches(@"^Foobar\\00200\\00200000_[\d\D]{13}.jpg$", processResult);
+        Assert.Matches(@"^Foobar/00200/00200000_[\d\D]{13}.jpg$", processResult);
     }
     
     [Fact]
@@ -1089,7 +1089,7 @@ public partial class FileUploadBehaviorTests
             Name = "test"
         });
         
-        Assert.Equal("a-test-\\_\\.jpg", processResult);
+        Assert.Equal("a-test-/_/.jpg", processResult);
     }
 
     private class IgnoreSlashEmptySanitizer : IFilenameFormatSanitizer
