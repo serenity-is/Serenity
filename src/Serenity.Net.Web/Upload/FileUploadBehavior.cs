@@ -132,7 +132,10 @@ namespace Serenity.Services
             return replaceFields;
         }
 
-        internal static string ProcessReplaceFields(string s, Dictionary<string, Field> replaceFields, ISaveRequestHandler handler)
+        internal static string ProcessReplaceFields(string s, 
+            Dictionary<string, Field> replaceFields, 
+            ISaveRequestHandler handler,
+            ISanitizeFilenamePlaceholder sanitizePlaceholder)
         {
             if (replaceFields == null)
                 return s;
@@ -174,12 +177,10 @@ namespace Serenity.Services
                 else
                     str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
 
-                str = StringHelper.SanitizeFilename(str).Replace('\\', '_').Replace("..", "_", StringComparison.Ordinal);
-                if (string.IsNullOrWhiteSpace(str))
-                    str = "_";
-
-                while (str.EndsWith(".", StringComparison.Ordinal))
-                    str = str[..^1] + "_";
+                if (sanitizePlaceholder != null)
+                    str = sanitizePlaceholder.Sanitize(p.Key, str);
+                else
+                    str = UploadFormatting.SanitizePlaceholder(str);
 
                 s = s.Replace(p.Key, str, StringComparison.Ordinal);
             }
@@ -301,7 +302,8 @@ namespace Serenity.Services
             var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
             {
                 Format = fileNameFormat,
-                PostFormat = s => ProcessReplaceFields(s, replaceFields, handler),
+                PostFormat = s => ProcessReplaceFields(s, replaceFields, handler, 
+                    editorAttr as ISanitizeFilenamePlaceholder),
                 TemporaryFile = newFilename,
                 EntityId = idField.AsObject(handler.Row),
                 FilesToDelete = filesToDelete,

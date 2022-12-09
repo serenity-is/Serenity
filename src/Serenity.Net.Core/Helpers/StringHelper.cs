@@ -300,10 +300,10 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sanitizes the filename by replacing /, :, &amp;, ı characters.
+        /// Sanitizes the filename by removing diacritics, ı with i and replacing /, :, &amp;, 
+        /// with underscore.
         /// </summary>
         /// <param name="s">The string.</param>
-        /// <returns></returns>
         /// <exception cref="ArgumentNullException">s is null</exception>
         public static string SanitizeFilename(string s)
         {

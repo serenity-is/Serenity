@@ -87,5 +87,28 @@ namespace Serenity.Web
 
             return value + " " + suffix;
         }
+
+        /// <summary>
+        /// Default implementation for sanitizing values of replacement placeholders 
+        /// in a file name format string like |X|/|Y|. Trims the value, 
+        /// if is empty, returns "_". , Characters like '/', '&amp;', and diacricits 
+        /// etc are replaced by calling StringHelper.SanitizeFileName, 
+        /// then replacing backslashes with underscore, double dots and tailing dots with underscore
+        /// </summary>
+        /// <param name="value">Value to be sanitized</param>
+        public static string SanitizePlaceholder(string value)
+        {
+            value = StringHelper.SanitizeFilename(value ?? "");
+            value = value.Replace('\\', '_')
+                .Replace("..", "_", StringComparison.Ordinal);
+
+            if (string.IsNullOrWhiteSpace(value))
+                value = "_";
+
+            while (value.EndsWith(".", StringComparison.Ordinal))
+                value = value[..^1] + "_";
+
+            return value;
+        }
     }
 }

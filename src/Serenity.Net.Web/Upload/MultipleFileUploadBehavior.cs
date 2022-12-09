@@ -190,7 +190,8 @@ namespace Serenity.Services
                 var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
                 {
                     Format = fileNameFormat,
-                    PostFormat = s => FileUploadBehavior.ProcessReplaceFields(s, replaceFields, handler),
+                    PostFormat = s => FileUploadBehavior.ProcessReplaceFields(s, replaceFields, handler,
+                        editorAttr as ISanitizeFilenamePlaceholder),
                     TemporaryFile = filename,
                     EntityId = idField.AsObject(handler.Row),
                     FilesToDelete = filesToDelete,
