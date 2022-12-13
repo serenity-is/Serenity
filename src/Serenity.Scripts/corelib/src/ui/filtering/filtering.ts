@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Config, Criteria, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, PropertyItem, startsWith, text, tryGetText } from "@serenity-is/corelib/q";
+import { ArgumentNullException, Config, Criteria, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeShortName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, PropertyItem, startsWith, text, tryGetText } from "@serenity-is/corelib/q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";
@@ -125,7 +125,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         }
 
         throw new Exception(format("Filtering '{0}' has no editor for '{1}' operator",
-            getTypeName(getInstanceType(this)), this.get_operator().key));
+            getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
     protected operatorFormat(op: FilterOperator) {
@@ -209,7 +209,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         }
 
         throw new Exception(format("Filtering '{0}' has no handler for '{1}' operator",
-            getTypeName(getInstanceType(this)), this.get_operator().key));
+            getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
     loadState(state: any) {

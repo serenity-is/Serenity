@@ -1,7 +1,7 @@
 ﻿import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeName, isAssignableFrom, notifyError, replaceAll, startsWith } from "@serenity-is/corelib/q";
+import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, replaceAll, startsWith } from "@serenity-is/corelib/q";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -90,7 +90,7 @@ export class Widget<TOptions = any> {
 
     public destroy(): void {
         if (this.element) {
-            this.element.removeClass('s-' + getTypeName(getInstanceType(this)));
+            this.element.removeClass(this.getCssClass());
             this.element.off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
         }
@@ -113,7 +113,7 @@ export class Widget<TOptions = any> {
             }
         }
 
-        classList.push(getTypeName(type));
+        classList.push(getTypeShortName(type));
         return classList
             .filter((v, i, a) => a.indexOf(v) === i)
             .map(s => 's-' + s)

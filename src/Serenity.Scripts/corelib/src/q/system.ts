@@ -136,7 +136,7 @@ export function getTypeFullName(type: Type): string {
         (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
 };
 
-export function getTypeName(type: Type): string {
+export function getTypeShortName(type: Type): string {
     var fullName = getTypeFullName(type);
     var bIndex = fullName.indexOf('[');
     var nsIndex = fullName.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);

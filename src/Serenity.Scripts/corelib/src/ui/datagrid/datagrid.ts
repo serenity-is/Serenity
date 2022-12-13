@@ -1,6 +1,6 @@
 ﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, getTypeName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, ScriptData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "@serenity-is/corelib/q";
+import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, ScriptData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "@serenity-is/corelib/q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "@serenity-is/corelib/slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -142,7 +142,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         var self = this;
 
         this.element.addClass('s-DataGrid').html('');
-        this.element.addClass('s-' + getTypeName(getInstanceType(this)));
 
         var layout = function() {
             self.layout();

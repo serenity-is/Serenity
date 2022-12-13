@@ -1010,7 +1010,7 @@ declare namespace Q {
     function getNested(from: any, name: string): any;
     function getType(name: string, target?: any): Type;
     function getTypeFullName(type: Type): string;
-    function getTypeName(type: Type): string;
+    function getTypeShortName(type: Type): string;
     function getInstanceType(instance: any): any;
     function isAssignableFrom(target: any, type: Type): boolean;
     function isInstanceOfType(instance: any, type: Type): boolean;

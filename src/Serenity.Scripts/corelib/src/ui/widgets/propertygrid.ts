@@ -1,5 +1,5 @@
 ﻿import { Decorators, ElementAttribute, OptionsTypeAttribute } from "../../decorators";
-import { any, Authorization, Culture, extend, getAttributes, getTypeName, isBS3, isBS5Plus, isEmptyOrNull, PropertyItem, startsWith, text, trimToEmpty, trimToNull, tryGetText } from "@serenity-is/corelib/q";
+import { any, Authorization, Culture, extend, getAttributes, getTypeShortName, isBS3, isBS5Plus, isEmptyOrNull, PropertyItem, startsWith, text, trimToEmpty, trimToNull, tryGetText } from "@serenity-is/corelib/q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
@@ -347,12 +347,12 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
         editor.initialize();
 
-        if (getTypeName(editor) == "BooleanEditor" &&
+        if (getTypeShortName(editor) == "BooleanEditor" &&
             (item.editorParams == null || !!!item.editorParams['labelFor'])) {
             label.removeAttr('for');
         }
 
-        if (getTypeName(editor) == "RadioButtonEditor" &&
+        if (getTypeShortName(editor) == "RadioButtonEditor" &&
             (item.editorParams == null || !!!item.editorParams['labelFor'])) {
             label.removeAttr('for');
         }
