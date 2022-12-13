@@ -107,36 +107,5 @@ declare namespace Serenity.Extensions {
             var b = Assert.Single(types, x => x.FullName == "A.B");
             Assert.Single(b.Methods, x => x.Name == "getSelect2Options");
         }
-
-        [Fact]
-        public void DecoratorsReferenceTest()
-        {
-            var fileSystem = new MockGeneratorFileSystem();
-            fileSystem.WriteAllText("a.ts", @"
-declare namespace Serenity {
-    export class Widget {
-    }
-
-    export namespace Decorators {
-        export function registerEditor();
-    }
-}
-
-
-namespace Serenity.Sub {
-
-    @Decorators.registerEditor()
-    export class B extends Serenity.Widget {
-    }
-}");
-
-            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
-            tl.AddInputFile("a.ts");
-
-            var types = tl.ExtractTypes();
-            var b = Assert.Single(types, x => x.FullName == "Serenity.Sub.B");
-            Assert.Single(b.Attributes, x => x.Type == "Serenity.Decorators.registerEditor");
-        }
-
     }
 }

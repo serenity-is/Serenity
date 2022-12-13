@@ -395,6 +395,12 @@ namespace Serenity.CodeGenerator
                     var pd = (member as PropertyDeclaration);
                     if (pd.Type != null)
                         externalMember.Type = GetTypeReferenceExpression(pd.Type);
+                    if (pd.Initializer is StringLiteral sl)
+                        externalMember.Value = sl.Text;
+                    else if (pd.Initializer?.Kind == SyntaxKind.FalseKeyword)
+                        externalMember.Value = false;
+                    else if (pd.Initializer?.Kind == SyntaxKind.TrueKeyword)
+                        externalMember.Value = true;
                 }
                 else if (member.Kind == SyntaxKind.MethodDeclaration)
                 {

@@ -123,7 +123,11 @@
                     x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
                     x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
                     x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
-                )?.Arguments[0].Value as string;
+                )?.Arguments[0].Value as string ??
+                type.Fields?.FirstOrDefault(x =>
+                    x.IsStatic == true &&
+                    x.Name == "__typeName" &&
+                    x.Value is string)?.Value as string;
 
             if (string.IsNullOrEmpty(ns))
             {
