@@ -815,9 +815,6 @@ declare let datePickerIconSvg: string;
 declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
-    private minDate;
-    private maxDate;
-    private sqlMinMax;
     constructor(input: JQuery);
     static useFlatpickr: boolean;
     static flatPickrOptions(input: JQuery): {

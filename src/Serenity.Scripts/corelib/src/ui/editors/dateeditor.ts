@@ -11,9 +11,6 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
 
     private minValue: string;
     private maxValue: string;
-    private minDate: string;
-    private maxDate: string;
-    private sqlMinMax: boolean;
 
     constructor(input: JQuery) {
         super(input);
