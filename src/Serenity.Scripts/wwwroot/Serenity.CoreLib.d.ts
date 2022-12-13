@@ -958,8 +958,8 @@ declare namespace Q {
     function canLoadScriptData(name: string): boolean;
 
     function getCookie(name: string): any;
-    function serviceCall<TResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
+    function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
+    function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
     function setEquality(request: ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;
@@ -1009,6 +1009,8 @@ declare namespace Q {
     }
     function getNested(from: any, name: string): any;
     function getType(name: string, target?: any): Type;
+    function getTypeNameProp(type: Type): string;
+    function setTypeNameProp(type: Type, value: string): void;
     function getTypeFullName(type: Type): string;
     function getTypeShortName(type: Type): string;
     function getInstanceType(instance: any): any;
@@ -1042,7 +1044,6 @@ declare namespace Q {
     function registerEnum(type: any, name: string): void;
     function registerInterface(type: any, name: string, intf?: any[]): void;
     function addAttribute(type: any, attr: any): void;
-    function setTypeName(target: Type, value: string): void;
     class ISlickFormatter {
     }
     function initializeTypes(root: any, pre: string, limit: number): void;
@@ -1324,7 +1325,7 @@ declare namespace Slick {
     	private _handlers;
     	/***
     	 * Adds an event handler to be called when the event is fired.
-    	 * <p> Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+    	 * <p>Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
     	 * object the event was fired with.<p>
     	 * @method subscribe
     	 * @param fn {Function} Event handler.
@@ -1347,7 +1348,7 @@ declare namespace Slick {
     	 * @param scope {Object}
     	 *      Optional.
     	 *      The scope ("this") within which the handler will be executed.
-    	 *      If not specified, the scope will be set to the <code> Slick.Event</code> instance.
+    	 *      If not specified, the scope will be set to the <code>Slick.Event</code> instance.
     	 */
     	notify(args?: any, e?: TEventData, scope?: object): any;
     	clear(): void;
@@ -3065,7 +3066,7 @@ declare namespace Serenity {
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyItems(): Q.PropertyItem[];
         protected getPropertyItemsData(): Q.PropertyItemsData;
-        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
+        protected getPropertyItemsDataAsync(): Promise<Q.PropertyItemsData>;
         protected getSaveEntity(): TItem;
         protected loadInitialEntity(): void;
         protected get_entity(): TItem;
@@ -3513,7 +3514,7 @@ declare namespace Serenity {
         protected getIdListCriteria(idList: any[]): any[];
         protected getCriteria(query: Select2SearchQuery): any[];
         protected getListRequest(query: Select2SearchQuery): Q.ListRequest;
-        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Q.ServiceOptions<ListResponse<TItem>>;
+        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Q.ServiceOptions<Q.ListResponse<TItem>>;
         protected hasAsyncSource(): boolean;
         protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
     }
@@ -4011,7 +4012,7 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    class SlickPager extends Widget<PagerOptions> {
+    class SlickPager extends Widget<Slick.PagerOptions> {
         constructor(div: JQuery, o: Slick.PagerOptions);
         _changePage(ctype: string): boolean;
         _updatePager(): void;
@@ -4295,7 +4296,7 @@ declare namespace Serenity {
         protected getColumnsKey(): string;
         protected getPropertyItems(): Q.PropertyItem[];
         protected getPropertyItemsData(): Q.PropertyItemsData;
-        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
+        protected getPropertyItemsDataAsync(): Promise<Q.PropertyItemsData>;
         protected getColumns(): Slick.Column[];
         protected propertyItemsToSlickColumns(propertyItems: Q.PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
@@ -4576,8 +4577,8 @@ declare namespace Serenity {
         protected isDeleted(): boolean;
         protected isNew(): boolean;
         protected isNewOrDeleted(): boolean;
-        protected getDeleteOptions(callback: (response: Q.DeleteResponse) => void): Q.ServiceOptions<DeleteResponse>;
-        protected deleteHandler(options: Q.ServiceOptions<DeleteResponse>, callback: (response: Q.DeleteResponse) => void): void;
+        protected getDeleteOptions(callback: (response: Q.DeleteResponse) => void): Q.ServiceOptions<Q.DeleteResponse>;
+        protected deleteHandler(options: Q.ServiceOptions<Q.DeleteResponse>, callback: (response: Q.DeleteResponse) => void): void;
         protected doDelete(callback: (response: Q.DeleteResponse) => void): void;
         protected onDeleteSuccess(response: Q.DeleteResponse): void;
         protected attrs<TAttr>(attrType: {
@@ -4610,11 +4611,11 @@ declare namespace Serenity {
         protected afterLoadEntity(): void;
         loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
         protected onLoadingData(data: Q.RetrieveResponse<TItem>): void;
-        protected getLoadByIdOptions(id: any, callback: (response: Q.RetrieveResponse<TItem>) => void): Q.ServiceOptions<RetrieveResponse<TItem>>;
+        protected getLoadByIdOptions(id: any, callback: (response: Q.RetrieveResponse<TItem>) => void): Q.ServiceOptions<Q.RetrieveResponse<TItem>>;
         protected getLoadByIdRequest(id: any): Q.RetrieveRequest;
         protected reloadById(): void;
         loadById(id: any, callback?: (response: Q.RetrieveResponse<TItem>) => void, fail?: () => void): void;
-        protected loadByIdHandler(options: Q.ServiceOptions<RetrieveResponse<TItem>>, callback: (response: Q.RetrieveResponse<TItem>) => void, fail: () => void): void;
+        protected loadByIdHandler(options: Q.ServiceOptions<Q.RetrieveResponse<TItem>>, callback: (response: Q.RetrieveResponse<TItem>) => void, fail: () => void): void;
         protected initLocalizationGrid(): void;
         protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
         protected isLocalizationMode(): boolean;
@@ -4629,23 +4630,23 @@ declare namespace Serenity {
         protected initPropertyGrid(): void;
         protected getPropertyItems(): Q.PropertyItem[];
         protected getPropertyItemsData(): Q.PropertyItemsData;
-        protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
+        protected getPropertyItemsDataAsync(): Promise<Q.PropertyItemsData>;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected validateBeforeSave(): boolean;
-        protected getSaveOptions(callback: (response: Q.SaveResponse) => void): Q.ServiceOptions<SaveResponse>;
+        protected getSaveOptions(callback: (response: Q.SaveResponse) => void): Q.ServiceOptions<Q.SaveResponse>;
         protected getSaveEntity(): TItem;
         protected getSaveRequest(): Q.SaveRequest<TItem>;
         protected onSaveSuccess(response: Q.SaveResponse): void;
         protected save_submitHandler(callback: (response: Q.SaveResponse) => void): void;
         protected save(callback?: (response: Q.SaveResponse) => void): void | boolean;
-        protected saveHandler(options: Q.ServiceOptions<SaveResponse>, callback: (response: Q.SaveResponse) => void): void;
+        protected saveHandler(options: Q.ServiceOptions<Q.SaveResponse>, callback: (response: Q.SaveResponse) => void): void;
         protected initToolbar(): void;
         protected showSaveSuccessMessage(response: Q.SaveResponse): void;
         protected getToolbarButtons(): ToolButton[];
         protected getCloningEntity(): TItem;
         protected updateInterface(): void;
-        protected getUndeleteOptions(callback?: (response: Q.UndeleteResponse) => void): Q.ServiceOptions<UndeleteResponse>;
-        protected undeleteHandler(options: Q.ServiceOptions<UndeleteResponse>, callback: (response: Q.UndeleteResponse) => void): void;
+        protected getUndeleteOptions(callback?: (response: Q.UndeleteResponse) => void): Q.ServiceOptions<Q.UndeleteResponse>;
+        protected undeleteHandler(options: Q.ServiceOptions<Q.UndeleteResponse>, callback: (response: Q.UndeleteResponse) => void): void;
         protected undelete(callback?: (response: Q.UndeleteResponse) => void): void;
         private _readonly;
         get readOnly(): boolean;
@@ -4767,9 +4768,9 @@ declare namespace Serenity {
         protected emptyItemText(): string;
         protected getService(): string;
         protected query(request: Q.ListRequest, callback: (p1: Q.ListResponse<any>) => void): void;
-        protected executeQuery(options: Q.ServiceOptions<ListResponse<any>>): void;
+        protected executeQuery(options: Q.ServiceOptions<Q.ListResponse<any>>): void;
         protected queryByKey(key: string, callback: (p1: any) => void): void;
-        protected executeQueryByKey(options: Q.ServiceOptions<RetrieveResponse<any>>): void;
+        protected executeQueryByKey(options: Q.ServiceOptions<Q.RetrieveResponse<any>>): void;
         protected getItemKey(item: any): string;
         protected getItemText(item: any): string;
         protected getTypeDelay(): number;
@@ -4931,7 +4932,7 @@ declare namespace Slick {
         init(grid: Slick.Grid): void;
         destroy?: () => void;
         setSelectedRanges(ranges: Slick.Range[]): void;
-        onSelectedRangesChanged: Slick.Event<Range[]>;
+        onSelectedRangesChanged: Slick.Event<Slick.Range[]>;
         refreshSelections?(): void;
     }
 }

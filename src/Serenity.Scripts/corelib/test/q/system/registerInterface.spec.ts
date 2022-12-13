@@ -1,4 +1,4 @@
-import { getType, registerInterface, isEnum, getTypeFullName } from "@/q/system";
+import { getType, registerInterface, isEnum, getTypeFullName, getTypeNameProp } from "@/q/system";
 
 function expectTypeDetails(klass: any, name: string, intf?: any[]) {
     expect(isEnum(klass)).toBe(false);
@@ -14,16 +14,14 @@ function expectTypeDetails(klass: any, name: string, intf?: any[]) {
 
     if (name != null) {
         expect(getTypeFullName(klass)).toBe(name);
-        expect(klass.__typeName).toBe(name);
-        expect(klass.__typeName$).toBe(name);
+        expect(getTypeNameProp(klass)).toBe(name);
 
         expect(getType(name)).toStrictEqual(klass);
     }
     else {
         var fullName = getTypeFullName(klass);
         expect(fullName).toBe(klass.name);
-        expect(klass.__typeName).toBeUndefined();
-        expect(klass.__typeName$).toBeUndefined();
+        expect(getTypeNameProp(klass));
 
         expect(getType(fullName) == null).toBe(true);
     }

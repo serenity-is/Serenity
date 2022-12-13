@@ -3,7 +3,7 @@ import { Config } from "./config"
 import { ErrorHandling } from "./errorhandling";
 import { alert, iframeDialog } from "./dialogs";
 import { blockUI, blockUndo } from "./blockui";
-import { ListRequest, ServiceOptions } from "./servicetypes";
+import { ListRequest, ServiceOptions, ServiceResponse } from "./servicetypes";
 
 export function getCookie(name: string) {
     if (($ as any).cookie)
@@ -25,7 +25,7 @@ typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
     }
 });
 
-export function serviceCall<TResponse>(options: ServiceOptions<TResponse>) {
+export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>) {
     let handleError = function (response: any) {
         if (Config.notLoggedInHandler != null &&
             response &&
@@ -121,7 +121,7 @@ export function serviceCall<TResponse>(options: ServiceOptions<TResponse>) {
     return $.ajax(options);
 }
 
-export function serviceRequest<TResponse>(service: string, request?: any,
+export function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any,
     onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>) {
     return serviceCall(extend<ServiceOptions<TResponse>>({
         service: service,

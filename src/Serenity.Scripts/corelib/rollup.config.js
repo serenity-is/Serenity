@@ -27,7 +27,7 @@ var rxReferenceTypes = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 var rxModuleAugmentation = /^(declare\s+module\s*['"]([A-Za-z\/@\-]+)['"]\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 
 const replaceTypeRef = function(src, name, rep) {
-    return src.replace(new RegExp('(>|:|,)\\s*' + name.replace('$', '\\$') + '([^A-Za-z0-9_\\$])', 'g'), (m, p1, p2) => p1 + ' ' + rep + p2);
+    return src.replace(new RegExp('([<>:,]\\s*)' + name.replace('$', '\\$') + '([^A-Za-z0-9_\\$])', 'g'), (m, p1, p2) => p1 + rep + p2);
 }
 
 function moduleToGlobalName(fromModule) {

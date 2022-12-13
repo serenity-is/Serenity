@@ -77,7 +77,6 @@ interface TypeExt {
     __metadata?: TypeMetadata;
     __metadata$?: TypeMetadata;
     __typeName?: string;
-    __typeName$?: string;
 }
 
 interface TypeMetadata {
@@ -131,8 +130,16 @@ export function getType(name: string, target?: any): Type  {
     return type;
 }
 
+export function getTypeNameProp(type: Type): string {
+    return (type.hasOwnProperty("__typeName") && (type as TypeExt).__typeName) || void 0;
+}
+
+export function setTypeNameProp(type: Type, value: string) {
+    (type as TypeExt).__typeName = value;
+}
+
 export function getTypeFullName(type: Type): string {
-    return (type as TypeExt).__typeName || (type as any).name ||
+    return getTypeNameProp(type) || (type as any).name ||
         (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
 };
 
@@ -540,18 +547,18 @@ function interfaceIsAssignableFrom(from: any) {
         (from as TypeExt).__interfaces != null && 
         (from as TypeExt).__interfaces.some(x => 
             x === this ||
-            (this.__typeName?.length && 
+            (getTypeNameProp(this)?.length && 
                 x.__interface &&
-                x.__typeName === this.__typeName));
+                getTypeNameProp(x) === this.__typeName));
 }
 
 function registerType(type: any, name: string, intf: any[]) {
     const types = getTypeStore();
     if (name && name.length) {
-        setTypeName(type, name);
+        setTypeNameProp(type, name);
         types[name] = type;
     }
-    else if ((type as TypeExt).__typeName && (type as TypeExt).__typeName.length)
+    else if (getTypeNameProp(type as TypeExt)?.length)
         types[(type as TypeExt).__typeName] = type;
 
     if (intf != null && intf.length)
@@ -578,16 +585,6 @@ export function addAttribute(type: any, attr: any) {
     var md = ensureMetadata(type);
     md.attr = md.attr || [];
     md.attr.push(attr);
-}
-
-export function setTypeName(target: Type, value: string) {
-    if (!Object.hasOwnProperty.call(target, '__typeName')) {
-        Object.defineProperty(target, '__typeName', {
-            get: function() { return Object.prototype.hasOwnProperty.call(this, '__typeName$') ? (this as TypeExt).__typeName$ : void 0; },
-            set: function(v) { (this as TypeExt).__typeName$ = v; }
-        });
-    }
-    (target as TypeExt).__typeName = value;
 }
 
 export class ISlickFormatter {
@@ -625,7 +622,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (t === "string" || t === "number")
             continue;
 
-        if (!(obj as TypeExt).__typeName &&
+        if (!getTypeNameProp(obj) &&
             ((typeof obj === "function" && obj.nodeType !== "number") || 
              ((obj as TypeExt).__interface !== undefined))) {
    
@@ -646,7 +643,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             }
 
             if ((obj as TypeExt).__interface !== undefined) {
-                setTypeName(obj, pre + k);
+                setTypeNameProp(obj, pre + k);
                 types[pre + k] = obj;
             }
         }
