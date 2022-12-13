@@ -617,7 +617,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             continue;
 
         if (!getTypeNameProp(obj) &&
-            ((typeof obj === "function" && obj.nodeType !== "number") || 
+            ((typeof obj === "function" && typeof obj.nodeType !== "number") || 
              ((obj as TypeExt).__interface !== undefined))) {
    
             if (!obj.__interfaces &&
