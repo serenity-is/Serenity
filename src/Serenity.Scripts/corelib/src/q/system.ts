@@ -75,7 +75,6 @@ interface TypeExt {
     __isAssignableFrom?: (from: any) => boolean;
     __isInstanceOfType?: (instance: any) => boolean;
     __metadata?: TypeMetadata;
-    __metadata$?: TypeMetadata;
     __typeName?: string;
 }
 
@@ -508,13 +507,8 @@ export function prop(type: any, name: string, getter?: string, setter?: string) 
 
 function ensureMetadata(target: Type): TypeMetadata {
 
-    if (!Object.hasOwnProperty.call(target, '__metadata')) {
-        Object.defineProperty(target, '__metadata', {
-            get: function () { return Object.prototype.hasOwnProperty.call(this, '__metadata$') ? (this as TypeExt).__metadata$ : void 0; },
-            set: function (v) { (this as TypeExt).__metadata$ = v; }
-        });
-    }
-    if (!(target as TypeExt).__metadata) {
+    if (!Object.hasOwnProperty.call(target, '__metadata') ||
+        !(target as TypeExt).__metadata) {
         (target as TypeExt).__metadata = Object.create(null);
     }
 
