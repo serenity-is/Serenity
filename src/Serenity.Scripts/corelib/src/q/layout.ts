@@ -1,7 +1,7 @@
 ﻿import { Config } from "./config";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
-import { getNested, initializeTypes } from "./system";
+import { getNested, getGlobalThis, initializeTypes } from "./system";
 
 export function autoFullHeight(element: JQuery) {
     element.css('height', '100%');
@@ -90,12 +90,10 @@ export function setMobileDeviceMode() {
     }
 }
 
-// @ts-ignore check for global
-let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
-
 setMobileDeviceMode();
 
 function initOnLoad() {
+    var globalObj = getGlobalThis();
     if (globalObj && Config.rootNamespaces) {
         for (var ns of Config.rootNamespaces) {
             var obj = getNested(globalObj, ns);

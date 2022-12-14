@@ -1,5 +1,6 @@
 **/bin/Debug/*
 **/bin/Release/*
+.swc/
 obj/
 packages/*/*
 *.bak

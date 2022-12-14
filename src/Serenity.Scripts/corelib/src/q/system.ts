@@ -66,9 +66,6 @@ function getRegExpFlags(regExp: RegExp) {
     }
 }
 
-// @ts-ignore check for global
-let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
-
 interface TypeExt {
     __interface?: boolean;
     __interfaces?: any[];
@@ -108,12 +105,24 @@ export function getNested(from: any, name: string) {
     return from;
 }
 
+const globalObj: any = 
+    (typeof globalThis !== "undefined" && globalThis) || 
+    (typeof window !== "undefined" && window) || 
+    (typeof self !== "undefined" && self) ||
+    // @ts-ignore check for global
+    (typeof global !== "undefined" && global) ||
+    (function () { return this; })() || Function('return this')();
+
+export function getGlobalThis(): any {
+    return globalObj;
+}
+
 export function getType(name: string, target?: any): Type  {
     var type: any;
     const types = getTypeStore();
     if (target == null) {
         type = types[name];
-        if (type != null || globalObj == null || name === "Object")
+        if (type != null || globalObj == void 0 || name === "Object")
             return type;
 
         target = globalObj;
@@ -352,16 +361,17 @@ export function delegateCombine(delegate1: any, delegate2: any) {
 
 const fallbackStore: any = {};
 
+
 export function getStateStore(key?: string): any {
 
     let store: any;
-    if (typeof globalThis !== "undefined") {
-        if (!((globalThis as any).Q))
-            (globalThis as any).Q = {};
+    if (globalObj) {
+        if (!globalObj.Q)
+            globalObj.Q = {};
 
-        store = (globalThis as any).Q.__stateStore;
+        store = globalObj.Q.__stateStore;
         if (!store)
-            (globalThis as any).Q.__stateStore = store = Object.create(null);
+            globalObj.Q.__stateStore = store = Object.create(null);
     }
     else
         store = fallbackStore;

@@ -1008,6 +1008,7 @@ declare namespace Q {
         setter?: string;
     }
     function getNested(from: any, name: string): any;
+    function getGlobalThis(): any;
     function getType(name: string, target?: any): Type;
     function getTypeNameProp(type: Type): string;
     function setTypeNameProp(type: Type, value: string): void;

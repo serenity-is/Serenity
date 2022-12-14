@@ -1,5 +1,3 @@
-const esbuildOptions = {}
-
 export default {
     testEnvironment: 'jsdom',
     testMatch: ['<rootDir>/test/**/*.spec.ts'],
@@ -8,7 +6,21 @@ export default {
         '^@serenity-is/corelib/q$': '<rootDir>/src/q',
         '^@serenity-is/corelib/slick$': '<rootDir>/src/slick'
     },
-    "transform": {
-        "^.+\\.tsx?$": ["jest-esbuild", esbuildOptions]
-    }
+    transform: {
+        "^.+\.(t|j)sx?$": [ "@swc/jest", {
+          jsc: {
+            parser: {
+              syntax: "typescript",
+              decorators: true 
+            },
+            keepClassNames: true,
+            experimental: {
+              plugins: [["jest_workaround", {}]]
+            }
+          },
+          module: {
+            type: "commonjs"
+          },
+        }]
+      }
 };
