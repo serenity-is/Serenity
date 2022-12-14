@@ -640,7 +640,7 @@ declare function addTypeMember(type: any, member: TypeMember): TypeMember;
 declare function getTypes(from?: any): any[];
 declare function clearKeys(d: any): void;
 declare function delegateCombine(delegate1: any, delegate2: any): any;
-declare function getStateStore(): any;
+declare function getStateStore(key?: string): any;
 declare namespace Enum {
     let toString: (enumType: any, value: number) => string;
     let getValues: (enumType: any) => any[];

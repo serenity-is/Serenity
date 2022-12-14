@@ -1029,7 +1029,7 @@ declare namespace Q {
     function getTypes(from?: any): any[];
     function clearKeys(d: any): void;
     function delegateCombine(delegate1: any, delegate2: any): any;
-    function getStateStore(): any;
+    function getStateStore(key?: string): any;
     namespace Enum {
         let toString: (enumType: any, value: number) => string;
         let getValues: (enumType: any) => any[];

@@ -16,10 +16,7 @@ export function dbText(prefix: string): ((key: string) => string) {
 }
 
 function getTable(): { [key: string]: string } {
-    let store = getStateStore()._lt;
-    if (!store) 
-        return (getStateStore()._lt = {});
-    return store;
+    return getStateStore("_lt");
 }
 
 export function prefixedText(prefix: string) {

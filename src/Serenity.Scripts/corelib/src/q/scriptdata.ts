@@ -11,7 +11,7 @@ function getHash(key: string, reload?: boolean): string {
     let k: string;
 
     const stateStore = getStateStore();
-    if (stateStore.__hash == null &&
+    if (stateStore.__scriptHash == null &&
         typeof document !== "undefined" && 
         (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
         k.charAt(0) == '{') {
@@ -19,35 +19,29 @@ function getHash(key: string, reload?: boolean): string {
         ScriptData.setRegisteredScripts(regs);
     }
 
-    if (stateStore.__hash == null) {
+    if (stateStore.__scriptHash == null) {
         if (reload)
-            stateStore.__hash = {};
+            stateStore.__scriptHash = {};
         else
             return null;
     }
 
     if (reload)
-        return (stateStore.__hash[key] = new Date().getTime().toString());
+        return (stateStore.__scriptHash[key] = new Date().getTime().toString());
 
-    return stateStore.__hash[key];
+    return stateStore.__scriptHash[key];
 }
 
 function setHash(key: string, value: string): void {
-    const stateStore = getStateStore();
-    stateStore.__hash = stateStore.__hash || (stateStore.__hash = {});
-    stateStore.__hash[key] = value;
+    getStateStore("__scriptHash")[key] = value;
 }
 
 function getLoadedData(name: string): any {
-    const stateStore = getStateStore();
-    const loadedData = stateStore.__data || (stateStore.__data = {} );
-    return loadedData[name];
+    return getStateStore("__scriptHash")[name];
 }
 
 function setLoadedData(name: string, value: any): void {
-    const stateStore = getStateStore();
-    const loadedData = stateStore.__data || ( stateStore.__data = {} );
-    loadedData[name] = value;
+    getStateStore("__scriptData")[name] = value;
 }
 
 export namespace ScriptData {

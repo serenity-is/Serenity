@@ -95,10 +95,7 @@ export interface TypeMember {
 }
 
 function getTypeStore() {
-    const stateStore = getStateStore();
-    if (stateStore.__types == null)
-        stateStore.__types = {};
-    return stateStore.__types;
+    return getStateStore("__types");
 }
 
 export function getNested(from: any, name: string) {
@@ -355,20 +352,30 @@ export function delegateCombine(delegate1: any, delegate2: any) {
 
 const fallbackStore: any = {};
 
-export function getStateStore(): any {
+export function getStateStore(key?: string): any {
 
+    let store: any;
     if (typeof globalThis !== "undefined") {
         if (!((globalThis as any).Q))
             (globalThis as any).Q = {};
 
-        var store = (globalThis as any).Q.__stateStore;
+        store = (globalThis as any).Q.__stateStore;
         if (!store)
-            return ((globalThis as any).Q.__stateStore = {});
+            (globalThis as any).Q.__stateStore = store = Object.create(null);;
 
         return store;
     }
+    else
+        store = fallbackStore;
 
-    return fallbackStore;
+    if (key != null) {
+        var s = store[key];
+        if (s == null)
+            store[key] = s = Object.create(null);
+        return s;
+    }
+    else
+        return store;
 }
 
 export namespace Enum {
