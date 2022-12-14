@@ -37,7 +37,7 @@ function setHash(key: string, value: string): void {
 }
 
 function getLoadedData(name: string): any {
-    return getStateStore("__scriptHash")[name];
+    return getStateStore("__scriptData")[name];
 }
 
 function setLoadedData(name: string, value: any): void {

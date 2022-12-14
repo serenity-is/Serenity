@@ -127,7 +127,7 @@ export function getType(name: string, target?: any): Type  {
 }
 
 export function getTypeNameProp(type: Type): string {
-    return (type.hasOwnProperty("__typeName") && (type as TypeExt).__typeName) || void 0;
+    return (Object.prototype.hasOwnProperty.call(type, "__typeName") && (type as TypeExt).__typeName) || void 0;
 }
 
 export function setTypeNameProp(type: Type, value: string) {
@@ -361,21 +361,18 @@ export function getStateStore(key?: string): any {
 
         store = (globalThis as any).Q.__stateStore;
         if (!store)
-            (globalThis as any).Q.__stateStore = store = Object.create(null);;
-
-        return store;
+            (globalThis as any).Q.__stateStore = store = Object.create(null);
     }
     else
         store = fallbackStore;
 
-    if (key != null) {
-        var s = store[key];
-        if (s == null)
-            store[key] = s = Object.create(null);
-        return s;
-    }
-    else
+    if (key == null)
         return store;
+
+    var s = store[key];
+    if (s == null)
+        store[key] = s = Object.create(null);
+    return s;
 }
 
 export namespace Enum {
@@ -514,7 +511,7 @@ export function prop(type: any, name: string, getter?: string, setter?: string) 
 
 function ensureMetadata(target: Type): TypeMetadata {
 
-    if (!Object.hasOwnProperty.call(target, '__metadata') ||
+    if (!Object.prototype.hasOwnProperty.call(target, '__metadata') ||
         !(target as TypeExt).__metadata) {
         (target as TypeExt).__metadata = Object.create(null);
     }
@@ -615,7 +612,8 @@ export function initializeTypes(root: any, pre: string, limit: number) {
 
         var obj = root[k];
 
-        if ($.isArray(obj) ||
+        if (obj == null ||
+            $.isArray(obj) ||
             root instanceof Date)
             continue;
 
@@ -625,7 +623,8 @@ export function initializeTypes(root: any, pre: string, limit: number) {
 
         if (!getTypeNameProp(obj) &&
             ((typeof obj === "function" && typeof obj.nodeType !== "number") || 
-             ((obj as TypeExt).__interface !== undefined))) {
+             (Object.prototype.hasOwnProperty.call(obj, "__interface") &&
+              (obj as TypeExt).__interface !== undefined))) {
    
             if (!obj.__interfaces &&
                 obj.prototype &&
