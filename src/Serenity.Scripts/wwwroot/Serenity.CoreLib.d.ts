@@ -1050,13 +1050,7 @@ declare namespace Q {
     class Exception extends Error {
         constructor(message: string);
     }
-    class NullReferenceException extends Exception {
-        constructor(message?: string);
-    }
     class ArgumentNullException extends Exception {
-        constructor(paramName: string, message?: string);
-    }
-    class ArgumentOutOfRangeException extends Exception {
         constructor(paramName: string, message?: string);
     }
     class InvalidCastException extends Exception {
