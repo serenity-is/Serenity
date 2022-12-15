@@ -140,7 +140,7 @@ export function getTypeNameProp(type: Type): string {
 }
 
 export function setTypeNameProp(type: Type, value: string) {
-    (type as TypeExt).__typeName = value;
+    Object.defineProperty(type, "__typeName", { value, configurable: true });
 }
 
 export function getTypeFullName(type: Type): string {
@@ -552,7 +552,7 @@ function merge(arr1: any[], arr2: any[]) {
 
 function interfaceIsAssignableFrom(from: any) {
     return from != null && 
-        (from as TypeExt).__interfaces != null && 
+        Array.isArray((from as TypeExt).__interfaces) && 
         (from as TypeExt).__interfaces.some(x => 
             x === this ||
             (getTypeNameProp(this)?.length && 
@@ -570,23 +570,26 @@ function registerType(type: any, name: string, intf: any[]) {
         types[(type as TypeExt).__typeName] = type;
 
     if (intf != null && intf.length)
-        (type as TypeExt).__interfaces = merge((type as TypeExt).__interfaces, intf);
+        Object.defineProperty(type, "__interfaces", {
+            value: merge((type as TypeExt).__interfaces, intf),
+            configurable: true
+        });
 }
 
 export function registerClass(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    (type as TypeExt).__interface = false;
+    Object.defineProperty(type, "__interface", { value: false, configurable: true });
 }
 
 export function registerEnum(type: any, name: string) {
     registerType(type, name, undefined);
-    (type as TypeExt).__interface = null; // mark as enum
+    Object.defineProperty(type, "__interface", { value: null, configurable: true });
 }
 
 export function registerInterface(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    (type as TypeExt).__interface = true;
-    (type as TypeExt).__isAssignableFrom = interfaceIsAssignableFrom;
+    Object.defineProperty(type, "__interface", { value: true, configurable: true });
+    Object.defineProperty(type, "__isAssignableFrom", { value: interfaceIsAssignableFrom, configurable: true });
 }
 
 export function addAttribute(type: any, attr: any) {
@@ -616,36 +619,31 @@ export function initializeTypes(root: any, pre: string, limit: number) {
 
         var obj = root[k];
 
-        if (obj == null ||
+        if (obj == void 0 ||
             Array.isArray(obj) ||
-            obj instanceof Date)
+            obj instanceof Date ||
+            (typeof obj != "function" &&
+             typeof obj != "object"))
             continue;
 
-        var t = typeof (obj);
-        if (t === "string" || t === "number")
-            continue;
-
-        if (!getTypeNameProp(obj) &&
+        // no explict __typeName, e.g. not registered with a name,
+        // a function but not an html element, or registered without name
+        if (!getTypeNameProp(obj) && 
             ((typeof obj === "function" && typeof obj.nodeType !== "number") || 
              (Object.prototype.hasOwnProperty.call(obj, "__interface") &&
               (obj as TypeExt).__interface !== undefined))) {
    
-            if (!obj.__interfaces &&
-                obj.prototype &&
-                obj.prototype.format &&
+            // legacy formatter with registerClass
+            if (typeof obj == "function" && 
+                !obj.__interfaces && 
+                obj.prototype?.format &&
                 k.substr(-9) === "Formatter") {
                 if ((obj as TypeExt).__interface === undefined)
-                    (obj as TypeExt).__interface = false;
+                    Object.defineProperty(obj, "__interface", { value: false, configurable: true });
                 (obj as TypeExt).__interfaces = [ISlickFormatter]
             }
 
-            if ((obj as TypeExt).__interface === undefined) {
-                var baseType = getBaseType(obj);
-                if (baseType && (baseType as TypeExt).__interface === false) {
-                    (obj as TypeExt).__interface = false;
-                }
-            }
-
+            // only register types that should
             if ((obj as TypeExt).__interface !== undefined) {
                 setTypeNameProp(obj, pre + k);
                 types[pre + k] = obj;
