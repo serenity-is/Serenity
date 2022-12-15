@@ -1,4 +1,4 @@
-﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom } from "@serenity-is/corelib/q";
+﻿import { Config, Exception, notifyError, endsWith, getType, isAssignableFrom, isEmptyOrNull, ArgumentNullException, htmlEncode } from "@serenity-is/corelib/q";
 import { IDialog } from "../interfaces";
 
 export namespace DialogTypeRegistry {
@@ -19,7 +19,7 @@ export namespace DialogTypeRegistry {
         return null;
     }
 
-    var knownTypes: { [key: string]: any } = {};
+    let knownTypes: { [key: string]: any } = {};
 
     export function tryGet(key: string): any {
         if (knownTypes[key] == null) {
@@ -44,20 +44,35 @@ export namespace DialogTypeRegistry {
 
     export function get(key: string): any {
 
+        if (isEmptyOrNull(key)) 
+            throw new ArgumentNullException('key');
+
         var type = tryGet(key);
 
-        if (type == null) {
-            var message = key + ' dialog class is not found! Make sure there is a dialog class with this name, ' +
-                'it is under your project root namespace, and your namespace parts start with capital letters, ' +
-                'e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option ' +
-                'check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). ' +
-                "You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.";
+        if (type)
+            return type;
 
-            notifyError(message, '', null);
+        var message = `"${htmlEncode(key)}" dialog class not found! 
+Make sure there is such a dialog type under the project root namespace, 
+and its namespace parts start with capital letters like MyProject.MyModule.MyDialog.
 
-            throw new Exception(message);
-        }
+If using ES modules, make sure the dialog type has a decorator like 
+@Decorators.registerClass('MyProject.MyModule.MyDialog') with the full name of 
+your dialog type and "side-effect-import" this dialog class from the current 
+"page.ts/grid.ts/dialog.ts file (import "./path/to/MyDialog.ts").
 
-        return type;
+If you had this error from an editor with the InplaceAdd option, verify that the lookup key
+and dialog type name match case-sensitively, excluding the Dialog suffix.
+Specify the DialogType property in the LookupEditor attribute if it is not.
+
+After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
+from the project folder.`;
+
+        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+        throw new Exception(message);
+    }
+
+    export function reset() {
+        knownTypes = {};
     }
 }
