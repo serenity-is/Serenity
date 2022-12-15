@@ -3459,7 +3459,7 @@ declare namespace Serenity {
         lookupKey?: string;
         async?: boolean;
     }
-    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+    abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
         hasAsyncSource(): boolean;
         destroy(): void;
@@ -3497,7 +3497,7 @@ declare namespace Serenity {
         equalityFilter?: any;
         criteria?: any[];
     }
-    class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+    abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
         protected getDialogTypeKey(): string;
         protected getService(): string;

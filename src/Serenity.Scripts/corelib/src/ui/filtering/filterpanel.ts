@@ -59,6 +59,7 @@ class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
     }
 }
 
+@Decorators.registerClass("Serenity.FilterPanel")
 export class FilterPanel extends FilterWidgetBase<any> {
 
     private rowsDiv: JQuery;

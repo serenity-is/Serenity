@@ -1,7 +1,9 @@
 ﻿import { extend, text } from "@serenity-is/corelib/q";
 import { PagerOptions } from "@serenity-is/corelib/slick";
+import { Decorators } from "../../decorators";
 import { Widget } from "../widgets/widget";
 
+@Decorators.registerClass("Serenity.SlickPager")
 export class SlickPager extends Widget<PagerOptions> {
 
     constructor(div: JQuery, o: PagerOptions) {

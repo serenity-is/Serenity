@@ -1,7 +1,9 @@
 ﻿import { validateOptions } from "@serenity-is/corelib/q";
+import { Decorators } from "../../decorators";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
 
+@Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
     constructor(container: JQuery, options?: TOptions) {
         super(container, options);

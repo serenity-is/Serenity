@@ -1122,7 +1122,7 @@ interface LookupEditorOptions extends Select2EditorOptions {
     lookupKey?: string;
     async?: boolean;
 }
-declare class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
     constructor(input: JQuery, opt?: TOptions);
     hasAsyncSource(): boolean;
     destroy(): void;
@@ -1160,7 +1160,7 @@ interface ServiceLookupEditorOptions extends Select2EditorOptions {
     equalityFilter?: any;
     criteria?: any[];
 }
-declare class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+declare abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
     constructor(input: JQuery, opt?: TOptions);
     protected getDialogTypeKey(): string;
     protected getService(): string;
