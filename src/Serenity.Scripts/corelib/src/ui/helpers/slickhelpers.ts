@@ -7,7 +7,7 @@ import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
-import { FormatterTypeRegistry } from "../formatters/formattertyperegistry";
+import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
