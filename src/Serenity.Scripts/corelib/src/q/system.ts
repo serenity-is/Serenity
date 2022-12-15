@@ -608,23 +608,17 @@ export function initializeTypes(root: any, pre: string, limit: number) {
     const types = getTypeStore();
 
     for (var k of Object.keys(root)) {
-        if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
-            continue;
-
-        if (k.indexOf('$') >= 0)
-            continue;
-
-        if (k === "prototype")
-            continue;
-
-        if (!Object.prototype.hasOwnProperty.call(root, k))
+        if (k.charAt(0) < 'A' || 
+            k.charAt(0) > 'Z' || 
+            k.indexOf('$') >= 0 || 
+            !Object.prototype.hasOwnProperty.call(root, k))
             continue;
 
         var obj = root[k];
 
         if (obj == null ||
-            $.isArray(obj) ||
-            root instanceof Date)
+            Array.isArray(obj) ||
+            obj instanceof Date)
             continue;
 
         var t = typeof (obj);
