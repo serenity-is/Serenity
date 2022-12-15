@@ -195,6 +195,7 @@ declare namespace ReflectionUtils {
 declare namespace DialogTypeRegistry {
     function tryGet(key: string): any;
     function get(key: string): any;
+    function reset(): void;
 }
 
 declare namespace EditorTypeRegistry {
@@ -1816,6 +1817,7 @@ declare class UrlFormatter implements Formatter, IInitializeColumn {
     target: string;
 }
 declare namespace FormatterTypeRegistry {
+    function tryGet(key: string): any;
     function get(key: string): Function;
     function reset(): void;
 }

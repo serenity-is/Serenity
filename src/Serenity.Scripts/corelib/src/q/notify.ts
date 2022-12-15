@@ -1,9 +1,14 @@
 ﻿import { extend } from "./system";
 
+// set default for toastr itself, possible security issue
+if (typeof toastr != null && toastr.options)
+    toastr.options.escapeHtml = true;
+
 export let defaultNotifyOptions: ToastrOptions = {
     timeOut: 3000,
     showDuration: 250,
     hideDuration: 500,
+    escapeHtml: true,
     extendedTimeOut: 500,
     positionClass: 'position-toast toast-top-full-width'
 }
