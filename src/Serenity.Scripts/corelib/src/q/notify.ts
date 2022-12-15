@@ -1,7 +1,7 @@
 ﻿import { extend } from "./system";
 
 // set default for toastr itself, possible security issue
-if (typeof toastr != null && toastr.options)
+if (typeof toastr !== "undefined" && toastr.options)
     toastr.options.escapeHtml = true;
 
 export let defaultNotifyOptions: ToastrOptions = {
