@@ -1816,6 +1816,7 @@ declare class UrlFormatter implements Formatter, IInitializeColumn {
     urlFormat: string;
     target: string;
 }
+
 declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
     function get(key: string): Function;

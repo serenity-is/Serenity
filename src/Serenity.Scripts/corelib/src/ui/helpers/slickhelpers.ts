@@ -4,9 +4,10 @@ import { attrEncode, Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNul
 import { Format, Formatter, RemoteView } from "@serenity-is/corelib/slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
-import { DateFormatter, EnumFormatter, FormatterTypeRegistry, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
+import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
+import { FormatterTypeRegistry } from "../formatters/formattertyperegistry";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;

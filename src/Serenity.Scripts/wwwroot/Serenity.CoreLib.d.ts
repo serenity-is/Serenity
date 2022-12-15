@@ -2548,6 +2548,7 @@ declare namespace Serenity {
     namespace DialogTypeRegistry {
         function tryGet(key: string): any;
         function get(key: string): any;
+        function reset(): void;
     }
 
     namespace EditorTypeRegistry {
@@ -4152,7 +4153,9 @@ declare namespace Serenity {
         urlFormat: string;
         target: string;
     }
+
     namespace FormatterTypeRegistry {
+        function tryGet(key: string): any;
         function get(key: string): Function;
         function reset(): void;
     }

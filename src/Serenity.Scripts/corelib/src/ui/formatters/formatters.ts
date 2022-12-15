@@ -1,8 +1,7 @@
-﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { ArgumentNullException, attrEncode, Config, Culture, endsWith, Enum, Exception, format, formatDate, formatNumber, getAttributes, getTypeFullName, getTypes, htmlEncode, 
-    isAssignableFrom, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "@serenity-is/corelib/q";
+﻿import { attrEncode, Culture, Enum, format, formatDate, formatNumber, getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "@serenity-is/corelib/q";
 import { Formatter } from "@serenity-is/corelib/slick";
+import { Column, FormatterContext } from "@serenity-is/sleekgrid";
+import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export interface IInitializeColumn {
@@ -302,73 +301,4 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
 
     @Decorators.option()
     target: string;
-}
-
-export namespace FormatterTypeRegistry {
-
-    let knownTypes: { [key: string]: Function };
-
-    function setTypeKeysWithoutFormatterSuffix() {
-        var suffix = 'formatter';
-        for (var k of Object.keys(knownTypes)) {
-            if (!endsWith(k, suffix)) 
-                continue;
-            
-            var p = k.substr(0, k.length - suffix.length);
-            if (isEmptyOrNull(p))
-                continue;
-            
-            if (knownTypes[p] != null)
-                continue;
-            
-            knownTypes[p] = knownTypes[k];
-        }
-    }
-
-    function initialize() {
-
-        if (knownTypes) {
-            return;
-        }
-
-        knownTypes = {};
-        var types = getTypes();
-        for (var type of types) {
-            if (!isAssignableFrom(ISlickFormatter, type))
-                continue;
-                
-            var fullName = getTypeFullName(type).toLowerCase();
-            knownTypes[fullName] = type;
-
-            for (var k of Config.rootNamespaces) {
-                if (startsWith(fullName, k.toLowerCase() + '.')) {
-                    var kx = fullName.substr(k.length + 1).toLowerCase();
-                    if (knownTypes[kx] == null) {
-                        knownTypes[kx] = type;
-                    }
-                }
-            }
-        }
-
-        setTypeKeysWithoutFormatterSuffix();
-    }
-
-    export function get(key: string): Function {
-        if (isEmptyOrNull(key)) 
-            throw new ArgumentNullException('key');
-        
-        initialize();
-
-        var formatterType = knownTypes[key.toLowerCase()];
-        if (formatterType == null) {
-            throw new Exception(format(
-                "Can't find {0} formatter type!", key));
-        }
-
-        return formatterType;
-    }
-
-    export function reset() {
-        knownTypes = null;
-    }
 }

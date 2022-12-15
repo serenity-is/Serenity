@@ -73,6 +73,6 @@ from the project folder.`;
     }
 
     export function reset() {
-        knownTypes = {};
+        knownTypes = null;
     }
 }

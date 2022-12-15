@@ -76,7 +76,8 @@
   "repository": "https://github.com/serenity-is/serenity/src/Serenity.Scripts/corelib",
   "scripts": {
     "build": "rollup -c && node build/build && pnpm run minify",
-    "minify": "terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.min.js && terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.min.js"
+    "minify": "terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.min.js && terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.min.js",
+    "test": "pnpm build && pnpm jest"
   },
   "type": "module"
 }
