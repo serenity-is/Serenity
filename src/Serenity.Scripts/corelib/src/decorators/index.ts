@@ -1,7 +1,8 @@
 import {
     addAttribute, addTypeMember, MemberType, ISlickFormatter,
-    registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum,
-    startsWith
+    registerClass as regClass, registerEditor as regEditor, registerInterface as regIntf, registerEnum as regEnum,
+    startsWith,
+    EditorAttribute
 } from "@serenity-is/corelib/q";
 
 function Attr(name: string) {
@@ -50,13 +51,6 @@ export class DefaultValueAttribute {
 export class DialogTypeAttribute {
     constructor(public value: any) {
     }
-}
-
-@Attr('Editor')
-export class EditorAttribute {
-    constructor() {
-    }
-    key: string;
 }
 
 @Attr('EditorOption')
@@ -262,7 +256,12 @@ export namespace Decorators {
     }
 
     export function registerEditor(nameOrIntf?: string | any[], intf2?: any[]) {
-        return registerClass(nameOrIntf, intf2);
+        return function (target: Function) {
+            if (typeof nameOrIntf == "string")
+                regEditor(target, nameOrIntf, intf2);
+            else
+                regEditor(target, null, nameOrIntf);
+        }
     }
 
     export function registerEnum(target: any, enumKey?: string, name?: string) {
@@ -308,11 +307,9 @@ export namespace Decorators {
         }
     }
 
-    export function editor(key?: string) {
+    export function editor() {
         return function (target: Function) {
             var attr = new EditorAttribute();
-            if (key !== undefined)
-                attr.key = key;
             addAttribute(target, attr);
         }
     }

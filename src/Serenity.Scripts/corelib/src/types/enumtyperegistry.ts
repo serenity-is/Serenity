@@ -1,50 +1,43 @@
-﻿import { EnumKeyAttribute } from "../decorators";
-import { Config, Exception, format, getAttributes, getTypeFullName, getTypes, isEnum, notifyError, startsWith } from "@serenity-is/corelib/q";
+﻿import { Exception, getAttributes, htmlEncode, isEnum, notifyError } from "@serenity-is/corelib/q";
+import { EnumKeyAttribute } from "../decorators";
+import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace EnumTypeRegistry {
 
-    let knownTypes: { [key: string]: Function }
-
-    export function tryGet(key: string): Function {
-
-        if (knownTypes == null) {
-            knownTypes = {};
-            for (var type of getTypes()) {
-                if (isEnum(type)) {
-                    var fullName = getTypeFullName(type);
-                    knownTypes[fullName] = type;
-                    var enumKeyAttr = getAttributes(type, EnumKeyAttribute, false);
-                    if (enumKeyAttr != null && enumKeyAttr.length > 0) {
-                        knownTypes[enumKeyAttr[0].value] = type;
-                    }
-
-                    for (var k of Config.rootNamespaces) {
-                        if (startsWith(fullName, k + '.')) {
-                            knownTypes[fullName.substr(k.length + 1)] = type;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (knownTypes[key] == null)
-            return null;
-
-        return knownTypes[key];
-    }
+    let registry = commonTypeRegistry(
+        isEnum, 
+        type => getAttributes(type, EnumKeyAttribute)[0]?.value,
+        null);
 
     export function get(key: string): Function {
-        var type = EnumTypeRegistry.tryGet(key);
-        if (type == null) {
-            var message = format("Can't find {0} enum type! If you have recently defined this enum type " + 
-                "in server side code, make sure your project builds successfully and transform T4 templates. " +
-                "Also make sure that enum is under your project root namespace, and your namespace parts starts " + 
-                "with capital letters, e.g.MyProject.Pascal.Cased namespace", key);
+        var type = registry.tryGet(key);
+        if (type)
+            return type;
 
-            notifyError(message, '', null);
-            throw new Exception(message);
-        }
+        var message = `Can't find "${htmlEncode(key)}" enum type! 
+If you have recently defined this enum type in server side code, make sure 
+your project builds successfully and run "dotnet sergen t". 
 
-        return type;
+Also verify there is such an enum type under the project root namespace, 
+and its namespace parts start with capital letters like MyProject.MyModule.MyEnum.
+
+If using ES modules, make sure the enum type is registered with 
+Q.registerEnum('MyProject.MyModule.MyDialog') with the full name of 
+your enum type and "side-effect-import" this enum from the current 
+"page.ts/grid.ts/dialog.ts file (import "./path/to/MyEnum.ts").
+
+After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
+from the project folder.`;
+
+    notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+    throw new Exception(message);
+    }
+
+    export function reset() {
+        registry.reset();
+    }
+
+    export function tryGet(key: string) {
+        return registry.tryGet(key);
     }
 }

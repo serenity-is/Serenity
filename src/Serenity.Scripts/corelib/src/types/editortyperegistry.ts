@@ -1,93 +1,44 @@
-﻿import { EditorAttribute } from "../decorators";
-import { ArgumentNullException, Config, endsWith, Exception, format, getAttributes, getType, getTypeFullName, getTypes, isEmptyOrNull, startsWith } from "@serenity-is/corelib/q";
-
-// @ts-ignore
-let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
+﻿import { ArgumentNullException, EditorAttribute, Exception, getAttributes, htmlEncode, isAssignableFrom, isEmptyOrNull, notifyError } from "@serenity-is/corelib/q";
+import { Widget } from "../ui/widgets/widget";
+import { commonTypeRegistry } from "./commontyperegistry";
 
 let knownTypes: { [key: string] : any };
 
 export namespace EditorTypeRegistry {
+    
+    let registry = commonTypeRegistry(
+        type => !!getAttributes(type, EditorAttribute).length || isAssignableFrom(Widget, type), 
+        null, "Editor");
+
     export function get(key: string): any {
-
-        if (isEmptyOrNull(key)) {
+        if (isEmptyOrNull(key)) 
             throw new ArgumentNullException('key');
-        }
+        
+        var type = registry.tryGet(key);
+        if (type)
+            return type;
 
-        initialize();
+        var message = `"${htmlEncode(key)}" editor class not found! 
+Make sure there is such a editor type under the project root namespace,
+and its namespace parts start with capital letters like MyProject.MyModule.MyEditor.
 
-        var editorType = knownTypes[key.toLowerCase()];
-        if (editorType == null) {
+If using ES modules, make sure the editor type has a decorator like 
+@Decorators.registerEditor('MyProject.MyModule.MyFormatter') with the full name 
+and "side-effect-import" this editor class from the current 
+"page.ts/grid.ts/dialog.ts file (import "./path/to/MyEditor.ts").
 
-            var type = getType(key) ?? getType(key, globalObj);
-            if (type != null) {
-                knownTypes[key.toLowerCase()] = type as any;
-                return type as any;
-            }
+After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
+from the project folder.`;
 
-            throw new Exception(format("Can't find {0} editor type!", key));
-        }
-        return editorType;
-
+        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+        throw new Exception(message);
     }
 
-    function initialize(): void {
-
-        if (knownTypes != null)
-            return;
-
-        knownTypes = {};
-
-        for (var type of getTypes()) {
-
-            var fullName = getTypeFullName(type).toLowerCase();
-            knownTypes[fullName] = type;
-
-            var editorAttr = getAttributes(type, EditorAttribute, false);
-            if (editorAttr != null && editorAttr.length > 0) {
-                var attrKey = editorAttr[0].key;
-                if (!isEmptyOrNull(attrKey)) {
-                    knownTypes[attrKey.toLowerCase()] = type;
-                }
-            }
-
-            for (var k of Config.rootNamespaces) {
-                if (startsWith(fullName, k.toLowerCase() + '.')) {
-                    var kx = fullName.substr(k.length + 1).toLowerCase();
-                    if (knownTypes[kx] == null) {
-                        knownTypes[kx] = type;
-                    }
-                }
-            }
-        }
-
-        setTypeKeysWithoutEditorSuffix();
+    export function reset() {
+        registry.reset();
     }
 
-    export function reset(): void {
-        knownTypes = null;
-    }
-
-    function setTypeKeysWithoutEditorSuffix() {
-        var keys = Object.keys(knownTypes);
-        for (var k of keys) {
-            setWithoutSuffix(k, knownTypes[k]);
-        }
-    }
-
-    function setWithoutSuffix(key: string, t: any) {
-        var suffix = 'editor';
-
-        if (!endsWith(key, suffix))
-            return;
-
-        var p = key.substr(0, key.length - suffix.length);
-
-        if (isEmptyOrNull(p))
-            return;
-
-        if (knownTypes[p] != null)
-            return;
-
-        knownTypes[p] = knownTypes[key];
+    export function tryGet(key: string) {
+        return registry.tryGet(key);
     }
 }

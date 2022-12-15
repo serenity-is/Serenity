@@ -1042,10 +1042,13 @@ declare namespace Q {
     function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
     function keyOf<T>(prop: keyof T): keyof T;
     function registerClass(type: any, name: string, intf?: any[]): void;
+    function registerEditor(type: any, name: string, intf?: any[]): void;
     function registerEnum(type: any, name: string): void;
     function registerInterface(type: any, name: string, intf?: any[]): void;
     function addAttribute(type: any, attr: any): void;
     class ISlickFormatter {
+    }
+    class EditorAttribute {
     }
     function initializeTypes(root: any, pre: string, limit: number): void;
     class Exception extends Error {
@@ -2546,19 +2549,21 @@ declare namespace Serenity {
     }
 
     namespace DialogTypeRegistry {
-        function tryGet(key: string): any;
         function get(key: string): any;
         function reset(): void;
+        function tryGet(key: string): any;
     }
 
     namespace EditorTypeRegistry {
         function get(key: string): any;
         function reset(): void;
+        function tryGet(key: string): any;
     }
 
     namespace EnumTypeRegistry {
-        function tryGet(key: string): Function;
         function get(key: string): Function;
+        function reset(): void;
+        function tryGet(key: string): any;
     }
 
     class EnumKeyAttribute {
@@ -2588,10 +2593,6 @@ declare namespace Serenity {
     class DialogTypeAttribute {
         value: any;
         constructor(value: any);
-    }
-    class EditorAttribute {
-        constructor();
-        key: string;
     }
     class EditorOptionAttribute {
         key: string;
@@ -2719,7 +2720,7 @@ declare namespace Serenity {
         function enumKey(value: string): (target: Function) => void;
         function option(): (target: Object, propertyKey: string) => void;
         function dialogType(value: any): (target: Function) => void;
-        function editor(key?: string): (target: Function) => void;
+        function editor(): (target: Function) => void;
         function element(value: string): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
         function flexify(value?: boolean): (target: Function) => void;
@@ -4155,9 +4156,9 @@ declare namespace Serenity {
     }
 
     namespace FormatterTypeRegistry {
-        function tryGet(key: string): any;
-        function get(key: string): Function;
+        function get(key: string): any;
         function reset(): void;
+        function tryGet(key: string): any;
     }
 
     interface SettingStorage {

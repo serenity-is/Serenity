@@ -581,6 +581,11 @@ export function registerClass(type: any, name: string, intf?: any[]) {
     Object.defineProperty(type, "__interface", { value: false, configurable: true });
 }
 
+export function registerEditor(type: any, name: string, intf?: any[]) {
+    registerClass(type, name, intf);
+    addAttribute(type, new EditorAttribute());
+}
+
 export function registerEnum(type: any, name: string) {
     registerType(type, name, undefined);
     Object.defineProperty(type, "__interface", { value: null, configurable: true });
@@ -602,6 +607,11 @@ export class ISlickFormatter {
 }
 
 registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
+
+export class EditorAttribute {
+}
+
+registerClass(EditorAttribute, 'Serenity.EditorAttribute');
 
 export function initializeTypes(root: any, pre: string, limit: number) {
 
