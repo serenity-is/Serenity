@@ -18,8 +18,8 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
     criteria?: any[];
 }
 
-@Decorators.registerEditor("ServiceLookupEditorBase")
-export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+@Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
+export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
     constructor(input: JQuery, opt?: TOptions) {
         super(input, opt);
@@ -176,7 +176,7 @@ export class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions
     }
 }
 
-@Decorators.registerEditor('ServiceLookupEditor')
+@Decorators.registerEditor('Serenity.ServiceLookupEditor')
 export class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
     constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions) {
         super(hidden, opt);
