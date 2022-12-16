@@ -654,7 +654,7 @@ declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function keyOf<T>(prop: keyof T): keyof T;
 declare function registerClass(type: any, name: string, intf?: any[]): void;
 declare function registerEditor(type: any, name: string, intf?: any[]): void;
-declare function registerEnum(type: any, name: string): void;
+declare function registerEnum(type: any, name: string, enumKey?: string): void;
 declare function registerInterface(type: any, name: string, intf?: any[]): void;
 declare function addAttribute(type: any, attr: any): void;
 declare class ISlickFormatter {

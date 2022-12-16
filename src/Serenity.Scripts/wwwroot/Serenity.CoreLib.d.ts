@@ -1043,7 +1043,7 @@ declare namespace Q {
     function keyOf<T>(prop: keyof T): keyof T;
     function registerClass(type: any, name: string, intf?: any[]): void;
     function registerEditor(type: any, name: string, intf?: any[]): void;
-    function registerEnum(type: any, name: string): void;
+    function registerEnum(type: any, name: string, enumKey?: string): void;
     function registerInterface(type: any, name: string, intf?: any[]): void;
     function addAttribute(type: any, attr: any): void;
     class ISlickFormatter {
