@@ -2,7 +2,7 @@
 
 export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (type: any) => string, suffix: string) {
 
-    let knownTypes: { [key: string]: any } = {};
+    let knownTypes: { [key: string]: any };
 
     function reset() {
         knownTypes = null;

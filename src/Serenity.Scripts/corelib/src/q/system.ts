@@ -586,8 +586,13 @@ export function registerEditor(type: any, name: string, intf?: any[]) {
     addAttribute(type, new EditorAttribute());
 }
 
-export function registerEnum(type: any, name: string) {
+export function registerEnum(type: any, name: string, enumKey?: string) {
     registerType(type, name, undefined);
+    if (enumKey && enumKey != name) {
+        const types = getTypeStore();
+        if (!types[enumKey])
+            types[enumKey] = type;
+    }
     Object.defineProperty(type, "__interface", { value: null, configurable: true });
 }
 

@@ -265,7 +265,7 @@ export namespace Decorators {
     }
 
     export function registerEnum(target: any, enumKey?: string, name?: string) {
-        regEnum(target, name);
+        regEnum(target, name, enumKey);
         if (enumKey)
             addAttribute(target, new EnumKeyAttribute(enumKey));
     }
