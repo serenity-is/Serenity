@@ -8,7 +8,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <PackageIcon>package-icon.png</PackageIcon>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
@@ -37,11 +37,26 @@
     <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-readme.md" Pack="true" PackagePath="\README.md">
         <Link>Properties\README.md</Link>
     </None>
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Condition="'$(EnableGlobalUsings)' != 'false'">
-        <Link>Properties\GlobalUsings.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(EnableGlobalUsings)' != 'false'">
+    <Using Include="Newtonsoft.Json" />
+    <Using Include="Serenity" />
+    <Using Include="Serenity.Abstractions" />
+    <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.Data" />
+    <Using Include="Serenity.Data.Mapping" Condition="'$(ProjectName)' != 'Serenity.Net.Core'" />
+    <Using Include="Serenity.Services" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Concurrent" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Data" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.RegularExpressions" />
   </ItemGroup>
 </Project>
