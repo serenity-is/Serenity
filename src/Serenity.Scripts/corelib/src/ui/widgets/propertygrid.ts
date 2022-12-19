@@ -202,21 +202,28 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             title.closest('.category').children('.category-title').click();
 
         var animate = function () {
-            title.fadeTo(100, 0.5, function () {
-                title.fadeTo(100, 1, function () {
+            if (($.fn as any).fadeTo) {
+                title.fadeTo(100, 0.5, function () {
+                    title.fadeTo(100, 1, function () {
+                    });
                 });
-            });
+            }
         };
 
         var intoView = title.closest('.category');
-        if (intoView.closest(':scrollable(both)').length === 0)
+        if (($.fn as any).scrollintoview) {
+            if (intoView.closest(':scrollable(both)').length === 0)
+                animate();
+            else
+                (intoView as any).scrollintoview({
+                    duration: 'fast',
+                    direction: 'y',
+                    complete: animate
+                });
+        }
+        else if (intoView && intoView[0] && intoView[0].scrollIntoView) {
+            intoView[0].scrollIntoView();
             animate();
-        else {
-            (intoView as any).scrollintoview({
-                duration: 'fast',
-                direction: 'y',
-                complete: animate
-            });
         }
     }
 
