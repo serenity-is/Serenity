@@ -34,7 +34,15 @@
         "jquery.min.js",
         "jquery.slim.js",
         "jquery.slim.min.js"
-      ],
+      ]
+    },
+    {
+      "library": "mousetrap@1.6.5",
+      "destination": "wwwroot/mousetrap",
+      "files": [
+        "mousetrap.js",
+        "mousetrap.min.js"
+      ]
     },
     {
       "library": "toastr.js@2.1.4",
