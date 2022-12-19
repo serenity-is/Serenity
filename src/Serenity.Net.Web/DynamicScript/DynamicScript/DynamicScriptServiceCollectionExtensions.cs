@@ -198,6 +198,13 @@ namespace Serenity.Extensions.DependencyInjection
             FormScriptRegistration.RegisterFormScripts(scriptManager,
                 typeSource, propertyProvider, serviceProvider);
 
+            scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
+                new Func<string>[]
+                {
+                    () => scriptManager.GetScriptText("ColumnsBundle"),
+                    () => scriptManager.GetScriptText("FormBundle")
+                }));
+
             return serviceProvider;
         }
 
