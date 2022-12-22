@@ -8,12 +8,11 @@
 }
 /* open-sans-regular - latin-ext_latin */
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local(''),
-       url('open-sans-400.woff2') format('woff2'),
-       url('open-sans-400.woff') format('woff'); 
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local(''), url('open-sans-400.woff2') format('woff2'), url('open-sans-400.woff') format('woff');
+    font-display: swap;
 }
 /* open-sans-500 - latin-ext_latin */
 @font-face {
