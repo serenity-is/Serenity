@@ -1,4 +1,4 @@
-﻿using Serenity.ComponentModel;
+﻿using ServerTypingsTest.PermissionKeys;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -35,9 +35,9 @@ namespace Serenity.Tests.CodeGenerator
 
         public void PermissionKeys_Modules_Generated_Properly(Type classType, string expected)
         {
-            var generator = CreateGeneratorModules();
+            var generator = CreateGeneratorModules(classType);
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == $"Tests/CodeGenerator.{classType.Name}.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == $"PermissionKeys/{classType.Name}.ts").Text;
 
             code = NormalizeTS(code);
             expected = NormalizeTS(expected);

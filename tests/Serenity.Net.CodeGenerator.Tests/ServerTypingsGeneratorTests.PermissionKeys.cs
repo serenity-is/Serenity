@@ -1,4 +1,5 @@
 ﻿using Serenity.ComponentModel;
+using ServerTypingsTest.PermissionKeys;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -20,14 +21,14 @@ namespace Serenity.Tests.CodeGenerator
         [Theory]
         [InlineData(
             typeof(PermissionKeysSample1Depth1),
-@"namespace Serenity.Tests.CodeGenerator {
+@"namespace ServerTypingsTest.PermissionKeys {
     export namespace PermissionKeysSample1Depth1 {
         export const Security = ""Administration:Security"";
     }
 }")]
         [InlineData(
             typeof(PermissionKeysSample2Depth1),
-@"namespace Serenity.Tests.CodeGenerator {
+@"namespace ServerTypingsTest.PermissionKeys {
     export namespace PermissionKeysSample2Depth1 {
         export const Security = ""Administration:Security"";
     
@@ -38,7 +39,7 @@ namespace Serenity.Tests.CodeGenerator
 }")]
         [InlineData(
             typeof(PermissionKeysSample3Depth1),
-@"namespace Serenity.Tests.CodeGenerator {
+@"namespace ServerTypingsTest.PermissionKeys {
     export namespace PermissionKeysSample3Depth1 {
         export const Security = ""Administration:Security"";
         
@@ -54,17 +55,21 @@ namespace Serenity.Tests.CodeGenerator
 
         public void PermissionKeys_Generated_Properly(Type classType, string expected)
         {
-            var generator = CreateGenerator();
+            var generator = CreateGenerator(classType);
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == $"Tests.CodeGenerator.{classType.Name}.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == $"PermissionKeys.{classType.Name}.ts").Text;
 
             code = NormalizeTS(code);
             expected = NormalizeTS(expected);
 
             Assert.Equal(expected, code);
-            
+
         }
     }
+}
+
+namespace ServerTypingsTest.PermissionKeys
+{ 
     [NestedPermissionKeys]
     public class PermissionKeysSample1Depth1
     {
@@ -97,7 +102,6 @@ namespace Serenity.Tests.CodeGenerator
             }
         }
     }
-
 }
 
 

@@ -4,7 +4,8 @@
     {
         protected override void HandleMemberType(TypeReference memberType, string codeNamespace, bool module)
         {
-            bool isSystem = memberType.NamespaceOf() == "System";
+            var ns = memberType.NamespaceOf();
+            bool isSystem = ns == "System";
 
             if (isSystem && memberType.Name == "String")
             {
@@ -12,9 +13,15 @@
                 return;
             }
 
-            if (memberType is GenericInstanceType &&
-                memberType.MetadataName() == "Nullable`1" &&
-                isSystem)
+            if (memberType.Name == "dynamic")
+            {
+                sb.Append("any");
+                return;
+            }
+
+            if (isSystem &&
+                memberType is GenericInstanceType &&
+                memberType.MetadataName() == "Nullable`1")
             {
                 memberType = (memberType as GenericInstanceType).GenericArguments()[0];
                 isSystem = memberType.NamespaceOf() == "System";

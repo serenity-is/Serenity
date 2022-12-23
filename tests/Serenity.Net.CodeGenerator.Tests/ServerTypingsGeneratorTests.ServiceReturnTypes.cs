@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using ServerTypingsTest.ServiceReturnTypes;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -9,9 +10,9 @@ namespace Serenity.Tests.CodeGenerator
         public void Return_Types_That_ShouldBe_Generated()
         {
             var controllerType = typeof(ResponseTypesThatShouldBeGenerated);
-            var generator = CreateGenerator();
+            var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGenerated) + "Service.ts";
+            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGenerated) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
@@ -24,9 +25,9 @@ namespace Serenity.Tests.CodeGenerator
         public void Return_Types_That_ShouldNotBe_Generated()
         {
             var controllerType = typeof(ResponseTypesThatShouldNotBeGenerated);
-            var generator = CreateGenerator();
+            var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldNotBeGenerated) + "Service.ts";
+            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldNotBeGenerated) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
@@ -39,8 +40,8 @@ namespace Serenity.Tests.CodeGenerator
         public void Return_Types_That_ShouldBe_Generated_As_Key_Value()
         {
             var controllerType = typeof(ResponseTypesThatShouldBeGeneratedAsKeyValue);
-            var generator = CreateGenerator();
-            var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGeneratedAsKeyValue) + "Service.ts";
+            var generator = CreateGenerator(controllerType);
+            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGeneratedAsKeyValue) + "Service.ts";
             var result = generator.Run();
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
@@ -56,9 +57,9 @@ namespace Serenity.Tests.CodeGenerator
         public void Return_Types_That_ShouldBe_Generated_As_List()
         {
             var controllerType = typeof(ResponseTypesThatShouldBeGeneratedAsList);
-            var generator = CreateGenerator();
+            var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "Tests.CodeGenerator." + nameof(ResponseTypesThatShouldBeGeneratedAsList) + "Service.ts";
+            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGeneratedAsList) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
@@ -69,7 +70,10 @@ namespace Serenity.Tests.CodeGenerator
             }
         }
     }
+}
 
+namespace ServerTypingsTest.ServiceReturnTypes
+{ 
     public class ResponseTypesThatShouldBeGenerated : ServiceEndpoint
     {
         public TestResponseClass Control(IDbConnection connection, ListRequest request)

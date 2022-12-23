@@ -119,6 +119,9 @@ namespace Serenity.CodeGeneration
         }
 
         public Mono.Cecil.AssemblyDefinition[] Assemblies { get; private set; }
+
+        /// <summary>Optional predicate for test purposes</summary>
+        public Func<TypeDefinition, bool> TypeFilter { get; set; }
 #endif
 
         protected virtual bool EnqueueType(TypeDefinition type)
@@ -325,7 +328,11 @@ namespace Serenity.CodeGeneration
                     TypeDefinition[] types;
                     try
                     {
-                        types = module.Types.ToArray();
+                        var typeFilter = TypeFilter ?? (type => true);
+
+                        types = module.Types
+                            .Where(typeFilter)
+                            .ToArray();
                     }
                     catch
                     {
