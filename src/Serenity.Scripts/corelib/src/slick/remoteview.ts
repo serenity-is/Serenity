@@ -1,4 +1,4 @@
-﻿import { deepClone, extend, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "@serenity-is/corelib/q";
+﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "@serenity-is/corelib/q";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 import { Event, EventData, Grid, gridDefaults, Group, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";
@@ -664,7 +664,7 @@ export class RemoteView<TEntity> {
                 var gi = groupingInfos[item.level];
                 if (!gi.displayTotalsRow) {
                     calculateTotals(item.totals);
-                    item.title = gi.formatter ? gi.formatter(item) : item.value;
+                    item.title = gi.formatter ? gi.formatter(item) : htmlEncode(item.value);
                 }
             }
             // if this is a totals row, make sure it's calculated
@@ -895,7 +895,7 @@ export class RemoteView<TEntity> {
                 }
 
                 g.collapsed = groupCollapsed ^ toggledGroups[g.groupingKey];
-                g.title = gi.formatter ? gi.formatter(g) : g.value;
+                g.title = gi.formatter ? gi.formatter(g) : htmlEncode(g.value);
             }
         }
 
