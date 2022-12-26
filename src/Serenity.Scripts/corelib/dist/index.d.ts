@@ -5,7 +5,7 @@ import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, Dial
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
 export { Formatter } from '@serenity-is/corelib/slick';
-import { Grid, Column, FormatterContext, ItemMetadata, IPlugin, Event, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
+import { Grid, Column, FormatterContext, IPlugin, Event, SelectionModel, Range, GroupItemMetadataProvider, GridOptions } from '@serenity-is/sleekgrid';
 
 declare global {
     namespace Select2 {
@@ -1821,28 +1821,12 @@ declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
 }
 
+type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 declare global {
     namespace Slick {
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        class AutoTooltips {
-            constructor(options: AutoTooltipsOptions);
-            init(): void;
-        }
         namespace Data {
-            interface GroupItemMetadataProvider {
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
-                constructor();
-                init(grid: Grid): void;
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
+            /** @obsolete use the type exported from @serenity-is/sleekgrid */
+            const GroupItemMetadataProvider: GroupItemMetadataProviderType;
         }
         interface RowMoveManagerOptions {
             cancelEditOnDrag: boolean;

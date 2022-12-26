@@ -20,36 +20,17 @@ import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, IPlugin, ItemMetadata, Range, SelectionModel } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, GroupItemMetadataProvider, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
+
+type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 
 declare global {
     namespace Slick {
-        interface AutoTooltipsOptions {
-            enableForHeaderCells?: boolean;
-            enableForCells?: boolean;
-            maxToolTipLength?: number;
-        }
-        
-        class AutoTooltips {
-            constructor(options: AutoTooltipsOptions);
-            init(): void;
+        namespace Data {
+            /** @obsolete use the type exported from @serenity-is/sleekgrid */
+            export const GroupItemMetadataProvider: GroupItemMetadataProviderType;
         }
    
-        namespace Data {
-    
-            interface GroupItemMetadataProvider {
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-
-            class GroupItemMetadataProvider implements GroupItemMetadataProvider, IPlugin {
-                constructor();
-                init(grid: Grid): void;
-                getGroupRowMetadata(item: any): ItemMetadata;
-                getTotalsRowMetadata(item: any): ItemMetadata;
-            }
-        }
-
         interface RowMoveManagerOptions {
             cancelEditOnDrag: boolean;
         }
@@ -545,7 +526,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         var slickOptions = this.getSlickOptions();
         var grid = new Grid(this.slickContainer, this.view as any, visibleColumns, slickOptions) as Grid;
-        grid.registerPlugin(new Slick.AutoTooltips({
+        grid.registerPlugin(new AutoTooltips({
             enableForHeaderCells: true
         }));
 

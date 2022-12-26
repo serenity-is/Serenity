@@ -2284,13 +2284,14 @@ Slick._ = (() => {
       return item[columnDef.field];
     }
     appendRowHtml(stringArrayL, stringArrayR, row, range, dataLength) {
+      var _a, _b;
       var d = this.getDataItem(row);
       var dataLoading = row < dataLength && !d;
       var rowCss = "slick-row" + (this._layout.isFrozenRow(row) ? " frozen" : "") + (dataLoading ? " loading" : "") + (row === this._activeRow ? " active" : "") + (row % 2 == 1 ? " odd" : " even");
       if (!d) {
         rowCss += " " + this._options.addNewRowCssClass;
       }
-      var itemMetadata = this._data.getItemMetadata && this._data.getItemMetadata(row);
+      var itemMetadata = (_b = (_a = this._data).getItemMetadata) == null ? void 0 : _b.call(_a, row);
       if (itemMetadata && itemMetadata.cssClasses) {
         rowCss += " " + itemMetadata.cssClasses;
       }
@@ -3886,4 +3887,4 @@ Slick._ = (() => {
   };
   return __toCommonJS(grid_exports);
 })();
-["Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

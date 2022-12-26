@@ -1,6 +1,6 @@
 ﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "@serenity-is/corelib/q";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
-import { Event, EventData, Grid, gridDefaults, Group, GroupTotals } from "@serenity-is/sleekgrid";
+import { Event, EventData, Grid, gridDefaults, Group, GroupItemMetadataProvider, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";
 
 export interface RemoteViewOptions {
@@ -19,7 +19,7 @@ export interface RemoteViewOptions {
     onProcessData?: RemoteViewProcessCallback<any>;
     method?: string;
     inlineFilters?: boolean;
-    groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+    groupItemMetadataProvider?: GroupItemMetadataProvider;
     onAjaxCall?: RemoteViewAjaxCallback<any>;
     getItemMetadata?: (p1?: any, p2?: number) => any;
     errorMsg?: string;
@@ -467,7 +467,7 @@ export class RemoteView<TEntity> {
 
         function setGrouping(groupingInfo: any) {
             if (!options.groupItemMetadataProvider) {
-                options.groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
+                options.groupItemMetadataProvider = new GroupItemMetadataProvider();
             }
 
             groups = [];

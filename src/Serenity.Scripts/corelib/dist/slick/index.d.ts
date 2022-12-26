@@ -1,5 +1,5 @@
 /// <reference types="jquery" />
-import { GroupTotals, Column, FormatterContext, Group, Event } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, Event } from '@serenity-is/sleekgrid';
 import { PropertyItem, ListResponse } from '@serenity-is/corelib/q';
 
 declare namespace Aggregators {
@@ -65,7 +65,7 @@ interface RemoteViewOptions {
     onProcessData?: RemoteViewProcessCallback<any>;
     method?: string;
     inlineFilters?: boolean;
-    groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+    groupItemMetadataProvider?: GroupItemMetadataProvider;
     onAjaxCall?: RemoteViewAjaxCallback<any>;
     getItemMetadata?: (p1?: any, p2?: number) => any;
     errorMsg?: string;

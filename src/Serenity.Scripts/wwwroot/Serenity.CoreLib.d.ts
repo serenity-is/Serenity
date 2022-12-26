@@ -1285,8 +1285,6 @@ declare namespace Slick {
     /***
      * An event object for passing data to event handlers and letting them control propagation.
      * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
-     * @class EventData
-     * @constructor
      */
     class EventData implements IEventData {
     	private _isPropagationStopped;
@@ -1298,26 +1296,19 @@ declare namespace Slick {
     	stopPropagation(): void;
     	/***
     	 * Returns whether stopPropagation was called on this event object.
-    	 * @method isPropagationStopped
-    	 * @return {Boolean}
     	 */
     	isPropagationStopped(): boolean;
     	/***
     	 * Prevents the rest of the handlers from being executed.
-    	 * @method stopImmediatePropagation
     	 */
     	stopImmediatePropagation(): void;
     	/***
     	 * Returns whether stopImmediatePropagation was called on this event object.\
-    	 * @method isImmediatePropagationStopped
-    	 * @return {Boolean}
     	 */
     	isImmediatePropagationStopped(): boolean;
     }
     /***
      * A simple publisher-subscriber implementation.
-     * @class Event
-     * @constructor
      */
     class Event<TArgs = any, TEventData extends IEventData = IEventData> {
     	private _handlers;
@@ -1337,7 +1328,6 @@ declare namespace Slick {
     	unsubscribe(fn: Handler<TArgs, TEventData>): void;
     	/***
     	 * Fires an event notifying all subscribers.
-    	 * @method notify
     	 * @param args {Object} Additional data object to be passed to all handlers.
     	 * @param e {EventData}
     	 *      Optional.
@@ -1544,6 +1534,8 @@ declare namespace Slick {
     const columnDefaults: Partial<Column>;
     interface ColumnMetadata<TItem = any> {
     	colspan: number | "*";
+    	cssClasses?: string;
+    	editor?: EditorClass;
     	format?: ColumnFormat<TItem>;
     	/** @deprecated */
     	formatter?: CompatFormatter<TItem>;
@@ -1553,12 +1545,15 @@ declare namespace Slick {
     	sortAsc?: boolean;
     }
     interface ItemMetadata<TItem = any> {
+    	cssClasses?: string;
     	columns?: {
     		[key: string]: ColumnMetadata<TItem>;
     	};
+    	focusable?: boolean;
     	format?: ColumnFormat<TItem>;
     	/** @deprecated */
     	formatter?: CompatFormatter<TItem>;
+    	selectable?: boolean;
     }
     function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
     function titleize(str: string): string;
@@ -2276,6 +2271,63 @@ declare namespace Slick {
     	const PercentComplete: typeof PercentCompleteEditor;
     	const LongText: typeof LongTextEditor;
     }
+    interface GroupItemMetadataProviderOptions {
+    	enableExpandCollapse?: boolean;
+    	groupCellCssClass?: string;
+    	groupCssClass?: string;
+    	groupIndentation?: number;
+    	groupFocusable?: boolean;
+    	groupFormat?: ColumnFormat<Group>;
+    	groupFormatter?: CompatFormatter<Group>;
+    	groupLevelPrefix?: string;
+    	groupRowTotals?: boolean;
+    	groupTitleCssClass?: string;
+    	hasSummaryType?: (column: Column) => boolean;
+    	toggleCssClass?: string;
+    	toggleExpandedCssClass?: string;
+    	toggleCollapsedCssClass?: string;
+    	totalsCssClass?: string;
+    	totalsFocusable?: boolean;
+    	totalsFormat?: ColumnFormat<GroupTotals>;
+    	totalsFormatter?: CompatFormatter<GroupTotals>;
+    }
+    class GroupItemMetadataProvider {
+    	private grid;
+    	private options;
+    	constructor(opt?: GroupItemMetadataProviderOptions);
+    	static readonly defaults: GroupItemMetadataProviderOptions;
+    	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string;
+    	static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): string;
+    	init(grid: Grid): void;
+    	destroy(): void;
+    	getOptions(): GroupItemMetadataProviderOptions;
+    	setOptions(value: GroupItemMetadataProviderOptions): void;
+    	handleGridClick: (e: MouseEvent, args: ArgsCell) => void;
+    	handleGridKeyDown: (e: KeyboardEvent, args: ArgsCell) => void;
+    	groupCellPosition: () => {
+    		cell: number;
+    		colspan: number | "*";
+    	};
+    	getGroupRowMetadata: ((item: Group) => ItemMetadata);
+    	getTotalsRowMetadata: ((item: GroupTotals) => ItemMetadata);
+    }
+    interface AutoTooltipsOptions {
+    	enableForCells?: boolean;
+    	enableForHeaderCells?: boolean;
+    	maxToolTipLength?: number;
+    	replaceExisting?: boolean;
+    }
+    class AutoTooltips implements IPlugin {
+    	private grid;
+    	private options;
+    	constructor(options?: AutoTooltipsOptions);
+    	static readonly defaults: AutoTooltipsOptions;
+    	init(grid: Grid): void;
+    	destroy(): void;
+    	private handleMouseEnter;
+    	private handleHeaderMouseEnter;
+    	pluginName: string;
+    }
 }
 
 
@@ -2345,7 +2397,7 @@ declare namespace Slick {
         onProcessData?: RemoteViewProcessCallback<any>;
         method?: string;
         inlineFilters?: boolean;
-        groupItemMetadataProvider?: Slick.Data.GroupItemMetadataProvider;
+        groupItemMetadataProvider?: GroupItemMetadataProvider;
         onAjaxCall?: RemoteViewAjaxCallback<any>;
         getItemMetadata?: (p1?: any, p2?: number) => any;
         errorMsg?: string;
@@ -4161,6 +4213,8 @@ declare namespace Serenity {
         function tryGet(key: string): any;
     }
 
+    type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
+
     interface SettingStorage {
         getItem(key: string): string;
         setItem(key: string, value: string): void;
@@ -4897,26 +4951,9 @@ interface JQuery {
     flexY(flexY: number): JQuery;
 }
 declare namespace Slick {
-    interface AutoTooltipsOptions {
-        enableForHeaderCells?: boolean;
-        enableForCells?: boolean;
-        maxToolTipLength?: number;
-    }
-    class AutoTooltips {
-        constructor(options: AutoTooltipsOptions);
-        init(): void;
-    }
     namespace Data {
-        interface GroupItemMetadataProvider {
-            getGroupRowMetadata(item: any): Slick.ItemMetadata;
-            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
-        }
-        class GroupItemMetadataProvider implements GroupItemMetadataProvider, Slick.IPlugin {
-            constructor();
-            init(grid: Slick.Grid): void;
-            getGroupRowMetadata(item: any): Slick.ItemMetadata;
-            getTotalsRowMetadata(item: any): Slick.ItemMetadata;
-        }
+        /** @obsolete use the type exported from @serenity-is/sleekgrid */
+        const GroupItemMetadataProvider: GroupItemMetadataProviderType;
     }
     interface RowMoveManagerOptions {
         cancelEditOnDrag: boolean;
