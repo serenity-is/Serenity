@@ -26,3 +26,4 @@ node_modules/
 /src/Serenity.Scripts/corelib/dist/**/*.js
 /src/Serenity.Scripts/corelib/dist/**/*.map
 package-lock.json
+/src/Serenity.Scripts/corelib/coverage/
