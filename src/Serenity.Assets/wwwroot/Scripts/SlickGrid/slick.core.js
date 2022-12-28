@@ -18,13 +18,13 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // core/index.ts
+  // src/core/index.ts
   var core_exports = {};
   __export(core_exports, {
     EditorLock: () => EditorLock,
-    Event: () => Event,
     EventData: () => EventData,
-    EventHandler: () => EventHandler,
+    EventEmitter: () => EventEmitter,
+    EventSubscriber: () => EventSubscriber,
     GlobalEditorLock: () => GlobalEditorLock,
     Group: () => Group,
     GroupTotals: () => GroupTotals,
@@ -48,7 +48,7 @@ Slick._ = (() => {
     titleize: () => titleize
   });
 
-  // core/base.ts
+  // src/core/base.ts
   var NonDataRow = class {
     constructor() {
       this.__nonDataRow = true;
@@ -57,7 +57,7 @@ Slick._ = (() => {
   var preClickClassName = "slick-edit-preclick";
   typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
 
-  // core/column.ts
+  // src/core/column.ts
   var columnDefaults = {
     nameIsHtml: false,
     resizable: true,
@@ -105,7 +105,7 @@ Slick._ = (() => {
     return underscore(str).replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
   }
 
-  // core/event.ts
+  // src/core/event.ts
   var EventData = class {
     constructor() {
       this._isPropagationStopped = false;
@@ -124,7 +124,7 @@ Slick._ = (() => {
       return this._isImmediatePropagationStopped;
     }
   };
-  var Event = class {
+  var EventEmitter = class {
     constructor() {
       this._handlers = [];
     }
@@ -151,7 +151,7 @@ Slick._ = (() => {
       this._handlers = [];
     }
   };
-  var EventHandler = class {
+  var EventSubscriber = class {
     constructor() {
       this._handlers = [];
     }
@@ -230,7 +230,7 @@ Slick._ = (() => {
     return e;
   }
 
-  // core/editing.ts
+  // src/core/editing.ts
   var EditorLock = class {
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
@@ -265,7 +265,7 @@ Slick._ = (() => {
   };
   var GlobalEditorLock = new EditorLock();
 
-  // core/util.ts
+  // src/core/util.ts
   function addClass(el, cls) {
     if (cls == null || !cls.length)
       return;
@@ -342,7 +342,7 @@ Slick._ = (() => {
     return value;
   }
 
-  // core/formatting.ts
+  // src/core/formatting.ts
   function defaultColumnFormat(ctx) {
     return escape(ctx.value);
   }
@@ -397,7 +397,7 @@ Slick._ = (() => {
     }
   }
 
-  // core/group.ts
+  // src/core/group.ts
   var Group = class extends NonDataRow {
     constructor() {
       super(...arguments);
@@ -419,7 +419,7 @@ Slick._ = (() => {
     }
   };
 
-  // core/range.ts
+  // src/core/range.ts
   var Range = class {
     constructor(fromRow, fromCell, toRow, toCell) {
       if (toRow === void 0 && toCell === void 0) {
@@ -450,4 +450,4 @@ Slick._ = (() => {
   };
   return __toCommonJS(core_exports);
 })();
-["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._; Slick.Event = Slick.EventEmitter; Slick.EventHandler = Slick.EventSubscriber;

@@ -1,83 +1,83 @@
-(function ($) {
-  // Register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "AutoTooltips": AutoTooltips
+var Slick = Slick || {};
+Slick._ = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
     }
-  });
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  /**
-   * AutoTooltips plugin to show/hide tooltips when columns are too narrow to fit content.
-   * @constructor
-   * @param {boolean} [options.enableForCells=true]        - Enable tooltip for grid cells
-   * @param {boolean} [options.enableForHeaderCells=false] - Enable tooltip for header cells
-   * @param {number}  [options.maxToolTipLength=null]      - The maximum length for a tooltip
-   */
-  function AutoTooltips(options) {
-    var _grid;
-    var _self = this;
-    var _defaults = {
-      enableForCells: true,
-      enableForHeaderCells: false,
-      maxToolTipLength: null
-    };
-    
-    /**
-     * Initialize plugin.
-     */
-    function init(grid) {
-      options = $.extend(true, {}, _defaults, options);
-      _grid = grid;
-      if (options.enableForCells) _grid.onMouseEnter.subscribe(handleMouseEnter);
-      if (options.enableForHeaderCells) _grid.onHeaderMouseEnter.subscribe(handleHeaderMouseEnter);
-    }
-    
-    /**
-     * Destroy plugin.
-     */
-    function destroy() {
-      if (options.enableForCells) _grid.onMouseEnter.unsubscribe(handleMouseEnter);
-      if (options.enableForHeaderCells) _grid.onHeaderMouseEnter.unsubscribe(handleHeaderMouseEnter);
-    }
-    
-    /**
-     * Handle mouse entering grid cell to add/remove tooltip.
-     * @param {jQuery.Event} e - The event
-     */
-    function handleMouseEnter(e) {
-      var cell = _grid.getCellFromEvent(e);
-      if (cell) {
-        var $node = $(_grid.getCellNode(cell.row, cell.cell));
+  // src/plugins/autotooltips.ts
+  var autotooltips_exports = {};
+  __export(autotooltips_exports, {
+    AutoTooltips: () => AutoTooltips
+  });
+  var _AutoTooltips = class {
+    constructor(options) {
+      this.handleMouseEnter = (e) => {
+        var _a, _b;
+        var cell = this.grid.getCellFromEvent(e);
+        if (!cell)
+          return;
+        var node = this.grid.getCellNode(cell.row, cell.cell);
+        if (!node)
+          return;
         var text;
-        if ($node.innerWidth() < $node[0].scrollWidth) {
-          text = $.trim($node.text());
-          if (options.maxToolTipLength && text.length > options.maxToolTipLength) {
-            text = text.substr(0, options.maxToolTipLength - 3) + "...";
+        if (!node.title || this.options.replaceExisting) {
+          if (node.clientWidth < node.scrollWidth) {
+            text = (_b = (_a = node.textContent) == null ? void 0 : _a.trim()) != null ? _b : "";
+            if (this.options.maxToolTipLength && text.length > this.options.maxToolTipLength) {
+              text = text.substring(0, this.options.maxToolTipLength - 3) + "...";
+            }
+          } else {
+            text = "";
           }
-        } else {
-          text = "";
+          node.title = text;
         }
-        $node.attr("title", text);
-      }
+        node = null;
+      };
+      this.handleHeaderMouseEnter = (e, args) => {
+        var column = args.column;
+        if (column && !column.toolTip) {
+          var node = e.target.closest(".slick-header-column");
+          node && (node.title = node.clientWidth < node.scrollWidth ? column.name : "");
+        }
+      };
+      this.pluginName = "AutoTooltips";
+      this.options = Object.assign({}, _AutoTooltips.defaults, options);
     }
-    
-    /**
-     * Handle mouse entering header cell to add/remove tooltip.
-     * @param {jQuery.Event} e     - The event
-     * @param {object} args.column - The column definition
-     */
-    function handleHeaderMouseEnter(e, args) {
-      var column = args.column,
-          $node = $(e.target).closest(".slick-header-column");
-      if (column && !column.toolTip) {
-        $node.attr("title", ($node.innerWidth() < $node[0].scrollWidth) ? column.name : "");
-      }
+    init(grid) {
+      this.grid = grid;
+      if (this.options.enableForCells)
+        this.grid.onMouseEnter.subscribe(this.handleMouseEnter);
+      if (this.options.enableForHeaderCells)
+        this.grid.onHeaderMouseEnter.subscribe(this.handleHeaderMouseEnter);
     }
-    
-    // Public API
-    $.extend(this, {
-      "init": init,
-      "destroy": destroy
-    });
-  }
-})(jQuery);
+    destroy() {
+      if (this.options.enableForCells)
+        this.grid.onMouseEnter.unsubscribe(this.handleMouseEnter);
+      if (this.options.enableForHeaderCells)
+        this.grid.onHeaderMouseEnter.unsubscribe(this.handleHeaderMouseEnter);
+    }
+  };
+  var AutoTooltips = _AutoTooltips;
+  AutoTooltips.defaults = {
+    enableForCells: true,
+    enableForHeaderCells: false,
+    maxToolTipLength: null,
+    replaceExisting: true
+  };
+  return __toCommonJS(autotooltips_exports);
+})();
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

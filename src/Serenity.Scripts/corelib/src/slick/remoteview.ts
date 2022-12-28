@@ -1,7 +1,7 @@
-﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, text, tryGetText } from "@serenity-is/corelib/q";
-import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
-import { Event, EventData, Grid, gridDefaults, Group, GroupItemMetadataProvider, GroupTotals } from "@serenity-is/sleekgrid";
+﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, text } from "@serenity-is/corelib/q";
+import { EventEmitter, EventData, Grid, gridDefaults, Group, GroupItemMetadataProvider, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";
+import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 export interface RemoteViewOptions {
     autoLoad?: boolean;
@@ -41,16 +41,16 @@ export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, v
 
 export interface RemoteView<TEntity> {
     onSubmit: CancellableViewCallback<TEntity>;
-    onDataChanged: Event;
-    onDataLoading: Event;
-    onDataLoaded: Event;
-    onPagingInfoChanged: Event;
-    onRowCountChanged: Event;
-    onRowsChanged: Event;
-    onRowsOrCountChanged: Event;
+    onDataChanged: EventEmitter;
+    onDataLoading: EventEmitter;
+    onDataLoaded: EventEmitter;
+    onPagingInfoChanged: EventEmitter;
+    onRowCountChanged: EventEmitter;
+    onRowsChanged: EventEmitter;
+    onRowsOrCountChanged: EventEmitter;
     getPagingInfo(): PagingInfo;
-    onGroupExpanded: Event,
-    onGroupCollapsed: Event,
+    onGroupExpanded: EventEmitter,
+    onGroupCollapsed: EventEmitter,
     onAjaxCall: RemoteViewAjaxCallback<TEntity>;
     onProcessData: RemoteViewProcessCallback<TEntity>;
     addData(data: ListResponse<TEntity>): void;
@@ -165,15 +165,15 @@ export class RemoteView<TEntity> {
         var page = 1;
         var totalRows = 0;
 
-        var onDataChanged: Event = new Event();
-        var onDataLoading: Event = new Event();
-        var onDataLoaded: Event = new Event();
-        var onGroupExpanded: Event = new Event();
-        var onGroupCollapsed: Event = new Event();
-        var onPagingInfoChanged: Event = new Event();
-        var onRowCountChanged: Event = new Event();
-        var onRowsChanged: Event = new Event();
-        var onRowsOrCountChanged: Event = new Event();
+        var onDataChanged: EventEmitter = new EventEmitter();
+        var onDataLoading: EventEmitter = new EventEmitter();
+        var onDataLoaded: EventEmitter = new EventEmitter();
+        var onGroupExpanded: EventEmitter = new EventEmitter();
+        var onGroupCollapsed: EventEmitter = new EventEmitter();
+        var onPagingInfoChanged: EventEmitter = new EventEmitter();
+        var onRowCountChanged: EventEmitter = new EventEmitter();
+        var onRowsChanged: EventEmitter = new EventEmitter();
+        var onRowsOrCountChanged: EventEmitter = new EventEmitter();
 
         var loading: any = false;
         var errorMessage: string = null;
@@ -1194,7 +1194,7 @@ export class RemoteView<TEntity> {
          * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
          *     that are currently out of the view (see preserveHidden) as selected when selection
          *     changes.
-         * @return {Event} An event that notifies when an internal list of selected row ids
+         * @return {EventEmitter} An event that notifies when an internal list of selected row ids
          *     changes.  This is useful since, in combination with the above two options, it allows
          *     access to the full list selected row ids, and not just the ones visible to the grid.
          * @method syncGridSelection
@@ -1203,7 +1203,7 @@ export class RemoteView<TEntity> {
             var self = this;
             var inHandler: any;
             var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
-            var onSelectedRowIdsChanged = new Event();
+            var onSelectedRowIdsChanged = new EventEmitter();
 
             function setSelectedRowIds(rowIds: any[]) {
                 if (selectedRowIds.join(",") == rowIds.join(",")) {

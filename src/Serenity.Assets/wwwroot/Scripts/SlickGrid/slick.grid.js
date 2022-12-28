@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // grid/index.ts
+  // src/grid/index.ts
   var grid_exports = {};
   __export(grid_exports, {
     BasicLayout: () => BasicLayout,
@@ -27,9 +27,9 @@ Slick._ = (() => {
   });
 
   // global-externals:_
-  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, Event, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, parsePx, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
+  var { addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, ensureUniqueColumnIds, escape, defaultColumnFormat, disableSelection, EventEmitter, EventData, GlobalEditorLock, initializeColumns, H, keyCode, NonDataRow, parsePx, preClickClassName, Range, removeClass, RowCell, spacerDiv, titleize } = Slick;
 
-  // grid/gridoptions.ts
+  // src/grid/gridoptions.ts
   var gridDefaults = {
     addNewRowCssClass: "new-row",
     alwaysAllowHorizontalScroll: false,
@@ -82,7 +82,7 @@ Slick._ = (() => {
     topPanelHeight: 30
   };
 
-  // grid/basiclayout.ts
+  // src/grid/basiclayout.ts
   var BasicLayout = function() {
     var host;
     var canvasWidth;
@@ -314,7 +314,7 @@ Slick._ = (() => {
     return intf;
   };
 
-  // grid/cellnavigator.ts
+  // src/grid/cellnavigator.ts
   var CellNavigator = class {
     constructor(h) {
       this.host = h;
@@ -537,7 +537,7 @@ Slick._ = (() => {
     }
   };
 
-  // grid/internal.ts
+  // src/grid/internal.ts
   var maxSupportedCssHeight;
   var scrollbarDimensions;
   function absBox(elem) {
@@ -833,7 +833,7 @@ Slick._ = (() => {
     return Math.max(width, 0);
   }
 
-  // grid/grid.ts
+  // src/grid/grid.ts
   var Grid = class {
     constructor(container, data, columns, options) {
       this._activeCellNode = null;
@@ -874,42 +874,42 @@ Slick._ = (() => {
       this._viewportInfo = {};
       this._vScrollDir = 1;
       this._boundAncestorScroll = [];
-      this.onActiveCellChanged = new Event();
-      this.onActiveCellPositionChanged = new Event();
-      this.onAddNewRow = new Event();
-      this.onBeforeCellEditorDestroy = new Event();
-      this.onBeforeDestroy = new Event();
-      this.onBeforeEditCell = new Event();
-      this.onBeforeFooterRowCellDestroy = new Event();
-      this.onBeforeHeaderCellDestroy = new Event();
-      this.onBeforeHeaderRowCellDestroy = new Event();
-      this.onCellChange = new Event();
-      this.onCellCssStylesChanged = new Event();
-      this.onClick = new Event();
-      this.onColumnsReordered = new Event();
-      this.onColumnsResized = new Event();
-      this.onCompositeEditorChange = new Event();
-      this.onContextMenu = new Event();
-      this.onDblClick = new Event();
-      this.onDrag = new Event();
-      this.onDragEnd = new Event();
-      this.onDragInit = new Event();
-      this.onDragStart = new Event();
-      this.onFooterRowCellRendered = new Event();
-      this.onHeaderCellRendered = new Event();
-      this.onHeaderClick = new Event();
-      this.onHeaderContextMenu = new Event();
-      this.onHeaderMouseEnter = new Event();
-      this.onHeaderMouseLeave = new Event();
-      this.onHeaderRowCellRendered = new Event();
-      this.onKeyDown = new Event();
-      this.onMouseEnter = new Event();
-      this.onMouseLeave = new Event();
-      this.onScroll = new Event();
-      this.onSelectedRowsChanged = new Event();
-      this.onSort = new Event();
-      this.onValidationError = new Event();
-      this.onViewportChanged = new Event();
+      this.onActiveCellChanged = new EventEmitter();
+      this.onActiveCellPositionChanged = new EventEmitter();
+      this.onAddNewRow = new EventEmitter();
+      this.onBeforeCellEditorDestroy = new EventEmitter();
+      this.onBeforeDestroy = new EventEmitter();
+      this.onBeforeEditCell = new EventEmitter();
+      this.onBeforeFooterRowCellDestroy = new EventEmitter();
+      this.onBeforeHeaderCellDestroy = new EventEmitter();
+      this.onBeforeHeaderRowCellDestroy = new EventEmitter();
+      this.onCellChange = new EventEmitter();
+      this.onCellCssStylesChanged = new EventEmitter();
+      this.onClick = new EventEmitter();
+      this.onColumnsReordered = new EventEmitter();
+      this.onColumnsResized = new EventEmitter();
+      this.onCompositeEditorChange = new EventEmitter();
+      this.onContextMenu = new EventEmitter();
+      this.onDblClick = new EventEmitter();
+      this.onDrag = new EventEmitter();
+      this.onDragEnd = new EventEmitter();
+      this.onDragInit = new EventEmitter();
+      this.onDragStart = new EventEmitter();
+      this.onFooterRowCellRendered = new EventEmitter();
+      this.onHeaderCellRendered = new EventEmitter();
+      this.onHeaderClick = new EventEmitter();
+      this.onHeaderContextMenu = new EventEmitter();
+      this.onHeaderMouseEnter = new EventEmitter();
+      this.onHeaderMouseLeave = new EventEmitter();
+      this.onHeaderRowCellRendered = new EventEmitter();
+      this.onKeyDown = new EventEmitter();
+      this.onMouseEnter = new EventEmitter();
+      this.onMouseLeave = new EventEmitter();
+      this.onScroll = new EventEmitter();
+      this.onSelectedRowsChanged = new EventEmitter();
+      this.onSort = new EventEmitter();
+      this.onValidationError = new EventEmitter();
+      this.onViewportChanged = new EventEmitter();
       this.handleSelectedRangesChanged = (e, ranges) => {
         var previousSelectedRows = this._selectedRows.slice(0);
         this._selectedRows = [];

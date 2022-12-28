@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // data/groupitemmetadataprovider.ts
+  // src/data/groupitemmetadataprovider.ts
   var groupitemmetadataprovider_exports = {};
   __export(groupitemmetadataprovider_exports, {
     GroupItemMetadataProvider: () => GroupItemMetadataProvider
@@ -27,7 +27,7 @@ Slick._ = (() => {
   // global-externals:_
   var { convertCompatFormatter, Group } = Slick;
 
-  // data/groupitemmetadataprovider.ts
+  // src/data/groupitemmetadataprovider.ts
   var _GroupItemMetadataProvider = class {
     constructor(opt) {
       this.handleGridClick = (e, args) => {

@@ -1,7 +1,8 @@
-﻿import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { IReadOnly } from "../../interfaces";
-import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, ScriptData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "@serenity-is/corelib/q";
+﻿import { Authorization, Criteria, debounce, deepClone, endsWith, extend, getAttributes, getColumnsData, getColumnsDataAsync, getInstanceType, getTypeFullName, htmlEncode, indexOf, isEmptyOrNull, isInstanceOfType, layoutFillHeight, LayoutTimer, ListResponse, PropertyItem, PropertyItemsData, ScriptData, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "@serenity-is/corelib/q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "@serenity-is/corelib/slick";
+import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, GroupItemMetadataProvider, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
+import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+import { IReadOnly } from "../../interfaces";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor } from "../editors/selecteditor";
@@ -15,12 +16,11 @@ import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } f
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
-import { QuickFilterBar } from "./quickfilterbar";
 import { IDataGrid } from "./idatagrid";
 import { QuickFilter } from "./quickfilter";
+import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { AutoTooltips, Column, ColumnSort, Event, FormatterContext, Grid, GridOptions, GroupItemMetadataProvider, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 
 type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 
@@ -38,15 +38,15 @@ declare global {
         class RowMoveManager implements IPlugin {
             constructor(options: RowMoveManagerOptions);
             init(): void;
-            onBeforeMoveRows: Event;
-            onMoveRows: Event;
+            onBeforeMoveRows: EventEmitter;
+            onMoveRows: EventEmitter;
         }
 
         class RowSelectionModel implements SelectionModel {
             init(grid: Grid): void;
             destroy?: () => void;
             setSelectedRanges(ranges: Range[]): void;
-            onSelectedRangesChanged: Event<Range[]>;
+            onSelectedRangesChanged: EventEmitter<Range[]>;
             refreshSelections?(): void;
         }        
     }

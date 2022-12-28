@@ -5,7 +5,7 @@ import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, Dial
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
 export { Formatter } from '@serenity-is/corelib/slick';
-import { Grid, Column, FormatterContext, IPlugin, Event, SelectionModel, Range, GroupItemMetadataProvider, GridOptions } from '@serenity-is/sleekgrid';
+import { Grid, Column, FormatterContext, IPlugin, EventEmitter, SelectionModel, Range, GroupItemMetadataProvider, GridOptions } from '@serenity-is/sleekgrid';
 
 declare global {
     namespace Select2 {
@@ -1834,14 +1834,14 @@ declare global {
         class RowMoveManager implements IPlugin {
             constructor(options: RowMoveManagerOptions);
             init(): void;
-            onBeforeMoveRows: Event;
-            onMoveRows: Event;
+            onBeforeMoveRows: EventEmitter;
+            onMoveRows: EventEmitter;
         }
         class RowSelectionModel implements SelectionModel {
             init(grid: Grid): void;
             destroy?: () => void;
             setSelectedRanges(ranges: Range[]): void;
-            onSelectedRangesChanged: Event<Range[]>;
+            onSelectedRangesChanged: EventEmitter<Range[]>;
             refreshSelections?(): void;
         }
     }

@@ -1,5 +1,5 @@
 /// <reference types="jquery" />
-import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, Event } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter } from '@serenity-is/sleekgrid';
 import { PropertyItem, ListResponse } from '@serenity-is/corelib/q';
 
 declare namespace Aggregators {
@@ -84,16 +84,16 @@ type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => b
 type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 interface RemoteView<TEntity> {
     onSubmit: CancellableViewCallback<TEntity>;
-    onDataChanged: Event;
-    onDataLoading: Event;
-    onDataLoaded: Event;
-    onPagingInfoChanged: Event;
-    onRowCountChanged: Event;
-    onRowsChanged: Event;
-    onRowsOrCountChanged: Event;
+    onDataChanged: EventEmitter;
+    onDataLoading: EventEmitter;
+    onDataLoaded: EventEmitter;
+    onPagingInfoChanged: EventEmitter;
+    onRowCountChanged: EventEmitter;
+    onRowsChanged: EventEmitter;
+    onRowsOrCountChanged: EventEmitter;
     getPagingInfo(): PagingInfo;
-    onGroupExpanded: Event;
-    onGroupCollapsed: Event;
+    onGroupExpanded: EventEmitter;
+    onGroupCollapsed: EventEmitter;
     onAjaxCall: RemoteViewAjaxCallback<TEntity>;
     onProcessData: RemoteViewProcessCallback<TEntity>;
     addData(data: ListResponse<TEntity>): void;

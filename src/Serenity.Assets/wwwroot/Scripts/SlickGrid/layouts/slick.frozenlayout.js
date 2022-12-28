@@ -18,7 +18,7 @@ Slick._ = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // layouts/frozenlayout.ts
+  // src/layouts/frozenlayout.ts
   var frozenlayout_exports = {};
   __export(frozenlayout_exports, {
     FrozenLayout: () => FrozenLayout
@@ -27,7 +27,7 @@ Slick._ = (() => {
   // global-externals:_
   var { disableSelection, H, parsePx, spacerDiv } = Slick;
 
-  // layouts/frozenlayout.ts
+  // src/layouts/frozenlayout.ts
   var FrozenLayout = function() {
     var canvasWidth;
     var canvasWidthL;

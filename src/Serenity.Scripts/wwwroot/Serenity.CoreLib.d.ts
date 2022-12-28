@@ -1268,7 +1268,7 @@ declare namespace Slick {
     	 */
     	max?: any;
     }
-    export type Handler<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
+    export type EventListener<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     interface IEventData {
     	readonly type?: string;
     	currentTarget?: EventTarget | null;
@@ -1310,7 +1310,7 @@ declare namespace Slick {
     /***
      * A simple publisher-subscriber implementation.
      */
-    class Event<TArgs = any, TEventData extends IEventData = IEventData> {
+    class EventEmitter<TArgs = any, TEventData extends IEventData = IEventData> {
     	private _handlers;
     	/***
     	 * Adds an event handler to be called when the event is fired.
@@ -1319,13 +1319,13 @@ declare namespace Slick {
     	 * @method subscribe
     	 * @param fn {Function} Event handler.
     	 */
-    	subscribe(fn: Handler<TArgs, TEventData>): void;
+    	subscribe(fn: EventListener<TArgs, TEventData>): void;
     	/***
     	 * Removes an event handler added with <code>subscribe(fn)</code>.
     	 * @method unsubscribe
     	 * @param fn {Function} Event handler to be removed.
     	 */
-    	unsubscribe(fn: Handler<TArgs, TEventData>): void;
+    	unsubscribe(fn: EventListener<TArgs, TEventData>): void;
     	/***
     	 * Fires an event notifying all subscribers.
     	 * @param args {Object} Additional data object to be passed to all handlers.
@@ -1341,11 +1341,11 @@ declare namespace Slick {
     	notify(args?: any, e?: TEventData, scope?: object): any;
     	clear(): void;
     }
-    class EventHandler<TArgs = any, TEventData extends IEventData = IEventData> {
+    class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
     	private _handlers;
-    	subscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-    	unsubscribe(event: Slick.Event<TArgs, TEventData>, handler: Handler<TArgs, TEventData>): this;
-    	unsubscribeAll(): EventHandler<TArgs, TEventData>;
+    	subscribe(event: EventEmitter<TArgs, TEventData>, handler: EventListener<TArgs, TEventData>): this;
+    	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: EventListener<TArgs, TEventData>): this;
+    	unsubscribeAll(): EventSubscriber<TArgs, TEventData>;
     }
     /** @deprecated */
     const keyCode: {
@@ -1386,7 +1386,7 @@ declare namespace Slick {
     	getActiveCell(): RowCell;
     	navigateNext(): boolean;
     	navigatePrev(): boolean;
-    	onCompositeEditorChange: Slick.Event<any>;
+    	onCompositeEditorChange: EventEmitter<any>;
     }
     interface CompositeEditorOptions {
     	formValues: any;
@@ -1611,7 +1611,7 @@ declare namespace Slick {
     }
     interface SelectionModel extends IPlugin {
     	setSelectedRanges(ranges: Range[]): void;
-    	onSelectedRangesChanged: Slick.Event<Range[]>;
+    	onSelectedRangesChanged: EventEmitter<Range[]>;
     	refreshSelections?(): void;
     }
     interface ViewRange {
@@ -1834,42 +1834,42 @@ declare namespace Slick {
     	private _focusSink1;
     	private _focusSink2;
     	private _groupingPanel;
-    	readonly onActiveCellChanged: Slick.Event<ArgsCell, IEventData>;
-    	readonly onActiveCellPositionChanged: Slick.Event<ArgsGrid, IEventData>;
-    	readonly onAddNewRow: Slick.Event<ArgsAddNewRow, IEventData>;
-    	readonly onBeforeCellEditorDestroy: Slick.Event<ArgsEditorDestroy, IEventData>;
-    	readonly onBeforeDestroy: Slick.Event<ArgsGrid, IEventData>;
-    	readonly onBeforeEditCell: Slick.Event<ArgsCellEdit, IEventData>;
-    	readonly onBeforeFooterRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onBeforeHeaderCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onBeforeHeaderRowCellDestroy: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onCellChange: Slick.Event<ArgsCellChange, IEventData>;
-    	readonly onCellCssStylesChanged: Slick.Event<ArgsCssStyle, IEventData>;
-    	readonly onClick: Slick.Event<ArgsCell, MouseEvent>;
-    	readonly onColumnsReordered: Slick.Event<ArgsGrid, IEventData>;
-    	readonly onColumnsResized: Slick.Event<ArgsGrid, IEventData>;
-    	readonly onCompositeEditorChange: Slick.Event<ArgsGrid, IEventData>;
-    	readonly onContextMenu: Slick.Event<ArgsGrid, UIEvent>;
-    	readonly onDblClick: Slick.Event<ArgsCell, MouseEvent>;
-    	readonly onDrag: Slick.Event<ArgsGrid, UIEvent>;
-    	readonly onDragEnd: Slick.Event<ArgsGrid, UIEvent>;
-    	readonly onDragInit: Slick.Event<ArgsGrid, UIEvent>;
-    	readonly onDragStart: Slick.Event<ArgsGrid, UIEvent>;
-    	readonly onFooterRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onHeaderCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onHeaderClick: Slick.Event<ArgsColumn, IEventData>;
-    	readonly onHeaderContextMenu: Slick.Event<ArgsColumn, IEventData>;
-    	readonly onHeaderMouseEnter: Slick.Event<ArgsColumn, MouseEvent>;
-    	readonly onHeaderMouseLeave: Slick.Event<ArgsColumn, MouseEvent>;
-    	readonly onHeaderRowCellRendered: Slick.Event<ArgsColumnNode, IEventData>;
-    	readonly onKeyDown: Slick.Event<ArgsCell, KeyboardEvent>;
-    	readonly onMouseEnter: Slick.Event<ArgsGrid, MouseEvent>;
-    	readonly onMouseLeave: Slick.Event<ArgsGrid, MouseEvent>;
-    	readonly onScroll: Slick.Event<ArgsScroll, IEventData>;
-    	readonly onSelectedRowsChanged: Slick.Event<ArgsSelectedRowsChange, IEventData>;
-    	readonly onSort: Slick.Event<ArgsSort, IEventData>;
-    	readonly onValidationError: Slick.Event<ArgsValidationError, IEventData>;
-    	readonly onViewportChanged: Slick.Event<ArgsGrid, IEventData>;
+    	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
+    	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
+    	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+    	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
+    	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
+    	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
+    	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onCellChange: EventEmitter<ArgsCellChange, IEventData>;
+    	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle, IEventData>;
+    	readonly onClick: EventEmitter<ArgsCell, MouseEvent>;
+    	readonly onColumnsReordered: EventEmitter<ArgsGrid, IEventData>;
+    	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
+    	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, IEventData>;
+    	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
+    	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
+    	readonly onDrag: EventEmitter<ArgsGrid, UIEvent>;
+    	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent>;
+    	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent>;
+    	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent>;
+    	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
+    	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, IEventData>;
+    	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
+    	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
+    	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+    	readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent>;
+    	readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent>;
+    	readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent>;
+    	readonly onScroll: EventEmitter<ArgsScroll, IEventData>;
+    	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange, IEventData>;
+    	readonly onSort: EventEmitter<ArgsSort, IEventData>;
+    	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
+    	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
     	constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
     	private bindAncestorScroll;
     	init(): void;
@@ -2292,13 +2292,13 @@ declare namespace Slick {
     	totalsFormatter?: CompatFormatter<GroupTotals>;
     }
     class GroupItemMetadataProvider {
-    	private grid;
+    	protected grid: Pick<Grid, "getActiveCell" | "getColumns" | "getData" | "getDataItem" | "getRenderedRange" | "onClick" | "onKeyDown" | "groupTotalsFormatter">;
     	private options;
     	constructor(opt?: GroupItemMetadataProviderOptions);
     	static readonly defaults: GroupItemMetadataProviderOptions;
     	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string;
-    	static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): string;
-    	init(grid: Grid): void;
+    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): string;
+    	init(grid: typeof this.grid): void;
     	destroy(): void;
     	getOptions(): GroupItemMetadataProviderOptions;
     	setOptions(value: GroupItemMetadataProviderOptions): void;
@@ -2416,16 +2416,16 @@ declare namespace Slick {
     type RemoteViewProcessCallback<TEntity> = (data: Q.ListResponse<TEntity>, view: RemoteView<TEntity>) => Q.ListResponse<TEntity>;
     interface RemoteView<TEntity> {
         onSubmit: CancellableViewCallback<TEntity>;
-        onDataChanged: Slick.Event;
-        onDataLoading: Slick.Event;
-        onDataLoaded: Slick.Event;
-        onPagingInfoChanged: Slick.Event;
-        onRowCountChanged: Slick.Event;
-        onRowsChanged: Slick.Event;
-        onRowsOrCountChanged: Slick.Event;
+        onDataChanged: EventEmitter;
+        onDataLoading: EventEmitter;
+        onDataLoaded: EventEmitter;
+        onPagingInfoChanged: EventEmitter;
+        onRowCountChanged: EventEmitter;
+        onRowsChanged: EventEmitter;
+        onRowsOrCountChanged: EventEmitter;
         getPagingInfo(): PagingInfo;
-        onGroupExpanded: Slick.Event;
-        onGroupCollapsed: Slick.Event;
+        onGroupExpanded: EventEmitter;
+        onGroupCollapsed: EventEmitter;
         onAjaxCall: RemoteViewAjaxCallback<TEntity>;
         onProcessData: RemoteViewProcessCallback<TEntity>;
         addData(data: Q.ListResponse<TEntity>): void;
@@ -4961,14 +4961,14 @@ declare namespace Slick {
     class RowMoveManager implements IPlugin {
         constructor(options: RowMoveManagerOptions);
         init(): void;
-        onBeforeMoveRows: Slick.Event;
-        onMoveRows: Slick.Event;
+        onBeforeMoveRows: Slick.EventEmitter;
+        onMoveRows: Slick.EventEmitter;
     }
     class RowSelectionModel implements SelectionModel {
         init(grid: Slick.Grid): void;
         destroy?: () => void;
         setSelectedRanges(ranges: Slick.Range[]): void;
-        onSelectedRangesChanged: Slick.Event<Slick.Range[]>;
+        onSelectedRangesChanged: Slick.EventEmitter<Slick.Range[]>;
         refreshSelections?(): void;
     }
 }

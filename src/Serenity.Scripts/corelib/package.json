@@ -5,7 +5,7 @@
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
   "dependencies": {
-    "@serenity-is/sleekgrid": "1.4.8",
+    "@serenity-is/sleekgrid": "1.5.0",
     "@types/jquery": "2.0.48",
     "@types/jqueryui": "1.12.6",
     "@types/jquery.validation": "1.16.7",
@@ -75,8 +75,7 @@
   "license": "MIT",
   "repository": "https://github.com/serenity-is/serenity/src/Serenity.Scripts/corelib",
   "scripts": {
-    "build": "rollup -c && node build/build && pnpm run minify",
-    "minify": "terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.core.min.js && terser ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.js --comments --mangle -f \"beautify=false,max_line_len=1000\" -o ../../Serenity.Assets/wwwroot/Scripts/SlickGrid/slick.grid.min.js",
+    "build": "rollup -c && node build/build",
     "test": "pnpm build && pnpm jest"
   },
   "type": "module"
