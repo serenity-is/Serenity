@@ -1,6 +1,6 @@
 ﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirm, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "@serenity-is/corelib/q";
+import { any, Authorization, confirmDialog, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "@serenity-is/corelib/q";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -932,7 +932,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             icon: 'fa-trash-o text-red',
             hotkey: 'alt+x',
             onClick: () => {
-                confirm(text('Controls.EntityDialog.DeleteConfirmation'), () => {
+                confirmDialog(text('Controls.EntityDialog.DeleteConfirmation'), () => {
                     this.doDelete(() => this.dialogClose());
                 });
             },
@@ -945,7 +945,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             cssClass: 'undo-delete-button',
             onClick: () => {
                 if (this.isDeleted()) {
-                    confirm(text('Controls.EntityDialog.UndeleteConfirmation'), () => {
+                    confirmDialog(text('Controls.EntityDialog.UndeleteConfirmation'), () => {
                         this.undelete(() => this.loadById(this.get_entityId()));
                     });
                 }

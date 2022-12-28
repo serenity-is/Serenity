@@ -1,4 +1,4 @@
-export { }
+import { alertDialog, resetBSVersionCheck } from "@/q";
 
 /**
  * @jest-environment jsdom
@@ -36,7 +36,7 @@ function setupDummyJQueryForModal(callback) {
 test('BS3 is detected when modal version starts with 3', function() {
 
     jest.isolateModules(function() {
-        var alert = require("@/q/dialogs").alert;
+        resetBSVersionCheck();
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
             passedHtml = html;
@@ -50,7 +50,7 @@ test('BS3 is detected when modal version starts with 3', function() {
                 }
             }
 
-            alert("hello");
+            alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
 
@@ -70,8 +70,7 @@ test('BS3 is detected when modal version starts with 3', function() {
 test('BS4 is detected when modal version does not exist', function() {
     
     jest.isolateModules(function() {
-        var alert = require("@/q/dialogs").alert;
-
+        resetBSVersionCheck();
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
             passedHtml = html;
@@ -80,9 +79,9 @@ test('BS4 is detected when modal version does not exist', function() {
             (global.$ as any).fn = {
                 modal: {
                 }
-            }        
+            }
 
-            alert("hello");
+            alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
 
@@ -102,7 +101,7 @@ test('BS4 is detected when modal version does not exist', function() {
 test('BS4 is detected when modal version is something other than 3', function() {
 
     jest.isolateModules(function() {
-        var alert = require("@/q/dialogs").alert;
+        resetBSVersionCheck();
         var passedHtml;
         setupDummyJQueryForModal(function(html) {
             passedHtml = html;
@@ -116,7 +115,7 @@ test('BS4 is detected when modal version is something other than 3', function() 
                 }
             }           
 
-            alert("hello");
+            alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
 

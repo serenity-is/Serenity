@@ -100,6 +100,11 @@ export function isBS5Plus(): boolean {
     return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
 }
 
+export function resetBSVersionCheck() {
+    _isBS3 = undefined;
+    _isBS5Plus = undefined;
+}
+
 const defaultTxt = {
     AlertTitle: 'Alert',
     InformationTitle: 'Information',
@@ -225,7 +230,7 @@ function messageHtml(message: string, options?: CommonDialogOptions): string {
     return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
 }
 
-export function alert(message: string, options?: AlertOptions) {
+export function alertDialog(message: string, options?: AlertOptions) {
 
     if (useBrowserDialogs()) {
         window.alert(message);
@@ -259,6 +264,9 @@ export function alert(message: string, options?: AlertOptions) {
         uiDialogMessage(options, message, options.dialogClass ?? "s-AlertDialog");
 }
 
+/** @obsolete use alertDialog */
+export const alert = alertDialog;
+
 export interface ConfirmOptions extends CommonDialogOptions {
     yesButton?: string | boolean;
     yesButtonClass?: string;
@@ -268,7 +276,7 @@ export interface ConfirmOptions extends CommonDialogOptions {
     onNo?: () => void;
 }
 
-export function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void {
+export function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void {
     if (useBrowserDialogs()) {
         if (window.confirm(message))
             onYes && onYes();
@@ -318,6 +326,9 @@ export function confirm(message: string, onYes: () => void, options?: ConfirmOpt
     else
         uiDialogMessage(options, message, options.dialogClass ?? "s-ConfirmDialog");
 }
+
+/** @obsolete use confirmDialog */
+export const confirm = confirmDialog;
 
 export interface IFrameDialogOptions {
     html?: string;
@@ -376,14 +387,14 @@ export function iframeDialog(options: IFrameDialogOptions) {
     e.dialog(settings as any);
 }
 
-export function information(message: string, onOk: () => void, options?: ConfirmOptions) {
+export function informationDialog(message: string, onOk: () => void, options?: ConfirmOptions) {
     if (useBrowserDialogs()) {
         window.alert(message);
         onOk && onOk();
         return;
     }
 
-    confirm(message, onOk, extend<ConfirmOptions>({
+    confirmDialog(message, onOk, extend<ConfirmOptions>({
         title: txt("InformationTitle"),
         dialogClass: "s-InformationDialog",
         modalClass: "s-InformationModal",
@@ -393,15 +404,17 @@ export function information(message: string, onOk: () => void, options?: Confirm
     }, options));
 }
 
+/** @obsolete use informationDialog */
+export const information = informationDialog;
 
-export function success(message: string, onOk: () => void, options?: ConfirmOptions) {
+export function successDialog(message: string, onOk: () => void, options?: ConfirmOptions) {
     if (useBrowserDialogs()) {
         window.alert(message);
         onOk && onOk();
         return;
     }
 
-    confirm(message, onOk, extend<ConfirmOptions>({
+    confirmDialog(message, onOk, extend<ConfirmOptions>({
         title: txt("SuccessTitle"),
         dialogClass: "s-SuccessDialog",
         modalClass: "s-SuccessModal",
@@ -411,14 +424,20 @@ export function success(message: string, onOk: () => void, options?: ConfirmOpti
     }, options));
 }
 
-export function warning(message: string, options?: AlertOptions) {
-    alert(message, extend<AlertOptions>({
+/** @obsolete use successDialog */
+export const success = successDialog;
+
+export function warningDialog(message: string, options?: AlertOptions) {
+    alertDialog(message, extend<AlertOptions>({
         title: txt("WarningTitle"),
         dialogClass: "s-WarningDialog",
         modalClass: "s-WarningModal",
         okButtonClass: 'btn-warning'
     }, options));
 }
+
+/** @obsolete use warningDialog */
+export const warning = warningDialog;
 
 export function closePanel(element: JQuery, e?: JQueryEventObject) {
 

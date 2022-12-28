@@ -1,7 +1,7 @@
 ﻿import { resolveUrl } from "./services";
 import { startsWith, trimToNull } from "./strings";
 import { blockUI, blockUndo } from "./blockui";
-import { alert, iframeDialog } from "./dialogs";
+import { alertDialog, iframeDialog } from "./dialogs";
 import { notifyError } from "./notify";
 import { format } from "./formatting";
 import { PropertyItem, PropertyItemsData } from "./propertyitem";
@@ -102,11 +102,11 @@ export namespace ScriptData {
                 var html = xhr.responseText;
                 if (!html) {
                     if (!xhr.status)
-                        alert("An unknown connection error occurred! Check browser console for details.");
+                        alertDialog("An unknown connection error occurred! Check browser console for details.");
                     else if (xhr.status == 500)
-                        alert("HTTP 500: Connection refused! Check browser console for details.");
+                        alertDialog("HTTP 500: Connection refused! Check browser console for details.");
                     else
-                        alert("HTTP " + xhr.status + ' error! Check browser console for details.');
+                        alertDialog("HTTP " + xhr.status + ' error! Check browser console for details.');
                 }
                 else
                     iframeDialog({ html: html });

@@ -575,7 +575,9 @@ declare namespace Q {
     function bsModalMarkup(title: string, body: string, modalClass?: string): string;
     function dialogButtonToBS(x: DialogButton): string;
     function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;
-    function alert(message: string, options?: AlertOptions): void;
+    function alertDialog(message: string, options?: AlertOptions): void;
+    /** @obsolete use alertDialog */
+    const alert: typeof alertDialog;
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string | boolean;
         yesButtonClass?: string;
@@ -584,14 +586,22 @@ declare namespace Q {
         onCancel?: () => void;
         onNo?: () => void;
     }
-    function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void;
+    function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
+    /** @obsolete use confirmDialog */
+    const confirm: typeof confirmDialog;
     interface IFrameDialogOptions {
         html?: string;
     }
     function iframeDialog(options: IFrameDialogOptions): void;
-    function information(message: string, onOk: () => void, options?: ConfirmOptions): void;
-    function success(message: string, onOk: () => void, options?: ConfirmOptions): void;
-    function warning(message: string, options?: AlertOptions): void;
+    function informationDialog(message: string, onOk: () => void, options?: ConfirmOptions): void;
+    /** @obsolete use informationDialog */
+    const information: typeof informationDialog;
+    function successDialog(message: string, onOk: () => void, options?: ConfirmOptions): void;
+    /** @obsolete use successDialog */
+    const success: typeof successDialog;
+    function warningDialog(message: string, options?: AlertOptions): void;
+    /** @obsolete use warningDialog */
+    const warning: typeof warningDialog;
     function closePanel(element: JQuery, e?: JQueryEventObject): void;
 
     interface ServiceError {

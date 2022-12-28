@@ -1,4 +1,4 @@
-﻿import { alert } from "./dialogs";
+﻿import { alertDialog } from "./dialogs";
 import { htmlEncode } from "./html";
 import { notifyError } from "./notify";
 import { ServiceError } from "./servicetypes";
@@ -17,7 +17,7 @@ export namespace ErrorHandling {
             }
         }
 
-        alert(msg);
+        alertDialog(msg);
     }
 
     export function runtimeErrorHandler(message: string, filename?: string,

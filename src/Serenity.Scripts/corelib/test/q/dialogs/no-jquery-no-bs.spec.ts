@@ -1,6 +1,6 @@
-import { alert, confirm, information, warning, iframeDialog } from "@/q/dialogs";
+import { alertDialog, confirmDialog, informationDialog, warningDialog, iframeDialog } from "@/q/dialogs";
 
-test('Q.alert uses window.alert when no BS/jQuery UI loaded', function() {
+test('Q.alertDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
     (global as any).window = global;
@@ -9,7 +9,7 @@ test('Q.alert uses window.alert when no BS/jQuery UI loaded', function() {
         alertMessage = message;
     }
     try {
-        alert('test message');
+        alertDialog('test message');
         expect(alertCount).toBe(1);
         expect(alertMessage).toBe('test message');
     } 
@@ -19,7 +19,7 @@ test('Q.alert uses window.alert when no BS/jQuery UI loaded', function() {
     }
 });
 
-test('Q.information uses window.alert when no BS/jQuery UI loaded', function() {
+test('Q.informationDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
     try {
@@ -29,7 +29,7 @@ test('Q.information uses window.alert when no BS/jQuery UI loaded', function() {
             alertMessage = message;
         }
         
-        information('test message', () => { });
+        informationDialog('test message', () => { });
         expect(alertCount).toBe(1);
         expect(alertMessage).toBe('test message');
     }
@@ -39,7 +39,7 @@ test('Q.information uses window.alert when no BS/jQuery UI loaded', function() {
     }
 });
 
-test('Q.warning uses window.alert when no BS/jQuery UI loaded', function() {
+test('Q.warningDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
     (global as any).window = global;
@@ -49,7 +49,7 @@ test('Q.warning uses window.alert when no BS/jQuery UI loaded', function() {
     }
 
     try {
-        warning('test message');
+        warningDialog('test message');
         expect(alertCount).toBe(1);
         expect(alertMessage).toBe('test message');
     }
@@ -59,7 +59,7 @@ test('Q.warning uses window.alert when no BS/jQuery UI loaded', function() {
     }
 });
 
-test('Q.confirm uses window.confirm when no BS/jQuery UI loaded', function() {
+test('Q.confirmDialog uses window.confirm when no BS/jQuery UI loaded', function() {
     var confirmCount = 0;           
     var confirmMessage: string = null;
     (global as any).window = global;
@@ -70,7 +70,7 @@ test('Q.confirm uses window.confirm when no BS/jQuery UI loaded', function() {
     }
     try {
         var onYesCalled;
-        confirm('test message', function() {
+        confirmDialog('test message', function() {
             onYesCalled = true;
         });
         expect(confirmCount).toBe(1);

@@ -1,7 +1,7 @@
 ﻿import { extend } from "./system";
 import { Config } from "./config"
 import { ErrorHandling } from "./errorhandling";
-import { alert, iframeDialog } from "./dialogs";
+import { alertDialog, iframeDialog } from "./dialogs";
 import { blockUI, blockUndo } from "./blockui";
 import { ListRequest, ServiceOptions, ServiceResponse } from "./servicetypes";
 
@@ -95,12 +95,12 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
                 if (!html) {
                     if (!xhr.status) {
                         if (xhr.statusText != "abort")
-                            alert("An unknown AJAX connection error occurred! Check browser console for details.");
+                            alertDialog("An unknown AJAX connection error occurred! Check browser console for details.");
                     }
                     else if (xhr.status == 500)
-                        alert("HTTP 500: Connection refused! Check browser console for details.");
+                        alertDialog("HTTP 500: Connection refused! Check browser console for details.");
                     else
-                        alert("HTTP " + xhr.status + ' error! Check browser console for details.');
+                        alertDialog("HTTP " + xhr.status + ' error! Check browser console for details.');
                 }
                 else
                     iframeDialog({ html: html });
