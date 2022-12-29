@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Data.Common;
 
 namespace Serenity.Data
 {
@@ -7,13 +8,38 @@ namespace Serenity.Data
     /// </summary>
     /// <seealso cref="IDbConnection" />
     public class WrappedConnection : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
-        IHasCurrentTransaction, IHasDialect, IHasLogger, IHasOpenedOnce
+        IHasCurrentTransaction, IHasDialect, IHasLogger, IHasOpenedOnce, IHasConnectionStateChange
     {
         private readonly IDbConnection actualConnection;
         private bool openedOnce;
         private WrappedTransaction currentTransaction;
         private ISqlDialect dialect;
         private readonly ILogger logger;
+
+        /// <summary>
+        /// Implements state change event by proxying it to the actual connection
+        /// </summary>
+        public event StateChangeEventHandler StateChange 
+        { 
+            add 
+            {
+                if (actualConnection is DbConnection dbConnection)
+                    dbConnection.StateChange += value;
+                else if (actualConnection is IHasConnectionStateChange hasStateChange)
+                    hasStateChange.StateChange += value;
+                else
+                    throw new NotImplementedException();
+            } 
+            remove 
+            {
+                if (actualConnection is DbConnection dbConnection)
+                    dbConnection.StateChange -= value;
+                else if (actualConnection is IHasConnectionStateChange hasStateChange)
+                    hasStateChange.StateChange -= value;
+                else
+                    throw new NotImplementedException();
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WrappedConnection"/> class.

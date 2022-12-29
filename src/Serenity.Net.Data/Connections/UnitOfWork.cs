@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data
+﻿using System.Data.Common;
+
+namespace Serenity.Data
 {
     /// <summary>
     /// Unit of work implementation.
@@ -31,10 +33,12 @@
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <exception cref="ArgumentNullException">connection</exception>
-        /// <param name="deferStart">Defers starting of the transaction until the first 
-        /// moment connection property is read. If the passed connection
-        /// is accessed somewhere else (e.g. other than via the UnitOfWork.Connection property), 
-        /// it may cause consistency issues so ensure it is not accessed via other means.</param>
+        /// <param name="deferStart">Defers starting of the transaction until the connection is opened 
+        /// if it has a statechange event, or the first moment connection property is read. 
+        /// If the connection is already open this flag has no effect.
+        /// If the passed connection does not have a statechange event and is accessed somewhere else 
+        /// (e.g. other than via the UnitOfWork.Connection property),  it may cause consistency 
+        /// issues so ensure it is not accessed via other means.</param>
         /// <exception cref="ArgumentNullException">connection</exception>
         public UnitOfWork(IDbConnection connection, bool deferStart)
             : this(connection, IsolationLevel.Unspecified, deferStart)
@@ -47,17 +51,43 @@
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <param name="il">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
-        /// <param name="deferStart">Defers starting of the transaction until the first 
-        /// moment connection property is read. If the passed connection
-        /// is accessed somewhere else (e.g. other than via the UnitOfWork.Connection property), 
-        /// it may cause consistency issues so ensure it is not accessed via other means.</param>
+        /// <param name="deferStart">Defers starting of the transaction until the connection is opened 
+        /// if it has a statechange event, or the first moment connection property is read. 
+        /// If the connection is already open this flag has no effect.
+        /// If the passed connection does not have a statechange event and is accessed somewhere else 
+        /// (e.g. other than via the UnitOfWork.Connection property),  it may cause consistency 
+        /// issues so ensure it is not accessed via other means.</param>
         /// <exception cref="ArgumentNullException">connection</exception>
         public UnitOfWork(IDbConnection connection, IsolationLevel il, bool deferStart = false)
         {
             this.connection = connection ?? throw new ArgumentNullException("connection");
             isolationLevel = il;
-            if (!deferStart)
+            if (!deferStart || connection.State == ConnectionState.Open)
                 Initialize();
+            else
+            {
+                if (connection is IHasConnectionStateChange hasStateChange)
+                    hasStateChange.StateChange += StateChangeHandler;
+                else if (connection is DbConnection dbConnection)
+                    dbConnection.StateChange += StateChangeHandler;
+            }
+        }
+
+        private void UnbindStateChange()
+        {
+            if (connection is IHasConnectionStateChange hasStateChange)
+                hasStateChange.StateChange -= StateChangeHandler;
+            else if (connection is DbConnection dbConnection)
+                dbConnection.StateChange -= StateChangeHandler;
+        }
+
+        private void StateChangeHandler(object sender, StateChangeEventArgs e)
+        {
+            if (e.CurrentState == ConnectionState.Open &&
+                e.OriginalState != ConnectionState.Open)
+            {
+                Initialize();
+            }
         }
 
         private void Initialize()
@@ -66,6 +96,8 @@
                 return;
 
             initialized = true;
+            UnbindStateChange();
+
             connection.EnsureOpen();
             transaction = isolationLevel == IsolationLevel.Unspecified ? connection.BeginTransaction()
                 : connection.BeginTransaction(isolationLevel);
@@ -81,7 +113,10 @@
         {
             get
             {
-                Initialize();
+                if (connection is not IHasConnectionStateChange &&
+                    connection is not DbConnection)
+                    Initialize();
+
                 return connection;
             }
         }
@@ -93,6 +128,8 @@
         {
             if (disposed)
                 return;
+
+            UnbindStateChange();
 
             onCommit = null;
             try

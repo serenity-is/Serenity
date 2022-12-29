@@ -80,14 +80,35 @@ public class UnitOfWorkTests
     }
 
     [Fact]
-    public void DeferStartCtor_DoesNotStartTransaction_IfAlreadyOpen_And_DeferStartTrue()
+    public void DeferStartCtor_DoesNotAutoOpen_IfDeferStartTrue_WithStateChange()
+    {
+        using var connection = new UnitOfWorkTestConnectionWithStateChange();
+        using var uow = new UnitOfWork(connection, deferStart: true);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.Null(connection.BeginTransactionLevel);
+        Assert.Null(connection.Transaction);
+    }
+
+    [Fact]
+    public void DeferStartCtor_StartsTransaction_IfAlreadyOpen_And_DeferStartTrue()
     {
         using var connection = new UnitOfWorkTestConnection();
         connection.State = ConnectionState.Open;
         using var uow = new UnitOfWork(connection, deferStart: true);
         Assert.Equal(0, connection.OpenCalls);
         Assert.Null(connection.BeginTransactionLevel);
-        Assert.Null(connection.Transaction);
+        Assert.NotNull(connection.Transaction);
+    }
+
+    [Fact]
+    public void DeferStartCtor_StartsTransaction_IfAlreadyOpen_And_DeferStartTrue_WithStateChangeEvent()
+    {
+        using var connection = new UnitOfWorkTestConnectionWithStateChange();
+        connection.State = ConnectionState.Open;
+        using var uow = new UnitOfWork(connection, deferStart: true);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.Null(connection.BeginTransactionLevel);
+        Assert.NotNull(connection.Transaction);
     }
 
     [Fact]
@@ -107,7 +128,51 @@ public class UnitOfWorkTests
     }
 
     [Fact]
+    public void DeferStartCtor_DoesNot_AutoOpen_IfDeferStartTrue_WithStateChangeEvent()
+    {
+        using var connection = new UnitOfWorkTestConnectionWithStateChange();
+        using var uow = new UnitOfWork(connection, deferStart: true);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.NotNull(uow.Connection);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.Null(connection.BeginTransactionLevel);
+        Assert.Null(connection.Transaction);
+        connection.stateChange(connection, new(ConnectionState.Closed, ConnectionState.Connecting));
+        Assert.NotNull(connection.stateChange);
+        connection.Open();
+        Assert.Equal(1, connection.OpenCalls);
+        Assert.Null(connection.Transaction);
+        connection.stateChange(connection, new(ConnectionState.Closed, ConnectionState.Open));
+        Assert.Null(connection.stateChange);
+        Assert.Equal(1, connection.OpenCalls);
+        Assert.Null(connection.BeginTransactionLevel);
+        Assert.NotNull(connection.Transaction);
+        Assert.Equal(0, connection.Transaction.CommitCalls);
+        Assert.Equal(0, connection.Transaction.RollbackCalls);
+        Assert.NotNull(uow.Connection);
+        Assert.Null(connection.stateChange);
+        Assert.Equal(1, connection.OpenCalls);
+    }
+
+    [Fact]
     public void DeferStartCtor_StartsTransactionOnly_WhenConnectionRead_IfAlreadyOpen_AndDeferStartTrue()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        connection.State = ConnectionState.Open;
+        using var uow = new UnitOfWork(connection, deferStart: true);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.NotNull(uow.Connection);
+        Assert.Equal(0, connection.OpenCalls);
+        Assert.Null(connection.BeginTransactionLevel);
+        Assert.NotNull(connection.Transaction);
+        Assert.Equal(0, connection.Transaction.CommitCalls);
+        Assert.Equal(0, connection.Transaction.RollbackCalls);
+        Assert.NotNull(uow.Connection);
+        Assert.Equal(0, connection.OpenCalls);
+    }
+
+    [Fact]
+    public void DeferStartCtor_StartsTransactionOnly_WhenConnectionRead_IfAlreadyOpen_AndDeferStartTrue_WithStateChange()
     {
         using var connection = new UnitOfWorkTestConnection();
         connection.State = ConnectionState.Open;
@@ -192,14 +257,14 @@ public class UnitOfWorkTests
     }
 
     [Fact]
-    public void IsolationLevelCtor_DoesNotStartTransaction_IfAlreadyOpen_And_DeferStartTrue()
+    public void IsolationLevelCtor_StartsTransaction_IfAlreadyOpen_And_DeferStartTrue()
     {
         using var connection = new UnitOfWorkTestConnection();
         connection.State = ConnectionState.Open;
         using var uow = new UnitOfWork(connection, IsolationLevel.ReadCommitted, deferStart: true);
         Assert.Equal(0, connection.OpenCalls);
-        Assert.Null(connection.BeginTransactionLevel);
-        Assert.Null(connection.Transaction);
+        Assert.Equal(IsolationLevel.ReadCommitted, connection.BeginTransactionLevel);
+        Assert.NotNull(connection.Transaction);
     }
 
     [Fact]
@@ -513,6 +578,17 @@ public class UnitOfWorkTests
         public void Dispose() {}
         public IDbCommand CreateCommand() => throw new NotImplementedException();
         public void Commit() => throw new NotImplementedException();
+    }
+
+    private class UnitOfWorkTestConnectionWithStateChange : UnitOfWorkTestConnection, IHasConnectionStateChange
+    {
+        public StateChangeEventHandler stateChange;
+
+        public event StateChangeEventHandler StateChange
+        {
+            add { stateChange += value; }
+            remove { stateChange -= value; }
+        }
     }
 
     private class UnitOfWorkTestTransaction : IDbTransaction, IDisposable
