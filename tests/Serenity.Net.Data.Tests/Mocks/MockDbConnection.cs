@@ -16,12 +16,12 @@ public class MockDbConnection : IDbConnection
 
     public virtual IDbTransaction BeginTransaction()
     {
-            return new MockDbTransaction(this);
+        return new MockDbTransaction(this);
     }
 
     public virtual IDbTransaction BeginTransaction(IsolationLevel il)
     {
-            return new MockDbTransaction(this);
+        return new MockDbTransaction(this);
     }
 
     public virtual void ChangeDatabase(string databaseName)
@@ -36,13 +36,13 @@ public class MockDbConnection : IDbConnection
 
     public virtual IDbCommand CreateCommand()
     {
-            var command = new MockDbCommand(this);
+        var command = new MockDbCommand(this);
 
-            if (onExecuteReader != null)
-                command.OnExecuteReader(() => onExecuteReader(command));
+        if (onExecuteReader != null)
+            command.OnExecuteReader(() => onExecuteReader(command));
 
-            if (onExecuteNonQuery != null)
-                command.OnExecuteNonQuery((command) => onExecuteNonQuery(command));
+        if (onExecuteNonQuery != null)
+            command.OnExecuteNonQuery((command) => onExecuteNonQuery(command));
 
         if (onCreateCommand != null)
             return onCreateCommand(command);
@@ -62,20 +62,20 @@ public class MockDbConnection : IDbConnection
     }
 
     protected Func<MockDbCommand, IDbCommand> onCreateCommand;
-        protected Func<IDbCommand, DbDataReader> onExecuteReader;
-        protected Func<MockDbCommand, int> onExecuteNonQuery;
+    protected Func<IDbCommand, DbDataReader> onExecuteReader;
+    protected Func<MockDbCommand, int> onExecuteNonQuery;
 
     public MockDbConnection OnExecuteReader(Func<IDbCommand, DbDataReader> func)
     {
-            onExecuteReader = func;
-            return this;
-        }
+        onExecuteReader = func;
+        return this;
+    }
 
 
-        public MockDbConnection OnExecuteNonQuery(Func<MockDbCommand, int> func)
-        {
-            onExecuteNonQuery = func;
-            return this;
+    public MockDbConnection OnExecuteNonQuery(Func<MockDbCommand, int> func)
+    {
+        onExecuteNonQuery = func;
+        return this;
     }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize

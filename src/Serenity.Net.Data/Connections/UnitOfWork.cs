@@ -7,10 +7,14 @@
     /// <seealso cref="IUnitOfWork" />
     public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        private readonly IDbConnection _connection;
-        private IDbTransaction _transaction;
-        private Action _commit;
-        private Action _rollback;
+        private readonly IDbConnection connection;
+        private IDbTransaction transaction;
+        private Action onCommit;
+        private Action onRollback;
+        private readonly IsolationLevel isolationLevel;
+        private bool initialized;
+        private bool commited;
+        private bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
@@ -18,10 +22,23 @@
         /// <param name="connection">The connection.</param>
         /// <exception cref="ArgumentNullException">connection</exception>
         public UnitOfWork(IDbConnection connection)
+            : this(connection, IsolationLevel.Unspecified, deferStart: false)
         {
-            _connection = connection ?? throw new ArgumentNullException("connection");
-            connection.EnsureOpen();
-            _transaction = connection.BeginTransaction();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <exception cref="ArgumentNullException">connection</exception>
+        /// <param name="deferStart">Defers starting of the transaction until the first 
+        /// moment connection property is read. If the passed connection
+        /// is accessed somewhere else (e.g. other than via the UnitOfWork.Connection property), 
+        /// it may cause consistency issues so ensure it is not accessed via other means.</param>
+        /// <exception cref="ArgumentNullException">connection</exception>
+        public UnitOfWork(IDbConnection connection, bool deferStart)
+            : this(connection, IsolationLevel.Unspecified, deferStart)
+        {
         }
 
         /// <summary>
@@ -30,12 +47,28 @@
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <param name="il">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
+        /// <param name="deferStart">Defers starting of the transaction until the first 
+        /// moment connection property is read. If the passed connection
+        /// is accessed somewhere else (e.g. other than via the UnitOfWork.Connection property), 
+        /// it may cause consistency issues so ensure it is not accessed via other means.</param>
         /// <exception cref="ArgumentNullException">connection</exception>
-        public UnitOfWork(IDbConnection connection, IsolationLevel il)
+        public UnitOfWork(IDbConnection connection, IsolationLevel il, bool deferStart = false)
         {
-            _connection = connection ?? throw new ArgumentNullException("connection");
+            this.connection = connection ?? throw new ArgumentNullException("connection");
+            isolationLevel = il;
+            if (!deferStart)
+                Initialize();
+        }
+
+        private void Initialize()
+        {
+            if (initialized || disposed)
+                return;
+
+            initialized = true;
             connection.EnsureOpen();
-            _transaction = connection.BeginTransaction(il);
+            transaction = isolationLevel == IsolationLevel.Unspecified ? connection.BeginTransaction()
+                : connection.BeginTransaction(isolationLevel);
         }
 
         /// <summary>
@@ -44,24 +77,40 @@
         /// <value>
         /// The connection.
         /// </value>
-        public IDbConnection Connection => _connection;
+        public IDbConnection Connection
+        {
+            get
+            {
+                Initialize();
+                return connection;
+            }
+        }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// Rollbacks the transaction if any.
+        /// Rollbacks the transaction if any and calls onRollback event.
         /// </summary>
         public void Dispose()
         {
-            if (_transaction != null)
-            {
-                _transaction.Dispose();
-                _transaction = null;
+            if (disposed)
+                return;
 
-                if (_rollback != null)
+            onCommit = null;
+            try
+            {
+                try
                 {
-                    _rollback();
-                    _rollback = null;
+                    transaction?.Dispose();
                 }
+                finally
+                { 
+                    onRollback?.Invoke();
+                }
+            }
+            finally
+            {
+                transaction = null;
+                onRollback = null;
+                disposed = true;
             }
         }
 
@@ -71,26 +120,36 @@
         /// <exception cref="ArgumentNullException">transaction</exception>
         public void Commit()
         {
-            if (_transaction == null)
-                throw new ArgumentNullException("transaction");
+            if (commited)
+                throw new InvalidOperationException("Transaction is already committed!");
+             
+            transaction?.Commit();
+            commited = true;
 
-            _transaction.Commit();
-            _transaction = null;
-
-            if (_commit != null)
+            onRollback = null;
+            try
             {
-                _commit();
-                _commit = null;
+                onCommit?.Invoke();
+            }
+            finally
+            {
+                onCommit = null;
             }
         }
+
+        /// <summary>
+        /// Returns true if the transaction is tried to be started at least once.
+        /// This always returns true if deferStart is not true.
+        /// </summary>
+        public bool Initialized => initialized;
 
         /// <summary>
         /// Occurs when transaction is committed.
         /// </summary>
         public event Action OnCommit
         {
-            add { _commit += value; }
-            remove { _commit -= value; }
+            add { onCommit += value; }
+            remove { onCommit -= value; }
         }
 
         /// <summary>
@@ -98,8 +157,8 @@
         /// </summary>
         public event Action OnRollback
         {
-            add { _rollback += value; }
-            remove { _rollback -= value; }
+            add { onRollback += value; }
+            remove { onRollback -= value; }
         }
     }
 }

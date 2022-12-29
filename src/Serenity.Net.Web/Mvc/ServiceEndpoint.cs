@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Serenity.Services
 {
@@ -47,11 +48,20 @@ namespace Serenity.Services
 
                 connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
 
-                var isolationLevel = (context.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttribute<IsolationLevelAttribute>();
-                if (isolationLevel is not null)
-                    unitOfWork = new UnitOfWork(connection, isolationLevel.Value);
-                else
-                    unitOfWork = new UnitOfWork(connection);
+                var attribute = (context.ActionDescriptor as ControllerActionDescriptor)?
+                    .MethodInfo.GetCustomAttribute<TransactionSettingsAttribute>() ??
+                    GetType().GetCustomAttribute<TransactionSettingsAttribute>();
+
+                var settings = context.HttpContext?.RequestServices?
+                    .GetService<IOptions<TransactionSettings>>()?.Value;
+
+                var isolationLevel = attribute?.IsolationLevel ??
+                    settings?.IsolationLevel ?? IsolationLevel.Unspecified;
+
+                var deferStart = attribute?.HasDeferStart == true ?
+                    attribute.DeferStart : (settings?.DeferStart ?? false);
+
+                unitOfWork = new UnitOfWork(connection, isolationLevel, deferStart);
 
                 context.ActionArguments[uowParam.Name] = unitOfWork;
                 base.OnActionExecuting(context);
