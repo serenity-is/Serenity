@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,7 +46,13 @@ namespace Serenity.Services
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
                 connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
-                unitOfWork = new UnitOfWork(connection);
+
+                var isolationLevel = (context.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttribute<IsolationLevelAttribute>();
+                if (isolationLevel is not null)
+                    unitOfWork = new UnitOfWork(connection, isolationLevel.Value);
+                else
+                    unitOfWork = new UnitOfWork(connection);
+
                 context.ActionArguments[uowParam.Name] = unitOfWork;
                 base.OnActionExecuting(context);
                 return;
