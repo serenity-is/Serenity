@@ -23,7 +23,7 @@ for (var esmOpt of [
     esmOpt = { 
         ...esmOpt, 
         absWorkingDir: sleekRoot,
-        outfile: esmOpt.outfile.replace('./dist/compat/', assetsSlick + '/'),
+        outfile: esmOpt.outfile.replace('./dist/compat/', assetsSlick + '/').replace('/plugins/', '/Plugins/'),
         minify: false,
         sourcemap: false
     };
