@@ -1,631 +1,428 @@
-/***
- * Contains basic SlickGrid editors.
- * @module Editors
- * @namespace Slick
- */
-
-(function ($) {
-  // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "Editors": {
-        "Text": TextEditor,
-        "Integer": IntegerEditor,
-		"Float": FloatEditor,
-        "Date": DateEditor,
-        "YesNoSelect": YesNoSelectEditor,
-        "Checkbox": CheckboxEditor,
-        "PercentComplete": PercentCompleteEditor,
-        "LongText": LongTextEditor
-      }
+var Slick = Slick || {};
+Slick._ = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
     }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/editors/index.ts
+  var editors_exports = {};
+  __export(editors_exports, {
+    CheckboxEditor: () => CheckboxEditor,
+    DateEditor: () => DateEditor,
+    Editors: () => Editors,
+    FloatEditor: () => FloatEditor,
+    IntegerEditor: () => IntegerEditor,
+    LongTextEditor: () => LongTextEditor,
+    PercentCompleteEditor: () => PercentCompleteEditor,
+    TextEditor: () => TextEditor,
+    YesNoSelectEditor: () => YesNoSelectEditor
   });
 
-  function TextEditor(args) {
-    var $input;
-    var defaultValue;
-    var scope = this;
+  // global-externals:_
+  var { escape, H, keyCode, parsePx } = Slick;
 
-    this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />")
-          .appendTo(args.container)
-          .bind("keydown.nav", function (e) {
-            if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
-              e.stopImmediatePropagation();
-            }
-          })
-          .focus()
-          .select();
-    };
-
-    this.destroy = function () {
-      $input.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.getValue = function () {
-      return $input.val();
-    };
-
-    this.setValue = function (val) {
-      $input.val(val);
-    };
-
-    this.loadValue = function (item) {
-      defaultValue = item[args.column.field] || "";
-      $input.val(defaultValue);
-      $input[0].defaultValue = defaultValue;
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return $input.val();
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
+  // src/editors/editors.ts
+  var BaseEditor = class {
+    constructor(args) {
+      this._args = args;
+      this.init();
+    }
+    destroy() {
+      this._input.remove();
+    }
+    focus() {
+      this._input.focus();
+    }
+    getValue() {
+      return this._input.value;
+    }
+    setValue(val) {
+      this._input.value = val;
+    }
+    loadValue(item) {
+      var _a;
+      this._defaultValue = (_a = item[this._args.column.field]) != null ? _a : "";
+      this._input.value = this._defaultValue;
+      if (this._input.select) {
+        this._input.defaultValue = this._defaultValue;
+        this._input.select();
+      }
+    }
+    serializeValue() {
+      return this._input.value;
+    }
+    applyValue(item, state) {
+      item[this._args.column.field] = state;
+    }
+    isValueChanged() {
+      return !(this._input.value === "" && this._defaultValue == null) && this._input.value != this._defaultValue;
+    }
+    validate() {
+      if (this._args.column.validator) {
+        var validationResults = this._args.column.validator(this._input.value, this._args);
         if (!validationResults.valid) {
           return validationResults;
         }
       }
-
       return {
         valid: true,
         msg: null
       };
-    };
-
-    this.init();
-  }
-
-  function IntegerEditor(args) {
-    var $input;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
-
-      $input.bind("keydown.nav", function (e) {
-        if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
-          e.stopImmediatePropagation();
-        }
-      });
-
-      $input.appendTo(args.container);
-      $input.focus().select();
-    };
-
-    this.destroy = function () {
-      $input.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.loadValue = function (item) {
-      defaultValue = item[args.column.field];
-      $input.val(defaultValue);
-      $input[0].defaultValue = defaultValue;
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return parseInt($input.val(), 10) || 0;
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      if (isNaN($input.val())) {
+    }
+  };
+  var TextEditor = class extends BaseEditor {
+    init() {
+      const input = this._input = this._args.container.appendChild(H("input", { type: "text", class: "editor-text slick-editor-text" }));
+      input.addEventListener("keydown", this._args.editorCellNavOnLRKeys ? handleKeydownLRNav : handleKeydownLRNoNav);
+      input.focus();
+      input.select();
+      addCompositeChangeListener(this, this._args, input);
+    }
+  };
+  var IntegerEditor = class extends TextEditor {
+    serializeValue() {
+      return parseInt(this._input.value, 10) || 0;
+    }
+    validate() {
+      if (isNaN(parseInt(this._input.value, 10))) {
         return {
           valid: false,
           msg: "Please enter a valid integer"
         };
       }
-
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
-        if (!validationResults.valid) {
-          return validationResults;
-        }
+      return super.validate();
+    }
+  };
+  var _FloatEditor = class extends TextEditor {
+    getDecimalPlaces() {
+      var rtn = this._args.column.editorFixedDecimalPlaces;
+      if (typeof rtn === "undefined") {
+        rtn = _FloatEditor.DefaultDecimalPlaces;
       }
-
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
-  }
-
-  function FloatEditor(args) {
-    var $input;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
-
-      $input.bind("keydown.nav", function (e) {
-        if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
-          e.stopImmediatePropagation();
-        }
-      });
-
-      $input.appendTo(args.container);
-      $input.focus().select();
-    };
-
-    this.destroy = function () {
-      $input.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-	function getDecimalPlaces() {
-		// returns the number of fixed decimal places or null
-		var rtn = args.column.editorFixedDecimalPlaces;
-		if (typeof rtn == 'undefined') { 
-			rtn = FloatEditor.DefaultDecimalPlaces;
-		}
-		return (!rtn && rtn!==0 ? null : rtn);
-	}
-	
-    this.loadValue = function (item) {
-      defaultValue = item[args.column.field];
-	  
-	  var decPlaces = getDecimalPlaces();
-	  if (decPlaces !== null 
-	  && (defaultValue || defaultValue===0) 
-	  && defaultValue.toFixed) { 
-		defaultValue = defaultValue.toFixed(decPlaces);
-	  }
-	  
-      $input.val(defaultValue);
-      $input[0].defaultValue = defaultValue;
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-	  var rtn = parseFloat($input.val()) || 0;
-
-	  var decPlaces = getDecimalPlaces();
-	  if (decPlaces !== null 
-	  && (rtn || rtn===0) 
-	  && rtn.toFixed) { 
-		rtn = parseFloat(rtn.toFixed(decPlaces));
-	  }
-	  
+      return !rtn && rtn !== 0 ? null : rtn;
+    }
+    loadValue(item) {
+      this._defaultValue = item[this._args.column.field];
+      var decPlaces = this.getDecimalPlaces();
+      if (decPlaces !== null && (this._defaultValue || this._defaultValue === 0) && this._defaultValue.toFixed) {
+        this._defaultValue = this._defaultValue.toFixed(decPlaces);
+      }
+      this._input.value = this._defaultValue;
+      this._input.defaultValue = this._defaultValue;
+      this._input.select();
+    }
+    serializeValue() {
+      var rtn = parseFloat(this._input.value);
+      if (_FloatEditor.AllowEmptyValue) {
+        if (!rtn && rtn !== 0)
+          rtn = "";
+      } else {
+        rtn = rtn || 0;
+      }
+      var decPlaces = this.getDecimalPlaces();
+      if (decPlaces !== null && (rtn || rtn === 0) && rtn.toFixed) {
+        rtn = parseFloat(rtn.toFixed(decPlaces));
+      }
       return rtn;
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      if (isNaN($input.val())) {
+    }
+    validate() {
+      if (isNaN(parseFloat(this._input.value))) {
         return {
           valid: false,
           msg: "Please enter a valid number"
         };
       }
-
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
-        if (!validationResults.valid) {
-          return validationResults;
-        }
-      }
-
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
-  }
-
+      return super.validate();
+    }
+  };
+  var FloatEditor = _FloatEditor;
+  FloatEditor.AllowEmptyValue = false;
   FloatEditor.DefaultDecimalPlaces = null;
-  
-  function DateEditor(args) {
-    var $input;
-    var defaultValue;
-    var scope = this;
-    var calendarOpen = false;
-
-    this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
-      $input.appendTo(args.container);
-      $input.focus().select();
-      $input.datepicker({
+  var DateEditor = class extends TextEditor {
+    constructor() {
+      super(...arguments);
+      this._calendarOpen = false;
+    }
+    init() {
+      super.init();
+      $(this._input).datepicker({
         showOn: "button",
+        buttonImage: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E`,
         buttonImageOnly: true,
-        buttonImage: "../images/calendar.gif",
-        beforeShow: function () {
-          calendarOpen = true
+        beforeShow: () => {
+          this._calendarOpen = true;
         },
-        onClose: function () {
-          calendarOpen = false
+        onClose: () => {
+          this._calendarOpen = false;
+          if (this._args.compositeEditorOptions)
+            triggerCompositeEditorChange(this, this._args);
         }
       });
-      $input.width($input.width() - 18);
-    };
-
-    this.destroy = function () {
+      this._input.style.width = parsePx(getComputedStyle(this._input).width) - (!this._args.compositeEditorOptions ? 18 : 28) + "px";
+    }
+    destroy() {
       $.datepicker.dpDiv.stop(true, true);
-      $input.datepicker("hide");
-      $input.datepicker("destroy");
-      $input.remove();
-    };
-
-    this.show = function () {
-      if (calendarOpen) {
+      $(this._input).datepicker("hide");
+      $(this._input).datepicker("destroy");
+      super.destroy();
+    }
+    show() {
+      if (this._calendarOpen) {
         $.datepicker.dpDiv.stop(true, true).show();
       }
-    };
-
-    this.hide = function () {
-      if (calendarOpen) {
+    }
+    hide() {
+      if (this._calendarOpen) {
         $.datepicker.dpDiv.stop(true, true).hide();
       }
-    };
-
-    this.position = function (position) {
-      if (!calendarOpen) {
+    }
+    position(position) {
+      if (!this._calendarOpen) {
         return;
       }
-      $.datepicker.dpDiv
-          .css("top", position.top + 30)
-          .css("left", position.left);
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.loadValue = function (item) {
-      defaultValue = item[args.column.field];
-      $input.val(defaultValue);
-      $input[0].defaultValue = defaultValue;
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return $input.val();
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
-        if (!validationResults.valid) {
-          return validationResults;
-        }
-      }
-
+      $.datepicker.dpDiv.css("top", position.top + 30).css("left", position.left);
+    }
+  };
+  var YesNoSelectEditor = class extends BaseEditor {
+    init() {
+      this._args.container.appendChild(this._input = H(
+        "select",
+        { tabIndex: "0", class: "editor-yesno slick-editor-yesno" },
+        H("option", { value: "yes" }, "Yes"),
+        H("option", { value: "no" }, "No")
+      ));
+      this._input.focus();
+      addCompositeChangeListener(this, this._args, this._input);
+    }
+    loadValue(item) {
+      this._input.value = (this._defaultValue = item[this._args.column.field]) ? "yes" : "no";
+    }
+    serializeValue() {
+      return this._input.value === "yes";
+    }
+    isValueChanged() {
+      return this._input.value != this._defaultValue;
+    }
+    validate() {
       return {
         valid: true,
         msg: null
       };
-    };
-
-    this.init();
-  }
-
-  function YesNoSelectEditor(args) {
-    var $select;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      $select = $("<SELECT tabIndex='0' class='editor-yesno'><OPTION value='yes'>Yes</OPTION><OPTION value='no'>No</OPTION></SELECT>");
-      $select.appendTo(args.container);
-      $select.focus();
-    };
-
-    this.destroy = function () {
-      $select.remove();
-    };
-
-    this.focus = function () {
-      $select.focus();
-    };
-
-    this.loadValue = function (item) {
-      $select.val((defaultValue = item[args.column.field]) ? "yes" : "no");
-      $select.select();
-    };
-
-    this.serializeValue = function () {
-      return ($select.val() == "yes");
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return ($select.val() != defaultValue);
-    };
-
-    this.validate = function () {
+    }
+  };
+  var CheckboxEditor = class extends BaseEditor {
+    init() {
+      this._input = this._args.container.appendChild(H("input", { type: "checkbox", value: "true", class: "editor-checkbox slick-editor-checkbox", hideFocus: true }));
+      this._input.focus();
+      addCompositeChangeListener(this, this._args, this._input);
+    }
+    loadValue(item) {
+      this._defaultValue = !!item[this._args.column.field];
+      this._input.checked = !!this._defaultValue;
+    }
+    preClick() {
+      this._input.checked = !this._input.checked;
+    }
+    serializeValue() {
+      return this._input.checked;
+    }
+    applyValue(item, state) {
+      item[this._args.column.field] = state;
+    }
+    isValueChanged() {
+      return this.serializeValue() !== this._defaultValue;
+    }
+    validate() {
       return {
         valid: true,
         msg: null
       };
-    };
-
-    this.init();
-  }
-
-  function CheckboxEditor(args) {
-    var $select;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      $select = $("<INPUT type=checkbox value='true' class='editor-checkbox' hideFocus>");
-      $select.appendTo(args.container);
-      $select.focus();
-    };
-
-    this.destroy = function () {
-      $select.remove();
-    };
-
-    this.focus = function () {
-      $select.focus();
-    };
-
-    this.loadValue = function (item) {
-      defaultValue = !!item[args.column.field];
-      if (defaultValue) {
-        $select.prop('checked', true);
-      } else {
-        $select.prop('checked', false);
-      }
-    };
-
-    this.serializeValue = function () {
-      return $select.prop('checked');
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (this.serializeValue() !== defaultValue);
-    };
-
-    this.validate = function () {
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
-  }
-
-  function PercentCompleteEditor(args) {
-    var $input, $picker;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      $input = $("<INPUT type=text class='editor-percentcomplete' />");
-      $input.width($(args.container).innerWidth() - 25);
-      $input.appendTo(args.container);
-
-      $picker = $("<div class='editor-percentcomplete-picker' />").appendTo(args.container);
-      $picker.append("<div class='editor-percentcomplete-helper'><div class='editor-percentcomplete-wrapper'><div class='editor-percentcomplete-slider' /><div class='editor-percentcomplete-buttons' /></div></div>");
-
-      $picker.find(".editor-percentcomplete-buttons").append("<button val=0>Not started</button><br/><button val=50>In Progress</button><br/><button val=100>Complete</button>");
-
-      $input.focus().select();
-
-      $picker.find(".editor-percentcomplete-slider").slider({
+    }
+  };
+  var PercentCompleteEditor = class extends IntegerEditor {
+    init() {
+      super.init();
+      this._input.classList.remove("editor-text", "slick-editor-text");
+      this._input.classList.add("editor-percentcomplete", "slick-editor-percentcomplete");
+      var slider;
+      this._picker = this._args.container.appendChild(
+        H(
+          "div",
+          { class: "slick-editor-percentcomplete-picker" },
+          H(
+            "div",
+            { class: "slick-editor-percentcomplete-helper" },
+            H(
+              "div",
+              { class: "slick-editor-percentcomplete-wrapper" },
+              H("div", { class: "slick-editor-percentcomplete-slider", ref: (el) => slider = el }),
+              H(
+                "div",
+                { class: "slick-editor-percentcomplete-buttons" },
+                H("button", { "data-val": 0 }, "Not started"),
+                H("button", { "data-val": 50 }, "In Progress"),
+                H("button", { "data-val": 100 }, "Complete")
+              )
+            )
+          )
+        )
+      );
+      this._input.focus();
+      this._input.select();
+      $(slider).slider({
         orientation: "vertical",
         range: "min",
-        value: defaultValue,
-        slide: function (event, ui) {
-          $input.val(ui.value)
+        value: this._defaultValue,
+        slide: (_, ui) => {
+          this._input.value = ui.value;
+        },
+        stop: () => {
+          if (this._args.compositeEditorOptions)
+            triggerCompositeEditorChange(this, this._args);
         }
       });
-
-      $picker.find(".editor-percentcomplete-buttons button").bind("click", function (e) {
-        $input.val($(this).attr("val"));
-        $picker.find(".editor-percentcomplete-slider").slider("value", $(this).attr("val"));
-      })
-    };
-
-    this.destroy = function () {
-      $input.remove();
-      $picker.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.loadValue = function (item) {
-      $input.val(defaultValue = item[args.column.field]);
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return parseInt($input.val(), 10) || 0;
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ((parseInt($input.val(), 10) || 0) != defaultValue);
-    };
-
-    this.validate = function () {
-      if (isNaN(parseInt($input.val(), 10))) {
-        return {
-          valid: false,
-          msg: "Please enter a valid positive number"
-        };
+      $(this._picker).find(".slick-editor-percentcomplete-buttons button").on("click", (e) => {
+        this._input.value = e.target.dataset.val;
+        $(slider).slider("value", e.target.dataset.val);
+      });
+    }
+    destroy() {
+      super.destroy();
+      this._picker.remove();
+    }
+  };
+  var LongTextEditor = class extends BaseEditor {
+    init() {
+      const isComposite = this._args.compositeEditorOptions;
+      this._container = isComposite ? this._args.container : document.body;
+      this._wrapper = this._container.appendChild(H(
+        "div",
+        {
+          class: "large-editor-text slick-large-editor-text",
+          style: `z-index:10000; background:white; padding:5px; border:3px solid gray; border-radius:10px;${isComposite ? "position: relative; padding: 0; border: 0" : "position: absolute"}`
+        },
+        H("textarea", { hidefocus: true, rows: "5", style: "background:white; width:250px; height:80px; border:0; outline:0", ref: (el) => this._input = el })
+      ));
+      if (isComposite)
+        addCompositeChangeListener(this, this._args, this._input);
+      else {
+        this._wrapper.appendChild(H(
+          "div",
+          { style: "text-align: right" },
+          H("button", { ref: (el) => el.addEventListener("click", this.save.bind(this)) }, "Save"),
+          H("button", { ref: (el) => el.addEventListener("click", this.cancel.bind(this)) }, "Cancel")
+        ));
+        this._input.addEventListener("keydown", this.handleKeyDown.bind(this));
+        this.position(this._args.position);
       }
-
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
-  }
-
-  /*
-   * An example of a "detached" editor.
-   * The UI is added onto document BODY and .position(), .show() and .hide() are implemented.
-   * KeyDown events are also handled to provide handling for Tab, Shift-Tab, Esc and Ctrl-Enter.
-   */
-  function LongTextEditor(args) {
-    var $input, $wrapper;
-    var defaultValue;
-    var scope = this;
-
-    this.init = function () {
-      var $container = $("body");
-
-      $wrapper = $("<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
-          .appendTo($container);
-
-      $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
-          .appendTo($wrapper);
-
-      $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
-          .appendTo($wrapper);
-
-      $wrapper.find("button:first").bind("click", this.save);
-      $wrapper.find("button:last").bind("click", this.cancel);
-      $input.bind("keydown", this.handleKeyDown);
-
-      scope.position(args.position);
-      $input.focus().select();
-    };
-
-    this.handleKeyDown = function (e) {
-      if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
-        scope.save();
-      } else if (e.which == $.ui.keyCode.ESCAPE) {
+      this._input.focus();
+      this._input.select();
+    }
+    handleKeyDown(e) {
+      if (e.key === "Enter" && e.ctrlKey) {
+        this.save();
+      } else if (e.key === "Esc" || e.key == "Escape") {
         e.preventDefault();
-        scope.cancel();
-      } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
+        this.cancel();
+      } else if (e.key === "Tab" && e.shiftKey) {
         e.preventDefault();
-        args.grid.navigatePrev();
-      } else if (e.which == $.ui.keyCode.TAB) {
+        this._args.grid.navigatePrev();
+      } else if (e.key === "Tab") {
         e.preventDefault();
-        args.grid.navigateNext();
-      }
-    };
-
-    this.save = function () {
-      args.commitChanges();
-    };
-
-    this.cancel = function () {
-      $input.val(defaultValue);
-      args.cancelChanges();
-    };
-
-    this.hide = function () {
-      $wrapper.hide();
-    };
-
-    this.show = function () {
-      $wrapper.show();
-    };
-
-    this.position = function (position) {
-      $wrapper
-          .css("top", position.top - 5)
-          .css("left", position.left - 5)
-    };
-
-    this.destroy = function () {
-      $wrapper.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.loadValue = function (item) {
-      $input.val(defaultValue = item[args.column.field]);
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return $input.val();
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
-        if (!validationResults.valid) {
-          return validationResults;
+        this._args.grid.navigateNext();
+      } else if (e.key === "Left" || e.key === "ArrowLeft" || e.key === "Right" || e.key === "ArrowRight") {
+        if (this._args.editorCellNavOnLRKeys) {
+          var cursorPosition = e.target.selectionStart;
+          var textLength = e.target.value.length;
+          if ((e.key === "Left" || e.key === "ArrowLeft") && cursorPosition === 0) {
+            this._args.grid.navigatePrev();
+          }
+          if ((e.key === "Right" || e.key === "ArrowRight") && cursorPosition >= textLength - 1) {
+            this._args.grid.navigateNext();
+          }
         }
       }
-
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
+    }
+    save() {
+      this._args.commitChanges();
+    }
+    cancel() {
+      this._input.value = this._defaultValue;
+      this._args.cancelChanges();
+    }
+    hide() {
+      this._wrapper.style.display = "none";
+    }
+    show() {
+      this._wrapper.style.display = null;
+    }
+    position(position) {
+      this._wrapper.style.top = position.top - 5 + "px";
+      this._wrapper.style.left = position.left - 5 + "px";
+    }
+    destroy() {
+      this._wrapper.remove();
+    }
+  };
+  function addCompositeChangeListener(editor, args, input) {
+    if (!args.compositeEditorOptions)
+      return;
+    input.addEventListener("change", () => {
+      triggerCompositeEditorChange(editor, args);
+    });
   }
-})(jQuery);
+  function triggerCompositeEditorChange(editor, args) {
+    var activeCell = args.grid.getActiveCell();
+    if (editor.validate().valid)
+      editor.applyValue(args.item, editor.serializeValue());
+    editor.applyValue(args.compositeEditorOptions.formValues, editor.serializeValue());
+    args.grid.onCompositeEditorChange.notify({
+      row: activeCell.row,
+      cell: activeCell.cell,
+      item: args.item,
+      column: args.column,
+      formValues: args.compositeEditorOptions.formValues
+    });
+  }
+  function handleKeydownLRNav(e) {
+    var cursorPosition = this.selectionStart;
+    var textLength = this.value.length;
+    if ((e.key === "Left" || e.key === "ArrowLeft") && cursorPosition > 0 || (e.key === "Right" || e.key === "ArrowRight") && cursorPosition < textLength - 1) {
+      e.stopImmediatePropagation();
+    }
+  }
+  function handleKeydownLRNoNav(e) {
+    if (e.key === "Left" || e.key === "ArrowLeft" || e.key === "Right" || e.key === "ArrowRight") {
+      e.stopImmediatePropagation();
+    }
+  }
+
+  // src/editors/index.ts
+  var Editors;
+  ((Editors2) => {
+    Editors2.Text = TextEditor;
+    Editors2.Integer = IntegerEditor;
+    Editors2.Float = FloatEditor;
+    Editors2.Date = DateEditor;
+    Editors2.YesNoSelect = YesNoSelectEditor;
+    Editors2.Checkbox = CheckboxEditor;
+    Editors2.PercentComplete = PercentCompleteEditor;
+    Editors2.LongText = LongTextEditor;
+  })(Editors || (Editors = {}));
+  return __toCommonJS(editors_exports);
+})();
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

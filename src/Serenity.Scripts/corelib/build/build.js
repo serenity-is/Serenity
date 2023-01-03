@@ -1,8 +1,12 @@
+import {
+    compatCore, compatDataGroupItemMetadataProvider, compatEditors,
+    compatFormatters, compatGrid,
+    compatLayoutsFrozen, compatPluginsAutoTooltips
+} from "@serenity-is/sleekgrid/build/defines";
 import esbuild from "esbuild";
-import { fileURLToPath } from 'url';
-import { compatCore, compatGrid, compatLayoutsFrozen, compatDataGroupItemMetadataProvider, compatPluginsAutoTooltips } from "@serenity-is/sleekgrid/build/defines";
-import { join, resolve } from "path";
 import { createRequire } from 'node:module';
+import { join, resolve } from "path";
+import { fileURLToPath } from 'url';
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
 
@@ -15,6 +19,8 @@ for (var esmOpt of [
     { ...compatCore, minify },
     { ...compatGrid, minify },
     { ...compatLayoutsFrozen },
+    { ...compatEditors },
+    { ...compatFormatters },
     { ...compatDataGroupItemMetadataProvider, minify },
     { ...compatPluginsAutoTooltips, minify }
 ]) {
