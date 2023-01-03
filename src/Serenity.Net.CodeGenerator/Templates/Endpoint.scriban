@@ -49,7 +49,7 @@
             return handler.List(connection, request);
         }
 
-        [AuthorizeList(typeof(MyRow))]
+        [HttpPost, AuthorizeList(typeof(MyRow))]
         public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
             [FromServices] I{{ClassName}}ListHandler handler,
             [FromServices] IExcelExporter exporter)
