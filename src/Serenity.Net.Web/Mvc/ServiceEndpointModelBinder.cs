@@ -58,7 +58,7 @@ namespace Serenity.Services
             foreach (var parameter in action.Parameters)
             {
                 var paramType = parameter.ParameterInfo.ParameterType;
-                if (typeof(ServiceRequest).IsAssignableFrom(typeof(ServiceRequest)))
+                if (typeof(ServiceRequest).IsAssignableFrom(paramType))
                 {
                     if (!action.Filters.Any(x => x is JsonRequestAttribute))
                         action.Filters.Add(new JsonRequestAttribute());
