@@ -92,7 +92,7 @@
         /// <param name="field">Field</param>
         /// <param name="enumType">Enum type</param>
         /// <param name="localizer">Text localizer</param>
-        public static void ValidateEnum(this IRow row, Field field, Type enumType, ITextLocalizer localizer)
+        public static void ValidateEnum(IRow row, Field field, Type enumType, ITextLocalizer localizer)
         {
             if (!Enum.IsDefined(enumType, field.AsObject(row)))
                 throw InvalidValueError(row, field, localizer);
@@ -105,7 +105,7 @@
         /// <param name="row">Row instance</param>
         /// <param name="field">Field</param>
         /// <param name="localizer">Text localizer</param>
-        public static void ValidateEnum<T>(this IRow row, GenericValueField<T> field,
+        public static void ValidateEnum<T>(IRow row, GenericValueField<T> field,
             ITextLocalizer localizer) where T : struct, IComparable<T>
         {
             if (!Enum.IsDefined(field.EnumType, field.AsObject(row)))
@@ -131,7 +131,7 @@
         /// <param name="start">Start date</param>
         /// <param name="finish">End date</param>
         /// <param name="localizer">Text localizer</param>
-        public static void ValidateDateRange(this IRow row, DateTimeField start, DateTimeField finish,
+        public static void ValidateDateRange(IRow row, DateTimeField start, DateTimeField finish,
             ITextLocalizer localizer)
         {
             if (!start.IsNull(row) &&
