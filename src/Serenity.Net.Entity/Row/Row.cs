@@ -11,7 +11,7 @@ namespace Serenity.Data
     /// <seealso cref="INotifyPropertyChanged" />
     /// <seealso cref="IEditableObject" />
     [JsonConverter(typeof(JsonRowConverter))]
-    public abstract partial class Row<TFields> : IRow, IRow<TFields>, INotifyPropertyChanged, IEditableObject
+    public abstract partial class Row<TFields> : IRow, IRow<TFields>
         where TFields : RowFieldsBase
     {
         /// <summary>
@@ -51,7 +51,7 @@ namespace Serenity.Data
 
             fields.RowCreated(this);
 
-            TrackAssignments = true;
+            ((IRow)this).TrackAssignments = true;
         }
 
         TFields IRow<TFields>.Fields => fields;
@@ -70,14 +70,14 @@ namespace Serenity.Data
         public static TFields Fields => (TFields)RowFieldsProvider.Current.Resolve(typeof(TFields));
 
         /// <summary>
-        /// Clones the into.
+        /// Clones the row into target.
         /// </summary>
         /// <param name="clone">The clone.</param>
         /// <param name="cloneHandlers">if set to <c>true</c> [clone handlers].</param>
-        public void CloneInto(Row<TFields> clone,
+        protected virtual void CloneInto(Row<TFields> clone,
             bool cloneHandlers)
         {
-            clone.IgnoreConstraints = IgnoreConstraints;
+            ((IRow)clone).IgnoreConstraints = ((IRow)this).IgnoreConstraints;
 
             foreach (var field in fields)
                 field.Copy(this, clone);
@@ -130,7 +130,7 @@ namespace Serenity.Data
         /// Clones the row.
         /// </summary>
         /// <returns></returns>
-        public virtual Row<TFields> CloneRow()
+        protected virtual Row<TFields> CloneRow()
         {
             var clone = CreateNew();
             CloneInto(clone, true);
@@ -142,7 +142,7 @@ namespace Serenity.Data
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public virtual Row<TFields> CreateNew()
+        protected virtual Row<TFields> CreateNew()
         {
             if (fields.rowFactory == null)
                 throw new NotImplementedException();
@@ -175,13 +175,12 @@ namespace Serenity.Data
             if (!tracking)
                 return;
 
-            if (assignedFields == null)
-                assignedFields = new bool[fields.Count];
+            assignedFields ??= new bool[fields.Count];
 
             assignedFields[field.index] = true;
 
             if (validationErrors != null)
-                RemoveValidationError(field.PropertyName ?? field.Name);
+                ((IEditableRow)this).RemoveValidationError(field.PropertyName ?? field.Name);
 
             if (propertyChanged != null &&
                 previousValues != null &&
@@ -212,14 +211,6 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets the field count.
-        /// </summary>
-        /// <value>
-        /// The field count.
-        /// </value>
-        public int FieldCount => fields.Count;
-
-        /// <summary>
         /// Gets a value indicating whether this instance is any field assigned.
         /// </summary>
         /// <value>
@@ -227,18 +218,12 @@ namespace Serenity.Data
         /// </value>
         public bool IsAnyFieldAssigned => tracking && assignedFields != null;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [ignore constraints].
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if [ignore constraints]; otherwise, <c>false</c>.
-        /// </value>
-        public bool IgnoreConstraints { get; set; }
+        bool IRow.IgnoreConstraints { get; set; }
 
         /// <summary>
         /// Table name
         /// </summary>
-        public string Table => fields.TableName;
+        string IEntity.Table => fields.TableName;
 
         /// <summary>
         /// Gets or sets a value indicating whether [track assignments].
@@ -246,7 +231,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if [track assignments]; otherwise, <c>false</c>.
         /// </value>
-        public bool TrackAssignments
+        bool IRow.TrackAssignments
         {
             get
             {
@@ -279,7 +264,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if [track with checks]; otherwise, <c>false</c>.
         /// </value>
-        public bool TrackWithChecks
+        bool IRow.TrackWithChecks
         {
             get
             {
@@ -287,10 +272,10 @@ namespace Serenity.Data
             }
             set
             {
-                if (value != TrackWithChecks)
+                if (value != (tracking && trackWithChecks))
                 {
                     if (value && !tracking)
-                        TrackAssignments = true;
+                        ((IRow)this).TrackAssignments = true;
 
                     trackWithChecks = value;
                 }
@@ -307,10 +292,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="System.Object"/> with the specified field name.
+        /// Gets or sets the <see cref="object"/> with the specified field name.
         /// </summary>
         /// <value>
-        /// The <see cref="System.Object"/>.
+        /// The <see cref="object"/>.
         /// </value>
         /// <param name="fieldName">Name of the field.</param>
         /// <returns></returns>
@@ -343,7 +328,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        public void SetDictionaryData(object key, object value)
+        void IRow.SetDictionaryData(object key, object value)
         {
             if (value == null)
             {
@@ -353,8 +338,7 @@ namespace Serenity.Data
             }
             else
             {
-                if (dictionaryData == null)
-                    dictionaryData = new Hashtable();
+                dictionaryData ??= new Hashtable();
                 dictionaryData[key] = value;
             }
         }
@@ -363,7 +347,7 @@ namespace Serenity.Data
         /// Gets the dictionary data keys.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable GetDictionaryDataKeys()
+        IEnumerable IRow.GetDictionaryDataKeys()
         {
             if (dictionaryData == null)
                 return Array.Empty<object>();
@@ -376,7 +360,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
-        public object GetDictionaryData(object key)
+        object IRow.GetDictionaryData(object key)
         {
             if (dictionaryData != null)
                 return dictionaryData[key];
@@ -403,8 +387,7 @@ namespace Serenity.Data
             }
             else
             {
-                if (indexedData == null)
-                    indexedData = new object[FieldCount];
+                indexedData ??= new object[fields.Count];
 
                 indexedData[index] = value;
             }
@@ -426,7 +409,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        /// Clears the assignment.
+        /// Clears the assignment flag of the field.
         /// </summary>
         /// <param name="field">The field.</param>
         public void ClearAssignment(Field field)
@@ -443,27 +426,6 @@ namespace Serenity.Data
             assignedFields = null;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is any field changed.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance is any field changed; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsAnyFieldChanged
-        {
-            get
-            {
-                if (originalValues == null)
-                    return false;
-
-                for (var i = 0; i < fields.Count; i++)
-                    if (fields[i].IndexCompare(originalValues, this) != 0)
-                        return true;
-
-                return false;
-            }
-        }
-
         IDictionary<string, Join> IHaveJoins.Joins => fields.Joins;
 
         /// <summary>
@@ -472,7 +434,7 @@ namespace Serenity.Data
         /// <value>
         /// The identifier field.
         /// </value>
-        public Field IdField => fields.IdField;
+        Field IRow.IdField => fields.IdField;
 
         /// <summary>
         /// Gets the name field.
@@ -480,6 +442,6 @@ namespace Serenity.Data
         /// <value>
         /// The name field.
         /// </value>
-        public Field NameField => fields.NameField;
+        Field IRow.NameField => fields.NameField;
     }
 }

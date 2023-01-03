@@ -79,7 +79,7 @@
         /// </summary>
         /// <param name="row">Row instance</param>
         /// <param name="field">Field</param>
-        public static void EnsureUniversalTime(this IRow row, DateTimeField field)
+        public static void EnsureUniversalTime(IRow row, DateTimeField field)
         {
             if (!field.IsNull(row))
                 field[row] = field[row].Value.ToUniversalTime();

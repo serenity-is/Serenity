@@ -75,19 +75,19 @@ namespace Serenity.Data
         /// </value>
         bool TrackWithChecks { get; set; }
         /// <summary>
+        /// Gets or sets a value indicating whether [ignore constraints].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [ignore constraints]; otherwise, <c>false</c>.
+        /// </value>
+        bool IgnoreConstraints { get; set; }
+        /// <summary>
         /// Gets a value indicating whether this row instance has any field assigned.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this instance has any field assigned; otherwise, <c>false</c>.
         /// </value>
         bool IsAnyFieldAssigned { get; }
-        /// <summary>
-        /// Gets a value indicating whether this instance is any field changed.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance has any field changed; otherwise, <c>false</c>.
-        /// </value>
-        bool IsAnyFieldChanged { get; }
         /// <summary>
         /// Determines whether the specified field is assigned.
         /// </summary>

@@ -30,7 +30,7 @@ public class EntityConnectionExtensions_ById_Tests
             });
 
         var row = connection.ById<IdNameRow>(777);
-        Assert.True(row.TrackWithChecks);
+        Assert.True(((IRow)row).TrackWithChecks);
     }
 
     [Fact]
