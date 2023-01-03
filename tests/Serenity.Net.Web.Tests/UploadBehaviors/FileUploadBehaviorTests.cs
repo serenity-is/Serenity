@@ -1170,7 +1170,7 @@ public partial class FileUploadBehaviorTests
                     if (foreignFieldQueryResults?.TryGetValue(field, out var dictValue) == true)
                         value = dictValue;
 
-                    retRow[field] = value;
+                    ((IRow)retRow)[field] = value;
                 }
 
                 return new MockDbDataReader(command.CommandText, retRow);

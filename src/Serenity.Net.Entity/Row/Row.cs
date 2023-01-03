@@ -299,7 +299,7 @@ namespace Serenity.Data
         /// </value>
         /// <param name="fieldName">Name of the field.</param>
         /// <returns></returns>
-        public object this[string fieldName]
+        object IRow.this[string fieldName]
         {
             get
             {
