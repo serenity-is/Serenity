@@ -9,6 +9,7 @@
     <Description>Contains Serenity scripts and CSS file</Description>
     <StaticWebAssetBasePath>/Serenity.Scripts</StaticWebAssetBasePath>
     <EnableGlobalUsings>false</EnableGlobalUsings>
+    <DefaultItemExcludes>node_modules/**;corelib/node_modules/**;tsbuild/node_modules/**;$(DefaultItemExcludes);</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
