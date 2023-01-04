@@ -39,7 +39,7 @@
     </None>
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableGlobalUsings)' != 'false'">
+  <ItemGroup>
     <Using Include="Newtonsoft.Json" />
     <Using Include="Serenity" />
     <Using Include="Serenity.Abstractions" />

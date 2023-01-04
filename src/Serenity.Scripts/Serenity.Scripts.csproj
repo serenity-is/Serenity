@@ -8,11 +8,11 @@
     <Title>Serenity Platform - Scripts</Title>
     <Description>Contains Serenity scripts and CSS file</Description>
     <StaticWebAssetBasePath>/Serenity.Scripts</StaticWebAssetBasePath>
-    <EnableGlobalUsings>false</EnableGlobalUsings>
     <DefaultItemExcludes>node_modules/**;corelib/node_modules/**;tsbuild/node_modules/**;$(DefaultItemExcludes);</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Remove="*" />
     <None Remove="*\tsconfig.json;style\*.css;" />
     <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json">
       <CopyToOutputDirectory>false</CopyToOutputDirectory>
