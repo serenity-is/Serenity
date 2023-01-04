@@ -66,13 +66,15 @@ namespace Serenity.TypeScript.TsTypes
 
         public string GetText()
         {
+            var sourceStr = SourceStr ?? (Parent as Node)?.SourceStr ?? 
+                ((Parent as Node)?.Parent as Node)?.SourceStr;
             if (NodeStart == -1)
             {
                 if (Pos != null && End != null)
-                    return SourceStr[Pos.Value..End.Value];
+                    return sourceStr?[Pos.Value..End.Value];
             }
             else if (End != null && End.Value > NodeStart)
-                return SourceStr[NodeStart..End.Value];
+                return sourceStr?[NodeStart..End.Value];
 
             return null;
         }
