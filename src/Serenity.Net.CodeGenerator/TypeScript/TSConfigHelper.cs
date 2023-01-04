@@ -77,7 +77,7 @@ namespace Serenity.CodeGenerator
                 .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                     (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
                 .Select(x => (!x.StartsWith("**/", StringComparison.Ordinal) && !x.StartsWith("/")) ? ("/" + x) : x)
-                .Select(x => PathHelper.ToPath(x));
+                .ToArray();
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -86,7 +86,7 @@ namespace Serenity.CodeGenerator
                 .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
                 .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                     (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
-                .Select(x => PathHelper.ToPath(x));
+                .ToArray();
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -102,9 +102,38 @@ namespace Serenity.CodeGenerator
             var includeGlob = new IO.GlobFilter(includePatterns);
             var excludeGlob = new IO.GlobFilter(excludePatterns);
 
-            var allTsFiles = fileSystem.GetFiles(rootDir, "*.ts", recursive: true)
-                .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-                    !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
+            IEnumerable<string> allTsFiles;
+
+            if (includePatterns.Any() &&
+                includePatterns.All(x =>
+                    x.StartsWith("/", StringComparison.Ordinal) &&
+                    !x.StartsWith(@"/*", StringComparison.Ordinal) &&
+                    x[1..].Split('/')[0].IndexOf("*", StringComparison.Ordinal) < 0))
+            {
+                // may optimize by traversing directories at root manually, e.g. skip node_modules etc.
+                var scanDirs = includePatterns.Select(x =>
+                    x[1..].Split('/')[0].Trim())
+                    .Where(y => !string.IsNullOrEmpty(y))
+                    .ToArray();
+
+                allTsFiles = fileSystem.GetFiles(rootDir, "*.ts");
+                foreach (var directory in fileSystem.GetDirectories(rootDir))
+                {
+                    var directoryName = fileSystem.GetFileName(directory);
+                    if (!scanDirs.Any(x => string.Equals(x, directoryName, StringComparison.OrdinalIgnoreCase)))
+                        continue;
+
+                    allTsFiles = allTsFiles.Concat(fileSystem.GetFiles(directory, "*.ts", recursive: true));
+                }
+                allTsFiles = allTsFiles.ToArray();
+            }
+            else
+            {
+                allTsFiles = fileSystem.GetFiles(rootDir, "*.ts", recursive: true);
+            }
+
+            allTsFiles = allTsFiles.Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
+                !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
 
             files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
                 includeGlob.IsMatch(x[(rootDir.Length + 1)..]) &&

@@ -73,8 +73,7 @@
                     s[^1] != '\\' &&
                     s.IndexOfAny(AsteriskQue, 1) < 0)
                 {
-                    if (exactMatch == null)
-                        exactMatch = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    exactMatch ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     exactMatch.Add(s[1..]);
                     continue;
@@ -84,8 +83,7 @@
                 if (starDotIndex == 0 &&
                     s.IndexOfAny(DotAsteriskSlashBackQue, 2) < 0)
                 {
-                    if (extensions == null)
-                        extensions = new HashSet<string>();
+                    extensions ??= new HashSet<string>();
 
                     extensions.Add(s[1..]);
                     continue;
@@ -95,8 +93,7 @@
                 if (starDotIndex == 0 &&
                     s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
                 {
-                    if (endsWith == null)
-                        endsWith = new List<string>();
+                    endsWith ??= new List<string>();
 
                     endsWith.Add(s[1..]);
                     continue;
@@ -109,8 +106,7 @@
                     s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0 &&
                     s.LastIndexOfAny(AsteriskQue, starDotIndex - 1) < 0)
                 {
-                    if (startsWithAndEndsWith == null)
-                        startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
+                    startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
 
                     startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
                         s[1..starDotIndex], false, s[(starDotIndex + 1)..]));
@@ -123,8 +119,7 @@
                     s[0] == sep &&
                     s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
                 {
-                    if (startsWithAndEndsWith == null)
-                        startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
+                    startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
 
                     startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[(starDotIndex + 1)..]));
                     continue;
@@ -135,11 +130,9 @@
                     s[0] != sep &&
                     s.IndexOfAny(AsteriskQue, 1) < 0)
                 {
-                    if (contains == null)
-                        contains = new List<string>();
+                    contains ??= new List<string>();
 
-                    if (startsWith == null)
-                        startsWith = new List<string>();
+                    startsWith ??= new List<string>();
 
                     contains.Add(sep.ToString() + s);
                     startsWith.Add(s);
@@ -152,8 +145,7 @@
                     s[0] == sep &&
                     s.IndexOfAny(AsteriskQue) < 0)
                 {
-                    if (startsWith == null)
-                        startsWith = new List<string>();
+                    startsWith ??= new List<string>();
 
                     startsWith.Add(s[1..]);
                     continue;
@@ -168,8 +160,7 @@
                     s.LastIndexOfAny(AsteriskQue, starDotIndex - 5) < 0 &&
                     s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
                 {
-                    if (startsWithAndEndsWith == null)
-                        startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
+                    startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
 
                     if (s[0] == sep)
                     {
@@ -178,8 +169,7 @@
                     }
                     else
                     {
-                        if (containsAndEndsWith == null)
-                            containsAndEndsWith = new List<Tuple<string, bool, string>>();
+                        containsAndEndsWith ??= new List<Tuple<string, bool, string>>();
 
                         startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
                             s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
@@ -193,8 +183,7 @@
 
                 if (s.IndexOfAny(AsteriskQue) < 0)
                 {
-                    if (exactMatch == null)
-                        exactMatch = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    exactMatch ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     if (s[0] == sep)
                     {
@@ -204,8 +193,7 @@
                     {
                         exactMatch.Add(s[..]);
 
-                        if (endsWith == null)
-                            endsWith = new List<string>();
+                        endsWith ??= new List<string>();
 
                         endsWith.Add(sep + s[..]);
                     }
@@ -215,8 +203,7 @@
 
                 if (s[0] == '*' && s.IndexOfAny(AsteriskSlashBackQue, 1) < 0)
                 {
-                    if (endsWith == null)
-                        endsWith = new List<string>();
+                    endsWith ??= new List<string>();
 
                     endsWith.Add(s[1..]);
                     continue;
@@ -227,8 +214,7 @@
                     s[1] == '*' &&
                     s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
                 {
-                    if (startsWithAndEndsWith == null)
-                        startsWithAndEndsWith = new List<Tuple<string, bool, string>>();
+                    startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
 
                     startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[2..]));
                     continue;
