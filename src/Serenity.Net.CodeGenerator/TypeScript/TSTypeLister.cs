@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using Serenity.TypeScript.TsTypes;
+using System.Collections.Concurrent;
+using System.Threading;
 #if !ISSOURCEGENERATOR
 using Serenity.CodeGeneration;
 #endif
@@ -10,11 +12,13 @@ namespace Serenity.CodeGenerator
         private readonly IGeneratorFileSystem fileSystem;
         private readonly CancellationToken cancellationToken;
         private readonly string tsConfigPath;
+        private readonly ConcurrentDictionary<string, SourceFile> astCache;
 
-        public TSTypeLister(IGeneratorFileSystem fileSystem, string tsConfigPath,
+        public TSTypeLister(IGeneratorFileSystem fileSystem, string tsConfigPath, ConcurrentDictionary<string, SourceFile> astCache = null,
             CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.astCache = astCache;
             this.cancellationToken = cancellationToken;
             if (tsConfigPath is null)
                 throw new ArgumentNullException(nameof(tsConfigPath));
@@ -69,7 +73,7 @@ namespace Serenity.CodeGenerator
 
             TSTypeListerAST typeListerAST = new(fileSystem, 
                 tsConfigDir: fileSystem.GetDirectoryName(tsConfigPath), tsConfig: tsConfig,
-                cancellationToken);
+                astCache, cancellationToken);
 
             foreach (var file in files)
                 typeListerAST.AddInputFile(file);

@@ -14,13 +14,16 @@ namespace Serenity.CodeGenerator
         private readonly List<string> fileNames = new();
         private readonly HashSet<string> exportedTypeNames = new();
         private readonly IGeneratorFileSystem fileSystem;
+        private readonly ConcurrentDictionary<string, SourceFile> astCache;
         private readonly TSModuleResolver moduleResolver;
         private readonly CancellationToken cancellationToken;
 
         public TSTypeListerAST(IGeneratorFileSystem fileSystem, string tsConfigDir,
-            TSConfig tsConfig, CancellationToken cancellationToken = default)
+            TSConfig tsConfig, ConcurrentDictionary<string, SourceFile> astCache = null, 
+            CancellationToken cancellationToken = default)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.astCache = astCache;
             if (tsConfigDir is null || tsConfigDir is "")
                 throw new ArgumentNullException(nameof(tsConfigDir));
 
@@ -859,7 +862,7 @@ namespace Serenity.CodeGenerator
             public Dictionary<string, ResolvedModuleFull> ResolvedModules { get; set; }
         }
 
-        private ConcurrentDictionary<SourceFile, SourceFileInfo> sourceFileInfos = new();
+        private readonly ConcurrentDictionary<SourceFile, SourceFileInfo> sourceFileInfos = new();
 
         SourceFile ParseFile(string fileFullPath, string moduleName, bool extractExportsOnly)
         {
@@ -867,9 +870,15 @@ namespace Serenity.CodeGenerator
 
             return parsedFiles.GetOrAdd(fileFullPath, (fileFullPath) =>
             {
-                var sourceFile = (SourceFile)new TypeScriptAST(
-                    fileSystem.ReadAllText(fileFullPath),
-                    fileFullPath, optimized: true).RootNode;
+                var sourceFileText = fileSystem.ReadAllText(fileFullPath);
+
+                SourceFile parseSourceFile()
+                {
+                    return (SourceFile)new TypeScriptAST(sourceFileText,
+                        fileFullPath, optimized: true).RootNode;
+                }
+
+                var sourceFile = astCache?.GetOrAdd(sourceFileText, _ => parseSourceFile()) ?? parseSourceFile();
 
                 if (sourceFile.ExternalModuleIndicator is not null)
                 {
