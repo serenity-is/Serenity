@@ -88,7 +88,7 @@ namespace Serenity.CodeGenerator
         {
             return string.Join(".", EnumerateParents(node)
                 .Where(x => x.Kind == SyntaxKind.ModuleDeclaration)
-                .Select(x => (x as ModuleDeclaration).Name.GetText())
+                .Select(x => GetText((x as ModuleDeclaration).Name))
                 .Reverse());
         }
 
@@ -100,12 +100,72 @@ namespace Serenity.CodeGenerator
             return s;
         }
 
+        static string AddTypeArgs(string text, NodeArray<ITypeNode> args)
+        {
+            if (args != null &&
+                args.Count > 0)
+            {
+                if (args.Count == 1)
+                    return text + "<" + GetText(args[0]) + ">";
+                else
+                    return text + "<" + string.Join(",", args.Select(x => GetText(x)) + ">");
+            }
+
+            return text;
+        }
+
+        static string GetText(INode node)
+        {
+            if (node is PropertyAccessExpression pac)
+            {
+                return GetText(pac.Expression) + "." + GetText(pac.Name);
+            }
+            else if (node is QualifiedName qfn)
+            {
+                return GetText(qfn.Left) + "." + GetText(qfn.Right);
+            }
+            else if (node is ExpressionWithTypeArguments ewta)
+            {
+                if (ewta.Expression is Identifier ewti && ewti.Text != null)
+                    return AddTypeArgs(ewti.Text, ewta.TypeArguments);
+                if (ewta.Expression is PropertyAccessExpression ewpa)
+                    return AddTypeArgs(GetText(ewpa), ewta.TypeArguments);
+            }
+            else if (node is Identifier idt && idt.Text is not null)
+                return idt.Text;
+            else if (node is TypeNode)
+            {
+                if (node.Kind == SyntaxKind.StringKeyword)
+                    return "string";
+                else if (node.Kind == SyntaxKind.AnyKeyword)
+                    return "any";
+                else if (node.Kind == SyntaxKind.BooleanKeyword)
+                    return "boolean";
+                else if (node.Kind == SyntaxKind.NumberKeyword)
+                    return "number";
+                if (node is TypeReferenceNode tr)
+                {
+                    if (tr.TypeName is Identifier tri && tri.Text != null)
+                        return AddTypeArgs(tri.Text, tr.TypeArguments);
+
+                    if (tr.TypeName is QualifiedName trq)
+                        return AddTypeArgs(GetText(trq), tr.TypeArguments);
+                }
+
+                if (node is ArrayTypeNode atn)
+                    return GetText(atn.ElementType) + "[]";
+            }
+            else if (node is Declaration de && de.Name != null)
+                return GetText(de.Name);
+            return node?.GetText();
+        }
+
         string GetTypeReferenceExpression(INode node, bool isDecorator = false)
         {
             if (node == null)
                 return string.Empty;
 
-            var text = node.GetText();
+            var text = GetText(node);
             if (text is null || text.Length == 0 || text == "any")
                 return null;
 
@@ -114,13 +174,14 @@ namespace Serenity.CodeGenerator
                 text.Contains('|'))
                 return null;
 
+
+            if (text == "number" || text == "string" || text == "boolean")
+                return text;
+
             var noGeneric = text;
             var lt = noGeneric.IndexOf('<');
             if (lt >= 0 && noGeneric[^1] == '>')
                 noGeneric = noGeneric[..lt];
-
-            if (noGeneric == "number" || noGeneric == "string" || noGeneric == "boolean")
-                return noGeneric;
 
             string functionSuffix = string.Empty;
             if (isDecorator)
@@ -189,11 +250,11 @@ namespace Serenity.CodeGenerator
                         foreach (var child in children)
                         {
                             if ((child.Kind == SyntaxKind.ClassDeclaration &&
-                                 (child as ClassDeclaration).Name.GetText() == noGeneric) ||
+                                 GetText((child as ClassDeclaration).Name) == noGeneric) ||
                                 (child.Kind == SyntaxKind.InterfaceDeclaration &&
-                                 (child as InterfaceDeclaration).Name.GetText() == noGeneric) ||
+                                 GetText((child as InterfaceDeclaration).Name) == noGeneric) ||
                                 (child.Kind == SyntaxKind.EnumDeclaration && 
-                                 (child as EnumDeclaration).Name.GetText() == noGeneric))
+                                 GetText((child as EnumDeclaration).Name) == noGeneric))
                                 return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                         }
                     }
@@ -203,9 +264,9 @@ namespace Serenity.CodeGenerator
                         {
                             if (child.Kind == SyntaxKind.ImportEqualsDeclaration)
                             {
-                                if ((child as ImportEqualsDeclaration).Name.GetText() == beforeDot)
+                                if (GetText((child as ImportEqualsDeclaration).Name) == beforeDot)
                                 {
-                                    var fullName = (child as ImportEqualsDeclaration).ModuleReference.GetText() +
+                                    var fullName = GetText((child as ImportEqualsDeclaration).ModuleReference) +
                                         afterDot.ToString();
                                     if (exportedTypeNames.Contains(fullName))
                                         return fullName + functionSuffix;
@@ -296,7 +357,7 @@ namespace Serenity.CodeGenerator
 
             return p.Select(k => new ExternalGenericParameter
             {
-                Name = k.GetText()
+                Name = GetText(k)
             }).ToList();
         }
 
@@ -384,7 +445,7 @@ namespace Serenity.CodeGenerator
                     member.Kind != SyntaxKind.Constructor)
                     continue;
 
-                var name = member.Name != null ? member.Name.GetText() : "$ctor";
+                var name = member.Name != null ? GetText(member.Name) : "$ctor";
 
                 if (!used.Add(name))
                     continue;
@@ -419,7 +480,7 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = arg.Name.GetText(),
+                            Name = GetText(arg.Name),
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }
@@ -437,7 +498,7 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = arg.Name.GetText(),
+                            Name = GetText(arg.Name),
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }
@@ -522,7 +583,7 @@ namespace Serenity.CodeGenerator
             var result = new ExternalType
             {
                 Namespace = GetNamespace(enumDec),
-                Name = enumDec.Name.GetText(),
+                Name = GetText(enumDec.Name),
                 IsDeclaration = IsUnderAmbientNamespace(enumDec) ? true : null
             };
 
@@ -537,7 +598,7 @@ namespace Serenity.CodeGenerator
                 GenericParameters = TypeParametersToExternal(klass.TypeParameters),
                 IsAbstract = klass.Modifiers != null && klass.Modifiers.Any(x => x.Kind == SyntaxKind.AbstractKeyword) == true ? true : null,
                 Namespace = GetNamespace(klass),
-                Name = klass.Name.GetText(),
+                Name = GetText(klass.Name),
                 IsDeclaration = IsUnderAmbientNamespace(klass) ? true : null
             };
 
@@ -561,7 +622,7 @@ namespace Serenity.CodeGenerator
             {
                 GenericParameters = TypeParametersToExternal(intf.TypeParameters),
                 Namespace = GetNamespace(intf),
-                Name = intf.Name.GetText(),
+                Name = GetText(intf.Name),
                 IsInterface = true,
                 IsDeclaration = IsUnderAmbientNamespace(intf) ? true : null
             };
@@ -595,7 +656,7 @@ namespace Serenity.CodeGenerator
                     member.Kind != SyntaxKind.PropertyDeclaration)
                     continue;
 
-                var name = ((member as MethodDeclaration)?.Name ?? (member as PropertyDeclaration)?.Name)?.GetText();
+                var name = GetText((member as MethodDeclaration)?.Name ?? (member as PropertyDeclaration)?.Name);
                 if (name == null || !used.Add(name))
                     continue;
 
@@ -622,7 +683,7 @@ namespace Serenity.CodeGenerator
                     {
                         (externalMember as ExternalMethod).Arguments.Add(new()
                         {
-                            Name = arg.Name.GetText(),
+                            Name = GetText(arg.Name),
                             Type = GetTypeReferenceExpression(arg.Type)
                         });
                     }
@@ -646,7 +707,7 @@ namespace Serenity.CodeGenerator
             var result = new ExternalType 
             {
                 Namespace = GetNamespace(module),
-                Name = module.Name.GetText(),
+                Name = GetText(module.Name),
                 IsInterface = true,
                 IsDeclaration = IsUnderAmbientNamespace(module) ? true : null
             };
@@ -818,7 +879,7 @@ namespace Serenity.CodeGenerator
                         if (sourceFile.IsDeclarationFile || HasExportModifier(node))
                         {
                             var klass = node as ClassDeclaration;
-                            target.Add(PrependNamespace(klass.Name.GetText(), klass));
+                            target.Add(PrependNamespace(GetText(klass.Name), klass));
                         }
                         break;
 
@@ -826,7 +887,7 @@ namespace Serenity.CodeGenerator
                         if (sourceFile.IsDeclarationFile || HasExportModifier(node))
                         {
                             var enumDec = node as EnumDeclaration;
-                            target.Add(PrependNamespace(enumDec.Name.GetText(), enumDec));
+                            target.Add(PrependNamespace(GetText(enumDec.Name), enumDec));
                         }
                         break;
 
@@ -834,7 +895,7 @@ namespace Serenity.CodeGenerator
                         if (sourceFile.IsDeclarationFile || HasExportModifier(node))
                         {
                             var intf = node as InterfaceDeclaration;
-                            target.Add(PrependNamespace(intf.Name.GetText(), intf));
+                            target.Add(PrependNamespace(GetText(intf.Name), intf));
                         }
                         break;
 
@@ -844,7 +905,7 @@ namespace Serenity.CodeGenerator
                             var modul = node as ModuleDeclaration;
                             if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
                                 (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
-                                target.Add(PrependNamespace(modul.Name.GetText(), modul));
+                                target.Add(PrependNamespace(GetText(modul.Name), modul));
                         }
                         break;
                 }
