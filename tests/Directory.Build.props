@@ -17,8 +17,24 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Condition="'$(EnableGlobalUsings)' != 'false'">
-        <Link>Properties\GlobalUsings.cs</Link>
-    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Serenity.Abstractions" />
+    <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.Data" />
+    <Using Include="Serenity.Data.Mapping" Condition="'$(ProjectName)' != 'Serenity.Net.Core.Tests'" />
+    <Using Include="Serenity.Extensions.DependencyInjection" />
+    <Using Include="Serenity.Services" />
+    <Using Include="Serenity.Web" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Data" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Text" />
+    <Using Include="Xunit" />
   </ItemGroup>
 </Project>

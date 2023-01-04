@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Localization;
+﻿using Serenity.Localization;
 
 namespace Serenity.Tests.Localization;
 

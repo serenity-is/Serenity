@@ -1,9 +1,7 @@
-﻿using Serenity.ComponentModel;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Text.RegularExpressions;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;

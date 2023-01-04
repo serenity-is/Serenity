@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;

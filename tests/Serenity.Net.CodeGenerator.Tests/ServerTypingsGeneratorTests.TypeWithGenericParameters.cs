@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using ServerTypingsTest.TypeWithGenericParameters;
+﻿using ServerTypingsTest.TypeWithGenericParameters;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -54,7 +53,7 @@ namespace Serenity.Tests.CodeGenerator
 }
 
 namespace ServerTypingsTest.TypeWithGenericParameters
-{ 
+{
     [ScriptInclude]
     public class TypeWithOneGenericParameter<T> : ServiceRequest
     {

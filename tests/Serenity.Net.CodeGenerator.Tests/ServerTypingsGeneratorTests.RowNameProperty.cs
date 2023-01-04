@@ -1,9 +1,4 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Data.Mapping;
-using Xunit;
-
-namespace Serenity.Tests.CodeGenerator
+﻿namespace Serenity.Tests.CodeGenerator
 {
     public partial class ServerTypingsGeneratorTests
     {

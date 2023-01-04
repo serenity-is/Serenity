@@ -1,6 +1,4 @@
-﻿using Serenity.ComponentModel;
-
-namespace Serenity.Tests.Web;
+﻿namespace Serenity.Tests.Web;
 
 public partial class MultipleFileUploadBehaviorTests
 {

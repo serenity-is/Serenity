@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using ServerTypingsTest.DynamicPropertyType;
+﻿using ServerTypingsTest.DynamicPropertyType;
 
 namespace Serenity.Tests.CodeGenerator
 {

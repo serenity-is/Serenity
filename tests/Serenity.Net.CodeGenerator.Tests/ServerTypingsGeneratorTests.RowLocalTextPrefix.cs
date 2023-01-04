@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using ServerTypingsTest.SomeModule.Entities;
+﻿using ServerTypingsTest.SomeModule.Entities;
 
 namespace Serenity.Tests.CodeGenerator
 {

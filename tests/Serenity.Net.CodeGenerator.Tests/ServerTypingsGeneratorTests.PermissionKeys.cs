@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using ServerTypingsTest.PermissionKeys;
+﻿using ServerTypingsTest.PermissionKeys;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -69,7 +68,7 @@ namespace Serenity.Tests.CodeGenerator
 }
 
 namespace ServerTypingsTest.PermissionKeys
-{ 
+{
     [NestedPermissionKeys]
     public class PermissionKeysSample1Depth1
     {

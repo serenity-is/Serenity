@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using System.IO;
+﻿using System.IO;
 
 namespace Serenity.Tests;
 

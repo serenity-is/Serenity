@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using ServerTypingsTest.RowLookupKeyModule.Entities;
+﻿using ServerTypingsTest.RowLookupKeyModule.Entities;
 
 namespace Serenity.Tests.CodeGenerator
 {
