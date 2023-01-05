@@ -775,7 +775,7 @@ namespace Serenity.TypeScript.TsParser
                     node.OriginalKeywordKind = Token();
                 }
 
-                node.Text = EscapeIdentifier(Scanner.TokenValue);
+                node.Text = Scanner.TokenValue;
 
                 NextToken();
 
