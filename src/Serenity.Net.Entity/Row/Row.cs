@@ -216,7 +216,7 @@ namespace Serenity.Data
         /// <value>
         ///   <c>true</c> if this instance is any field assigned; otherwise, <c>false</c>.
         /// </value>
-        public bool IsAnyFieldAssigned => tracking && assignedFields != null;
+        bool IRow.IsAnyFieldAssigned => tracking && assignedFields != null;
 
         bool IRow.IgnoreConstraints { get; set; }
 
