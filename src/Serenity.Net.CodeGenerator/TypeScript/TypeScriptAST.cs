@@ -30,8 +30,10 @@ namespace Serenity.TypeScript
         public void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true, bool optimized = false)
         {
             SourceStr = source;
-            var parser = new Parser();
-            parser.Optimized = optimized;
+            var parser = new Parser
+            {
+                Optimized = optimized
+            };
             var sourceFile = parser.ParseSourceFile(fileName, source, null, false, ScriptKind.Ts);
             RootNode = sourceFile;
             RootNode.SourceStr = SourceStr;

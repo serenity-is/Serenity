@@ -666,10 +666,7 @@ namespace Serenity.TypeScript.TsParser
 
         public static List<CommentRange> AppendCommentRange((int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, object _state, List<CommentRange> comments) cb)
         {
-            if (cb.comments == null)
-            {
-                cb.comments = new List<CommentRange>();
-            }
+            cb.comments ??= new List<CommentRange>();
             cb.comments.Add(new CommentRange { Kind = cb.kind, Pos = cb.pos, End = cb.end, HasTrailingNewLine = cb.hasTrailingNewLine });
             return cb.comments;
         }

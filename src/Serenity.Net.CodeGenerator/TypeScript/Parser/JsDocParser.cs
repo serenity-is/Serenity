@@ -39,24 +39,11 @@ namespace Serenity.TypeScript.TsParser
 
         public bool IsJsDocType()
         {
-            switch (Token())
+            return Token() switch
             {
-                case SyntaxKind.AsteriskToken:
-                case SyntaxKind.QuestionToken:
-                case SyntaxKind.OpenParenToken:
-                case SyntaxKind.OpenBracketToken:
-                case SyntaxKind.ExclamationToken:
-                case SyntaxKind.OpenBraceToken:
-                case SyntaxKind.FunctionKeyword:
-                case SyntaxKind.DotDotDotToken:
-                case SyntaxKind.NewKeyword:
-                case SyntaxKind.ThisKeyword:
-
-                    return true;
-            }
-
-
-            return TokenIsIdentifierOrKeyword(Token());
+                SyntaxKind.AsteriskToken or SyntaxKind.QuestionToken or SyntaxKind.OpenParenToken or SyntaxKind.OpenBracketToken or SyntaxKind.ExclamationToken or SyntaxKind.OpenBraceToken or SyntaxKind.FunctionKeyword or SyntaxKind.DotDotDotToken or SyntaxKind.NewKeyword or SyntaxKind.ThisKeyword => true,
+                _ => TokenIsIdentifierOrKeyword(Token()),
+            };
         }
 
 
@@ -178,60 +165,22 @@ namespace Serenity.TypeScript.TsParser
 
         public IJsDocType ParseBasicTypeExpression()
         {
-            switch (Token())
+            return Token() switch
             {
-                case SyntaxKind.AsteriskToken:
-
-                    return ParseJsDocAllType();
-                case SyntaxKind.QuestionToken:
-
-                    return ParseJsDocUnknownOrNullableType();
-                case SyntaxKind.OpenParenToken:
-
-                    return ParseJsDocUnionType();
-                case SyntaxKind.OpenBracketToken:
-
-                    return ParseJsDocTupleType();
-                case SyntaxKind.ExclamationToken:
-
-                    return ParseJsDocNonNullableType();
-                case SyntaxKind.OpenBraceToken:
-
-                    return ParseJsDocRecordType();
-                case SyntaxKind.FunctionKeyword:
-
-                    return ParseJsDocFunctionType();
-                case SyntaxKind.DotDotDotToken:
-
-                    return ParseJsDocVariadicType();
-                case SyntaxKind.NewKeyword:
-
-                    return ParseJsDocConstructorType();
-                case SyntaxKind.ThisKeyword:
-
-                    return ParseJsDocThisType();
-                case SyntaxKind.AnyKeyword:
-                case SyntaxKind.StringKeyword:
-                case SyntaxKind.NumberKeyword:
-                case SyntaxKind.BooleanKeyword:
-                case SyntaxKind.SymbolKeyword:
-                case SyntaxKind.VoidKeyword:
-                case SyntaxKind.NullKeyword:
-                case SyntaxKind.UndefinedKeyword:
-                case SyntaxKind.NeverKeyword:
-                case SyntaxKind.ObjectKeyword:
-
-                    return ParseTokenNode<JsDocType>();
-                case SyntaxKind.StringLiteral:
-                case SyntaxKind.NumericLiteral:
-                case SyntaxKind.TrueKeyword:
-                case SyntaxKind.FalseKeyword:
-
-                    return ParseJsDocLiteralType();
-            }
-
-
-            return ParseJsDocTypeReference();
+                SyntaxKind.AsteriskToken => ParseJsDocAllType(),
+                SyntaxKind.QuestionToken => ParseJsDocUnknownOrNullableType(),
+                SyntaxKind.OpenParenToken => ParseJsDocUnionType(),
+                SyntaxKind.OpenBracketToken => ParseJsDocTupleType(),
+                SyntaxKind.ExclamationToken => ParseJsDocNonNullableType(),
+                SyntaxKind.OpenBraceToken => ParseJsDocRecordType(),
+                SyntaxKind.FunctionKeyword => ParseJsDocFunctionType(),
+                SyntaxKind.DotDotDotToken => ParseJsDocVariadicType(),
+                SyntaxKind.NewKeyword => ParseJsDocConstructorType(),
+                SyntaxKind.ThisKeyword => ParseJsDocThisType(),
+                SyntaxKind.AnyKeyword or SyntaxKind.StringKeyword or SyntaxKind.NumberKeyword or SyntaxKind.BooleanKeyword or SyntaxKind.SymbolKeyword or SyntaxKind.VoidKeyword or SyntaxKind.NullKeyword or SyntaxKind.UndefinedKeyword or SyntaxKind.NeverKeyword or SyntaxKind.ObjectKeyword => ParseTokenNode<JsDocType>(),
+                SyntaxKind.StringLiteral or SyntaxKind.NumericLiteral or SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword => ParseJsDocLiteralType(),
+                _ => ParseJsDocTypeReference(),
+            };
         }
 
 
@@ -525,7 +474,7 @@ namespace Serenity.TypeScript.TsParser
 
         public Tuple<JsDoc, List<Diagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
         {
-            if (Parser == null) Parser = new Parser();
+            Parser ??= new Parser();
             Parser.InitializeState(content, null, ScriptKind.Js);
 
             Parser.SourceFile = new SourceFile { LanguageVariant = LanguageVariant.Standard, Text = content };
@@ -720,11 +669,7 @@ namespace Serenity.TypeScript.TsParser
                return result;
                void PushComment(string text)
                {
-                   if (margin == null)
-                   {
-
-                       margin = indent;
-                   }
+                   margin ??= indent;
 
                    comments.Add(text);
 
@@ -813,45 +758,16 @@ namespace Serenity.TypeScript.TsParser
                 IJsDocTag tag = null;
                 if (tagName != null)
                 {
-                    switch (tagName.Text)
+                    tag = tagName.Text switch
                     {
-                        case "augments":
-
-                            tag = ParseAugmentsTag(atToken, tagName);
-
-                            break;
-                        case "param":
-
-                            tag = ParseParamTag(atToken, tagName);
-
-                            break;
-                        case "return":
-                        case "returns":
-
-                            tag = ParseReturnTag(atToken, tagName);
-
-                            break;
-                        case "template":
-
-                            tag = ParseTemplateTag(atToken, tagName);
-
-                            break;
-                        case "type":
-
-                            tag = ParseTypeTag(atToken, tagName);
-
-                            break;
-                        case "typedef":
-
-                            tag = ParseTypedefTag(atToken, tagName);
-
-                            break;
-                        default:
-
-                            tag = ParseUnknownTag(atToken, tagName);
-
-                            break;
-                    }
+                        "augments" => ParseAugmentsTag(atToken, tagName),
+                        "param" => ParseParamTag(atToken, tagName),
+                        "return" or "returns" => ParseReturnTag(atToken, tagName),
+                        "template" => ParseTemplateTag(atToken, tagName),
+                        "type" => ParseTypeTag(atToken, tagName),
+                        "typedef" => ParseTypedefTag(atToken, tagName),
+                        _ => ParseUnknownTag(atToken, tagName),
+                    };
                 }
                 else
                 {
@@ -946,11 +862,7 @@ namespace Serenity.TypeScript.TsParser
                 return comments2;
                 void PushComment(string text)
                 {
-                    if (margin == null)
-                    {
-
-                        margin = indent;
-                    }
+                    margin ??= indent;
 
                     comments2.Add(text);
 
@@ -1062,11 +974,7 @@ namespace Serenity.TypeScript.TsParser
 
                     preName = name;
                 }
-                if (typeExpression == null)
-                {
-
-                    typeExpression = TryParseTypeExpression();
-                }
+                typeExpression ??= TryParseTypeExpression();
                 var result4 = new JsDocParameterTag
                 {
                     AtToken = atToken,
@@ -1228,11 +1136,7 @@ namespace Serenity.TypeScript.TsParser
                             }
                         }
                     }
-                    if (typedefTag.JsDocTypeLiteral == null)
-                    {
-
-                        typedefTag.JsDocTypeLiteral = (JsDocTypeLiteral)typeExpression.Type;
-                    }
+                    typedefTag.JsDocTypeLiteral ??= (JsDocTypeLiteral)typeExpression.Type;
                 }
                 else
                 {
@@ -1367,11 +1271,7 @@ namespace Serenity.TypeScript.TsParser
                         var propertyTag = ParsePropertyTag(atToken, tagName);
                         if (propertyTag != null)
                         {
-                            if (parentTag.JsDocPropertyTags == null)
-                            {
-
-                                parentTag.JsDocPropertyTags = new NodeArray<JsDocPropertyTag>();
-                            }
+                            parentTag.JsDocPropertyTags ??= new NodeArray<JsDocPropertyTag>();
 
                             parentTag.JsDocPropertyTags.Add(propertyTag);
 

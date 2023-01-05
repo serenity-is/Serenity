@@ -59,21 +59,10 @@ namespace Serenity.TypeScript.TsParser
             return sourceText[start..node.End.Value];
         }
 
-
-        public static string EscapeIdentifier(string identifier)
-        {
-            return identifier.Length >= 2 && identifier[0] == '_' &&
-                   identifier[1] == '_'
-                ? "_" + identifier
-                : identifier;
-        }
-
-
         public static List<CommentRange> GetLeadingCommentRangesOfNodeFromText(INode node, string text)
         {
             return GetLeadingCommentRanges(text, node.Pos ?? 0);
         }
-
 
         public static List<CommentRange> GetJsDocCommentRanges(INode node, string text)
         {
@@ -83,7 +72,7 @@ namespace Serenity.TypeScript.TsParser
                                 node.Kind == SyntaxKind.ArrowFunction
                 ? GetTrailingCommentRanges(text, node.Pos ?? 0).Concat(GetLeadingCommentRanges(text, node.Pos ?? 0))
                 : GetLeadingCommentRangesOfNodeFromText(node, text);
-            if (commentRanges == null) commentRanges = new List<CommentRange>();
+            commentRanges ??= new List<CommentRange>();
             return commentRanges.Where(comment =>
                     text[(comment.Pos ?? 0) + 1] == '*' &&
                     text[(comment.Pos ?? 0) + 2] == '*' &&
@@ -106,24 +95,11 @@ namespace Serenity.TypeScript.TsParser
 
         public static bool IsModifierKind(SyntaxKind token)
         {
-            switch (token)
+            return token switch
             {
-                case SyntaxKind.AbstractKeyword:
-                case SyntaxKind.AsyncKeyword:
-                case SyntaxKind.ConstKeyword:
-                case SyntaxKind.DeclareKeyword:
-                case SyntaxKind.DefaultKeyword:
-                case SyntaxKind.ExportKeyword:
-                case SyntaxKind.PublicKeyword:
-                case SyntaxKind.PrivateKeyword:
-                case SyntaxKind.ProtectedKeyword:
-                case SyntaxKind.ReadonlyKeyword:
-                case SyntaxKind.StaticKeyword:
-
-                    return true;
-            }
-
-            return false;
+                SyntaxKind.AbstractKeyword or SyntaxKind.AsyncKeyword or SyntaxKind.ConstKeyword or SyntaxKind.DeclareKeyword or SyntaxKind.DefaultKeyword or SyntaxKind.ExportKeyword or SyntaxKind.PublicKeyword or SyntaxKind.PrivateKeyword or SyntaxKind.ProtectedKeyword or SyntaxKind.ReadonlyKeyword or SyntaxKind.StaticKeyword => true,
+                _ => false,
+            };
         }
 
 
@@ -175,33 +151,21 @@ namespace Serenity.TypeScript.TsParser
 
         public static ModifierFlags ModifierToFlag(SyntaxKind token)
         {
-            switch (token)
+            return token switch
             {
-                case SyntaxKind.StaticKeyword:
-                    return ModifierFlags.Static;
-                case SyntaxKind.PublicKeyword:
-                    return ModifierFlags.Public;
-                case SyntaxKind.ProtectedKeyword:
-                    return ModifierFlags.Protected;
-                case SyntaxKind.PrivateKeyword:
-                    return ModifierFlags.Private;
-                case SyntaxKind.AbstractKeyword:
-                    return ModifierFlags.Abstract;
-                case SyntaxKind.ExportKeyword:
-                    return ModifierFlags.Export;
-                case SyntaxKind.DeclareKeyword:
-                    return ModifierFlags.Ambient;
-                case SyntaxKind.ConstKeyword:
-                    return ModifierFlags.Const;
-                case SyntaxKind.DefaultKeyword:
-                    return ModifierFlags.Default;
-                case SyntaxKind.AsyncKeyword:
-                    return ModifierFlags.Async;
-                case SyntaxKind.ReadonlyKeyword:
-                    return ModifierFlags.Readonly;
-            }
-
-            return ModifierFlags.None;
+                SyntaxKind.StaticKeyword => ModifierFlags.Static,
+                SyntaxKind.PublicKeyword => ModifierFlags.Public,
+                SyntaxKind.ProtectedKeyword => ModifierFlags.Protected,
+                SyntaxKind.PrivateKeyword => ModifierFlags.Private,
+                SyntaxKind.AbstractKeyword => ModifierFlags.Abstract,
+                SyntaxKind.ExportKeyword => ModifierFlags.Export,
+                SyntaxKind.DeclareKeyword => ModifierFlags.Ambient,
+                SyntaxKind.ConstKeyword => ModifierFlags.Const,
+                SyntaxKind.DefaultKeyword => ModifierFlags.Default,
+                SyntaxKind.AsyncKeyword => ModifierFlags.Async,
+                SyntaxKind.ReadonlyKeyword => ModifierFlags.Readonly,
+                _ => ModifierFlags.None,
+            };
         }
 
 

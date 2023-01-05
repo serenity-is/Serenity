@@ -57,19 +57,14 @@ namespace Serenity.TypeScript.TsParser
         {
             //var ext = fileName.substr(fileName.LastIndexOf("."));
             var ext = System.IO.Path.GetExtension(fileName);
-            switch (ext?.ToLower())
+            return (ext?.ToLower()) switch
             {
-                case ".js":
-                    return ScriptKind.Js;
-                case ".jsx":
-                    return ScriptKind.Jsx;
-                case ".ts":
-                    return ScriptKind.Ts;
-                case ".tsx":
-                    return ScriptKind.Tsx;
-                default:
-                    return ScriptKind.Unknown;
-            }
+                ".js" => ScriptKind.Js,
+                ".jsx" => ScriptKind.Jsx,
+                ".ts" => ScriptKind.Ts,
+                ".tsx" => ScriptKind.Tsx,
+                _ => ScriptKind.Unknown,
+            };
         }
 
         public static string NormalizePath(string path)

@@ -427,12 +427,9 @@ namespace Serenity.CodeGeneration
 
             var properties = EnumerateProperties(rowType).ToList();
 
-            if (metadata.IdProperty == null)
-            {
-                metadata.IdProperty = properties.FirstOrDefault(x =>
+            metadata.IdProperty ??= properties.FirstOrDefault(x =>
                     x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
                         "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
-            }
 
             if (metadata.IdProperty == null)
             {
@@ -457,12 +454,9 @@ namespace Serenity.CodeGeneration
                     "Serenity.Data.StringField", "NameField",
                     "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
 
-            if (metadata.NameProperty == null)
-            {
-                metadata.NameProperty = properties.FirstOrDefault(x =>
+            metadata.NameProperty ??= properties.FirstOrDefault(x =>
                     x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
                         "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
-            }
 
             metadata.IsActiveProperty = ExtractInterfacePropertyFromRow(rowType,
                 new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },

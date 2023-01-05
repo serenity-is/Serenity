@@ -13,8 +13,7 @@
             cw.InBrace(delegate
             {
                 var serviceUrl = GetServiceUrlFromRoute(type);
-                if (serviceUrl == null)
-                    serviceUrl = GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
+                serviceUrl ??= GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
 
                 cw.Indented("export const baseUrl = '");
                 sb.Append(serviceUrl);

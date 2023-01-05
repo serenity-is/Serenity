@@ -81,7 +81,7 @@ namespace Serenity.TypeScript.TsTypes
 
         public string GetTextWithComments(string source = null)
         {
-            if (source == null) source = SourceStr;
+            source ??= SourceStr;
             if (Pos != null && End != null)
                 return source[(int)Pos..(int)End];
             return null;
