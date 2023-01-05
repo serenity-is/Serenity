@@ -509,6 +509,10 @@ Slick._ = (() => {
         posX: newCell
       };
     }
+    /**
+     * @param {string} dir Navigation direction.
+     * @return {boolean} Whether navigation resulted in a change of active cell.
+     */
     navigate(dir, activeRow, activeCell, activePosX) {
       var tabbingDirections = {
         up: -1,
@@ -1887,6 +1891,8 @@ Slick._ = (() => {
         delete this[k];
       }
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // General
     trigger(evt, args, e) {
       e = e || new EventData();
       args = args || {};
@@ -2180,6 +2186,8 @@ Slick._ = (() => {
     getUID() {
       return this._uid;
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Rendering / Scrolling
     getRowTop(row) {
       return this._options.rowHeight * row - this._pageOffset;
     }
@@ -2599,6 +2607,11 @@ Slick._ = (() => {
       }
       this.updateCanvasWidth(false);
     }
+    /**
+     * @param viewportTop optional viewport top
+     * @param viewportLeft optional viewport left
+     * @returns viewport range
+     */
     getViewport(viewportTop, viewportLeft) {
       return this.getVisibleRange(viewportTop, viewportLeft);
     }
@@ -2774,8 +2787,14 @@ Slick._ = (() => {
         this._rowsCache[i] = {
           rowNodeL: null,
           rowNodeR: null,
+          // ColSpans of rendered cells (by column idx).
+          // Can also be used for checking whether a cell has been rendered.
           cellColSpans: [],
+          // Cell nodes (by column idx).  Lazy-populated by ensureCellNodesInRowsCache().
           cellNodesByColumnIdx: [],
+          // Column indices of cell nodes that have been rendered, but not yet indexed in
+          // cellNodesByColumnIdx.  These are in the same order as cell nodes added at the
+          // end of the row.
           cellRenderQueue: []
         };
         this.appendRowHtml(stringArrayL, stringArrayR, i, range, dataLength);
@@ -2864,6 +2883,7 @@ Slick._ = (() => {
         }
       }
     }
+    // for usage as fallback by the groupmetadataitemprovider
     groupTotalsFormatter(p1, p2, grid) {
       return this._options.groupTotalsFormatter ? this._options.groupTotalsFormatter(p1, p2, grid != null ? grid : this) : "";
     }
@@ -3057,6 +3077,8 @@ Slick._ = (() => {
         }, speed);
       }
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Interactivity
     handleDragInit(e, dd) {
       var cell = this.getCellFromEvent(e);
       if (!cell || !this.cellExists(cell.row, cell.cell)) {
@@ -3330,6 +3352,8 @@ Slick._ = (() => {
         right: x2
       };
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Cell switching
     resetActiveCell() {
       this.setActiveCellInternal(null, false);
     }
@@ -3674,6 +3698,10 @@ Slick._ = (() => {
     navigateRowEnd() {
       return this.navigate("end");
     }
+    /**
+     * @param {string} dir Navigation direction.
+     * @return {boolean} Whether navigation resulted in a change of active cell.
+     */
     navigate(dir) {
       if (!this._options.enableCellNavigation) {
         return false;
@@ -3792,6 +3820,8 @@ Slick._ = (() => {
         this.setFocus();
       }
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // IEditor implementation for the editor lock
     commitCurrentEdit() {
       var item = this.getDataItem(this._activeRow);
       var column = this._cols[this._activeCell];

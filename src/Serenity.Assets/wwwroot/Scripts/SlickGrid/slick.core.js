@@ -111,15 +111,28 @@ Slick._ = (() => {
       this._isPropagationStopped = false;
       this._isImmediatePropagationStopped = false;
     }
+    /***
+     * Stops event from propagating up the DOM tree.
+     * @method stopPropagation
+     */
     stopPropagation() {
       this._isPropagationStopped = true;
     }
+    /***
+     * Returns whether stopPropagation was called on this event object.
+     */
     isPropagationStopped() {
       return this._isPropagationStopped;
     }
+    /***
+     * Prevents the rest of the handlers from being executed.
+     */
     stopImmediatePropagation() {
       this._isImmediatePropagationStopped = true;
     }
+    /***
+     * Returns whether stopImmediatePropagation was called on this event object.\
+     */
     isImmediatePropagationStopped() {
       return this._isImmediatePropagationStopped;
     }
@@ -128,9 +141,21 @@ Slick._ = (() => {
     constructor() {
       this._handlers = [];
     }
+    /***
+     * Adds an event handler to be called when the event is fired.
+     * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+     * object the event was fired with.<p>
+     * @method subscribe
+     * @param fn {Function} Event handler.
+     */
     subscribe(fn) {
       this._handlers.push(fn);
     }
+    /***
+     * Removes an event handler added with <code>subscribe(fn)</code>.
+     * @method unsubscribe
+     * @param fn {Function} Event handler to be removed.
+     */
     unsubscribe(fn) {
       for (var i = this._handlers.length - 1; i >= 0; i--) {
         if (this._handlers[i] === fn) {
@@ -138,6 +163,18 @@ Slick._ = (() => {
         }
       }
     }
+    /***
+     * Fires an event notifying all subscribers.
+     * @param args {Object} Additional data object to be passed to all handlers.
+     * @param e {EventData}
+     *      Optional.
+     *      An <code>EventData</code> object to be passed to all handlers.
+     *      For DOM events, an existing W3C/jQuery event object can be passed in.
+     * @param scope {Object}
+     *      Optional.
+     *      The scope ("this") within which the handler will be executed.
+     *      If not specified, the scope will be set to the <code>Event</code> instance.
+     */
     notify(args, e, scope) {
       e = patchEvent(e) || new EventData();
       scope = scope || this;
@@ -232,9 +269,22 @@ Slick._ = (() => {
 
   // src/core/editing.ts
   var EditorLock = class {
+    /***
+     * Returns true if a specified edit controller is active (has the edit lock).
+     * If the parameter is not specified, returns true if any edit controller is active.
+     * @method isActive
+     * @param editController {EditController}
+     * @return {Boolean}
+     */
     isActive(editController) {
       return editController ? this.activeEditController === editController : this.activeEditController != null;
     }
+    /***
+     * Sets the specified edit controller as the active edit controller (acquire edit lock).
+     * If another edit controller is already active, and exception will be thrown.
+     * @method activate
+     * @param editController {EditController} edit controller acquiring the lock
+     */
     activate(editController) {
       if (editController === this.activeEditController) {
         return;
@@ -250,15 +300,36 @@ Slick._ = (() => {
       }
       this.activeEditController = editController;
     }
+    /***
+     * Unsets the specified edit controller as the active edit controller (release edit lock).
+     * If the specified edit controller is not the active one, an exception will be thrown.
+     * @method deactivate
+     * @param editController {EditController} edit controller releasing the lock
+     */
     deactivate(editController) {
       if (this.activeEditController !== editController) {
         throw "SleekGrid.EditorLock.deactivate: specified editController is not the currently active one";
       }
       this.activeEditController = null;
     }
+    /***
+     * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
+     * controller and returns whether the commit attempt was successful (commit may fail due to validation
+     * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
+     * and false otherwise.  If no edit controller is active, returns true.
+     * @method commitCurrentEdit
+     * @return {Boolean}
+     */
     commitCurrentEdit() {
       return this.activeEditController ? this.activeEditController.commitCurrentEdit() : true;
     }
+    /***
+     * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
+     * controller and returns whether the edit was successfully cancelled.  If no edit controller is
+     * active, returns true.
+     * @method cancelCurrentEdit
+     * @return {Boolean}
+     */
     cancelCurrentEdit() {
       return this.activeEditController ? this.activeEditController.cancelCurrentEdit() : true;
     }
@@ -402,11 +473,37 @@ Slick._ = (() => {
     constructor() {
       super(...arguments);
       this.__group = true;
+      /**
+       * Grouping level, starting with 0.
+       * @property level
+       * @type {Number}
+       */
       this.level = 0;
+      /***
+       * Number of rows in the group.
+       * @property count
+       * @type {Number}
+       */
       this.count = 0;
+      /***
+       * Whether a group is collapsed.
+       * @property collapsed
+       * @type {Boolean}
+       */
       this.collapsed = false;
+      /**
+       * Rows that are part of the group.
+       * @property rows
+       * @type {Array}
+       */
       this.rows = [];
     }
+    /***
+     * Compares two Group instances.
+     * @method equals
+     * @return {Boolean}
+     * @param group {Group} Group instance to compare to.
+     */
     equals(group) {
       return this.value === group.value && this.count === group.count && this.collapsed === group.collapsed && this.title === group.title;
     }
@@ -415,6 +512,12 @@ Slick._ = (() => {
     constructor() {
       super(...arguments);
       this.__groupTotals = true;
+      /***
+       * Whether the totals have been fully initialized / calculated.
+       * Will be set to false for lazy-calculated group totals.
+       * @param initialized
+       * @type {Boolean}
+       */
       this.initialized = false;
     }
   };
@@ -431,15 +534,27 @@ Slick._ = (() => {
       this.toRow = Math.max(fromRow, toRow);
       this.toCell = Math.max(fromCell, toCell);
     }
+    /***
+     * Returns whether a range represents a single row.
+     */
     isSingleRow() {
       return this.fromRow == this.toRow;
     }
+    /***
+     * Returns whether a range represents a single cell.
+     */
     isSingleCell() {
       return this.fromRow == this.toRow && this.fromCell == this.toCell;
     }
+    /***
+     * Returns whether a range contains a given cell.
+     */
     contains(row, cell) {
       return row >= this.fromRow && row <= this.toRow && cell >= this.fromCell && cell <= this.toCell;
     }
+    /***
+     * Returns a readable representation of a range.
+     */
     toString() {
       if (this.isSingleCell()) {
         return "(" + this.fromRow + ":" + this.fromCell + ")";
