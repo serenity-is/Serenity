@@ -158,9 +158,12 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
             .parent().removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading');
 
             if (!results) {
-                this.element.closest('.s-QuickSearchBar')
-                    .find('.quick-search-icon i')
-                    .effect('shake', { distance: 2 });
+                var el = this.element.closest('.s-QuickSearchBar')
+                    .find('.quick-search-icon i')[0] as HTMLElement;
+                if (el) {
+                    el.classList.add('s-shake-effect');
+                    setTimeout(() => el.classList.remove('s-shake-effect'), 2000);
+                }
             }
         };
 
