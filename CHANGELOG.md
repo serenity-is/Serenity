@@ -1,4 +1,39 @@
+## 6.4.3 (2023-01-07)
+
+> Release Notes: https://serenity.is/docs/release-notes/6.4.3
+
+Features:
+  - Flutter based mobile applications for Android/iOS [StartSharp Enterprise]
+  - OpenIddict integration and JWT authentication options [StartSharp]
+  - Introduced AutoValidateAntiforgeryIgnoreBearerFilter attribute which can be used in place of AutoValidateAntiforgeryAttribute and will skip anti-forgery validation when the request contains an `Authentication: Bearer` header and there are no cookie headers.
+  - New Glassy Light theme [StartSharp]
+  - Improved handling for type registries like `EnumTypeRegistry`, `EditorTypeRegistry`, and `FormatterTypeRegistry`. Improved error messages that are displayed when a type cannot be found. They can now discover types that are registered after the type initialization process is completed. Use a common base type registry for all type registries to make it consistent.
+  - [BREAKING CHANGE] `Q.getTypeName` is renamed to `Q.getTypeShortName`. Got rid of some static type properties like __typeName$, __metadata$ etc. that is no longer necessary. Used defineproperty for system related props like __typeName etc. to make them non enumerable
+  - [BREAKING CHANGE] toastr notification functions like `Q.notifyError` and `Q.notifyInfo` will escape HTML by default. This is to avoid possible script injection attacks. Pass `escapeHtml: false` if you need the old behavior.
+  - Removed jQuery ScrollIntoView hard-coded dependency and use it only if it is available. You may remove `jquery.scrollintoview.js` from `appsettings.bundles.json`.
+  - Removed `jquery.iframe-transport.js` dependency. You may remove it from your `appsettings.bundles.json` as it is only used by jquery.upload plugin for very old browsers like IE9 etc.
+  - Serenity.Pro.UI.js dependency as it is only used for legacy `EmailClient` sample.
+  - Removed TemplateBundle from `appsettings.bundles.json`, introduced ColumnAndFormBundle that combines `ColumnsBundle` and `FormBundle`.
+  - Rewrote Dashboard with ES Modules [StartSharp]
+  - GroupItemMetadataProvider SleekGrid plugin is ported to ES Modules. Slick.Data.GroupItemMetadataProvider is now obsolete, use GroupItemMetadataProvider from "@serenity-is/sleekgrid" or Slick.GroupItemMetadataProvider
+  - Q.alert, Q.confirm, etc. methods are suffixed with `Dialog` to avoid mixing up with the browser methods, e.g. `Q.alertDialog`, `Q.confirmDialog`. Old methods are still available but obsolete.
+  - TsBuild trigger argument is now obsolete. You should change `prepare` script in `package.json` file with `dotnet build -target:RestoreTypings`
+  - [BREAKING CHANGE] Some row properties are only available via IRow or IEditableRow interface. Introduced IEditableRow and instead of making desktop UI editing (e.g. WPF INotifyPropertyChanged, IsAnyFieldChanged, IsEditing) etc. related properties / methods of row instances only accessible via this interface. They were confusing and polluting the row interface in web applications where they were almost never used. Cast the row instance like ((IEditableRow)row).BeginEdit() etc to access them if ever used. Similary, "IdField, IgnoreConstraints, NameField, Table, TrackAssignments, TrackWithChecks, GetDictionaryData, GetDictionaryDataKeys, SetDictionaryData" properties and fields can only be accessed via IRow interface. This is done to avoid polluting intellisense list as they are very rarely used, and as a preparation to fix swagger / apiexplorer integration
+  - [BREAKING CHANGE] rename MethodChainingExtensions to ChainableExtensions and only support single action overload as that is the only one which is used anywhere so far
+  - [BREAKING CHANGE] make rarely used ValidateEnum and ValidateDateRange methods non-extension methods so they don't come up in the intellisense for rows. Not a breaking change unless you used them as extension methods.
+  - improved binding convention of IDbConnection and IUnitOfWork and ServiceRequest types in ServiceEndpoints so that api browsers like swagger etc. can analyse it better and not crash
+  - [BREAKING CHANGE] `Slick.Event` is renamed to `Slick.EventEmitter`, and `Slick.EventHandler` is renamed to `Slick.EventSubscriber`, `Slick.Handler` is renamed to `Slick.EventListener` to avoid mixing up with browser types with same names.
+  - Introduced TransactionSettingsAttribute and added a TransactionSettings which can be configured via options pattern. ServiceEndpoint will check the attribute or transaction settings like IsolationLevel. The attribute, settings and the UnitOfWork object has a DeferStart option that defers starting the transaction until the Connection is opened. This flag might have undesired side effects, so use it at your own risk if you know what you are doing.
+  - Added the TransactionlessUnitOfWork which is an implementation of IUnitOfWork that does not actually start any transaction. Should only be used in edge cases to call methods that expect a IUnitOfWork instance, but you are sure that the whole operation will be readonly, or you don't really need a transaction. If using with save handlers etc it might be risky. Make sure there are no service behaviors that run behind the scenes which may write or require a transaction.
+  - Improved `TSTypeLister` performance by making it not dive into huge directories like `node_modules` if not needed.
+  
+Bugfixes:
+  - use Object.prototype.hasOwnProperty and fix field proxy detected as class
+  - fix handling for dynamic property, https://github.com/serenity-is/Serenity/issues/6624
+
 ## 6.4.2 (2022-12-09)
+
+> Release Notes: https://serenity.is/docs/release-notes/6.4.2
 
 Bugfixes:
   - fix script null reference issue with MultipleFileUploadEditors
@@ -88,6 +123,8 @@ Bugfixes:
   - possible null reference exception in sergen when combination types used as interfaces
 
 ## 6.3.0 (2022-11-06)
+
+> Release Notes: https://serenity.is/docs/release-notes/6.3.0
 
 Features:
   - ported all common features projects to ES modules, including Serenity.Extensions, Serenity.Demo.BasicSamples, Serenity.Demo.Northwind
