@@ -1,3 +1,9 @@
+## 6.4.4 (2023-01-08)
+
+Bugfixes:
+  - Removed corelib/coverage folder from Serenity.Scripts nuget contents
+  
+
 ## 6.4.3 (2023-01-07)
 
 > Release Notes: https://serenity.is/docs/release-notes/6.4.3
