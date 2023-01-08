@@ -8,7 +8,7 @@
     <Title>Serenity Platform - Scripts</Title>
     <Description>Contains Serenity scripts and CSS file</Description>
     <StaticWebAssetBasePath>/Serenity.Scripts</StaticWebAssetBasePath>
-    <DefaultItemExcludes>node_modules/**;corelib/node_modules/**;tsbuild/node_modules/**;$(DefaultItemExcludes);</DefaultItemExcludes>
+    <DefaultItemExcludes>**\node_modules\**;**\coverage\**;$(DefaultItemExcludes);</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +35,7 @@
     <None Remove="node_modules\**" />
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
-    <TypeScriptCompile Remove="corelib\out\**;node_modules\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
+    <TypeScriptCompile Remove="**\node_modules\**;*\out\**;*\dist\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
     <ToCompileCoreLib Include="corelib\src\**\*.ts;corelib\src\tsconfig.json;corelib\build\build.js;corelib\node_modules\@serenity-is\*\*.d.ts;corelib\rollup.config.js;corelib\package.json"></ToCompileCoreLib>
     <NpmPackageFile Include="corelib\package.json" />
