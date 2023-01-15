@@ -50,14 +50,14 @@
         /// </summary>
         public string LookupKey
         {
-            get { return GetOption<string>("lookupKey"); }
+            get { return GetOption<string>("lookupKey")!; }
             set { SetOption("lookupKey", value); }
         }
 
         /// <summary>
         /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
         /// </summary>
-        public string CascadeFrom
+        public string? CascadeFrom
         {
             get { return GetOption<string>("cascadeFrom"); }
             set { SetOption("cascadeFrom", value); }
@@ -68,7 +68,7 @@
         /// Make sure you have [LookupInclude] attribute on this field of lookup row,
         /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
-        public object CascadeField
+        public object? CascadeField
         {
             get { return GetOption<string>("cascadeField"); }
             set { SetOption("cascadeField", value); }
@@ -78,7 +78,7 @@
         /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
         /// If null or empty, and CascadeField is set, all items are filtered
         /// </summary>
-        public object CascadeValue
+        public object? CascadeValue
         {
             get { return GetOption<string>("cascadeValue"); }
             set { SetOption("cascadeValue", value); }
@@ -89,7 +89,7 @@
         /// Make sure you have [LookupInclude] attribute on this field of lookup row,
         /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
-        public object FilterField
+        public object? FilterField
         {
             get { return GetOption<string>("filterField"); }
             set { SetOption("filterField", value); }
@@ -98,7 +98,7 @@
         /// <summary>
         /// Optional filtering value, e.g. the integer value of GroupID. If null or empty string no filtering occurs.
         /// </summary>
-        public object FilterValue
+        public object? FilterValue
         {
             get { return GetOption<string>("filterValue"); }
             set { SetOption("filterValue", value); }

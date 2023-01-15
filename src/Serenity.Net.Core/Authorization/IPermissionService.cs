@@ -1,5 +1,4 @@
-﻿
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Permission service abstraction

@@ -12,7 +12,7 @@
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        public FormatterOptionAttribute(string key, object value)
+        public FormatterOptionAttribute(string key, object? value)
         {
             Key = key;
             Value = value;
@@ -32,6 +32,6 @@
         /// <value>
         /// The option value.
         /// </value>
-        public object Value { get; private set; }
+        public object? Value { get; private set; }
     }
 }

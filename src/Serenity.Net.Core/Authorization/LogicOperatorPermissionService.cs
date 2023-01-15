@@ -10,7 +10,7 @@
     /// registrar.RegisterInstance&lt;IPermissionService&gt;(new LogicOperatorPermissionService(new MyPermissionService()))
     /// </code>
     /// </remarks>
-    public partial class LogicOperatorPermissionService : IPermissionService
+    public class LogicOperatorPermissionService : IPermissionService
     {
         private static readonly char[] chars = new char[] { '|', '&', '!', '(', ')' };
         private readonly IPermissionService permissionService;

@@ -12,7 +12,7 @@
         /// <param name="permission">The permission.</param>
         public PermissionAttributeBase(object permission)
         {
-            Permission = permission?.ToString();
+            Permission = permission.ToString();
         }
 
         /// <summary>

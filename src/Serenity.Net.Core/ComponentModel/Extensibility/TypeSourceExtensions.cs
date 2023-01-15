@@ -12,6 +12,9 @@
         public static IEnumerable<TAttribute> GetAssemblyAttributes<TAttribute>(this ITypeSource typeSource)
             where TAttribute: Attribute
         {
+            if (typeSource is null) 
+                throw new ArgumentNullException(nameof(typeSource));
+
             return typeSource.GetAssemblyAttributes(typeof(TAttribute)).Cast<TAttribute>();
         }
     }

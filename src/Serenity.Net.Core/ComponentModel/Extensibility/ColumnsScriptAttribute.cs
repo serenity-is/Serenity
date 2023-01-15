@@ -26,8 +26,8 @@
         /// <exception cref="ArgumentNullException">key</exception>
         public ColumnsScriptAttribute(string key)
         {
-            if (key.IsEmptyOrNull())
-                throw new ArgumentNullException("key");
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
 
             Key = key;
         }
@@ -38,6 +38,6 @@
         /// <value>
         /// The key.
         /// </value>
-        public string Key { get; private set; }
+        public string? Key { get; private set; }
     }
 }

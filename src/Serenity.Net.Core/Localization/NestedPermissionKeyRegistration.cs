@@ -13,7 +13,7 @@
         /// Gets permission keys and adds texts if any from static nested permission key 
         /// classes marked with NestedPermissionKeys attribute.
         /// </summary>
-        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, 
+        public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry? registry, 
             ITypeSource typeSource)
         {
             if (typeSource == null)
@@ -34,7 +34,7 @@
 
         private static readonly char[] splitChar = new char[] { '|', '&' };
 
-        private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry registry, 
+        private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry? registry, 
             Type type, string languageID)
         {
             var thisKeys = new List<string>();
@@ -84,7 +84,7 @@
                     lastColonIndex < thisKeys[0].Length - 1 &&
                     thisKeys.TrueForAll(x => x.LastIndexOf(":") == lastColonIndex))
                 {
-                    registry.Add(languageID, "Permission." + thisKeys[0].Substring(0, lastColonIndex + 1), displayName.DisplayName);
+                    registry.Add(languageID, "Permission." + thisKeys[0][..(lastColonIndex + 1)], displayName.DisplayName);
                 }
             }
 

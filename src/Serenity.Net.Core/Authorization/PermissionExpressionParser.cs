@@ -34,6 +34,9 @@
         /// <returns>List of tokens</returns>
         public static IEnumerable<string> Tokenize(string expression)
         {
+            if (expression is null)
+                throw new ArgumentNullException(nameof(expression));
+
             var token = new StringBuilder();
 
             for (var index = 0; index < expression.Length; index++)
@@ -67,6 +70,9 @@
         /// <returns>Tokens in RPN notation</returns>
         public static IEnumerable<string> ShuntingYard(IEnumerable<string> tokens)
         {
+            if (tokens == null)
+                throw new ArgumentNullException(nameof(tokens));
+
             var stack = new Stack<string>();
             foreach (var token in tokens)
             {
@@ -124,6 +130,12 @@
         /// <returns>True if expression evaluates to true</returns>
         public static bool Evaluate(IEnumerable<string> rpnTokens, Func<string, bool> hasPermission)
         {
+            if (rpnTokens is null)
+                throw new ArgumentNullException(nameof(rpnTokens));
+
+            if (hasPermission == null)
+                throw new ArgumentNullException(nameof(hasPermission));
+
             var stack = new Stack<bool>();
 
             foreach (var token in rpnTokens)

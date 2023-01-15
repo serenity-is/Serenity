@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Serenity
@@ -16,7 +17,7 @@ namespace Serenity
         ///   String.</param>
         /// <returns>
         ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
-        public static bool IsEmptyOrNull(this string str)
+        public static bool IsEmptyOrNull([NotNullWhen(false)] this string? str)
         {
             return string.IsNullOrEmpty(str);
         }
@@ -30,7 +31,7 @@ namespace Serenity
         ///   String.</param>
         /// <returns>
         ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
-        public static bool IsNullOrEmpty(this string str)
+        public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str)
         {
             return string.IsNullOrEmpty(str);
         }
@@ -46,7 +47,7 @@ namespace Serenity
         ///   String.</param>
         /// <returns>
         ///   If string is null, empty or contains only white space, <c>true</c></returns>
-        public static bool IsTrimmedEmpty(this string str)
+        public static bool IsTrimmedEmpty([NotNullWhen(false)] this string? str)
         {
             return TrimToNull(str) == null;
         }
@@ -65,7 +66,7 @@ namespace Serenity
         ///   String to be trimmed.</param>
         /// <returns>
         ///   Trimmed string, result is null if empty.</returns>
-        public static string TrimToNull(this string str)
+        public static string? TrimToNull(this string? str)
         {
             if (str.IsNullOrEmpty())
                 return null;
@@ -91,7 +92,7 @@ namespace Serenity
         ///   String to be trimmed.</param>
         /// <returns>
         ///   Trimmed string (result won't be null).</returns>
-        public static string TrimToEmpty(this string str)
+        public static string TrimToEmpty(this string? str)
         {
             if (str.IsNullOrEmpty())
                 return string.Empty;
@@ -112,7 +113,7 @@ namespace Serenity
         ///   String 2.</param>
         /// <returns>
         ///   If two strings are same trimmed, true</returns>
-        public static bool IsTrimmedSame(this string string1, string string2)
+        public static bool IsTrimmedSame(this string? string1, string? string2)
         {
             if ((string1 == null || string1.Length == 0) &&
                 (string2 == null || string2.Length == 0))
@@ -133,7 +134,7 @@ namespace Serenity
         ///   it is trimmed to be under this limit in length including "the three dots".</param>
         /// <returns>
         ///   <paramref name="str"/> itself, or trimmed and three dotted string</returns>
-        public static string ThreeDots(this string str, int maxLength)
+        public static string ThreeDots(this string? str, int maxLength)
         {
             if (str == null)
                 return string.Empty;
@@ -155,7 +156,7 @@ namespace Serenity
         /// </summary>
         /// <param name="str">The string.</param>
         /// <returns>Single lined string.</returns>
-        public static string ToSingleLine(this string str)
+        public static string ToSingleLine(this string? str)
         {
             return str.TrimToEmpty().Replace("\r\n", " ").Replace("\n", " ").Trim();
         }
@@ -285,7 +286,7 @@ namespace Serenity
         /// <param name="startIndex">The start index.</param>
         /// <param name="maxLength">The maximum length.</param>
         /// <returns>Substring or empty string.</returns>
-        public static string SafeSubstring(this string value, int startIndex, int maxLength)
+        public static string SafeSubstring(this string? value, int startIndex, int maxLength)
         {
             if (value.IsNullOrEmpty())
                 return string.Empty;
@@ -400,7 +401,7 @@ namespace Serenity
         /// <param name="empty">The string to show when the source is <c>null</c>. 
         /// If <c>null</c> an empty string is returned</param>
         /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
-        public static string ToStringDefault<T>(this T? source, string format = null, IFormatProvider provider = null, string empty = null)
+        public static string ToStringDefault<T>(this T? source, string? format = null, IFormatProvider? provider = null, string? empty = null)
             where T : struct, IFormattable
         {
             if (source.HasValue)
@@ -420,7 +421,7 @@ namespace Serenity
         /// <param name="empty">The string to show when the source is <c>null</c>. 
         /// If <c>null</c> an empty string is returned</param>
         /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
-        public static string ToStringDefault<T>(this T source, string format = null, IFormatProvider provider = null, string empty = null)
+        public static string ToStringDefault<T>(this T source, string? format = null, IFormatProvider? provider = null, string? empty = null)
             where T : class, IFormattable
         {
             if (source != null)

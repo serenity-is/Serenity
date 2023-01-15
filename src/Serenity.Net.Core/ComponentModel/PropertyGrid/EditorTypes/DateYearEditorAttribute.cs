@@ -27,7 +27,7 @@
         /// <value>
         /// The maximum year.
         /// </value>
-        public string MaxYear
+        public string? MaxYear
         {
             get { return GetOption<string>("maxYear"); }
             set { SetOption("maxYear", value); }
@@ -41,7 +41,7 @@
         /// <value>
         /// The minimum year. 
         /// </value>
-        public string MinYear
+        public string? MinYear
         {
             get { return GetOption<string>("minYear"); }
             set { SetOption("minYear", value); }

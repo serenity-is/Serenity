@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="key">Local text key</param>
         /// <returns>Translated text or null if no translation found in the context language</returns>
-        string TryGet(string key);
+        string? TryGet(string key);
     }
 }

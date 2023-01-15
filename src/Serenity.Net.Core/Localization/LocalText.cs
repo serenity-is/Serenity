@@ -25,9 +25,9 @@
         /// Creates a new LocalText instance that contains the specified local text key
         /// </summary>
         /// <param name="key">Local text key</param>
-        public LocalText(string key)
+        public LocalText(string? key)
         {
-            Key = key;
+            Key = key ?? string.Empty;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@
         /// Implicit conversion from String that creates a new instance of LocalText with the specified key.
         /// </summary>
         /// <param name="key">Local text key</param>
-        public static implicit operator LocalText(string key)
+        public static implicit operator LocalText(string? key)
         {
             return string.IsNullOrEmpty(key) ? Empty : new LocalText(key);
         }
@@ -58,7 +58,7 @@
         /// <summary>
         /// Returns the translation for current context
         /// </summary>   
-        public string ToString(ITextLocalizer localizer)
+        public string ToString(ITextLocalizer? localizer)
         {
             return localizer?.TryGet(Key) ?? Key;
         }

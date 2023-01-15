@@ -14,7 +14,7 @@ public interface IFilenameFormatSanitizer
     /// </summary>
     /// <param name="key">Key for placeholder, e.g. field name</param>
     /// <param name="value">Value for placeholder, e.g. field value</param>
-    string SanitizePlaceholder(string key, string value);
+    string SanitizePlaceholder(string key, string? value);
 
     /// <summary>
     /// Sanitizes the formatting result, usually by replacing double

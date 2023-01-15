@@ -21,7 +21,7 @@
         /// </summary>
         /// <param name="key">Local text key</param>
         /// <returns>Translated text or null if no translation found in the context language</returns>
-        public string TryGet(string key)
+        public string? TryGet(string key)
         {
             return registry.TryGet(CultureInfo.CurrentUICulture.Name, key, false);
         }

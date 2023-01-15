@@ -15,9 +15,9 @@ namespace Serenity.Localization
     /// </remarks>
     public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
-        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<ItemKey, string?> approvedTexts = new(ItemKeyComparer.Default);
 
-        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<ItemKey, string?> pendingTexts = new(ItemKeyComparer.Default);
 
         private readonly ConcurrentDictionary<string, string> languageFallbacks = new(StringComparer.OrdinalIgnoreCase);
 
@@ -27,7 +27,7 @@ namespace Serenity.Localization
         /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
         /// <param name="key">Local text key</param>
         /// <param name="text">Translated text</param>
-        public void Add(string languageID, string key, string text)
+        public void Add(string languageID, string key, string? text)
         {
             if (languageID == null)
                 throw new ArgumentNullException(nameof(languageID));
@@ -63,9 +63,9 @@ namespace Serenity.Localization
         /// null is returned. See SetLanguageFallback for information about language fallbacks.
         /// </summary>
         /// <param name="languageID">Language ID.</param>
-        /// <param name="textKey">Local text key (can be null).</param>
+        /// <param name="textKey">Local text key</param>
         /// <param name="pending">If pending approval texts to be used, true.</param>
-        public string TryGet(string languageID, string textKey, bool pending)
+        public string? TryGet(string languageID, string textKey, bool pending)
         {
             if (languageID == null)
                 throw new ArgumentNullException(nameof(languageID));
@@ -76,7 +76,7 @@ namespace Serenity.Localization
             // create a key to lookup by language and text key pair
             var k = new ItemKey(languageID, textKey);
 
-            string s;
+            string? s;
 
             if (pending)
             {
@@ -188,7 +188,7 @@ namespace Serenity.Localization
             languageFallbacks[languageID] = languageFallbackID ?? throw new ArgumentNullException(nameof(languageFallbackID));
         }
 
-        private string TryGetLanguageFallback(string languageID)
+        private string? TryGetLanguageFallback(string languageID)
         {
             if (languageFallbacks.TryGetValue(languageID, out string fallback))
                 return fallback;
@@ -219,7 +219,7 @@ namespace Serenity.Localization
                 throw new ArgumentNullException(nameof(languageID));
 
             var texts = new Dictionary<string, string>();
-            string text;
+            string? text;
 
             var currentID = languageID;
             int tries = 0;
@@ -286,7 +286,7 @@ namespace Serenity.Localization
 
         private class ItemKeyComparer : IEqualityComparer<ItemKey>
         {
-            public static readonly ItemKeyComparer Default = new ItemKeyComparer();
+            public static readonly ItemKeyComparer Default = new();
 
             public bool Equals(ItemKey lhs, ItemKey rhs)
             {

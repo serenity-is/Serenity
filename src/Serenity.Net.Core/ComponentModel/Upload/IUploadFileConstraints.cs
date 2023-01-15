@@ -17,13 +17,13 @@ public interface IUploadFileConstraints : IUploadOptions
     /// This is currently only used by the upload behavior,
     /// the editor and temporary upload does not yet use this setting.
     /// </summary>
-    public string AllowedExtensions { get; }
+    public string? AllowedExtensions { get; }
 
     /// <summary>
     /// Contains extensions that are considered dangerous / disallowed.
     /// Default is ".asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.dll;.jar;.jsp;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs"
     /// </summary>
-    public string ExtensionBlacklist { get; }
+    public string? ExtensionBlacklist { get; }
 
     /// <summary>
     /// Semicolon separated list of image extensions. The default list is 
@@ -35,7 +35,7 @@ public interface IUploadFileConstraints : IUploadOptions
     /// Note that if AllowNonImage is false, only these extensions are
     /// allowed and only if they contain a valid image.
     /// </summary>
-    public string ImageExtensions { get; }
+    public string? ImageExtensions { get; }
 
     /// <summary>
     /// Maximum size in bytes of the uploaded file.

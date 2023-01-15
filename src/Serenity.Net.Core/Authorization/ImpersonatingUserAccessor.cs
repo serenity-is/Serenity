@@ -23,9 +23,9 @@ namespace Serenity.Web
             requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
         }
 
-        private Stack<ClaimsPrincipal> GetImpersonationStack(bool createIfNull)
+        private Stack<ClaimsPrincipal>? GetImpersonationStack(bool createIfNull)
         {
-            Stack<ClaimsPrincipal> stack;
+            Stack<ClaimsPrincipal>? stack;
             var requestItems = requestContext.Items;
 
             if (requestItems != null)
@@ -47,7 +47,7 @@ namespace Serenity.Web
         /// <summary>
         /// Return current user
         /// </summary>
-        public ClaimsPrincipal User
+        public ClaimsPrincipal? User
         {
             get
             {
@@ -69,7 +69,7 @@ namespace Serenity.Web
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            var impersonationStack = GetImpersonationStack(true);
+            var impersonationStack = GetImpersonationStack(true)!;
             impersonationStack.Push(user);
         }
 

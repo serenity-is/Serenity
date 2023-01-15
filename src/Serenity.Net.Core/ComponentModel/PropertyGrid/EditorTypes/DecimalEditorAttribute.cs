@@ -39,7 +39,7 @@
         /// <value>
         /// The maximum value.
         /// </value>
-        public object MaxValue
+        public object? MaxValue
         {
             get { return GetOption<string>("maxValue"); }
             set { SetOption("maxValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }
@@ -51,7 +51,7 @@
         /// <value>
         /// The minimum value.
         /// </value>
-        public object MinValue
+        public object? MinValue
         {
             get { return GetOption<string>("minValue"); }
             set { SetOption("minValue", value == null ? null : Convert.ToString(value, CultureInfo.InvariantCulture)); }

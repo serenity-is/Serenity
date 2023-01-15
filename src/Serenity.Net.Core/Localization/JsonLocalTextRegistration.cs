@@ -60,7 +60,7 @@ namespace Serenity.Localization
         /// <param name="registry">Registry</param>
         /// <param name="path">Path containing JSON files</param>
         /// <param name="fileSystem">File system</param>
-        public static void AddJsonTexts(this ILocalTextRegistry registry, string path, IFileSystem fileSystem = null)
+        public static void AddJsonTexts(this ILocalTextRegistry registry, string path, IFileSystem? fileSystem = null)
         {
             if (registry is null)
                 throw new ArgumentNullException(nameof(registry));
@@ -78,7 +78,7 @@ namespace Serenity.Localization
 
             foreach (var file in files)
             {
-                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(fileSystem.ReadAllText(file).TrimToNull() ?? "{}");
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? new();
                 var langID = fileSystem.GetFileNameWithoutExtension(fileSystem.GetFileName(file));
 
                 var idx = langID.LastIndexOf(".");

@@ -34,12 +34,12 @@
         /// If specified this annotation only applies to types in the namespaces 
         /// and their sub namespaces if namespace ends with ".*"
         /// </summary>
-        public string[] Namespaces { get; set; }
+        public string[]? Namespaces { get; set; }
 
         /// <summary>
         /// If specified, this annotation matches the type only if it has all the
         /// properties listed in this array.
         /// </summary>
-        public string[] Properties { get; set; }
+        public string[]? Properties { get; set; }
     }
 }

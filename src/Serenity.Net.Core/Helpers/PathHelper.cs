@@ -15,16 +15,16 @@ namespace Serenity
         /// </summary>
         /// <param name="relativePath">Relative path</param>
         /// <returns>True if relative path looks safe</returns>
-        public static bool IsSecureRelativePath(string relativePath)
+        public static bool IsSecureRelativePath(string? relativePath)
         {
             var trim = relativePath.TrimToNull();
 
             return !(trim == null ||
                 trim == "." ||
                 trim == ".." ||
-                relativePath.IndexOf("../", StringComparison.Ordinal) >= 0 ||
-                relativePath.IndexOf("..\\", StringComparison.Ordinal) >= 0 ||
-                relativePath.IndexOf(':') >= 0 ||
+                relativePath!.IndexOf("../", StringComparison.Ordinal) >= 0 ||
+                relativePath!.IndexOf("..\\", StringComparison.Ordinal) >= 0 ||
+                relativePath!.IndexOf(':') >= 0 ||
                 trim.StartsWith("/") ||
                 trim.StartsWith("\\") ||
                 Path.IsPathRooted(relativePath) ||
@@ -57,12 +57,12 @@ namespace Serenity
         /// </summary>
         /// <param name="relativeFile">Relative file</param>
         /// <returns>True if relative file looks safe</returns>
-        public static bool IsSecureRelativeFile(string relativeFile)
+        public static bool IsSecureRelativeFile(string? relativeFile)
         {
             if (!IsSecureRelativePath(relativeFile))
                 return false;
 
-            var trimRight = relativeFile.TrimEnd();
+            var trimRight = relativeFile!.TrimEnd();
             if (trimRight.EndsWith('/') || trimRight.EndsWith('\\'))
                 return false;
 
@@ -73,7 +73,7 @@ namespace Serenity
         /// Validates if filename is a secure relative file
         /// </summary>
         /// <param name="filename">Relative filename</param>
-        public static void ValidateSecureRelativeFile(string filename)
+        public static void ValidateSecureRelativeFile(string? filename)
         {
             if (!IsSecureRelativeFile(filename))
                 throw new ArgumentOutOfRangeException(nameof(filename));
@@ -85,7 +85,7 @@ namespace Serenity
         ///   Filename.</param>
         /// <returns>
         ///   Converted filename.</returns>
-        public static string ToUrl(string fileName)
+        public static string? ToUrl(string? fileName)
         {
             if (fileName != null && fileName.IndexOf('\\') >= 0)
                 return fileName.Replace('\\', '/');
@@ -99,7 +99,7 @@ namespace Serenity
         ///   Filename.</param>
         /// <returns>
         ///   Converted filename.</returns>
-        public static string ToPath(string fileName)
+        public static string? ToPath(string? fileName)
         {
             var separator = Path.DirectorySeparatorChar;
             var opposite = separator == '/' ? '\\' : '/';

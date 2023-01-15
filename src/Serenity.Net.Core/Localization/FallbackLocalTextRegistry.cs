@@ -24,9 +24,9 @@
         /// <param name="languageID">Language identifier</param>
         /// <param name="pending">If pending approval text should be used</param>
         /// <returns></returns>
-        public string TryGet(string languageID, string key, bool pending)
+        public string? TryGet(string languageID, string key, bool pending)
         {
-            string text = source.TryGet(languageID, key, pending);
+            string? text = source.TryGet(languageID, key, pending);
 
             if (!string.IsNullOrEmpty(text) || string.IsNullOrEmpty(key))
                 return text;
@@ -36,7 +36,7 @@
             foreach (var suffix in suffixes)
                 if (key.EndsWith(suffix))
                 {
-                    key = key.Substring(0, key.Length - suffix.Length);
+                    key = key[..^suffix.Length];
 
                     text = source.TryGet(languageID, key, pending);
                     if (!string.IsNullOrEmpty(text))
@@ -46,14 +46,14 @@
                 }
 
             // Fallback to a sub-key (e.g. if Enums.Month.June not found, then try get June instead)
-            key = TryGetKeyFallback(key);
-            if (!string.IsNullOrEmpty(key))
+            var fbKey = TryGetKeyFallback(key);
+            if (!string.IsNullOrEmpty(fbKey))
             {
-                text = source.TryGet(languageID, key, pending);
+                text = source.TryGet(languageID, fbKey, pending);
                 if (!string.IsNullOrEmpty(text))
                     return text;
 
-                return BreakUpString(key);
+                return BreakUpString(fbKey);
             }
 
             return null;
@@ -64,7 +64,7 @@
         /// </summary>
         /// <param name="key">Local text key</param>
         /// <returns>Local text key fallback</returns>
-        public static string TryGetKeyFallback(string key)
+        public static string? TryGetKeyFallback(string key)
         {
             // Get last part of the key after the last dot
             var lastDot = key.LastIndexOf('.');
@@ -104,7 +104,7 @@
         /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
         /// <param name="key">Local text key</param>
         /// <param name="text">Translated text</param>
-        public void Add(string languageID, string key, string text)
+        public void Add(string languageID, string key, string? text)
         {
             source.Add(languageID, key, text);
         }

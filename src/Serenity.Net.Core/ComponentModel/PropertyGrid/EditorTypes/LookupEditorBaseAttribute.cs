@@ -18,7 +18,7 @@
         /// <summary>
         /// Lookup key, e.g. Northwind.CustomerCity
         /// </summary>
-        public string LookupKey
+        public string? LookupKey
         {
             get { return GetOption<string>("lookupKey"); }
             set { SetOption("lookupKey", value); }
@@ -48,7 +48,7 @@
         /// <summary>
         /// Permission required to use inplace add / edit
         /// </summary>
-        public string InplaceAddPermission
+        public string? InplaceAddPermission
         {
             get { return GetOption<string>("inplaceAddPermission"); }
             set { SetOption("inplaceAddPermission", value); }
@@ -60,7 +60,7 @@
         /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
         /// than lookup key, set this to classname, e.g. "MyModule.MyDialog"
         /// </summary>
-        public string DialogType
+        public string? DialogType
         {
             get { return GetOption<string>("dialogType"); }
             set { SetOption("dialogType", value); }
@@ -69,7 +69,7 @@
         /// <summary>
         /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
         /// </summary>
-        public string CascadeFrom
+        public string? CascadeFrom
         {
             get { return GetOption<string>("cascadeFrom"); }
             set { SetOption("cascadeFrom", value); }
@@ -80,7 +80,7 @@
         /// Make sure you have [LookupInclude] attribute on this field of lookup row,
         /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
-        public object CascadeField
+        public string? CascadeField
         {
             get { return GetOption<string>("cascadeField"); }
             set { SetOption("cascadeField", value); }
@@ -90,7 +90,7 @@
         /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
         /// If null or empty, and CascadeField is set, all items are filtered
         /// </summary>
-        public object CascadeValue
+        public object? CascadeValue
         {
             get { return GetOption<string>("cascadeValue"); }
             set { SetOption("cascadeValue", value); }
@@ -101,7 +101,7 @@
         /// Make sure you have [LookupInclude] attribute on this field of lookup row,
         /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
-        public object FilterField
+        public string? FilterField
         {
             get { return GetOption<string>("filterField"); }
             set { SetOption("filterField", value); }
@@ -110,9 +110,9 @@
         /// <summary>
         /// Optional filtering value, e.g. the integer value of GroupID. If null or empty string no filtering occurs.
         /// </summary>
-        public object FilterValue
+        public object? FilterValue
         {
-            get { return GetOption<string>("filterValue"); }
+            get { return GetOption<object?>("filterValue"); }
             set { SetOption("filterValue", value); }
         }
 

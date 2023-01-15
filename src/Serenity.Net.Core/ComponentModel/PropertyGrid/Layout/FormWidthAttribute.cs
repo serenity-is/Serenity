@@ -18,7 +18,7 @@
         /// like col-md-6 col-sm-4 etc.
         /// </summary>
         /// <param name="cssClass"></param>
-        public FormWidthAttribute(string cssClass)
+        public FormWidthAttribute(string? cssClass)
         {
             Value = cssClass;
         }
@@ -62,7 +62,7 @@
         /// <summary>
         /// Gets the css class that will be applied to field
         /// </summary>
-        public string Value { get; protected set; }
+        public string? Value { get; protected set; }
 
         /// <summary>
         /// Applies this form width (e.g. bootstrap grid size) to all 

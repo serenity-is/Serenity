@@ -21,7 +21,7 @@
         /// Initializes a new instance of the <see cref="LabelWidthAttribute"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public LabelWidthAttribute(string value)
+        public LabelWidthAttribute(string? value)
         {
             Value = value;
         }
@@ -32,7 +32,7 @@
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; private set; }
+        public string? Value { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this attribute should apply 

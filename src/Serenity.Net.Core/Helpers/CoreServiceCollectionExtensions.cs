@@ -14,13 +14,16 @@ namespace Serenity.Extensions.DependencyInjection
         /// Adds memory caching as ILocalCache implementation and a distributed cache
         /// emulator as IDistributed cache implementation.
         /// </summary>
-        /// <param name="collection">The service collection.</param>
-        public static IServiceCollection AddCaching(this IServiceCollection collection)
+        /// <param name="services">The service collection.</param>
+        public static IServiceCollection AddCaching(this IServiceCollection services)
         {
-            collection.AddMemoryCache();
-            collection.AddDistributedMemoryCache();
-            collection.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
-            return collection;
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.AddMemoryCache();
+            services.AddDistributedMemoryCache();
+            services.TryAddSingleton<ITwoLevelCache, TwoLevelCache>();
+            return services;
         }
 
         /// <summary>
@@ -29,6 +32,9 @@ namespace Serenity.Extensions.DependencyInjection
         /// <param name="services">The services.</param>
         public static void AddTextRegistry(this IServiceCollection services)
         {
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
             services.TryAddSingleton<ILocalTextRegistry, LocalTextRegistry>();
             services.TryAddSingleton<ITextLocalizer, DefaultTextLocalizer>();
         }
@@ -39,6 +45,9 @@ namespace Serenity.Extensions.DependencyInjection
         /// <param name="services">The services.</param>
         public static void AddAnnotationTypes(this IServiceCollection services)
         {
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
             services.TryAddSingleton<IAnnotationTypeRegistry, AnnotationTypeRegistry>();
         }
 
@@ -49,6 +58,9 @@ namespace Serenity.Extensions.DependencyInjection
         /// <param name="assemblies">List of assembles</param>
         public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies)
         {
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
             services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies));
         }
 
@@ -58,6 +70,9 @@ namespace Serenity.Extensions.DependencyInjection
         /// <param name="services">The services.</param>
         public static void AddServiceResolver(this IServiceCollection services)
         {
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
             services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
         }
     }

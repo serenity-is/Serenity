@@ -1,4 +1,5 @@
-﻿namespace Serenity.Reflection
+﻿#nullable enable
+namespace Serenity.Reflection
 {
     /// <summary>
     /// Used to write formatted code to a string builder.
@@ -207,17 +208,17 @@
         /// <summary>
         /// Gets / sets current namespace
         /// </summary>
-        public string CurrentNamespace { get; set; }
+        public string? CurrentNamespace { get; set; }
 
         /// <summary>
         /// Gets / sets file comment
         /// </summary>
-        public string FileComment { get; set; }
+        public string? FileComment { get; set; }
 
         /// <summary>
         /// Gets / sets global usings hash set
         /// </summary>
-        public HashSet<string> GlobalUsings { get; set; }
+        public HashSet<string>? GlobalUsings { get; set; }
 
         /// <summary>
         /// Gets / sets if the code writer is used for generating C# code.
@@ -227,7 +228,7 @@
         /// <summary>
         /// Gets / sets local usings hash set
         /// </summary>
-        public HashSet<string> LocalUsings { get; private set; }
+        public HashSet<string>? LocalUsings { get; private set; }
 
         /// <summary>
         /// Gets tab string
@@ -396,7 +397,7 @@
         /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
         /// </summary>
         /// <param name="dataType"></param>
-        public static string ToCSKeyword(string dataType)
+        public static string? ToCSKeyword(string dataType)
         {
             return dataType switch
             {

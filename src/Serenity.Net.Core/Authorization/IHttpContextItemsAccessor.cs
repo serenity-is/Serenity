@@ -9,6 +9,6 @@
         /// <summary>
         /// A dictionary that can be used as a request context specific storage
         /// </summary>
-        IDictionary<object, object> Items { get; }
+        IDictionary<object, object?> Items { get; }
     }
 }

@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        public EditorOptionAttribute(string key, object value)
+        public EditorOptionAttribute(string key, object? value)
         {
             Key = key;
             Value = value;
@@ -34,6 +34,6 @@
         /// <value>
         /// The value.
         /// </value>
-        public object Value { get; private set; }
+        public object? Value { get; private set; }
     }
 }

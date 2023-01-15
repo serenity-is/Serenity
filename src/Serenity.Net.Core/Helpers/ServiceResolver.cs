@@ -6,7 +6,8 @@ namespace Serenity.Extensions.DependencyInjection
     /// A generic version of IServiceProvider which resolves a service on demand.
     /// </summary>
     /// <typeparam name="TService"></typeparam>
-    public class ServiceResolver<TService> : IServiceResolver<TService>
+    public class ServiceResolver<TService> : IServiceResolver<TService> 
+        where TService : notnull
     {
         private readonly IServiceProvider serviceProvider;
 

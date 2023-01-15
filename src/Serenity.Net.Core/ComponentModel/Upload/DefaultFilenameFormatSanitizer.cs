@@ -19,7 +19,7 @@ public class DefaultFilenameFormatSanitizer : IFilenameFormatSanitizer
     /// </summary>
     /// <param name="_">Key for placeholder, ignored by this implementation.</param>
     /// <param name="value">Value to be sanitized</param>
-    public virtual string SanitizePlaceholder(string _, string value)
+    public virtual string SanitizePlaceholder(string _, string? value)
     {
         value = StringHelper.SanitizeFilename((value ?? "").Replace('\\', '/'));
         value = value.Replace("..", "_", StringComparison.Ordinal);

@@ -9,7 +9,7 @@
         /// Initializes a new instance of the <see cref="TabAttribute"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public TabAttribute(string value)
+        public TabAttribute(string? value)
         {
             Value = value;
         }
@@ -20,6 +20,6 @@
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; private set; }
+        public string? Value { get; private set; }
     }
 }

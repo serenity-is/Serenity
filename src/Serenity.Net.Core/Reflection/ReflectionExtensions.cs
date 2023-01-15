@@ -13,7 +13,7 @@
         /// <param name="inherit">if set to <c>true</c> [inherit].</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static TAttribute GetAttribute<TAttribute>(this MemberInfo member, bool inherit = false) where TAttribute : Attribute
+        public static TAttribute? GetAttribute<TAttribute>(this MemberInfo member, bool inherit = false) where TAttribute : Attribute
         {
             var attrs = member.GetCustomAttributes(typeof(TAttribute), inherit);
             if (!attrs.Any())

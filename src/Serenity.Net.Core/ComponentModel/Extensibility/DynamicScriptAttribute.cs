@@ -40,6 +40,6 @@
         /// <value>
         /// The cache group key.
         /// </value>
-        public string CacheGroupKey { get; set; }
+        public string? CacheGroupKey { get; set; }
     }
 }

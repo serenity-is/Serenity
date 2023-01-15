@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets current user
         /// </summary>
-        ClaimsPrincipal User { get; }
+        ClaimsPrincipal? User { get; }
     }
 }

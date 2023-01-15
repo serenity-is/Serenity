@@ -15,36 +15,36 @@ namespace Serenity.Web
     {
         private readonly IPermissionService permissionService;
         private readonly IHttpContextItemsAccessor requestContext;
-        private readonly ThreadLocal<Stack<HashSet<string>>> grantingStack = new ThreadLocal<Stack<HashSet<string>>>();
+        private readonly ThreadLocal<Stack<HashSet<string>?>> grantingStack = new();
 
         /// <summary>
         /// Creates a new TransientGrantingPermissionService wrapping passed service
         /// </summary>
         /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
         /// <param name="requestContext">Request context</param>
-        public TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor requestContext = null)
+        public TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor? requestContext = null)
         {
             this.permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
             this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
         }
 
-        private Stack<HashSet<string>> GetGrantingStack(bool createIfNull)
+        private Stack<HashSet<string>?>? GetGrantingStack(bool createIfNull)
         {
-            Stack<HashSet<string>> stack;
+            Stack<HashSet<string>?>? stack;
 
             var requestItems = requestContext.Items;
 
             if (requestItems != null)
             {
-                stack = requestItems["GrantingStack"] as Stack<HashSet<string>>;
+                stack = requestItems["GrantingStack"] as Stack<HashSet<string>?>;
                 if (stack == null && createIfNull)
-                    requestItems["GrantingStack"] = stack = new Stack<HashSet<string>>();
+                    requestItems["GrantingStack"] = stack = new Stack<HashSet<string>?>();
             }
             else
             {
                 stack = grantingStack.Value;
                 if (stack == null && createIfNull)
-                    grantingStack.Value = stack = new Stack<HashSet<string>>();
+                    grantingStack.Value = stack = new Stack<HashSet<string>?>();
             }
 
             return stack;
@@ -83,7 +83,7 @@ namespace Serenity.Web
 
             var grantingStack = GetGrantingStack(true);
 
-            if (grantingStack.Count > 0)
+            if (grantingStack!.Count > 0)
             {
                 var oldSet = grantingStack.Peek();
                 if (oldSet == null)
@@ -107,7 +107,7 @@ namespace Serenity.Web
         public void GrantAll()
         {
             var grantingStack = GetGrantingStack(true);
-            grantingStack.Push(null);
+            grantingStack!.Push(null);
         }
 
         /// <summary>

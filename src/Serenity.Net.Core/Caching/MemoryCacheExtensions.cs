@@ -42,7 +42,7 @@ namespace Serenity
         /// <param name="cacheKey">Key</param>
         /// <param name="expiration">Expiration (TimeSpan.Zero means no expiration)</param>
         /// <param name="loader">Loader function that will be called if item doesn't exist in the cache.</param>
-        public static TItem Get<TItem>(this IMemoryCache cache, object cacheKey, TimeSpan expiration, Func<TItem> loader)
+        public static TItem? Get<TItem>(this IMemoryCache cache, object cacheKey, TimeSpan expiration, Func<TItem?> loader)
             where TItem : class
         {
             if (cache == null)
@@ -61,7 +61,7 @@ namespace Serenity
                     return null;
 
                 var item = loader();
-                cache.Add(cacheKey, (object)item ?? DBNull.Value, expiration);
+                cache.Add(cacheKey, (object?)item ?? DBNull.Value, expiration);
                 return item;
             }
 
@@ -75,7 +75,7 @@ namespace Serenity
         /// <typeparam name="TItem">Expected type</typeparam>
         /// <param name="cache">Cache</param>
         /// <param name="cacheKey">Key</param>
-        public static TItem TryGet<TItem>(this IMemoryCache cache, string cacheKey)
+        public static TItem? TryGet<TItem>(this IMemoryCache cache, string cacheKey)
             where TItem : class
         {
             if (cache == null)

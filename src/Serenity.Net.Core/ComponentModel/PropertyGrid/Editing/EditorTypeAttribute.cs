@@ -19,7 +19,7 @@
         /// Transfers the current editor parameters to specified editorParams dictionary.
         /// </summary>
         /// <param name="editorParams">The editor parameters.</param>
-        public virtual void SetParams(IDictionary<string, object> editorParams)
+        public virtual void SetParams(IDictionary<string, object?> editorParams)
         {
         }
 

@@ -12,7 +12,7 @@
         /// Initializes a new instance of the <see cref="CssClassAttribute"/> class.
         /// </summary>
         /// <param name="cssClass">The CSS class.</param>
-        public CssClassAttribute(string cssClass)
+        public CssClassAttribute(string? cssClass)
         {
             CssClass = cssClass;
         }
@@ -23,6 +23,6 @@
         /// <value>
         /// The CSS class.
         /// </value>
-        public string CssClass { get; private set; }
+        public string? CssClass { get; private set; }
     }
 }

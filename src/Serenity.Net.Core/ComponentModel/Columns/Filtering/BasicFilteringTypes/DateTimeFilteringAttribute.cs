@@ -21,7 +21,7 @@
         /// <summary>
         /// Gets/sets optional display format to use for display of filter
         /// </summary>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }

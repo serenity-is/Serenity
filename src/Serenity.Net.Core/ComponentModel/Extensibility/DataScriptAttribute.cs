@@ -31,14 +31,14 @@
         /// <value>
         /// The key.
         /// </value>
-        public string Key { get; private set; }
+        public string? Key { get; private set; }
 
         /// <summary>
         /// Permission key required to access this data script.
         /// Use special value "?" for all logged-in users.
         /// Use special value "*" for anyone including not logged-in users.
         /// </summary>
-        public string Permission { get; set; }
+        public string? Permission { get; set; }
 
         /// <summary>
         /// Cache duration in seconds
@@ -52,7 +52,7 @@
         /// <value>
         /// The cache group key.
         /// </value>
-        public string CacheGroupKey { get; set; }
+        public string? CacheGroupKey { get; set; }
 
         /// <summary>
         /// Gets the automatically generated key for given type.

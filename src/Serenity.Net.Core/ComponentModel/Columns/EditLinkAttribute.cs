@@ -31,16 +31,16 @@
         /// Optional item type that this edit link should open. 
         /// It should match the dialog namespace / class name.
         /// </summary>
-        public string ItemType { get; set; }
+        public string? ItemType { get; set; }
 
         /// <summary>
         /// Gets/sets from which property this edit link should get its ID value to edit
         /// </summary>
-        public string IdField { get; set; }
+        public string? IdField { get; set; }
 
         /// <summary>
         /// Gets/sets optional css class to add to edit links
         /// </summary>
-        public string CssClass { get; set; }
+        public string? CssClass { get; set; }
     }
 }

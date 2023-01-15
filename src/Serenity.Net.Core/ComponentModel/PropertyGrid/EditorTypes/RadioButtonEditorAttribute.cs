@@ -60,7 +60,7 @@
         /// <value>
         /// The enum key.
         /// </value>
-        public string EnumKey
+        public string? EnumKey
         {
             get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }
@@ -72,7 +72,7 @@
         /// <value>
         /// The lookup key.
         /// </value>
-        public string LookupKey
+        public string? LookupKey
         {
             get { return GetOption<string>("lookupKey"); }
             set { SetOption("lookupKey", value); }

@@ -20,7 +20,7 @@
         /// additional parameters / options to the filtering object
         /// </summary>
         /// <param name="formatterParams">The formatter parameters.</param>
-        public virtual void SetParams(IDictionary<string, object> formatterParams)
+        public virtual void SetParams(IDictionary<string, object?> formatterParams)
         {
         }
 

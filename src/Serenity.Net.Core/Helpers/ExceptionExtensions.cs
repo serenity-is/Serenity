@@ -13,7 +13,7 @@
         ///   Custom exception data name.</param>
         /// <param name="value">
         ///   Custom exception data value.</param>
-        public static void SetData(this Exception exception, string property, object value)
+        public static void SetData(this Exception exception, string property, object? value)
         {
             exception.GetBaseException().Data[property] = value;
         }
@@ -24,7 +24,7 @@
         /// <param name="exception">Exception</param>
         /// <param name="logger">Logger</param>
         /// <param name="category">Optional category</param>
-        public static void Log(this Exception exception, IExceptionLogger logger, string category = null)
+        public static void Log(this Exception exception, IExceptionLogger logger, string? category = null)
         {
             try
             {

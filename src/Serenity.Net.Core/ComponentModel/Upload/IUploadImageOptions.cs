@@ -33,7 +33,7 @@ public interface IUploadImageOptions : IUploadOptions
     /// <summary>
     /// Background color to use when padding image
     /// </summary>
-    public string ScaleBackColor { get; set; }
+    public string? ScaleBackColor { get; set; }
 
     /// <summary>
     /// Thumbnail width for the default thumbnail. Default is 0, e.g. disabled.
@@ -49,7 +49,7 @@ public interface IUploadImageOptions : IUploadOptions
     /// List of thumbnail sizes requested. Something like
     /// "96x96;128x128;200x200"
     /// </summary>
-    public string ThumbSizes { get; }
+    public string? ThumbSizes { get; }
 
     /// <summary>
     /// What kind of image scaling should be used to generate thumbnails.
@@ -64,5 +64,5 @@ public interface IUploadImageOptions : IUploadOptions
     /// <summary>
     /// Background color to use when padding thumbnails
     /// </summary>
-    public string ThumbBackColor { get; set; }
+    public string? ThumbBackColor { get; set; }
 }

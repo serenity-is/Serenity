@@ -88,7 +88,7 @@
         ///   Numerical ID value or Null.Int64 if null, empty, or invalid string.</returns>
         /// <seealso cref="TryParseID(string)"/>
         /// <seealso cref="long.Parse(string)"/>
-        public static long? TryParseID(this string str)
+        public static long? TryParseID(this string? str)
         {
             if (long.TryParse(str, out long id))
                 return id;
@@ -106,7 +106,7 @@
         ///   Numerical ID value or Null.Int64 if null, empty, or invalid string.</returns>
         /// <seealso cref="TryParseID(string)"/>
         /// <seealso cref="long.Parse(string)"/>
-        public static int? TryParseID32(this string str)
+        public static int? TryParseID32(this string? str)
         {
             if (int.TryParse(str, out int id))
                 return id;

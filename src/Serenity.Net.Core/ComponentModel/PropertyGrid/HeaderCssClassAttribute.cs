@@ -10,7 +10,7 @@
         /// Initializes a new instance of the <see cref="HeaderCssClassAttribute"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public HeaderCssClassAttribute(string value)
+        public HeaderCssClassAttribute(string? value)
         {
             Value = value;
         }
@@ -21,6 +21,6 @@
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; private set; }
+        public string? Value { get; private set; }
     }
 }

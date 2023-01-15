@@ -1,4 +1,5 @@
-﻿namespace Serenity
+﻿#nullable enable
+namespace Serenity
 {
     /// <summary>
     /// Base file system for abstracting physical disk access
@@ -101,7 +102,7 @@
         /// </summary>
         /// <param name="path">Path to the file</param>
         /// <param name="encoding">Optional encoding</param>
-        string ReadAllText(string path, Encoding encoding = null);
+        string ReadAllText(string path, Encoding? encoding = null);
 
         /// <summary>
         /// Writes all bytes to a file
@@ -116,6 +117,6 @@
         /// <param name="path">Path to the file</param>
         /// <param name="content">Content</param>
         /// <param name="encoding">Optional encoding</param>
-        void WriteAllText(string path, string content, Encoding encoding = null);
+        void WriteAllText(string path, string content, Encoding? encoding = null);
     }
 }

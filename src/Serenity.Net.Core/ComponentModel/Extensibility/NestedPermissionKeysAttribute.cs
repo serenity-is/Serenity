@@ -22,6 +22,6 @@
         /// <value>
         /// The language identifier.
         /// </value>
-        public string LanguageID { get; set; }
+        public string? LanguageID { get; set; }
     }
 }

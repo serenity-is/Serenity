@@ -19,7 +19,7 @@
         /// List service url, e.g. Northwind/Customer/List.
         /// It can be an absolute or relative URL to ~/Services
         /// </summary>
-        public string Service
+        public string? Service
         {
             get { return GetOption<string>("service"); }
             set { SetOption("service", value); }
@@ -28,7 +28,7 @@
         /// <summary>
         /// Name of the id field
         /// </summary>
-        public string IdField
+        public string? IdField
         {
             get { return GetOption<string>("idField"); }
             set { SetOption("idField", value); }
@@ -37,7 +37,7 @@
         /// <summary>
         /// Name of the text field
         /// </summary>
-        public string TextField
+        public string? TextField
         {
             get { return GetOption<string>("idField"); }
             set { SetOption("textField", value); }
@@ -46,7 +46,7 @@
         /// <summary>
         /// Page size used while loading records, default 100
         /// </summary>
-        public int PageSize
+        public int? PageSize
         {
             get { return GetOption<int>("pageSize"); }
             set { SetOption("pageSize", value); }
@@ -55,10 +55,10 @@
         /// <summary>
         /// Sort order for records, defaults to text field
         /// </summary>
-        public object Sort
+        public object? Sort
         {
             get { return GetOption<string[]>("sort"); }
-            set { SetOption("sort", value is string ? new string[] { value as string } : value); }
+            set { SetOption("sort", value is string s ? new string[] { s } : value); }
         }
 
         /// <summary>
@@ -73,7 +73,7 @@
         /// <summary>
         /// Include columns list, defaults to id, text, and [LookupInclude] columns.
         /// </summary>
-        public string[] IncludeColumns
+        public string[]? IncludeColumns
         {
             get { return GetOption<string[]>("includeColumns"); }
             set { SetOption("includeColumns", value); }
@@ -82,7 +82,7 @@
         /// <summary>
         /// Exclude columns list
         /// </summary>
-        public string[] ExcludeColumns
+        public string[]? ExcludeColumns
         {
             get { return GetOption<string[]>("excludeColumns"); }
             set { SetOption("excludeColumns", value); }
@@ -91,7 +91,7 @@
         /// <summary>
         /// Include deleted, defaults to false
         /// </summary>
-        public string[] IncludeDeleted
+        public string[]? IncludeDeleted
         {
             get { return GetOption<string[]>("includeDeleted"); }
             set { SetOption("includeDeleted", value); }
@@ -121,7 +121,7 @@
         /// <summary>
         /// Permission required to use inplace add / edit
         /// </summary>
-        public string InplaceAddPermission
+        public string? InplaceAddPermission
         {
             get { return GetOption<string>("inplaceAddPermission"); }
             set { SetOption("inplaceAddPermission", value); }
@@ -133,7 +133,7 @@
         /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
         /// than the service, set this to classname, e.g. "MyModule.MyDialog"
         /// </summary>
-        public string DialogType
+        public string? DialogType
         {
             get { return GetOption<string>("dialogType"); }
             set { SetOption("dialogType", value); }
@@ -142,7 +142,7 @@
         /// <summary>
         /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
         /// </summary>
-        public string CascadeFrom
+        public string? CascadeFrom
         {
             get { return GetOption<string>("cascadeFrom"); }
             set { SetOption("cascadeFrom", value); }
@@ -151,7 +151,7 @@
         /// <summary>
         /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
         /// </summary>
-        public object CascadeField
+        public string? CascadeField
         {
             get { return GetOption<string>("cascadeField"); }
             set { SetOption("cascadeField", value); }
@@ -161,16 +161,16 @@
         /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
         /// If null or empty, and CascadeField is set, all items are filtered
         /// </summary>
-        public object CascadeValue
+        public object? CascadeValue
         {
-            get { return GetOption<string>("cascadeValue"); }
+            get { return GetOption<object>("cascadeValue"); }
             set { SetOption("cascadeValue", value); }
         }
 
         /// <summary>
         /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
         /// </summary>
-        public object FilterField
+        public string? FilterField
         {
             get { return GetOption<string>("filterField"); }
             set { SetOption("filterField", value); }
@@ -179,9 +179,9 @@
         /// <summary>
         /// Optional filtering value, e.g. the integer value of GroupID. If null or empty string no filtering occurs.
         /// </summary>
-        public object FilterValue
+        public object? FilterValue
         {
-            get { return GetOption<string>("filterValue"); }
+            get { return GetOption<object>("filterValue"); }
             set { SetOption("filterValue", value); }
         }
 
@@ -227,6 +227,6 @@
         /// <summary>
         /// Gets/sets row type related with this service lookup editor
         /// </summary>
-        public Type ItemType { get; set; }
+        public Type? ItemType { get; set; }
     }
 }

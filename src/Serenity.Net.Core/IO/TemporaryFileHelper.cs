@@ -64,7 +64,7 @@ namespace Serenity.IO
             }
 
             // get folder information
-            DirectoryInfo directoryInfo = new DirectoryInfo(directoryToClean);
+            DirectoryInfo directoryInfo = new(directoryToClean);
 
             // if no time condition, or all files are to be deleted (maxFilesInDirectory = 0) 
             // no need for this part
@@ -235,12 +235,12 @@ namespace Serenity.IO
 
         private class TempFile
         {
-            public string Filename;
+            public string? Filename;
             public DateTime? Expiry;
             public bool RemoveFolder;
         }
 
-        private static readonly List<TempFile> _tempFiles = new List<TempFile>();
+        private static readonly List<TempFile> _tempFiles = new();
 
         /// <summary>
         /// Clears the temporary files.
@@ -256,7 +256,7 @@ namespace Serenity.IO
                     var tf = _tempFiles[i];
                     if (ignoreExpiry || (tf.Expiry != null && tf.Expiry <= utcNow))
                     {
-                        TryDelete(tf.Filename);
+                        TryDelete(tf.Filename!);
                         if (!File.Exists(tf.Filename))
                         {
                             _tempFiles.RemoveAt(i);
@@ -282,7 +282,7 @@ namespace Serenity.IO
         /// <param name="removeFolder">if set to <c>true</c> [remove folder].</param>
         public static void RegisterTempFile(string filename, DateTime? expiry, bool removeFolder)
         {
-            TempFile tf = new TempFile
+            TempFile tf = new()
             {
                 Filename = filename,
                 Expiry = expiry,

@@ -12,7 +12,7 @@
         ///   The value.</param>
         /// <param name="serializer">
         ///   The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value == null)
                 writer.WriteNull();
@@ -38,7 +38,7 @@
         ///   The calling serializer.</param>
         /// <returns>
         ///   The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }

@@ -21,10 +21,6 @@
         /// <value>
         ///   <c>true</c> if enabled; otherwise, <c>false</c>.
         /// </value>
-        public bool Value
-        {
-            get;
-            private set;
-        }
+        public bool Value { get; private set; }
     }
 }

@@ -11,7 +11,7 @@
         /// Initializes a new instance of the <see cref="HintAttribute"/> class.
         /// </summary>
         /// <param name="hint">The hint.</param>
-        public HintAttribute(string hint)
+        public HintAttribute(string? hint)
         {
             Hint = hint;
         }
@@ -22,6 +22,6 @@
         /// <value>
         /// The hint.
         /// </value>
-        public string Hint { get; private set; }
+        public string? Hint { get; private set; }
     }
 }

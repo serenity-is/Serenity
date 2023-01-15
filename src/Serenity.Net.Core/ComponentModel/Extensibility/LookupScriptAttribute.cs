@@ -99,14 +99,14 @@
         /// <summary>
         /// Lookup key, usually in "Module.EntityName" format.
         /// </summary>
-        public string Key { get; private set; }
+        public string? Key { get; private set; }
 
         /// <summary>
         /// Permission key required to access this lookup script.
         /// Use special value "?" for all logged-in users.
         /// Use special value "*" for anyone including not logged-in users.
         /// </summary>
-        public string Permission { get; set; }
+        public string? Permission { get; set; }
 
         /// <summary>
         /// Cache duration in seconds
@@ -118,6 +118,6 @@
         /// Only meaningful for Row types with external lookup scripts. Can be a generic type of TRow or
         /// a simple lookup class.
         /// </summary>
-        public Type LookupType { get; set; }
+        public Type? LookupType { get; set; }
     }
 }

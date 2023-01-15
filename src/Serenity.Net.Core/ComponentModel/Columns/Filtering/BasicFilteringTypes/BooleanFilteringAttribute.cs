@@ -25,7 +25,7 @@
         /// <value>
         /// The false text.
         /// </value>
-        public string FalseText
+        public string? FalseText
         {
             get { return GetOption<string>("falseText"); }
             set { SetOption("falseText", value); }
@@ -37,7 +37,7 @@
         /// <value>
         /// The true text.
         /// </value>
-        public string TrueText
+        public string? TrueText
         {
             get { return GetOption<string>("trueText"); }
             set { SetOption("trueText", value); }

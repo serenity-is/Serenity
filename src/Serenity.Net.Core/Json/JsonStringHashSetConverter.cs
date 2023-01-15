@@ -12,9 +12,9 @@
         ///   The value.</param>
         /// <param name="serializer">
         ///   The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            var hashset = (HashSet<string>)value;
+            var hashset = (HashSet<string>?)value;
             if (hashset == null)
             {
                 writer.WriteNull();
@@ -38,7 +38,7 @@
         ///   The calling serializer.</param>
         /// <returns>
         ///   The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
                 return null;
@@ -52,7 +52,7 @@
             {
                 reader.Read();
                 if (reader.TokenType == JsonToken.String)
-                    hashset.Add((string)reader.Value);
+                    hashset.Add((string)reader.Value!);
                 else if (reader.TokenType == JsonToken.EndArray)
                     break;
                 else

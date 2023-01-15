@@ -38,6 +38,6 @@
         /// <value>
         /// The CSS class to add to the quick filter div.
         /// </value>
-        public string CssClass { get; set; }
+        public string? CssClass { get; set; }
     }
 }

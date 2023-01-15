@@ -13,7 +13,7 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The site key.
         /// </value>
-        public string SiteKey { get; set; }
+        public string? SiteKey { get; set; }
 
         /// <summary>
         /// Gets or sets the secret key.
@@ -21,7 +21,7 @@ namespace Serenity.ComponentModel
         /// <value>
         /// The secret key.
         /// </value>
-        public string SecretKey { get; set; }
+        public string? SecretKey { get; set; }
 
         /// <summary>
         /// Returns this

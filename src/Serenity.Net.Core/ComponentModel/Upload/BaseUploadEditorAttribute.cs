@@ -28,7 +28,7 @@ namespace Serenity.ComponentModel
         public abstract bool IsMultiple { get; }
 
         /// <inheritdoc/>
-        public string UploadIntent
+        public string? UploadIntent
         {
             get { return GetOption<string>("uploadIntent"); }
             set { SetOption("uploadIntent", value); }
@@ -99,7 +99,7 @@ namespace Serenity.ComponentModel
         public ImageScaleMode ScaleMode { get; set; } = UploadOptions.DefaultScaleMode;
 
         /// <inheritdoc/>
-        public string ScaleBackColor { get; set; }
+        public string? ScaleBackColor { get; set; }
 
         /// <inheritdoc/>
         public int ThumbHeight { get; set; }
@@ -108,7 +108,7 @@ namespace Serenity.ComponentModel
         public int ThumbWidth { get; set; }
 
         /// <inheritdoc/>
-        public string ThumbSizes { get; set; }
+        public string? ThumbSizes { get; set; }
 
         /// <inheritdoc/>
         public ImageScaleMode ThumbMode { get; set; } = UploadOptions.DefaultThumbMode;
@@ -117,7 +117,7 @@ namespace Serenity.ComponentModel
         public int ThumbQuality { get; set; } = UploadOptions.DefaultThumbQuality;
 
         /// <inheritdoc/>
-        public string ThumbBackColor { get; set; }
+        public string? ThumbBackColor { get; set; }
 
         /// <inheritdoc/>
         public bool JsonEncodeValue
@@ -127,7 +127,7 @@ namespace Serenity.ComponentModel
         }
 
         /// <inheritdoc/>
-        public string OriginalNameProperty
+        public string? OriginalNameProperty
         {
             get { return GetOption<string>("originalNameProperty"); }
             set { SetOption("originalNameProperty", value); }
@@ -144,17 +144,17 @@ namespace Serenity.ComponentModel
         public bool CopyToHistory { get; set; }
 
         /// <inheritdoc/>
-        public string FilenameFormat { get; set; }
+        public string? FilenameFormat { get; set; }
 
 
         /// <inheritdoc/>
-        public string AllowedExtensions { get; set; }
+        public string? AllowedExtensions { get; set; }
 
         /// <inheritdoc/>
-        public string ExtensionBlacklist { get; set; } = UploadOptions.DefaultExtensionBlacklist;
+        public string? ExtensionBlacklist { get; set; } = UploadOptions.DefaultExtensionBlacklist;
 
         /// <inheritdoc/>
-        public string ImageExtensions { get; set; } = UploadOptions.DefaultImageExtensions;
+        public string? ImageExtensions { get; set; } = UploadOptions.DefaultImageExtensions;
 
         /// <inheritdoc/>
         public bool IgnoreExtensionMismatch { get; set; } = true;

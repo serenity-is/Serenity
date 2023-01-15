@@ -23,7 +23,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }

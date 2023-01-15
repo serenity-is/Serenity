@@ -15,7 +15,7 @@ namespace Serenity.ComponentModel
         /// The name.
         /// </value>
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the title, e.g. label of a form field, 
@@ -25,7 +25,7 @@ namespace Serenity.ComponentModel
         /// The title.
         /// </value>
         [JsonProperty("title")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Serenity.ComponentModel
         /// The hint.
         /// </value>
         [JsonProperty("hint")]
-        public string Hint { get; set; }
+        public string? Hint { get; set; }
 
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Serenity.ComponentModel
         /// The placeholder.
         /// </value>
         [JsonProperty("placeholder")]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Serenity.ComponentModel
         /// The type of the editor.
         /// </value>
         [JsonProperty("editorType")]
-        public string EditorType { get; set; }
+        public string? EditorType { get; set; }
 
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Serenity.ComponentModel
         /// The editor parameters.
         /// </value>
         [JsonProperty("editorParams")]
-        public Dictionary<string, object> EditorParams { get; set; }
+        public Dictionary<string, object>? EditorParams { get; set; }
 
         /// <summary>
         /// Gets or sets the category of the property in form.
@@ -79,7 +79,7 @@ namespace Serenity.ComponentModel
         /// The category.
         /// </value>
         [JsonProperty("category")]
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Serenity.ComponentModel
         /// The tab.
         /// </value>
         [JsonProperty("tab")]
-        public string Tab { get; set; }
+        public string? Tab { get; set; }
 
         /// <summary>
         /// Gets or sets the CSS class that should be applied to the grid column, 
@@ -118,7 +118,7 @@ namespace Serenity.ComponentModel
         /// The CSS class.
         /// </value>
         [JsonProperty("cssClass")]
-        public string CssClass { get; set; }
+        public string? CssClass { get; set; }
 
         /// <summary>
         /// Gets or sets the header CSS class for the grid column.
@@ -128,7 +128,7 @@ namespace Serenity.ComponentModel
         /// The header CSS class.
         /// </value>
         [JsonProperty("headerCssClass")]
-        public string HeaderCssClass { get; set; }
+        public string? HeaderCssClass { get; set; }
 
         /// <summary>
         /// Gets or sets the form CSS class for the property.
@@ -139,7 +139,7 @@ namespace Serenity.ComponentModel
         /// The form CSS class.
         /// </value>
         [JsonProperty("formCssClass")]
-        public string FormCssClass { get; set; }
+        public string? FormCssClass { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum length of the editor in a form.
@@ -176,7 +176,7 @@ namespace Serenity.ComponentModel
         /// The read permission.
         /// </value>
         [JsonProperty("readPermission")]
-        public string ReadPermission { get; set; }
+        public string? ReadPermission { get; set; }
 
         /// <summary>
         /// Gets or sets the insertable flag of the property.
@@ -198,7 +198,7 @@ namespace Serenity.ComponentModel
         /// The insert permission.
         /// </value>
         [JsonProperty("insertPermission")]
-        public string InsertPermission { get; set; }
+        public string? InsertPermission { get; set; }
 
         /// <summary>
         /// Gets or sets the hide on insert flag which controls visibility of the property
@@ -231,7 +231,7 @@ namespace Serenity.ComponentModel
         /// The update permission.
         /// </value>
         [JsonProperty("updatePermission")]
-        public string UpdatePermission { get; set; }
+        public string? UpdatePermission { get; set; }
 
         /// <summary>
         /// Gets or sets the hide on update flag which controls visibility of the property
@@ -261,7 +261,7 @@ namespace Serenity.ComponentModel
         /// The default value.
         /// </value>
         [JsonProperty("defaultValue")]
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// Gets or sets the localizable flag of the property.
@@ -301,7 +301,7 @@ namespace Serenity.ComponentModel
         /// The type of the formatter.
         /// </value>
         [JsonProperty("formatterType")]
-        public string FormatterType { get; set; }
+        public string? FormatterType { get; set; }
 
         /// <summary>
         /// Gets or sets the formatter parameters for columns.
@@ -310,7 +310,7 @@ namespace Serenity.ComponentModel
         /// The formatter parameters.
         /// </value>
         [JsonProperty("formatterParams")]
-        public Dictionary<string, object> FormatterParams { get; set; }
+        public Dictionary<string, object>? FormatterParams { get; set; }
 
         /// <summary>
         /// Gets or sets the display format to be passed to the formatter
@@ -321,7 +321,7 @@ namespace Serenity.ComponentModel
         /// The display format.
         /// </value>
         [JsonProperty("displayFormat")]
-        public string DisplayFormat { get; set; }
+        public string? DisplayFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the alignment of the column.
@@ -331,7 +331,7 @@ namespace Serenity.ComponentModel
         /// The alignment.
         /// </value>
         [JsonProperty("alignment")]
-        public string Alignment { get; set; }
+        public string? Alignment { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the column.
@@ -381,7 +381,7 @@ namespace Serenity.ComponentModel
         /// The width of the label.
         /// </value>
         [JsonProperty("labelWidth")]
-        public string LabelWidth { get; set; }
+        public string? LabelWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the resizable flag of a column.
@@ -451,7 +451,7 @@ namespace Serenity.ComponentModel
         /// The type of the edit link item.
         /// </value>
         [JsonProperty("editLinkItemType")]
-        public string EditLinkItemType { get; set; }
+        public string? EditLinkItemType { get; set; }
 
         /// <summary>
         /// Gets or sets the edit link identifier (e.g. ID) field.
@@ -462,7 +462,7 @@ namespace Serenity.ComponentModel
         /// The edit link identifier field.
         /// </value>
         [JsonProperty("editLinkIdField")]
-        public string EditLinkIdField { get; set; }
+        public string? EditLinkIdField { get; set; }
 
         /// <summary>
         /// Gets or sets the edit link CSS class.
@@ -471,7 +471,7 @@ namespace Serenity.ComponentModel
         /// The edit link CSS class.
         /// </value>
         [JsonProperty("editLinkCssClass")]
-        public string EditLinkCssClass { get; set; }
+        public string? EditLinkCssClass { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the filtering for the column.
@@ -480,7 +480,7 @@ namespace Serenity.ComponentModel
         /// The type of the filtering.
         /// </value>
         [JsonProperty("filteringType")]
-        public string FilteringType { get; set; }
+        public string? FilteringType { get; set; }
 
 
         /// <summary>
@@ -490,7 +490,7 @@ namespace Serenity.ComponentModel
         /// The filtering parameters.
         /// </value>
         [JsonProperty("filteringParams")]
-        public Dictionary<string, object> FilteringParams { get; set; }
+        public Dictionary<string, object>? FilteringParams { get; set; }
 
         /// <summary>
         /// Gets or sets the filtering identifier field.
@@ -501,7 +501,7 @@ namespace Serenity.ComponentModel
         /// The filtering identifier field.
         /// </value>
         [JsonProperty("filteringIdField")]
-        public string FilteringIdField { get; set; }
+        public string? FilteringIdField { get; set; }
 
         /// <summary>
         /// Gets or sets the filter only flag, e.g. this property
@@ -541,7 +541,7 @@ namespace Serenity.ComponentModel
         /// The quick filter parameters.
         /// </value>
         [JsonProperty("quickFilterParams")]
-        public Dictionary<string, object> QuickFilterParams { get; set; }
+        public Dictionary<string, object>? QuickFilterParams { get; set; }
 
         /// <summary>
         /// Gets or sets the quick filter separator flag.
@@ -559,7 +559,7 @@ namespace Serenity.ComponentModel
         /// The quick filter CSS class.
         /// </value>
         [JsonProperty("quickFilterCssClass")]
-        public string QuickFilterCssClass { get; set; }
+        public string? QuickFilterCssClass { get; set; }
 
         /// <summary>
         /// Gets or sets the extension data, used for JSON.NET
@@ -569,7 +569,7 @@ namespace Serenity.ComponentModel
         /// The extension data.
         /// </value>
         [JsonExtensionData]
-        public IDictionary<string, JToken> ExtensionData { get; set; }
+        public IDictionary<string, JToken>? ExtensionData { get; set; }
 
         /// <summary>
         /// Should the EditorType property be serialized by JSON.NET, used to reduce JSON size.

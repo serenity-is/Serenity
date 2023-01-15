@@ -24,7 +24,7 @@
         /// <value>
         /// The language identifier.
         /// </value>
-        public string LanguageID { get; set; }
+        public string? LanguageID { get; set; }
 
         /// <summary>
         /// Gets or sets the optional local text prefix.
@@ -32,6 +32,6 @@
         /// <value>
         /// The local text prefix.
         /// </value>
-        public string Prefix { get; set; }
+        public string? Prefix { get; set; }
     }
 }

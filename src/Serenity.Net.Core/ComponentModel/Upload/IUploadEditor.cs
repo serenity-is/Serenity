@@ -26,5 +26,5 @@ public interface IUploadEditor
     /// upload processor can locate the original attribute by its type name
     /// and validate its settings or generate the expected thumbnail types.
     /// </summary>
-    public string UploadIntent { get; }
+    public string? UploadIntent { get; }
 }

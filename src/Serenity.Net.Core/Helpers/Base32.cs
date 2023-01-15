@@ -44,7 +44,7 @@
                 throw new ArgumentNullException("bytes");
 
             int len = bytes.Length;
-            StringBuilder base32 = new StringBuilder((len * 8 + 4) / 5);
+            StringBuilder base32 = new((len * 8 + 4) / 5);
 
             int currByte, digit, i = 0;
             while (i < len)

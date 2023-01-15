@@ -26,7 +26,7 @@
         /// <value>
         /// The mask.
         /// </value>
-        public string Mask
+        public string? Mask
         {
             get { return GetOption<string>("mask"); }
             set { SetOption("mask", value); }
@@ -38,7 +38,7 @@
         /// <value>
         /// The placeholder.
         /// </value>
-        public string Placeholder
+        public string? Placeholder
         {
             get { return GetOption<string>("placeholder"); }
             set { SetOption("placeholder", value); }

@@ -1,4 +1,6 @@
-﻿namespace Serenity
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Serenity
 {
     /// <summary>
     /// Authorization extension methods
@@ -8,7 +10,7 @@
         /// <summary>
         /// Returns true if user is logged in (authenticated).
         /// </summary>
-        public static bool IsLoggedIn(this IUserAccessor userAccessor)
+        public static bool IsLoggedIn([NotNullWhen(true)] this IUserAccessor? userAccessor)
         {
             return userAccessor?.User?.Identity?.IsAuthenticated == true;
         }
@@ -16,7 +18,7 @@
         /// <summary>
         /// Returns true if user is logged in (authenticated).
         /// </summary>
-        public static bool IsLoggedIn(this ClaimsPrincipal user)
+        public static bool IsLoggedIn([NotNullWhen(true)] this ClaimsPrincipal? user)
         {
             return user?.Identity?.IsAuthenticated == true;
         }
@@ -43,7 +45,7 @@
         /// Checks if there is a currently logged user and throws a validation error with
         /// "NotLoggedIn" error code if not.
         /// </summary>
-        public static void ValidateLoggedIn(this IUserAccessor userAccessor, ITextLocalizer localizer)
+        public static void ValidateLoggedIn([NotNull] this IUserAccessor? userAccessor, ITextLocalizer? localizer)
         {
             if (!IsLoggedIn(userAccessor))
                 throw new ValidationError("NotLoggedIn", null,
@@ -55,7 +57,7 @@
         /// </summary>
         /// <param name="identity"></param>
         /// <returns></returns>
-        public static string GetIdentifier(this ClaimsPrincipal identity)
+        public static string? GetIdentifier(this ClaimsPrincipal? identity)
         {
             if (identity == null)
                 return null;
@@ -69,9 +71,9 @@
         /// <param name="identity"></param>
         /// <param name="userRetrieveService">User retrieve service</param>
         /// <returns></returns>
-        public static TUserDefinition GetUserDefinition<TUserDefinition>(this ClaimsPrincipal identity, 
+        public static TUserDefinition? GetUserDefinition<TUserDefinition>(this ClaimsPrincipal? identity,
             IUserRetrieveService userRetrieveService)
-                where TUserDefinition: class, IUserDefinition
+                where TUserDefinition : class, IUserDefinition
         {
             if (!IsLoggedIn(identity))
                 return null;
@@ -85,7 +87,7 @@
         /// <param name="identity"></param>
         /// <param name="userRetrieveService">User retrieve service</param>
         /// <returns></returns>
-        public static IUserDefinition GetUserDefinition(this ClaimsPrincipal identity,
+        public static IUserDefinition? GetUserDefinition(this ClaimsPrincipal? identity,
             IUserRetrieveService userRetrieveService)
         {
             if (!IsLoggedIn(identity))

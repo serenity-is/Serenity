@@ -44,7 +44,7 @@
         /// <value>
         /// The identifier field.
         /// </value>
-        public string IdField
+        public string? IdField
         {
             get { return GetOption<string>("idField"); }
             set { SetOption("idField", value); }

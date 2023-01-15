@@ -70,8 +70,8 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
-            string groupKey, Func<TItem> loader)
+        public static TItem? Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
+            string groupKey, Func<TItem?> loader)
             where TItem : class
         {
             return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
@@ -99,7 +99,7 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan expiration, string groupKey, Func<TItem> loader)
+        public static TItem? Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan expiration, string groupKey, Func<TItem?> loader)
             where TItem : class
         {
             return GetInternal(cache, cacheKey, expiration, expiration,
@@ -128,17 +128,17 @@ namespace Serenity
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem GetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
-            string groupKey, Func<TItem> loader)
+        public static TItem? GetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
+            string groupKey, Func<TItem?> loader)
             where TItem : class
         {
             return GetInternal(cache, cacheKey, localExpiration, TimeSpan.FromSeconds(0),
                 groupKey, loader, localOnly: true, forceReload: false);
         }
 
-        private static TItem GetInternal<TItem>(ITwoLevelCache cache, string cacheKey,
+        private static TItem? GetInternal<TItem>(ITwoLevelCache cache, string cacheKey,
             TimeSpan localExpiration, TimeSpan remoteExpiration,
-            string groupKey, Func<TItem> loader, bool localOnly, bool forceReload)
+            string groupKey, Func<TItem?> loader, bool localOnly, bool forceReload)
             where TItem : class
         {
             ulong? groupGeneration = null;
@@ -243,7 +243,7 @@ namespace Serenity
             var item = loader();
 
             // add item and its version to cache
-            localCache.Add(cacheKey, (object)item ?? DBNull.Value, localExpiration);
+            localCache.Add(cacheKey, (object?)item ?? DBNull.Value, localExpiration);
             localCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
 
             if (!localOnly)
@@ -308,8 +308,8 @@ namespace Serenity
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="value">Value to set.</param>
-        public static TItem Set<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
-            string groupKey, TItem value)
+        public static TItem? Set<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
+            string groupKey, TItem? value)
             where TItem : class
         {
             return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
@@ -327,7 +327,7 @@ namespace Serenity
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="value">Value to set.</param>
-        public static TItem Set<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan expiration, string groupKey, TItem value)
+        public static TItem? Set<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan expiration, string groupKey, TItem value)
             where TItem : class
         {
             return GetInternal(cache, cacheKey, expiration, expiration,
@@ -345,7 +345,7 @@ namespace Serenity
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="value">Value to set.</param>
-        public static TItem SetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
+        public static TItem? SetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
             string groupKey, TItem value)
             where TItem : class
         {

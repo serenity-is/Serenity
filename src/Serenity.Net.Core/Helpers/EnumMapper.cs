@@ -60,7 +60,7 @@
             }
             else
             {
-                value = default;
+                value = default!;
                 return false;
             }
         }

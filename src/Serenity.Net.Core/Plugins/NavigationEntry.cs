@@ -19,7 +19,7 @@
         /// <value>
         /// The controller type.
         /// </value>
-        public Type Controller { get; set; }
+        public Type? Controller { get; set; }
 
         /// <summary>
         /// Gets or sets the action name.
@@ -27,7 +27,7 @@
         /// <value>
         /// The action name.
         /// </value>
-        public string Action { get; set; }
+        public string? Action { get; set; }
 
         /// <summary>
         /// Gets or sets the URL.
@@ -35,7 +35,7 @@
         /// <value>
         /// The URL.
         /// </value>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Gets or sets the full path.
@@ -43,7 +43,7 @@
         /// <value>
         /// The full path.
         /// </value>
-        public string FullPath { get; set; }
+        public string? FullPath { get; set; }
 
         /// <summary>
         /// Gets or sets the category.
@@ -51,7 +51,7 @@
         /// <value>
         /// The category.
         /// </value>
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
         /// <summary>
         /// Gets or sets the title.
@@ -59,7 +59,7 @@
         /// <value>
         /// The title.
         /// </value>
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the icon class.
@@ -67,7 +67,7 @@
         /// <value>
         /// The icon class.
         /// </value>
-        public string IconClass { get; set; }
+        public string? IconClass { get; set; }
 
         /// <summary>
         /// Gets or sets the item class.
@@ -75,7 +75,7 @@
         /// <value>
         /// The item class.
         /// </value>
-        public string ItemClass { get; set; }
+        public string? ItemClass { get; set; }
 
         /// <summary>
         /// Gets or sets the permission.
@@ -83,7 +83,7 @@
         /// <value>
         /// The permission.
         /// </value>
-        public string Permission { get; set; }
+        public string? Permission { get; set; }
 
         /// <summary>
         /// Gets or sets the target window.
@@ -91,6 +91,6 @@
         /// <value>
         /// The target window, e.g. _blank.
         /// </value>
-        public string Target { get; set; }
+        public string? Target { get; set; }
     }
 }

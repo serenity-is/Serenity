@@ -40,19 +40,19 @@
         /// <summary>
         /// RowType that this editor will get values from
         /// </summary>
-        public Type RowType { get; set; }
+        public Type? RowType { get; set; }
 
         /// <summary>
         /// Property name that this editor will get values from
         /// </summary>
-        public string PropertyName { get; set; }
+        public string? PropertyName { get; set; }
 
         /// <summary>
         /// Permission key required to access this lookup script.
         /// Use special value "?" for all logged-in users.
         /// Use special value "*" for anyone including not logged-in users.
         /// </summary>
-        public string Permission { get; set; }
+        public string? Permission { get; set; }
 
         /// <summary>
         /// Cache duration in seconds

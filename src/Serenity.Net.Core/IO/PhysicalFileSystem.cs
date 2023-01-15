@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿#nullable enable
+using System.IO;
 
 namespace Serenity
 {
@@ -93,7 +94,7 @@ namespace Serenity
         }
 
         /// <inheritdoc/>
-        public string ReadAllText(string path, Encoding encoding = null)
+        public string ReadAllText(string path, Encoding? encoding = null)
         {
             return encoding != null ?
                 File.ReadAllText(path, encoding) :
@@ -107,7 +108,7 @@ namespace Serenity
         }
 
         /// <inheritdoc/>
-        public void WriteAllText(string path, string content, Encoding encoding = null)
+        public void WriteAllText(string path, string content, Encoding? encoding = null)
         {
             if (encoding != null)
             {

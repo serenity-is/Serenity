@@ -9,7 +9,7 @@
             return base.ContainsKey(key);
         }
 
-        public new object this[object key]
+        public new object? this[object key]
         {
             get { if (key == null) return null; return base[key]; }
         }

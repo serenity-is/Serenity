@@ -25,7 +25,7 @@
         /// <value>
         /// The enum key.
         /// </value>
-        public string EnumKey
+        public string? EnumKey
         {
             get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }

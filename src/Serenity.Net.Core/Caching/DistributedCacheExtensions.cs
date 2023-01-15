@@ -14,7 +14,7 @@ namespace Serenity
         /// <param name="cache">Cache</param>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue value)
+        public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue? value)
             where TValue: class
         {
             if (cache == null)
@@ -37,7 +37,7 @@ namespace Serenity
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
         /// <param name="expiration">Expiration</param>
-        public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue value, TimeSpan expiration)
+        public static void SetAutoJson<TValue>(this IDistributedCache cache, string key, TValue? value, TimeSpan expiration)
             where TValue: class
         {
             if (cache == null)
@@ -73,7 +73,7 @@ namespace Serenity
         /// </summary>
         /// <param name="cache">Cache</param>
         /// <param name="key">Key</param>
-        public static TValue GetAutoJson<TValue>(this IDistributedCache cache, string key)
+        public static TValue? GetAutoJson<TValue>(this IDistributedCache cache, string key)
             where TValue: class
         {
             if (cache == null)

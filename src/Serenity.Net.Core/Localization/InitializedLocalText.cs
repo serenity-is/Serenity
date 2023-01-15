@@ -8,14 +8,14 @@ namespace Serenity.Localization
     /// </summary>
     public class InitializedLocalText : LocalText
     {
-        private readonly string initialText;
+        private readonly string? initialText;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializedLocalText"/> class.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="initialText">The initial text.</param>
-        public InitializedLocalText(string key, string initialText)
+        public InitializedLocalText(string key, string? initialText)
             : base(key)
         {
             this.initialText = initialText;
@@ -27,6 +27,6 @@ namespace Serenity.Localization
         /// <value>
         /// The initial text.
         /// </value>
-        public string InitialText => initialText;
+        public string? InitialText => initialText;
     }
 }

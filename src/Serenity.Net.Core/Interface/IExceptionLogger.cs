@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="category">Optional category, can be null</param>
-        void Log(Exception exception, string category);
+        void Log(Exception exception, string? category);
     }
 }

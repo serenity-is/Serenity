@@ -1,6 +1,0 @@
-﻿namespace Serenity.ComponentModel
-{
-
-
-
-}

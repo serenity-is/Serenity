@@ -18,7 +18,7 @@
         /// </summary>
         /// <typeparam name="TAttr">The type of the attribute.</typeparam>
         /// <returns></returns>
-        TAttr GetAttribute<TAttr>() where TAttr : Attribute;
+        TAttr? GetAttribute<TAttr>() where TAttr : Attribute;
 
         /// <summary>
         /// Gets the attributes.

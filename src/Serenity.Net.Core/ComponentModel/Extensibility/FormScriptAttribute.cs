@@ -26,7 +26,7 @@
         /// <exception cref="ArgumentNullException">key</exception>
         public FormScriptAttribute(string key)
         {
-            if (key.IsEmptyOrNull())
+            if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
 
             Key = key;
@@ -38,6 +38,6 @@
         /// <value>
         /// The key.
         /// </value>
-        public string Key { get; private set; }
+        public string? Key { get; private set; }
     }
 }

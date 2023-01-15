@@ -27,7 +27,7 @@
         public EditorFilteringAttribute(string editorType)
             : base(Key)
         {
-            EditorType = editorType;
+            EditorType = editorType ?? throw new ArgumentNullException(nameof(editorType));
         }
 
         /// <summary>
@@ -48,7 +48,7 @@
         /// </value>
         public string EditorType
         {
-            get { return GetOption<string>("editorType"); }
+            get { return GetOption<string>("editorType")!; }
             set { SetOption("editorType", value); }
         }
 

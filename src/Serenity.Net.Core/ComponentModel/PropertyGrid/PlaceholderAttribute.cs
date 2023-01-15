@@ -11,7 +11,7 @@
         /// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public PlaceholderAttribute(string value)
+        public PlaceholderAttribute(string? value)
         {
             Value = value;
         }
@@ -22,6 +22,6 @@
         /// <value>
         /// The value.
         /// </value>
-        public string Value { get; private set; }
+        public string? Value { get; private set; }
     }
 }

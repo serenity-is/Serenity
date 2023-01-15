@@ -20,10 +20,6 @@
         /// <value>
         ///   <c>true</c> if on; otherwise, <c>false</c>.
         /// </value>
-        public bool Value
-        {
-            get;
-            private set;
-        }
+        public bool Value { get; private set; }
     }
 }

@@ -13,7 +13,7 @@
         /// <param name="languageID">Language identifier</param>
         /// <param name="pending">Include pending (not approved) texts</param>
         /// <returns></returns>
-        string TryGet(string languageID, string key, bool pending);
+        string? TryGet(string languageID, string key, bool pending);
 
         /// <summary>
         /// Adds a local text entry to the registry
@@ -21,6 +21,6 @@
         /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
         /// <param name="key">Local text key</param>
         /// <param name="text">Translated text</param>
-        void Add(string languageID, string key, string text);
+        void Add(string languageID, string key, string? text);
     }
 }

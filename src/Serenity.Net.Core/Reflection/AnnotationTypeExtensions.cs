@@ -61,7 +61,7 @@
 
             public Type PropertyType => property.PropertyType;
 
-            public TAttr GetAttribute<TAttr>() where TAttr : Attribute
+            public TAttr? GetAttribute<TAttr>() where TAttr : Attribute
             {
                 var attr = property.GetCustomAttribute<TAttr>();
                 if (attr != null)

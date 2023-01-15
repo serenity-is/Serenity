@@ -25,7 +25,7 @@
         /// <value>
         /// The false text.
         /// </value>
-        public string FalseText
+        public string? FalseText
         {
             get { return GetOption<string>("falseText"); }
             set { SetOption("falseText", value); }
@@ -37,7 +37,7 @@
         /// <value>
         /// The true text.
         /// </value>
-        public string TrueText
+        public string? TrueText
         {
             get { return GetOption<string>("trueText"); }
             set { SetOption("trueText", value); }
@@ -89,7 +89,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -121,7 +121,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -155,7 +155,7 @@
         /// <value>
         /// The enum key.
         /// </value>
-        public string EnumKey
+        public string? EnumKey
         {
             get { return GetOption<string>("enumKey"); }
             set { SetOption("enumKey", value); }
@@ -187,7 +187,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -200,7 +200,7 @@
         /// <value>
         /// The original name property.
         /// </value>
-        public string OriginalNameProperty
+        public string? OriginalNameProperty
         {
             get { return GetOption<string>("originalNameProperty"); }
             set { SetOption("originalNameProperty", value); }
@@ -232,7 +232,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -264,7 +264,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -296,7 +296,7 @@
         /// <value>
         /// The display property.
         /// </value>
-        public string DisplayProperty
+        public string? DisplayProperty
         {
             get { return GetOption<string>("displayProperty"); }
             set { SetOption("displayProperty", value); }
@@ -308,7 +308,7 @@
         /// <value>
         /// The display format.
         /// </value>
-        public string DisplayFormat
+        public string? DisplayFormat
         {
             get { return GetOption<string>("displayFormat"); }
             set { SetOption("displayFormat", value); }
@@ -320,7 +320,7 @@
         /// <value>
         /// The URL property.
         /// </value>
-        public string UrlProperty
+        public string? UrlProperty
         {
             get { return GetOption<string>("urlProperty"); }
             set { SetOption("urlProperty", value); }
@@ -332,7 +332,7 @@
         /// <value>
         /// The URL format.
         /// </value>
-        public string UrlFormat
+        public string? UrlFormat
         {
             get { return GetOption<string>("urlFormat"); }
             set { SetOption("urlFormat", value); }
@@ -344,7 +344,7 @@
         /// <value>
         /// The target.
         /// </value>
-        public string Target
+        public string? Target
         {
             get { return GetOption<string>("target"); }
             set { SetOption("target", value); }

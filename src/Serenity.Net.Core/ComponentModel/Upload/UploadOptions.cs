@@ -49,7 +49,7 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public ImageScaleMode ScaleMode { get; set; } = DefaultScaleMode;
 
     /// <inheritdoc/>
-    public string ScaleBackColor { get; set; }
+    public string? ScaleBackColor { get; set; }
 
     /// <inheritdoc/>
     public int ThumbHeight { get; set; }
@@ -58,7 +58,7 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public int ThumbWidth { get; set; }
 
     /// <inheritdoc/>
-    public string ThumbSizes { get; set; }
+    public string? ThumbSizes { get; set; }
 
     /// <summary>
     /// Default thumb mode
@@ -77,13 +77,13 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public int ThumbQuality { get; set; } = DefaultThumbQuality;
 
     /// <inheritdoc/>
-    public string ThumbBackColor { get; set; }
+    public string? ThumbBackColor { get; set; }
 
     /// <inheritdoc/>
     public bool JsonEncodeValue { get; set; }
 
     /// <inheritdoc/>
-    public string OriginalNameProperty { get; set; }
+    public string? OriginalNameProperty { get; set; }
 
     /// <inheritdoc/>
     public bool DisplayFileName { get; set; }
@@ -91,10 +91,10 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public bool CopyToHistory { get; set; }
 
     /// <inheritdoc/>
-    public string FilenameFormat { get; set; }
+    public string? FilenameFormat { get; set; }
 
     /// <inheritdoc/>
-    public string AllowedExtensions { get; set; }
+    public string? AllowedExtensions { get; set; }
 
     /// <summary>
     /// Default list of blacklisted extensions;
@@ -103,14 +103,14 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
         ".dll;.jar;.jsp;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs";
 
     /// <inheritdoc/>
-    public string ExtensionBlacklist { get; set; }
+    public string? ExtensionBlacklist { get; set; }
 
     /// Default list of image extensions: ".gif;.jpg;.jpeg;.png;"
     public static string DefaultImageExtensions =
         ".gif;.jpg;.jpeg;.png;";
 
     /// <inheritdoc/>
-    public string ImageExtensions { get; set; } = DefaultImageExtensions;
+    public string? ImageExtensions { get; set; } = DefaultImageExtensions;
 
     /// <inheritdoc/>
     public bool IgnoreExtensionMismatch { get; set; } = true;

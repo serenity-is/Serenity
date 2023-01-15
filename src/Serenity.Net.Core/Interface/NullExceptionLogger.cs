@@ -12,14 +12,14 @@
         /// <summary>
         /// NullExceptionLogger instance
         /// </summary>
-        public static readonly NullExceptionLogger Instance = new NullExceptionLogger();
+        public static readonly NullExceptionLogger Instance = new();
 
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="category">Optional category, can be null</param>
-        public void Log(Exception exception, string category)
+        public void Log(Exception exception, string? category)
         {
         }
     }
