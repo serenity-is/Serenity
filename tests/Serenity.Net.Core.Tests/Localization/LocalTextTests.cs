@@ -32,7 +32,7 @@ public class LocalTextTests
     [Fact]
     public void Key_Returns_KeySet_In_Constructor_AsIs()
     {
-        Assert.Null(new LocalText(null).Key);
+        Assert.Equal(string.Empty, new LocalText(null).Key);
         Assert.Equal(string.Empty, new LocalText(string.Empty).Key);
         Assert.Equal("ABC", new LocalText("ABC").Key);
         Assert.Equal("  dEf ", new LocalText("  dEf ").Key);
@@ -68,7 +68,7 @@ public class LocalTextTests
     {
         LocalText text1 = new(null);
         string actual1 = text1.ToString(localizer: null);
-        Assert.Null(actual1);
+        Assert.Equal(string.Empty, actual1);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class LocalTextTests
     public void ToString_Returns_KeyAsIs_If_NoLocalTextProvider()
     {
         Assert.Equal("Dummy", new LocalText("Dummy").ToString(localizer: null));
-        Assert.Null(new LocalText(null).ToString(localizer: null));
+        Assert.Equal(string.Empty, new LocalText(null).ToString(localizer: null));
         Assert.Equal(string.Empty, new LocalText(string.Empty).ToString(localizer: null));
     }
 
