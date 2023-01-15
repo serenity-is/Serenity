@@ -1,5 +1,4 @@
-﻿using Serenity.Localization;
-using SerenityIs.Administration;
+﻿using SerenityIs.Administration;
 using System.IO;
 
 namespace Serenity.Web

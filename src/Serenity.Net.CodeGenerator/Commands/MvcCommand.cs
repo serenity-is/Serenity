@@ -1,6 +1,4 @@
-﻿using Serenity.CodeGeneration;
-
-namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator
 {
     public class MvcCommand : BaseFileSystemCommand
     {

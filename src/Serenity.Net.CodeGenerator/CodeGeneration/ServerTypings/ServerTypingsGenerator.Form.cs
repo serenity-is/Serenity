@@ -1,8 +1,6 @@
 ﻿#if !ISSOURCEGENERATOR
 using Mono.Cecil.Cil;
 #endif
-using System.Linq;
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace Serenity.CodeGeneration

@@ -1,5 +1,4 @@
 ﻿using Scriban.Runtime;
-using static Serenity.CodeGenerator.EntityModel;
 
 namespace Serenity.CodeGenerator
 {
