@@ -1,3 +1,8 @@
+## 6.4.7 (2023-01-16)
+
+Bugfixes:
+  - fix sleekgrid groupitemmetadataprovider group header totals
+
 ## 6.4.6 (2023-01-16)
 
 Bugfixes:

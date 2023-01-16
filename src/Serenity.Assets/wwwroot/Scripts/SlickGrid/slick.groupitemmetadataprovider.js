@@ -155,7 +155,7 @@ Slick._ = (() => {
       var _a, _b, _c, _d, _e;
       var item = ctx.item;
       if (!item.__groupTotals && item.totals)
-        ctx.item = ctx.item.totals;
+        item = item.totals;
       return (_e = (_d = (_b = (_a = ctx.column) == null ? void 0 : _a.groupTotalsFormatter) == null ? void 0 : _b.call(_a, item, ctx.column)) != null ? _d : (_c = grid == null ? void 0 : grid.groupTotalsFormatter) == null ? void 0 : _c.call(grid, item, ctx.column)) != null ? _e : "";
     }
     init(grid) {
