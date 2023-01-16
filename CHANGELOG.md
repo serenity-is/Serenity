@@ -1,3 +1,8 @@
+## 6.4.6 (2023-01-16)
+
+Bugfixes:
+  - fix sleekgrid groupitemmetadataprovider colspan calculation
+
 ## 6.4.4 (2023-01-08)
 
 Bugfixes:

@@ -157,7 +157,7 @@ Slick._ = (() => {
     function getFooterRowCols() {
       return [footerRowColsL, footerRowColsR];
     }
-    const getCanvasNodeFor = (row, cell) => {
+    const getCanvasNodeFor = (cell, row) => {
       if (row == null && cell == null)
         return canvasTopL;
       var rightSide = cell >= frozenCols;
@@ -177,7 +177,7 @@ Slick._ = (() => {
     function getScrollContainerY() {
       return scrollContainerY;
     }
-    function getViewportNodeFor(row, cell) {
+    function getViewportNodeFor(cell, row) {
       if (row == null && cell == null)
         return canvasTopL;
       var rightSide = cell >= frozenCols;

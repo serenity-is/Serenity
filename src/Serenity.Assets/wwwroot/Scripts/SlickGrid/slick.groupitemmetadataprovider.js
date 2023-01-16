@@ -96,7 +96,7 @@ Slick._ = (() => {
           }
         }
         result.colspan = 0;
-        for (var idx = result.cell + 1; idx <= cols.length; idx++) {
+        for (var idx = result.cell + 1; idx < cols.length; idx++) {
           var col2 = cols[idx];
           if (!((_d = (_c = this.options).hasSummaryType) == null ? void 0 : _d.call(_c, col2)) && !!(col1 == null ? void 0 : col1.frozen) === !!(col2 == null ? void 0 : col2.frozen)) {
             result.colspan++;

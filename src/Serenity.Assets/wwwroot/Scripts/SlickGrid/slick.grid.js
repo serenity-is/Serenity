@@ -557,7 +557,7 @@ Slick._ = (() => {
     box.bottom = box.top + box.height;
     box.right = box.left + box.width;
     var offsetParent = elem.offsetParent;
-    while ((elem = elem.parentNode) != document.body) {
+    while ((elem = elem.parentNode) != document.body && elem != null) {
       if (box.visible && elem.scrollHeight != elem.offsetHeight && getComputedStyle(elem).overflowY !== "visible") {
         box.visible = box.bottom > elem.scrollTop && box.top < elem.scrollTop + elem.clientHeight;
       }
@@ -655,8 +655,8 @@ Slick._ = (() => {
   function simpleArrayEquals(arr1, arr2) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)
       return false;
-    arr1.sort();
-    arr2.sort();
+    arr1 = arr1.slice().sort();
+    arr2 = arr2.slice().sort();
     for (var i = 0; i < arr1.length; i++) {
       if (arr1[i] !== arr2[i])
         return false;
@@ -823,15 +823,16 @@ Slick._ = (() => {
     var p = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
     var delta = 0;
     for (var val of p)
-      delta += delta += parsePx(style.getPropertyValue(val)) || 0;
+      delta += parsePx(style.getPropertyValue(val)) || 0;
     return delta;
   }
   function getInnerWidth(el) {
+    var _a;
     var style = getComputedStyle(el);
-    var width = parseFloat(style.width);
+    var width = (_a = parsePx(style.width)) != null ? _a : 0;
     if (style.boxSizing != "border-box")
-      return width;
-    var p = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
+      return Math.max(0, width);
+    var p = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
     for (var val of p)
       width -= parsePx(style.getPropertyValue(val)) || 0;
     return Math.max(width, 0);
@@ -1050,7 +1051,7 @@ Slick._ = (() => {
       this._data = data;
       this._colDefaults = Object.assign({}, columnDefaults);
       this._options = options = Object.assign({}, gridDefaults, options);
-      options.jQuery = this._jQuery = options.jQuery === void 0 ? typeof jQuery !== "undefined" ? jQuery : void 0 : void 0;
+      options.jQuery = this._jQuery = options.jQuery === void 0 ? typeof jQuery !== "undefined" ? jQuery : void 0 : options.jQuery;
       if (this._jQuery && container instanceof this._jQuery)
         this._container = container[0];
       else if (container instanceof Element)
@@ -1250,17 +1251,19 @@ Slick._ = (() => {
       }
     }
     setSelectionModel(model) {
-      if (this._selectionModel) {
-        this._selectionModel.onSelectedRangesChanged.unsubscribe(this.handleSelectedRangesChanged);
-        if (this._selectionModel.destroy) {
-          this._selectionModel.destroy();
-        }
-      }
+      this.unregisterSelectionModel();
       this._selectionModel = model;
       if (this._selectionModel) {
         this._selectionModel.init(this);
         this._selectionModel.onSelectedRangesChanged.subscribe(this.handleSelectedRangesChanged);
       }
+    }
+    unregisterSelectionModel() {
+      var _a, _b;
+      if (!this._selectionModel)
+        return;
+      this._selectionModel.onSelectedRangesChanged.unsubscribe(this.handleSelectedRangesChanged);
+      (_b = (_a = this._selectionModel).destroy) == null ? void 0 : _b.call(_a);
     }
     getScrollBarDimensions() {
       return this._scrollDims;
@@ -1285,35 +1288,29 @@ Slick._ = (() => {
       return columnIdOrIdx;
     }
     getCanvasNode(columnIdOrIdx, row) {
-      return this._layout.getCanvasNodeFor(row || 0, this.colIdOrIdxToCell(columnIdOrIdx || 0));
+      return this._layout.getCanvasNodeFor(this.colIdOrIdxToCell(columnIdOrIdx || 0), row || 0);
     }
     getCanvases() {
       var canvases = this._layout.getCanvasNodes();
       return this._jQuery ? this._jQuery(canvases) : canvases;
     }
     getActiveCanvasNode(e) {
-      this.setActiveCanvasNode(e);
-      return this._activeCanvasNode;
-    }
-    setActiveCanvasNode(e) {
       if (e) {
         this._activeCanvasNode = e.target.closest(".grid-canvas");
       }
+      return this._activeCanvasNode;
     }
     getViewportNode(columnIdOrIdx, row) {
-      return this._layout.getViewportNodeFor(row || 0, this.colIdOrIdxToCell(columnIdOrIdx || 0));
+      return this._layout.getViewportNodeFor(this.colIdOrIdxToCell(columnIdOrIdx || 0), row || 0);
     }
     getViewports() {
       return this._layout.getViewportNodes();
     }
     getActiveViewportNode(e) {
-      this.setActiveViewportNode(e);
-      return this._activeViewportNode;
-    }
-    setActiveViewportNode(e) {
       if (e) {
         this._activeViewportNode = e.target.closest(".slick-viewport");
       }
+      return this._activeViewportNode;
     }
     getAvailableWidth() {
       return this._viewportInfo.hasVScroll ? this._viewportInfo.width - this._scrollDims.width : this._viewportInfo.width;
@@ -1863,6 +1860,7 @@ Slick._ = (() => {
       this._stylesheet = null;
     }
     destroy() {
+      var _a;
       this.getEditorLock().cancelCurrentEdit();
       this.trigger(this.onBeforeDestroy);
       var i = this._plugins.length;
@@ -1873,7 +1871,9 @@ Slick._ = (() => {
         this._jQuery(this._layout.getHeaderCols()).filter(":ui-sortable").sortable("destroy");
       }
       this.unbindAncestorScrollEvents();
-      this._jQuery(this._container).off(".slickgrid");
+      this.unbindFromData();
+      this.unregisterSelectionModel();
+      (_a = this._jQuery) == null ? void 0 : _a.call(this, this._container).off(".slickgrid");
       this.removeCssRules();
       var canvasNodes = this._layout.getCanvasNodes();
       if (this._jQuery)

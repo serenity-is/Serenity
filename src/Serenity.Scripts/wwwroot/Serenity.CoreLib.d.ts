@@ -1890,6 +1890,7 @@ declare namespace Slick {
     	unregisterPlugin(plugin: IPlugin): void;
     	getPluginByName(name: string): IPlugin;
     	setSelectionModel(model: SelectionModel): void;
+    	private unregisterSelectionModel;
     	getScrollBarDimensions(): {
     		width: number;
     		height: number;
@@ -1904,11 +1905,9 @@ declare namespace Slick {
     	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
     	getCanvases(): JQuery | HTMLElement[];
     	getActiveCanvasNode(e?: IEventData): HTMLElement;
-    	setActiveCanvasNode(e?: IEventData): void;
     	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
     	private getViewports;
     	getActiveViewportNode(e?: IEventData): HTMLElement;
-    	setActiveViewportNode(e?: IEventData): void;
     	private getAvailableWidth;
     	private updateCanvasWidth;
     	private unbindAncestorScrollEvents;
