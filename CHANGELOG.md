@@ -1,3 +1,8 @@
+## 6.4.8 (2022-01-18)
+
+Bugfixes:
+  - set Widget.idPrefix to the value passed from property grid options, https://github.com/serenity-is/common-features/issues/21, so that the invalid examples in common-features like OtherFormInTab etc. work
+  
 ## 6.4.7 (2023-01-16)
 
 Bugfixes:
