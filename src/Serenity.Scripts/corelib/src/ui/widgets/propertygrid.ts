@@ -10,12 +10,15 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     private editors: Widget<any>[];
     private items: PropertyItem[];
+    declare public readonly idPrefix: string;
 
     constructor(div: JQuery, opt: PropertyGridOptions) {
         super(div, opt);
 
-        if (opt.mode == null)
-            opt.mode = 1;
+        this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
+
+        if (this.options.mode == null)
+            this.options.mode = 1;
 
         div.addClass('s-PropertyGrid');
         this.editors = [];
@@ -172,7 +175,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             .text(this.determineText(category, function (prefix) {
                 return prefix + 'Categories.' + category;
             }))
-            .attr('name', this.options.idPrefix + 
+            .attr('name', this.idPrefix + 
                 'Category' + categoryIndexes[category].toString()))
             .appendTo(categoryDiv);
 
@@ -279,7 +282,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 }
             }
         }
-        var editorId = this.options.idPrefix + item.name;
+        var editorId = this.idPrefix + item.name;
         var title = this.determineText(item.title, function (prefix) {
             return prefix + item.name;
         });
@@ -468,7 +471,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                             return prefix + 'Categories.' + this.category.$;
                         }.bind({ category: category })))
                     .attr('tabindex', '-1')
-                    .attr('href', '#' + this.options.idPrefix +
+                    .attr('href', '#' + this.idPrefix +
                         'Category' + index.toString())
                     .click(this.categoryLinkClick)
                     .prependTo(container);
@@ -488,7 +491,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 
     get_idPrefix(): string {
-        return this.options.idPrefix;
+        return this.idPrefix;
     }
 
     get_mode(): PropertyGridMode {

@@ -61,7 +61,7 @@ export class Widget<TOptions = any> {
     protected options: TOptions;
     protected widgetName: string;
     protected uniqueName: string;
-    protected idPrefix: string;
+    declare public readonly idPrefix: string;
 
     constructor(element: JQuery, options?: TOptions) {
 

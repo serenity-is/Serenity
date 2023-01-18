@@ -2847,7 +2847,7 @@ declare namespace Serenity {
         protected options: TOptions;
         protected widgetName: string;
         protected uniqueName: string;
-        protected idPrefix: string;
+        readonly idPrefix: string;
         constructor(element: JQuery, options?: TOptions);
         destroy(): void;
         protected addCssClass(): void;
@@ -3028,6 +3028,7 @@ declare namespace Serenity {
     class PropertyGrid extends Widget<PropertyGridOptions> {
         private editors;
         private items;
+        readonly idPrefix: string;
         constructor(div: JQuery, opt: PropertyGridOptions);
         destroy(): void;
         private createItems;
