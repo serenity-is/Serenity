@@ -1,3 +1,10 @@
+## 6.4.9 (2022-01-21)
+
+Bugfixes:
+  - [WARNING!] If htmlEncode is not called when using local texts in a script method (e.g. `<div>{ text("SomeKey") }</div>` instead of `<div>{ htmlEncode(text("SomeKey")) }</div>`, like getTemplate etc. an attacker may use the translations screen to inject javascript. This affected parts of our demo as everyone can login as admin and can use the translation screen. The translations are reset every 30 mins in our demo so it was not a big issue. But you are strongly recommended to check your own code in addition to standard screens like login, reset password etc. See our latest commits in Serene/StartSharp/Common Features, etc. repositories for fixes we applied. Even if no one other than the admin can enter translations screen, it is still a good idea to mitigate the risk as you should not trust translators, even the admin himself. We can't change the "text" or "tryGetText" functions to htmlEncode by default, as they may be used by others in contexts other than HTML like functions which expects raw text like notify messages, dialog titles, column titles etc., which would result in double HTML encoding. Prefer localText() function instead of obsolete text() function for better discoverability (but it does not encode as well)
+
+[BREAKING CHANGE] htmlEncode now also encodes single and double quotes just like attrEncode. This is done to avoid cases where a developer might use htmlEncode in an attribute instead of attrEncode by mistake.
+
 ## 6.4.8 (2022-01-18)
 
 Bugfixes:
