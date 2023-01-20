@@ -1,4 +1,4 @@
-﻿import { attrEncode, Culture, Enum, format, formatDate, formatNumber, getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "@serenity-is/corelib/q";
+﻿import { Culture, Enum, format, formatDate, formatNumber, getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "@serenity-is/corelib/q";
 import { Formatter } from "@serenity-is/corelib/slick";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
@@ -159,7 +159,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
             originalName, dbFile, downloadUrl);
 
         return "<a class='file-download-link' target='_blank' href='" +
-            attrEncode(downloadUrl) + "'>" + htmlEncode(text) + '</a>';
+            htmlEncode(downloadUrl) + "'>" + htmlEncode(text) + '</a>';
     }
 
     static dbFileUrl(filename: string): string {
@@ -264,7 +264,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         if (!isEmptyOrNull(this.displayFormat))
             display = format(this.displayFormat, display);
 
-        var s = "<a href='" + attrEncode(url) + "'";
+        var s = "<a href='" + htmlEncode(url) + "'";
         if (!isEmptyOrNull(this.target))
             s += " target='" + this.target + "'";
 

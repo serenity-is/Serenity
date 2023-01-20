@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { notifyError, text } from "@serenity-is/corelib/q";
+import { notifyError, localText } from "@serenity-is/corelib/q";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { FilterPanel } from "./filterpanel";
 
@@ -16,7 +16,7 @@ export class FilterDialog extends TemplatedDialog<any> {
         this.filterPanel.set_showSearchButton(false);
         this.filterPanel.set_updateStoreOnReset(false);
 
-        this.dialogTitle = text('Controls.FilterPanel.DialogTitle');
+        this.dialogTitle = localText('Controls.FilterPanel.DialogTitle');
     }
 
     get_filterPanel(): FilterPanel {
@@ -30,11 +30,11 @@ export class FilterDialog extends TemplatedDialog<any> {
     protected getDialogButtons() {
         return [
             {
-                text: text('Dialogs.OkButton'),
+                text: localText('Dialogs.OkButton'),
                 click: () => {
                     this.filterPanel.search();
                     if (this.filterPanel.get_hasErrors()) {
-                        notifyError(text('Controls.FilterPanel.FixErrorsMessage'), '', null);
+                        notifyError(localText('Controls.FilterPanel.FixErrorsMessage'), '', null);
                         return;
                     }
 
@@ -42,7 +42,7 @@ export class FilterDialog extends TemplatedDialog<any> {
                 }
             },
             {
-                text: text('Dialogs.CancelButton'),
+                text: localText('Dialogs.CancelButton'),
                 click: () => this.dialogClose()
             }
         ];

@@ -1,5 +1,5 @@
 ﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, text } from "@serenity-is/corelib/q";
+import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, localText } from "@serenity-is/corelib/q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -65,11 +65,11 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
     protected getDialogButtons() {
         super.getDialogButtons();
         return <DialogButton[]>[{
-            text: text('Dialogs.OkButton'),
+            text: localText('Dialogs.OkButton'),
             cssClass: "btn btn-primary",
             click: () => this.okClick()
         }, {
-            text: text('Dialogs.CancelButton'),
+            text: localText('Dialogs.CancelButton'),
             click: () => this.cancelClick()
         }];
     }

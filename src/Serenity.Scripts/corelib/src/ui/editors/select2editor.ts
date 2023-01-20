@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, PropertyItem, startsWith, text, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
+import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, PropertyItem, startsWith, localText, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -84,7 +84,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
 
         if (this.useInplaceAdd())
-            this.addInplaceCreate(text('Controls.SelectEditor.InplaceAdd'), null);
+            this.addInplaceCreate(localText('Controls.SelectEditor.InplaceAdd'), null);
     }
 
     destroy() {
@@ -113,7 +113,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected emptyItemText() {
         return this.element.attr('placeholder') ??
-            text('Controls.SelectEditor.EmptyItemText');
+            localText('Controls.SelectEditor.EmptyItemText');
     }
 
     protected getPageSize(): number {
@@ -380,8 +380,8 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected addInplaceCreate(addTitle: string, editTitle: string) {
         var self = this;
-        addTitle = (addTitle ?? text('Controls.SelectEditor.InplaceAdd'));
-        editTitle = (editTitle ?? text('Controls.SelectEditor.InplaceEdit'));
+        addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
+        editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
         var inplaceButton = $('<a><b/></a>')
             .addClass('inplace-button inplace-create')
             .attr('title', addTitle)
@@ -470,7 +470,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
                 return {
                     id: (-2147483648).toString(),
-                    text: text('Controls.SelectEditor.NoResultsClickToDefine')
+                    text: localText('Controls.SelectEditor.NoResultsClickToDefine')
                 };
             }
 
@@ -483,7 +483,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
             return {
                 id: (-2147483648).toString(),
-                text: text('Controls.SelectEditor.ClickToDefine')
+                text: localText('Controls.SelectEditor.ClickToDefine')
             };
         }
     }

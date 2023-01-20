@@ -1,6 +1,6 @@
 ﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { attrEncode, Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, text, tryGetText } from "@serenity-is/corelib/q";
+import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText } from "@serenity-is/corelib/q";
 import { Format, Formatter, RemoteView } from "@serenity-is/corelib/slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -362,7 +362,7 @@ export namespace GridUtils {
         };
 
         if (hint == null) 
-            hint = text('Controls.EntityGrid.IncludeDeletedToggle');
+            hint = localText('Controls.EntityGrid.IncludeDeletedToggle');
         
         addToggleButton(toolDiv, 's-IncludeDeletedToggle',
             function (pressed) {
@@ -657,8 +657,8 @@ export namespace SlickFormatting {
         extraClass: string, encode: boolean): string {
         return '<a' + (id != null ? (' href="#' + replaceAll(itemType, '.', '-') +
             '/' + id + '"') : '') + ' data-item-type="' +
-            attrEncode(itemType) + '"' + ' data-item-id="' +
-            attrEncode(id) + '"' + ' class="s-EditLink s-' +
+            htmlEncode(itemType) + '"' + ' data-item-id="' +
+            htmlEncode(id) + '"' + ' class="s-EditLink s-' +
             replaceAll(itemType, '.', '-') + 'Link' +
             (isEmptyOrNull(extraClass) ? '' : (' ' + extraClass)) + '">' +
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
@@ -692,7 +692,7 @@ export namespace SlickHelper {
             if (localTextPrefix != null && col.id != null &&
                 (col.name == null || startsWith(col.name, '~'))) {
                 var key = (col.name != null ? col.name.substr(1) : col.id);
-                col.name = text(localTextPrefix + key);
+                col.name = localText(localTextPrefix + key);
             }
         }
 

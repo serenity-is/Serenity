@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Criteria, Culture, delegateCombine, delegateRemove, PropertyItem, text, tryGetText } from "@serenity-is/corelib/q";
+import { ArgumentNullException, Criteria, Culture, delegateCombine, delegateRemove, PropertyItem, localText, tryGetText } from "@serenity-is/corelib/q";
 import { FilterLine } from "./filterline";
 
 @Decorators.registerClass('Serenity.FilterStore')
@@ -115,7 +115,7 @@ export class FilterStore {
             }
 
             if (displayText.length > 0) {
-                displayText += ' ' + text('Controls.FilterPanel.' +
+                displayText += ' ' + localText('Controls.FilterPanel.' +
                     (line.isOr ? 'Or' : 'And')) + ' ';
             }
 

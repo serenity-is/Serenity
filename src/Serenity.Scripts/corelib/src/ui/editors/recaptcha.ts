@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { addValidationRule, isEmptyOrNull, text } from "@serenity-is/corelib/q";
+import { addValidationRule, isEmptyOrNull, localText } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 
 export interface RecaptchaOptions {
@@ -39,7 +39,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
 
         addValidationRule(input, this.uniqueName, e => {
             if (isEmptyOrNull(this.get_value())) {
-                return text('Validation.Required');
+                return localText('Validation.Required');
             }
             return null;
         });

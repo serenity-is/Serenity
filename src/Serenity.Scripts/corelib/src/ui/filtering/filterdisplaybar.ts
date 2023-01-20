@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { text, trimToNull } from "@serenity-is/corelib/q";
+import { localText, trimToNull } from "@serenity-is/corelib/q";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
@@ -10,13 +10,13 @@ export class FilterDisplayBar extends FilterWidgetBase<any> {
         super(div);
 
         this.element.find('.cap').text(
-            text('Controls.FilterPanel.EffectiveFilter'));
+            localText('Controls.FilterPanel.EffectiveFilter'));
 
         this.element.find('.edit').text(
-            text('Controls.FilterPanel.EditFilter'));
+            localText('Controls.FilterPanel.EditFilter'));
 
         this.element.find('.reset').attr('title',
-            text('Controls.FilterPanel.ResetFilterHint'));
+            localText('Controls.FilterPanel.ResetFilterHint'));
 
         var openFilterDialog = (e: JQueryEventObject) => {
             e.preventDefault();
@@ -44,7 +44,7 @@ export class FilterDisplayBar extends FilterWidgetBase<any> {
         this.element.find('.reset').toggle(displayText != null);
 
         if (displayText == null)
-            displayText = text('Controls.FilterPanel.EffectiveEmpty');
+            displayText = localText('Controls.FilterPanel.EffectiveEmpty');
 
         this.element.find('.txt').text('[' + displayText + ']');
     }

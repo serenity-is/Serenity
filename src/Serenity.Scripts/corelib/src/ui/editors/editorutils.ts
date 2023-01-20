@@ -1,5 +1,5 @@
 ﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
-import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, PropertyItem, safeCast, text, tryGetText } from "@serenity-is/corelib/q";
+import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, PropertyItem, safeCast, localText, tryGetText } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 
 export namespace EditorUtils {
@@ -193,7 +193,7 @@ export namespace EditorUtils {
         var gridField = widget.element.closest('.field');
         var hasSupItem = gridField.find('sup').get().length > 0;
         if (isRequired && !hasSupItem) {
-            $('<sup>*</sup>').attr('title', text('Controls.PropertyGrid.RequiredHint'))
+            $('<sup>*</sup>').attr('title', localText('Controls.PropertyGrid.RequiredHint'))
                 .prependTo(gridField.find('.caption')[0]);
         }
         else if (!isRequired && hasSupItem) {

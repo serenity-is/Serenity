@@ -150,7 +150,7 @@ export namespace AggregateFormatting {
         var value = totals[aggType][column.field];
         var formattedValue = formatValue(column, value);
     
-        return "<span class='aggregate agg-" + aggType + "'  title='" + text + "'>" +
+        return "<span class='aggregate agg-" + aggType + "'  title='" + htmlEncode(text) + "'>" +
             formattedValue +
             "</span>";
     }

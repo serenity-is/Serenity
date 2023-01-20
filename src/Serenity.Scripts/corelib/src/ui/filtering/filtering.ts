@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Config, Criteria, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeShortName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, PropertyItem, startsWith, text, tryGetText } from "@serenity-is/corelib/q";
+import { ArgumentNullException, Config, Criteria, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeShortName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, PropertyItem, startsWith, localText, tryGetText } from "@serenity-is/corelib/q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";
@@ -235,7 +235,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected argumentNull() {
-        return new ArgumentNullException('value', text('Controls.FilterPanel.ValueRequired'));
+        return new ArgumentNullException('value', localText('Controls.FilterPanel.ValueRequired'));
     }
 
     validateEditorValue(value: string) {

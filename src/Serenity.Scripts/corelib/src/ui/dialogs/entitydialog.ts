@@ -1,6 +1,6 @@
 ﻿import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirmDialog, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, text, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "@serenity-is/corelib/q";
+import { any, Authorization, confirmDialog, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, localText, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "@serenity-is/corelib/q";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -111,11 +111,11 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected getEntityTitle(): string {
         if (!this.isEditMode()) {
-            return format(text('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
+            return format(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
         }
         else {
             var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
-                text('Controls.EntityDialog.ViewRecordTitle') : text('Controls.EntityDialog.EditRecordTitle');
+                localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
             var title = this.getEntityNameFieldValue() ?? '';
             return format(titleFormat,
                 this.getEntitySingular(), (isEmptyOrNull(title) ? '' : (' (' + title + ')')));
@@ -879,14 +879,14 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected showSaveSuccessMessage(response: SaveResponse): void {
-        notifySuccess(text('Controls.EntityDialog.SaveSuccessMessage'), '', null);
+        notifySuccess(localText('Controls.EntityDialog.SaveSuccessMessage'), '', null);
     }
 
     protected getToolbarButtons(): ToolButton[] {
         var list: ToolButton[] = [];
 
         list.push({
-            title: text('Controls.EntityDialog.SaveButton'),
+            title: localText('Controls.EntityDialog.SaveButton'),
             cssClass: 'save-and-close-button',
             icon: 'fa-check-circle text-purple',
             hotkey: 'alt+s',
@@ -901,7 +901,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         list.push({
             title: '',
-            hint: text('Controls.EntityDialog.ApplyChangesButton'),
+            hint: localText('Controls.EntityDialog.ApplyChangesButton'),
             cssClass: 'apply-changes-button',
             icon: 'fa-clipboard-check text-purple',
             hotkey: 'alt+a',
@@ -927,12 +927,12 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         });
 
         list.push({
-            title: text('Controls.EntityDialog.DeleteButton'),
+            title: localText('Controls.EntityDialog.DeleteButton'),
             cssClass: 'delete-button',
             icon: 'fa-trash-o text-red',
             hotkey: 'alt+x',
             onClick: () => {
-                confirmDialog(text('Controls.EntityDialog.DeleteConfirmation'), () => {
+                confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'), () => {
                     this.doDelete(() => this.dialogClose());
                 });
             },
@@ -941,11 +941,11 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         });
 
         list.push({
-            title: text('Controls.EntityDialog.UndeleteButton'),
+            title: localText('Controls.EntityDialog.UndeleteButton'),
             cssClass: 'undo-delete-button',
             onClick: () => {
                 if (this.isDeleted()) {
-                    confirmDialog(text('Controls.EntityDialog.UndeleteConfirmation'), () => {
+                    confirmDialog(localText('Controls.EntityDialog.UndeleteConfirmation'), () => {
                         this.undelete(() => this.loadById(this.get_entityId()));
                     });
                 }
@@ -956,7 +956,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         if (this.useViewMode()) {
             list.push({
-                title: text('Controls.EntityDialog.EditButton'),
+                title: localText('Controls.EntityDialog.EditButton'),
                 cssClass: 'edit-button',
                 icon: 'fa-edit',
                 onClick: () => {
@@ -973,13 +973,13 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         }
 
         list.push({
-            title: text('Controls.EntityDialog.LocalizationButton'),
+            title: localText('Controls.EntityDialog.LocalizationButton'),
             cssClass: 'localization-button',
             onClick: () => this.localizationButtonClick()
         });
 
         list.push({
-            title: text('Controls.EntityDialog.CloneButton'),
+            title: localText('Controls.EntityDialog.CloneButton'),
             cssClass: 'clone-button',
             icon: 'fa-clone',
             onClick: () => {
@@ -1054,8 +1054,8 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             this.localizationButton.toggle(this.localizationGrid != null);
             this.localizationButton.find('.button-inner')
                 .text((this.isLocalizationMode() ?
-                    text('Controls.EntityDialog.LocalizationBack') :
-                    text('Controls.EntityDialog.LocalizationButton')));
+                    localText('Controls.EntityDialog.LocalizationBack') :
+                    localText('Controls.EntityDialog.LocalizationButton')));
         }
 
         if (isLocalizationMode) {

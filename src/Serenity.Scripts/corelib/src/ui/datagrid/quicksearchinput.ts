@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull, isValue, text, trim } from "@serenity-is/corelib/q";
+import { isEmptyOrNull, isValue, localText, trim } from "@serenity-is/corelib/q";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
@@ -26,8 +26,8 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
     constructor(input: JQuery, opt: QuickSearchInputOptions) {
         super(input, opt);
 
-        input.attr('title', text('Controls.QuickSearch.Hint'))
-            .attr('placeholder', text('Controls.QuickSearch.Placeholder'));
+        input.attr('title', localText('Controls.QuickSearch.Hint'))
+            .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
         this.lastValue = trim(input.val() ?? '');
 
         var self = this;
@@ -44,7 +44,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
 
         if (isValue(this.options.fields) && this.options.fields.length > 0) {
             var a = $('<a/>').addClass('quick-search-field').attr('title',
-                text('Controls.QuickSearch.FieldSelection')).insertBefore(input);
+                localText('Controls.QuickSearch.FieldSelection')).insertBefore(input);
 
             var menu = $('<ul></ul>').css('width', '120px');
 

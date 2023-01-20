@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, Culture, format, formatDate, Invariant, isEmptyOrNull, parseDate, parseISODateTime, replaceAll, text, today } from "@serenity-is/corelib/q";
+import { addValidationRule, Culture, format, formatDate, Invariant, isEmptyOrNull, parseDate, parseISODateTime, replaceAll, localText, today } from "@serenity-is/corelib/q";
 import { Widget } from "../widgets/widget";
 
 export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="currentColor"></path></svg>';
@@ -55,11 +55,11 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             }
 
             if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_minValue(), 'yyyy-MM-dd')) < 0) {
-                return format(text('Validation.MinDate'), formatDate(this.get_minValue(), null));
+                return format(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
             }
 
             if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_maxValue(), 'yyyy-MM-dd')) > 0) {
-                return format(text('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
+                return format(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
             }
 
             return null;

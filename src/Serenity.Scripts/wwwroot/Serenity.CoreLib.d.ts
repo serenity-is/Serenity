@@ -768,16 +768,12 @@ declare namespace Q {
     function clearOptions(select: JQuery): void;
     function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
     /**
-     * Html attribute encodes a string (encodes quotes in addition to &, > and <)
-     * @param s String to be HTML attribute encoded
-     */
-    function attrEncode(s: any): string;
-    /**
-     * Html encodes a string
+     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
      * @param s String to be HTML encoded
      */
     function htmlEncode(s: any): string;
-    function log(m: any): void;
+    /** @obsolete use htmlEncode as it also encodes quotes */
+    const attrEncode: typeof htmlEncode;
     function newBodyDiv(): JQuery;
     function outerHtml(element: JQuery): string;
 
@@ -801,7 +797,9 @@ declare namespace Q {
     function executeOnceWhenVisible(element: JQuery, callback: Function): void;
     function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
-    function text(key: string): string;
+    function localText(key: string): string;
+    /** @obsolete prefer localText for better discoverability */
+    const text: typeof localText;
     function dbText(prefix: string): ((key: string) => string);
     function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
     function tryGetText(key: string): string;

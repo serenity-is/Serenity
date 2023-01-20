@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, text, trimToNull } from "@serenity-is/corelib/q";
+import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, localText, trimToNull } from "@serenity-is/corelib/q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { Widget } from "../widgets/widget";
 
@@ -41,7 +41,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
             if (e.hasClass('required')) {
                 var value = trimToNull(this.get_value());
                 if (value == null)
-                    return text('Validation.Required');
+                    return localText('Validation.Required');
             }
 
             return null;

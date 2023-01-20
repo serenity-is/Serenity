@@ -1,4 +1,4 @@
-﻿import { extend, text } from "@serenity-is/corelib/q";
+﻿import { htmlEncode, extend, localText } from "@serenity-is/corelib/q";
 import { PagerOptions } from "@serenity-is/corelib/slick";
 import { Decorators } from "../../decorators";
 import { Widget } from "../widgets/widget";
@@ -25,7 +25,7 @@ export class SlickPager extends Widget<PagerOptions> {
                         '<div class="slick-pg-first slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
                         '<div class="slick-pg-prev slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
                     '</div><div class="slick-pg-sep"></div><div class="slick-pg-grp">' + 
-                        '<span class="slick-pg-control">&nbsp;' + text("Controls.Pager.Page") +
+                        '<span class="slick-pg-control">&nbsp;' + htmlEncode(localText("Controls.Pager.Page")) +
                         '&nbsp;<input class="slick-pg-current" type="text" size="4" value="1" /> / ' +
                         '<span class="slick-pg-total"> 1 </span></span>' + 
                     '</div><div class="slick-pg-sep"></div><div class="slick-pg-grp">' + 
@@ -132,19 +132,19 @@ export class SlickPager extends Widget<PagerOptions> {
         var stat: string;
 
         if (info.loading) {
-            stat = text("Controls.Pager.LoadingStatus");
+            stat = htmlEncode(localText("Controls.Pager.LoadingStatus"));
         }
         else if (info.error) {
             stat = info.error;
         }
         else if (info.totalCount > 0) {
-            stat = text("Controls.Pager.PageStatus");
+            stat = htmlEncode(localText("Controls.Pager.PageStatus"));
             stat = stat.replace(/{from}/, <any>r1);
             stat = stat.replace(/{to}/, <any>r2);
             stat = stat.replace(/{total}/, <any>info.totalCount);
         }
         else
-            stat = text("Controls.Pager.NoRowStatus");
+            stat = htmlEncode(localText("Controls.Pager.NoRowStatus"));
 
         $('.slick-pg-stat', this.element).html(stat);
         $('.slick-pg-size', this.element).val((info.rowsPerPage || 0).toString());

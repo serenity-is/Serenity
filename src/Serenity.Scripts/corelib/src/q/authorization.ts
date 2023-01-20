@@ -1,4 +1,4 @@
-﻿import { text } from "./localtext";
+﻿import { localText } from "./localtext";
 import { notifyError } from "./notify";
 import { getRemoteData } from "./scriptdata";
 import { UserDefinition } from "./userdefinition";
@@ -50,8 +50,8 @@ export namespace Authorization {
 
     export function validatePermission(permission: string) {
         if (!hasPermission(permission)) {
-            notifyError(text("Authorization.AccessDenied"));
-            throw new Error(text("Authorization.AccessDenied"));
+            notifyError(localText("Authorization.AccessDenied"));
+            throw new Error(localText("Authorization.AccessDenied"));
         }
     }
 }

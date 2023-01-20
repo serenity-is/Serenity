@@ -1,6 +1,6 @@
 ﻿import { Config } from "./config";
 import { extend } from "./system";
-import { attrEncode, htmlEncode } from "./html";
+import { htmlEncode } from "./html";
 import { startsWith } from "./strings";
 import { tryGetText } from "./localtext";
 
@@ -142,8 +142,8 @@ export function dialogButtonToBS(x: DialogButton) {
     var text = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
     if (iconClass != null)
-        text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");            
-    return `<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + attrEncode(x.hint) + '"') : '' }>${text}</button>`;
+        text = '<i class="' + iconClass + "><i>" + (text ? (" " + text) : "");
+    return `<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + htmlEncode(x.hint) + '"') : ''}>${text}</button>`;
 }
 
 export function dialogButtonToUI(x: DialogButton) {

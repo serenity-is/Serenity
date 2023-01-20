@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, PropertyItem, replaceAll, startsWith, text, trimToNull } from "@serenity-is/corelib/q";
+import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, PropertyItem, replaceAll, startsWith, localText, trimToNull } from "@serenity-is/corelib/q";
 import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../helpers/uploadhelper";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
@@ -85,7 +85,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     protected addFileButtonText(): string {
-        return text('Controls.ImageUpload.AddFileButton');
+        return localText('Controls.ImageUpload.AddFileButton');
     }
 
     protected getToolButtons(): ToolButton[] {
@@ -98,7 +98,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             },
             {
                 title: '',
-                hint: text('Controls.ImageUpload.DeleteButtonHint'),
+                hint: localText('Controls.ImageUpload.DeleteButtonHint'),
                 cssClass: 'delete-button',
                 onClick: () => {
                     this.entity = null;
@@ -342,7 +342,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     protected addFileButtonText(): string {
-        return text('Controls.ImageUpload.AddFileButton');
+        return localText('Controls.ImageUpload.AddFileButton');
     }
 
     protected getToolButtons(): ToolButton[] {

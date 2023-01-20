@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { cast, isEmptyOrNull, PropertyItem, text, tryGetText } from "@serenity-is/corelib/q";
+import { cast, isEmptyOrNull, PropertyItem, localText, tryGetText } from "@serenity-is/corelib/q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
@@ -20,7 +20,7 @@ class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
 
     emptyItemText() {
         if (isEmptyOrNull(this.value)) {
-            return text('Controls.FilterPanel.SelectField');
+            return localText('Controls.FilterPanel.SelectField');
         }
 
         return null;
@@ -106,7 +106,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
             divl.children('.leftparen').toggleClass('active', !!item.leftParen);
             divl.children('.rightparen').toggleClass('active', !!item.rightParen);
             divl.children('.andor').toggleClass('or', !!item.isOr)
-                .text(text((!!item.isOr ? 'Controls.FilterPanel.Or' :
+                .text(localText((!!item.isOr ? 'Controls.FilterPanel.Or' :
                     'Controls.FilterPanel.And')));
 
             var fieldSelect = row.children('div.f')
@@ -172,13 +172,13 @@ export class FilterPanel extends FilterWidgetBase<any> {
     }
 
     protected initButtons(): void {
-        this.byId('AddButton').text(text('Controls.FilterPanel.AddFilter'))
+        this.byId('AddButton').text(localText('Controls.FilterPanel.AddFilter'))
             .click((e) => this.addButtonClick(e));
 
-        this.byId('SearchButton').text(text('Controls.FilterPanel.SearchButton'))
+        this.byId('SearchButton').text(localText('Controls.FilterPanel.SearchButton'))
             .click((e) => this.searchButtonClick(e));
 
-        this.byId('ResetButton').text(text('Controls.FilterPanel.ResetButton'))
+        this.byId('ResetButton').text(localText('Controls.FilterPanel.ResetButton'))
             .click((e) => this.resetButtonClick(e));
     }
 
@@ -211,7 +211,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
                 .getWidget(FilterOperatorSelect).value;
 
             if (op == null || op.length === 0) {
-                errorText = text('Controls.FilterPanel.InvalidOperator');
+                errorText = localText('Controls.FilterPanel.InvalidOperator');
                 break;
             }
 
@@ -323,18 +323,18 @@ export class FilterPanel extends FilterWidgetBase<any> {
         parenDiv.children('a.leftparen, a.rightparen')
             .click((e) => this.leftRightParenClick(e));
 
-        var andor = parenDiv.children('a.andor').attr('title', text('Controls.FilterPanel.ChangeAndOr'));
+        var andor = parenDiv.children('a.andor').attr('title', localText('Controls.FilterPanel.ChangeAndOr'));
         if (isLastRowOr) {
-            andor.addClass('or').text(text('Controls.FilterPanel.Or'));
+            andor.addClass('or').text(localText('Controls.FilterPanel.Or'));
         }
         else {
-            andor.text(text('Controls.FilterPanel.And'));
+            andor.text(localText('Controls.FilterPanel.And'));
         }
 
         andor.click((e) => this.andOrClick(e));
 
         row.children('a.delete')
-            .attr('title', text('Controls.FilterPanel.RemoveField'))
+            .attr('title', localText('Controls.FilterPanel.RemoveField'))
             .click((e) => this.deleteRowClick(e));
 
         var fieldSel = new FilterFieldSelect(row.children('div.f')
@@ -494,7 +494,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
     protected andOrClick(e: JQueryEventObject): void {
         e.preventDefault();
         var andor = $(e.target).toggleClass('or');
-        andor.text(text('Controls.FilterPanel.' +
+        andor.text(localText('Controls.FilterPanel.' +
             (andor.hasClass('or') ? 'Or' : 'And')));
     }
 

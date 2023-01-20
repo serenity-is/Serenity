@@ -1,6 +1,6 @@
 ﻿import { extend } from "./system";
 import { notifyError } from "./notify";
-import { text } from "./localtext";
+import { localText } from "./localtext";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
 import { isBS3 } from "./dialogs";
 
@@ -89,7 +89,7 @@ export function validateOptions(options: JQueryValidation.ValidationOptions) {
             return false;
         },
         invalidHandler: function (event: any, validator: JQueryValidation.Validator) {
-            notifyError(text("Validation.InvalidFormMessage"));
+            notifyError(localText("Validation.InvalidFormMessage"));
 
             $(validator.errorList.map(x => x.element))
                 .closest('.category.collapsed')

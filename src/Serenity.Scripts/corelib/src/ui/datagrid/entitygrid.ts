@@ -1,6 +1,6 @@
 ﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, text, tryGetText } from "@serenity-is/corelib/q";
+import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "@serenity-is/corelib/q";
 import { RemoteViewOptions } from "@serenity-is/corelib/slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -150,7 +150,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     }
 
     protected getAddButtonCaption(): string {
-        return format(text('Controls.EntityGrid.NewButton'), this.getItemName());
+        return format(localText('Controls.EntityGrid.NewButton'), this.getItemName());
     }
 
     protected getButtons(): ToolButton[] {
@@ -175,8 +175,8 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
 
     protected newRefreshButton(noText?: boolean): ToolButton {
         return {
-            title: (noText ? null : text('Controls.EntityGrid.RefreshButton')),
-            hint: (noText ? text('Controls.EntityGrid.RefreshButton') : null),
+            title: (noText ? null : localText('Controls.EntityGrid.RefreshButton')),
+            hint: (noText ? localText('Controls.EntityGrid.RefreshButton') : null),
             icon: 'fa-refresh text-blue',
             cssClass: 'refresh-button',
             onClick: () => {

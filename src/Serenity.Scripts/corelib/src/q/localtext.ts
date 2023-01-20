@@ -1,17 +1,21 @@
 ﻿import { getStateStore } from "./system";
 import { isEmptyOrNull, startsWith } from "./strings";
+import { htmlEncode } from "./html";
 
-export function text(key: string): string {
-    let t = getTable()[key];
+export function localText(key: string): string {
+    let t: string = getTable()[key];
     if (t == null) {
-        t = key || '';
+        t = key ?? '';
     }
     return t;
 }
 
+/** @obsolete prefer localText for better discoverability */
+export const text = localText;
+
 export function dbText(prefix: string): ((key: string) => string) {
     return function (key: string) {
-        return text("Db." + prefix + "." + key);
+        return localText("Db." + prefix + "." + key);
     }
 }
 
@@ -47,12 +51,13 @@ export function prefixedText(prefix: string) {
 }
 
 export function tryGetText(key: string): string {
-    return getTable()[key];
+    var value = getTable()[key];
+    return value;
 }
 
 export function dbTryText(prefix: string): ((key: string) => string) {
     return function (key: string) {
-        return text("Db." + prefix + "." + key);
+        return localText("Db." + prefix + "." + key);
     }
 }
 
@@ -64,7 +69,7 @@ export function proxyTexts(o: Object, p: string, t: Object): Object {
                 if (tv == null)
                     return;
                 if (typeof tv == 'number')
-                    return text(p + y);
+                    return localText(p + y);
                 else {
                     var z = o[y];
                     if (z != null)
@@ -80,7 +85,7 @@ export function proxyTexts(o: Object, p: string, t: Object): Object {
         for (var k of Object.keys(t)) {
             if (typeof t[k] == 'number')
                 Object.defineProperty(o, k, {
-                    get: () => text(p + k)
+                    get: () => localText(p + k)
                 });
             else
                 o[k] = proxyTexts({}, p + k + '.', t[k]);

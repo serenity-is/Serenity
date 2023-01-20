@@ -1,4 +1,4 @@
-﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, text } from "@serenity-is/corelib/q";
+﻿import { deepClone, extend, htmlEncode, ListRequest, ListResponse, notifyError, ServiceResponse, localText } from "@serenity-is/corelib/q";
 import { EventEmitter, EventData, Grid, gridDefaults, Group, GroupItemMetadataProvider, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
@@ -1520,7 +1520,7 @@ export class RemoteView<TEntity> {
             onAjaxCall: options.onAjaxCall || null,
             onProcessData: options.onProcessData || null,
             method: options.method || "POST",
-            errormsg: text("Controls.Pager.DefaultLoadError"),
+            errormsg: localText("Controls.Pager.DefaultLoadError"),
             sortBy: typeof options.sortBy == "string" ? [options.sortBy] : (options.sortBy || []),
             idField: idProperty
         };

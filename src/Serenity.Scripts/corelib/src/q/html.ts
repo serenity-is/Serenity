@@ -1,4 +1,4 @@
-﻿import { text } from "./localtext";
+﻿import { localText } from "./localtext";
 import { isEmptyOrNull } from "./strings";
 
 export function addOption(select: JQuery, key: string, text: string) {
@@ -6,7 +6,7 @@ export function addOption(select: JQuery, key: string, text: string) {
 }
 
 export function addEmptyOption(select: JQuery) {
-    addOption(select, '', text("Controls.SelectEditor.EmptyItemText"));
+    addOption(select, '', localText("Controls.SelectEditor.EmptyItemText"));
 }
 
 export function clearOptions(select: JQuery) {
@@ -45,56 +45,34 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string): 
     }
 }
 
-function attrEncoder(a: string): string {
-    switch (a) {
-        case '&': return '&amp;';
-        case '>': return '&gt;';
-        case '<': return '&lt;';
-        case '\'': return '&apos;'
-        case '\"': return '&quot;'
-    }
-    return a;
+const esc = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": "&apos;",
+    '&': '&amp;',
 }
 
-const attrRegex = /[><&'"]/g;
-
-/**
- * Html attribute encodes a string (encodes quotes in addition to &, > and <)
- * @param s String to be HTML attribute encoded
- */
-export function attrEncode(s: any): string {
-    let text = (s == null ? '' : s.toString());
-    if (attrRegex.test(text)) {
-        return text.replace(attrRegex, attrEncoder);
-    }
-    return text;
-}
-
-function htmlEncoder(a: string): string {
-    switch (a) {
-        case '&': return '&amp;';
-        case '>': return '&gt;';
-        case '<': return '&lt;';
-    }
-    return a;
+function escFunc(a: string) {
+    return esc[a];
 }
 
 /**
- * Html encodes a string
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String to be HTML encoded
  */
 export function htmlEncode(s: any): string {
-    let text = (s == null ? '' : s.toString());
-    if ((new RegExp('[><&]', 'g')).test(text)) {
-        return text.replace(new RegExp('[><&]', 'g'), htmlEncoder);
-    }
-    return text;
+    if (s == null)
+        return '';
+
+    if (typeof s !== "string")
+        s = "" + s;
+
+    return s.replace(/[<>"'&]/g, escFunc)
 }
 
-export function log(m: any) {
-    if (typeof console !== "undefined" && console.log)
-        console.log(m);
-}
+/** @obsolete use htmlEncode as it also encodes quotes */
+export const attrEncode = htmlEncode;
 
 export function newBodyDiv(): JQuery {
     return $('<div/>').appendTo(document.body);

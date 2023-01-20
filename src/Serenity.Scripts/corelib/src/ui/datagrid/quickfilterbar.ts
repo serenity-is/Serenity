@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Criteria, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, ListRequest, notifyWarning, parseDate, text, toId, tryGetText } from "@serenity-is/corelib/q";
+import { ArgumentNullException, Criteria, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, ListRequest, notifyWarning, parseDate, localText, toId, tryGetText } from "@serenity-is/corelib/q";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -166,12 +166,12 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 var active2 = !isTrimmedEmpty(end.value);
                 if (active1 && !parseDate(args.widget.element.val())) {
                     active1 = false;
-                    notifyWarning(text('Validation.DateInvalid'), '', null);
+                    notifyWarning(localText('Validation.DateInvalid'), '', null);
                     args.widget.element.val('');
                 }
                 if (active2 && !parseDate(end.element.val())) {
                     active2 = false;
-                    notifyWarning(text('Validation.DateInvalid'), '', null);
+                    notifyWarning(localText('Validation.DateInvalid'), '', null);
                     end.element.val('');
                 }
                 args.active = active1 || active2;
@@ -255,12 +255,12 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 var active2 = !isTrimmedEmpty(end.value);
                 if (active1 && !parseDate(args.widget.element.val())) {
                     active1 = false;
-                    notifyWarning(text('Validation.DateInvalid'), '', null);
+                    notifyWarning(localText('Validation.DateInvalid'), '', null);
                     args.widget.element.val('');
                 }
                 if (active2 && !parseDate(end.element.val())) {
                     active2 = false;
-                    notifyWarning(text('Validation.DateInvalid'), '', null);
+                    notifyWarning(localText('Validation.DateInvalid'), '', null);
                     end.element.val('');
                 }
                 args.active = active1 || active2;
@@ -315,13 +315,13 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
 
         var trueText = yes;
         if (trueText == null) {
-            trueText = text('Controls.FilterPanel.OperatorNames.true');
+            trueText = localText('Controls.FilterPanel.OperatorNames.true');
         }
         items.push(['1', trueText]);
 
         var falseText = no;
         if (falseText == null) {
-            falseText = text('Controls.FilterPanel.OperatorNames.false');
+            falseText = localText('Controls.FilterPanel.OperatorNames.false');
         }
 
         items.push(['0', falseText]);

@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeShortName, replaceAll, startsWith, text } from "@serenity-is/corelib/q";
+import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeShortName, replaceAll, startsWith, localText } from "@serenity-is/corelib/q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
@@ -120,7 +120,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
             if (end < 0)
                 break;
             var key = widgetMarkup.substr(idx + 8, end - idx - 8);
-            var txt = text(key);
+            var txt = localText(key);
             widgetMarkup = widgetMarkup.substr(0, idx) + txt + widgetMarkup.substr(end + 3);
             end = idx + txt.length;
         }

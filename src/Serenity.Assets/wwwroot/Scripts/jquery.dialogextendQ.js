@@ -21,8 +21,8 @@
     _initButtons: function () {
         var _this = this;
 
-        this._addButton("maximize", this.options.maximizable, Q.text('Dialogs.MaximizeHint'), "fa fa-window-maximize");
-        this._addButton("restore", false, Q.text('Dialogs.RestoreHint'), "fa fa-window-restore");
+        this._addButton("maximize", this.options.maximizable, Q.localText('Dialogs.MaximizeHint'), "fa fa-window-maximize");
+        this._addButton("restore", false, Q.localText('Dialogs.RestoreHint'), "fa fa-window-restore");
 
         var titlebar = this.element.closest('.ui-dialog').children('.ui-dialog-titlebar');
         titlebar.dblclick(function (evt) {
