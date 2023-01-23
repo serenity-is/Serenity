@@ -323,10 +323,6 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
         var editorType = EditorTypeRegistry
             .get(item.editorType ?? 'String');
-        var elementAttr = getAttributes(editorType,
-            ElementAttribute, true);
-        var elementHtml = ((elementAttr.length > 0) ?
-            elementAttr[0].value : '<input/>');
 
         var element = Widget.elementFor(editorType as any)
             .addClass('editor')
