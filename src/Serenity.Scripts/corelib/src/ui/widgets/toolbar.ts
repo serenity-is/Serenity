@@ -167,7 +167,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
             else if (startsWith(klass, 'glyphicon-')) {
                 klass = 'glyphicon ' + klass;
             }
-            text = "<i class='" + klass + "'></i> " + text;
+            text = "<i class='" + htmlEncode(klass) + "'></i> " + text;
         }
         if (text == null || text.length === 0) {
             btn.addClass('no-text');

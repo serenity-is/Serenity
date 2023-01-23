@@ -300,8 +300,10 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         }
 
         var label = $('<label/>')
-            .addClass('caption').attr('for', editorId)
-            .attr('title', hint).html(title ?? '')
+            .addClass('caption')
+            .attr('for', editorId)
+            .attr('title', hint)
+            .text(title ?? '')
             .appendTo(fieldDiv);
 
         if (!isEmptyOrNull(item.labelWidth)) {
