@@ -19,7 +19,7 @@ namespace Serenity.CodeGenerator
                 AnsiConsole.WriteLine();
                 AnsiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]Table Code Generation[/]")
                 {
-                    Alignment = Justify.Left
+                    Justification = Justify.Left
                 });
 
                 var csproj = SelectCsProj();
@@ -314,7 +314,7 @@ namespace Serenity.CodeGenerator
                 AnsiConsole.WriteLine();
                 AnsiConsole.Write(new Spectre.Console.Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
                 {
-                    Alignment = Justify.Left
+                    Justification = Justify.Left
                 });
                 AnsiConsole.WriteLine();
                 var selections = new SelectionPrompt<string>()

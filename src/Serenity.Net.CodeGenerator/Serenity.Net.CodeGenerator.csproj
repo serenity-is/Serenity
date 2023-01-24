@@ -24,17 +24,17 @@
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="5.4.1" />
+    <PackageReference Include="Scriban" Version="5.5.2" />
     <PackageReference Include="Mono.Cecil" Version="0.11.4" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="8.5.4" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.3" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
-    <PackageReference Include="MySqlConnector" Version="2.1.8" />
-    <PackageReference Include="Npgsql" Version="6.0.3" />
+    <PackageReference Include="MySqlConnector" Version="2.2.5" />
+    <PackageReference Include="Npgsql" Version="7.0.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
-    <PackageReference Include="Microsoft.Build" Version="17.3.1" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.3.1" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
-    <PackageReference Include="Spectre.Console" Version="0.43.0" />
+    <PackageReference Include="Microsoft.Build" Version="17.3.2" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.3.2" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
+    <PackageReference Include="Spectre.Console" Version="0.46.0" />
   </ItemGroup>
 </Project>
