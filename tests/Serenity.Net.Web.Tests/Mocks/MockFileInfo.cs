@@ -21,7 +21,7 @@ public class MockFileInfo : Microsoft.Extensions.FileProviders.IFileInfo
         FileSystem.File.GetLastWriteTime(Path);
 
     public long Length => IsDirectory ? 0 :
-        FileSystem.FileInfo.FromFileName(Path).Length;
+        FileSystem.FileInfo.New(Path).Length;
 
     public string Name => FileSystem.Path.GetFileName(Path);
 

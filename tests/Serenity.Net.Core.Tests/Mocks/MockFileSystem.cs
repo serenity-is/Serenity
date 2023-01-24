@@ -65,7 +65,7 @@ namespace Serenity.Tests
         /// <inheritdoc/>
         public long GetFileSize(string path)
         {
-            return FileInfo.FromFileName(path).Length;
+            return FileInfo.New(path).Length;
         }
 
         /// <inheritdoc/>
