@@ -3,11 +3,10 @@
     <AssemblyName>Serenity.Net.Services</AssemblyName>
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.0" />
   </ItemGroup>
 </Project>

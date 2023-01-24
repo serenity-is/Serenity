@@ -3,7 +3,6 @@
     <AssemblyName>Serenity.Net.Core</AssemblyName>
     <Title>Serenity Platform - Core Library</Title>
     <Description>Contains abstractions and implementations for some basic Serenity features like authorization, caching, localization, dependency resolution, reflection...</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>

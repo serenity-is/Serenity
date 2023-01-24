@@ -5,6 +5,7 @@
     <LangVersion>10.0</LangVersion>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Volkan Ceylan</Authors>
     <PackageIcon>package-icon.png</PackageIcon>

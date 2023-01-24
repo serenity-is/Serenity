@@ -3,7 +3,6 @@
     <AssemblyName>Serenity.Net.Data</AssemblyName>
     <Title>Serenity Platform - Data Library</Title>
     <Description>Contains helper classes for SQL data connections, fluent SQL builders, criteria, join definitions, data mapping, validation...</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
