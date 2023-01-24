@@ -4,8 +4,18 @@ import { Exception } from "./system";
 import { tryGetText } from "./localtext";
 import { parseDate, parseHourAndMin, parseDayHourAndMin, parseDecimal, parseInteger } from "./formatting";
 import { isBS3 } from "./dialogs";
+import { htmlEncode } from "./html";
 
 if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validator.addMethod) {
+
+    if ($.validator["prototype"].showLabel) {
+        var orgShowLabel = $.validator["prototype"].showLabel;
+        $.validator["prototype"].showLabel = function(element: any, message: any) {
+            if (message != null)
+                message = htmlEncode(message);
+            orgShowLabel.call(this, element, message);
+        }
+    }
 
     $.validator.addMethod('customValidate', function (value: any, element: any) {
         var result = this.optional(element) as any;
