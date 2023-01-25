@@ -1,6 +1,5 @@
 ﻿import { getStateStore } from "./system";
 import { isEmptyOrNull, startsWith } from "./strings";
-import { htmlEncode } from "./html";
 
 export function localText(key: string): string {
     let t: string = getTable()[key];

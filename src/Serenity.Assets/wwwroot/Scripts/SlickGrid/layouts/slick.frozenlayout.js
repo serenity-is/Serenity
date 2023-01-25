@@ -395,15 +395,35 @@ Slick._ = (() => {
       }
     };
     const applyColumnWidths = () => {
-      var x = 0, w, rule, cols = host.getColumns(), rtl = host.getOptions().rtl, s = rtl ? "right" : "left", e = rtl ? "left" : "right";
-      for (var i = 0; i < cols.length; i++) {
-        if (frozenCols == i)
-          x = 0;
-        w = cols[i].width;
-        rule = host.getColumnCssRules(i);
-        rule[s].style[s] = x + "px";
-        rule[e].style[e] = (frozenCols > 0 && i >= frozenCols ? canvasWidthR : canvasWidthL) - x - w + "px";
-        x += w;
+      var x = 0, w, rule, cols = host.getColumns(), opts = host.getOptions(), rtl = opts.rtl, s = rtl ? "right" : "left", e = rtl ? "left" : "right";
+      if (opts.useCssVars) {
+        var styles = host.getContainerNode().style;
+        for (var i = 0; i < cols.length; i++) {
+          if (frozenCols == i)
+            x = 0;
+          w = cols[i].width;
+          var prop = "--l" + i;
+          var oldVal = styles.getPropertyValue(prop);
+          var newVal = x + "px";
+          if (oldVal !== newVal)
+            styles.setProperty(prop, newVal);
+          prop = "--r" + i;
+          oldVal = styles.getPropertyValue(prop);
+          newVal = (frozenCols > 0 && i >= frozenCols ? canvasWidthR : canvasWidthL) - x - w + "px";
+          if (oldVal !== newVal)
+            styles.setProperty(prop, newVal);
+          x += w;
+        }
+      } else {
+        for (var i = 0; i < cols.length; i++) {
+          if (frozenCols == i)
+            x = 0;
+          w = cols[i].width;
+          rule = host.getColumnCssRules(i);
+          rule[s].style[s] = x + "px";
+          rule[e].style[e] = (frozenCols > 0 && i >= frozenCols ? canvasWidthR : canvasWidthL) - x - w + "px";
+          x += w;
+        }
       }
     };
     const getTopPanelFor = (cell) => {

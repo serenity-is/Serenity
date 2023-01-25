@@ -1769,6 +1769,7 @@ declare namespace Slick {
     	syncColumnCellResize?: boolean;
     	topPanelHeight?: number;
     	useLegacyUI?: boolean;
+    	useCssVars?: boolean;
     	viewportClass?: string;
     }
     const gridDefaults: GridOptions;

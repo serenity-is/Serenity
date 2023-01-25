@@ -65,7 +65,6 @@ Slick._ = (() => {
     groupingPanelHeight: 30,
     headerRowHeight: 30,
     leaveSpaceForNewRows: false,
-    useLegacyUI: true,
     minBuffer: 3,
     multiColumnSort: false,
     multiSelect: true,
@@ -79,7 +78,9 @@ Slick._ = (() => {
     showHeaderRow: false,
     showTopPanel: false,
     suppressActiveCellChangeOnEdit: false,
-    topPanelHeight: 30
+    topPanelHeight: 30,
+    useLegacyUI: true,
+    useCssVars: false
   };
 
   // src/grid/basiclayout.ts
@@ -119,14 +120,31 @@ Slick._ = (() => {
       rowNode && canvas.appendChild(rowNode);
     }
     function applyColumnWidths() {
-      var x = 0, w, rule, cols = host.getColumns();
-      for (var i = 0; i < cols.length; i++) {
-        w = cols[i].width;
-        rule = host.getColumnCssRules(i);
-        const rtl = host.getOptions().rtl;
-        rule[rtl ? "right" : "left"].style[rtl ? "right" : "left"] = x + "px";
-        rule[rtl ? "left" : "right"].style[rtl ? "left" : "right"] = canvasWidth - x - w + "px";
-        x += w;
+      var x = 0, w, rule, cols = host.getColumns(), opts = host.getOptions(), rtl = opts.rtl;
+      if (opts.useCssVars) {
+        var styles = host.getContainerNode().style;
+        for (var i = 0; i < cols.length; i++) {
+          w = cols[i].width;
+          var prop = "--l" + i;
+          var oldVal = styles.getPropertyValue(prop);
+          var newVal = x + "px";
+          if (oldVal !== newVal)
+            styles.setProperty(prop, newVal);
+          prop = "--r" + i;
+          oldVal = styles.getPropertyValue(prop);
+          newVal = canvasWidth - x - w + "px";
+          if (oldVal !== newVal)
+            styles.setProperty(prop, newVal);
+          x += w;
+        }
+      } else {
+        for (var i = 0; i < cols.length; i++) {
+          w = cols[i].width;
+          rule = host.getColumnCssRules(i);
+          rule[rtl ? "right" : "left"].style[rtl ? "right" : "left"] = x + "px";
+          rule[rtl ? "left" : "right"].style[rtl ? "left" : "right"] = canvasWidth - x - w + "px";
+          x += w;
+        }
       }
     }
     function bindAncestorScrollEvents() {
@@ -1071,6 +1089,10 @@ Slick._ = (() => {
           options.showGroupingPanel = options.showPreHeaderPanel;
       }
       this._options.rtl = (_a = this._options.rtl) != null ? _a : document.body.classList.contains("rtl") || typeof getComputedStyle != "undefined" && getComputedStyle(this._container).direction == "rtl";
+      if (this._options.rtl)
+        this._container.classList.add("rtl");
+      else
+        this._container.classList.add("ltr");
       this.validateAndEnforceOptions();
       this._colDefaults.width = options.defaultColumnWidth;
       this._editController = {
@@ -1793,9 +1815,22 @@ Slick._ = (() => {
       this._absoluteColMinWidth = Math.max(this._headerColumnWidthDiff, this._cellWidthDiff);
     }
     createCssRules() {
+      var cellHeight = this._options.rowHeight - this._cellHeightDiff;
+      if (this._options.useCssVars && this.getColumns().length > 50)
+        this._options.useCssVars = false;
+      this._container.classList.toggle("sleek-vars", !!this._options.useCssVars);
+      if (this._options.useCssVars) {
+        var style = this._container.style;
+        style.setProperty("--sleek-row-height", this._options.rowHeight + "px");
+        style.setProperty("--sleek-cell-height", cellHeight + "px");
+        style.setProperty("--sleek-top-panel-height", this._options.topPanelHeight + "px");
+        style.setProperty("--sleek-grouping-panel-height", this._options.groupingPanelHeight + "px");
+        style.setProperty("--sleek-headerrow-height", this._options.headerRowHeight + "px");
+        style.setProperty("--sleek-footerrow-height", this._options.footerRowHeight + "px");
+        return;
+      }
       var el = this._styleNode = document.createElement("style");
       el.dataset.uid = this._uid;
-      var rowHeight = this._options.rowHeight - this._cellHeightDiff;
       var rules = [
         "." + this._uid + " { --slick-cell-height: " + this._options.rowHeight + "px; }",
         "." + this._uid + " .slick-group-header-column { " + (this._options.rtl ? "right" : "left") + ": 1000px; }",
@@ -1803,7 +1838,7 @@ Slick._ = (() => {
         "." + this._uid + " .slick-top-panel { height:" + this._options.topPanelHeight + "px; }",
         "." + this._uid + " .slick-grouping-panel { height:" + this._options.groupingPanelHeight + "px; }",
         "." + this._uid + " .slick-headerrow-columns { height:" + this._options.headerRowHeight + "px; }",
-        "." + this._uid + " .slick-cell { height:" + rowHeight + "px; }",
+        "." + this._uid + " .slick-cell { height:" + cellHeight + "px; }",
         "." + this._uid + " .slick-row { height:" + this._options.rowHeight + "px; }",
         "." + this._uid + " .slick-footerrow-columns { height:" + this._options.footerRowHeight + "px; }"
       ];
@@ -1816,6 +1851,8 @@ Slick._ = (() => {
       document.head.appendChild(el);
     }
     getColumnCssRules(idx) {
+      if (this._options.useCssVars)
+        return null;
       if (!this._stylesheet) {
         var stylesheetFromUid = document.querySelector("style[data-uid='" + this._uid + "']");
         if (stylesheetFromUid && stylesheetFromUid.sheet) {
@@ -1856,7 +1893,9 @@ Slick._ = (() => {
       };
     }
     removeCssRules() {
-      this._styleNode.remove();
+      var _a;
+      (_a = this._styleNode) == null ? void 0 : _a.remove();
+      this._styleNode = null;
       this._stylesheet = null;
     }
     destroy() {

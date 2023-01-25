@@ -46,14 +46,14 @@ importers:
 
   src/Serenity.Scripts/corelib:
     specifiers:
-      '@serenity-is/sleekgrid': 1.5.2
+      '@serenity-is/sleekgrid': 1.5.3
       '@types/jquery': 2.0.48
       '@types/jquery.validation': 1.16.7
       '@types/jqueryui': 1.12.6
       '@types/toastr': 2.1.39
       tslib: 2.4.1
     dependencies:
-      '@serenity-is/sleekgrid': 1.5.2
+      '@serenity-is/sleekgrid': 1.5.3
       '@types/jquery': 2.0.48
       '@types/jquery.validation': 1.16.7
       '@types/jqueryui': 1.12.6
@@ -907,8 +907,8 @@ packages:
       rollup: 2.79.1
     dev: true
 
-  /@serenity-is/sleekgrid/1.5.2:
-    resolution: {integrity: sha512-oIDZR101a8YTHp+kXtKzGoQukOfZ1afPjQUPKkyRnWnCMgaiLPR5TrVwicAWZoI8mcFPucuNkvUzAnG59Z6DyA==}
+  /@serenity-is/sleekgrid/1.5.3:
+    resolution: {integrity: sha512-l3NN2iqK/uaA2gWNC8GtxS6GtmnyODWSlebC3EwhVhB0/RHTCGnc0MEboRy29tjQBqh14XnVvoICRwZJ1mqbjA==}
     dev: false
 
   /@sinclair/typebox/0.24.51:
