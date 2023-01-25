@@ -1,3 +1,11 @@
+## 6.5.0 (2022-01-26)
+
+Features:
+ - [BREAKING CHANGE] Updating Microsoft.Data.SqlClient to 5.1.0. As Encrypt=true became the default in 4.x+ (https://techcommunity.microsoft.com/t5/sql-server-blog/released-general-availability-of-microsoft-data-sqlclient-4-0/ba-p/2983346) it may cause connections to fail. Please see the linked doc, and either install a trusted certificate in your SQL server (recommended!), or set TrustServerCertificate=true or Encrypt=false in your connection strings both in development and deployment/production!
+ - Updated packages including Newtonsoft.json to 13.0.2, SixLabors.ImageSharp to 2.1.3, NUglify to 1.20.4, Microsoft.Build to 17.3.2, Spectre.Console to 0.46.0, Npgsql to 7.01, MySqlConnector to 2.2.5, Microsoft.Data.Sqlite to 7.0.2, FirebirdSql.Data.FirebirdClient to 9.11, Scriban to 5.5.2
+ - Html encode jquery validator messages in showLabel function
+ - Updated SleekGrid to 1.5.3 which includes useCssVars option to use css vars for cell positioning instead of dynamic stylesheet (up to 50 columns). This should reduce amount of css reflows on page load etc. It is not enabled by default yet.
+
 ## 6.4.10 (2022-01-24)
 
 Bugfixes:
