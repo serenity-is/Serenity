@@ -14,10 +14,7 @@
   <ItemGroup>
     <Using Remove="*" />
     <None Remove="*\tsconfig.json;style\*.css;" />
-    <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json">
-      <CopyToOutputDirectory>false</CopyToOutputDirectory>
-      <Pack>false</Pack>
-    </Content>
+    <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json;tslint.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Include="style\*.css">
       <Pack>true</Pack>
       <PackagePath>content\Content\serenity\</PackagePath>
