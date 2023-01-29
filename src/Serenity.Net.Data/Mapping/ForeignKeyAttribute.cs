@@ -33,11 +33,20 @@
         /// <summary>
         /// Specifies that this property is a foreign key to another field in a primary key table.
         /// </summary>
+        /// <param name="rowType">Entity for primary key table.</param>
+        public ForeignKeyAttribute(Type rowType)
+            : this(rowType, null)
+        {
+        }
+
+        /// <summary>
+        /// Specifies that this property is a foreign key to another field in a primary key table.
+        /// </summary>
         /// <param name="rowType">Entity for primary key table. Row must have a [TableName] attribute.</param>
         /// <param name="field">If field parameter is not specified, the row type must have a field with 
         /// [Identity] attribute or single property with [PrimaryKey] attribute.
         /// (implementing IIdRow won't help)</param>
-        public ForeignKeyAttribute(Type rowType, string field = null)
+        public ForeignKeyAttribute(Type rowType, string field)
         {
             RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
