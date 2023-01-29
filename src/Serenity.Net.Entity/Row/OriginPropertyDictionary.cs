@@ -38,13 +38,7 @@
                     joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute[], ISqlJoin>(property.Name, fk, lj);
             }
 
-            foreach (var attr in rowType.GetCustomAttributes<LeftJoinAttribute>())
-                rowJoinByAlias[attr.Alias] = attr;
-
-            foreach (var attr in rowType.GetCustomAttributes<InnerJoinAttribute>())
-                rowJoinByAlias[attr.Alias] = attr;
-
-            foreach (var attr in rowType.GetCustomAttributes<OuterApplyAttribute>())
+            foreach (var attr in rowType.GetCustomAttributes().OfType<ISqlJoin>())
                 rowJoinByAlias[attr.Alias] = attr;
 
             originByAlias = origins.ToLookup(x => x.Value.Join);
