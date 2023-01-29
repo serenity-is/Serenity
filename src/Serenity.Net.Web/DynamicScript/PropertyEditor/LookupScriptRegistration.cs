@@ -34,6 +34,9 @@ namespace Serenity.Web
 
             foreach (var type in typeSource.GetTypesWithAttribute(typeof(LookupScriptAttribute)))
             {
+                if (type.IsAbstract)
+                    continue;
+
                 var attr = type.GetCustomAttribute<LookupScriptAttribute>();
                 LookupScript script;
 
@@ -55,8 +58,7 @@ namespace Serenity.Web
                         continue;
                     }
                 }
-                else if (!typeof(LookupScript).IsAssignableFrom(type) ||
-                    type.IsAbstract)
+                else if (!typeof(LookupScript).IsAssignableFrom(type))
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, 
                         "Type {0} can't be registered as a lookup script!", type.FullName));
