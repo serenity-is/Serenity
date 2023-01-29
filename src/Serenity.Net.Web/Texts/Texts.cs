@@ -1,10 +1,9 @@
-﻿namespace Serenity.Web
+﻿namespace Serenity.Web;
+
+[NestedLocalTexts]
+internal static partial class Texts
 {
-    [NestedLocalTexts]
-    internal static partial class Texts
+    static Texts()
     {
-        static Texts()
-        {
-        }
     }
 }

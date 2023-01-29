@@ -1,15 +1,14 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+///   Interface for query classes (e.g. SqlQuery) that can return expression given column name
+/// </summary>
+public interface IGetExpressionByName
 {
     /// <summary>
-    ///   Interface for query classes (e.g. SqlQuery) that can return expression given column name
+    /// Gets the expression.
     /// </summary>
-    public interface IGetExpressionByName
-    {
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        /// <param name="columnName">Name of the column.</param>
-        /// <returns></returns>
-        string GetExpression(string columnName);
-    }
+    /// <param name="columnName">Name of the column.</param>
+    /// <returns></returns>
+    string GetExpression(string columnName);
 }

@@ -1,13 +1,12 @@
-﻿namespace Serenity.Navigation
+﻿namespace Serenity.Navigation;
+
+/// <summary>
+/// Factory abstraction for navigation models
+/// </summary>
+public interface INavigationModelFactory
 {
     /// <summary>
-    /// Factory abstraction for navigation models
+    /// Creates a navigation model for current user
     /// </summary>
-    public interface INavigationModelFactory
-    {
-        /// <summary>
-        /// Creates a navigation model for current user
-        /// </summary>
-        INavigationModel Create();
-    }
+    INavigationModel Create();
 }

@@ -1,12 +1,11 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetHideOnInsert(IPropertySource source, PropertyItem item)
     {
-        private void SetHideOnInsert(IPropertySource source, PropertyItem item)
-        {
-            var attr = source.GetAttribute<HideOnInsertAttribute>();
-            if (attr != null && attr.Value)
-                item.HideOnInsert = true;
-        }
+        var attr = source.GetAttribute<HideOnInsertAttribute>();
+        if (attr != null && attr.Value)
+            item.HideOnInsert = true;
     }
 }

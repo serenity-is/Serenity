@@ -1,15 +1,14 @@
 ﻿
-namespace Serenity.Tests
-{
-    public class MockGeneratorFileSystem : MockFileSystem, IGeneratorFileSystem
-    {
-        public MockGeneratorFileSystem()
-        {
-        }
+namespace Serenity.Tests;
 
-        public DateTime GetLastWriteTime(string path)
-        {
-            return File.GetLastWriteTime(path);
-        }
+public class MockGeneratorFileSystem : MockFileSystem, IGeneratorFileSystem
+{
+    public MockGeneratorFileSystem()
+    {
+    }
+
+    public DateTime GetLastWriteTime(string path)
+    {
+        return File.GetLastWriteTime(path);
     }
 }

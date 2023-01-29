@@ -1,7 +1,6 @@
-﻿namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator;
+
+public interface IBuildProject
 {
-    public interface IBuildProject
-    {
-        IEnumerable<IBuildProjectItem> AllEvaluatedItems { get; }
-    }
+    IEnumerable<IBuildProjectItem> AllEvaluatedItems { get; }
 }

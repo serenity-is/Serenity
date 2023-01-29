@@ -1,66 +1,65 @@
 ﻿using Scriban.Runtime;
 
-namespace Serenity.CodeGenerator
+namespace Serenity.CodeGenerator;
+
+public class CSharpDynamicUsings
 {
-    public class CSharpDynamicUsings
+    delegate string TypeDelegate(string key);
+    delegate string NamespaceDelegate(string key);
+    delegate string TypeListDelegate(List<string> key);
+    delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
+    delegate void UsingDelegate(string key);
+
+    public static ScriptObject GetScriptObject(CodeWriter cw)
     {
-        delegate string TypeDelegate(string key);
-        delegate string NamespaceDelegate(string key);
-        delegate string TypeListDelegate(List<string> key);
-        delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
-        delegate void UsingDelegate(string key);
+        var scriptObject = new ScriptObject();
 
-        public static ScriptObject GetScriptObject(CodeWriter cw)
+        scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
         {
-            var scriptObject = new ScriptObject();
+            return cw.ShortTypeName(cw, fullName);
+        }));
 
-            scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
+        scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
+        {
+            if (fullNames == null)
+                return "";
+
+            HashSet<string> result = new();
+
+            foreach (var fullName in fullNames)
             {
-                return cw.ShortTypeName(cw, fullName);
-            }));
+                result.Add(cw.ShortTypeName(cw, fullName));
+            }
 
-            scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
+            return string.Join(", ", result);
+        }));
+
+        scriptObject.Import("ATTRREF", new TypeModelListDelegate((models) =>
+        {
+            if (models == null)
+                return "";
+
+            HashSet<string> result = new();
+
+            foreach (var model in models)
             {
-                if (fullNames == null)
-                    return "";
+                result.Add(cw.ShortTypeName(cw, model.TypeName) + (string.IsNullOrEmpty(model.Arguments) ? "" : "(" + model.Arguments + ")"));
+            }
 
-                HashSet<string> result = new();
+            return string.Join(", ", result);
+        }));
 
-                foreach (var fullName in fullNames)
-                {
-                    result.Add(cw.ShortTypeName(cw, fullName));
-                }
+        scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
+        {
+            cw.Using(requestedNamespace, true);
+        }));
 
-                return string.Join(", ", result);
-            }));
-
-            scriptObject.Import("ATTRREF", new TypeModelListDelegate((models) =>
-            {
-                if (models == null)
-                    return "";
-
-                HashSet<string> result = new();
-
-                foreach (var model in models)
-                {
-                    result.Add(cw.ShortTypeName(cw, model.TypeName) + (string.IsNullOrEmpty(model.Arguments) ? "" : "(" + model.Arguments + ")"));
-                }
-
-                return string.Join(", ", result);
-            }));
-
-            scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
-            {
-                cw.Using(requestedNamespace, true);
-            }));
-
-            scriptObject.Import("NAMESPACE", new NamespaceDelegate((requestedNamespace) =>
-            {
-                cw.CurrentNamespace = requestedNamespace;
-                return "namespace " + requestedNamespace;
-            }));
-            
-            return scriptObject;
-        }
+        scriptObject.Import("NAMESPACE", new NamespaceDelegate((requestedNamespace) =>
+        {
+            cw.CurrentNamespace = requestedNamespace;
+            return "namespace " + requestedNamespace;
+        }));
+        
+        return scriptObject;
     }
 }

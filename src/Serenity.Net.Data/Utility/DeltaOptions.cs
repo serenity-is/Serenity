@@ -1,18 +1,17 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// Delta options flags
+/// </summary>
+[Flags]
+public enum DeltaOptions
 {
     /// <summary>
-    /// Delta options flags
+    /// The default
     /// </summary>
-    [Flags]
-    public enum DeltaOptions
-    {
-        /// <summary>
-        /// The default
-        /// </summary>
-        Default = IgnoreInvalidNewId,
-        /// <summary>
-        /// The ignore invalid new identifier
-        /// </summary>
-        IgnoreInvalidNewId = 1
-    }
+    Default = IgnoreInvalidNewId,
+    /// <summary>
+    /// The ignore invalid new identifier
+    /// </summary>
+    IgnoreInvalidNewId = 1
 }

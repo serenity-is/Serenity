@@ -1,15 +1,14 @@
-﻿namespace Serenity.Reflection
+﻿namespace Serenity.Reflection;
+
+/// <summary>
+/// Annotated type information
+/// </summary>
+public interface IAnnotatedType
 {
     /// <summary>
-    /// Annotated type information
+    /// Gets the annotated property.
     /// </summary>
-    public interface IAnnotatedType
-    {
-        /// <summary>
-        /// Gets the annotated property.
-        /// </summary>
-        /// <param name="property">The property.</param>
-        /// <returns></returns>
-        IPropertyInfo GetAnnotatedProperty(PropertyInfo property);
-    }
+    /// <param name="property">The property.</param>
+    /// <returns></returns>
+    IPropertyInfo GetAnnotatedProperty(PropertyInfo property);
 }

@@ -1,10 +1,9 @@
-﻿namespace Serenity.TypeScript.Change
+﻿namespace Serenity.TypeScript.Change;
+
+public enum NodeChangeType
 {
-    public enum NodeChangeType
-    {
-        InsertBefore,
-        Change,
-        Delete,
-        InsertAfter
-    }
+    InsertBefore,
+    Change,
+    Delete,
+    InsertAfter
 }

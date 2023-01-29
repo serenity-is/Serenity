@@ -1,14 +1,14 @@
 using Serenity.CodeGenerator;
 
-namespace Serenity.Tests.CodeGenerator
+namespace Serenity.Tests.CodeGenerator;
+
+public partial class TSTypeListerASTTests
 {
-    public partial class TSTypeListerASTTests
+    [Fact]
+    public void NamespaceDTS_Extracts_StringEditor_Without_Decorators()
     {
-        [Fact]
-        public void NamespaceDTS_Extracts_StringEditor_Without_Decorators()
-        {
-            var fileSystem = new MockGeneratorFileSystem();
-            fileSystem.WriteAllText("Serenity.CoreLib.d.ts", @"
+        var fileSystem = new MockGeneratorFileSystem();
+        fileSystem.WriteAllText("Serenity.CoreLib.d.ts", @"
 declare namespace Serenity {
     class Widget<TOptions = any> {
     }
@@ -27,11 +27,10 @@ declare namespace Serenity {
     }
 }");
 
-            var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
-            tl.AddInputFile("Serenity.CoreLib.d.ts");
+        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
+        tl.AddInputFile("Serenity.CoreLib.d.ts");
 
-            var types = tl.ExtractTypes();
-            var b = Assert.Single(types, x => x.FullName == "Serenity.StringEditor");
-        }
+        var types = tl.ExtractTypes();
+        var b = Assert.Single(types, x => x.FullName == "Serenity.StringEditor");
     }
 }

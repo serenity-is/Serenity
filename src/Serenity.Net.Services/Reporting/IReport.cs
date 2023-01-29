@@ -1,14 +1,13 @@
 ﻿
-namespace Serenity.Reporting
+namespace Serenity.Reporting;
+
+/// <summary>
+/// The basic interface for all reports
+/// </summary>
+public interface IReport
 {
     /// <summary>
-    /// The basic interface for all reports
+    /// Returns the data for the report
     /// </summary>
-    public interface IReport
-    {
-        /// <summary>
-        /// Returns the data for the report
-        /// </summary>
-        object GetData();
-    }
+    object GetData();
 }

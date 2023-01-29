@@ -1,13 +1,12 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// Interfaces for types that has an ActualConnection property of type IDbConnection
+/// </summary>
+public interface IHasActualConnection
 {
     /// <summary>
-    /// Interfaces for types that has an ActualConnection property of type IDbConnection
+    /// Gets the actual connection
     /// </summary>
-    public interface IHasActualConnection
-    {
-        /// <summary>
-        /// Gets the actual connection
-        /// </summary>
-        IDbConnection ActualConnection { get; }
-    }
+    IDbConnection ActualConnection { get; }
 }

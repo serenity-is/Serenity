@@ -1,13 +1,12 @@
-﻿namespace Serenity.Web
+﻿namespace Serenity.Web;
+
+/// <summary>
+/// Provides access to the data object of a dynamic script
+/// </summary>
+public interface IGetScriptData
 {
     /// <summary>
-    /// Provides access to the data object of a dynamic script
+    /// Gets script data
     /// </summary>
-    public interface IGetScriptData
-    {
-        /// <summary>
-        /// Gets script data
-        /// </summary>
-        object GetScriptData();
-    }
+    object GetScriptData();
 }

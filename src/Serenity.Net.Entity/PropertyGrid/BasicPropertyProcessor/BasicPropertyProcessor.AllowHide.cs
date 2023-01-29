@@ -1,12 +1,11 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetAllowHide(IPropertySource source, PropertyItem item)
     {
-        private void SetAllowHide(IPropertySource source, PropertyItem item)
-        {
-            var attr = source.GetAttribute<AllowHideAttribute>();
-            if (attr != null && attr.Value == false)
-                item.AllowHide = false;
-        }
+        var attr = source.GetAttribute<AllowHideAttribute>();
+        if (attr != null && attr.Value == false)
+            item.AllowHide = false;
     }
 }

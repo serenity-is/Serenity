@@ -1,12 +1,11 @@
-﻿namespace Serenity.CodeGenerator
-{
-    public abstract class BaseFileSystemCommand
-    {
-        protected readonly IGeneratorFileSystem fileSystem;
+﻿namespace Serenity.CodeGenerator;
 
-        protected BaseFileSystemCommand(IGeneratorFileSystem fileSystem)
-        {
-            this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        }
+public abstract class BaseFileSystemCommand
+{
+    protected readonly IGeneratorFileSystem fileSystem;
+
+    protected BaseFileSystemCommand(IGeneratorFileSystem fileSystem)
+    {
+        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     }
 }

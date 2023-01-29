@@ -1,99 +1,98 @@
 ﻿using System.Collections;
 
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+/// Criteria object with one value
+/// </summary>
+/// <seealso cref="BaseCriteria" />
+public class ValueCriteria : BaseCriteria
 {
+    private readonly object value;
+
     /// <summary>
-    /// Criteria object with one value
+    /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
     /// </summary>
-    /// <seealso cref="BaseCriteria" />
-    public class ValueCriteria : BaseCriteria
+    /// <param name="value">The value.</param>
+    public ValueCriteria(object value)
     {
-        private readonly object value;
+        this.value = value;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public ValueCriteria(object value)
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <value>
+    /// The value.
+    /// </value>
+    public object Value => value;
+
+    /// <summary>
+    /// Converts the criteria to string.
+    /// </summary>
+    /// <param name="sb">The string builder.</param>
+    /// <param name="query">The target query to add params to.</param>
+    public override void ToString(StringBuilder sb, IQueryWithParams query)
+    {
+        if (value is IEnumerable enumerable && value is not string)
         {
-            this.value = value;
-        }
+            var c = 0;
+            foreach (var k in enumerable)
+                c++;
 
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <value>
-        /// The value.
-        /// </value>
-        public object Value => value;
-
-        /// <summary>
-        /// Converts the criteria to string.
-        /// </summary>
-        /// <param name="sb">The string builder.</param>
-        /// <param name="query">The target query to add params to.</param>
-        public override void ToString(StringBuilder sb, IQueryWithParams query)
-        {
-            if (value is IEnumerable enumerable && value is not string)
+            int i = 0;
+            sb.Append('(');
+            foreach (var k in enumerable)
             {
-                var c = 0;
-                foreach (var k in enumerable)
-                    c++;
+                if (i++ > 0)
+                    sb.Append(',');
 
-                int i = 0;
-                sb.Append('(');
-                foreach (var k in enumerable)
+                if (c > 10)
                 {
-                    if (i++ > 0)
-                        sb.Append(',');
-
-                    if (c > 10)
+                    if (IsIntegerType(k))
                     {
-                        if (IsIntegerType(k))
-                        {
-                            sb.Append(k.ToString());
-                            continue;
-                        }
-                        else if (k is Enum)
-                        {
-                            sb.Append(Convert.ToInt64(k).ToString());
-                            continue;
-                        }
+                        sb.Append(k.ToString());
+                        continue;
                     }
-                    sb.Append(AddParam(query, k).Name);
+                    else if (k is Enum)
+                    {
+                        sb.Append(Convert.ToInt64(k).ToString());
+                        continue;
+                    }
                 }
-                sb.Append(')');
+                sb.Append(AddParam(query, k).Name);
             }
-            else
-            {
-                sb.Append(AddParam(query, value).Name);
-            }
+            sb.Append(')');
         }
-
-        private bool IsIntegerType(object k)
+        else
         {
-            if (k == null)
-                return false;
-
-            if (k is int || k is long)
-                return true;
-
-            if (!k.GetType().IsPrimitive)
-                return false;
-
-            return k is byte ||
-                   k is sbyte ||
-                   k is short ||
-                   k is ushort ||
-                   k is uint ||
-                   k is ulong;
+            sb.Append(AddParam(query, value).Name);
         }
+    }
 
-        private Parameter AddParam(IQueryWithParams query, object value)
-        {
-            var param = query.AutoParam();
-            query.AddParam(param.Name, value);
-            return param;
-        }
+    private bool IsIntegerType(object k)
+    {
+        if (k == null)
+            return false;
+
+        if (k is int || k is long)
+            return true;
+
+        if (!k.GetType().IsPrimitive)
+            return false;
+
+        return k is byte ||
+               k is sbyte ||
+               k is short ||
+               k is ushort ||
+               k is uint ||
+               k is ulong;
+    }
+
+    private Parameter AddParam(IQueryWithParams query, object value)
+    {
+        var param = query.AutoParam();
+        query.AddParam(param.Name, value);
+        return param;
     }
 }

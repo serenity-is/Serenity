@@ -1,81 +1,81 @@
-﻿namespace Serenity.Data.Schema
+﻿namespace Serenity.Data.Schema;
+
+/// <summary>
+/// MySql metadata provider
+/// </summary>
+/// <seealso cref="ISchemaProvider" />
+public class MySqlSchemaProvider : ISchemaProvider
 {
     /// <summary>
-    /// MySql metadata provider
+    /// Gets the default schema.
     /// </summary>
-    /// <seealso cref="ISchemaProvider" />
-    public class MySqlSchemaProvider : ISchemaProvider
+    /// <value>
+    /// The default schema.
+    /// </value>
+    public string DefaultSchema => null;
+
+    private class FieldInfoSource
     {
-        /// <summary>
-        /// Gets the default schema.
-        /// </summary>
-        /// <value>
-        /// The default schema.
-        /// </value>
-        public string DefaultSchema => null;
+        public string ORDINAL_POSITION { get; set; }
+        public string Field { get; set; }
+        public string Null { get; set; }
+        public string Type { get; set; }
+        public string Key { get; set; }
+        public string Extra { get; set; }
+    }
 
-        private class FieldInfoSource
-        {
-            public string ORDINAL_POSITION { get; set; }
-            public string Field { get; set; }
-            public string Null { get; set; }
-            public string Type { get; set; }
-            public string Key { get; set; }
-            public string Extra { get; set; }
-        }
-
-        /// <summary>
-        /// Gets the field infos.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <param name="schema">The schema.</param>
-        /// <param name="table">The table.</param>
-        /// <returns></returns>
-        public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
-        {
-            return connection.Query<FieldInfoSource>(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
-                .OrderBy(x => Convert.ToInt32(x.ORDINAL_POSITION))
-                .Select(src =>
+    /// <summary>
+    /// Gets the field infos.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="schema">The schema.</param>
+    /// <param name="table">The table.</param>
+    /// <returns></returns>
+    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
+    {
+        return connection.Query<FieldInfoSource>(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
+            .OrderBy(x => Convert.ToInt32(x.ORDINAL_POSITION))
+            .Select(src =>
+            {
+                var fi = new FieldInfo
                 {
-                    var fi = new FieldInfo
+                    FieldName = src.Field,
+                    IsNullable = (src.Null) != "NO"
+                };
+                var dataType = src.Type;
+                var dx = dataType.IndexOf('(');
+                if (dx >= 0)
+                {
+                    var dxend = dataType.IndexOf(')', dx);
+                    var strlen = dataType.Substring(dx + 1, dxend - dx - 1);
+                    dataType = dataType.Substring(0, dx);
+                    var lower = dataType.ToLowerInvariant();
+                    if (lower == "char" || lower == "varchar")
+                        fi.Size = int.Parse(strlen);
+                    else if (lower == "real" || lower == "decimal")
                     {
-                        FieldName = src.Field,
-                        IsNullable = (src.Null) != "NO"
-                    };
-                    var dataType = src.Type;
-                    var dx = dataType.IndexOf('(');
-                    if (dx >= 0)
-                    {
-                        var dxend = dataType.IndexOf(')', dx);
-                        var strlen = dataType.Substring(dx + 1, dxend - dx - 1);
-                        dataType = dataType.Substring(0, dx);
-                        var lower = dataType.ToLowerInvariant();
-                        if (lower == "char" || lower == "varchar")
-                            fi.Size = int.Parse(strlen);
-                        else if (lower == "real" || lower == "decimal")
-                        {
-                            var strparts = strlen.Split(',');
-                            fi.Size = int.Parse(strparts[0]);
-                            fi.Scale = int.Parse(strparts[1]);
-                        }
+                        var strparts = strlen.Split(',');
+                        fi.Size = int.Parse(strparts[0]);
+                        fi.Scale = int.Parse(strparts[1]);
                     }
-                    fi.DataType = dataType;
-                    fi.IsPrimaryKey = src.Key == "PRI";
-                    fi.IsIdentity = src.Extra == "auto_increment";
-                    return fi;
-                });
-        }
+                }
+                fi.DataType = dataType;
+                fi.IsPrimaryKey = src.Key == "PRI";
+                fi.IsIdentity = src.Extra == "auto_increment";
+                return fi;
+            });
+    }
 
-        /// <summary>
-        /// Gets the foreign keys.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <param name="schema">The schema.</param>
-        /// <param name="table">The table.</param>
-        /// <returns></returns>
-        public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
-        {
-            return connection.Query<ForeignKeyInfo>(@"
+    /// <summary>
+    /// Gets the foreign keys.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="schema">The schema.</param>
+    /// <param name="table">The table.</param>
+    /// <returns></returns>
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
+    {
+        return connection.Query<ForeignKeyInfo>(@"
                 SELECT 
                     i.CONSTRAINT_NAME FKName,
                     k.COLUMN_NAME FKColumn, 
@@ -88,41 +88,41 @@
                 WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
                 AND i.TABLE_SCHEMA = Database()
                 AND i.TABLE_NAME = @tbl", new
-            {
-                tbl = table
-            });
-        }
-
-        /// <summary>
-        /// Gets the identity fields.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <param name="schema">The schema.</param>
-        /// <param name="table">The table.</param>
-        /// <returns></returns>
-        public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
-            return connection.Query<string>(@"
+            tbl = table
+        });
+    }
+
+    /// <summary>
+    /// Gets the identity fields.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="schema">The schema.</param>
+    /// <param name="table">The table.</param>
+    /// <returns></returns>
+    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
+    {
+        return connection.Query<string>(@"
                     SELECT COLUMN_NAME FROM information_schema.COLUMNS 
                     WHERE TABLE_SCHEMA = Database()
                     AND table_name = @tbl
                     AND EXTRA = 'auto_increment'",
-                new
-                {
-                    tbl = table
-                });
-        }
+            new
+            {
+                tbl = table
+            });
+    }
 
-        /// <summary>
-        /// Gets the primary key fields.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <param name="schema">The schema.</param>
-        /// <param name="table">The table.</param>
-        /// <returns></returns>
-        public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
-        {
-            return connection.Query<string>(@"
+    /// <summary>
+    /// Gets the primary key fields.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="schema">The schema.</param>
+    /// <param name="table">The table.</param>
+    /// <returns></returns>
+    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
+    {
+        return connection.Query<string>(@"
                     SELECT COLUMN_NAME  
                     FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc  
                     INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS ku  
@@ -132,34 +132,33 @@
                     AND ku.TABLE_SCHEMA = Database()  
                     AND ku.TABLE_NAME = @tbl  
                     ORDER BY ku.ORDINAL_POSITION",
-                new
-                {
-                    tbl = table
-                });
-        }
+            new
+            {
+                tbl = table
+            });
+    }
 
-        private class TableNameSource
-        {
-            public string TABLE_NAME { get; set; }
-            public string TABLE_TYPE { get; set; }
-        }
+    private class TableNameSource
+    {
+        public string TABLE_NAME { get; set; }
+        public string TABLE_TYPE { get; set; }
+    }
 
-        /// <summary>
-        /// Gets the table names.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <returns></returns>
-        public IEnumerable<TableName> GetTableNames(IDbConnection connection)
-        {
-            return connection.Query<TableNameSource>(
-                    "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES " +
-                    "WHERE TABLE_SCHEMA = Database() " +
-                    "ORDER BY TABLE_SCHEMA, TABLE_NAME")
-                .Select(x => new TableName
-                {
-                    Table = x.TABLE_NAME,
-                    IsView = x.TABLE_TYPE == "VIEW"
-                });
-        }
+    /// <summary>
+    /// Gets the table names.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <returns></returns>
+    public IEnumerable<TableName> GetTableNames(IDbConnection connection)
+    {
+        return connection.Query<TableNameSource>(
+                "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES " +
+                "WHERE TABLE_SCHEMA = Database() " +
+                "ORDER BY TABLE_SCHEMA, TABLE_NAME")
+            .Select(x => new TableName
+            {
+                Table = x.TABLE_NAME,
+                IsView = x.TABLE_TYPE == "VIEW"
+            });
     }
 }

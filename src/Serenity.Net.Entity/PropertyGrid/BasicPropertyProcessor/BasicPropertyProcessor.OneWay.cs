@@ -1,12 +1,11 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetOneWay(IPropertySource source, PropertyItem item)
     {
-        private void SetOneWay(IPropertySource source, PropertyItem item)
-        {
-            var attr = source.GetAttribute<OneWayAttribute>();
-            if (attr != null)
-                item.OneWay = true;
-        }
+        var attr = source.GetAttribute<OneWayAttribute>();
+        if (attr != null)
+            item.OneWay = true;
     }
 }

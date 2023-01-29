@@ -2,47 +2,46 @@
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
 
-namespace Serenity.CodeGenerator.MSBuild
+namespace Serenity.CodeGenerator.MSBuild;
+
+public class MSBuildProjectSystem : IBuildProjectSystem
 {
-    public class MSBuildProjectSystem : IBuildProjectSystem
+    static MSBuildProjectSystem()
     {
-        static MSBuildProjectSystem()
+        try
         {
-            try
-            {
-                MSBuildLocator.RegisterDefaults();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine("Error while initializing MSBuildLocator: " + ex.ToString());
-            }
+            MSBuildLocator.RegisterDefaults();
         }
-
-        public IBuildProject LoadProject(string path)
+        catch (Exception ex)
         {
-            var project = ProjectCollection.GlobalProjectCollection
-                .GetLoadedProjects(path).FirstOrDefault();
+            Console.Error.WriteLine("Error while initializing MSBuildLocator: " + ex.ToString());
+        }
+    }
 
-            if (project == null)
+    public IBuildProject LoadProject(string path)
+    {
+        var project = ProjectCollection.GlobalProjectCollection
+            .GetLoadedProjects(path).FirstOrDefault();
+
+        if (project == null)
+        {
+            ProjectCollection.GlobalProjectCollection.IsBuildEnabled = false;
+            ProjectCollection.GlobalProjectCollection.OnlyLogCriticalEvents = true;
+
+            project = Project.FromFile(path, new ProjectOptions
             {
-                ProjectCollection.GlobalProjectCollection.IsBuildEnabled = false;
-                ProjectCollection.GlobalProjectCollection.OnlyLogCriticalEvents = true;
-
-                project = Project.FromFile(path, new ProjectOptions
+                GlobalProperties = new Dictionary<string, string>
                 {
-                    GlobalProperties = new Dictionary<string, string>
-                    {
-                        ["DesignTimeBuild"] = "true"
-                    },
-                    LoadSettings = 
-                        ProjectLoadSettings.IgnoreEmptyImports |
-                        ProjectLoadSettings.IgnoreInvalidImports |
-                        ProjectLoadSettings.IgnoreMissingImports |
-                        ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
-                });
-            }
-
-            return new MSBuildProject(project);
+                    ["DesignTimeBuild"] = "true"
+                },
+                LoadSettings = 
+                    ProjectLoadSettings.IgnoreEmptyImports |
+                    ProjectLoadSettings.IgnoreInvalidImports |
+                    ProjectLoadSettings.IgnoreMissingImports |
+                    ProjectLoadSettings.DoNotEvaluateElementsWithFalseCondition
+            });
         }
+
+        return new MSBuildProject(project);
     }
 }

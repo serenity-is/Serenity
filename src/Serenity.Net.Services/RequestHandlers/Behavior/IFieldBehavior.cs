@@ -1,13 +1,12 @@
-﻿namespace Serenity.Services
+﻿namespace Serenity.Services;
+
+/// <summary>
+/// Represents a request handler behavior that is targeted to a field.
+/// </summary>
+public interface IFieldBehavior
 {
     /// <summary>
-    /// Represents a request handler behavior that is targeted to a field.
+    /// Gets / sets the target field that current behavior should operate on
     /// </summary>
-    public interface IFieldBehavior
-    {
-        /// <summary>
-        /// Gets / sets the target field that current behavior should operate on
-        /// </summary>
-        Field Target { get; set; }
-    }
+    Field Target { get; set; }
 }

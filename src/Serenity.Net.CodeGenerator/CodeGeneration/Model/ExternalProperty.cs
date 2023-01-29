@@ -1,6 +1,5 @@
-﻿namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration;
+
+public class ExternalProperty : ExternalMember
 {
-    public class ExternalProperty : ExternalMember
-    {
-    }
 }

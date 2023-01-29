@@ -1,10 +1,9 @@
 ﻿
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+/// Interface for an entity with join information
+/// </summary>
+public interface IEntityWithJoins : IEntity, IHaveJoins
 {
-    /// <summary>
-    /// Interface for an entity with join information
-    /// </summary>
-    public interface IEntityWithJoins : IEntity, IHaveJoins
-    {
-    }
 }

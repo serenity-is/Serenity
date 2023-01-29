@@ -1,27 +1,26 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetUpdatePermission(IPropertySource source, PropertyItem item)
     {
-        private void SetUpdatePermission(IPropertySource source, PropertyItem item)
+        if (source.Property != null)
         {
-            if (source.Property != null)
+            var attr = source.Property.GetAttribute<UpdatePermissionAttribute>(false);
+            if (attr != null)
             {
-                var attr = source.Property.GetAttribute<UpdatePermissionAttribute>(false);
-                if (attr != null)
-                {
-                    if (attr.Permission != "*")
-                        item.UpdatePermission = attr.Permission ?? "?";
+                if (attr.Permission != "*")
+                    item.UpdatePermission = attr.Permission ?? "?";
 
-                    return;
-                }
+                return;
             }
+        }
 
-            if (source.BasedOnField is not null)
-            {
-                if (source.BasedOnField.UpdatePermission != null &&
-                    source.BasedOnField.UpdatePermission != "*")
-                    item.UpdatePermission = source.BasedOnField.UpdatePermission;
-            }
+        if (source.BasedOnField is not null)
+        {
+            if (source.BasedOnField.UpdatePermission != null &&
+                source.BasedOnField.UpdatePermission != "*")
+                item.UpdatePermission = source.BasedOnField.UpdatePermission;
         }
     }
 }

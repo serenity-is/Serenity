@@ -1,12 +1,11 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetGrouping(IPropertySource source, PropertyItem item)
     {
-        private void SetGrouping(IPropertySource source, PropertyItem item)
-        {
-            var groupOrderAttr = source.GetAttribute<GroupOrderAttribute>();
-            if (groupOrderAttr != null && groupOrderAttr.GroupOrder != 0)
-                item.GroupOrder = groupOrderAttr.GroupOrder;
-        }
+        var groupOrderAttr = source.GetAttribute<GroupOrderAttribute>();
+        if (groupOrderAttr != null && groupOrderAttr.GroupOrder != 0)
+            item.GroupOrder = groupOrderAttr.GroupOrder;
     }
 }

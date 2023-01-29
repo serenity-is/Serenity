@@ -1,22 +1,21 @@
-﻿namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel;
+
+/// <summary>
+/// Determines type of aggregate function for a column to use
+/// </summary>
+public class SummaryTypeAttribute : Attribute
 {
     /// <summary>
-    /// Determines type of aggregate function for a column to use
+    /// Creates a new instance of SummaryTypeAttribute.
     /// </summary>
-    public class SummaryTypeAttribute : Attribute
+    /// <param name="value">Aggregate function type</param>
+    public SummaryTypeAttribute(SummaryType value)
     {
-        /// <summary>
-        /// Creates a new instance of SummaryTypeAttribute.
-        /// </summary>
-        /// <param name="value">Aggregate function type</param>
-        public SummaryTypeAttribute(SummaryType value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        /// Gets aggregate function type
-        /// </summary>
-        public SummaryType Value { get; private set; }
+        Value = value;
     }
+
+    /// <summary>
+    /// Gets aggregate function type
+    /// </summary>
+    public SummaryType Value { get; private set; }
 }

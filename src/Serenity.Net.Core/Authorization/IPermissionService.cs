@@ -1,14 +1,13 @@
-﻿namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions;
+
+/// <summary>
+/// Permission service abstraction
+/// </summary>
+public interface IPermissionService
 {
     /// <summary>
-    /// Permission service abstraction
+    /// Returns true if user has specified permission
     /// </summary>
-    public interface IPermissionService
-    {
-        /// <summary>
-        /// Returns true if user has specified permission
-        /// </summary>
-        /// <param name="permission">The permission key (e.g. Administration)</param>
-        bool HasPermission(string permission);
-    }
+    /// <param name="permission">The permission key (e.g. Administration)</param>
+    bool HasPermission(string permission);
 }

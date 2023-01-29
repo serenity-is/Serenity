@@ -1,15 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+/// Interfaces for types that has an Logger 
+/// </summary>
+public interface IHasLogger
 {
     /// <summary>
-    /// Interfaces for types that has an Logger 
+    /// Gets the logger (that can be used by SqlHelper methods for logging)
     /// </summary>
-    public interface IHasLogger
-    {
-        /// <summary>
-        /// Gets the logger (that can be used by SqlHelper methods for logging)
-        /// </summary>
-        ILogger Logger { get; }
-    }
+    ILogger Logger { get; }
 }

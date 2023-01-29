@@ -1,7 +1,6 @@
-﻿namespace Serenity
+﻿namespace Serenity;
+
+public interface IGeneratorFileSystem : IFileSystem
 {
-    public interface IGeneratorFileSystem : IFileSystem
-    {
-        DateTime GetLastWriteTime(string path);
-    }
+    DateTime GetLastWriteTime(string path);
 }

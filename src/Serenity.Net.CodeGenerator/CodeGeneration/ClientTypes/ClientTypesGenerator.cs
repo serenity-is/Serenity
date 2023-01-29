@@ -1,173 +1,172 @@
-﻿namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration;
+
+public partial class ClientTypesGenerator : ImportGeneratorBase
 {
-    public partial class ClientTypesGenerator : ImportGeneratorBase
+    static readonly HashSet<string> lookupEditorBaseOptions;
+    static readonly HashSet<string> serviceLookupEditorBaseOptions;
+
+    static ClientTypesGenerator()
     {
-        static readonly HashSet<string> lookupEditorBaseOptions;
-        static readonly HashSet<string> serviceLookupEditorBaseOptions;
-
-        static ClientTypesGenerator()
+        lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "Async",
-                "AutoComplete",
-                "CascadeField",
-                "CascadeValue",
-                "Delimited",
-                "DialogType",
-                "FilterField",
-                "FilterValue",
-                "InplaceAdd",
-                "InplaceAddPermission",
-                "LookupKey",
-                "MinimumResultsForSearch",
-                "Multiple",
-                "OpenDialogAsPanel"
-            };
+            "Async",
+            "AutoComplete",
+            "CascadeField",
+            "CascadeValue",
+            "Delimited",
+            "DialogType",
+            "FilterField",
+            "FilterValue",
+            "InplaceAdd",
+            "InplaceAddPermission",
+            "LookupKey",
+            "MinimumResultsForSearch",
+            "Multiple",
+            "OpenDialogAsPanel"
+        };
 
-            var lookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.LookupEditorBaseAttribute, Serenity.Net.Core");
-            if (lookupEditorBaseAttr != null)
-            {
-                foreach (var p in lookupEditorBaseAttr
-                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
-                    lookupEditorBaseOptions.Add(p.Name);
-            }
-
-            serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "AutoComplete",
-                "CascadeField",
-                "CascadeValue",
-                "ColumnSelection",
-                "Delimited",
-                "DialogType",
-                "ExcludeColumns",
-                "FilterField",
-                "FilterValue",
-                "IdField",
-                "TextField",
-                "IncludeColumns",
-                "IncludeDeleted",
-                "InplaceAdd",
-                "InplaceAddPermission",
-                "ItemType",
-                "MinimumResultsForSearch",
-                "Multiple",
-                "OpenDialogAsPanel",
-                "PageSize",
-                "Service",
-                "Sort"
-            };
-
-            var serviceLookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.ServiceLookupEditorBaseAttribute, Serenity.Net.Core");
-            if (serviceLookupEditorBaseAttr != null)
-            {
-                foreach (var p in serviceLookupEditorBaseAttr
-                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
-                    serviceLookupEditorBaseOptions.Add(p.Name);
-            }
+        var lookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.LookupEditorBaseAttribute, Serenity.Net.Core");
+        if (lookupEditorBaseAttr != null)
+        {
+            foreach (var p in lookupEditorBaseAttr
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                lookupEditorBaseOptions.Add(p.Name);
         }
 
-        protected override void GenerateAll()
+        serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            var generatedTypes = new HashSet<string>();
+            "AutoComplete",
+            "CascadeField",
+            "CascadeValue",
+            "ColumnSelection",
+            "Delimited",
+            "DialogType",
+            "ExcludeColumns",
+            "FilterField",
+            "FilterValue",
+            "IdField",
+            "TextField",
+            "IncludeColumns",
+            "IncludeDeleted",
+            "InplaceAdd",
+            "InplaceAddPermission",
+            "ItemType",
+            "MinimumResultsForSearch",
+            "Multiple",
+            "OpenDialogAsPanel",
+            "PageSize",
+            "Service",
+            "Sort"
+        };
 
-            foreach (var tsType in tsTypes)
+        var serviceLookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.ServiceLookupEditorBaseAttribute, Serenity.Net.Core");
+        if (serviceLookupEditorBaseAttr != null)
+        {
+            foreach (var p in serviceLookupEditorBaseAttr
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                serviceLookupEditorBaseOptions.Add(p.Name);
+        }
+    }
+
+    protected override void GenerateAll()
+    {
+        var generatedTypes = new HashSet<string>();
+
+        foreach (var tsType in tsTypes)
+        {
+            if (generatedTypes.Contains(tsType.Key))
+                continue;
+
+            if (tsType.Value.IsDeclaration == true)
+                continue;
+
+            GenerateType(tsType.Value);
+        }
+    }
+
+    private static string GetNamespace(string ns)
+    {
+        if (ns == "Serenity")
+            return "Serenity.ComponentModel";
+
+        return ns;
+    }
+
+    private void GenerateType(ExternalType type)
+    {
+        bool isEditorType = IsEditorType(type);
+        bool isFormatterType = IsFormatterType(type);
+
+        if (!isEditorType && !isFormatterType)
+            return;
+
+        AppendUsings(new string[] {
+            "Serenity",
+            "Serenity.ComponentModel",
+            "System",
+            "System.Collections",
+            "System.Collections.Generic",
+            "System.ComponentModel"
+        });
+
+        sb.AppendLine();
+
+        var ns = GetNamespace(type.Namespace);
+
+        var key = type.Attributes?.FirstOrDefault(x =>
+            x.Arguments?.Count > 0 &&
+            !string.IsNullOrEmpty(x.Arguments[0]?.Value as string) &&
+            (
+                string.Equals(x.Type, "registerClass", StringComparison.Ordinal) ||
+                string.Equals(x.Type, "registerEditor", StringComparison.Ordinal) ||
+                string.Equals(x.Type, "registerFormatter", StringComparison.Ordinal) ||
+                x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
+                x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
+                x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
+            )?.Arguments[0].Value as string ??
+            type.Fields?.FirstOrDefault(x =>
+                x.IsStatic == true &&
+                x.Name == "__typeName" &&
+                x.Value is string)?.Value as string;
+
+        if (string.IsNullOrEmpty(ns))
+        {
+            if (key != null)
             {
-                if (generatedTypes.Contains(tsType.Key))
-                    continue;
-
-                if (tsType.Value.IsDeclaration == true)
-                    continue;
-
-                GenerateType(tsType.Value);
+                var idx = key.LastIndexOf('.');
+                if (idx > 0)
+                    ns = key[..idx];
             }
-        }
-
-        private static string GetNamespace(string ns)
-        {
-            if (ns == "Serenity")
-                return "Serenity.ComponentModel";
-
-            return ns;
-        }
-
-        private void GenerateType(ExternalType type)
-        {
-            bool isEditorType = IsEditorType(type);
-            bool isFormatterType = IsFormatterType(type);
-
-            if (!isEditorType && !isFormatterType)
-                return;
-
-            AppendUsings(new string[] {
-                "Serenity",
-                "Serenity.ComponentModel",
-                "System",
-                "System.Collections",
-                "System.Collections.Generic",
-                "System.ComponentModel"
-            });
-
-            sb.AppendLine();
-
-            var ns = GetNamespace(type.Namespace);
-
-            var key = type.Attributes?.FirstOrDefault(x =>
-                x.Arguments?.Count > 0 &&
-                !string.IsNullOrEmpty(x.Arguments[0]?.Value as string) &&
-                (
-                    string.Equals(x.Type, "registerClass", StringComparison.Ordinal) ||
-                    string.Equals(x.Type, "registerEditor", StringComparison.Ordinal) ||
-                    string.Equals(x.Type, "registerFormatter", StringComparison.Ordinal) ||
-                    x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
-                    x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
-                    x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
-                )?.Arguments[0].Value as string ??
-                type.Fields?.FirstOrDefault(x =>
-                    x.IsStatic == true &&
-                    x.Name == "__typeName" &&
-                    x.Value is string)?.Value as string;
 
             if (string.IsNullOrEmpty(ns))
-            {
-                if (key != null)
-                {
-                    var idx = key.LastIndexOf('.');
-                    if (idx > 0)
-                        ns = key[..idx];
-                }
+                ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+        }
+        else
+            key = null;
 
-                if (string.IsNullOrEmpty(ns))
-                    ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
-            }
-            else
-                key = null;
+        string name = type.Name + "Attribute";
 
-            string name = type.Name + "Attribute";
+        if (!string.IsNullOrEmpty(ns))
+        {
+            cw.Indented("namespace ");
+            sb.AppendLine(ns);
 
-            if (!string.IsNullOrEmpty(ns))
-            {
-                cw.Indented("namespace ");
-                sb.AppendLine(ns);
-
-                cw.InBrace(delegate
-                {
-                    if (isEditorType)
-                        GenerateEditor(type, name, key);
-                    else if (isFormatterType)
-                        GenerateFormatter(type, name, key);
-                });
-            }
-            else
+            cw.InBrace(delegate
             {
                 if (isEditorType)
                     GenerateEditor(type, name, key);
                 else if (isFormatterType)
                     GenerateFormatter(type, name, key);
-            }
-
-            AddFile(RemoveRootNamespace(ns, name) + ".cs");
+            });
         }
+        else
+        {
+            if (isEditorType)
+                GenerateEditor(type, name, key);
+            else if (isFormatterType)
+                GenerateFormatter(type, name, key);
+        }
+
+        AddFile(RemoveRootNamespace(ns, name) + ".cs");
     }
 }

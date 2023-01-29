@@ -1,14 +1,13 @@
 ﻿
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+/// Interface for rows with a CultureId field
+/// </summary>
+public interface ILocalizationRow : IIdRow
 {
     /// <summary>
-    /// Interface for rows with a CultureId field
+    /// Culture ID field, e.g. LanguageID / LanguageKey
     /// </summary>
-    public interface ILocalizationRow : IIdRow
-    {
-        /// <summary>
-        /// Culture ID field, e.g. LanguageID / LanguageKey
-        /// </summary>
-        Field CultureIdField { get; }
-    }
+    Field CultureIdField { get; }
 }

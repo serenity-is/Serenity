@@ -1,14 +1,13 @@
 ﻿
-namespace Serenity.Web
+namespace Serenity.Web;
+
+/// <summary>
+/// Provides access to the registration name for a dynamic script
+/// </summary>
+public interface IScriptName
 {
     /// <summary>
-    /// Provides access to the registration name for a dynamic script
+    /// Gets the script name
     /// </summary>
-    public interface IScriptName
-    {
-        /// <summary>
-        /// Gets the script name
-        /// </summary>
-        string ScriptName { get; }
-    }
+    string ScriptName { get; }
 }

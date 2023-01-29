@@ -1,29 +1,28 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+/// Connection string options
+/// </summary>
+public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, 
+    IOptions<ConnectionStringOptions>
 {
     /// <summary>
-    /// Connection string options
+    /// Default sectionkey for ConnectionStringOptions
     /// </summary>
-    public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, 
-        IOptions<ConnectionStringOptions>
+    public const string SectionKey = "Data";
+
+    /// <summary>
+    /// Creates a new instance
+    /// </summary>
+    public ConnectionStringOptions()
+        : base(StringComparer.OrdinalIgnoreCase)
     {
-        /// <summary>
-        /// Default sectionkey for ConnectionStringOptions
-        /// </summary>
-        public const string SectionKey = "Data";
-
-        /// <summary>
-        /// Creates a new instance
-        /// </summary>
-        public ConnectionStringOptions()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
-
-        /// <summary>
-        /// Returns this
-        /// </summary>
-        public ConnectionStringOptions Value => this;
     }
+
+    /// <summary>
+    /// Returns this
+    /// </summary>
+    public ConnectionStringOptions Value => this;
 }

@@ -1,63 +1,62 @@
 ﻿using Newtonsoft.Json.Converters;
 
-namespace Serenity
+namespace Serenity;
+
+/// <summary>
+/// Contains default Serenity JSON serialization settings.
+/// </summary>
+public static class JsonSettings
 {
     /// <summary>
-    /// Contains default Serenity JSON serialization settings.
+    /// The tolerant settings, ignores missing members, reference loops on deserialization, ignores nulls
     /// </summary>
-    public static class JsonSettings
+    public static JsonSerializerSettings Tolerant;
+
+    /// <summary>
+    /// The tolerant settings, ignores missing members, reference loops on deserialization, includes nulls
+    /// </summary>
+    public static JsonSerializerSettings TolerantIncludeNulls;
+
+    /// <summary>
+    /// The stricter settings, raises error on missing members / reference loops, ignores nulls.
+    /// </summary>
+    public static JsonSerializerSettings Strict;
+
+    /// <summary>
+    /// The stricter settings, raises error on missing members / reference loops, includes nulls.
+    /// </summary>
+    public static JsonSerializerSettings StrictIncludeNulls;
+
+    static JsonSettings()
     {
-        /// <summary>
-        /// The tolerant settings, ignores missing members, reference loops on deserialization, ignores nulls
-        /// </summary>
-        public static JsonSerializerSettings Tolerant;
+        Tolerant = CreateDefaults();
+        Tolerant.NullValueHandling = NullValueHandling.Ignore;
+        Tolerant.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-        /// <summary>
-        /// The tolerant settings, ignores missing members, reference loops on deserialization, includes nulls
-        /// </summary>
-        public static JsonSerializerSettings TolerantIncludeNulls;
+        TolerantIncludeNulls = CreateDefaults();
+        TolerantIncludeNulls.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-        /// <summary>
-        /// The stricter settings, raises error on missing members / reference loops, ignores nulls.
-        /// </summary>
-        public static JsonSerializerSettings Strict;
+        Strict = CreateDefaults();
+        Strict.NullValueHandling = NullValueHandling.Ignore;
+        Strict.MissingMemberHandling = MissingMemberHandling.Error;
 
-        /// <summary>
-        /// The stricter settings, raises error on missing members / reference loops, includes nulls.
-        /// </summary>
-        public static JsonSerializerSettings StrictIncludeNulls;
+        StrictIncludeNulls = CreateDefaults();
+        StrictIncludeNulls.MissingMemberHandling = MissingMemberHandling.Error;
+    }
 
-        static JsonSettings()
+    /// <summary>
+    /// Creates a JsonSerializerSettings object with common values and converters.
+    /// </summary>
+    /// <returns></returns>
+    public static JsonSerializerSettings CreateDefaults()
+    {
+        return new JsonSerializerSettings
         {
-            Tolerant = CreateDefaults();
-            Tolerant.NullValueHandling = NullValueHandling.Ignore;
-            Tolerant.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-
-            TolerantIncludeNulls = CreateDefaults();
-            TolerantIncludeNulls.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-
-            Strict = CreateDefaults();
-            Strict.NullValueHandling = NullValueHandling.Ignore;
-            Strict.MissingMemberHandling = MissingMemberHandling.Error;
-
-            StrictIncludeNulls = CreateDefaults();
-            StrictIncludeNulls.MissingMemberHandling = MissingMemberHandling.Error;
-        }
-
-        /// <summary>
-        /// Creates a JsonSerializerSettings object with common values and converters.
-        /// </summary>
-        /// <returns></returns>
-        public static JsonSerializerSettings CreateDefaults()
-        {
-            return new JsonSerializerSettings
-            {
-                DateParseHandling = DateParseHandling.DateTimeOffset,
-                Converters = {
-                    new IsoDateTimeConverter(),
-                    new JsonSafeInt64Converter()
-                }
-            };
-        }
+            DateParseHandling = DateParseHandling.DateTimeOffset,
+            Converters = {
+                new IsoDateTimeConverter(),
+                new JsonSafeInt64Converter()
+            }
+        };
     }
 }

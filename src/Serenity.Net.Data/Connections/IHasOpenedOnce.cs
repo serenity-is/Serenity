@@ -1,14 +1,13 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// Interfaces for types that has an OpenedOnce property that
+/// determines if the connection has opened at least once
+/// </summary>
+public interface IHasOpenedOnce
 {
     /// <summary>
-    /// Interfaces for types that has an OpenedOnce property that
-    /// determines if the connection has opened at least once
+    /// Gets opened once info
     /// </summary>
-    public interface IHasOpenedOnce
-    {
-        /// <summary>
-        /// Gets opened once info
-        /// </summary>
-        bool OpenedOnce { get; }
-    }
+    bool OpenedOnce { get; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Serenity.CodeGeneration
+﻿namespace Serenity.CodeGeneration;
+
+public class ExternalGenericParameter
 {
-    public class ExternalGenericParameter
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

@@ -1,14 +1,13 @@
-﻿namespace Serenity.Plugins
+﻿namespace Serenity.Plugins;
+
+/// <summary>
+/// Abstraction for plugins with script file dependencies
+/// </summary>
+public interface IScriptFiles
 {
     /// <summary>
-    /// Abstraction for plugins with script file dependencies
+    /// Gets the script files.
     /// </summary>
-    public interface IScriptFiles
-    {
-        /// <summary>
-        /// Gets the script files.
-        /// </summary>
-        /// <returns>List of script files.</returns>
-        IEnumerable<ScriptFile> GetScriptFiles();
-    }
+    /// <returns>List of script files.</returns>
+    IEnumerable<ScriptFile> GetScriptFiles();
 }

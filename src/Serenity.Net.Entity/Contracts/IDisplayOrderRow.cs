@@ -1,12 +1,11 @@
 ﻿
-namespace Serenity.Data
+namespace Serenity.Data;
+
+/// <summary>
+///   Basic interface for rows that has a display order field and provides a default sorting order.</summary>
+public interface IDisplayOrderRow : IRow
 {
     /// <summary>
-    ///   Basic interface for rows that has a display order field and provides a default sorting order.</summary>
-    public interface IDisplayOrderRow : IRow
-    {
-        /// <summary>
-        ///   Gets display order field for this row.</summary>
-        Int32Field DisplayOrderField { get; }
-    }
+    ///   Gets display order field for this row.</summary>
+    Int32Field DisplayOrderField { get; }
 }

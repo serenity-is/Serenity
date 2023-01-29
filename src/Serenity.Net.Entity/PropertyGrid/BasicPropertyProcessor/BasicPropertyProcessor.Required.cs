@@ -1,20 +1,19 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetRequired(IPropertySource source, PropertyItem item)
     {
-        private void SetRequired(IPropertySource source, PropertyItem item)
+        var attr = source.GetAttribute<RequiredAttribute>();
+        if (attr != null)
         {
-            var attr = source.GetAttribute<RequiredAttribute>();
-            if (attr != null)
-            {
-                if (attr.IsRequired)
-                    item.Required = true;
-            }
-            else if (source.BasedOnField is not null &&
-                (source.BasedOnField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
-            {
+            if (attr.IsRequired)
                 item.Required = true;
-            }
+        }
+        else if (source.BasedOnField is not null &&
+            (source.BasedOnField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
+        {
+            item.Required = true;
         }
     }
 }

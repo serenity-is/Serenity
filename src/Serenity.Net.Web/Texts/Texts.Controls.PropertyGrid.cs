@@ -1,15 +1,14 @@
 ﻿
-namespace Serenity.Web
+namespace Serenity.Web;
+
+internal static partial class Texts
 {
-    internal static partial class Texts
+    public static partial class Controls
     {
-        public static partial class Controls
+        public static class PropertyGrid
         {
-            public static class PropertyGrid
-            {
-                public static LocalText DefaultCategory = "Properties";
-                public static LocalText RequiredHint = "this field is required";
-            }
+            public static LocalText DefaultCategory = "Properties";
+            public static LocalText RequiredHint = "this field is required";
         }
     }
 }

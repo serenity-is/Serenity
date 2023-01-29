@@ -1,12 +1,11 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetReadOnly(IPropertySource source, PropertyItem item)
     {
-        private void SetReadOnly(IPropertySource source, PropertyItem item)
-        {
-            var attr = source.GetAttribute<ReadOnlyAttribute>();
-            if (attr != null && attr.IsReadOnly)
-                item.ReadOnly = true;
-        }
+        var attr = source.GetAttribute<ReadOnlyAttribute>();
+        if (attr != null && attr.IsReadOnly)
+            item.ReadOnly = true;
     }
 }

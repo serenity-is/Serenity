@@ -1,25 +1,24 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetSorting(IPropertySource source, PropertyItem item)
     {
-        private void SetSorting(IPropertySource source, PropertyItem item)
+        var sortOrderAttr = source.GetAttribute<SortOrderAttribute>();
+        if (sortOrderAttr != null && sortOrderAttr.SortOrder != 0)
+            item.SortOrder = sortOrderAttr.SortOrder;
+
+        var sortableAttr = source.GetAttribute<SortableAttribute>();
+        if (sortableAttr != null)
         {
-            var sortOrderAttr = source.GetAttribute<SortOrderAttribute>();
-            if (sortOrderAttr != null && sortOrderAttr.SortOrder != 0)
-                item.SortOrder = sortOrderAttr.SortOrder;
-
-            var sortableAttr = source.GetAttribute<SortableAttribute>();
-            if (sortableAttr != null)
-            {
-                if (!sortableAttr.Value)
-                    item.Sortable = false;
-
-                return;
-            }
-
-            if (source.BasedOnField is not null &&
-                source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+            if (!sortableAttr.Value)
                 item.Sortable = false;
+
+            return;
         }
+
+        if (source.BasedOnField is not null &&
+            source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+            item.Sortable = false;
     }
 }

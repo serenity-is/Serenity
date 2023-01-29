@@ -1,14 +1,13 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// The sql dialect mapper
+/// </summary>
+public interface ISqlDialectMapper
 {
     /// <summary>
-    /// The sql dialect mapper
+    /// Returns dialect for a dialect or provider name
     /// </summary>
-    public interface ISqlDialectMapper
-    {
-        /// <summary>
-        /// Returns dialect for a dialect or provider name
-        /// </summary>
-        /// <param name="dialectOrProviderName">The dialect name or provider name</param>
-        ISqlDialect TryGet(string dialectOrProviderName);
-    }
+    /// <param name="dialectOrProviderName">The dialect name or provider name</param>
+    ISqlDialect TryGet(string dialectOrProviderName);
 }

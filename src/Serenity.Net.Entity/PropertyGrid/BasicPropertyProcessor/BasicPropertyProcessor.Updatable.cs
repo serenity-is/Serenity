@@ -1,26 +1,25 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetUpdatable(IPropertySource source, PropertyItem item)
     {
-        private void SetUpdatable(IPropertySource source, PropertyItem item)
+        if (source.Property != null)
         {
-            if (source.Property != null)
+            var attr = source.Property.GetAttribute<UpdatableAttribute>(false);
+            if (attr != null)
             {
-                var attr = source.Property.GetAttribute<UpdatableAttribute>(false);
-                if (attr != null)
-                {
-                    if (!attr.Value)
-                        item.Updatable = false;
-
-                    return;
-                }
-            }
-
-            if (source.BasedOnField is not null)
-            {
-                if ((source.BasedOnField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                if (!attr.Value)
                     item.Updatable = false;
+
+                return;
             }
+        }
+
+        if (source.BasedOnField is not null)
+        {
+            if ((source.BasedOnField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                item.Updatable = false;
         }
     }
 }

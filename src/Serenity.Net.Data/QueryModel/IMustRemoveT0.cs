@@ -1,9 +1,8 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// Obsolete interface
+/// </summary>
+public interface IMustRemoveT0
 {
-    /// <summary>
-    /// Obsolete interface
-    /// </summary>
-    public interface IMustRemoveT0
-    {
-    }
 }

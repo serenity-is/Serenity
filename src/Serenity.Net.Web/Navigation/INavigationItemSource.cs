@@ -1,13 +1,12 @@
-﻿namespace Serenity.Navigation
+﻿namespace Serenity.Navigation;
+
+/// <summary>
+/// Navigation item source abstraction
+/// </summary>
+public interface INavigationItemSource
 {
     /// <summary>
-    /// Navigation item source abstraction
+    /// Gets list of navigation item attributes (<see cref="NavigationItemAttribute"/>)
     /// </summary>
-    public interface INavigationItemSource
-    {
-        /// <summary>
-        /// Gets list of navigation item attributes (<see cref="NavigationItemAttribute"/>)
-        /// </summary>
-        List<NavigationItemAttribute> GetItems();
-    }
+    List<NavigationItemAttribute> GetItems();
 }

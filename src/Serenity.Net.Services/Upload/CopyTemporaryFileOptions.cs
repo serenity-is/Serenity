@@ -1,18 +1,17 @@
-﻿namespace Serenity.Web
+﻿namespace Serenity.Web;
+
+/// <summary>
+/// Options for copying a temporary file to its target
+/// </summary>
+public class CopyTemporaryFileOptions : FormatFilenameOptions
 {
     /// <summary>
-    /// Options for copying a temporary file to its target
+    /// Temporary file
     /// </summary>
-    public class CopyTemporaryFileOptions : FormatFilenameOptions
-    {
-        /// <summary>
-        /// Temporary file
-        /// </summary>
-        public string TemporaryFile { get; set; }
+    public string TemporaryFile { get; set; }
 
-        /// <summary>
-        /// Files to delete container
-        /// </summary>
-        public IFilesToDelete FilesToDelete { get; set; }
-    }
+    /// <summary>
+    /// Files to delete container
+    /// </summary>
+    public IFilesToDelete FilesToDelete { get; set; }
 }

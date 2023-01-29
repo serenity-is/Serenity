@@ -1,14 +1,13 @@
 ﻿
-namespace Serenity.Web
+namespace Serenity.Web;
+
+internal static partial class Texts
 {
-    internal static partial class Texts
+    public static partial class Controls
     {
-        public static partial class Controls
+        public static class DateTimeEditor
         {
-            public static class DateTimeEditor
-            {
-                public static LocalText SetToNow = "set to now";
-            }
+            public static LocalText SetToNow = "set to now";
         }
     }
 }

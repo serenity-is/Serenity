@@ -1,18 +1,17 @@
 ﻿
-namespace Serenity.Data.Mapping
+namespace Serenity.Data.Mapping;
+
+/// <summary>
+/// Marks the field as auto increment, e.g. generated on insert in SQL side
+/// </summary>
+/// <seealso cref="SetFieldFlagsAttribute" />
+public class AutoIncrementAttribute : SetFieldFlagsAttribute
 {
     /// <summary>
-    /// Marks the field as auto increment, e.g. generated on insert in SQL side
+    /// Initializes a new instance of the <see cref="AutoIncrementAttribute"/> class.
     /// </summary>
-    /// <seealso cref="SetFieldFlagsAttribute" />
-    public class AutoIncrementAttribute : SetFieldFlagsAttribute
+    public AutoIncrementAttribute()
+        : base(FieldFlags.AutoIncrement, FieldFlags.Insertable | FieldFlags.Updatable)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AutoIncrementAttribute"/> class.
-        /// </summary>
-        public AutoIncrementAttribute()
-            : base(FieldFlags.AutoIncrement, FieldFlags.Insertable | FieldFlags.Updatable)
-        {
-        }
     }
 }

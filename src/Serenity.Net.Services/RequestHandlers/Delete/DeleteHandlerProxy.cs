@@ -1,31 +1,30 @@
-﻿namespace Serenity.Services
+﻿namespace Serenity.Services;
+
+internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
+    : IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
+    where TRow : class, IRow, IIdRow, new()
+    where TDeleteRequest : DeleteRequest
+    where TDeleteResponse : DeleteResponse, new()
 {
-    internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
-        : IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
-        where TRow : class, IRow, IIdRow, new()
-        where TDeleteRequest : DeleteRequest
-        where TDeleteResponse : DeleteResponse, new()
+    private readonly IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse> handler;
+
+    public DeleteHandlerProxy(IDefaultHandlerFactory factory)
     {
-        private readonly IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse> handler;
+        if (factory is null)
+            throw new ArgumentNullException(nameof(factory));
 
-        public DeleteHandlerProxy(IDefaultHandlerFactory factory)
-        {
-            if (factory is null)
-                throw new ArgumentNullException(nameof(factory));
-
-            handler = (IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>) factory.CreateHandler<IDeleteRequestProcessor>(typeof(TRow));
-        }
-
-        public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
-        {
-            return handler.Delete(uow, request);
-        }
+        handler = (IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>) factory.CreateHandler<IDeleteRequestProcessor>(typeof(TRow));
     }
 
-    internal class DeleteHandlerProxy<TRow>
-        : DeleteHandlerProxy<TRow, DeleteRequest, DeleteResponse>, IDeleteHandler<TRow>
-        where TRow : class, IRow, IIdRow, new()
+    public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
     {
-        public DeleteHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
+        return handler.Delete(uow, request);
     }
+}
+
+internal class DeleteHandlerProxy<TRow>
+    : DeleteHandlerProxy<TRow, DeleteRequest, DeleteResponse>, IDeleteHandler<TRow>
+    where TRow : class, IRow, IIdRow, new()
+{
+    public DeleteHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

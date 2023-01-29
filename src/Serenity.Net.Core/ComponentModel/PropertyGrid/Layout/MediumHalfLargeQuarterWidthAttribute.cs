@@ -1,17 +1,16 @@
-﻿namespace Serenity.ComponentModel
+﻿namespace Serenity.ComponentModel;
+
+/// <summary>
+/// Marks form field with "col-md-6 col-lg-3" css class, which makes it allocate half of form row
+/// on device widths >= 992px (some desktop), and quarter on device widths >= 1200px
+/// </summary>
+public class MediumHalfLargeQuarterWidthAttribute : FormWidthAttribute
 {
     /// <summary>
-    /// Marks form field with "col-md-6 col-lg-3" css class, which makes it allocate half of form row
-    /// on device widths >= 992px (some desktop), and quarter on device widths >= 1200px
+    /// Initializes a new instance of the <see cref="MediumHalfLargeQuarterWidthAttribute"/> class.
     /// </summary>
-    public class MediumHalfLargeQuarterWidthAttribute : FormWidthAttribute
+    public MediumHalfLargeQuarterWidthAttribute()
+        : base("col-md-6 col-lg-3")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MediumHalfLargeQuarterWidthAttribute"/> class.
-        /// </summary>
-        public MediumHalfLargeQuarterWidthAttribute()
-            : base("col-md-6 col-lg-3")
-        {
-        }
     }
 }

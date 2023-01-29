@@ -1,23 +1,22 @@
-﻿namespace Serenity.Reporting
+﻿namespace Serenity.Reporting;
+
+/// <summary>
+/// Attribute used to set the <see cref="ICellDecorator"/> type
+/// for a property.
+/// </summary>
+public class CellDecoratorAttribute : Attribute
 {
     /// <summary>
-    /// Attribute used to set the <see cref="ICellDecorator"/> type
-    /// for a property.
+    /// Creates an instance of the class.
     /// </summary>
-    public class CellDecoratorAttribute : Attribute
+    /// <param name="decorator">Decorator type</param>
+    public CellDecoratorAttribute(Type decorator)
     {
-        /// <summary>
-        /// Creates an instance of the class.
-        /// </summary>
-        /// <param name="decorator">Decorator type</param>
-        public CellDecoratorAttribute(Type decorator)
-        {
-            DecoratorType = decorator;
-        }
-
-        /// <summary>
-        /// Gets the decorator type.
-        /// </summary>
-        public Type DecoratorType { get; set; }
+        DecoratorType = decorator;
     }
+
+    /// <summary>
+    /// Gets the decorator type.
+    /// </summary>
+    public Type DecoratorType { get; set; }
 }

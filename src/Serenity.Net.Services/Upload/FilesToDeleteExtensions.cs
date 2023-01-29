@@ -1,40 +1,39 @@
-﻿namespace Serenity.Web
+﻿namespace Serenity.Web;
+
+/// <summary>
+/// Extension methods for <see cref="FilesToDelete"/>
+/// </summary>
+public static class FilesToDeleteExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="FilesToDelete"/>
+    /// Registers a <see cref="FilesToDelete"/> in the target unit of work. 
+    /// This deletes the old files on commit, and new files on rollback
     /// </summary>
-    public static class FilesToDeleteExtensions
+    /// <param name="unitOfWork">Unit of work</param>
+    /// <param name="filesToDelete">Files to delete container</param>
+    public static void RegisterFilesToDelete(this IUnitOfWork unitOfWork, FilesToDelete filesToDelete)
     {
-        /// <summary>
-        /// Registers a <see cref="FilesToDelete"/> in the target unit of work. 
-        /// This deletes the old files on commit, and new files on rollback
-        /// </summary>
-        /// <param name="unitOfWork">Unit of work</param>
-        /// <param name="filesToDelete">Files to delete container</param>
-        public static void RegisterFilesToDelete(this IUnitOfWork unitOfWork, FilesToDelete filesToDelete)
+        unitOfWork.OnCommit += delegate ()
         {
-            unitOfWork.OnCommit += delegate ()
+            try
             {
-                try
-                {
-                    filesToDelete.KeepNewFiles();
-                    filesToDelete.Dispose();
-                }
-                catch
-                {
-                }
-            };
+                filesToDelete.KeepNewFiles();
+                filesToDelete.Dispose();
+            }
+            catch
+            {
+            }
+        };
 
-            unitOfWork.OnRollback += delegate ()
+        unitOfWork.OnRollback += delegate ()
+        {
+            try
             {
-                try
-                {
-                    filesToDelete.Dispose();
-                }
-                catch
-                {
-                }
-            };
-        }
+                filesToDelete.Dispose();
+            }
+            catch
+            {
+            }
+        };
     }
 }

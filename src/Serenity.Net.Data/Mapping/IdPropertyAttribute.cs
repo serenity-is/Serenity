@@ -1,17 +1,16 @@
-﻿namespace Serenity.Data
+﻿namespace Serenity.Data;
+
+/// <summary>
+/// Determines that the attached property is the ID field of the table.
+/// </summary>
+/// <seealso cref="Attribute" />
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public class IdPropertyAttribute : Attribute
 {
     /// <summary>
-    /// Determines that the attached property is the ID field of the table.
+    /// Initializes a new instance of the <see cref="IdPropertyAttribute"/> class.
     /// </summary>
-    /// <seealso cref="Attribute" />
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class IdPropertyAttribute : Attribute
+    public IdPropertyAttribute()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IdPropertyAttribute"/> class.
-        /// </summary>
-        public IdPropertyAttribute()
-        {
-        }
     }
 }

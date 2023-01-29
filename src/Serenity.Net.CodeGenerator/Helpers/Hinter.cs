@@ -1,89 +1,88 @@
-﻿namespace Serenity.CodeGenerator
+﻿namespace Serenity.CodeGenerator;
+
+/// <summary>
+/// Original code from https://github.com/fjunqueira/hinter
+/// </summary>
+public class Hinter
 {
-    /// <summary>
-    /// Original code from https://github.com/fjunqueira/hinter
-    /// </summary>
-    public class Hinter
+    public static string ReadHintedLine(IEnumerable<string> hintSource, 
+        string inputRegex = ".", string userInput = null)
     {
-        public static string ReadHintedLine(IEnumerable<string> hintSource, 
-            string inputRegex = ".", string userInput = null)
+        Console.OutputEncoding = Encoding.UTF8;
+        ConsoleKeyInfo input;
+
+        userInput ??= string.Empty;
+
+        if (userInput.Length > 0)
         {
-            Console.OutputEncoding = Encoding.UTF8;
-            ConsoleKeyInfo input;
+            Console.Write(userInput);
+        }
 
-            userInput ??= string.Empty;
+        string lastUserInput = null;
+        string lastSuggestion = null;
 
-            if (userInput.Length > 0)
+        while (ConsoleKey.Enter != (input = Console.ReadKey(true)).Key)
+        {
+            var oldUserInput = userInput;
+
+            if (input.Key == ConsoleKey.Backspace)
             {
-                Console.Write(userInput);
+                userInput = userInput.Any() ? userInput.Remove(userInput.Length - 1, 1) : string.Empty;
+                lastSuggestion = null;
+                lastUserInput = null;
             }
-
-            string lastUserInput = null;
-            string lastSuggestion = null;
-
-            while (ConsoleKey.Enter != (input = Console.ReadKey(true)).Key)
+            else if (input.Key == ConsoleKey.Tab)
             {
-                var oldUserInput = userInput;
+                lastUserInput ??= userInput;
+                var suggestions = hintSource
+                    .Where(item => item.Length >= lastUserInput.Length &&
+                        string.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToList();
 
-                if (input.Key == ConsoleKey.Backspace)
+                if (suggestions.Any())
                 {
-                    userInput = userInput.Any() ? userInput.Remove(userInput.Length - 1, 1) : string.Empty;
-                    lastSuggestion = null;
-                    lastUserInput = null;
-                }
-                else if (input.Key == ConsoleKey.Tab)
-                {
-                    lastUserInput ??= userInput;
-                    var suggestions = hintSource
-                        .Where(item => item.Length >= lastUserInput.Length &&
-                            string.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
-                        .Distinct()
-                        .OrderBy(x => x)
-                        .ToList();
+                    var idx = lastSuggestion == null ? -1 : suggestions.IndexOf(lastSuggestion);
 
-                    if (suggestions.Any())
+                    if (idx < 0 || idx == suggestions.Count - 1)
                     {
-                        var idx = lastSuggestion == null ? -1 : suggestions.IndexOf(lastSuggestion);
-
-                        if (idx < 0 || idx == suggestions.Count - 1)
-                        {
-                            lastSuggestion = suggestions[0];
-                        }
-                        else
-                        {
-                            lastSuggestion = suggestions[idx + 1];
-                        }
-
-                        
-                        userInput = lastSuggestion;                       
+                        lastSuggestion = suggestions[0];
                     }
                     else
                     {
-                        lastSuggestion = null;
-                        lastUserInput = null;
+                        lastSuggestion = suggestions[idx + 1];
                     }
+
+                    
+                    userInput = lastSuggestion;                       
                 }
-                else if (input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
-                    userInput += input.KeyChar;
-
-                var same = 0;
-                while (same < userInput.Length && same < oldUserInput.Length && userInput[same] == oldUserInput[same])
-                    same++;
-
-                for (var i = same; i < oldUserInput.Length; i++)
+                else
                 {
-                    Console.Write('\b');
-                    Console.Write(' ');
-                    Console.Write('\b');
+                    lastSuggestion = null;
+                    lastUserInput = null;
                 }
+            }
+            else if (input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
+                userInput += input.KeyChar;
 
-                for (var i = same; i < userInput.Length; i++)
-                    Console.Write(userInput[i]);
+            var same = 0;
+            while (same < userInput.Length && same < oldUserInput.Length && userInput[same] == oldUserInput[same])
+                same++;
+
+            for (var i = same; i < oldUserInput.Length; i++)
+            {
+                Console.Write('\b');
+                Console.Write(' ');
+                Console.Write('\b');
             }
 
-            Console.WriteLine();
-
-            return userInput;
+            for (var i = same; i < userInput.Length; i++)
+                Console.Write(userInput[i]);
         }
+
+        Console.WriteLine();
+
+        return userInput;
     }
 }

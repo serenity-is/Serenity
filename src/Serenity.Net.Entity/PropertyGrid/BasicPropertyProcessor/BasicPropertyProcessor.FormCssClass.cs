@@ -1,41 +1,40 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private FormCssClassAttribute formCssClassPrior;
+    private FormWidthAttribute formWidthPrior;
+
+    private void SetFormCssClass(IPropertySource source, PropertyItem item)
     {
-        private FormCssClassAttribute formCssClassPrior;
-        private FormWidthAttribute formWidthPrior;
+        var cssClass = source.GetAttribute<FormCssClassAttribute>() ?? formCssClassPrior;
 
-        private void SetFormCssClass(IPropertySource source, PropertyItem item)
+        if (cssClass != null)
         {
-            var cssClass = source.GetAttribute<FormCssClassAttribute>() ?? formCssClassPrior;
-
-            if (cssClass != null)
+            if (!string.IsNullOrEmpty(cssClass.Value))
             {
-                if (!string.IsNullOrEmpty(cssClass.Value))
-                {
-                    if (!string.IsNullOrEmpty(item.FormCssClass))
-                        item.FormCssClass = " " + cssClass.Value;
-                    else
-                        item.FormCssClass = cssClass.Value;
-                }
-
-                formCssClassPrior = cssClass.UntilNext ? cssClass : null;
+                if (!string.IsNullOrEmpty(item.FormCssClass))
+                    item.FormCssClass = " " + cssClass.Value;
+                else
+                    item.FormCssClass = cssClass.Value;
             }
 
-            var width = source.GetAttribute<FormWidthAttribute>() ?? formWidthPrior;
-            if (width != null)
-            {
-                if (!string.IsNullOrEmpty(width.Value))
-                {
-                    if (!string.IsNullOrEmpty(item.FormCssClass))
-                        item.FormCssClass += " " + width.Value;
-                    else
-                        item.FormCssClass = width.Value;
-                }
+            formCssClassPrior = cssClass.UntilNext ? cssClass : null;
+        }
 
-                if (!width.JustThis)
-                    formWidthPrior = width.UntilNext ? width : null;
+        var width = source.GetAttribute<FormWidthAttribute>() ?? formWidthPrior;
+        if (width != null)
+        {
+            if (!string.IsNullOrEmpty(width.Value))
+            {
+                if (!string.IsNullOrEmpty(item.FormCssClass))
+                    item.FormCssClass += " " + width.Value;
+                else
+                    item.FormCssClass = width.Value;
             }
+
+            if (!width.JustThis)
+                formWidthPrior = width.UntilNext ? width : null;
         }
     }
 }

@@ -1,27 +1,26 @@
-﻿namespace Serenity.PropertyGrid
+﻿namespace Serenity.PropertyGrid;
+
+public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    private void SetReadPermission(IPropertySource source, PropertyItem item)
     {
-        private void SetReadPermission(IPropertySource source, PropertyItem item)
+        if (source.Property != null)
         {
-            if (source.Property != null)
+            var attr = source.Property.GetAttribute<ReadPermissionAttribute>(false);
+            if (attr != null)
             {
-                var attr = source.Property.GetAttribute<ReadPermissionAttribute>(false);
-                if (attr != null)
-                {
-                    if (attr.Permission != "*")
-                        item.ReadPermission = attr.Permission ?? "?";
+                if (attr.Permission != "*")
+                    item.ReadPermission = attr.Permission ?? "?";
 
-                    return;
-                }
+                return;
             }
+        }
 
-            if (source.BasedOnField is not null)
-            {
-                if (source.BasedOnField.ReadPermission != null &&
-                    source.BasedOnField.ReadPermission != "*")
-                    item.ReadPermission = source.BasedOnField.ReadPermission;
-            }
+        if (source.BasedOnField is not null)
+        {
+            if (source.BasedOnField.ReadPermission != null &&
+                source.BasedOnField.ReadPermission != "*")
+                item.ReadPermission = source.BasedOnField.ReadPermission;
         }
     }
 }

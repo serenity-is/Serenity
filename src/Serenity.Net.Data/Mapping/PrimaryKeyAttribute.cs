@@ -1,18 +1,17 @@
 ﻿
-namespace Serenity.Data.Mapping
+namespace Serenity.Data.Mapping;
+
+/// <summary>
+/// Marks the property as part of the primary key.
+/// </summary>
+/// <seealso cref="SetFieldFlagsAttribute" />
+public class PrimaryKeyAttribute : SetFieldFlagsAttribute
 {
     /// <summary>
-    /// Marks the property as part of the primary key.
+    /// Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class.
     /// </summary>
-    /// <seealso cref="SetFieldFlagsAttribute" />
-    public class PrimaryKeyAttribute : SetFieldFlagsAttribute
+    public PrimaryKeyAttribute()
+        : base(FieldFlags.PrimaryKey)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class.
-        /// </summary>
-        public PrimaryKeyAttribute()
-            : base(FieldFlags.PrimaryKey)
-        {
-        }
     }
 }
