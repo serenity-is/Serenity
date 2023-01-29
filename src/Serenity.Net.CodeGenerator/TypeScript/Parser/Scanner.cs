@@ -1,6 +1,5 @@
 ﻿using Serenity.TypeScript.TsTypes;
-﻿#if ISSOURCEGENERATOR
-using CharSpan = System.String;
+#if ISSOURCEGENERATOR
 #else
 using CharSpan = System.ReadOnlySpan<char>;
 #endif
