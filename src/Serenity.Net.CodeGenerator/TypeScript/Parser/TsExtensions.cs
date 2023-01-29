@@ -18,7 +18,7 @@
             if (end <= start)
                 return string.Empty;
 
-            return str.Substring(start, end - start);
+            return str[start..end];
         }
 
     }

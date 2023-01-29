@@ -22,22 +22,22 @@ namespace Serenity.TypeScript.Change
                 switch (ch.ChangeType)
                 {
                     case NodeChangeType.InsertBefore:
-                        if (ch.Node.Pos > pos) sb.Append(source.Substring(pos, (int) ch.Node.Pos - pos));
+                        if (ch.Node.Pos > pos) sb.Append(source[pos..(int)ch.Node.Pos]);
                         sb.Append(ch.NewValue);
                         pos = (int) ch.Node.Pos;
                         break;
                     case NodeChangeType.Change:
-                        if (ch.Node.Pos > pos) sb.Append(source.Substring(pos, (int) ch.Node.Pos - pos));
+                        if (ch.Node.Pos > pos) sb.Append(source[pos..(int)ch.Node.Pos]);
                         sb.Append(ch.NewValue);
                         if (ch.Node.End != null) pos = (int) ch.Node.End;
                         else throw new NullReferenceException("Node.End");
                         break;
                     case NodeChangeType.Delete:
-                        if (ch.Node.Pos > pos) sb.Append(source.Substring(pos, (int) ch.Node.Pos - pos));
+                        if (ch.Node.Pos > pos) sb.Append(source[pos..(int)ch.Node.Pos]);
                         if (ch.Node.End != null) pos = (int) ch.Node.End + 1;
                         break;
                     case NodeChangeType.InsertAfter:
-                        if (ch.Node.End > pos) sb.Append(source.Substring(pos, (int) ch.Node.End - pos));
+                        if (ch.Node.End > pos) sb.Append(source[pos..(int)ch.Node.End]);
                         sb.Append(ch.NewValue);
                         if (ch.Node.End != null) pos = (int) ch.Node.End;
                         break;
@@ -45,7 +45,7 @@ namespace Serenity.TypeScript.Change
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            if (pos < source.Length) sb.Append(source.Substring(pos));
+            if (pos < source.Length) sb.Append(source[pos..]);
             var newSource = sb.ToString();
 
             return newSource;

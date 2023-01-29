@@ -138,7 +138,7 @@
                 var key = param.Key;
                 if (key != null &&
                     key.Length >= 1)
-                    key = key.Substring(0, 1).ToLowerInvariant() + key[1..];
+                    key = key[..1].ToLowerInvariant() + key[1..];
 
                 item.EditorParams[key] = param.Value;
             }

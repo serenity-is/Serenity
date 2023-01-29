@@ -71,7 +71,7 @@ namespace Serenity.TypeScript.TsParser
         {
             path = NormalizeSlashes(path);
             var rootLength = GetRootLength(path);
-            var root = path.Substring(0, rootLength);
+            var root = path[..rootLength];
             var normalized = GetNormalizedParts(path, rootLength);
             if (normalized.Any())
             {
@@ -131,7 +131,7 @@ namespace Serenity.TypeScript.TsParser
         public static int DirectorySeparatorCharCode = '/';
         public static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
         {
-            var parts = normalizedSlashedPath.Substring(rootLength).Split(DirectorySeparator);
+            var parts = normalizedSlashedPath[rootLength..].Split(DirectorySeparator);
             List<string> normalized = new List<string>();
             foreach (var part in parts)
             {

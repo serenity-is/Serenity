@@ -42,7 +42,7 @@
             if (pos >= 0 && last > pos)
             {
                 char[] c = typeName.Substring(pos + 1, last - pos - 1).ToCharArray();
-                typeName = typeName.Substring(0, pos);
+                typeName = typeName[..pos];
 
                 int nestingLevel = 0;
                 for (int i = 0; i < c.Length; i++)
@@ -89,8 +89,8 @@
                 if (propField == "ID")
                     return "id";
                 else
-                    return propField.Substring(0, 1).ToLowerInvariant()
-                        + propField.Substring(1);
+                    return propField[..1].ToLowerInvariant()
+                        + propField[1..];
             }
             else
                 return prop.Name;

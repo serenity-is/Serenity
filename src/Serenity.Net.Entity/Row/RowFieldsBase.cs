@@ -146,11 +146,11 @@ namespace Serenity.Data
             var idx2 = tableName.IndexOf('.', idx1 + 1);
             if (idx2 < 0)
             {
-                schema = tableName.Substring(0, idx1);
+                schema = tableName[..idx1];
                 return tableName[(idx1 + 1)..];
             }
 
-            database = tableName.Substring(0, idx1);
+            database = tableName[..idx1];
             schema = tableName.Substring(idx1 + 1, idx2 - idx1 - 1);
             return tableName[(idx2 + 1)..];
         }
@@ -359,16 +359,13 @@ namespace Serenity.Data
                                         expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
                                             property.Name, origin, expressionSelector, "", rowCustomAttributes));
 
-                                    if (display == null)
-                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
+                                    display ??= new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
                                             property.Name, origin, expressionSelector));
 
-                                    if (size == null)
-                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(
+                                    size ??= propertyDictionary.OriginAttribute<SizeAttribute>(
                                             property.Name, expressionSelector);
 
-                                    if (scale == null)
-                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(
+                                    scale ??= propertyDictionary.OriginAttribute<ScaleAttribute>(
                                             property.Name, expressionSelector);
                                 }
                                 catch (DivideByZeroException)
@@ -679,7 +676,7 @@ namespace Serenity.Data
                 byAttribute.TryGetValue(attrType, out Field[] fieldList))
                 return fieldList;
 
-            List<Field> newList = new List<Field>();
+            List<Field> newList = new();
 
             foreach (var field in this)
             {
@@ -712,13 +709,6 @@ namespace Serenity.Data
 
             this.byAttribute = byAttribute;
             return fieldList;
-        }
-
-        private static TAttr GetFieldAttr<TAttr>(Field x)
-            where TAttr : Attribute
-        {
-            return x.CustomAttributes.FirstOrDefault(z => 
-                typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)
@@ -1080,10 +1070,8 @@ namespace Serenity.Data
                         field.GetAttribute<LookupIncludeAttribute>() == null)
                     {
                         field.ReadPermission = permission;
-                        if (field.InsertPermission == null)
-                            field.InsertPermission = permission;
-                        if (field.UpdatePermission == null)
-                            field.UpdatePermission = permission;
+                        field.InsertPermission ??= permission;
+                        field.UpdatePermission ??= permission;
                     }
                 }
             }

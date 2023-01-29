@@ -15,7 +15,7 @@ namespace Serenity.TypeScript.Change
         private string NewValueSmall => NewValue == null
             ? ""
             : NewValue.Length > 20
-                ? NewValue.Substring(0, 18) + $"..({NewValue.Length})"
+                ? NewValue[..18] + $"..({NewValue.Length})"
                 : NewValue;
 
         public override string ToString()

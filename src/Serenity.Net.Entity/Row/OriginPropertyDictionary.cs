@@ -82,7 +82,7 @@
             {
                 var current = enumerator.Current ?? "";
                 if (current.Length < prefix.Length)
-                    prefix = prefix.Substring(0, current.Length);
+                    prefix = prefix[..current.Length];
 
                 while (!current.StartsWith(prefix) && prefix.Length > 0)
                     prefix = prefix[0..^1];
