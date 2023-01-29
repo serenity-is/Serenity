@@ -4,15 +4,15 @@
     {
         internal Type rowType;
         internal Dictionary<string, PropertyInfo> propertyByName;
-        internal Dictionary<string, Tuple<string, ForeignKeyAttribute[], ISqlJoin>> joinPropertyByAlias;
+        internal Dictionary<string, (string propertyName, ForeignKeyAttribute[] foreignKeys, ISqlJoin join)> joinPropertyByAlias;
+        internal Dictionary<string, ISqlJoin> joinPropertyByName;
         internal Dictionary<string, ISqlJoin> rowJoinByAlias;
-        internal Dictionary<string, OriginAttribute> origins;
+        internal Dictionary<string, OriginAttribute> originAttrByPropertyName;
         internal Dictionary<string, Tuple<PropertyInfo, Type>> originPropertyByName;
         internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
         internal IDictionary<string, string> prefixByAlias;
 
-        internal static ConcurrentDictionary<Type, OriginPropertyDictionary> cache =
-            new ConcurrentDictionary<Type, OriginPropertyDictionary>();
+        internal static ConcurrentDictionary<Type, OriginPropertyDictionary> cache = new();
 
         public OriginPropertyDictionary(Type rowType)
         {
@@ -23,35 +23,39 @@
             foreach (var pi in rowType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 propertyByName[pi.Name] = pi;
 
-            origins = new Dictionary<string, OriginAttribute>(StringComparer.OrdinalIgnoreCase);
+            originAttrByPropertyName = new Dictionary<string, OriginAttribute>(StringComparer.OrdinalIgnoreCase);
 
-            joinPropertyByAlias = new Dictionary<string, Tuple<string, ForeignKeyAttribute[], ISqlJoin>>();
+            joinPropertyByAlias = new(StringComparer.OrdinalIgnoreCase);
+            joinPropertyByName = new(StringComparer.Ordinal);
             foreach (var property in propertyByName.Values)
             {
                 var originAttr = property.GetCustomAttribute<OriginAttribute>();
                 if (originAttr != null)
-                    origins[property.Name] = originAttr;
+                    originAttrByPropertyName[property.Name] = originAttr;
 
                 var lj = property.GetCustomAttribute<LeftJoinAttribute>();
                 var fk = property.GetCustomAttributes<ForeignKeyAttribute>().ToArray();
                 if (lj != null && fk != null)
-                    joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute[], ISqlJoin>(property.Name, fk, lj);
+                {
+                    joinPropertyByAlias[lj.Alias] = new(property.Name, fk, lj);
+                    joinPropertyByName[property.Name] = lj;
+                }
             }
 
             foreach (var attr in rowType.GetCustomAttributes().OfType<ISqlJoin>())
                 rowJoinByAlias[attr.Alias] = attr;
 
-            originByAlias = origins.ToLookup(x => x.Value.Join);
+            originByAlias = originAttrByPropertyName.ToLookup(x => GetJoinAlias(x.Value), StringComparer.OrdinalIgnoreCase);
             prefixByAlias = originByAlias.ToDictionary(x => x.Key, x =>
             {
-                if (joinPropertyByAlias.TryGetValue(x.Key, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> joinProperty))
+                if (joinPropertyByAlias.TryGetValue(x.Key, out var joinProperty))
                 {
-                    if (joinProperty.Item3.PropertyPrefix != null)
-                        return joinProperty.Item3.PropertyPrefix;
+                    if (joinProperty.join.PropertyPrefix != null)
+                        return joinProperty.join.PropertyPrefix;
 
-                    if (joinProperty.Item1.EndsWith("ID") ||
-                        joinProperty.Item1.EndsWith("Id"))
-                        return joinProperty.Item1[0..^2];
+                    if (joinProperty.propertyName.EndsWith("ID") ||
+                        joinProperty.propertyName.EndsWith("Id"))
+                        return joinProperty.propertyName[0..^2];
                 }
 
                 if (rowJoinByAlias.TryGetValue(x.Key, out ISqlJoin join))
@@ -62,6 +66,18 @@
 
                 return DeterminePrefix(x.Select(z => z.Key));
             });
+        }
+
+        private string GetJoinAlias(OriginAttribute attr)
+        {
+            var join = attr?.Join;
+            if (!string.IsNullOrEmpty(join) &&
+                !rowJoinByAlias.ContainsKey(join) &&
+                !joinPropertyByAlias.ContainsKey(join) &&
+                joinPropertyByName.TryGetValue(join, out ISqlJoin s))
+                return s.Alias;
+
+            return join;
         }
 
         private static string DeterminePrefix(IEnumerable<string> items)
@@ -95,7 +111,7 @@
             return dictionary;
         }
 
-        private Tuple<PropertyInfo, Type> GetOriginProperty(string name, DialectExpressionSelector expressionSelector)
+        private Tuple<PropertyInfo, Type> GetOriginProperty(string propertyName, DialectExpressionSelector expressionSelector)
         {
             Type originType;
             Tuple<PropertyInfo, Type> pi;
@@ -104,17 +120,21 @@
             {
                 d = new Dictionary<string, Tuple<PropertyInfo, Type>>
                 {
-                    [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
-                    origins[name], expressionSelector, out originType), originType)
+                    [propertyName] = pi = new Tuple<PropertyInfo, Type>(
+                        GetOriginProperty(propertyByName[propertyName],
+                            originAttrByPropertyName[propertyName], expressionSelector, 
+                            out originType), originType)
                 };
                 originPropertyByName = d;
             }
-            else if (!d.TryGetValue(name, out pi))
+            else if (!d.TryGetValue(propertyName, out pi))
             {
                 d = new Dictionary<string, Tuple<PropertyInfo, Type>>
                 {
-                    [name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
-                    origins[name], expressionSelector, out originType), originType)
+                    [propertyName] = pi = new Tuple<PropertyInfo, Type>(
+                        GetOriginProperty(propertyByName[propertyName],
+                            originAttrByPropertyName[propertyName], expressionSelector, 
+                            out originType), originType)
                 };
                 originPropertyByName = d;
             }
@@ -125,13 +145,13 @@
         private PropertyInfo GetOriginProperty(PropertyInfo property, OriginAttribute origin,
             DialectExpressionSelector expressionSelector, out Type originRowType)
         {
-            var joinAlias = origin.Join;
+            var joinAlias = GetJoinAlias(origin);
 
-            if (joinPropertyByAlias.TryGetValue(joinAlias, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> joinProperty))
+            if (joinPropertyByAlias.TryGetValue(joinAlias, out var joinProperty))
             {
-                var joinPropertyName = joinProperty.Item1;
-                var fk = expressionSelector.GetBestMatch(joinProperty.Item2, x => x.Dialect);
-                var lj = joinProperty.Item3;
+                var joinPropertyName = joinProperty.propertyName;
+                var fk = expressionSelector.GetBestMatch(joinProperty.foreignKeys, x => x.Dialect);
+                var lj = joinProperty.join;
                 originRowType = lj.RowType ?? fk.RowType;
 
                 if (originRowType == null)
@@ -170,7 +190,7 @@
                 originPropertyName = origin.Property;
             else
             {
-                var prefix = prefixByAlias[origin.Join];
+                var prefix = prefixByAlias[GetJoinAlias(origin)];
                 if (prefix != null &&
                     prefix.Length > 0 &&
                     property.Name.StartsWith(prefix) &&
@@ -205,10 +225,11 @@
             var org = GetOriginProperty(propertyName, expressionSelector);
             var originProperty = org.Item1;
 
+            var joinAlias = GetJoinAlias(origin);
             if (aliasPrefix.Length == 0)
-                aliasPrefix = origin.Join;
+                aliasPrefix = joinAlias;
             else
-                aliasPrefix = aliasPrefix + "_" + origin.Join;
+                aliasPrefix = aliasPrefix + "_" + joinAlias;
 
             var columnAttr = originProperty.GetCustomAttribute<ColumnAttribute>();
             if (columnAttr != null)
@@ -229,7 +250,7 @@
                     var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
                     if (originOrigin != null)
                     {
-                        originDictionary.PrefixAliases(originOrigin.Join + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
+                        originDictionary.PrefixAliases(GetJoinAlias(originOrigin) + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
                         return originDictionary.OriginExpression(originProperty.Name, originOrigin, expressionSelector, aliasPrefix, extraJoins);
                     }
                     else
@@ -270,21 +291,22 @@
 
             DisplayNameAttribute attr;
             string prefix = "";
+            var joinAlias = GetJoinAlias(origin);
 
-            if (joinPropertyByAlias.TryGetValue(origin.Join, out Tuple<string, ForeignKeyAttribute[], ISqlJoin> propJoin))
+            if (joinPropertyByAlias.TryGetValue(joinAlias, out var propJoin))
             {
-                if (propJoin.Item3.TitlePrefix != null)
-                    prefix = propJoin.Item3.TitlePrefix;
+                if (propJoin.join.TitlePrefix != null)
+                    prefix = propJoin.join.TitlePrefix;
                 else
                 {
-                    attr = propertyByName[propJoin.Item1].GetCustomAttribute<DisplayNameAttribute>();
+                    attr = propertyByName[propJoin.propertyName].GetCustomAttribute<DisplayNameAttribute>();
                     if (attr != null)
                         prefix = attr.DisplayName;
                     else
-                        prefix = propJoin.Item1;
+                        prefix = propJoin.propertyName;
                 }
             }
-            else if (rowJoinByAlias.TryGetValue(origin.Join, out ISqlJoin join) &&
+            else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin join) &&
                 join.TitlePrefix != null)
             {
                 prefix = join.TitlePrefix.Length > 0 ? join.TitlePrefix + " " : "";
@@ -348,7 +370,7 @@
 
                 if (joinPropertyByAlias.TryGetValue(x, out var propJoin))
                 {
-                    var propertyInfo = propertyByName[propJoin.Item1];
+                    var propertyInfo = propertyByName[propJoin.propertyName];
                     string leftExpression;
                     var newAlias = aliasPrefix + x;
                     var columnAttr = propertyInfo.GetCustomAttribute<ColumnAttribute>();
@@ -369,8 +391,8 @@
                         }
                     }
 
-                    ISqlJoin srcJoin = propJoin.Item3;
-                    var fkAttr = expressionSelector.GetBestMatch(propJoin.Item2, x => x.Dialect);
+                    ISqlJoin srcJoin = propJoin.join;
+                    var fkAttr = expressionSelector.GetBestMatch(propJoin.foreignKeys, x => x.Dialect);
                     var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr.Field);
 
                     var frgTable = fkAttr.Table ??
@@ -384,7 +406,7 @@
                     else
                         throw new ArgumentOutOfRangeException("joinType");
 
-                    srcJoin.RowType = fkAttr.RowType ?? propJoin.Item3.RowType;
+                    srcJoin.RowType = fkAttr.RowType ?? propJoin.join.RowType;
                     mappedJoins[x] = srcJoin;
                     extraJoins.Add((Attribute)srcJoin);
                     return newAlias;

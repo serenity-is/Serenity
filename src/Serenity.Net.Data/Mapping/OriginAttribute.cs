@@ -9,7 +9,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="OriginAttribute"/> class.
         /// </summary>
-        /// <param name="join">The join alias.</param>
+        /// <param name="join">The join alias or the property name to read join
+        /// key via LeftJoin attribute.</param>
         public OriginAttribute(string join)
         {
             Join = join ?? throw new ArgumentNullException(nameof(join));
@@ -27,7 +28,8 @@
         }
 
         /// <summary>
-        /// Gets the join.
+        /// Gets the join alias or the property name of the field to read join alias from 
+        /// via LeftJoin attribute.
         /// </summary>
         /// <value>
         /// The join.
