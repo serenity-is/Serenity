@@ -3,14 +3,24 @@
     /// <summary>
     /// Specifies that this column belongs to another table.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class OriginAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OriginAttribute"/> class.
         /// </summary>
-        /// <param name="join">The join.</param>
+        /// <param name="join">The join alias.</param>
+        public OriginAttribute(string join)
+        {
+            Join = join ?? throw new ArgumentNullException(nameof(join));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OriginAttribute"/> class.
+        /// </summary>
+        /// <param name="join">The join alias.</param>
         /// <param name="property">The property.</param>
-        public OriginAttribute(string join, string property = null)
+        public OriginAttribute(string join, string property)
         {
             Join = join ?? throw new ArgumentNullException(nameof(join));
             Property = property;
