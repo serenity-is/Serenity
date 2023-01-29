@@ -153,7 +153,7 @@
         /// <value>
         /// The size.
         /// </value>
-        public int Size => size;
+        public int Size { get; set; }
 
         /// <summary>
         /// Gets or sets the scale.
