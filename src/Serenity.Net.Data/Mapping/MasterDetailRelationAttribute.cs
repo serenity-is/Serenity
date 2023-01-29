@@ -10,7 +10,10 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="MasterDetailRelationAttribute"/> class.
         /// </summary>
-        /// <param name="foreignKey">The foreign key.</param>
+        /// <param name="foreignKey">The property name of the FK field in the detail 
+        /// table which matches the PK (id) of the master table. For example, if the two 
+        /// tables are 'Order(Id, Date, ...)' and 'OrderDetail(DetailId, OrderId, Qty, ...)' 
+        /// it should be 'OrderId'.</param>
         public MasterDetailRelationAttribute(string foreignKey)
         {
             ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
@@ -85,7 +88,8 @@
         public object FilterValue { get; set; }
 
         /// <summary>
-        /// Optional: override the default behaviour and use a different id field (i.e. from a unique constraint)
+        /// Optional: override the default behaviour and use a different master id (PK) field 
+        /// (i.e. from a unique constraint)
         /// </summary>
         public string MasterKeyField { get; set; }
 
