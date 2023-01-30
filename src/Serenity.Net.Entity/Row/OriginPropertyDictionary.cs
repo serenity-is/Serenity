@@ -382,7 +382,7 @@ internal class OriginPropertyDictionary
                     var expressionAttr = propertyInfo.GetCustomAttributes<BaseExpressionAttribute>();
                     var expression = expressionSelector.GetBestMatch(expressionAttr,
                         x => x is ExpressionAttribute exp ? exp.Dialect : null);
-                    if (expressionAttr != null)
+                    if (expression != null)
                         leftExpression = mapExpression(expression.ToString(expressionSelector.Dialect));
                     else
                     {
