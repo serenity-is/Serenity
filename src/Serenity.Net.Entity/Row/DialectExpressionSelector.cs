@@ -15,8 +15,7 @@ public class DialectExpressionSelector
     /// <exception cref="ArgumentNullException">dialect</exception>
     public DialectExpressionSelector(ISqlDialect dialect)
     {
-        if (dialect == null)
-            throw new ArgumentNullException(nameof(dialect));
+        Dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectServerType = dialect.ServerType;
         dialectTypeName = dialect.GetType().Name;
     }
@@ -100,4 +99,9 @@ public class DialectExpressionSelector
     }
 
     private static readonly char[] comma = new char[] { ',' };
+
+    /// <summary>
+    /// Gets the dialect used for this expression selector
+    /// </summary>
+    public ISqlDialect Dialect { get; }
 }

@@ -1,11 +1,12 @@
-﻿namespace Serenity.Data.Mapping;
+﻿
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Specifies SQL expression this property corresponds to.
 /// You may use brackets ([]) to escape identifiers. Brackets will be converted to database specific quotes.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-public class ExpressionAttribute : Attribute
+public class ExpressionAttribute : BaseExpressionAttribute
 {
     /// <summary>
     /// Specifies SQL expression this property corresponds to.
@@ -13,27 +14,30 @@ public class ExpressionAttribute : Attribute
     /// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
     public ExpressionAttribute(string value)
     {
-        Value = value;
+        Value = value ?? throw new ArgumentNullException(nameof(value));
     }
 
     /// <summary>
     /// Specifies SQL expression and dialects this property corresponds to.
     /// </summary>
-    /// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
+    /// <param name="expression">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
     /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
-    public ExpressionAttribute(string value, params ServerType[] serverTypes)
-        : this(value)
+    public ExpressionAttribute(string expression, params ServerType[] serverTypes)
+        : this(expression)
     {
         Dialect = string.Join(",", serverTypes);
     }
 
+    /// <inheritdoc/>
+    public override string Translate(ISqlDialect dialect)
+    {
+        return Value;
+    }
+
     /// <summary>
-    /// Gets the value.
+    /// Gets the expression
     /// </summary>
-    /// <value>
-    /// The value.
-    /// </value>
-    public string Value { get; private set; }
+    public string Value { get; }
 
     /// <summary>
     /// Gets or sets the dialect.

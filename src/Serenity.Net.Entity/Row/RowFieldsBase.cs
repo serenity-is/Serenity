@@ -466,7 +466,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                     if (expression != null)
                     {
-                        field.Expression = expression.Value;
+                        field.Expression = expression.ToString(dialect);
                     }
 
                     if (foreignKey != null)

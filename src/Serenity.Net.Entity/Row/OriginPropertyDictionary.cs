@@ -238,11 +238,12 @@ internal class OriginPropertyDictionary
         {
             var originDictionary = GetPropertyDictionary(org.Item2);
 
-            var expressionAttr = originProperty.GetCustomAttributes<ExpressionAttribute>();
+            var expressionAttr = originProperty.GetCustomAttributes<BaseExpressionAttribute>();
             if (expressionAttr.Any())
             {
-                var expression = expressionSelector.GetBestMatch(expressionAttr, x => x.Dialect);
-                return originDictionary.PrefixAliases(expression.Value, aliasPrefix,
+                var expression = expressionSelector.GetBestMatch(expressionAttr, 
+                    x => x is ExpressionAttribute exp ? exp.Dialect : null);
+                return originDictionary.PrefixAliases(expression.ToString(expressionSelector.Dialect), aliasPrefix,
                     expressionSelector, extraJoins);
             }
             else
@@ -378,9 +379,11 @@ internal class OriginPropertyDictionary
                     leftExpression = alias + "." + SqlSyntax.AutoBracket(columnAttr.Name);
                 else
                 {
-                    var expressionAttr = propertyInfo.GetCustomAttribute<ExpressionAttribute>();
+                    var expressionAttr = propertyInfo.GetCustomAttributes<BaseExpressionAttribute>();
+                    var expression = expressionSelector.GetBestMatch(expressionAttr,
+                        x => x is ExpressionAttribute exp ? exp.Dialect : null);
                     if (expressionAttr != null)
-                        leftExpression = mapExpression(expressionAttr.Value);
+                        leftExpression = mapExpression(expression.ToString(expressionSelector.Dialect));
                     else
                     {
                         var origin = propertyInfo.GetCustomAttribute<OriginAttribute>();
