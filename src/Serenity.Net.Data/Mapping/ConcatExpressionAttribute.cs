@@ -20,33 +20,22 @@ public class ConcatExpressionAttribute : BaseExpressionAttribute
         if (rest.Length > 0)
         {
             Expressions = new[] {
-                Normalize(expression1 ?? throw new ArgumentNullException(nameof(expression1))),
-                Normalize(expression2 ?? throw new ArgumentNullException(nameof(expression2))),
-                Normalize(rest[0] ?? throw new ArgumentNullException(nameof(rest)))
+                expression1 ?? throw new ArgumentNullException(nameof(expression1)),
+                expression2 ?? throw new ArgumentNullException(nameof(expression2)),
+                rest[0] ?? throw new ArgumentNullException(nameof(rest))
             };
 
             if (rest.Length > 1)
                 Expressions = Expressions.Concat(rest.Skip(1).Select(
-                    x => Normalize(x ?? throw new ArgumentNullException(nameof(rest))))).ToArray();
+                    x => x ?? throw new ArgumentNullException(nameof(rest)))).ToArray();
         }
         else
         {
             Expressions = new[] {
-                Normalize(expression1 ?? throw new ArgumentNullException(nameof(expression1))),
-                Normalize(expression2 ?? throw new ArgumentNullException(nameof(expression2)))
+                expression1 ?? throw new ArgumentNullException(nameof(expression1)),
+                expression2 ?? throw new ArgumentNullException(nameof(expression2))
             };
         }
-    }
-
-    private static string Normalize(string expression)
-    {
-        if (expression.Length == 0) // handle common error passing empty string instead of ''
-            return "''";
-        
-        if (expression == " ") // handle common error of passing space instead of ' '
-            return "' '";
-
-        return expression;
     }
 
     /// <inheritdoc/>
