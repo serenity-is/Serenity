@@ -45,6 +45,9 @@ public class FirebirdDialect : ISqlDialect
         "WRITE", "YEAR", "YEARDAY"
     };
 
+    /// <inheritdoc/>
+    public virtual bool CanUseConcat => false;
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>

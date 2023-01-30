@@ -45,7 +45,7 @@ public class ComplexRow : Row<ComplexRow.RowFields>
         set { fields.CountryName[this] = value; }
     }
 
-    [DisplayName("Concat Expression"), Expression("CONCAT('A', 'B')")]
+    [DisplayName("Concat Expression"), ConcatExpression("A", "B")]
     public string ConcatExpression
     {
         get { return fields.ConcatExpression[this]; }

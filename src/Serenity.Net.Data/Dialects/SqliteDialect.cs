@@ -11,6 +11,9 @@ public class SqliteDialect : ISqlDialect
     /// </summary>
     public static ISqlDialect Instance = new SqliteDialect();
 
+    /// <inheritdoc/>
+    public virtual bool CanUseConcat => false;
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>

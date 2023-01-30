@@ -1,0 +1,109 @@
+﻿namespace Serenity.Data.Mapping;
+
+/// <summary>
+/// Concat expression attribute
+/// </summary>
+public class ConcatExpressionAttribute : BaseExpressionAttribute
+{
+    /// <summary>
+    /// Creates a new instance
+    /// </summary>
+    /// <param name="expression1">SQL Expression 1</param>
+    /// <param name="expression2">SQL Expression 2</param>
+    /// <param name="rest">Additional expressions</param>
+    /// <exception cref="ArgumentNullException">One of expressions is null</exception>
+    public ConcatExpressionAttribute(string expression1, string expression2, params string[] rest)
+    {
+        if (rest == null)
+            throw new ArgumentNullException(nameof(rest));
+
+        if (rest.Length > 0)
+        {
+            Expressions = new[] {
+                Normalize(expression1 ?? throw new ArgumentNullException(nameof(expression1))),
+                Normalize(expression2 ?? throw new ArgumentNullException(nameof(expression2))),
+                Normalize(rest[0] ?? throw new ArgumentNullException(nameof(rest)))
+            };
+
+            if (rest.Length > 1)
+                Expressions = Expressions.Concat(rest.Skip(1).Select(
+                    x => Normalize(x ?? throw new ArgumentNullException(nameof(rest))))).ToArray();
+        }
+        else
+        {
+            Expressions = new[] {
+                Normalize(expression1 ?? throw new ArgumentNullException(nameof(expression1))),
+                Normalize(expression2 ?? throw new ArgumentNullException(nameof(expression2)))
+            };
+        }
+    }
+
+    private static string Normalize(string expression)
+    {
+        if (expression.Length == 0) // handle common error passing empty string instead of ''
+            return "''";
+        
+        if (expression == " ") // handle common error of passing space instead of ' '
+            return "' '";
+
+        return expression;
+    }
+
+    /// <inheritdoc/>
+    public override string Translate(ISqlDialect sqlDialect)
+    {
+        string coalesce(string s)
+        {
+            if (NullAsEmpty && s != "''" && s != "' '")
+                return "COALESCE(" + s + ", '')";
+
+            return s;
+        }
+
+        if (sqlDialect.CanUseConcat)
+        {
+            switch (sqlDialect?.ServerType)
+            {
+                case nameof(ServerType.SqlServer):
+                case nameof(ServerType.Postgres):
+                    // SqlServer and Postgres never return null from CONCAT even when all args are null
+                    return "CONCAT(" + string.Join(", ", Expressions) + ")";
+
+                case nameof(ServerType.Oracle):
+                    // Oracle accepts only two arguments in CONCAT function 
+                    // and it only returns null when both arguments are null
+                    var result = coalesce("CONCAT(" + Expressions[0] + ", " + Expressions[1] + ")");
+
+                    for (var i = 2; i < Expressions.Length; i++)
+                        result = "CONCAT(" + result + ", " + Expressions[i] + ")";
+
+                    return result;
+
+                default:
+                    return "CONCAT(" + string.Join(", ", Expressions.Select(coalesce)) + ")";
+            }
+        }
+        else
+        {
+            return (sqlDialect?.ServerType) switch
+            {
+                nameof(ServerType.SqlServer) => "(" + string.Join(" + ", Expressions.Select(coalesce)) + ")",
+                _ => "(" + string.Join(" || ", Expressions.Select(coalesce)) + ")"
+            };
+        }
+    }
+
+    /// <summary>
+    /// Gets the expressions
+    /// </summary>
+    public string[] Expressions { get; }
+
+    /// <summary>
+    /// When true (default), NULLS values are assumed to be empty.
+    /// This is done using the COALESCE operator for dialects
+    /// that is necessary. SQLServer Concat() returns empty string
+    /// even when all the arguments are null. Oracle only returns null
+    /// when all the arguments are null.
+    /// </summary>
+    public bool NullAsEmpty { get; set; } = true;
+}

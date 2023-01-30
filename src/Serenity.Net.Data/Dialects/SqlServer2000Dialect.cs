@@ -11,6 +11,9 @@ public class SqlServer2000Dialect : ISqlDialect
     /// </summary>
     public static readonly ISqlDialect Instance = new SqlServer2000Dialect();
 
+    /// <inheritdoc/>
+    public virtual bool CanUseConcat => false;
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>

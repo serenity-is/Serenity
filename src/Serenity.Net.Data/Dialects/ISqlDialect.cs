@@ -6,6 +6,14 @@
 public interface ISqlDialect
 {
     /// <summary>
+    /// Gets a value indicating whether the server supports CONCAT.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if the server supports CONCAT function; otherwise, <c>false</c>.
+    /// </value>
+    public bool CanUseConcat => true;
+
+    /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>
     /// <value>

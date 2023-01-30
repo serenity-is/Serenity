@@ -12,6 +12,9 @@ public class SqlServer2012Dialect : SqlServer2008Dialect
     /// </summary>
     public static new readonly ISqlDialect Instance = new SqlServer2012Dialect();
 
+    /// <inheritdoc/>
+    public override bool CanUseConcat => true;
+
     /// <summary>
     /// Gets a value indicating whether the server supports OFFSET FETCH.
     /// </summary>

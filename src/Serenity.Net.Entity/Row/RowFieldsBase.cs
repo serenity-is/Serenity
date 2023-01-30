@@ -276,7 +276,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     ColumnAttribute column = null;
                     DisplayNameAttribute display = null;
                     SizeAttribute size = null;
-                    ExpressionAttribute expression = null;
+                    BaseExpressionAttribute expression = null;
                     ScaleAttribute scale = null;
                     MinSelectLevelAttribute selectLevel = null;
                     ForeignKeyAttribute foreignKey = null;
@@ -303,12 +303,12 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         display = property.GetAttribute<DisplayNameAttribute>();
                         size = property.GetAttribute<SizeAttribute>();
 
-                        var expressions = property.GetAttributes<ExpressionAttribute>();
+                        var expressions = property.GetAttributes<BaseExpressionAttribute>();
                         if (expressions.Any())
                         {
                             try
                             {
-                                expression = expressionSelector.GetBestMatch(expressions, x => x.Dialect);
+                                expression = expressionSelector.GetBestMatch(expressions, x => x is ExpressionAttribute exp ? exp.Dialect : null);
                             }
                             catch (AmbiguousMatchException ex)
                             {
