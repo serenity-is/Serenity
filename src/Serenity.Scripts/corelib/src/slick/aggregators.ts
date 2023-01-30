@@ -120,7 +120,7 @@ export namespace Aggregators
 
     export function Sum(field: string): void {
         this.field_ = field;
-        this.type = "_Sum";
+        this.type_ = "Sum";
 
         this.init = function () {
             this.sum_ = null;
