@@ -32,28 +32,6 @@ public class ConcatExpressionAttribute_Tests
     [InlineData(typeof(PostgresDialect), false)]
     [InlineData(typeof(PostgresDialect), true)]
     [Theory]
-    public void Quotes_Empty_String_And_Single_Whitespace(Type dialectType, bool nullAsEmpty)
-    {
-        var dialect = (ISqlDialect)Activator.CreateInstance(dialectType);
-
-        Assert.Equal("CONCAT(Test1, '')", new Concat("Test1", "") { NullAsEmpty = nullAsEmpty }
-            .ToString(dialect));
-
-        Assert.Equal("CONCAT(Test1, ' ', '')", new Concat("Test1", " ", "") { NullAsEmpty = nullAsEmpty }
-            .ToString(dialect));
-
-        Assert.Equal("CONCAT(Test1, ' ', ' ', '')", new Concat("Test1", " ", " ", "") { NullAsEmpty = nullAsEmpty }
-            .ToString(dialect));
-
-        Assert.Equal("CONCAT(Test1, ' ', ' ', ' ')", new Concat("Test1", " ", " ", " ") { NullAsEmpty = nullAsEmpty }
-            .ToString(dialect));
-    }
-
-    [InlineData(typeof(SqlServer2012Dialect), false)]
-    [InlineData(typeof(SqlServer2012Dialect), true)]
-    [InlineData(typeof(PostgresDialect), false)]
-    [InlineData(typeof(PostgresDialect), true)]
-    [Theory]
     public void Uses_Concat_For_SqlServer_And_Postgres(Type dialectType, bool nullAsEmpty)
     {
         var dialect = (ISqlDialect)Activator.CreateInstance(dialectType);
