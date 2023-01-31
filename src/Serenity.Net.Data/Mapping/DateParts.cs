@@ -1,9 +1,9 @@
-﻿namespace Serenity.Data.Mapping;
+﻿namespace Serenity.Data;
 
 /// <summary>
-/// DatePart type
+/// DateParts type
 /// </summary>
-public enum DatePart
+public enum DateParts
 {
     /// <summary>
     /// Year
