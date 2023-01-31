@@ -3,7 +3,7 @@
 /// <summary>
 /// DatePart expression attribute
 /// </summary>
-public class DatePartExpressionAttribute : BaseExpressionAttribute
+public class DatePartAttribute : BaseExpressionAttribute
 {
     /// <summary>
     /// Creates a new instance
@@ -11,7 +11,7 @@ public class DatePartExpressionAttribute : BaseExpressionAttribute
     /// <param name="expression">An expression that returns a date value</param>
     /// <param name="part">Datepart like "year", "month" etc.</param>
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public DatePartExpressionAttribute(DateParts part, string expression)
+    public DatePartAttribute(DateParts part, string expression)
     {
         Part = part;
         Expression = expression ?? throw new ArgumentNullException(nameof(expression));

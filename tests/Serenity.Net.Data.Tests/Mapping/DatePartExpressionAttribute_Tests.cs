@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Tests.Data;
 
-using Attr = DatePartExpressionAttribute;
+using Attr = DatePartAttribute;
 
 public class DatePartExpressionAttribute_Tests
 {
