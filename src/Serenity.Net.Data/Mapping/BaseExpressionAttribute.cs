@@ -22,13 +22,24 @@ public abstract class BaseExpressionAttribute : Attribute
     /// <param name="dialect">Target dialect</param>
     public string ToString(ISqlDialect dialect)
     {
+        string expression;
         if (dialect is ISqlExpressionTranslator translator)
         {
-            var expression = translator.Translate(this);
-            if (expression != null)
-                return expression;
+            expression = translator.Translate(this) ??
+                Translate(dialect);
         }
+        else
+            expression = Translate(dialect);
 
-        return Translate(dialect);
+        if (string.IsNullOrEmpty(Format))
+            return expression;
+
+        return string.Format(Format, expression);
     }
+
+    /// <summary>
+    /// Gets sets an optional format string to apply with
+    /// {0} placeholder for the expression.
+    /// </summary>
+    public string Format { get; set; }
 }
