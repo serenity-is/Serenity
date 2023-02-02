@@ -39,11 +39,9 @@ public class DatePartAttribute : BaseExpressionAttribute
         {
             nameof(ServerType.MySql) or
             nameof(ServerType.Oracle) or
+            nameof(ServerType.Postgres) or
             nameof(ServerType.Firebird) =>
                 "EXTRACT(" + datePart + " FROM " + Expression + ")",
-
-            nameof(ServerType.Postgres) =>
-                "DATEPART(" + Expression + ", " + datePart + ")",
 
             nameof(ServerType.Sqlite) =>
                 "CAST(STRFTIME('" + ToSqliteSpecifier(Part) + "', " +

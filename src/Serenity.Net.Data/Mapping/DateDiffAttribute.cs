@@ -20,9 +20,64 @@ public class DateDiffAttribute : BaseExpressionAttribute
     }
 
     /// <inheritdoc/>
-    public override string Translate(ISqlDialect sqlDialect)
+    public override string Translate(ISqlDialect dialect)
     {
-        return "DATEDIFF(" + Part.GetName() + ", " + Start + ", " + End + ")";
+        string expr;
+
+        if ((Part == DateParts.Year || Part == DateParts.Month) && (
+             dialect.ServerType == nameof(ServerType.Sqlite) ||
+             dialect.ServerType == nameof(ServerType.Postgres) ||
+             dialect.ServerType == nameof(ServerType.Oracle)))
+        {
+            expr = $"({new DatePartAttribute(DateParts.Year, End).ToString(dialect)} - " +
+                new DatePartAttribute(DateParts.Year, Start).ToString(dialect) + ")";
+
+            if (Part == DateParts.Year)
+                return expr;
+
+            return $"({expr} * 12 + " +
+                new DatePartAttribute(DateParts.Month, End).ToString(dialect) + " - " +
+                new DatePartAttribute(DateParts.Month, Start).ToString(dialect) + ")";
+        }
+
+        string multiplier()
+        {
+            return Part switch
+            {
+                DateParts.Day => "",
+                DateParts.Hour => " * 24",
+                DateParts.Minute => " * 1440",
+                DateParts.Second => " * 86400",
+                _ => throw new InvalidOperationException(nameof(Part))
+            };
+        }
+
+        switch (dialect.ServerType)
+        {
+            case nameof(ServerType.Sqlite):
+                return $"ROUND((JULIANDAY({End}) - JULIANDAY({Start})){multiplier()})";
+
+            case nameof(ServerType.Oracle):
+                return $"ROUND((CAST ({End} as DATE) - CAST ({Start} as DATE)){multiplier()})";
+
+            case nameof(ServerType.Postgres):
+                expr = Part switch
+                {
+                    DateParts.Day => " / 86400",
+                    DateParts.Hour => " / 3600",
+                    DateParts.Minute => " / 60",
+                    DateParts.Second => "",
+                    _ => throw new InvalidOperationException(nameof(Part))
+                };
+
+                return $"ROUND(EXTRACT(EPOCH FROM ({End}::timestamp - {Start}::timestamp)){expr})";
+
+            case nameof(ServerType.MySql):
+                return $"TIMESTAMPDIFF({Part.GetName().ToUpperInvariant()}, {Start}, {End})";
+
+            default:
+                return $"DATEDIFF({Part.GetName().ToUpperInvariant()}, {Start}, {End})";
+        };
     }
 
     /// <summary>

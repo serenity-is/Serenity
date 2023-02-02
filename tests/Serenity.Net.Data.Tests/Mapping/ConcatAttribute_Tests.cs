@@ -2,7 +2,7 @@
 
 using Concat = ConcatExpressionAttribute;
 
-public class ConcatExpressionAttribute_Tests
+public class ConcatAttribute_Tests
 {
     [Fact]
     public void Throws_ArgumentNull_If_Expression1_Or_Expression2_IsNull()
