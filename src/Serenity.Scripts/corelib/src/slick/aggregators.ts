@@ -145,7 +145,7 @@ export namespace Aggregators
 export namespace AggregateFormatting {
     export function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string {
         var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
-        var text = tryGetText(textKey);
+        var text = tryGetText("Enums.Serenity.SummaryType." + textKey) ?? textKey;
     
         var value = totals[aggType][column.field];
         var formattedValue = formatValue(column, value);
