@@ -6,7 +6,9 @@ Features:
  - Optional Format for expression attribute types
  - Allow overriding field size via attribute
  - Allow specifying join alias in OriginAttribute indirectly via propery name of a property with LeftJoinAttribute
-
+ - New useCssVars option in SleekGrid that allows using inline css variables at grid container element to position columns instead of a CSS stylesheet appended to the head
+ - Don't swallow exception in source generators so that issues can be identified if any [StartSharp]
+ 
 Bugfixes:
   - LookupScriptRegistration should not try to run for abstract classes.
   - Fix typo in Sum aggregator name and aggregator display texts
