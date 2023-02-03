@@ -1,4 +1,17 @@
-## 6.5.0 (2022-01-26)
+## 6.5.1 (2023-02-03)
+
+Features:
+ - Introduced new BaseExpressionAttribute which allows inherited expression attributes to perform translation based on target dialect. Also the dialect itself can customize the translation by implementing the new ISqlExpressionTranslator interface.
+ - New ConcatAttribute, DatePartAttribute and DateDiffAttribute dynamic SQL expression types that generates expression based on server type.
+ - Optional Format for expression attribute types
+ - Allow overriding field size via attribute
+ - Allow specifying join alias in OriginAttribute indirectly via propery name of a property with LeftJoinAttribute
+
+Bugfixes:
+  - LookupScriptRegistration should not try to run for abstract classes.
+  - Fix typo in Sum aggregator name and aggregator display texts
+
+## 6.5.0 (2023-01-26)
 
 Features:
  - [BREAKING CHANGE] Updating Microsoft.Data.SqlClient to 5.1.0. As Encrypt=true became the default in 4.x+ (https://techcommunity.microsoft.com/t5/sql-server-blog/released-general-availability-of-microsoft-data-sqlclient-4-0/ba-p/2983346) it may cause connections to fail. Please see the linked doc, and either install a trusted certificate in your SQL server (recommended!), or set TrustServerCertificate=true or Encrypt=false in your connection strings both in development and deployment/production!
@@ -6,20 +19,20 @@ Features:
  - Html encode jquery validator messages in showLabel function
  - Updated SleekGrid to 1.5.3 which includes useCssVars option to use css vars for cell positioning instead of dynamic stylesheet (up to 50 columns). This should reduce amount of css reflows on page load etc. It is not enabled by default yet.
 
-## 6.4.10 (2022-01-24)
+## 6.4.10 (2023-01-24)
 
 Bugfixes:
  - propertygrid should htmlEncode field captions
  - draggabble grouping mixin should htmlEncode grouped column captions
 
-## 6.4.9 (2022-01-21)
+## 6.4.9 (2023-01-21)
 
 Bugfixes:
   - [WARNING!] If htmlEncode is not called when using local texts in ascript method (e.g. `<div>{ text("SomeKey") }</div>` instead of `<div>{htmlEncode(text("SomeKey")) }</div>`, like getTemplate etc. an attackermay use the translations screen to inject javascript. This affected partsof our demo as everyone can login as admin and can use the translationscreen. The translations are reset every 30 mins in our demo so it was nota big issue. But you are strongly recommended to check your own code inaddition to standard screens like login, reset password etc. See ourlatest commits in Serene/StartSharp/Common Features, etc. repositories forfixes we applied. Even if no one other than the admin can entertranslations screen, it is still a good idea to mitigate the risk as youshould not trust translators, even the admin himself. We can't change the"text" or "tryGetText" functions to htmlEncode by default, as they may beused by others in contexts other than HTML like functions which expectsraw text like notify messages, dialog titles, column titles etc., whichwould result in double HTML encoding. Prefer localText() function insteadof obsolete text() function for better discoverability (but it does notencode as well)
 
   - [BREAKING CHANGE] htmlEncode now also encodes single and double quotes just like attrEncode. This is done to avoid cases where a developer might use htmlEncode in an attribute instead of attrEncode by mistake.
 
-## 6.4.8 (2022-01-18)
+## 6.4.8 (2023-01-18)
 
 Bugfixes:
   - set Widget.idPrefix to the value passed from property grid options, https://github.com/serenity-is/common-features/issues/21, so that the invalid examples in common-features like OtherFormInTab etc. work
