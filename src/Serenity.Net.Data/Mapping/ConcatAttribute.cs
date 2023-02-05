@@ -99,3 +99,16 @@ public class ConcatAttribute : BaseExpressionAttribute
     /// </summary>
     public bool NullAsEmpty { get; set; } = true;
 }
+
+/// <summary>
+/// Please use <see cref="ConcatAttribute" />
+/// </summary>
+[Obsolete("Use ConcatAttribute")]
+public class ConcatExpressionAttribute : ConcatAttribute
+{
+    /// <inheritdoc/>
+    public ConcatExpressionAttribute(string expression1, string expression2)
+        : base(expression1, expression2)
+    {
+    }
+}
