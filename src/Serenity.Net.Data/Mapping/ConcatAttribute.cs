@@ -107,8 +107,8 @@ public class ConcatAttribute : BaseExpressionAttribute
 public class ConcatExpressionAttribute : ConcatAttribute
 {
     /// <inheritdoc/>
-    public ConcatExpressionAttribute(string expression1, string expression2)
-        : base(expression1, expression2)
+    public ConcatExpressionAttribute(string expression1, string expression2, params object[] rest)
+        : base(expression1, expression2, rest)
     {
     }
 }
