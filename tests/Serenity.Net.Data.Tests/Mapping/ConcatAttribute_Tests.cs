@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Tests.Data;
 
-using Concat = ConcatExpressionAttribute;
+using Concat = ConcatAttribute;
 
 public class ConcatAttribute_Tests
 {

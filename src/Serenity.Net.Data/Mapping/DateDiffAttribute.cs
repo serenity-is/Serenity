@@ -12,7 +12,7 @@ public class DateDiffAttribute : BaseExpressionAttribute
     /// <param name="start">An expression that returns a date value</param>
     /// <param name="end">An expression that returns a date value</param>
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public DateDiffAttribute(DateParts part, string start, string end)
+    public DateDiffAttribute(DateParts part, object start, object end)
     {
         Part = part;
         Start = start ?? throw new ArgumentNullException(nameof(start));
@@ -22,6 +22,9 @@ public class DateDiffAttribute : BaseExpressionAttribute
     /// <inheritdoc/>
     public override string Translate(ISqlDialect dialect)
     {
+        var start = ToString(Start, dialect);
+        var end = ToString(End, dialect);
+
         string expr;
 
         if ((Part == DateParts.Year || Part == DateParts.Month) && (
@@ -29,15 +32,15 @@ public class DateDiffAttribute : BaseExpressionAttribute
              dialect.ServerType == nameof(ServerType.Postgres) ||
              dialect.ServerType == nameof(ServerType.Oracle)))
         {
-            expr = $"({new DatePartAttribute(DateParts.Year, End).ToString(dialect)} - " +
-                new DatePartAttribute(DateParts.Year, Start).ToString(dialect) + ")";
+            expr = $"({new DatePartAttribute(DateParts.Year, end).ToString(dialect)} - " +
+                new DatePartAttribute(DateParts.Year, start).ToString(dialect) + ")";
 
             if (Part == DateParts.Year)
                 return expr;
 
             return $"({expr} * 12 + " +
-                new DatePartAttribute(DateParts.Month, End).ToString(dialect) + " - " +
-                new DatePartAttribute(DateParts.Month, Start).ToString(dialect) + ")";
+                new DatePartAttribute(DateParts.Month, end).ToString(dialect) + " - " +
+                new DatePartAttribute(DateParts.Month, start).ToString(dialect) + ")";
         }
 
         string multiplier()
@@ -55,10 +58,10 @@ public class DateDiffAttribute : BaseExpressionAttribute
         switch (dialect.ServerType)
         {
             case nameof(ServerType.Sqlite):
-                return $"ROUND((JULIANDAY({End}) - JULIANDAY({Start})){multiplier()})";
+                return $"ROUND((JULIANDAY({end}) - JULIANDAY({start})){multiplier()})";
 
             case nameof(ServerType.Oracle):
-                return $"ROUND((CAST ({End} as DATE) - CAST ({Start} as DATE)){multiplier()})";
+                return $"ROUND((CAST ({end} as DATE) - CAST ({start} as DATE)){multiplier()})";
 
             case nameof(ServerType.Postgres):
                 expr = Part switch
@@ -70,13 +73,13 @@ public class DateDiffAttribute : BaseExpressionAttribute
                     _ => throw new InvalidOperationException(nameof(Part))
                 };
 
-                return $"ROUND(EXTRACT(EPOCH FROM ({End}::timestamp - {Start}::timestamp)){expr})";
+                return $"ROUND(EXTRACT(EPOCH FROM ({end}::timestamp - {start}::timestamp)){expr})";
 
             case nameof(ServerType.MySql):
-                return $"TIMESTAMPDIFF({Part.GetName().ToUpperInvariant()}, {Start}, {End})";
+                return $"TIMESTAMPDIFF({Part.GetName().ToUpperInvariant()}, {start}, {end})";
 
             default:
-                return $"DATEDIFF({Part.GetName().ToUpperInvariant()}, {Start}, {End})";
+                return $"DATEDIFF({Part.GetName().ToUpperInvariant()}, {start}, {end})";
         };
     }
 
@@ -88,10 +91,10 @@ public class DateDiffAttribute : BaseExpressionAttribute
     /// <summary>
     /// Date expression 1
     /// </summary>
-    public string Start { get; }
+    public object Start { get; }
 
     /// <summary>
     /// Date expression 1
     /// </summary>
-    public string End { get; }
+    public object End { get; }
 }

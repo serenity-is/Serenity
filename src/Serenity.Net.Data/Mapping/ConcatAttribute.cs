@@ -3,7 +3,7 @@
 /// <summary>
 /// Concat expression attribute
 /// </summary>
-public class ConcatExpressionAttribute : BaseExpressionAttribute
+public class ConcatAttribute : BaseExpressionAttribute
 {
     /// <summary>
     /// Creates a new instance
@@ -12,7 +12,7 @@ public class ConcatExpressionAttribute : BaseExpressionAttribute
     /// <param name="expression2">SQL Expression 2</param>
     /// <param name="rest">Additional expressions</param>
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public ConcatExpressionAttribute(string expression1, string expression2, params string[] rest)
+    public ConcatAttribute(object expression1, object expression2, params object[] rest)
     {
         if (rest == null)
             throw new ArgumentNullException(nameof(rest));
@@ -39,7 +39,7 @@ public class ConcatExpressionAttribute : BaseExpressionAttribute
     }
 
     /// <inheritdoc/>
-    public override string Translate(ISqlDialect sqlDialect)
+    public override string Translate(ISqlDialect dialect)
     {
         string coalesce(string s)
         {
@@ -49,35 +49,38 @@ public class ConcatExpressionAttribute : BaseExpressionAttribute
             return s;
         }
 
-        if (sqlDialect.CanUseConcat)
+        var expressions = Expressions.Select(x => ToString(x, dialect)).ToArray();
+
+        if (dialect.CanUseConcat)
         {
-            switch (sqlDialect?.ServerType)
+            switch (dialect?.ServerType)
             {
                 case nameof(ServerType.SqlServer):
                 case nameof(ServerType.Postgres):
                     // SqlServer and Postgres never return null from CONCAT even when all args are null
-                    return "CONCAT(" + string.Join(", ", Expressions) + ")";
+                    return "CONCAT(" + string.Join(", ", expressions) + ")";
 
                 case nameof(ServerType.Oracle):
                     // Oracle accepts only two arguments in CONCAT function 
                     // and it only returns null when both arguments are null
-                    var result = coalesce("CONCAT(" + Expressions[0] + ", " + Expressions[1] + ")");
+                    var result = coalesce("CONCAT(" + expressions[0] + ", " 
+                        + expressions[1] + ")");
 
-                    for (var i = 2; i < Expressions.Length; i++)
-                        result = "CONCAT(" + result + ", " + Expressions[i] + ")";
+                    for (var i = 2; i < expressions.Length; i++)
+                        result = "CONCAT(" + result + ", " + expressions[i] + ")";
 
                     return result;
 
                 default:
-                    return "CONCAT(" + string.Join(", ", Expressions.Select(coalesce)) + ")";
+                    return "CONCAT(" + string.Join(", ", expressions.Select(coalesce)) + ")";
             }
         }
         else
         {
-            return (sqlDialect?.ServerType) switch
+            return (dialect?.ServerType) switch
             {
-                nameof(ServerType.SqlServer) => "(" + string.Join(" + ", Expressions.Select(coalesce)) + ")",
-                _ => "(" + string.Join(" || ", Expressions.Select(coalesce)) + ")"
+                nameof(ServerType.SqlServer) => "(" + string.Join(" + ", expressions.Select(coalesce)) + ")",
+                _ => "(" + string.Join(" || ", expressions.Select(coalesce)) + ")"
             };
         }
     }
@@ -85,7 +88,7 @@ public class ConcatExpressionAttribute : BaseExpressionAttribute
     /// <summary>
     /// Gets the expressions
     /// </summary>
-    public string[] Expressions { get; }
+    public object[] Expressions { get; }
 
     /// <summary>
     /// When true (default), NULLS values are assumed to be empty.

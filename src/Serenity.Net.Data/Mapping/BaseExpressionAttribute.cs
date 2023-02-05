@@ -42,4 +42,63 @@ public abstract class BaseExpressionAttribute : Attribute
     /// {0} placeholder for the expression.
     /// </summary>
     public string Format { get; set; }
+
+    /// <summary>
+    /// Convert the expression to string. Used by derived expression attributes
+    /// to convert their constructor arguments to string while supporting
+    /// other expression attribute types, or a special array with the first
+    /// argument as the attribute type and others as its constructor parameters.
+    /// </summary>
+    /// <param name="expression">Expression</param>
+    /// <param name="dialect">Target dialect</param>
+    /// <exception cref="ArgumentNullException">Dialect is null</exception>
+    public static string ToString(object expression, ISqlDialect dialect)
+    {
+        if (dialect is null)
+            throw new ArgumentNullException(nameof(dialect));
+
+        if (expression is null)
+            return SqlConversions.Null;
+
+        if (expression is string s)
+            return s;
+
+        if (expression is int i)
+            return SqlConversions.ToSql(i);
+
+        if (expression is bool b)
+            return SqlConversions.ToSql(b);
+
+        if (expression is double d)
+            return SqlConversions.ToSql(d);
+
+        if (expression is decimal m)
+            return SqlConversions.ToSql(m);
+
+        if (expression is long l)
+            return SqlConversions.ToSql(l);
+
+        if (expression is DateTime dt)
+            return SqlConversions.ToSql(dt, dialect);
+
+        if (expression is Type t1 &&
+            !t1.IsAbstract &&
+            typeof(BaseExpressionAttribute).IsAssignableFrom(t1))
+        {
+            var instance = (BaseExpressionAttribute)(Activator.CreateInstance(t1));
+            return instance.ToString(dialect);
+        }
+
+        if (expression is IEnumerable<object> enumerable &&
+            enumerable.FirstOrDefault() is Type t2 &&
+            !t2.IsAbstract &&
+            typeof(BaseExpressionAttribute).IsAssignableFrom(t2))
+        {
+            var args = enumerable.Skip(1).ToArray();
+            var instance = (BaseExpressionAttribute)Activator.CreateInstance(t2, args);
+            return instance.ToString(dialect);
+        }
+
+        return Convert.ToString(expression, CultureInfo.InvariantCulture);
+    }
 }

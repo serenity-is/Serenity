@@ -11,7 +11,7 @@ public class DatePartAttribute : BaseExpressionAttribute
     /// <param name="expression">An expression that returns a date value</param>
     /// <param name="part">Datepart like "year", "month" etc.</param>
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public DatePartAttribute(DateParts part, string expression)
+    public DatePartAttribute(DateParts part, object expression)
     {
         Part = part;
         Expression = expression ?? throw new ArgumentNullException(nameof(expression));
@@ -32,22 +32,23 @@ public class DatePartAttribute : BaseExpressionAttribute
     }
 
     /// <inheritdoc/>
-    public override string Translate(ISqlDialect sqlDialect)
+    public override string Translate(ISqlDialect dialect)
     {
         string datePart = Enum.GetName(typeof(DateParts), Part).ToUpperInvariant();
-        return sqlDialect.ServerType switch
+        string expression = ToString(Expression, dialect);
+        return dialect.ServerType switch
         {
             nameof(ServerType.MySql) or
             nameof(ServerType.Oracle) or
             nameof(ServerType.Postgres) or
             nameof(ServerType.Firebird) =>
-                "EXTRACT(" + datePart + " FROM " + Expression + ")",
+                "EXTRACT(" + datePart + " FROM " + expression + ")",
 
             nameof(ServerType.Sqlite) =>
                 "CAST(STRFTIME('" + ToSqliteSpecifier(Part) + "', " +
-                    Expression + ") AS INTEGER)",
+                    expression + ") AS INTEGER)",
 
-            _ => "DATEPART(" + datePart + ", " + Expression + ")"
+            _ => "DATEPART(" + datePart + ", " + expression + ")"
         };
     }
 
@@ -59,5 +60,5 @@ public class DatePartAttribute : BaseExpressionAttribute
     /// <summary>
     /// Date expression
     /// </summary>
-    public string Expression { get; }
+    public object Expression { get; }
 }
