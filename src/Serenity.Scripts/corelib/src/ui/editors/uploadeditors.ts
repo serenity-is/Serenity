@@ -308,7 +308,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         }
 
         this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
-            '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>').appendTo(this.element);
+            '_Validator" data-vx-highlight="' + this.element.attr('id') + '" multiple="multiple"></input>').appendTo(this.element);
 
         this.updateInterface();
     }
@@ -323,6 +323,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
             progress: this.progress,
             uploadIntent: this.options.uploadIntent,
             uploadUrl: this.options.uploadUrl,
+            allowMultiple: true,
             fileDone: (response, name) => {
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
