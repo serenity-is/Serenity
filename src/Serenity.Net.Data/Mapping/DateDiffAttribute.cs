@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// DatePart expression attribute
+/// DateDiff expression attribute
 /// </summary>
 public class DateDiffAttribute : BaseExpressionAttribute
 {
