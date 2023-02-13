@@ -603,8 +603,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// Sets the omit parens flag, e.g. to exclude parens.
     /// Parens are normally only included for sub queries.
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">Value</param>
     public SqlQuery OmitParens(bool value = true)
     {
         omitParens = value;
