@@ -60,9 +60,15 @@ public class UnaryCriteria : BaseCriteria
                 break;
 
             case CriteriaOperator.Exists:
-                sb.Append("EXISTS (");
+                bool hasParens = operand is Criteria c &&
+                    c.Expression != null &&
+                    c.Expression.StartsWith("(", StringComparison.Ordinal) &&
+                    c.Expression.EndsWith(")", StringComparison.Ordinal);
+                // Sqlite does not like double parentheses in Exist expressions
+                sb.Append(hasParens ? "EXISTS " : "EXISTS (");
                 operand.ToString(sb, query);
-                sb.Append(')');
+                if (!hasParens)
+                    sb.Append(')');
                 break;
         }
     }

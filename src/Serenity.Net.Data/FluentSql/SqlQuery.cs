@@ -600,6 +600,17 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     }
 
     /// <summary>
+    /// Sets the omit parens flag, e.g. to exclude parens.
+    /// Parens are normally only included for sub queries.
+    /// </summary>
+    /// <param name="value">Value</param>
+    public SqlQuery OmitParens(bool value = true)
+    {
+        omitParens = value;
+        return this;
+    }
+
+    /// <summary>
     /// Gets/sets the flag to get the total record count when paging is used by SKIP/TAKE. 
     /// A secondary query without SKIP/TAKE is generated to get total record count, 
     /// when this property is true.
