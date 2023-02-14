@@ -14,7 +14,7 @@
     "Controls.EntityDialog.SaveSuccessMessage": "Erfolgreich gespeichert",
     "Controls.EntityDialog.UndeleteButton": "Wiederherstellen",
     "Controls.EntityDialog.UndeleteConfirmation": "Datensatz wiederherstellen?",
-    "Controls.EntityDialog.UpdateButton": "Bearbeitung",
+    "Controls.EntityDialog.UpdateButton": "Aktualisieren",
     "Controls.EntityGrid.IncludeDeletedToggle": "Gelöschte Datensätze anzeigen",
     "Controls.EntityGrid.NewButton": "{0} anlegen",
     "Controls.EntityGrid.RefreshButton": "Aktualisieren",
