@@ -76,10 +76,9 @@ public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
         };
 
         if (string.IsNullOrEmpty(converter.UtilityExePath))
-            throw new ValidationError("Can't locate wkhtmltopdf.exe (or wkhtmltopdf in Linux) " +
-                "that is required for report generation in PATH or folder " +
-                fileSystem.GetDirectoryName(typeof(WKHtmlToPdfConverter).Assembly.Location) +
-                ". Please download and install the version suitable for your system from " +
+            throw new ValidationError("Can't locate wkhtmltopdf executable " +
+                "that is required for report generation in the system PATH, or in the web application " + 
+                "directory. Please download and install the version suitable for your system from " +
                 "https://wkhtmltopdf.org/downloads.html");
 
         return converter.Execute();
