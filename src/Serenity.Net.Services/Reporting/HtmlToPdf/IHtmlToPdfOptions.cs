@@ -36,11 +36,6 @@ public interface IHtmlToPdfOptions
     bool PrintBackground { get; set; }
 
     /// <summary>
-    /// Path of wkhtmltopdf.exe, ~/App_Data/Reporting/wkhtmltopdf.exe if not specified
-    /// </summary>
-    string UtilityExePath { get; set; }
-
-    /// <summary>
     /// Page size constant like "A4", "Letter" etc. Default value is A4
     /// </summary>
     string PageSize { get; set; }

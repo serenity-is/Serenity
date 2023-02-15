@@ -8,20 +8,16 @@ namespace Serenity.Reporting;
 /// HTML to PDF converter class using WKHTMLToPdf
 /// </summary>
 public class HtmlToPdfConverter : IHtmlToPdfOptions
-{       
+{
+    private readonly IHtmlToPdfOptions options;
+
     /// <summary>
-    /// Creates a new instance of the class
+    /// WKHtmlToPdf converter class
     /// </summary>
-    public HtmlToPdfConverter()
+    /// <param name="options">List of options</param>
+    public HtmlToPdfConverter(IHtmlToPdfOptions options = null)
     {
-        AdditionalUrls = new List<string>();
-        Cookies = new Dictionary<string, string>();
-        CustomArgs = new List<string>();
-        FooterHeaderReplace = new Dictionary<string, string>();
-        TimeoutSeconds = 300;
-        UsePrintMediaType = true;
-        PrintBackground = true;
-        PageSize = "A4";
+        this.options = options ?? new HtmlToPdfOptions();
     }
 
     /// <summary>
@@ -191,82 +187,74 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
         }
     }
 
-    /// <inheritdoc/>
-    public string Url { get; set; }
-
-    /// <inheritdoc/>
-    public List<string> AdditionalUrls { get; set; }
-
-    /// <inheritdoc/>
-    public Dictionary<string, string> Cookies { get; set; }
-
-    /// <inheritdoc/>
-    public int TimeoutSeconds { get; set; }
-
-    /// <inheritdoc/>
-    public bool UsePrintMediaType { get; set; }
-
-    /// <inheritdoc/>
-    public bool PrintBackground { get; set; }
-
-    /// <inheritdoc/>
+    /// <summary>
+    /// Path to the wkhtmltopdf executable
+    /// </summary>
     public string UtilityExePath { get; set; }
 
     /// <inheritdoc/>
-    public string PageHeight { get; set; }
-    
-    /// <inheritdoc/>
-    public string PageSize { get; set; }
+    public string Url { get => options.Url; set => options.Url = value; }
 
     /// <inheritdoc/>
-    public string PageWidth { get; set; }
+    public List<string> AdditionalUrls => options.AdditionalUrls;
 
     /// <inheritdoc/>
-    public bool SmartShrinking { get; set; }
+    public Dictionary<string, string> Cookies => options.Cookies;
 
     /// <inheritdoc/>
-    public int? Dpi { get; set; }
+    public int TimeoutSeconds { get => options.TimeoutSeconds; set => options.TimeoutSeconds = value; }
 
     /// <inheritdoc/>
-    public bool Landscape { get; set; }
+    public bool UsePrintMediaType { get => options.UsePrintMediaType; set => options.UsePrintMediaType = value; }
 
     /// <inheritdoc/>
-    public string Zoom { get; set; }
+    public bool PrintBackground { get => options.PrintBackground; set => options.PrintBackground = value; }
 
     /// <inheritdoc/>
-    public string MarginLeft { get; set; }
+    public string PageHeight { get => options.PageHeight; set => options.PageHeight = value; }
 
     /// <inheritdoc/>
-    public string MarginRight { get; set; }
-    
-    /// <inheritdoc/>
-    public string MarginBottom { get; set; }
+    public string PageSize { get => options.PageSize; set => options.PageSize = value; }
 
     /// <inheritdoc/>
-    public string MarginTop { get; set; }
+    public string PageWidth { get => options.PageWidth; set => options.PageWidth = value; }
 
     /// <inheritdoc/>
-    public string HeaderHtmlUrl { get; set; }
+    public bool SmartShrinking { get => options.SmartShrinking; set => options.SmartShrinking = value; }
 
     /// <inheritdoc/>
-    public string FooterHtmlUrl { get; set; }
-
-
-    /// <inheritdoc/>
-    public Dictionary<string, string> FooterHeaderReplace { get; private set; }
+    public int? Dpi { get => options.Dpi; set => options.Dpi = value; }
 
     /// <inheritdoc/>
-    public List<string> CustomArgs { get; private set; }
+    public bool Landscape { get => options.Landscape; set => options.Landscape = value; }
 
     /// <inheritdoc/>
-    public string MarginsAll
-    {
-        set
-        {
-            MarginLeft = value;
-            MarginTop = value;
-            MarginRight = value;
-            MarginBottom = value;
-        }
-    }
+    public string Zoom { get => options.Zoom; set => options.Zoom = value; }
+
+    /// <inheritdoc/>
+    public string MarginLeft { get => options.MarginLeft; set => options.MarginLeft = value; }
+
+    /// <inheritdoc/>
+    public string MarginRight { get => options.MarginRight; set => options.MarginRight = value; }
+
+    /// <inheritdoc/>
+    public string MarginBottom { get => options.MarginBottom; set => options.MarginBottom = value; }
+
+    /// <inheritdoc/>
+    public string MarginTop { get => options.MarginTop; set => options.MarginTop = value; }
+
+    /// <inheritdoc/>
+    public string HeaderHtmlUrl { get => options.HeaderHtmlUrl; set => options.HeaderHtmlUrl = value; }
+
+    /// <inheritdoc/>
+    public string FooterHtmlUrl { get => options.FooterHtmlUrl; set => options.FooterHtmlUrl = value; }
+
+    /// <inheritdoc/>
+    public Dictionary<string, string> FooterHeaderReplace => options.FooterHeaderReplace;
+
+    /// <inheritdoc/>
+    public List<string> CustomArgs => options.CustomArgs;
+
+    /// <inheritdoc/>
+    public string MarginsAll { set => options.MarginsAll = value; }
 }
