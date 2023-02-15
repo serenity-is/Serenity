@@ -9,7 +9,10 @@ namespace Serenity.Web;
 public class RowLookupScript<TRow> : LookupScript
     where TRow: class, IRow, new()
 {
-    private readonly ISqlConnections connections;
+    /// <summary>
+    /// Sql connections
+    /// </summary>
+    protected readonly ISqlConnections sqlConnections;
 
     /// <summary>
     /// Applies the sort order to the query
@@ -51,12 +54,12 @@ public class RowLookupScript<TRow> : LookupScript
     /// <summary>
     /// Creates a new instance of the class
     /// </summary>
-    /// <param name="connections">Sql connections</param>
+    /// <param name="sqlConnections">Sql connections</param>
     /// <exception cref="ArgumentNullException">Connections is null</exception>
-    public RowLookupScript(ISqlConnections connections)
+    public RowLookupScript(ISqlConnections sqlConnections)
         : base()
     {
-        this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
+        this.sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));
 
         var row = new TRow();
 
@@ -94,7 +97,7 @@ public class RowLookupScript<TRow> : LookupScript
         PrepareQuery(query);
         ApplyOrder(query);
 
-        using (var connection = connections.NewByKey(loader.Fields.ConnectionKey))
+        using (var connection = sqlConnections.NewByKey(loader.Fields.ConnectionKey))
         {
             query.ForEach(connection, delegate ()
             {
