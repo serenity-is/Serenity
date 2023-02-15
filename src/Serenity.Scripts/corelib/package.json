@@ -1,11 +1,11 @@
 {
   "name": "@serenity-is/corelib",
-  "version": "6.5.1",
+  "version": "6.5.2",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
   "dependencies": {
-    "@serenity-is/sleekgrid": "1.5.3",
+    "@serenity-is/sleekgrid": "1.5.5",
     "@types/jquery": "2.0.48",
     "@types/jqueryui": "1.12.6",
     "@types/jquery.validation": "1.16.7",

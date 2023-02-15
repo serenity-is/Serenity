@@ -1881,6 +1881,7 @@ declare namespace Slick {
     	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
     	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
     	constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+    	private createGroupingPanel;
     	private bindAncestorScroll;
     	init(): void;
     	private hasFrozenColumns;
@@ -2306,8 +2307,9 @@ declare namespace Slick {
     	constructor(opt?: GroupItemMetadataProviderOptions);
     	static readonly defaults: GroupItemMetadataProviderOptions;
     	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string;
-    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): string;
+    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): any;
     	init(grid: typeof this.grid): void;
+    	readonly pluginName = "GroupItemMetadataProvider";
     	destroy(): void;
     	getOptions(): GroupItemMetadataProviderOptions;
     	setOptions(value: GroupItemMetadataProviderOptions): void;
@@ -2445,6 +2447,8 @@ declare namespace Slick {
         setFilter(filter: RemoteViewFilter<TEntity>): void;
         getFilter(): RemoteViewFilter<TEntity>;
         getFilteredItems(): any;
+        getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+        setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
         fastSort: any;
         setItems(items: any[], newIdProperty?: boolean | string): void;
         getIdPropertyName(): string;

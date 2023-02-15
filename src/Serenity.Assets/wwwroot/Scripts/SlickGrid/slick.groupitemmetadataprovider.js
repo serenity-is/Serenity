@@ -30,6 +30,7 @@ Slick._ = (() => {
   // src/data/groupitemmetadataprovider.ts
   var _GroupItemMetadataProvider = class {
     constructor(opt) {
+      this.pluginName = "GroupItemMetadataProvider";
       this.handleGridClick = (e, args) => {
         var _a, _b, _c, _d, _e, _f, _g;
         let grid = (_a = args == null ? void 0 : args.grid) != null ? _a : this.grid;
@@ -152,11 +153,11 @@ Slick._ = (() => {
 <span class="${ctx.escape(opt.groupTitleCssClass)}" level="${ctx.escape(item.level)}">${item.title}</span>`;
     }
     static defaultTotalsFormat(ctx, grid) {
-      var _a, _b, _c, _d, _e;
+      var _a, _b, _c, _d, _e, _f;
       var item = ctx.item;
       if (!item.__groupTotals && item.totals)
         item = item.totals;
-      return (_e = (_d = (_b = (_a = ctx.column) == null ? void 0 : _a.groupTotalsFormatter) == null ? void 0 : _b.call(_a, item, ctx.column)) != null ? _d : (_c = grid == null ? void 0 : grid.groupTotalsFormatter) == null ? void 0 : _c.call(grid, item, ctx.column)) != null ? _e : "";
+      return (_f = (_e = (_b = (_a = ctx.column) == null ? void 0 : _a.groupTotalsFormatter) == null ? void 0 : _b.call(_a, item, ctx.column)) != null ? _e : (_d = (_c = grid != null ? grid : ctx.grid) == null ? void 0 : _c.groupTotalsFormatter) == null ? void 0 : _d.call(_c, item, ctx.column)) != null ? _f : "";
     }
     init(grid) {
       this.grid = grid;

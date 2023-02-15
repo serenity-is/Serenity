@@ -55,7 +55,6 @@ Slick._ = (() => {
     }
   };
   var preClickClassName = "slick-edit-preclick";
-  typeof window !== "undefined" && window.Slick && (window.Slick.Map = Map);
 
   // src/core/column.ts
   var columnDefaults = {
@@ -69,7 +68,7 @@ Slick._ = (() => {
     selectable: true
   };
   function initializeColumns(columns, defaults) {
-    var _a, _b;
+    var _a;
     var usedIds = {};
     for (var i = 0; i < columns.length; i++) {
       var m = columns[i];
@@ -91,18 +90,16 @@ Slick._ = (() => {
       }
       usedIds[m.id] = true;
       if (m.name === void 0) {
-        m.name = titleize((_b = (_a = m.field) != null ? _a : m.id) != null ? _b : "");
+        m.name = titleize((_a = m.field) != null ? _a : m.id);
         delete m.nameIsHtml;
       }
     }
   }
-  function underscore(str) {
-    return (str != null ? str : "").replace(/([A-Z]+)([A-Z][a-z])/, "$1_$2").replace(/([a-z\d])([A-Z])/, "$1_$2").replace(/[-\s]/, "_").toLowerCase();
-  }
   function titleize(str) {
     if (!str)
       return str;
-    return underscore(str).replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
+    str = ("" + str).replace(/([A-Z]+)([A-Z][a-z])/, "$1_$2").replace(/([a-z\d])([A-Z])/, "$1_$2").replace(/[-\s]/, "_").toLowerCase();
+    return str.replace(/\s/, "_").split("_").filter((x) => x.length).map((x) => x.charAt(0).toUpperCase() + x.substring(1).toLowerCase()).join(" ");
   }
 
   // src/core/event.ts
@@ -206,7 +203,7 @@ Slick._ = (() => {
         if (this._handlers[i].event === event && this._handlers[i].handler === handler) {
           this._handlers.splice(i, 1);
           event.unsubscribe(handler);
-          return;
+          return this;
         }
       }
       return this;
@@ -394,7 +391,7 @@ Slick._ = (() => {
             v(el);
             continue;
           }
-          var key = k === "cssClass" ? "class" : k;
+          var key = k === "className" ? "class" : k;
           el.setAttribute(key, v === true ? "" : v);
         }
       }
@@ -431,17 +428,17 @@ Slick._ = (() => {
     };
   }
   function applyFormatterResultToCellNode(ctx, html, node) {
-    var _a, _b, _c, _d;
-    var oldFmtAtt = (_a = node.dataset) == null ? void 0 : _a.fmtatt;
+    var _a, _b;
+    var oldFmtAtt = node.dataset.fmtatt;
     if ((oldFmtAtt == null ? void 0 : oldFmtAtt.length) > 0) {
       for (var k of oldFmtAtt.split(","))
         node.removeAttribute(k);
       delete node.dataset.fmtatt;
     }
-    var oldFmtCls = (_b = node.dataset) == null ? void 0 : _b.fmtcls;
+    var oldFmtCls = node.dataset.fmtcls;
     if ((oldFmtCls == null ? void 0 : oldFmtCls.length) && ctx.addClass != oldFmtCls) {
       removeClass(node, oldFmtCls);
-      if (!((_c = ctx.addClass) == null ? void 0 : _c.length))
+      if (!((_a = ctx.addClass) == null ? void 0 : _a.length))
         delete node.dataset.fmtcls;
     }
     var oldTooltip = node.getAttribute("tooltip");
@@ -462,7 +459,7 @@ Slick._ = (() => {
         node.dataset.fmtatt = keys.join(",");
       }
     }
-    if ((_d = ctx.addClass) == null ? void 0 : _d.length) {
+    if ((_b = ctx.addClass) == null ? void 0 : _b.length) {
       addClass(node, ctx.addClass);
       node.dataset.fmtcls = ctx.addClass;
     }
@@ -565,4 +562,4 @@ Slick._ = (() => {
   };
   return __toCommonJS(core_exports);
 })();
-["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._; Slick.Event = Slick.EventEmitter; Slick.EventHandler = Slick.EventSubscriber;
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._; Slick.Event = Slick.EventEmitter; Slick.EventHandler = Slick.EventSubscriber; typeof Map !== 'undefined' && (Slick.Map = Map);

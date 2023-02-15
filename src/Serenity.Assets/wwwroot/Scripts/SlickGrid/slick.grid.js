@@ -835,6 +835,8 @@ Slick._ = (() => {
     this == null ? void 0 : this.classList.remove("ui-state-hover");
   }
   function getVBoxDelta(el) {
+    if (!el)
+      return 0;
     var style = getComputedStyle(el);
     if (style.boxSizing === "border-box")
       return 0;
@@ -1121,13 +1123,7 @@ Slick._ = (() => {
       this.setInitialCols(columns);
       this._scrollDims = getScrollBarDimensions();
       if (options.groupingPanel) {
-        this._container.appendChild(this._groupingPanel = H("div", {
-          class: "slick-grouping-panel",
-          style: "overflow:hidden; position:relative;" + (!options.showGroupingPanel ? " display: none" : "")
-        }));
-        if (options.createPreHeaderPanel) {
-          this._groupingPanel.appendChild(H("div", { class: "slick-preheader-panel" }));
-        }
+        this.createGroupingPanel();
       }
       this._layout.init({
         cleanUpAndRenderCells: this.cleanUpAndRenderCells.bind(this),
@@ -1153,6 +1149,17 @@ Slick._ = (() => {
         this.init();
       }
       this.bindToData();
+    }
+    createGroupingPanel() {
+      if (this._groupingPanel || !this._focusSink1)
+        return;
+      this._focusSink1.insertAdjacentElement("afterend", this._groupingPanel = H("div", {
+        class: "slick-grouping-panel",
+        style: "overflow:hidden; position:relative;" + (!this._options.showGroupingPanel ? " display: none" : "")
+      }));
+      if (this._options.createPreHeaderPanel) {
+        this._groupingPanel.appendChild(H("div", { class: "slick-preheader-panel" }));
+      }
     }
     bindAncestorScroll(elem) {
       if (this._jQuery)
@@ -2076,6 +2083,10 @@ Slick._ = (() => {
         return;
       }
       this.makeActiveCellNormal();
+      if (args.groupingPanel && !this._options.groupingPanel)
+        this.createGroupingPanel();
+      else if (args.groupingPanel != void 0 && !args.groupingPanel && this._groupingPanel)
+        this._groupingPanel.remove();
       if (args.showColumnHeader !== void 0) {
         this.setColumnHeaderVisibility(args.showColumnHeader);
       }

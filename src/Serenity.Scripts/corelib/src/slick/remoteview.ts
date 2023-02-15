@@ -61,6 +61,8 @@ export interface RemoteView<TEntity> {
     setFilter(filter: RemoteViewFilter<TEntity>): void;
     getFilter(): RemoteViewFilter<TEntity>;
     getFilteredItems(): any;
+    getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+    setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
     fastSort: any;
     setItems(items: any[], newIdProperty?: boolean | string): void;
     getIdPropertyName(): string;
@@ -182,7 +184,8 @@ export class RemoteView<TEntity> {
         var contentType: string;
         var dataType: string;
         var totalCount: number = null;
-        var localSort: boolean = options?.localSort ?? false;
+        var groupItemMetadataProvider = options.groupItemMetadataProvider;
+        var localSort: boolean = options.localSort ?? false;
 
         var intf: RemoteView<TEntity>;
 
@@ -466,8 +469,8 @@ export class RemoteView<TEntity> {
         }
 
         function setGrouping(groupingInfo: any) {
-            if (!options.groupItemMetadataProvider) {
-                options.groupItemMetadataProvider = new GroupItemMetadataProvider();
+            if (!groupItemMetadataProvider) {
+                groupItemMetadataProvider = new GroupItemMetadataProvider();
             }
 
             groups = [];
@@ -683,12 +686,12 @@ export class RemoteView<TEntity> {
 
             // overrides for grouping rows
             if (item.__group) {
-                return options.groupItemMetadataProvider.getGroupRowMetadata(item);
+                return groupItemMetadataProvider.getGroupRowMetadata(item);
             }
 
             // overrides for totals rows
             if (item.__groupTotals) {
-                return options.groupItemMetadataProvider.getTotalsRowMetadata(item);
+                return groupItemMetadataProvider.getTotalsRowMetadata(item);
             }
 
             return (options.getItemMetadata && options.getItemMetadata(item, i)) || null;
@@ -1442,6 +1445,15 @@ export class RemoteView<TEntity> {
                     populate();
             }
         }
+
+        function getGroupItemMetadataProvider() {
+            return groupItemMetadataProvider;
+        }
+
+        function setGroupItemMetadataProvider(value: GroupItemMetadataProvider) {
+            groupItemMetadataProvider = value;
+        }
+
         idProperty = options.idField || 'id';
         contentType = options.contentType || "application/json";
         dataType = options.dataType || 'json';
@@ -1497,6 +1509,8 @@ export class RemoteView<TEntity> {
             getLength: getLength,
             getItem: getItem,
             getItemMetadata: getItemMetadata,
+            getGroupItemMetadataProvider: getGroupItemMetadataProvider,
+            setGroupItemMetadataProvider: setGroupItemMetadataProvider,
 
             onRowCountChanged: onRowCountChanged,
             onRowsChanged: onRowsChanged,

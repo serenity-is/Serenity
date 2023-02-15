@@ -104,6 +104,8 @@ interface RemoteView<TEntity> {
     setFilter(filter: RemoteViewFilter<TEntity>): void;
     getFilter(): RemoteViewFilter<TEntity>;
     getFilteredItems(): any;
+    getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+    setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
     fastSort: any;
     setItems(items: any[], newIdProperty?: boolean | string): void;
     getIdPropertyName(): string;
