@@ -17,7 +17,9 @@ public interface IHtmlReportRenderUrlBuilder
     /// <param name="reportParams">The set of report params usually a serialized JSON object 
     /// to be passed to the URL callback. These params should already be applied to the passed
     /// report instance. Will be ignored if the report is rendered directly, e.g. without a callback.</param>
-    string GetRenderUrl(IReport report, string reportKey, string reportParams);
+    /// <param name="cleanup">An optional cleanup method that should be called after the render 
+    /// operation completed, e.g. to cleanup temporary files</param>
+    string GetRenderUrl(IReport report, string reportKey, string reportParams, out Action cleanup);
 
     /// <summary>
     /// Gets cookies to forward like authentication / language preference etc. to the target converter
