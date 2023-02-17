@@ -1,7 +1,4 @@
-﻿
-using System.Net;
-
-namespace Serenity.Reporting;
+﻿namespace Serenity.Reporting;
 
 /// <summary>
 /// Interface abstraction to get HTML report render URL
