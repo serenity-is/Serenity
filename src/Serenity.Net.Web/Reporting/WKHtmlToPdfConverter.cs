@@ -11,7 +11,7 @@ public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
     private readonly IOptions<WKHtmlToPdfSettings> options;
     private readonly IWebHostEnvironment webHostEnvironment;
     private readonly IFileSystem fileSystem;
-    private string utilityPath;
+    private string executablePath;
 
     /// <summary>
     /// Creates a new instance of the class
@@ -27,17 +27,21 @@ public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
         this.fileSystem = fileSystem ?? new PhysicalFileSystem();
     }
 
-    /// <inheritdoc/>
-    public string GetUtilityExePath()
+    /// <summary>
+    /// Gets wkhtmltopdf executable path
+    /// </summary>
+    /// <returns></returns>
+    public virtual string GetExecutablePath()
     {
-        if (!string.IsNullOrEmpty(utilityPath) && fileSystem.FileExists(utilityPath))
-            return utilityPath;
+        if (!string.IsNullOrEmpty(executablePath) && 
+            fileSystem.FileExists(executablePath))
+            return executablePath;
 
-        if (!string.IsNullOrEmpty(options?.Value.UtilityExePath) &&
-            fileSystem.FileExists(options.Value.UtilityExePath))
+        if (!string.IsNullOrEmpty(options?.Value.ExecutablePath) &&
+            fileSystem.FileExists(options.Value.ExecutablePath))
         {
-            utilityPath = options.Value.UtilityExePath;
-            return utilityPath;
+            executablePath = options.Value.ExecutablePath;
+            return executablePath;
         }
 
         var assemblyPath = fileSystem.GetDirectoryName(typeof(WKHtmlToPdfConverter).Assembly.Location);
@@ -60,22 +64,22 @@ public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
 
         paths = paths.Concat((Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'));
 
-        utilityPath = paths.SelectMany(path =>
+        executablePath = paths.SelectMany(path =>
             wkhtmlFileNames.Select(f => fileSystem.Combine(path, f)))
                 .FirstOrDefault(fileSystem.FileExists);
 
-        return utilityPath;
+        return executablePath;
     }
 
     /// <inheritdoc/>
     public byte[] Convert(IHtmlToPdfOptions options)
     {
-        var converter = new HtmlToPdfConverter(options)
+        var converter = new WKHtmlToPdf(options)
         {
-            UtilityExePath = GetUtilityExePath()
+            ExecutablePath = GetExecutablePath()
         };
 
-        if (string.IsNullOrEmpty(converter.UtilityExePath))
+        if (string.IsNullOrEmpty(converter.ExecutablePath))
             throw new ValidationError("Can't locate wkhtmltopdf executable " +
                 "that is required for report generation in the system PATH, or in the web application " + 
                 "directory. Please download and install the version suitable for your system from " +

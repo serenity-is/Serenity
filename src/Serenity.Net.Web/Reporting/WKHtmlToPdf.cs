@@ -7,7 +7,7 @@ namespace Serenity.Reporting;
 /// <summary>
 /// HTML to PDF converter class using WKHTMLToPdf
 /// </summary>
-public class HtmlToPdfConverter : IHtmlToPdfOptions
+public class WKHtmlToPdf : IHtmlToPdfOptions
 {
     private readonly IHtmlToPdfOptions options;
 
@@ -15,7 +15,7 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
     /// WKHtmlToPdf converter class
     /// </summary>
     /// <param name="options">List of options</param>
-    public HtmlToPdfConverter(IHtmlToPdfOptions options = null)
+    public WKHtmlToPdf(IHtmlToPdfOptions options = null)
     {
         this.options = options ?? new HtmlToPdfOptions();
     }
@@ -27,7 +27,7 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
     /// <exception cref="InvalidOperationException">An error occureed during process execution</exception>
     public byte[] Execute()
     {
-        var exePath = UtilityExePath ?? throw new ArgumentNullException(nameof(UtilityExePath));
+        var exePath = ExecutablePath ?? throw new ArgumentNullException(nameof(ExecutablePath));
         
         if (!File.Exists(exePath))
         {
@@ -145,6 +145,14 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
         foreach (var additional in AdditionalUrls)
             args.Add(additional);
 
+        args.Add(DisableLocalFileAccess ? "disable-local-file-access" : "enable-local-file-access");
+
+        foreach (var localPath in AllowedLocalPaths)
+        {
+            args.Add("--allow");
+            args.Add(localPath);
+        }
+
         foreach (var arg in CustomArgs)
             args.Add(arg);
 
@@ -190,7 +198,7 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
     /// <summary>
     /// Path to the wkhtmltopdf executable
     /// </summary>
-    public string UtilityExePath { get; set; }
+    public string ExecutablePath { get; set; }
 
     /// <inheritdoc/>
     public string Url { get => options.Url; set => options.Url = value; }
@@ -244,6 +252,9 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
     public string MarginTop { get => options.MarginTop; set => options.MarginTop = value; }
 
     /// <inheritdoc/>
+    public string MarginsAll { set => options.MarginsAll = value; }
+
+    /// <inheritdoc/>
     public string HeaderHtmlUrl { get => options.HeaderHtmlUrl; set => options.HeaderHtmlUrl = value; }
 
     /// <inheritdoc/>
@@ -253,8 +264,23 @@ public class HtmlToPdfConverter : IHtmlToPdfOptions
     public Dictionary<string, string> FooterHeaderReplace => options.FooterHeaderReplace;
 
     /// <inheritdoc/>
-    public List<string> CustomArgs => options.CustomArgs;
+    public bool DisableLocalFileAccess { get => options.DisableLocalFileAccess; set => options.DisableLocalFileAccess = value; }
 
     /// <inheritdoc/>
-    public string MarginsAll { set => options.MarginsAll = value; }
+    public List<string> AllowedLocalPaths => options.AllowedLocalPaths;
+
+    /// <inheritdoc/>
+    public List<string> CustomArgs => options.CustomArgs;
+}
+
+/// <summary>
+/// 
+/// </summary>
+[Obsolete("Use WKHtmlToPdf")]
+public class HtmlToPdfConverter : WKHtmlToPdf
+{
+    /// <summary>
+    /// Compatibility property for ExecutablePath
+    /// </summary>
+    public string UtilityExePath { get => ExecutablePath; set => ExecutablePath = value; }
 }

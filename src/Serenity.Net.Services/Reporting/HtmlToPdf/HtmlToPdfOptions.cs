@@ -72,19 +72,6 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public string MarginTop { get; set; }
 
     /// <inheritdoc/>
-    public string HeaderHtmlUrl { get; set; }
-
-    /// <inheritdoc/>
-    public string FooterHtmlUrl { get; set; }
-
-
-    /// <inheritdoc/>
-    public Dictionary<string, string> FooterHeaderReplace { get; private set; }
-
-    /// <inheritdoc/>
-    public List<string> CustomArgs { get; private set; }
-
-    /// <inheritdoc/>
     public string MarginsAll
     {
         set
@@ -95,4 +82,22 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
             MarginBottom = value;
         }
     }
+
+    /// <inheritdoc/>
+    public string HeaderHtmlUrl { get; set; }
+
+    /// <inheritdoc/>
+    public string FooterHtmlUrl { get; set; }
+
+    /// <inheritdoc/>
+    public Dictionary<string, string> FooterHeaderReplace { get; private set; }
+
+    /// <inheritdoc/>
+    public bool DisableLocalFileAccess { get; set; } = true;
+
+    /// <inheritdoc/>
+    public List<string> AllowedLocalPaths { get; private set; } = new();
+
+    /// <inheritdoc/>
+    public List<string> CustomArgs { get; private set; }
 }

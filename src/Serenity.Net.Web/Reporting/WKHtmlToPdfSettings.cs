@@ -13,5 +13,5 @@ public class WKHtmlToPdfSettings
     /// <summary>
     /// Gets/sets the wkhtmltopdf executable path
     /// </summary>
-    public string UtilityExePath { get; set; }
+    public string ExecutablePath { get; set; }
 }

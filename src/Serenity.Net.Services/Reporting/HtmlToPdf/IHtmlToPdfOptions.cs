@@ -111,6 +111,16 @@ public interface IHtmlToPdfOptions
     Dictionary<string, string> FooterHeaderReplace { get; }
 
     /// <summary>
+    /// Disables local file access, default is true
+    /// </summary>
+    bool DisableLocalFileAccess { get; set; }
+
+    /// <summary>
+    /// List of allowed local folder (or file) paths
+    /// </summary>
+    List<string> AllowedLocalPaths { get; }
+
+    /// <summary>
     /// A list of custom arguments to pass to HTML to PDF converter
     /// </summary>
     List<string> CustomArgs { get; }
