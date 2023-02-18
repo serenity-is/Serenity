@@ -60,16 +60,16 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public string Zoom { get; set; }
 
     /// <inheritdoc/>
-    public string MarginLeft { get; set; }
+    public string MarginLeft { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginRight { get; set; }
-    
-    /// <inheritdoc/>
-    public string MarginBottom { get; set; }
+    public string MarginRight { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginTop { get; set; }
+    public string MarginBottom { get; set; } = "10mm";
+
+    /// <inheritdoc/>
+    public string MarginTop { get; set; } = "10mm";
 
     /// <inheritdoc/>
     public string MarginsAll
