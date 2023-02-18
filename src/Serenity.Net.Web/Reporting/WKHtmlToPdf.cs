@@ -141,11 +141,10 @@ public class WKHtmlToPdf : IHtmlToPdfOptions
             args.Add(replace.Value);
         }
 
-        args.Add(Url);
         foreach (var additional in AdditionalUrls)
             args.Add(additional);
 
-        args.Add(DisableLocalFileAccess ? "disable-local-file-access" : "enable-local-file-access");
+        args.Add(DisableLocalFileAccess ? "--disable-local-file-access" : "--enable-local-file-access");
 
         foreach (var localPath in AllowedLocalPaths)
         {
@@ -156,36 +155,48 @@ public class WKHtmlToPdf : IHtmlToPdfOptions
         foreach (var arg in CustomArgs)
             args.Add(arg);
 
+        args.Add(Url);
+
         var tempFile = Path.GetTempFileName();
         try
         {
             args.Add(tempFile);
 
+            var commandLineArgs = CommandLineTools.EscapeArguments(args.ToArray());
+
             var process = new Process 
             { 
-                StartInfo = new ProcessStartInfo(exePath, CommandLineTools.EscapeArguments(args.ToArray()))
+                StartInfo = new ProcessStartInfo(exePath, commandLineArgs)
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
 
+            Exception invalidOperation(string message)
+            {
+                var exception = new InvalidOperationException(message);
+                exception.SetData("log:WKHtmlToPdfExecutable", exePath);
+                exception.SetData("log:CommandLineArguments", commandLineArgs);
+                return exception;
+            };
+
             if (!process.Start())
-                throw new InvalidOperationException("An error occurred while starting PDF generator!");
+                throw invalidOperation("An error occurred while starting PDF generator!");
 
             if (!process.WaitForExit(TimeoutSeconds * 1000)) // max 300 seconds
-                throw new InvalidOperationException("Timeout while PDF generation!");
+                throw invalidOperation("Timeout while PDF generation!");
 
             if (process.ExitCode != 0 && process.ExitCode != 1)
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                throw invalidOperation(string.Format(CultureInfo.CurrentCulture,
                     "PDF generator returned error code {0}!", process.ExitCode));
 
             if (!File.Exists(tempFile))
-                throw new InvalidOperationException("Can't find generatored PDF file!");
+                throw invalidOperation("Can't find generatored PDF file!");
 
             var bytes = File.ReadAllBytes(tempFile);
             if (bytes.Length == 0)
-                throw new InvalidOperationException("Generated PDF file is empty!");
+                throw invalidOperation("Generated PDF file is empty!");
 
             return bytes;
         }
