@@ -22,6 +22,9 @@ public class FileWatcher : IFileWatcher, IDisposable
         Path = path ?? throw new ArgumentNullException(nameof(path));
         Filter = filter ?? throw new ArgumentNullException(nameof(filter));
 
+        if (!Directory.Exists(Path))
+            return;
+
         watcher = new FileSystemWatcher(Path, Filter)
         {
             IncludeSubdirectories = true,
