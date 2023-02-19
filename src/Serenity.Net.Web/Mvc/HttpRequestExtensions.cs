@@ -11,23 +11,19 @@ public static class HttpRequestExtensions
     /// Gets the base uri for the current request
     /// </summary>
     /// <param name="request">HTTP request</param>
+    /// <param name="pathBase">Include path base</param>
     /// <exception cref="ArgumentNullException">Request is null</exception>
-    public static Uri GetBaseUri(this HttpRequest request)
+    public static Uri GetBaseUri(this HttpRequest request, bool pathBase = true)
     {
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var hostComponents = request.Host.ToUriComponent().Split(':');
+        var uriBuilder = new UriBuilder(request.Scheme, request.Host.Host, 
+            request.Host.Port ?? -1, pathBase ? request.PathBase : "");
+            
+        if (uriBuilder.Uri.IsDefaultPort)
+            uriBuilder.Port = -1;
 
-        var builder = new UriBuilder
-        {
-            Scheme = request.Scheme,
-            Host = hostComponents[0]
-        };
-
-        if (hostComponents.Length == 2)
-            builder.Port = Convert.ToInt32(hostComponents[1], CultureInfo.InvariantCulture);
-
-        return builder.Uri;
+        return uriBuilder.Uri;
     }
 }
