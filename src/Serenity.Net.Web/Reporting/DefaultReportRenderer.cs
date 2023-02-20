@@ -146,7 +146,7 @@ public class DefaultReportRenderer : IReportRenderer
         }
 
         if (string.Equals(format, "pdf", StringComparison.OrdinalIgnoreCase))
-            RenderAsPdf(report, options);
+            return RenderAsPdf(report, options);
 
         return RenderUnknownFormat(report, options);
     }
