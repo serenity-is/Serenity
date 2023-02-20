@@ -151,10 +151,10 @@ public class ReportRegistry : IReportRegistry
     /// <exception cref="ArgumentNullException">reportKey is n ull</exception>
     public Report GetReport(string reportKey, bool validatePermission = true)
     {
-        EnsureTypes();
+        if (string.IsNullOrEmpty(reportKey))
+            throw new ArgumentNullException(nameof(reportKey));
 
-        if (reportByKey.IsEmptyOrNull())
-            throw new ArgumentNullException("reportKey");
+        EnsureTypes();
 
         if (reportByKey.TryGetValue(reportKey, out Report report))
         {
