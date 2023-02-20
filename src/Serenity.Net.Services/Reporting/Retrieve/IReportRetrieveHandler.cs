@@ -9,5 +9,5 @@ public interface IReportRetrieveHandler
     /// Retrieves a report info
     /// </summary>
     /// <param name="request">Request</param>
-    public ReportRetrieveResult Retrieve(ReportRetrieveRequest request);
+    public ReportRetrieveResponse Retrieve(ReportRetrieveRequest request);
 }
