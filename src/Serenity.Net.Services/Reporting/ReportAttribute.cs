@@ -10,7 +10,7 @@ public class ReportAttribute : Attribute
     /// </summary>
     /// <param name="reportKey">The report key. If not passed
     /// it is calculated from the class name.</param>
-    public ReportAttribute(string reportKey = null)
+    public ReportAttribute(string? reportKey = null)
     {
         ReportKey = reportKey;
     }
@@ -18,5 +18,5 @@ public class ReportAttribute : Attribute
     /// <summary>
     /// The report key.
     /// </summary>
-    public string ReportKey { get; private set; }
+    public string? ReportKey { get; private set; }
 }

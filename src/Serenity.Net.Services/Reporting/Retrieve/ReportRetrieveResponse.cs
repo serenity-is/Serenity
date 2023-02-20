@@ -30,4 +30,9 @@ public class ReportRetrieveResponse : ServiceResponse
     /// True if the report is an <see cref="IDataOnlyReport"/>
     /// </summary>
     public bool IsDataOnlyReport { get; set; }
+
+    /// <summary>
+    /// True if the report is an <see cref="IExternalReport"/>
+    /// </summary>
+    public bool IsExternalReport { get; set; }
 }
