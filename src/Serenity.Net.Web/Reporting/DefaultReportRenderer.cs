@@ -12,7 +12,11 @@ public class DefaultReportRenderer : IReportRenderer
     /// Excel renderer
     /// </summary>
     protected readonly IDataReportExcelRenderer excelRenderer;
-    private readonly IHtmlReportPdfRenderer htmlReportPdfRenderer;
+
+    /// <summary>
+    /// Html report pdf renderer
+    /// </summary>
+    protected readonly IHtmlReportPdfRenderer htmlReportPdfRenderer;
 
     /// <summary>
     /// Http context accessor
