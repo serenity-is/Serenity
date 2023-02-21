@@ -1,3 +1,27 @@
+## 6.5.2 (2023-02-21)
+
+Features:
+  - Added SqlNow, SqlUtcNow, SqlDateTimeOffset, Case, CaseSwitch, Coalesce dynamic expression attributes
+  - Added ability to use another type of expression attribute as arguments to the dynamic expression attributes, e.g. use SqlNow etc. in a DateDiff attribute like: `[DateDiff(DateParts.Day, typeof(SqlNowAttribute), "t0.ReleaseDate")]`
+  - Add ability to get/set the groupitemmetadataprovider in RemoteView
+  - DraggableGroupingMixin will try to create and auto register GroupItemMetadataProvider itself if it is not already registered and pass it to the view
+  - Make SqlConnections available to use for the derived classes of RowLookupScripts
+  - Added `ISiteAbsoluteUrl` abstraction to access web site's internal (local) and external (public) url's and `EnviromentSettings:InternalSiteUrl` setting that takes precedence over request's base URI, and SiteExternalUrl for report callbacks.  
+  - Refactored HTML to PDF conversion process via new `IHtmlToPdfConverter`, `IHtmlReportPdfRenderer`, `IHtmlReportRenderUrlBuilder` abstractions
+  - [BREAKING CHANGE] To register the default implementations for `IHtmlToPdfConverter`, `IHtmlReportPdfRenderer` etc. services.AddReporting should be called instead of services.AddExcelExporter in Startup.cs.
+  - Added new `HtmlToPdfOptions` class that implements `IHtmlToPdfOptions` like the converters.
+  - Completely redesigned and refactored reporting system and abstractions via new `IReportFactory`, `IReportRenderer`, `IReportRetrieveHandler`, `IReportTreeFactory` interfaces. Make sure to call `services.AddReporting()` in Startup.cs.
+  - Added Puppeteer based HTML to PDF converter implementation with Chrome and experimental Firefox option [StartSharp]. `services.AddPuppeteerHtmlToPdf` should be called before `services.AddReporting` line to use Puppeteer instead of WKHtmlToPdf. To make some old reports keep using old WKHtmlToPdf based converter, add `[UseWKHtmlToPdf(true)]` attribute on the report classes.
+  - `TemplateHelper.RenderViewToString` can access the current request/action context if available
+  - Added experimental `HtmlReportFileUrlBuilder` that can use a temporary folder, instead of a callback for HTML report rendering.
+
+Bugfixes:
+  - MultipleUploadEditor should selecting multiple files in upload dialog
+  - Fix Criteria.Exist for sqlite as it does not like double parenthesis (#6687)
+  - Group summaries was not displayed in some cases like when the group item metadata provider is not passed to the view options
+  - File watcher should not try to create watcher if the directory does not exist
+  - Add section.content for proper layout when opening panels if the navigation is hidden e.g. hideNav=1
+
 ## 6.5.1 (2023-02-03)
 
 Features:
