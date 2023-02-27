@@ -38,12 +38,13 @@ public class DefaultSqlConnections : ISqlConnections
     }
 
     /// <summary>
-    /// Creates a new <see cref="IDbConnection"/> for given connection string, provider name and dialect.</summary>
+    /// Creates an actual connection based on providerName, this should not return a wrapped connection.
+    /// </summary>
     /// <param name="connectionString">Connection string</param>
     /// <param name="providerName">Provider name</param>
     /// <param name="dialect">Dialect</param>
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
-    public virtual IDbConnection New(string connectionString, string providerName, ISqlDialect dialect)
+    protected virtual IDbConnection CreateConnection(string connectionString, string providerName, ISqlDialect dialect)
     {
         if (providerName == null)
             throw new ArgumentNullException(nameof(providerName));
@@ -63,10 +64,34 @@ public class DefaultSqlConnections : ISqlConnections
             return null;
         }
 
+        return connection;
+    }
+
+    /// <summary>
+    /// Wraps and profiles the actual connection
+    /// </summary>
+    /// <param name="connection">Actual connection</param>
+    /// <param name="providerName">Provider name</param>
+    /// <param name="dialect">Dialect</param>
+    /// <returns></returns>
+    protected virtual IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect)
+    {
         if (profiler != null)
             return new WrappedConnection(profiler.Profile(connection), dialect, loggerFactory?.CreateLogger<ISqlConnections>());
 
         return new WrappedConnection(connection, dialect, loggerFactory?.CreateLogger<ISqlConnections>());
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="IDbConnection"/> for given connection string, provider name and dialect.</summary>
+    /// <param name="connectionString">Connection string</param>
+    /// <param name="providerName">Provider name</param>
+    /// <param name="dialect">Dialect</param>
+    /// <returns>A new <see cref="IDbConnection"/> object.</returns>
+    public virtual IDbConnection New(string connectionString, string providerName, ISqlDialect dialect)
+    {
+        var connection = CreateConnection(connectionString, providerName, dialect);
+        return WrapConnection(connection, providerName, dialect);
     }
 
     /// <summary>
