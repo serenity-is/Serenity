@@ -8,8 +8,11 @@ namespace Serenity.Data;
 /// </summary>
 public class DefaultSqlConnections : ISqlConnections
 {
+    /// <summary>Connection strings</summary>
     protected readonly IConnectionStrings connectionStrings;
+    /// <summary>Profiler</summary>
     protected readonly IConnectionProfiler profiler;
+    /// <summary>Logger factory</summary>
     protected readonly ILoggerFactory loggerFactory;
 
     /// <summary>
@@ -85,7 +88,7 @@ public class DefaultSqlConnections : ISqlConnections
     /// </summary>
     /// <param name="connectionKey">Connection key</param>
     /// <returns>Connection string or null if not found</returns>
-    public IConnectionString TryGetConnectionString(string connectionKey)
+    public virtual IConnectionString TryGetConnectionString(string connectionKey)
     {
         return connectionStrings.TryGetConnectionString(connectionKey);
     }

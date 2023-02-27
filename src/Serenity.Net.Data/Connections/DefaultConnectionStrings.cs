@@ -7,8 +7,12 @@ namespace Serenity.Data;
 /// </summary>
 public class DefaultConnectionStrings : IConnectionStrings
 {
-    private readonly IOptions<ConnectionStringOptions> options;
-    private readonly ISqlDialectMapper sqlDialectMapper;
+    /// <summary>Options</summary>
+    protected readonly IOptions<ConnectionStringOptions> options;
+    /// <summary>Sql dialect mapper</summary>
+    protected readonly ISqlDialectMapper sqlDialectMapper;
+    /// <summary>Cached dictionary of connection string infos</summary>
+    protected readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new();
 
     /// <summary>
     /// Creates a new instance of DefaultConnectionStringSource
@@ -41,14 +45,12 @@ public class DefaultConnectionStrings : IConnectionStrings
             throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
     }
 
-    private readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new ConcurrentDictionary<string, ConnectionStringInfo>();
-
     /// <summary>
     /// Gets a connection string by its key
     /// </summary>
     /// <param name="connectionKey">Connection key</param>
     /// <returns>Connection string or null if not found</returns>
-    public IConnectionString TryGetConnectionString(string connectionKey)
+    public virtual IConnectionString TryGetConnectionString(string connectionKey)
     {
         if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo info))
             return info;
@@ -67,7 +69,7 @@ public class DefaultConnectionStrings : IConnectionStrings
     /// Lists all known connections strings
     /// </summary>
     /// <returns>List of all registered connections</returns>
-    public IEnumerable<IConnectionString> ListConnectionStrings()
+    public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
         return options.Value.Keys.Select(x => TryGetConnectionString(x));
     }
