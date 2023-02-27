@@ -1,3 +1,13 @@
+## 6.5.3 (2023-02-27)
+
+Features:
+  - Add virtual methods / protected members to DefaultSqlConnections / DefaultConnectionStrings for better extensibility
+  - Changed update button text in german to Aktualisieren instead of Bearbeitung which was reported to be incorrect (#6689)
+  
+Bugfixes:
+  - Fix field size not set to the correct variable, possibly affecting precision / scale
+  - BasePermissionAttribute should accept null values for compatibility
+
 ## 6.5.2 (2023-02-21)
 
 Features:
