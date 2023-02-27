@@ -8,9 +8,9 @@ namespace Serenity.Data;
 /// </summary>
 public class DefaultSqlConnections : ISqlConnections
 {
-    private readonly IConnectionStrings connectionStrings;
-    private readonly IConnectionProfiler profiler;
-    private readonly ILoggerFactory loggerFactory;
+    protected readonly IConnectionStrings connectionStrings;
+    protected readonly IConnectionProfiler profiler;
+    protected readonly ILoggerFactory loggerFactory;
 
     /// <summary>
     /// Creates a new instance
