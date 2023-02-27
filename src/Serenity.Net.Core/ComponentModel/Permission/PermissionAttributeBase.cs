@@ -10,9 +10,9 @@ public abstract class PermissionAttributeBase : Attribute
     /// Initializes a new instance of the <see cref="PermissionAttributeBase"/> class.
     /// </summary>
     /// <param name="permission">The permission.</param>
-    public PermissionAttributeBase(object permission)
+    public PermissionAttributeBase(object? permission)
     {
-        Permission = permission.ToString();
+        Permission = permission?.ToString();
     }
 
     /// <summary>
@@ -21,8 +21,8 @@ public abstract class PermissionAttributeBase : Attribute
     /// </summary>
     /// <param name="module">The module.</param>
     /// <param name="permission">The permission.</param>
-    public PermissionAttributeBase(object module, object permission)
-        : this(module.ToString() + ":" + permission)
+    public PermissionAttributeBase(object? module, object? permission)
+        : this(module?.ToString() + ":" + permission)
     {
     }
 
@@ -33,8 +33,8 @@ public abstract class PermissionAttributeBase : Attribute
     /// <param name="module">The module.</param>
     /// <param name="submodule">The submodule.</param>
     /// <param name="permission">The permission.</param>
-    public PermissionAttributeBase(object module, object submodule, object permission)
-        : this(module.ToString() + ":" + submodule + ":" + permission)
+    public PermissionAttributeBase(object? module, object? submodule, object? permission)
+        : this(module?.ToString() + ":" + submodule + ":" + permission)
     {
     }
 
@@ -44,5 +44,5 @@ public abstract class PermissionAttributeBase : Attribute
     /// <value>
     /// The permission.
     /// </value>
-    public string Permission { get; private set; }
+    public string? Permission { get; private set; }
 }
