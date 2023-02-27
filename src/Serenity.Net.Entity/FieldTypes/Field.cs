@@ -20,7 +20,6 @@ public abstract partial class Field : IFieldWithJoinInfo
     internal string origin;
     internal string propertyName;
     internal HashSet<string> referencedAliases;
-    private readonly int size;
     private readonly FieldType type;
     internal object defaultValue;
     internal SelectLevel minSelectLevel;
@@ -44,7 +43,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     {
         this.name = name;
         expression = "T0." + SqlSyntax.AutoBracket(name);
-        this.size = size;
+        Size = size;
         this.flags = flags;
         this.type = type;
         index = -1;
