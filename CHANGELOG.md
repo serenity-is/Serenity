@@ -1,7 +1,8 @@
 ## 6.5.4 (2023-02-28)
 
 Features:
-  - Implemented OpenID Authorization Code Flow, e.g. logging via the web site instead of with password in mobile / desktop apps `[StartSharp]`.
+  - Implemented OpenID Authorization Code Flow, e.g. logging via the web site instead of with user/password in mobile / desktop apps `[StartSharp]`.
+  - [BREAKING CHANGE] The services required for OpenIdAuthorizationControllerBase is changed, so you should get latest version of `OpenIdAuthorizationController.cs` from the StartSharp repository if you have that in your project.
 
 Bugfixes:
   - Handle the case where select2 is destroyed before the request is completed or timer fires
@@ -14,7 +15,7 @@ Features:
   - Changed update button text in german to Aktualisieren instead of Bearbeitung which was reported to be incorrect (#6689)
   
 Bugfixes:
-  - Fix field size not set to the correct variable, possibly affecting precision / scale
+  - Fix field size not set to the correct variable, possibly affecting precision/scale
   - BasePermissionAttribute should accept null values for compatibility
 
 ## 6.5.2 (2023-02-21)
