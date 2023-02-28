@@ -1,3 +1,12 @@
+## 6.5.4 (2023-02-28)
+
+Features:
+  - Implemented OpenID Authorization Code Flow, e.g. logging via the web site instead of with password in mobile / desktop apps `[StartSharp]`.
+
+Bugfixes:
+  - Handle the case where select2 is destroyed before the request is completed or timer fires
+  - Fixed icon for FileDownloadFormatter
+
 ## 6.5.3 (2023-02-27)
 
 Features:
