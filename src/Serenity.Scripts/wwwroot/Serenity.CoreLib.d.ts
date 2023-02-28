@@ -3410,9 +3410,10 @@ declare namespace Serenity {
         protected mapItems(items: TItem[]): Select2Item[];
         protected allowClear(): boolean;
         protected isMultiple(): boolean;
-        private typeTimeout;
+        private initSelectionPromise;
         private queryPromise;
-        protected abortPendingRequest(): void;
+        private typeTimeout;
+        protected abortPendingQuery(): void;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
         get items(): Select2Item[];

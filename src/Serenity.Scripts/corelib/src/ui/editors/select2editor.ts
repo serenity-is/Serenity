@@ -88,7 +88,8 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     destroy() {
-        this.abortPendingRequest();
+        this.initSelectionPromise?.abort?.();
+        this.abortPendingQuery();
         this.element?.select2?.('destroy');
         super.destroy();
     }
@@ -166,10 +167,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         return !!(this.options as Select2EditorOptions).multiple;
     }
 
-    private typeTimeout: number;
+    private initSelectionPromise: Select2SearchPromise;
     private queryPromise: Select2SearchPromise;
+    private typeTimeout: number;
 
-    protected abortPendingRequest() {
+    protected abortPendingQuery() {
         this.queryPromise?.abort?.();
         this.queryPromise = null;
         if (this.typeTimeout) {
@@ -197,13 +199,13 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     checkMore: true
                 }
 
-                this.abortPendingRequest();
+                this.abortPendingQuery();
 
                 var select2 = $(this.element).data('select2');
                 select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
 
                 this.typeTimeout = setTimeout(() => {
-                    this.abortPendingRequest();
+                    this.abortPendingQuery();
                     select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
                     this.queryPromise = this.asyncSearch(searchQuery, result => {
                         this.queryPromise = null;
@@ -219,7 +221,6 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 }, !query.term ? 0 : this.getTypeDelay());
             }
 
-            var initPromise: Select2SearchPromise = null;
             opt.initSelection = (element, callback) => {
                 var val = element.val();
                 if (val == null || val == '') {
@@ -233,9 +234,9 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     idList: idList
                 }
 
-                initPromise && initPromise.abort && initPromise.abort();
-                initPromise = this.asyncSearch(searchQuery, result => {
-                    initPromise = null;
+                this.initSelectionPromise?.abort?.();
+                this.initSelectionPromise = this.asyncSearch(searchQuery, result => {
+                    this.initSelectionPromise = null;
                     if (isMultiple) {
                         var items = (result.items || []).map(x => this.mapItem(x));
                         this._itemById = this._itemById || {};
@@ -271,8 +272,8 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                         callback(item);
                     }
                 });
-                (initPromise && (initPromise.catch || initPromise.fail)).call(initPromise, () => {
-                    initPromise = null;
+                (this.initSelectionPromise.catch || this.initSelectionPromise.fail)?.call(this.initSelectionPromise, () => {
+                    this.initSelectionPromise = null;
                 });
             }
         }
