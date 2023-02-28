@@ -3412,7 +3412,7 @@ declare namespace Serenity {
         protected isMultiple(): boolean;
         private typeTimeout;
         private queryPromise;
-        protected abortPending(): void;
+        protected abortPendingRequest(): void;
         protected getSelect2Options(): Select2Options;
         get_delimited(): boolean;
         get items(): Select2Item[];

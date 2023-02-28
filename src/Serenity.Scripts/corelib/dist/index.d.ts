@@ -1007,7 +1007,7 @@ declare class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected isMultiple(): boolean;
     private typeTimeout;
     private queryPromise;
-    protected abortPending(): void;
+    protected abortPendingRequest(): void;
     protected getSelect2Options(): Select2Options;
     get_delimited(): boolean;
     get items(): Select2Item[];
