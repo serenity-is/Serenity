@@ -1796,6 +1796,7 @@ declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
     initializeColumn(column: Column): void;
     displayFormat: string;
     originalNameProperty: string;
+    iconClass: string;
 }
 declare class MinuteFormatter implements Formatter {
     format(ctx: FormatterContext): string;

@@ -4201,6 +4201,7 @@ declare namespace Serenity {
         initializeColumn(column: Slick.Column): void;
         displayFormat: string;
         originalNameProperty: string;
+        iconClass: string;
     }
     class MinuteFormatter implements Formatter {
         format(ctx: Slick.FormatterContext): string;

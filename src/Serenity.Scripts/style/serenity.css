@@ -2533,7 +2533,6 @@ body.mobile-device.modal-dialog-open,
   display: inline-block;
   padding-left: 22px;
   min-height: 20px;
-  background: url(images/arrow-down.png) no-repeat left 1px;
   opacity: 0.5;
   cursor: pointer;
 }
