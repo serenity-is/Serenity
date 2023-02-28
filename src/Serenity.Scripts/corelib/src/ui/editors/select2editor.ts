@@ -88,10 +88,8 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     destroy() {
-        if (this.element != null) {
-            this.element.select2('destroy');
-        }
-
+        this.abortPendingRequest();
+        this.element?.select2?.('destroy');
         super.destroy();
     }
 
@@ -168,6 +166,18 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         return !!(this.options as Select2EditorOptions).multiple;
     }
 
+    private typeTimeout: number;
+    private queryPromise: Select2SearchPromise;
+
+    protected abortPendingRequest() {
+        this.queryPromise?.abort?.();
+        this.queryPromise = null;
+        if (this.typeTimeout) {
+            clearTimeout(this.typeTimeout);
+            this.typeTimeout = null;
+        }
+    }
+
     protected getSelect2Options(): Select2Options {
         var emptyItemText = this.emptyItemText();
         var opt: Select2Options = {
@@ -178,8 +188,6 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         }
 
         if (this.hasAsyncSource()) {
-            var typeTimeout = 0;
-            var queryPromise: Select2SearchPromise = null;
             opt.query = query => {
                 var pageSize = this.getPageSize();
                 var searchQuery: Select2SearchQuery = {
@@ -189,28 +197,24 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     checkMore: true
                 }
 
-                queryPromise && queryPromise.abort && queryPromise.abort();
-                queryPromise = null;
-
-                if (typeTimeout != null)
-                    clearTimeout(typeTimeout);
+                this.abortPendingRequest();
 
                 var select2 = $(this.element).data('select2');
-                select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
+                select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
 
-                typeTimeout = setTimeout(() => {
-                    queryPromise && queryPromise.abort && queryPromise.abort();
-                    select2 && select2.search.addClass('select2-active').parent().addClass('select2-active');
-                    queryPromise = this.asyncSearch(searchQuery, result => {
-                        queryPromise = null;
+                this.typeTimeout = setTimeout(() => {
+                    this.abortPendingRequest();
+                    select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
+                    this.queryPromise = this.asyncSearch(searchQuery, result => {
+                        this.queryPromise = null;
                         query.callback({
                             results: this.mapItems(result.items),
                             more: result.more
                         });
                     });
-                    (queryPromise && (queryPromise.catch || queryPromise.fail)).call(queryPromise, () => {
-                        queryPromise = null;
-                        select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
+                    (this.queryPromise?.catch || this.queryPromise?.fail)?.call(this.queryPromise, () => {
+                        this.queryPromise = null;
+                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
                     });
                 }, !query.term ? 0 : this.getTypeDelay());
             }
