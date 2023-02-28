@@ -158,8 +158,13 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         var text = format((this.displayFormat ?? '{0}'),
             originalName, dbFile, downloadUrl);
 
+        var iconClass = this.iconClass ?? "fa fa-download";
+
+        if (iconClass.startsWith("fa-"))
+            iconClass = "fa " + iconClass;
+
         return "<a class='file-download-link' target='_blank' href='" +
-            htmlEncode(downloadUrl) + "'>" + htmlEncode(text) + '</a>';
+            htmlEncode(downloadUrl) + "'><i class='" + iconClass + "'></i> " + htmlEncode(text) + '</a>';
     }
 
     static dbFileUrl(filename: string): string {
@@ -180,6 +185,9 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     @Decorators.option()
     originalNameProperty: string;
+
+    @Decorators.option()
+    iconClass: string;
 }
 
 @Decorators.registerFormatter('Serenity.MinuteFormatter')

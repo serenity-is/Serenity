@@ -194,6 +194,18 @@ public class FileDownloadFormatterAttribute : CustomFormatterAttribute
     }
 
     /// <summary>
+    /// Gets or sets the icon class.
+    /// </summary>
+    /// <value>
+    /// The icon class.
+    /// </value>
+    public string? IconClass
+    {
+        get { return GetOption<string>("iconClass"); }
+        set { SetOption("iconClass", value); }
+    }
+    
+    /// <summary>
     /// Gets or sets the original name property which indicates
     /// the property to read original file name from (if any).
     /// </summary>
