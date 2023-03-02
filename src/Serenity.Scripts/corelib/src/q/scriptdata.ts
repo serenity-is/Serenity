@@ -67,7 +67,7 @@ export namespace ScriptData {
             async: async,
             cache: true,
             type: 'GET',
-            url: resolveUrl('~/DynJS.axd/') + name + '.js?' + getHash(name),
+            url: resolveUrl('~/DynJS.axd/') + name + '.js?v=' + (getHash(name) ?? new Date().getTime()),
             data: null,
             dataType: 'text',
             converters: {
