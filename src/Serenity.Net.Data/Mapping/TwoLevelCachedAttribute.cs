@@ -2,7 +2,7 @@
 
 /// <summary>
 /// This attribute marks a row so that when it is Inserted/Updated/Deleted
-/// through repository, its related cache, if any should be cleared. 
+/// through handler, its related cache, if any should be cleared. 
 /// It doesn't turn on/off caching. A sample of related cached item to a row, might
 /// be its lookup if any.
 /// </summary>
