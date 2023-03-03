@@ -118,6 +118,8 @@ export namespace Criteria {
         isNull(fieldName: string): ICriteriaBuilderCondition;
         // Creates an exists condition with the given sub-query
         exists(subQuery: any[]): ICriteriaBuilderCondition;
+        // Joins criteria with current flags
+        join(criteria: any[] | ICriteriaBuilderCondition): ICriteriaBuilderCondition;
     }
 
     export function Builder(): ICriteriaBuilder;
@@ -298,6 +300,16 @@ export namespace Criteria {
 
         like(fieldName: string, value: any): ICriteriaBuilderCondition {
             this.appendCondition([[fieldName], Operator.like, value]);
+            return this;
+        }
+
+        join(criteria: any[] | ICriteriaBuilderCondition): ICriteriaBuilderCondition {
+            let crit: any[] = criteria as any[]
+
+            if (criteria instanceof CriteriaBuilderImpl)
+                crit = criteria.build();
+
+            this.appendCondition(crit);
             return this;
         }
 

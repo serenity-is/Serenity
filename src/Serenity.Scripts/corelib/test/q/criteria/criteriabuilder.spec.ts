@@ -396,3 +396,17 @@ it('should be able to use existing criteria with xor', () => {
         [['c'], Operator.eq, 'd']
     ]);
 });
+
+it('should be able to parenthesize multiple criteria', () => {
+    expect(
+        Builder()
+            .paren.join(Builder().equals('a', 'b').and.equals('c', 'd'))
+    ).toEqual([
+        Operator.paren,
+        [
+            [['a'], Operator.eq, 'b'],
+            Operator.and,
+            [['c'], Operator.eq, 'd']
+        ]
+    ]);
+});
