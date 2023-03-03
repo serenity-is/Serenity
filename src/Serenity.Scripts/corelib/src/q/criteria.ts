@@ -49,7 +49,7 @@ export namespace Criteria {
     }
 
     export function not(c: any[]) {
-
+        return [Operator.not, c]
     }
 
     export enum Operator {
