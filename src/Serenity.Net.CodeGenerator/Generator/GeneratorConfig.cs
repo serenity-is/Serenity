@@ -101,15 +101,80 @@ public class GeneratorConfig
         BaseRowClasses != null && BaseRowClasses.Any();
 
     /// <summary>
+    /// Will define and use jFKTable type of constants for expressions in entities
+    /// Not implemented yet.
+    /// </summary>
+    public bool? JoinConstants { get; set; }
+
+    /// <summary>
+    /// When true, defines private RowTemplate class instead. This should
+    /// only be used when Serenity.Pro.Coder is enabled in the project.
+    /// Not implemented yet.
+    /// </summary>
+    public bool? RowTemplate { get; set; }
+
+    /// <summary>
+    /// Enumeration that determines which foreign view fields will be generated
+    /// for current row
+    /// </summary>
+    public enum FieldSelection
+    {
+        /// <summary>
+        /// Don't generate any foreign view fields except the ones
+        /// explicitly included via IncludeForeignFields
+        /// </summary>
+        None = -1,
+
+        /// <summary>
+        /// Generate all the foreign view fields, except ones excluded 
+        /// explicitly via RemoveForeignFields
+        /// </summary>
+        All = 0,
+
+        /// <summary>
+        /// Don't generate any foreign view fields except the Name property of the target row
+        /// and ones explicitly included via IncludeForeignFields
+        /// </summary>
+        NameOnly = 1
+    }
+
+    /// <summary>
+    /// The set of foreign fields to generate, default is All
+    /// Not implemented yet.
+    /// </summary>
+    public FieldSelection? ForeignFieldSelection { get; set; }
+
+    /// <summary>
+    /// A list of foreign fields to omit from generated code.
+    /// This could be used to include some additional fields 
+    /// in the foreign table when ForeignSelection is None or NameOnly
+    /// </summary>
+    public List<string> IncludeForeignFields { get; set; }
+
+    /// <summary>Used for Newtonsoft.JSON</summary>
+    public bool ShouldSerializeIncludeForeignFields() =>
+        IncludeForeignFields != null && IncludeForeignFields.Any();
+
+    /// <summary>
     /// A list of foreign fields to omit from generated code.
     /// This could be used to disable generating code for join fields 
     /// like CreatedBy, ModifiedBy etc, so properties like CustomerCreatedBy,
     /// CustomerModifiedBy etc. won't be generated in OrderRow.
+    /// Will be ignored if ForeignFieldSelection is None or NameOnly
     /// </summary>
     public List<string> RemoveForeignFields { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
         RemoveForeignFields != null && RemoveForeignFields.Any();
+
+    /// <summary>
+    /// When true, instead of using [Expression] attributes for foreign view fields,
+    /// it will use Origin(nameof(jFK), nameof(FKRow.ViewField)) if the FKRow is already 
+    /// generated in the project. It will also use ForeignKey(typeof(FKRow)) type of 
+    /// foreign keys instead of strings.
+    /// Not implemented yet.
+    /// </summary>
+    public bool? UseOriginAttribute { get; set; }
 
     /// <summary>
     /// The location of custom templates folder. The files in this folder
@@ -242,8 +307,7 @@ public class GeneratorConfig
                 xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
         }
 
-        if (rootNamespace == null)
-            rootNamespace = fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
+        rootNamespace ??= fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
 
         if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
             rootNamespace = rootNamespace[0..^4];

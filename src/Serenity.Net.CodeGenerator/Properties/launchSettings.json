@@ -3,7 +3,7 @@
     "Serenity.CodeGenerator": {
       "commandName": "Project",
       "commandLineArgs": "t",
-      "workingDirectory": "C:\\Sandbox\\StartSharp\\StartSharp\\StartSharp.Web"
+      "workingDirectory": "C:\\Sandbox\\StartSharp\\src\\StartSharp.Web"
     }
   }
 }

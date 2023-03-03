@@ -52,7 +52,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         var projectDir = fileSystem.GetDirectoryName(csproj);
         if (!args.Any())
         {
-            var exitCode = new Interactive(fileSystem).Run();
+            var exitCode = new Interactive(fileSystem, Spectre.Console.AnsiConsole.Console).Run();
             if (exitCode != ExitCodes.Success &&
                 exitCode != ExitCodes.Help)
                 Environment.Exit((int)exitCode);
@@ -60,26 +60,27 @@ public partial class GenerateCommand : BaseFileSystemCommand
             return;
         }
 
-        var outFile = GetOption(args, "o").TrimToNull();
-        var connectionKey = GetOption(args, "c").TrimToNull();
+        var inputs = new EntityModelInputs
+        {
+            ConnectionKey = GetOption(args, "c").TrimToNull(),
+            Module = GetOption(args, "m").TrimToNull(),
+            Identifier = GetOption(args, "i").TrimToNull(),
+            PermissionKey = GetOption(args, "p").TrimToNull(),
+            Config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"))
+        };
+
+        var interactive = inputs.Identifier is null;
+
         var table = GetOption(args, "t").TrimToNull();
         var what = GetOption(args, "w").TrimToNull();
-        var module = GetOption(args, "m").TrimToNull();
-        var identifier = GetOption(args, "i").TrimToNull();
-        var permissionKey = GetOption(args, "p").TrimToNull();
-        var codeFileHelper = new CodeFileHelper(fileSystem);
-        if (identifier != null)
-            codeFileHelper.NoUserInteraction = true;
-
-        var config = GeneratorConfig.LoadFromFile(fileSystem,
-            fileSystem.Combine(projectDir, "sergen.json"));
+        var outFile = GetOption(args, "o").TrimToNull();
 
         var connectionStringOptions = new ConnectionStringOptions();
 
-        if (!string.IsNullOrEmpty(config.CustomTemplates))
-            Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);
+        if (!string.IsNullOrEmpty(inputs.Config.CustomTemplates))
+            Templates.TemplatePath = fileSystem.Combine(projectDir, inputs.Config.CustomTemplates);
 
-        foreach (var x in config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
+        foreach (var x in inputs.Config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
         {
             connectionStringOptions[x.Key] = new ConnectionStringEntry
             {
@@ -89,7 +90,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             };
         }
 
-        foreach (var name in config.GetAppSettingsFiles())
+        foreach (var name in inputs.Config.GetAppSettingsFiles())
         {
             var path = fileSystem.Combine(projectDir, name);
             if (fileSystem.FileExists(name))
@@ -119,7 +120,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         var connectionKeys = connectionStringOptions.Keys.OrderBy(x => x).ToArray();
 
-        if (outFile == null && connectionKey == null)
+        if (outFile == null && inputs.ConnectionKey == null)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("=== Table Code Generation ===");
@@ -134,7 +135,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             Console.ResetColor();
             Console.WriteLine();
         }
-        else if (connectionKey == null)
+        else if (inputs.ConnectionKey == null)
         {
             fileSystem.WriteAllText(outFile, System.Text.Json.JsonSerializer.Serialize(connectionStringOptions.Keys.OrderBy(x => x)));
             Environment.Exit(0);
@@ -142,19 +143,19 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         string userInput = null;
 
-        if (outFile == null && connectionKey == null)
+        if (outFile == null && inputs.ConnectionKey == null)
         {
             userInput = connectionKeys.Length == 1 ? connectionKeys[0] : null;
-            while (connectionKey == null ||
-                !connectionKeys.Contains(connectionKey, StringComparer.OrdinalIgnoreCase))
+            while (inputs.ConnectionKey == null ||
+                !connectionKeys.Contains(inputs.ConnectionKey, StringComparer.OrdinalIgnoreCase))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Connection: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                connectionKey = Hinter.ReadHintedLine(connectionKeys, userInput: userInput);
-                userInput = connectionKey;
+                inputs.ConnectionKey = Hinter.ReadHintedLine(connectionKeys, userInput: userInput);
+                userInput = inputs.ConnectionKey;
 
-                if (connectionKey == "!")
+                if (inputs.ConnectionKey == "!")
                 {
                     Console.ResetColor();
                     return;
@@ -162,7 +163,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             }
         }
 
-        userInput = connectionKey;
+        userInput = inputs.ConnectionKey;
         if (!connectionStringOptions.ContainsKey(userInput))
         {
             Console.Error.WriteLine("Can't find connection with key: " + userInput + "!");
@@ -182,15 +183,15 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         ISchemaProvider schemaProvider;
         List<TableName> tableNames;
-        using (var connection = sqlConnections.NewByKey(connectionKey))
+        using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
         {
             schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
             tableNames = schemaProvider.GetTableNames(connection).ToList();
         }
 
         var tables = tableNames.Select(x => x.Tablename).ToList();
-        var confConnection = config.Connections.FirstOrDefault(x =>
-            string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
+        var confConnection = inputs.Config.Connections.FirstOrDefault(x =>
+            string.Compare(x.Key, inputs.ConnectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
         if (outFile == null && table == null)
         {
@@ -209,7 +210,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 return new
                 {
                     name = x.Tablename,
-                    module = xct == null || xct.Module.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(connectionKey) : xct.Module,
+                    module = xct == null || xct.Module.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(inputs.ConnectionKey) : xct.Module,
                     permission = xct == null || xct.PermissionKey.IsTrimmedEmpty() ? "Administration:General" : xct.PermissionKey,
                     identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(x.Table) : xct.Identifier,
                 };
@@ -245,32 +246,36 @@ public partial class GenerateCommand : BaseFileSystemCommand
         }
 
         userInput = table;
-        var tableName = tableNames.First(x => string.Compare(x.Tablename, userInput, StringComparison.OrdinalIgnoreCase) == 0);
+        var tableName = tableNames.First(x => string.Compare(x.Tablename, 
+            userInput, StringComparison.OrdinalIgnoreCase) == 0);
         if (tableName == null)
         {
             Console.Error.WriteLine("Can't find table with name: " + userInput + "!");
             Environment.Exit(1);
         }
 
+        inputs.Schema = tableName.Schema;
+        inputs.Table = tableName.Table;
+
         var confTable = confConnection?.Tables.FirstOrDefault(x =>
             string.Compare(x.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
 
-        if (module == null)
+        if (inputs.Module == null)
         {
             userInput = confTable == null || confTable.Module.IsEmptyOrNull() ?
-                RowGenerator.ClassNameFromTableName(connectionKey) : confTable.Module;
+                RowGenerator.ClassNameFromTableName(inputs.ConnectionKey) : confTable.Module;
 
             Console.WriteLine();
 
-            while (module.IsTrimmedEmpty())
+            while (inputs.Module.IsTrimmedEmpty())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Module name for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                module = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = module;
+                inputs.Module = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
+                userInput = inputs.Module;
 
-                if (module == "!")
+                if (inputs.Module == "!")
                 {
                     Console.ResetColor();
                     return;
@@ -278,22 +283,22 @@ public partial class GenerateCommand : BaseFileSystemCommand
             }
         }
 
-        if (identifier == null)
+        if (inputs.Identifier == null)
         {
             userInput = confTable == null || confTable.Identifier.IsEmptyOrNull() ?
                 RowGenerator.ClassNameFromTableName(tableName.Table) : confTable.Identifier;
 
             Console.WriteLine();
 
-            while (identifier.IsTrimmedEmpty())
+            while (inputs.Identifier.IsTrimmedEmpty())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a class Identifier for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                identifier = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = identifier;
+                inputs.Identifier = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
+                userInput = inputs.Identifier;
 
-                if (identifier == "!")
+                if (inputs.Identifier == "!")
                 {
                     Console.ResetColor();
                     return;
@@ -301,22 +306,22 @@ public partial class GenerateCommand : BaseFileSystemCommand
             }
         }
 
-        if (permissionKey == null)
+        if (inputs.PermissionKey == null)
         {
             userInput = confTable == null || confTable.PermissionKey.IsTrimmedEmpty() ?
                 "Administration:General" : confTable.PermissionKey;
 
             Console.WriteLine();
 
-            while (permissionKey.IsTrimmedEmpty())
+            while (inputs.PermissionKey.IsTrimmedEmpty())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Permission Key for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                permissionKey = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = permissionKey;
+                inputs.PermissionKey = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
+                userInput = inputs.PermissionKey;
 
-                if (permissionKey == "!")
+                if (inputs.PermissionKey == "!")
                 {
                     Console.ResetColor();
                     return;
@@ -346,68 +351,83 @@ public partial class GenerateCommand : BaseFileSystemCommand
             }
         }
 
-        config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
-        config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
-        config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
-        config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
-
         Console.ResetColor();
         Console.WriteLine();
 
+        inputs.Config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
+        inputs.Config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
+        inputs.Config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
+        inputs.Config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
+
+        UpdateConfigTable(inputs, tableName.Tablename, confConnection, confTable);
+
+        fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), inputs.Config.SaveToJson());
+
+        using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
+        {
+            connection.Open();
+            var generator = CreateGenerator(inputs, csproj, sqlConnections, fileSystem, interactive);
+            generator.Run();
+        }
+    }
+
+    private static void UpdateConfigTable(EntityModelInputs inputs, string tableName,
+        GeneratorConfig.Connection confConnection,
+        GeneratorConfig.Table confTable)
+    {
         if (confConnection == null)
         {
             confConnection = new GeneratorConfig.Connection
             {
-                Key = connectionKey
+                Key = inputs.ConnectionKey
             };
-            config.Connections.Add(confConnection);
+            inputs.Config.Connections.Add(confConnection);
         }
 
         if (confTable == null)
         {
             confTable = new GeneratorConfig.Table
             {
-                Identifier = identifier,
-                Module = module,
-                PermissionKey = permissionKey,
-                Tablename = tableName.Tablename
+                Identifier = inputs.Identifier,
+                Module = inputs.Module,
+                PermissionKey = inputs.PermissionKey,
+                Tablename = tableName
             };
 
             confConnection.Tables.Add(confTable);
         }
         else
         {
-            confTable.Identifier = identifier;
-            confTable.Module = module;
-            confTable.PermissionKey = permissionKey;
+            confTable.Identifier = inputs.Identifier;
+            confTable.Module = inputs.Module;
+            confTable.PermissionKey = inputs.PermissionKey;
         }
+    }
 
-        fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
+    private static EntityCodeGenerator CreateGenerator(EntityModelInputs inputs, string csproj, 
+        ISqlConnections sqlConnections, IGeneratorFileSystem fileSystem, bool interactive = true)
+    {
+        using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
+        connection.EnsureOpen();
 
-        using (var connection = sqlConnections.NewByKey(connectionKey))
+        var csprojContent = fileSystem.ReadAllText(csproj);
+        inputs.Net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>",
+            RegexOptions.Multiline | RegexOptions.Compiled).IsMatch(csprojContent);
+
+        inputs.OmitSchemaInExpressions = connection.GetDialect().ServerType.StartsWith("MySql",
+            StringComparison.OrdinalIgnoreCase);
+
+        inputs.DataSchema = new EntityDataSchema(connection);
+        var rowModel = RowGenerator.GenerateModel(inputs);
+
+        var codeFileHelper = new CodeFileHelper(fileSystem)
         {
-            connection.Open();
+            NoUserInteraction = !interactive,
+            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(fileSystem.FileExists),
+            TSCPath = inputs.Config.TSCPath ?? "tsc"
+        };
 
-            var csprojContent = fileSystem.ReadAllText(csproj);
-            var net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)
-                .IsMatch(csprojContent);
-
-            var rowModel = RowGenerator.GenerateModel(connection, tableName.Schema, tableName.Table,
-                module, connectionKey, identifier, permissionKey, config, net5Plus);
-
-            rowModel.AspNetCore = true;
-            rowModel.NET5Plus = net5Plus;
-
-            var kdiff3Paths = new[]
-            {
-                config.KDiff3Path
-            };
-
-            codeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(fileSystem.FileExists);
-            codeFileHelper.TSCPath = config.TSCPath ?? "tsc";
-
-            new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, config, csproj).Run();
-        }
+        return new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, inputs.Config, csproj);
     }
 
     private static void RegisterSqlProviders()

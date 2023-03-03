@@ -1,6 +1,4 @@
-﻿using FieldInfo = Serenity.Data.Schema.FieldInfo;
-
-namespace Serenity.CodeGenerator;
+﻿namespace Serenity.CodeGenerator;
 
 public class RowGenerator
 {
@@ -12,7 +10,7 @@ public class RowGenerator
         int length = str1.IndexOf('_', StringComparison.Ordinal);
         if (length <= 0)
             return 0;
-        string str2 = str1.Substring(0, length + 1);
+        string str2 = str1[..(length + 1)];
         foreach (T obj in list)
         {
             if (!getName(obj).StartsWith(str2, StringComparison.Ordinal) || getName(obj).Length == str2.Length)
@@ -21,7 +19,7 @@ public class RowGenerator
         return str2.Length;
     }
 
-    public static string JI(string join, string field)
+    private static string JI(string join, string field)
     {
         if (string.Compare(field, join, StringComparison.OrdinalIgnoreCase) == 0)
             return field;
@@ -29,7 +27,7 @@ public class RowGenerator
             return join + field;
     }
 
-    public static string JU(string join, string field)
+    private static string JU(string join, string field)
     {
         if (string.Compare(join, field, StringComparison.OrdinalIgnoreCase) == 0)
             return field;
@@ -37,7 +35,7 @@ public class RowGenerator
             return join + "_" + field;
     }
 
-    public static string FieldTypeToTS(string ft)
+    private static string FieldTypeToTS(string ft)
     {
         return ft switch
         {
@@ -49,7 +47,7 @@ public class RowGenerator
         };
     }
 
-    private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
+    private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength)
     {
         List<AttributeTypeRef> flags;
         if (fieldInfo.IsIdentity)
@@ -81,48 +79,43 @@ public class RowGenerator
         };
     }
 
-    public static EntityModel GenerateModel(IDbConnection connection, string tableSchema, string table,
-        string module, string connectionKey, string entityClass, string permission, GeneratorConfig config, bool net5Plus)
+    public static EntityModel GenerateModel(IEntityModelInputs inputs)
     {
+        if (inputs is null)
+            throw new ArgumentNullException(nameof(inputs));
+
+        var className = inputs.Identifier ?? ClassNameFromTableName(inputs.Table);
+
         var model = new EntityModel
         {
-            Module = module
+            ClassName = className,
+            ConnectionKey = inputs.ConnectionKey,
+            Module = inputs.Module,
+            NET5Plus = inputs.Net5Plus,
+            Permission = inputs.PermissionKey,
+            RootNamespace = inputs.Config.RootNamespace,
+            RowClassName = className + "Row",
+            Schema = inputs.OmitSchemaInExpressions ? null : inputs.Schema,
+            Tablename = inputs.Table,
+            Title = Inflector.Inflector.Titleize(className)?.Trim()
         };
 
-        if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
-            model.Schema = null;
-        else
-            model.Schema = tableSchema;
-
-        model.Permission = permission;
-        model.ConnectionKey = connectionKey;
-        model.RootNamespace = config.RootNamespace;
-        var className = entityClass ?? ClassNameFromTableName(table);
-        model.ClassName = className;
-        model.RowClassName = className + "Row";
-        model.Title = Inflector.Inflector.Titleize(className)?.Trim();
-        model.Tablename = table;
-        model.Fields = new List<EntityField>();
-        model.Joins = new List<EntityJoin>();
-        model.Instance = true;
-
-        var schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
-        var fields = schemaProvider.GetFieldInfos(connection, tableSchema, table).ToList();
+        var fields = inputs.DataSchema.GetFieldInfos(inputs.Schema, inputs.Table);
         if (!fields.Any(x => x.IsPrimaryKey))
         {
-            var primaryKeys = new HashSet<string>(schemaProvider.GetPrimaryKeyFields(connection, tableSchema, table));
+            var primaryKeys = new HashSet<string>(inputs.DataSchema.GetPrimaryKeyFields(inputs.Schema, inputs.Table));
             foreach (var field in fields)
                 field.IsPrimaryKey = primaryKeys.Contains(field.FieldName);
         }
 
         if (!fields.Any(x => x.IsIdentity))
         {
-            var identities = new HashSet<string>(schemaProvider.GetIdentityFields(connection, tableSchema, table));
+            var identities = new HashSet<string>(inputs.DataSchema.GetIdentityFields(inputs.Schema, inputs.Table));
             foreach (var field in fields)
                 field.IsIdentity = identities.Contains(field.FieldName);
         }
 
-        var foreigns = schemaProvider.GetForeignKeys(connection, tableSchema, table)
+        var foreigns = inputs.DataSchema.GetForeignKeys(inputs.Schema, inputs.Table)
             .ToLookup(x => x.FKName)
             .Where(x => x.Count() == 1)
             .SelectMany(x => x)
@@ -141,11 +134,10 @@ public class RowGenerator
 
         var prefix = DeterminePrefixLength(fields, x => x.FieldName);
 
-        model.FieldPrefix = fields.First().FieldName.Substring(0, prefix);
+        model.FieldPrefix = fields.First().FieldName[..prefix];
 
         var identity = fields.FirstOrDefault(f => f.IsIdentity == true);
-        if (identity == null)
-            identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true);
+        identity ??= fields.FirstOrDefault(f => f.IsPrimaryKey == true);
         if (identity != null)
             model.Identity = GenerateVariableName(identity.FieldName[prefix..]);
         else
@@ -159,41 +151,47 @@ public class RowGenerator
         string baseRowMatch = null;
         HashSet<string> baseRowFieldset = null;
         List<string> baseRowFieldList = new();
-        foreach (var k in config.BaseRowClasses ?? new List<GeneratorConfig.BaseRowClass>())
+        if (inputs?.Config?.BaseRowClasses is { } baseRowClasses)
         {
-            var b = k.ClassName;
-            var f = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var fl = new List<string>();
-            bool skip = false;
-            foreach (var s in k.Fields ?? new List<string>())
+            foreach (var k in inputs.Config.BaseRowClasses)
             {
-                string n = s.TrimToNull();
-                if (n == null || !fields.Any(z => z.FieldName[prefix..] == n))
+                var b = k.ClassName;
+                var f = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var fl = new List<string>();
+                bool skip = false;
+                foreach (var s in k.Fields ?? new List<string>())
                 {
-                    skip = true;
-                    break;
+                    string n = s.TrimToNull();
+                    if (n == null || !fields.Any(z => z.FieldName[prefix..] == n))
+                    {
+                        skip = true;
+                        break;
+                    }
+                    f.Add(n);
+                    fl.Add(n);
                 }
-                f.Add(n);
-                fl.Add(n);
-            }
 
-            if (skip)
-                continue;
+                if (skip)
+                    continue;
 
-            if (baseRowFieldset == null || f.Count > baseRowFieldset.Count)
-            {
-                baseRowFieldset = f;
-                baseRowFieldList = fl;
-                baseRowMatch = b;
+                if (baseRowFieldset == null || f.Count > baseRowFieldset.Count)
+                {
+                    baseRowFieldset = f;
+                    baseRowFieldList = fl;
+                    baseRowMatch = b;
+                }
             }
         }
 
         var removeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var s in config.RemoveForeignFields ?? new List<string>())
+        if (inputs.Config.RemoveForeignFields is { } removeFK)
         {
-            string n = s.TrimToNull();
-            if (n != null)
-                removeForeignFields.Add(n);
+            foreach (var s in removeFK)
+            {
+                string n = s.TrimToNull();
+                if (n != null)
+                    removeForeignFields.Add(n);
+            }
         }
 
         removeForeignFields.Add("password");
@@ -205,7 +203,6 @@ public class RowGenerator
         {
             model.RowBaseClass = baseRowMatch;
             model.FieldsBaseClass = baseRowMatch + "Fields";
-            model.RowBaseFields = new List<EntityField>();
             fields = fields.Where(f =>
             {
                 if (baseRowFieldset.Contains(f.FieldName[prefix..]))
@@ -218,14 +215,8 @@ public class RowGenerator
                 return true;
             }).ToList();
         }
-        else
-        {
-            model.RowBaseClass = "Serenity.Data.Row";
-            model.RowBaseFields = new List<EntityField>();
-            model.FieldsBaseClass = "Serenity.Data.RowFieldsBase";
-        }
 
-        if (net5Plus)
+        if (inputs.Net5Plus)
             model.RowBaseClass = model.RowBaseClass + "<" + model.RowClassName + ".RowFields>";
 
         var fieldByIdent = new Dictionary<string, EntityField>(StringComparer.OrdinalIgnoreCase);
@@ -260,7 +251,7 @@ public class RowGenerator
                 f.PKTable = foreign.PKTable;
                 f.PKColumn = foreign.PKColumn;
 
-                var frgfld = schemaProvider.GetFieldInfos(connection, foreign.PKSchema, foreign.PKTable).ToList();
+                var frgfld = inputs.DataSchema.GetFieldInfos(foreign.PKSchema, foreign.PKTable).ToList();
                 int frgPrefix = DeterminePrefixLength(frgfld, z => z.FieldName);
                 var j = new EntityJoin
                 {
@@ -341,17 +332,19 @@ public class RowGenerator
 
             if (!string.IsNullOrEmpty(x.PKTable))
             {
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.ForeignKey", "\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\""));
+                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.ForeignKey", "\"" + 
+                    (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", " +
+                    "\"" + x.PKColumn + "\""));
                 attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.LeftJoin", "\"j" + x.ForeignJoinAlias + "\""));
             }
 
-            if (model.IdField == x.Ident && net5Plus)
+            if (model.IdField == x.Ident && inputs.Net5Plus)
                 attrs.Add(new AttributeTypeRef("Serenity.Data.IdProperty"));
 
             if (model.NameField == x.Ident)
             {
                 attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.QuickSearch"));
-                if (net5Plus)
+                if (inputs.Net5Plus)
                     attrs.Add(new AttributeTypeRef("Serenity.Data.NameProperty"));
             }
 
@@ -362,14 +355,6 @@ public class RowGenerator
         }
 
         return model;
-    }
-
-    private static bool IsStringLowerCase(string s)
-    {
-        foreach (char c in s)
-            if (!char.IsLower(c))
-                return false;
-        return s.Length > 0;
     }
 
     public static string GenerateVariableName(string fieldName)
@@ -385,31 +370,5 @@ public class RowGenerator
         else if (tableName.StartsWith("aspnet_", StringComparison.Ordinal))
             tableName = "AspNet" + tableName[7..];
         return GenerateVariableName(tableName);
-    }
-
-    private static string ClassNameToLowerCase(string className)
-    {
-        className = StringHelper.TrimToNull(className);
-        if (className == null)
-            return className;
-        StringBuilder sb = new();
-        for (int i = 0; i < className.Length; i++)
-        {
-            char c = className[i];
-            if (char.IsUpper(c) &&
-                c >= 'A' &&
-                c <= 'Z')
-            {
-                c = char.ToLowerInvariant(c);
-                if (i > 0 &&
-                    !char.IsUpper(className[i - 1]) &&
-                    className[i - 1] != '_')
-                    sb.Append('_');
-                sb.Append(c);
-            }
-            else
-                sb.Append(c);
-        }
-        return sb.ToString();
     }
 }

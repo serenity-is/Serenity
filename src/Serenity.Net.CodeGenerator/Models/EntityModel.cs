@@ -12,17 +12,17 @@ public class EntityModel
     public string Tablename { get; set; }
     public string Title { get; set; }
     public string Identity { get; set; }
-    public string RowBaseClass { get; set; }
-    public List<EntityField> RowBaseFields { get; set; }
-    public string FieldsBaseClass { get; set; }
+    public string RowBaseClass { get; set; } = "Serenity.Data.Row";
+    public List<EntityField> RowBaseFields { get; } = new();
+    public string FieldsBaseClass { get; set; } = "Serenity.Data.RowFieldsBase";
     public bool IsLookup { get; set; }
-    public List<EntityField> Fields { get; set; }
-    public List<EntityJoin> Joins { get;set;}
+    public List<EntityField> Fields { get; } = new();
+    public List<EntityJoin> Joins { get; } = new();
     public bool Instance { get; set; }
     public string NameField { get; set; }
     public string FieldPrefix { get; set; }
-    public bool AspNetCore { get; set; }
-    public bool NET5Plus { get; set; }
+    public bool AspNetCore { get; set; } = true;
+    public bool NET5Plus { get; set; } = true;
 
     public string IdField { get { return Identity; } }
     public Dictionary<string, object> CustomSettings { get; set; }

@@ -8,16 +8,19 @@ public partial class GenerateCommand
     private class Interactive
     {
         private readonly IGeneratorFileSystem fileSystem;
+        private readonly IAnsiConsole ansiConsole;
 
-        public Interactive(IGeneratorFileSystem fileSystem)
+        public Interactive(IGeneratorFileSystem fileSystem,
+            IAnsiConsole ansiConsole)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
         }
 
         public ExitCodes Run()
         {
-            AnsiConsole.WriteLine();
-            AnsiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]Table Code Generation[/]")
+            ansiConsole.WriteLine();
+            ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]Table Code Generation[/]")
             {
                 Justification = Justify.Left
             });
@@ -75,67 +78,29 @@ public partial class GenerateCommand
             {
                 var confTable = confConnection?.Tables.FirstOrDefault(x => string.Compare(x.Tablename, data.Key, StringComparison.OrdinalIgnoreCase) == 0);
 
-                if (confConnection == null)
+                var inputs = new EntityModelInputs
                 {
-                    confConnection = new GeneratorConfig.Connection
-                    {
-                        Key = connectionKey
-                    };
-                    config.Connections.Add(confConnection);
-                }
-
-                if (confTable == null)
-                {
-                    confTable = new GeneratorConfig.Table
-                    {
-                        Identifier = data.Value.identifier,
-                        Module = data.Value.module,
-                        PermissionKey = data.Value.permissionKey,
-                        Tablename = data.Key
-                    };
-
-                    confConnection.Tables.Add(confTable);
-                }
-                else
-                {
-                    confTable.Identifier = data.Value.identifier;
-                    confTable.Module = data.Value.module;
-                    confTable.PermissionKey = data.Value.permissionKey;
-                }
-
-                fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
-
-                using var connection = sqlConnections.NewByKey(connectionKey);
-                connection.Open();
-
-                var csprojContent = fileSystem.ReadAllText(csproj);
-                var net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)
-                    .IsMatch(csprojContent);
-
-                var rowModel = RowGenerator.GenerateModel(connection, data.Value.table.Schema, data.Value.table.Table,
-                    data.Value.module, connectionKey, data.Value.identifier, data.Value.permissionKey, config, net5Plus);
-
-                rowModel.AspNetCore = true;
-                rowModel.NET5Plus = net5Plus;
-
-                var kdiff3Paths = new[]
-                {
-                    config.KDiff3Path
+                    Config = config,
+                    ConnectionKey = connectionKey,
+                    Identifier = data.Value.identifier,
+                    Module = data.Value.module,
+                    PermissionKey = data.Value.permissionKey,
+                    Table = data.Value.table.Table,
+                    Schema = data.Value.table.Schema
                 };
 
-                var codeFileHelper = new CodeFileHelper(fileSystem)
-                {
-                    Kdiff3Path = kdiff3Paths.FirstOrDefault(fileSystem.FileExists),
-                    TSCPath = config.TSCPath ?? "tsc"
-                };
+                UpdateConfigTable(inputs, data.Value.table.Tablename, confConnection, confTable);
 
-                new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, config, csproj).Run();
+                var generator = CreateGenerator(inputs, csproj, sqlConnections, fileSystem, interactive: true);
+                generator.Run();
             }
+
+            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
             return ExitCodes.Success;
         }
 
-        private static IEnumerable<string> SelectWhatToGenerate()
+        private IEnumerable<string> SelectWhatToGenerate()
         {
             var whatToGenerate = new List<string>
             {
@@ -145,7 +110,7 @@ public partial class GenerateCommand
                 "Custom"
             };
 
-            return AnsiConsole.Prompt(
+            return ansiConsole.Prompt(
                 new MultiSelectionPrompt<string>()
                     .Title("[steelblue1]Choose What to Generate[/]")
                     .InstructionsText(
@@ -155,10 +120,10 @@ public partial class GenerateCommand
                     .AddChoiceGroup<string>("All", whatToGenerate));
         }
 
-        private static string SelectPermissionKey(string table, string defaultPermissionKey)
+        private string SelectPermissionKey(string table, string defaultPermissionKey)
         {
-            AnsiConsole.WriteLine();
-            return AnsiConsole.Prompt(
+            ansiConsole.WriteLine();
+            return ansiConsole.Prompt(
                 new TextPrompt<string>($"Enter a Permission Key for table [springgreen3_1]{table}[/]")
                     .DefaultValue(defaultPermissionKey)
                     .Validate(module =>
@@ -173,10 +138,10 @@ public partial class GenerateCommand
                     }));
         }
 
-        private static string SelectIdentifier(string table, string defaultIdentifier)
+        private string SelectIdentifier(string table, string defaultIdentifier)
         {
-            AnsiConsole.WriteLine();
-            return AnsiConsole.Prompt(
+            ansiConsole.WriteLine();
+            return ansiConsole.Prompt(
                 new TextPrompt<string>($"Enter a class Identifier for table [springgreen3_1]{table}[/]")
                     .Validate(module =>
                     {
@@ -191,10 +156,10 @@ public partial class GenerateCommand
                     .DefaultValue(defaultIdentifier));
         }
 
-        private static string SelectModule(string table, string defaultModule)
+        private string SelectModule(string table, string defaultModule)
         {
-            AnsiConsole.WriteLine();
-            return AnsiConsole.Prompt(
+            ansiConsole.WriteLine();
+            return ansiConsole.Prompt(
                 new TextPrompt<string>($"Enter a Module name for table [springgreen3_1]{table}[/]")
                     .Validate(module =>
                     {
@@ -209,7 +174,7 @@ public partial class GenerateCommand
                     .DefaultValue(defaultModule));
         }
 
-        private static (IEnumerable<TableName> selectedTables, List<TableName> tableNames) SelectedTables(
+        private (IEnumerable<TableName> selectedTables, List<TableName> tableNames) SelectedTables(
             ISqlConnections sqlConnections, string connectionKey)
         {
             ISchemaProvider schemaProvider;
@@ -222,7 +187,7 @@ public partial class GenerateCommand
 
             var tables = tableNames.Select(x => x.Tablename).ToList();
 
-            var selectedTableNames = AnsiConsole.Prompt(
+            var selectedTableNames = ansiConsole.Prompt(
                 new MultiSelectionPrompt<string>()
                     .Title("[steelblue1]Select tables for code generation (single/multiple)[/]")
                     .PageSize(10)
@@ -274,8 +239,8 @@ public partial class GenerateCommand
 
             if (connectionStringOptions.Count == 0)
             {
-                AnsiConsole.Write(new Markup($"[bold red]No connections in appsettings files or sergen.json![/]"));
-                AnsiConsole.WriteLine();
+                ansiConsole.Write(new Markup($"[bold red]No connections in appsettings files or sergen.json![/]"));
+                ansiConsole.WriteLine();
                 return (null, null);
             }
 
@@ -286,14 +251,14 @@ public partial class GenerateCommand
             var sqlConnections = new DefaultSqlConnections(
                 new DefaultConnectionStrings(connectionStringOptions));
 
-            AnsiConsole.WriteLine();
+            ansiConsole.WriteLine();
             var selections = new SelectionPrompt<string>()
                     .Title("[steelblue1]Available Connections[/]")
                     .PageSize(10)
                     .MoreChoicesText("[grey](Move up and down to reveal more connections)[/]")
                     .AddChoices(connectionKeys);
 
-            return (AnsiConsole.Prompt(selections), sqlConnections);
+            return (ansiConsole.Prompt(selections), sqlConnections);
         }
 
         private string SelectCsProj()
@@ -304,25 +269,25 @@ public partial class GenerateCommand
 
             if (csprojFiles.Length == 0)
             {
-                AnsiConsole.Write(new Markup($"[bold red]Can't find a project file in current directory![/]"));
-                AnsiConsole.WriteLine();
-                AnsiConsole.Write(new Markup($"[bold red]Please run Sergen in a folder that contains the Asp.Net Core project.[/]"));
-                AnsiConsole.WriteLine();
+                ansiConsole.Write(new Markup($"[bold red]Can't find a project file in current directory![/]"));
+                ansiConsole.WriteLine();
+                ansiConsole.Write(new Markup($"[bold red]Please run Sergen in a folder that contains the Asp.Net Core project.[/]"));
+                ansiConsole.WriteLine();
                 return null;
             }
 
-            AnsiConsole.WriteLine();
-            AnsiConsole.Write(new Spectre.Console.Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
+            ansiConsole.WriteLine();
+            ansiConsole.Write(new Spectre.Console.Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
             {
                 Justification = Justify.Left
             });
-            AnsiConsole.WriteLine();
+            ansiConsole.WriteLine();
             var selections = new SelectionPrompt<string>()
                     .PageSize(10)
                     .MoreChoicesText("[grey](Move up and down to reveal more project files)[/]")
                     .AddChoices(csprojFiles);
 
-            return AnsiConsole.Prompt(selections);
+            return ansiConsole.Prompt(selections);
         }
     }
 }
