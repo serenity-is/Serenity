@@ -80,7 +80,7 @@ public partial class RowTemplateTests
         """"";
 
     [Fact]
-    public void CustomersRow_Defaults()
+    public void CustomerRow_Defaults()
     {
         var model = new MockEntityModel();
         var actual = RenderTemplate(model);

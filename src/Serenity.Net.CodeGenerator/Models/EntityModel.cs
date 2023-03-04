@@ -23,6 +23,7 @@ public class EntityModel
     public string FieldPrefix { get; set; }
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
+    public bool FileScopedNamespaces { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 
     public string IdField { get { return Identity; } }
@@ -82,7 +83,7 @@ public class EntityModel
     {
         get => string.Join(", ", RowBaseClassAndInterfaceList);
     }
-   
+
     public record EditorVariable(string Editor, int Index);
 
     private List<EditorVariable> editorVariables;

@@ -90,6 +90,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         {
             ClassName = className,
             ConnectionKey = inputs.ConnectionKey,
+            FileScopedNamespaces = inputs.Config.FileScopedNamespaces ?? false,
             Module = inputs.Module,
             NET5Plus = inputs.Net5Plus,
             Permission = inputs.PermissionKey,

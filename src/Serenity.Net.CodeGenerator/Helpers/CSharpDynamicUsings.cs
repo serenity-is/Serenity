@@ -1,4 +1,4 @@
-﻿using Scriban.Runtime;
+using Scriban.Runtime;
 
 namespace Serenity.CodeGenerator;
 
@@ -6,6 +6,7 @@ public class CSharpDynamicUsings
 {
     delegate string TypeDelegate(string key);
     delegate string NamespaceDelegate(string key);
+    delegate string IndentBlockDelegate(string indent, string text);
     delegate string TypeListDelegate(List<string> key);
     delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
     delegate void UsingDelegate(string key);
@@ -59,7 +60,17 @@ public class CSharpDynamicUsings
             cw.CurrentNamespace = requestedNamespace;
             return "namespace " + requestedNamespace;
         }));
-        
+
+        scriptObject.Import("INDENTBLOCK", new IndentBlockDelegate((code, indent) =>
+        {
+            if (string.IsNullOrEmpty(code))
+                return "";
+
+            return string.Join("\n", code.Replace("\r", "")
+                .Split('\n')
+                .Select(line => (line.Length > 0 ? (indent + line) : line)));
+        }));
+
         return scriptObject;
     }
 }

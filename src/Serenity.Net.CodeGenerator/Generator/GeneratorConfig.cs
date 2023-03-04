@@ -101,10 +101,9 @@ public class GeneratorConfig
         BaseRowClasses != null && BaseRowClasses.Any();
 
     /// <summary>
-    /// If true, Prefers file scoped namespaces
-    /// Not implemented yet.
+    /// If true, prefers file scoped namespaces in generated code
     /// </summary>
-    public bool? FileScopedNamespace { get; set; }
+    public bool? FileScopedNamespaces { get; set; }
 
     /// <summary>
     /// If true, global usings will be tried to be parsed
