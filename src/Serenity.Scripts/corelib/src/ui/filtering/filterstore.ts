@@ -61,7 +61,7 @@ export class FilterStore {
                         currentBlock = Criteria.paren(currentBlock);
 
                     if (isBlockOr)
-                        criteria = Criteria.and(criteria, currentBlock);
+                        criteria = Criteria.or(criteria, currentBlock);
                     else
                         criteria = Criteria.and(criteria, currentBlock);
 
@@ -77,7 +77,7 @@ export class FilterStore {
             }
 
             if (line.isOr)
-                currentBlock = Criteria.and(currentBlock, line.criteria);
+                currentBlock = Criteria.or(currentBlock, line.criteria);
             else
                 currentBlock = Criteria.and(currentBlock, line.criteria);
         }
