@@ -691,13 +691,14 @@ declare function validateForm(form: JQuery, opt: JQueryValidation.ValidationOpti
 declare function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
 declare function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 
-declare function Criteria(field: string): any[];
+declare function Criteria(field: string): Criteria.Builder;
 declare namespace Criteria {
     function isEmpty(c: any[]): boolean;
     function join(c1: any[], op: string, c2: any[]): any[];
     function paren(c: any[]): any[];
     function and(c1: any[], c2: any[], ...rest: any[][]): any[];
     function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+    function not(c: any[]): (string | any[])[];
     enum Operator {
         paren = "()",
         not = "not",
@@ -718,6 +719,26 @@ declare namespace Criteria {
         like = "like",
         notLike = "not like"
     }
+    class Builder extends Array {
+        bw(fromInclusive: any, toInclusive: any): Array<any>;
+        contains(value: string): Array<any>;
+        endsWith(value: string): Array<any>;
+        eq(value: any): Array<any>;
+        gt(value: any): Array<any>;
+        ge(value: any): Array<any>;
+        in(values: any[]): Array<any>;
+        isNull(): Array<any>;
+        isNotNull(): Array<any>;
+        le(value: any): Array<any>;
+        lt(value: any): Array<any>;
+        ne(value: any): Array<any>;
+        like(value: any): Array<any>;
+        startsWith(value: string): Array<any>;
+        notIn(values: any[]): Array<any>;
+        notLike(value: any): Array<any>;
+    }
+    function parse(expression: string, params?: any): any[];
+    function parse(strings: TemplateStringsArray, ...values: any[]): any[];
 }
 
 export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, Culture, DateFormat, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, Group, Grouping, Groups, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, mockDebounce, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, outerHtml, padLeft, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resetBSVersionCheck, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

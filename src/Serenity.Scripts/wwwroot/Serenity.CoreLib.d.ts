@@ -1080,13 +1080,14 @@ declare namespace Q {
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 
-    function Criteria(field: string): any[];
+    function Criteria(field: string): Criteria.Builder;
     namespace Criteria {
         function isEmpty(c: any[]): boolean;
         function join(c1: any[], op: string, c2: any[]): any[];
         function paren(c: any[]): any[];
         function and(c1: any[], c2: any[], ...rest: any[][]): any[];
         function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function not(c: any[]): (string | any[])[];
         enum Operator {
             paren = "()",
             not = "not",
@@ -1107,6 +1108,26 @@ declare namespace Q {
             like = "like",
             notLike = "not like"
         }
+        class Builder extends Array {
+            bw(fromInclusive: any, toInclusive: any): Array<any>;
+            contains(value: string): Array<any>;
+            endsWith(value: string): Array<any>;
+            eq(value: any): Array<any>;
+            gt(value: any): Array<any>;
+            ge(value: any): Array<any>;
+            in(values: any[]): Array<any>;
+            isNull(): Array<any>;
+            isNotNull(): Array<any>;
+            le(value: any): Array<any>;
+            lt(value: any): Array<any>;
+            ne(value: any): Array<any>;
+            like(value: any): Array<any>;
+            startsWith(value: string): Array<any>;
+            notIn(values: any[]): Array<any>;
+            notLike(value: any): Array<any>;
+        }
+        function parse(expression: string, params?: any): any[];
+        function parse(strings: TemplateStringsArray, ...values: any[]): any[];
     }
 }
 declare namespace Q {

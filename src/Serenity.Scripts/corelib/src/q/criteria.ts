@@ -77,7 +77,11 @@ export namespace Criteria {
         bw(fromInclusive: any, toInclusive: any): Array<any> {
             return [[this, '>=', fromInclusive], 'and', [this, '<=', toInclusive]];
         }
-    
+
+        contains(value: string): Array<any> { 
+            return [this, 'like', '%' + value + '%'];
+        }
+        
         endsWith(value: string): Array<any> { 
             return [this, 'like', '%' + value];
         }

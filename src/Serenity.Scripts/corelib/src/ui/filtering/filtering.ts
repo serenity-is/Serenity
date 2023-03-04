@@ -155,42 +155,44 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     public getCriteria(): CriteriaWithText {
         var result: CriteriaWithText = {};
         var text: string;
-        switch (this.get_operator().key) {
+        var field = Criteria(this.getCriteriaField());
+        var op = this.get_operator().key;
+        switch (op) {
             case 'true': {
                 result.displayText = this.displayText(this.get_operator(), []);
-                result.criteria = [[this.getCriteriaField()], '=', true];
+                result.criteria = field.eq(true);
                 return result;
             }
 
             case 'false': {
                 result.displayText = this.displayText(this.get_operator(), []);
-                result.criteria = [[this.getCriteriaField()], '=', false];
+                result.criteria = field.eq(false);
                 return result;
             }
 
             case 'isnull': {
                 result.displayText = this.displayText(this.get_operator(), []);
-                result.criteria = ['is null', [this.getCriteriaField()]];
+                result.criteria = field.isNull();
                 return result;
             }
 
             case 'isnotnull': {
                 result.displayText = this.displayText(this.get_operator(), []);
-                result.criteria = ['is not null', [this.getCriteriaField()]];
+                result.criteria = field.isNotNull();
                 return result;
             }
 
             case 'contains': {
                 text = this.getEditorText();
                 result.displayText = this.displayText(this.get_operator(), [text]);
-                result.criteria = [[this.getCriteriaField()], 'like', '%' + text + '%'];
+                result.criteria = field.contains(text);
                 return result;
             }
 
             case 'startswith': {
                 text = this.getEditorText();
                 result.displayText = this.displayText(this.get_operator(), [text]);
-                result.criteria = [[this.getCriteriaField()], 'like', text + '%'];
+                result.criteria = field.startsWith(text);
                 return result;
             }
 
@@ -202,8 +204,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'ge': {
                 text = this.getEditorText();
                 result.displayText = this.displayText(this.get_operator(), [text]);
-                result.criteria = [[this.getCriteriaField()], FilterOperators.toCriteriaOperator[
-                    this.get_operator().key], this.getEditorValue()];
+                result.criteria = field[op](this.getEditorValue());
                 return result;
             }
         }

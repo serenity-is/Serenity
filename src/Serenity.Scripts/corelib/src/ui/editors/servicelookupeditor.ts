@@ -83,7 +83,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
         if (val == null || val === '') {
 
             if (!isEmptyOrNull(this.get_cascadeField())) {
-                return ['1', '=', '0'];
+                return ['0', '=', '1'];
             }
 
             return null;
@@ -91,7 +91,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 
         var fld = this.get_cascadeField();
 
-        return [[fld], '=', val];
+        return Criteria(fld).eq(val);
     }
 
     protected getFilterCriteria(): any[] {
@@ -116,7 +116,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
         if (idField == null)
             throw new Error("ServiceLookupEditor requires 'idField' option to be configured!");
 
-        return [[idField], 'in', [idList]];
+        return Criteria(idField).in(idList);
     }
 
     protected getCriteria(query: Select2SearchQuery): any[] {
