@@ -29,7 +29,7 @@ public partial class EntiyModelGeneratorTests
             Table = testTable,
             Config = new GeneratorConfig() { RootNamespace = "MyTest"},
             ConnectionKey = testConnection,
-            DataSchema = new MockEntityDataSchema(),
+            DataSchema = new MockDataSchema(),
             Module = testModule,
             Net5Plus = true,
             PermissionKey = testPermission,

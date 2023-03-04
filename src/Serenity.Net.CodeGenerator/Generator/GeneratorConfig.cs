@@ -101,6 +101,33 @@ public class GeneratorConfig
         BaseRowClasses != null && BaseRowClasses.Any();
 
     /// <summary>
+    /// If true, Prefers file scoped namespaces
+    /// Not implemented yet.
+    /// </summary>
+    public bool? FileScopedNamespace { get; set; }
+
+    /// <summary>
+    /// If true, global usings will be tried to be parsed
+    /// from the current project
+    /// Not implemented yet.
+    /// </summary>
+    public bool? ParseGlobalUsings { get; set; }
+
+    /// <summary>
+    /// If passed, these global usings will be assumed to be present,
+    /// even if not parsed from the project.
+    /// Not implemented yet.
+    /// </summary>
+    public List<string> IncludeGlobalUsings { get; set; }
+
+    /// <summary>
+    /// If passed, these global usings will be assumed to be not 
+    /// present. Even if they are parsed from the project.
+    /// Not implemented yet.
+    /// </summary>
+    public List<string> ExcludeGlobalUsings { get; set; }
+
+    /// <summary>
     /// Will define and use jFKTable type of constants for expressions in entities
     /// Not implemented yet.
     /// </summary>

@@ -26,10 +26,8 @@ public static class Templates
         if (template == null)
         {
             var stream = typeof(Templates).Assembly
-                .GetManifestResourceStream("Serenity.CodeGenerator.Templates." + templateKey + ".scriban");
-
-            if (stream == null)
-                throw new Exception("Can't find template resource with key: " + templateKey);
+                .GetManifestResourceStream("Serenity.CodeGenerator.Templates." + templateKey + ".scriban") ?? 
+                    throw new Exception("Can't find template resource with key: " + templateKey);
 
             using var sr = new System.IO.StreamReader(stream);
             template = sr.ReadToEnd();
@@ -40,9 +38,8 @@ public static class Templates
         return t;
     }
 
-
-
-    public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model)
+    public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model,
+        Action<CodeWriter> initWriter = null)
     {
         var template = GetTemplate(fileSystem, templateKey);
         try
@@ -70,6 +67,12 @@ public static class Templates
                   ns == "System.Collections.Generic",
                 IsCSharp = true
             };
+
+            if (model is EntityModel entityModel &&
+                entityModel.GlobalUsings.Any())
+                cw.GlobalUsings = new(entityModel.GlobalUsings);
+
+            initWriter?.Invoke(cw);
 
             var modularTSImporter = new ModularTSImporter((model as EntityModel)?.Module);
 

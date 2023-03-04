@@ -6,6 +6,7 @@ public interface IEntityModelInputs
     string Identifier { get; }
     GeneratorConfig Config { get; }
     IEntityDataSchema DataSchema { get; }
+    HashSet<string> GlobalUsings { get; }
     string Module { get; }
     bool Net5Plus { get; }
     bool OmitSchemaInExpressions { get; }

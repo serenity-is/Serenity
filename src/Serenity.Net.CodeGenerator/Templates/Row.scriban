@@ -1,7 +1,7 @@
-﻿{{USING "Serenity.ComponentModel" }}
-{{USING "Serenity.Data" }}
-{{USING "Serenity.Data.Mapping" }}
-{{USING "System.ComponentModel" }}
+﻿{{USING "Serenity.ComponentModel"}}
+{{USING "Serenity.Data"}}
+{{USING "Serenity.Data.Mapping"}}
+{{USING "System.ComponentModel"}}
 
 {{NAMESPACE RootNamespaceDotModule}}
 {
@@ -29,17 +29,7 @@
         }
 {{end}}
 {{-end}}
-{{-if NET5Plus}}
-        public {{RowClassName}}()
-            : base()
-        {
-        }
-
-        public {{RowClassName}}(RowFields fields)
-            : base(fields)
-        {
-        }
-{{-else}}
+{{-if !NET5Plus-}}
 {{-if Identity}}
         IIdField IIdRow.IdField => Fields.{{Identity}};
 {{end-}}
@@ -52,7 +42,7 @@
             : base(Fields)
         {
         }
-{{end}}
+{{end~}}
 
         public class RowFields : {{TYPEREF FieldsBaseClass}}
         {

@@ -3,14 +3,6 @@
 public interface IEntityDataSchema
 {
     /// <summary>
-    /// Gets the default schema.
-    /// </summary>
-    /// <value>
-    /// The default schema.
-    /// </value>
-    string DefaultSchema { get; }
-
-    /// <summary>
     /// Gets the foreign keys.
     /// </summary>
     /// <param name="schema">The schema.</param>

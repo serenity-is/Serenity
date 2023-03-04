@@ -97,8 +97,10 @@ public class EntityModelGenerator : IEntityModelGenerator
             RowClassName = className + "Row",
             Schema = inputs.OmitSchemaInExpressions ? null : inputs.Schema,
             Tablename = inputs.Table,
-            Title = Inflector.Inflector.Titleize(className)?.Trim()
+            Title = Inflector.Inflector.Titleize(className)?.Trim(),
         };
+
+        model.GlobalUsings.AddRange(inputs.GlobalUsings);
 
         var fields = inputs.DataSchema.GetFieldInfos(inputs.Schema, inputs.Table);
         if (!fields.Any(x => x.IsPrimaryKey))

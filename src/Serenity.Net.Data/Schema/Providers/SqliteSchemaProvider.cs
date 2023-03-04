@@ -91,12 +91,12 @@ public class SqliteSchemaProvider : ISchemaProvider
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         var fields = connection.Query<IdentitySource>("PRAGMA table_info([" + table + "])")
-            .Where(x => (int)x.pk > 0);
+            .Where(x => x.pk > 0);
 
         if (fields.Count() == 1 &&
-            (string)fields.First().type == "INTEGER")
+            fields.First().type == "INTEGER")
         {
-            return new List<string> { (string)fields.First().name };
+            return new List<string> { fields.First().name };
         };
 
         return new List<string> { "ROWID" };
