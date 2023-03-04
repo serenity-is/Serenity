@@ -70,7 +70,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             DataType = dataType,
             IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
             TSType = FieldTypeToTS(fieldType),
-            Ident = GenerateVariableName(fieldInfo.FieldName[prefixLength..]),
+            Ident = PropertyNameFor(fieldInfo.FieldName[prefixLength..]),
             Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
             FlagList = flags,
             Name = fieldInfo.FieldName,
@@ -84,7 +84,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         if (inputs is null)
             throw new ArgumentNullException(nameof(inputs));
 
-        var className = inputs.Identifier ?? ClassNameFromTableName(inputs.Table);
+        var className = inputs.Identifier ?? IdentifierForTable(inputs.Table);
 
         var model = new EntityModel
         {
@@ -138,13 +138,13 @@ public class EntityModelGenerator : IEntityModelGenerator
         var identity = fields.FirstOrDefault(f => f.IsIdentity == true);
         identity ??= fields.FirstOrDefault(f => f.IsPrimaryKey == true);
         if (identity != null)
-            model.Identity = GenerateVariableName(identity.FieldName[prefix..]);
+            model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
         else
         {
             identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true) ??
                 fields.FirstOrDefault();
             if (identity != null)
-                model.Identity = GenerateVariableName(identity.FieldName[prefix..]);
+                model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
         }
 
         string baseRowMatch = null;
@@ -255,7 +255,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 var j = new EntityJoin
                 {
                     Fields = new List<EntityField>(),
-                    Name = GenerateVariableName(f.Name[prefix..])
+                    Name = PropertyNameFor(f.Name[prefix..])
                 };
                 if (j.Name.EndsWith("Id", StringComparison.Ordinal) || j.Name.EndsWith("ID", StringComparison.Ordinal))
                     j.Name = j.Name[0..^2];
@@ -356,18 +356,18 @@ public class EntityModelGenerator : IEntityModelGenerator
         return model;
     }
 
-    private static string GenerateVariableName(string fieldName)
+    private static string PropertyNameFor(string fieldName)
     {
         return Inflector.Inflector.Titleize(fieldName).Replace(" ", "", StringComparison.Ordinal);
     }
 
-    public static string ClassNameFromTableName(string tableName)
+    public static string IdentifierForTable(string tableName)
     {
         tableName = tableName.Replace(" ", "", StringComparison.Ordinal);
         if (tableName.StartsWith("tb_", StringComparison.Ordinal))
             tableName = tableName[3..];
         else if (tableName.StartsWith("aspnet_", StringComparison.Ordinal))
             tableName = "AspNet" + tableName[7..];
-        return GenerateVariableName(tableName);
+        return PropertyNameFor(tableName);
     }
 }

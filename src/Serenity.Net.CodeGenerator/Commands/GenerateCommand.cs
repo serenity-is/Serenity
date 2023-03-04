@@ -210,9 +210,9 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 return new
                 {
                     name = x.Tablename,
-                    module = xct == null || xct.Module.IsEmptyOrNull() ? EntityModelGenerator.ClassNameFromTableName(inputs.ConnectionKey) : xct.Module,
+                    module = xct == null || xct.Module.IsEmptyOrNull() ? EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : xct.Module,
                     permission = xct == null || xct.PermissionKey.IsTrimmedEmpty() ? "Administration:General" : xct.PermissionKey,
-                    identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? EntityModelGenerator.ClassNameFromTableName(x.Table) : xct.Identifier,
+                    identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? EntityModelGenerator.IdentifierForTable(x.Table) : xct.Identifier,
                 };
             })));
 
@@ -263,7 +263,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         if (inputs.Module == null)
         {
             userInput = confTable == null || confTable.Module.IsEmptyOrNull() ?
-                EntityModelGenerator.ClassNameFromTableName(inputs.ConnectionKey) : confTable.Module;
+                EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : confTable.Module;
 
             Console.WriteLine();
 
@@ -286,7 +286,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         if (inputs.Identifier == null)
         {
             userInput = confTable == null || confTable.Identifier.IsEmptyOrNull() ?
-                EntityModelGenerator.ClassNameFromTableName(tableName.Table) : confTable.Identifier;
+                EntityModelGenerator.IdentifierForTable(tableName.Table) : confTable.Identifier;
 
             Console.WriteLine();
 
