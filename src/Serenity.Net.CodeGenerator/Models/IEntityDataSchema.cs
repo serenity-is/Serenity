@@ -32,11 +32,6 @@ public interface IEntityDataSchema
     IEnumerable<string> GetPrimaryKeyFields(string schema, string table);
 
     /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    IEnumerable<Data.Schema.TableName> GetTableNames();
-
-    /// <summary>
     /// Gets the field infos.
     /// </summary>
     /// <param name="schema">The schema.</param>

@@ -26,7 +26,4 @@ public class EntityDataSchema : IEntityDataSchema
 
     public IEnumerable<string> GetPrimaryKeyFields(string schema, string table)
         => schemaProvider.GetPrimaryKeyFields(connection, schema, table);
-
-    public IEnumerable<TableName> GetTableNames()
-        => schemaProvider.GetTableNames(connection);
 }

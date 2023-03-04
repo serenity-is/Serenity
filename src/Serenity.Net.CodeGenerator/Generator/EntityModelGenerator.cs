@@ -133,8 +133,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         }
 
         var prefix = DeterminePrefixLength(fields, x => x.FieldName);
-
-        model.FieldPrefix = fields.First().FieldName[..prefix];
+        model.FieldPrefix = prefix > 0 ? fields.First().FieldName[..prefix] : "";
 
         var identity = fields.FirstOrDefault(f => f.IsIdentity == true);
         identity ??= fields.FirstOrDefault(f => f.IsPrimaryKey == true);
