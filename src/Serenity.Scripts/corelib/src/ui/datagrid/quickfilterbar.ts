@@ -176,14 +176,14 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 }
                 args.active = active1 || active2;
                 if (active1) {
-                    args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
-                        [[args.field], '>=', args.widget.value]);
+                    args.request.Criteria = Criteria.and(args.request.Criteria, 
+                        Criteria(args.field).ge(args.widget.value));
                 }
                 if (active2) {
                     var next = new Date(end.valueAsDate.valueOf());
                     next.setDate(next.getDate() + 1);
-                    args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
-                        [[args.field], '<', formatDate(next, 'yyyy-MM-dd')]);
+                    args.request.Criteria = Criteria.and(args.request.Criteria,
+                        Criteria(args.field).lt(formatDate(next, 'yyyy-MM-dd')));
                 }
             },
             displayText: function (w, l) {
@@ -265,12 +265,12 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 }
                 args.active = active1 || active2;
                 if (active1) {
-                    args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
-                        [[args.field], '>=', args.widget.value]);
+                    args.request.Criteria = Criteria.and(args.request.Criteria,
+                        Criteria(args.field).ge(args.widget.value));
                 }
                 if (active2) {
-                    args.request.Criteria = Criteria.join(args.request.Criteria, 'and',
-                        [[args.field], '<=', end.value]);
+                    args.request.Criteria = Criteria.and(args.request.Criteria,
+                        Criteria(args.field).le(end.value));
                 }
             },
             displayText: function (w, l) {
