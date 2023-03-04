@@ -55,12 +55,12 @@ public partial class GenerateCommand
 
                 if (string.IsNullOrEmpty(module))
                     module = confTable?.Module?.TrimToNull() is null ?
-                        RowGenerator.ClassNameFromTableName(connectionKey) : confTable.Module;
+                        EntityModelGenerator.ClassNameFromTableName(connectionKey) : confTable.Module;
 
                 module = SelectModule(table.Tablename, module);
 
                 var defaultIdentifier = confTable?.Identifier?.TrimToNull() is null ?
-                    RowGenerator.ClassNameFromTableName(table.Table) : confTable.Identifier;
+                    EntityModelGenerator.ClassNameFromTableName(table.Table) : confTable.Identifier;
                 var identifier = SelectIdentifier(table.Tablename, defaultIdentifier);
 
                 permissionKey = SelectPermissionKey(table.Tablename, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);
@@ -91,7 +91,9 @@ public partial class GenerateCommand
 
                 UpdateConfigTable(inputs, data.Value.table.Tablename, confConnection, confTable);
 
-                var generator = CreateGenerator(inputs, csproj, sqlConnections, fileSystem, interactive: true);
+                var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
+                    csproj, fileSystem, sqlConnections, interactive: true);
+
                 generator.Run();
             }
 

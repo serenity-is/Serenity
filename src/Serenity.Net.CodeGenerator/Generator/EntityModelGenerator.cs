@@ -1,6 +1,6 @@
 ﻿namespace Serenity.CodeGenerator;
 
-public class RowGenerator
+public class EntityModelGenerator : IEntityModelGenerator
 {
     private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
     {
@@ -79,7 +79,7 @@ public class RowGenerator
         };
     }
 
-    public static EntityModel GenerateModel(IEntityModelInputs inputs)
+    public EntityModel GenerateModel(IEntityModelInputs inputs)
     {
         if (inputs is null)
             throw new ArgumentNullException(nameof(inputs));
@@ -357,7 +357,7 @@ public class RowGenerator
         return model;
     }
 
-    public static string GenerateVariableName(string fieldName)
+    private static string GenerateVariableName(string fieldName)
     {
         return Inflector.Inflector.Titleize(fieldName).Replace(" ", "", StringComparison.Ordinal);
     }

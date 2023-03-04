@@ -210,9 +210,9 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 return new
                 {
                     name = x.Tablename,
-                    module = xct == null || xct.Module.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(inputs.ConnectionKey) : xct.Module,
+                    module = xct == null || xct.Module.IsEmptyOrNull() ? EntityModelGenerator.ClassNameFromTableName(inputs.ConnectionKey) : xct.Module,
                     permission = xct == null || xct.PermissionKey.IsTrimmedEmpty() ? "Administration:General" : xct.PermissionKey,
-                    identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? RowGenerator.ClassNameFromTableName(x.Table) : xct.Identifier,
+                    identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? EntityModelGenerator.ClassNameFromTableName(x.Table) : xct.Identifier,
                 };
             })));
 
@@ -263,7 +263,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         if (inputs.Module == null)
         {
             userInput = confTable == null || confTable.Module.IsEmptyOrNull() ?
-                RowGenerator.ClassNameFromTableName(inputs.ConnectionKey) : confTable.Module;
+                EntityModelGenerator.ClassNameFromTableName(inputs.ConnectionKey) : confTable.Module;
 
             Console.WriteLine();
 
@@ -286,7 +286,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         if (inputs.Identifier == null)
         {
             userInput = confTable == null || confTable.Identifier.IsEmptyOrNull() ?
-                RowGenerator.ClassNameFromTableName(tableName.Table) : confTable.Identifier;
+                EntityModelGenerator.ClassNameFromTableName(tableName.Table) : confTable.Identifier;
 
             Console.WriteLine();
 
@@ -366,7 +366,8 @@ public partial class GenerateCommand : BaseFileSystemCommand
         using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
         {
             connection.Open();
-            var generator = CreateGenerator(inputs, csproj, sqlConnections, fileSystem, interactive);
+            var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
+                csproj, fileSystem, sqlConnections, interactive);
             generator.Run();
         }
     }
@@ -404,8 +405,10 @@ public partial class GenerateCommand : BaseFileSystemCommand
         }
     }
 
-    private static EntityCodeGenerator CreateGenerator(EntityModelInputs inputs, string csproj, 
-        ISqlConnections sqlConnections, IGeneratorFileSystem fileSystem, bool interactive = true)
+    private static EntityCodeGenerator CreateCodeGenerator(
+        EntityModelInputs inputs, IEntityModelGenerator modelGenerator, 
+        string csproj, IGeneratorFileSystem fileSystem,
+        ISqlConnections sqlConnections, bool interactive = true)
     {
         using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
         connection.EnsureOpen();
@@ -418,7 +421,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             StringComparison.OrdinalIgnoreCase);
 
         inputs.DataSchema = new EntityDataSchema(connection);
-        var rowModel = RowGenerator.GenerateModel(inputs);
+        var rowModel = modelGenerator.GenerateModel(inputs);
 
         var codeFileHelper = new CodeFileHelper(fileSystem)
         {
