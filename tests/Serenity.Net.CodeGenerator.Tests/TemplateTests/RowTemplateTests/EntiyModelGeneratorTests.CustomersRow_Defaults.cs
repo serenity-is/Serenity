@@ -16,7 +16,7 @@ public partial class RowTemplateTests
         Assert.Equal(expected, actual);
     }
 
-    const string ExpectedDefault = 
+    const string ExpectedDefaultTestRowCS = 
         """""
         using Serenity.ComponentModel;
         using Serenity.Data;
@@ -84,6 +84,6 @@ public partial class RowTemplateTests
     {
         var model = new MockEntityModel();
         var actual = RenderTemplate(model);
-        AssertEqual(ExpectedDefault, actual);
+        AssertEqual(ExpectedDefaultTestRowCS, actual);
     }
 }

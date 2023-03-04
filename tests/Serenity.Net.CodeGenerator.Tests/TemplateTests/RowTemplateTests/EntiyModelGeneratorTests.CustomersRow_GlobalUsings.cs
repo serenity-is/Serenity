@@ -11,7 +11,7 @@ public partial class RowTemplateTests
         model.GlobalUsings.Add("Serenity.ComponentModel");
         model.GlobalUsings.Add("System.ComponentModel");
         var actual = RenderTemplate(model);
-        var expected = Regex.Replace(ExpectedDefault, 
+        var expected = Regex.Replace(ExpectedDefaultTestRowCS, 
             @"^using (Serenity|System)\.ComponentModel\s*;\r?\n", "", 
             RegexOptions.Multiline);
 
@@ -29,7 +29,7 @@ public partial class RowTemplateTests
         model.GlobalUsings.Add("Serenity.Data.Mapping");
         model.GlobalUsings.Add("System.ComponentModel");
         var actual = RenderTemplate(model);
-        var expected = Regex.Replace(ExpectedDefault,
+        var expected = Regex.Replace(ExpectedDefaultTestRowCS,
             @"^using.*;\r?\n", "",
             RegexOptions.Multiline).TrimStart();
 
@@ -44,7 +44,7 @@ public partial class RowTemplateTests
         var model = new MockEntityModel();
         model.GlobalUsings.Add("System.Threading.Tasks");
         var actual = RenderTemplate(model);
-        AssertEqual(ExpectedDefault, actual);
+        AssertEqual(ExpectedDefaultTestRowCS, actual);
         foreach (var ns in model.GlobalUsings)
             Assert.DoesNotContain(ns, actual);
     }
