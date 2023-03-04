@@ -61,11 +61,9 @@ export class FilterStore {
                         currentBlock = Criteria.paren(currentBlock);
 
                     if (isBlockOr)
-                        criteria = Criteria.join(criteria,
-                            'or', currentBlock);
+                        criteria = Criteria.and(criteria, currentBlock);
                     else
-                        criteria = Criteria.join(criteria,
-                            'and', currentBlock);
+                        criteria = Criteria.and(criteria, currentBlock);
 
                     currentBlock = [''];
                 }
@@ -79,20 +77,16 @@ export class FilterStore {
             }
 
             if (line.isOr)
-                currentBlock = Criteria.join(currentBlock,
-                    'or', line.criteria);
+                currentBlock = Criteria.and(currentBlock, line.criteria);
             else
-                currentBlock = Criteria.join(currentBlock,
-                    'and', line.criteria);
+                currentBlock = Criteria.and(currentBlock, line.criteria);
         }
 
         if (!Criteria.isEmpty(currentBlock)) {
             if (isBlockOr)
-                criteria = Criteria.join(criteria,
-                    'or', Criteria.paren(currentBlock));
+                criteria = Criteria.or(criteria, Criteria.paren(currentBlock));
             else
-                criteria = Criteria.join(criteria,
-                    'and', Criteria.paren(currentBlock));
+                criteria = Criteria.and(criteria, Criteria.paren(currentBlock));
         }
 
         return criteria;

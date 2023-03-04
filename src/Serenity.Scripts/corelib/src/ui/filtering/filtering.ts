@@ -440,32 +440,31 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
                     var date = parseISODateTime(this.getEditorValue());
                     date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
                     var next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-                    var criteria = [this.getCriteriaField()];
+                    var criteria = Criteria(this.getCriteriaField());
                     var dateValue = formatDate(date, 'yyyy-MM-dd');
                     var nextValue = formatDate(next, 'yyyy-MM-dd');
                     switch (this.get_operator().key) {
                         case 'eq': {
-                            result.criteria = Criteria.join([criteria, '>=', dateValue], 'and', [criteria, '<', nextValue]);
+                            result.criteria = Criteria.and(criteria.ge(dateValue), criteria.lt(nextValue));
                             return result;
                         }
                         case 'ne': {
-                            result.criteria = Criteria.paren(Criteria.join([criteria, '<', dateValue], 'or', [criteria, '>', nextValue]));
+                            result.criteria = Criteria.paren(Criteria.or(criteria.lt(dateValue), criteria.gt(nextValue)));
                             return result;
                         }
                         case 'lt': {
-                            result.criteria = [criteria, '<', dateValue];
+                            result.criteria = criteria.lt(dateValue);
                             return result;
                         }
                         case 'le': {
-                            result.criteria = [criteria, '<', nextValue];
-                            return result;
+                            result.criteria = criteria.lt(nextValue);
                         }
                         case 'gt': {
-                            result.criteria = [criteria, '>=', nextValue];
+                            result.criteria = criteria.ge(nextValue);
                             return result;
                         }
                         case 'ge': {
-                            result.criteria = [criteria, '>=', dateValue];
+                            result.criteria = criteria.ge(dateValue);
                             return result;
                         }
                     }

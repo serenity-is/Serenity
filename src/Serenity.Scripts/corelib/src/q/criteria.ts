@@ -49,7 +49,7 @@ export namespace Criteria {
     }
 
     export function not(c: any[]) {
-        return [Operator.not, c]
+        return ['not', c]
     }
 
     export enum Operator {
@@ -75,63 +75,63 @@ export namespace Criteria {
 
     export class Builder extends Array {
         bw(fromInclusive: any, toInclusive: any): Array<any> {
-            return Criteria.and([this, '>=', fromInclusive], [this, '<=', toInclusive]);
+            return [[this, '>=', fromInclusive], 'and', [this, '<=', toInclusive]];
         }
     
         endsWith(value: string): Array<any> { 
-            return [this, Operator.like, '%' + value];
+            return [this, 'like', '%' + value];
         }
 
         eq(value: any): Array<any> { 
-            return [this, Operator.eq, value];
+            return [this, '=', value];
         }
     
         gt(value: any): Array<any> { 
-            return [this, Operator.gt, value];
+            return [this, '>', value];
         }
     
         ge(value: any): Array<any> { 
-            return [this, Operator.ge, value];
+            return [this, '>=', value];
         }
     
         in(values: any[]): Array<any> { 
-            return [this, Operator.in, [values]];
+            return [this, 'in', [values]];
         }
     
         isNull(): Array<any> { 
-            return [Operator.isNull, this];
+            return ['is null', this];
         }
         
         isNotNull(): Array<any> { 
-            return [Operator.isNotNull, this];
+            return ['is not null', this];
         }
     
         le(value: any): Array<any> { 
-            return [this, Operator.le, value];
+            return [this, '<=', value];
         }
     
         lt(value: any): Array<any> { 
-            return [this, Operator.lt, value];
+            return [this, '<', value];
         }
     
         ne(value: any): Array<any> { 
-            return [this, Operator.ne, value];
+            return [this, '!=', value];
         }
     
         like(value: any): Array<any> { 
-            return [this, Operator.like, value];
+            return [this, 'like', value];
         }
 
         startsWith(value: string): Array<any> { 
-            return [this, Operator.like, value + '%'];
+            return [this, 'like', value + '%'];
         }
 
         notIn(values: any[]): Array<any> { 
-            return [this, Operator.notIn, [values]];
+            return [this, 'not in', [values]];
         }
     
         notLike(value: any): Array<any> { 
-            return [this, Operator.notLike, value];
+            return [this, 'not like', value];
         }
     }
 
@@ -343,7 +343,7 @@ export namespace Criteria {
                         if (v.toLowerCase() === 'null') {
                             tokens.push({
                                 t: TOKEN_OPERATOR,
-                                v: Criteria.Operator.isNotNull
+                                v: 'is not null'
                             });
                         }
                         else
@@ -352,7 +352,7 @@ export namespace Criteria {
                     else if (w === 'null') {
                         tokens.push({
                             t: TOKEN_OPERATOR,
-                            v: Criteria.Operator.isNull
+                            v: 'is null'
                         });
                     }
                     else
@@ -378,7 +378,7 @@ export namespace Criteria {
     
                         tokens.push({
                             t: TOKEN_OPERATOR,
-                            v: Criteria.Operator.notIn
+                            v: 'not in'
                         });
     
                         readArrayList();
@@ -399,14 +399,14 @@ export namespace Criteria {
                     else if (w === "like") {
                         tokens.push({
                             t: TOKEN_OPERATOR,
-                            v: Criteria.Operator.notLike
+                            v: 'not like'
                         });
     
                         index = end;
                     } else {
                         tokens.push({
                             t: TOKEN_OPERATOR,
-                            v: Criteria.Operator.not
+                            v: 'not'
                         });
     
                         index = currentEnd;
@@ -417,7 +417,7 @@ export namespace Criteria {
                 else if (w === 'in') {
                     tokens.push({
                         t: TOKEN_OPERATOR,
-                        v: Criteria.Operator.in
+                        v: 'in'
                     });
     
                     index = end + 1;
@@ -442,7 +442,7 @@ export namespace Criteria {
                 else if (w === "like") {
                     tokens.push({
                         t: TOKEN_OPERATOR,
-                        v: Criteria.Operator.like
+                        v: 'like'
                     });
                 }
                 else {
