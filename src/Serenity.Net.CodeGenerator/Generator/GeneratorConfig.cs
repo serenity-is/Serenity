@@ -75,6 +75,13 @@ public class GeneratorConfig
     public bool? UseOriginAttribute { get; set; }
 
     /// <summary>
+    /// If true (default) generated table options like Identity,
+    /// Module etc. will be saved to the Connections array in 
+    /// sergen.json after code generation
+    /// </summary>
+    public bool? SaveGeneratedTables { get; set; }
+
+    /// <summary>
     /// Client types code generation related configuration
     /// </summary>
     public ClientTypesConfig ClientTypes { get; set; }

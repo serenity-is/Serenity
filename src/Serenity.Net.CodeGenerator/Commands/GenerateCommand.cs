@@ -361,7 +361,8 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         UpdateConfigTable(inputs, tableName.Tablename, confConnection, confTable);
 
-        fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), inputs.Config.SaveToJson());
+        if (inputs.Config.SaveGeneratedTables != false)
+            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), inputs.Config.SaveToJson());
 
         using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
         {

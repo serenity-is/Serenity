@@ -97,7 +97,8 @@ public partial class GenerateCommand
                 generator.Run();
             }
 
-            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
+            if (config.SaveGeneratedTables != false)
+                fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
             return ExitCodes.Success;
         }
