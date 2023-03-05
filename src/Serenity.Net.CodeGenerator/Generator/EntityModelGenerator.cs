@@ -90,6 +90,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         {
             ClassName = className,
             ConnectionKey = inputs.ConnectionKey,
+            DeclareJoinConstants = inputs.Config.DeclareJoinConstants ?? false,
             FileScopedNamespaces = inputs.Config.FileScopedNamespaces ?? false,
             Module = inputs.Module,
             NET5Plus = inputs.Net5Plus,
@@ -262,7 +263,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 };
                 if (j.Name.EndsWith("Id", StringComparison.Ordinal) || j.Name.EndsWith("ID", StringComparison.Ordinal))
                     j.Name = j.Name[0..^2];
-                f.ForeignJoinAlias = j.Name;
+                f.ForeignJoinAlias = j.Alias;
                 j.SourceField = f.Ident;
 
                 frgfld = frgfld.Where(y => !removeForeignFields.Contains(y.FieldName)).ToList();
@@ -285,10 +286,17 @@ public class EntityModelGenerator : IEntityModelGenerator
 
                     var atk = new List<AttributeTypeRef>
                     {
-                        new AttributeTypeRef("System.ComponentModel.DisplayName", "\"" + k.Title + "\"")
+                        new AttributeTypeRef("System.ComponentModel.DisplayName", 
+                            "\"" + k.Title + "\"")
                     };
-                    k.Expression = "j" + j.Name + ".[" + k.Name + "]";
-                    atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", "\"" + k.Expression + "\"") );
+                    
+                    k.Expression = j.Alias + ".[" + k.Name + "]";
+
+                    var expr = model.DeclareJoinConstants ?
+                            "$\"{" + j.Alias + "}.[" + k.Name + "]\"" :
+                            ("\"" + k.Expression + "\"");
+
+                    atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", expr));
                     k.AttributeList = atk;
 
                     if (f.TextualField == null && k.FieldType == "String")
@@ -337,7 +345,9 @@ public class EntityModelGenerator : IEntityModelGenerator
                 attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.ForeignKey", "\"" + 
                     (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", " +
                     "\"" + x.PKColumn + "\""));
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.LeftJoin", "\"j" + x.ForeignJoinAlias + "\""));
+                var alias = model.DeclareJoinConstants ?
+                    x.ForeignJoinAlias : ("\"" + x.ForeignJoinAlias + "\"");
+                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.LeftJoin", alias));
             }
 
             if (model.IdField == x.Ident && inputs.Net5Plus)
@@ -351,7 +361,8 @@ public class EntityModelGenerator : IEntityModelGenerator
             }
 
             if (x.TextualField != null)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.TextualField", "\"" + x.TextualField + "\""));
+                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.TextualField", 
+                    "nameof(x.TextualField)"));
 
             x.AttributeList = attrs;
         }

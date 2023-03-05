@@ -5,7 +5,7 @@ namespace Serenity.Tests;
 
 public class MockEntityModel : EntityModel
 {
-    public MockEntityModel()
+    public MockEntityModel(bool joinConstants = false)
     {
         Module = TestModule;
         ConnectionKey = TestConnection;
@@ -23,6 +23,7 @@ public class MockEntityModel : EntityModel
         FieldPrefix = "";
         AspNetCore = true;
         NET5Plus = true;
+        DeclareJoinConstants = joinConstants;
 
         Fields.Add(new()
         {
@@ -90,7 +91,7 @@ public class MockEntityModel : EntityModel
             PKSchema = "test",
             PKTable = "City",
             PKColumn = "CityId",
-            ForeignJoinAlias = "City",
+            ForeignJoinAlias = "jCity",
             Insertable = false,
             Updatable = false,
             IsValueType = true,
@@ -100,7 +101,7 @@ public class MockEntityModel : EntityModel
             {
                 new("System.ComponentModel.DisplayName", "\"City\""),
                 new("Serenity.Data.Mapping.ForeignKey", "\"[test].[City]\", \"CityId\""),
-                new("Serenity.Data.Mapping.LeftJoin", "\"jCity\""),
+                new("Serenity.Data.Mapping.LeftJoin", joinConstants ? "jCity" : "\"jCity\""),
                 new("Serenity.Data.Mapping.TextualField", "\"CityCityName\"")
             },
         });
@@ -127,7 +128,8 @@ public class MockEntityModel : EntityModel
                     AttributeList = new()
                     {
                         new("System.ComponentModel.DisplayName", "\"City City Name\""),
-                        new("Serenity.Data.Mapping.Expression", "\"jCity.[CityName]\"")
+                        new("Serenity.Data.Mapping.Expression", 
+                            joinConstants ? "$\"{jCity}.[CityName]\"" : "\"jCity.[CityName]\"")
                     },
                     Expression = "jCity.[CityName]"
                 },
@@ -146,7 +148,8 @@ public class MockEntityModel : EntityModel
                     AttributeList = new()
                     {
                         new("System.ComponentModel.DisplayName", "\"City Country Id\""),
-                        new("Serenity.Data.Mapping.Expression", "\"jCity.[CountryId]\"")
+                        new("Serenity.Data.Mapping.Expression", 
+                            joinConstants ? "$\"{jCity}.[CountryId]\"" : "\"jCity.[CountryId]\"")
                     },
                     Expression = "jCity.[CountryId]"
                 }

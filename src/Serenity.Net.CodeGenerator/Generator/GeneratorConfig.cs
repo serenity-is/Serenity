@@ -21,7 +21,6 @@ public class GeneratorConfig
 
     /// <summary>
     /// Will declare and use jFKTable type of constants for expressions in entities
-    /// Not implemented yet.
     /// </summary>
     public bool? DeclareJoinConstants { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Serenity.CodeGenerator;
+using static Serenity.Tests.MockModelInputs;
 
 namespace Serenity.Tests.CodeGenerator;
 
@@ -10,46 +11,77 @@ public partial class EntiyModelGeneratorTests
         Assert.Throws<ArgumentNullException>(() => new EntityModelGenerator().GenerateModel(inputs: null));
     }
 
-    const string testIdentifier = "Test";
-    const string testSchema = "dbo";
-    const string testTable = "test";
-    const string testConnection = $"{testIdentifier}TestConnection";
-    const string testModule = $"{testIdentifier}Module";
-    const string testPermission = $"{testIdentifier}Permission";
-    const string testRowClass = $"{testIdentifier}Row";
-    const string testTitle = testIdentifier;
-    const string testRootNamespace = $"My{testIdentifier}";
-
-    private EntityModelInputs CreateMockInputs()
-    {
-        return new EntityModelInputs
-        {
-            Identifier = testIdentifier,
-            Schema = testSchema,
-            Table = testTable,
-            Config = new GeneratorConfig() { RootNamespace = "MyTest"},
-            ConnectionKey = testConnection,
-            DataSchema = new MockDataSchema(),
-            Module = testModule,
-            Net5Plus = true,
-            PermissionKey = testPermission,
-        };
-    }
-
     [Fact]
     public void Uses_Passed_Input_Parameters()
     {
         var generator = new EntityModelGenerator();
-        var inputs = CreateMockInputs();
+        var inputs = new MockModelInputs();
         var model = generator.GenerateModel(inputs);
-        Assert.Equal(testIdentifier, model.ClassName);
-        Assert.Equal(testConnection, model.ConnectionKey);
-        Assert.Equal(testModule, model.Module);
-        Assert.Equal(testPermission, model.Permission);
-        Assert.Equal(testRootNamespace, model.RootNamespace);
-        Assert.Equal(testRowClass, model.RowClassName);
-        Assert.Equal(testSchema, model.Schema);
-        Assert.Equal(testSchema, model.Schema);
-        Assert.Equal(testTitle, model.Title);
+        Assert.Equal(Customer, model.ClassName);
+        Assert.Equal(TestConnection, model.ConnectionKey);
+        Assert.Equal(TestModule, model.Module);
+        Assert.Equal(TestPermission, model.Permission);
+        Assert.Equal(TestNamespace, model.RootNamespace);
+        Assert.Equal(Customer + "Row", model.RowClassName);
+        Assert.Equal(TestSchema, model.Schema);
+        Assert.Equal(TestSchema, model.Schema);
+        Assert.Equal(Customer, model.Title);
     }
+
+    [Fact]
+    public void DeclareJoinConstants_False_Configuration()
+    {
+        var generator = new EntityModelGenerator();
+        var inputs = new MockModelInputs();
+        inputs.Config.DeclareJoinConstants = false;
+        var model = generator.GenerateModel(inputs);
+        Assert.False(model.DeclareJoinConstants);
+        
+        var joinAttr = model.Fields.FirstOrDefault(x => x.Ident == "CityId")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.LeftJoin");
+        Assert.NotNull(joinAttr);
+        Assert.Equal("\"jCity\"", joinAttr.Arguments);
+
+        var cityJoin = model.Joins.FirstOrDefault(x => x.Name == "City");
+        Assert.NotNull(cityJoin);
+        
+        var cityNameExpr = cityJoin.Fields.FirstOrDefault(x => x.Ident == "CityCityName")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.Expression");
+        Assert.NotNull(cityNameExpr);
+        Assert.Equal("\"jCity.[CityName]\"", cityNameExpr.Arguments);
+
+        var countryIdExpr = cityJoin.Fields.FirstOrDefault(x => x.Ident == "CityCountryId")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.Expression");
+        Assert.NotNull(countryIdExpr);
+        Assert.Equal("\"jCity.[CountryId]\"", countryIdExpr.Arguments);
+    }
+
+    [Fact]
+    public void DeclareJoinConstants_True_Configuration()
+    {
+        var generator = new EntityModelGenerator();
+        var inputs = new MockModelInputs();
+        inputs.Config.DeclareJoinConstants = true;
+        var model = generator.GenerateModel(inputs);
+        Assert.True(model.DeclareJoinConstants);
+
+        var joinAttr = model.Fields.FirstOrDefault(x => x.Ident == "CityId")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.LeftJoin");
+        Assert.NotNull(joinAttr);
+        Assert.Equal("jCity", joinAttr.Arguments);
+
+        var cityJoin = model.Joins.FirstOrDefault(x => x.Name == "City");
+        Assert.NotNull(cityJoin);
+
+        var cityNameExpr = cityJoin.Fields.FirstOrDefault(x => x.Ident == "CityCityName")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.Expression");
+        Assert.NotNull(cityNameExpr);
+        Assert.Equal("$\"{jCity}.[CityName]\"", cityNameExpr.Arguments);
+
+        var countryIdExpr = cityJoin.Fields.FirstOrDefault(x => x.Ident == "CityCountryId")?
+            .AttributeList?.FirstOrDefault(x => x.TypeName == "Serenity.Data.Mapping.Expression");
+        Assert.NotNull(countryIdExpr);
+        Assert.Equal("$\"{jCity}.[CountryId]\"", countryIdExpr.Arguments);
+    }
+
 }

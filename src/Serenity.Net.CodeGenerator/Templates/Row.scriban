@@ -9,7 +9,13 @@
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
 public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
-{   {{~for x in Fields~}}
+{   {{~if DeclareJoinConstants~}}
+
+    {{~for j in Joins~}}
+    const string {{j.Alias}} = nameof({{j.Alias}});
+    {{~end~}}
+    {{~end~}}
+    {{~for x in Fields~}}
 
     [{{ATTRREF x.AttributeList}}]
     public {{TYPEREF x.PropertyType}} {{x.Ident}}

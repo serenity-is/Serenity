@@ -1,22 +1,8 @@
-﻿using Serenity.CodeGenerator;
-
-namespace Serenity.Tests.CodeGenerator;
+﻿namespace Serenity.Tests.CodeGenerator;
 
 public partial class RowTemplateTests
 {
-    private string RenderTemplate(EntityModel model)
-    {
-        return Templates.Render(new MockGeneratorFileSystem(), "Row", model);
-    }
-
-    private void AssertEqual(string expected, string actual)
-    {
-        expected = expected?.Replace("\r", "");
-        actual = actual?.Replace("\r", "");
-        Assert.Equal(expected, actual);
-    }
-
-    const string ExpectedDefaultTestRowCS = 
+    const string ExpectedJoinConstantsTestRowCS =
         """""
         using Serenity.ComponentModel;
         using Serenity.Data;
@@ -31,6 +17,8 @@ public partial class RowTemplateTests
             [ModifyPermission("TestPermission")]
             public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
             {
+                const string jCity = nameof(jCity);
+
                 [DisplayName("Test Id"), Identity, IdProperty]
                 public int? CustomerId
                 {
@@ -45,21 +33,21 @@ public partial class RowTemplateTests
                     set => fields.CustomerName[this] = value;
                 }
 
-                [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin("jCity"), TextualField("CityCityName")]
+                [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField("CityCityName")]
                 public int? CityId
                 {
                     get => fields.CityId[this];
                     set => fields.CityId[this] = value;
                 }
 
-                [DisplayName("City City Name"), Expression("jCity.[CityName]")]
+                [DisplayName("City City Name"), Expression($"{jCity}.[CityName]")]
                 public string CityCityName
                 {
                     get => fields.CityCityName[this];
                     set => fields.CityCityName[this] = value;
                 }
 
-                [DisplayName("City Country Id"), Expression("jCity.[CountryId]")]
+                [DisplayName("City Country Id"), Expression($"{jCity}.[CountryId]")]
                 public int? CityCountryId
                 {
                     get => fields.CityCountryId[this];
@@ -80,10 +68,10 @@ public partial class RowTemplateTests
         """"";
 
     [Fact]
-    public void CustomerRow_Defaults()
+    public void CustomerRow_DeclareJoinConstants()
     {
-        var model = new MockEntityModel();
+        var model = new MockEntityModel(joinConstants: true);
         var actual = RenderTemplate(model);
-        AssertEqual(ExpectedDefaultTestRowCS, actual);
+        AssertEqual(ExpectedJoinConstantsTestRowCS, actual);
     }
 }

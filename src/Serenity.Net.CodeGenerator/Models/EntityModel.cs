@@ -23,6 +23,7 @@ public class EntityModel
     public string FieldPrefix { get; set; }
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
+    public bool DeclareJoinConstants { get; set; }
     public bool FileScopedNamespaces { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 
