@@ -9,7 +9,7 @@ public interface IEntityModelInputs
     HashSet<string> GlobalUsings { get; }
     string Module { get; }
     bool Net5Plus { get; }
-    bool OmitSchemaInExpressions { get; }
+    bool SchemaIsDatabase { get; }
     string PermissionKey { get; }
     string Schema { get; }
     string Table { get; }

@@ -90,6 +90,8 @@ public class MockDataSchema : IEntityDataSchema
 
     }
 
+    public string DefaultSchema => "dbo";
+
     public List<(string schema, string table, Data.Schema.FieldInfo item)> FieldInfos { get; } = new();
 
     public IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string schema, string table)

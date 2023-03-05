@@ -418,7 +418,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         inputs.Net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>",
             RegexOptions.Multiline | RegexOptions.Compiled).IsMatch(csprojContent);
 
-        inputs.OmitSchemaInExpressions = connection.GetDialect().ServerType.StartsWith("MySql",
+        inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
             StringComparison.OrdinalIgnoreCase);
 
         inputs.DataSchema = new EntityDataSchema(connection);

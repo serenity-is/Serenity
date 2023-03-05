@@ -65,6 +65,14 @@ public class GeneratorConfig
     public List<string> ExcludeGlobalUsings { get; set; }
 
     /// <summary>
+    /// If true, the default schema name, e.g. "dbo" for SQL Server
+    /// won't be emitted in generated field expressions in Row.cs
+    /// This is true by default only for MySql as in MySql schema names
+    /// are actually database names.
+    /// </summary>
+    public bool? OmitDefaultSchema { get; set; }
+
+    /// <summary>
     /// When true, instead of using [Expression] attributes for foreign view fields,
     /// it will use Origin(nameof(jFK), nameof(FKRow.ViewField)) if the FKRow is already 
     /// generated in the project. It will also use ForeignKey(typeof(FKRow)) type of 

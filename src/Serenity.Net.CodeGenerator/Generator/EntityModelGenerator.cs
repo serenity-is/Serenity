@@ -85,6 +85,20 @@ public class EntityModelGenerator : IEntityModelGenerator
             throw new ArgumentNullException(nameof(inputs));
 
         var className = inputs.Identifier ?? IdentifierForTable(inputs.Table);
+        bool omitSchema = inputs.SchemaIsDatabase ||
+            (inputs.Config.OmitDefaultSchema == true &&
+             !string.IsNullOrEmpty(inputs.DataSchema.DefaultSchema) &&
+             inputs.Schema == inputs.DataSchema.DefaultSchema);
+
+        string normalizeSchema(string name)
+        {
+            if (name != null &&
+                omitSchema && string.Equals(name, inputs.DataSchema.DefaultSchema,
+                StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return name;
+        }
 
         var model = new EntityModel
         {
@@ -97,7 +111,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             Permission = inputs.PermissionKey,
             RootNamespace = inputs.Config.RootNamespace,
             RowClassName = className + "Row",
-            Schema = inputs.OmitSchemaInExpressions ? null : inputs.Schema,
+            Schema = omitSchema ? null : inputs.Schema,
             Tablename = inputs.Table,
             Title = Inflector.Inflector.Titleize(className)?.Trim(),
         };
@@ -130,7 +144,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             var fk = foreigns.FirstOrDefault(x => x.FKColumn == field.FieldName);
             if (fk != null)
             {
-                field.PKSchema = fk.PKSchema;
+                field.PKSchema = normalizeSchema(fk.PKSchema);
                 field.PKTable = fk.PKTable;
                 field.PKColumn = fk.PKColumn;
             }
@@ -250,7 +264,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 if (f.Title.EndsWith(" Id", StringComparison.Ordinal) && f.Title.Length > 3)
                     f.Title = f.Title.SafeSubstring(0, f.Title.Length - 3);
 
-                f.PKSchema = foreign.PKSchema;
+                f.PKSchema = normalizeSchema(foreign.PKSchema);
                 f.PKTable = foreign.PKTable;
                 f.PKColumn = foreign.PKColumn;
 
