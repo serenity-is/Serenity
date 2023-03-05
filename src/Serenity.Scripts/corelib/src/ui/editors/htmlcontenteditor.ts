@@ -198,7 +198,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
                 // @ts-ignore
                 path = CKEDITOR_BASEPATH;
             else
-                return "~/Scripts/ckeditor/";
+                return "~/Serenity.Assets/Scripts/ckeditor/";
         }
         if (endsWith(path, '/'))
             return path;
