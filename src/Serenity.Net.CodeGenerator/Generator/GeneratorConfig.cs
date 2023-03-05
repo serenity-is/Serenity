@@ -18,11 +18,19 @@ public class GeneratorConfig
     /// types are assumed to be under this namespace as well.
     /// </summary>
     public string RootNamespace { get; set; }
-    
+
     /// <summary>
-    /// Server typings code generation related configuration
+    /// Will declare and use jFKTable type of constants for expressions in entities
+    /// Not implemented yet.
     /// </summary>
-    public ServerTypingsConfig ServerTypings { get; set; }
+    public bool? DeclareJoinConstants { get; set; }
+
+    /// <summary>
+    /// When true, enables RowTemplate class generation. This should
+    /// only be used when Serenity.Pro.Coder is enabled in the project.
+    /// Not implemented yet.
+    /// </summary>
+    public bool? EnableRowTemplates { get; set; }
 
     /// <summary>
     /// End of line style. Can be "lf" or "crlf", default is based on 
@@ -31,8 +39,40 @@ public class GeneratorConfig
     /// </summary>
     public string EndOfLine { get; set; }
 
-    /// <summary>Used for Newtonsoft.JSON</summary>
-    public bool ShouldSerializeEndOfLine() => EndOfLine != null;
+    /// <summary>
+    /// If true, prefers file scoped namespaces in generated code
+    /// </summary>
+    public bool? FileScopedNamespaces { get; set; }
+
+    /// <summary>
+    /// If true, global usings will be tried to be parsed
+    /// from the current project
+    /// Not implemented yet.
+    /// </summary>
+    public bool? ParseGlobalUsings { get; set; }
+
+    /// <summary>
+    /// If passed, these global usings will be assumed to be present,
+    /// even if not parsed from the project.
+    /// Not implemented yet.
+    /// </summary>
+    public List<string> IncludeGlobalUsings { get; set; }
+
+    /// <summary>
+    /// If passed, these global usings will be assumed to be not 
+    /// present. Even if they are parsed from the project.
+    /// Not implemented yet.
+    /// </summary>
+    public List<string> ExcludeGlobalUsings { get; set; }
+
+    /// <summary>
+    /// When true, instead of using [Expression] attributes for foreign view fields,
+    /// it will use Origin(nameof(jFK), nameof(FKRow.ViewField)) if the FKRow is already 
+    /// generated in the project. It will also use ForeignKey(typeof(FKRow)) type of 
+    /// foreign keys instead of strings.
+    /// Not implemented yet.
+    /// </summary>
+    public bool? UseOriginAttribute { get; set; }
 
     /// <summary>
     /// Client types code generation related configuration
@@ -56,6 +96,11 @@ public class GeneratorConfig
          MVC.SearchViewPaths?.Any() == true ||
          MVC.StripViewPaths?.Any() == true ||
          MVC.SourceGenerator == false);
+
+    /// <summary>
+    /// Server typings code generation related configuration
+    /// </summary>
+    public ServerTypingsConfig ServerTypings { get; set; }
 
     /// <summary>
     /// Sergen restore command related configuration
@@ -101,70 +146,6 @@ public class GeneratorConfig
         BaseRowClasses != null && BaseRowClasses.Any();
 
     /// <summary>
-    /// If true, prefers file scoped namespaces in generated code
-    /// </summary>
-    public bool? FileScopedNamespaces { get; set; }
-
-    /// <summary>
-    /// If true, global usings will be tried to be parsed
-    /// from the current project
-    /// Not implemented yet.
-    /// </summary>
-    public bool? ParseGlobalUsings { get; set; }
-
-    /// <summary>
-    /// If passed, these global usings will be assumed to be present,
-    /// even if not parsed from the project.
-    /// Not implemented yet.
-    /// </summary>
-    public List<string> IncludeGlobalUsings { get; set; }
-
-    /// <summary>
-    /// If passed, these global usings will be assumed to be not 
-    /// present. Even if they are parsed from the project.
-    /// Not implemented yet.
-    /// </summary>
-    public List<string> ExcludeGlobalUsings { get; set; }
-
-    /// <summary>
-    /// Will define and use jFKTable type of constants for expressions in entities
-    /// Not implemented yet.
-    /// </summary>
-    public bool? JoinConstants { get; set; }
-
-    /// <summary>
-    /// When true, defines private RowTemplate class instead. This should
-    /// only be used when Serenity.Pro.Coder is enabled in the project.
-    /// Not implemented yet.
-    /// </summary>
-    public bool? RowTemplate { get; set; }
-
-    /// <summary>
-    /// Enumeration that determines which foreign view fields will be generated
-    /// for current row
-    /// </summary>
-    public enum FieldSelection
-    {
-        /// <summary>
-        /// Don't generate any foreign view fields except the ones
-        /// explicitly included via IncludeForeignFields
-        /// </summary>
-        None = -1,
-
-        /// <summary>
-        /// Generate all the foreign view fields, except ones excluded 
-        /// explicitly via RemoveForeignFields
-        /// </summary>
-        All = 0,
-
-        /// <summary>
-        /// Don't generate any foreign view fields except the Name property of the target row
-        /// and ones explicitly included via IncludeForeignFields
-        /// </summary>
-        NameOnly = 1
-    }
-
-    /// <summary>
     /// The set of foreign fields to generate, default is All
     /// Not implemented yet.
     /// </summary>
@@ -192,15 +173,6 @@ public class GeneratorConfig
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
         RemoveForeignFields != null && RemoveForeignFields.Any();
-
-    /// <summary>
-    /// When true, instead of using [Expression] attributes for foreign view fields,
-    /// it will use Origin(nameof(jFK), nameof(FKRow.ViewField)) if the FKRow is already 
-    /// generated in the project. It will also use ForeignKey(typeof(FKRow)) type of 
-    /// foreign keys instead of strings.
-    /// Not implemented yet.
-    /// </summary>
-    public bool? UseOriginAttribute { get; set; }
 
     /// <summary>
     /// The location of custom templates folder. The files in this folder
@@ -530,6 +502,31 @@ public class GeneratorConfig
         public bool? SourceGenerator { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
+    }
+
+    /// <summary>
+    /// Enumeration that determines which foreign view fields will be generated
+    /// for current row
+    /// </summary>
+    public enum FieldSelection
+    {
+        /// <summary>
+        /// Don't generate any foreign view fields except the ones
+        /// explicitly included via IncludeForeignFields
+        /// </summary>
+        None = -1,
+
+        /// <summary>
+        /// Generate all the foreign view fields, except ones excluded 
+        /// explicitly via RemoveForeignFields
+        /// </summary>
+        All = 0,
+
+        /// <summary>
+        /// Don't generate any foreign view fields except the Name property of the target row
+        /// and ones explicitly included via IncludeForeignFields
+        /// </summary>
+        NameOnly = 1
     }
 
     /// <summary>

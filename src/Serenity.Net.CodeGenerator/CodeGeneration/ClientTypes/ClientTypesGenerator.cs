@@ -70,6 +70,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
     protected override void GenerateAll()
     {
+        cw.IsCSharp = true;
         var generatedTypes = new HashSet<string>();
 
         foreach (var tsType in tsTypes)
@@ -100,16 +101,17 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         if (!isEditorType && !isFormatterType)
             return;
 
-        AppendUsings(new string[] {
+        foreach (var defaultUsing in new string[] {
             "Serenity",
             "Serenity.ComponentModel",
             "System",
             "System.Collections",
             "System.Collections.Generic",
             "System.ComponentModel"
-        });
-
-        sb.AppendLine();
+        })
+        {
+            cw.Using(defaultUsing);
+        }
 
         var ns = GetNamespace(type.Namespace);
 
@@ -146,26 +148,13 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
         string name = type.Name + "Attribute";
 
-        if (!string.IsNullOrEmpty(ns))
-        {
-            cw.Indented("namespace ");
-            sb.AppendLine(ns);
-
-            cw.InBrace(delegate
-            {
-                if (isEditorType)
-                    GenerateEditor(type, name, key);
-                else if (isFormatterType)
-                    GenerateFormatter(type, name, key);
-            });
-        }
-        else
+        cw.InNamespace(ns, () =>
         {
             if (isEditorType)
                 GenerateEditor(type, name, key);
             else if (isFormatterType)
                 GenerateFormatter(type, name, key);
-        }
+        });
 
         AddFile(RemoveRootNamespace(ns, name) + ".cs");
     }

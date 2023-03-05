@@ -112,16 +112,6 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         return GetScriptType(GetBaseTypeName(type));
     }
 
-    protected void AppendUsings(IEnumerable<string> namespaces)
-    {
-        foreach (var ns in namespaces)
-        {
-            cw.Indented("using ");
-            sb.Append(ns);
-            sb.AppendLine(";");
-        }
-    }
-
     protected ExternalType GetScriptTypeFrom(ExternalType fromType, string typeName)
     {
         var ns = fromType.Namespace;

@@ -27,7 +27,10 @@ public class ClientTypesCommand : BaseFileSystemCommand
         Console.ResetColor();
         Console.WriteLine(outDir);
 
-        var generator = new ClientTypesGenerator();
+        var generator = new ClientTypesGenerator()
+        {
+            FileScopedNamespaces = config.FileScopedNamespaces == true
+        };
         generator.RootNamespaces.Add(config.RootNamespace);
 
         foreach (var type in tsTypes)
