@@ -168,29 +168,35 @@ public class CodeWriter
     /// <param name="action">Action</param>
     public void InNamespace(string ns, Action action)
     {
+        var oldNamespace = CurrentNamespace;
+        CurrentNamespace = ns;
         if (!string.IsNullOrEmpty(ns))
         {
-            var oldNamespace = CurrentNamespace;
             Indented("namespace ");
-            sb.AppendLine(ns);
-            CurrentNamespace = ns;
-            InBrace(action);
-            CurrentNamespace = oldNamespace;
+            if (FileScopedNamespaces && IsCSharp)
+            {
+                sb.Append(ns);
+                sb.AppendLine(";");
+                sb.AppendLine();
+                action();
+            }
+            else
+            {
+                sb.AppendLine(ns);
+                InBrace(action);
+            }
         }
         else
         {
-            var oldNamespace = CurrentNamespace;
-            CurrentNamespace = ns;
             action();
-            CurrentNamespace = oldNamespace;
         }
+        CurrentNamespace = oldNamespace;
     }
 
     /// <summary>
     /// Gets sets function that determines if a namespace is allowed to be added to the local usings
     /// </summary>
     public Func<string, bool> AllowUsing { get; set; } = (ns) => true;
-
 
     /// <summary>
     /// Whether to put opening brace on the same line.
@@ -199,6 +205,12 @@ public class CodeWriter
     ///   <c>true</c> if brace on same line; otherwise, <c>false</c>.
     /// </value>
     public bool BraceOnSameLine { get; set; }
+
+    /// <summary>
+    /// Use a file scoped namespace instead. Can only
+    /// be used with one namespace per file.
+    /// </summary>
+    public bool FileScopedNamespaces { get; set; }
 
     /// <summary>
     /// Gets internal string builder

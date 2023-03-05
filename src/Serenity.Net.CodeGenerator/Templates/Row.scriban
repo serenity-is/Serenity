@@ -3,61 +3,61 @@
 {{USING "Serenity.Data.Mapping"}}
 {{USING "System.ComponentModel"}}
 
-{{NAMESPACE RootNamespaceDotModule}}{{capture codeblock-}}
+{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
 [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
 [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
 public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
-{
-{{-for x in Fields}}
+{   {{~for x in Fields~}}
+
     [{{ATTRREF x.AttributeList}}]
     public {{TYPEREF x.PropertyType}} {{x.Ident}}
     {
         get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
         set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this] = value;
     }
-{{end}}
-{{-for j in Joins}}
-{{-for k in j.Fields}}
+    {{~end~}}
+    {{~for j in Joins~}}
+    {{~for k in j.Fields~}}
+
     [{{ATTRREF k.AttributeList}}]
     public {{TYPEREF k.PropertyType}} {{k.Ident}}
     {
         get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
         set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this] = value;
     }
-{{end}}
-{{-end}}
-{{-if !NET5Plus-}}
-{{-if Identity}}
+    {{~end~}}
+    {{~end~}}
+{{~if !NET5Plus~}}
+    {{~if Identity~}}
+
     IIdField IIdRow.IdField => Fields.{{Identity}};
-{{end-}}
-{{-if NameField}}
-        StringField INameRow.NameField => Fields.{{NameField}};
-{{end}}
+    {{~end~}}
+    {{~if NameField~}}
+
+    StringField INameRow.NameField => Fields.{{NameField}};
+    {{~end~}}
+
     public static readonly RowFields Fields = new RowFields().Init();
 
     public {{RowClassName}}()
         : base(Fields)
     {
     }
-{{end~}}
+{{~end~}}
 
     public class RowFields : {{TYPEREF FieldsBaseClass}}
     {
-{{-for x in Fields}}
+        {{~for x in Fields~}}
         public {{x.FieldType}}Field {{x.Ident}};
-{{-end}}
-{{-for j in Joins}}
-{{for k in j.Fields}}
-        public {{k.FieldType}}Field {{k.Ident}};
-{{-end}}
-{{-end}}
-    }
-}{{end}}{{if FileScopedNamespaces}};
+        {{~end~}}
 
-{{codeblock}}
-{{else}}
-{
-{{codeblock | INDENTBLOCK "    "}}
-}{{end}}
+        {{~for j in Joins~}}
+        {{~for k in j.Fields~}}
+        public {{k.FieldType}}Field {{k.Ident}};
+        {{~end~}}
+        {{~end~}}
+    }
+}
+{{~end}}{{NAMESPACEBLOCK block~}}

@@ -6,7 +6,7 @@ public class CSharpDynamicUsings
 {
     delegate string TypeDelegate(string key);
     delegate string NamespaceDelegate(string key);
-    delegate string IndentBlockDelegate(string indent, string text);
+    delegate string NamespaceBlockDelegate(string text);
     delegate string TypeListDelegate(List<string> key);
     delegate string TypeModelListDelegate(List<AttributeTypeRef> key);
     delegate void UsingDelegate(string key);
@@ -61,14 +61,17 @@ public class CSharpDynamicUsings
             return "namespace " + requestedNamespace;
         }));
 
-        scriptObject.Import("INDENTBLOCK", new IndentBlockDelegate((code, indent) =>
+        scriptObject.Import("NAMESPACEBLOCK", new NamespaceBlockDelegate((code) =>
         {
-            if (string.IsNullOrEmpty(code))
-                return "";
+            if (!cw.FileScopedNamespaces ||
+                !cw.IsCSharp)
+                return "\n{\n" + string.Join("\n", (code ?? "").TrimStart()
+                    .Replace("\r", "")
+                    .Split('\n')
+                    .Select(line => (line.Length > 0 ? ("    " + line) : line)))
+                        .TrimEnd() + "\n}";
 
-            return string.Join("\n", code.Replace("\r", "")
-                .Split('\n')
-                .Select(line => (line.Length > 0 ? (indent + line) : line)));
+            return ";\n\n" + code.Trim();
         }));
 
         return scriptObject;

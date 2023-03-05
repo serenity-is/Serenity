@@ -68,9 +68,11 @@ public static class Templates
                 IsCSharp = true
             };
 
-            if (model is EntityModel entityModel &&
-                entityModel.GlobalUsings.Any())
+            if (model is EntityModel entityModel)
+            {
                 cw.GlobalUsings = new(entityModel.GlobalUsings);
+                cw.FileScopedNamespaces = entityModel.FileScopedNamespaces;
+            }
 
             initWriter?.Invoke(cw);
 

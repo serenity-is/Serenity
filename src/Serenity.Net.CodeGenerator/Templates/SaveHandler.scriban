@@ -3,15 +3,14 @@
 {{USING "MyResponse = Serenity.Services.SaveResponse"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-{{NAMESPACE RootNamespaceDotModule}}
-{
-    public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> {}
+{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> {}
 
-    public class {{ClassName}}SaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}SaveHandler
+public class {{ClassName}}SaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}SaveHandler
+{
+    public {{ClassName}}SaveHandler(IRequestContext context)
+            : base(context)
     {
-        public {{ClassName}}SaveHandler(IRequestContext context)
-             : base(context)
-        {
-        }
     }
 }
+{{~end}}{{~NAMESPACEBLOCK block~}}

@@ -8,7 +8,7 @@ export abstract class {{RowClassName}} {%{{}%}{{if Identity}}
     static readonly idProperty = '{{Identity}}';{{end}}{{if NameField}}
     static readonly nameProperty = '{{NameField}}';{{end}}
     static readonly localTextPrefix = '{{ModuleDot}}{{ClassName}}';
-	
+
     static readonly deletePermission = '{{Permission}}';
     static readonly insertPermission = '{{Permission}}';
     static readonly readPermission = '{{Permission}}';

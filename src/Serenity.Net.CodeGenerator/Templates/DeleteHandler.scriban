@@ -3,15 +3,14 @@
 {{USING "MyResponse = Serenity.Services.DeleteResponse"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName }}
 
-{{NAMESPACE RootNamespaceDotModule}}
-{
-    public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> {}
+{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> {}
 
-    public class {{ClassName}}DeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}DeleteHandler
+public class {{ClassName}}DeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}DeleteHandler
+{
+    public {{ClassName}}DeleteHandler(IRequestContext context)
+            : base(context)
     {
-        public {{ClassName}}DeleteHandler(IRequestContext context)
-             : base(context)
-        {
-        }
     }
 }
+{{~end}}{{NAMESPACEBLOCK block~}}

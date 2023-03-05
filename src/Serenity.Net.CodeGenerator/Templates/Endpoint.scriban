@@ -8,56 +8,55 @@
 {{USING "System.Globalization" }}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-{{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}
+{{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}{{capture block~}}
+[Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
+[ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
+public class {{ClassName}}Controller : ServiceEndpoint
 {
-    [Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
-    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
-    public class {{ClassName}}Controller : ServiceEndpoint
+    [HttpPost, AuthorizeCreate(typeof(MyRow))]
+    public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] I{{ClassName}}SaveHandler handler)
     {
-        [HttpPost, AuthorizeCreate(typeof(MyRow))]
-        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
-            [FromServices] I{{ClassName}}SaveHandler handler)
-        {
-            return handler.Create(uow, request);
-        }
+        return handler.Create(uow, request);
+    }
 
-        [HttpPost, AuthorizeUpdate(typeof(MyRow))]
-        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
-            [FromServices] I{{ClassName}}SaveHandler handler)
-        {
-            return handler.Update(uow, request);
-        }
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] I{{ClassName}}SaveHandler handler)
+    {
+        return handler.Update(uow, request);
+    }
  
-        [HttpPost, AuthorizeDelete(typeof(MyRow))]
-        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
-            [FromServices] I{{ClassName}}DeleteHandler handler)
-        {
-            return handler.Delete(uow, request);
-        }
+    [HttpPost, AuthorizeDelete(typeof(MyRow))]
+    public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
+        [FromServices] I{{ClassName}}DeleteHandler handler)
+    {
+        return handler.Delete(uow, request);
+    }
 
-        [HttpPost]
-        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
-            [FromServices] I{{ClassName}}RetrieveHandler handler)
-        {
-            return handler.Retrieve(connection, request);
-        }
+    [HttpPost]
+    public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
+        [FromServices] I{{ClassName}}RetrieveHandler handler)
+    {
+        return handler.Retrieve(connection, request);
+    }
 
-        [HttpPost, AuthorizeList(typeof(MyRow))]
-        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
-            [FromServices] I{{ClassName}}ListHandler handler)
-        {
-            return handler.List(connection, request);
-        }
+    [HttpPost, AuthorizeList(typeof(MyRow))]
+    public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
+        [FromServices] I{{ClassName}}ListHandler handler)
+    {
+        return handler.List(connection, request);
+    }
 
-        [HttpPost, AuthorizeList(typeof(MyRow))]
-        public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
-            [FromServices] I{{ClassName}}ListHandler handler,
-            [FromServices] IExcelExporter exporter)
-        {
-            var data = List(connection, request, handler).Entities;
-            var bytes = exporter.Export(data, typeof(Columns.{{ClassName}}Columns), request.ExportColumns);
-            return ExcelContentResult.Create(bytes, "{{ClassName}}List_" +
-                DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
-        }
+    [HttpPost, AuthorizeList(typeof(MyRow))]
+    public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
+        [FromServices] I{{ClassName}}ListHandler handler,
+        [FromServices] IExcelExporter exporter)
+    {
+        var data = List(connection, request, handler).Entities;
+        var bytes = exporter.Export(data, typeof(Columns.{{ClassName}}Columns), request.ExportColumns);
+        return ExcelContentResult.Create(bytes, "{{ClassName}}List_" +
+            DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
 }
+{{~end}}{{~NAMESPACEBLOCK block~}}

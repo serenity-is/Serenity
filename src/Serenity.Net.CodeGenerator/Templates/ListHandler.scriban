@@ -3,15 +3,14 @@
 {{USING "MyResponse = Serenity.Services.ListResponse<" + RootNamespace + DotModule + "." + RowClassName + ">"}}
 {{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
 
-{{NAMESPACE RootNamespaceDotModule}}
-{
-    public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> {}
+{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> {}
 
-    public class {{ClassName}}ListHandler : ListRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}ListHandler
+public class {{ClassName}}ListHandler : ListRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}ListHandler
+{
+    public {{ClassName}}ListHandler(IRequestContext context)
+            : base(context)
     {
-        public {{ClassName}}ListHandler(IRequestContext context)
-             : base(context)
-        {
-        }
     }
 }
+{{~end}}{{NAMESPACEBLOCK block~}}
