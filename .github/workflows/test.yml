@@ -34,5 +34,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
+    - name: Dotnet Test
       run: dotnet test --no-build --verbosity normal
+    - name: Javascript Test
+      run: pnpm test
+      working-directory: "src/Serenity.Scripts/corelib"
