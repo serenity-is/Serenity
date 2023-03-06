@@ -20,7 +20,7 @@ public class MockHostEnvironment : IWebHostEnvironment
         File.WriteAllText(file, text);
     }
 
-    public MockHostEnvironment(string root = @"C:\Testing\Test\", System.IO.Abstractions.IFileSystem fileSystem = null)
+    public MockHostEnvironment(string root = @"C:/Testing/Test/", System.IO.Abstractions.IFileSystem fileSystem = null)
     {
         EnvironmentName = "Development";
         ApplicationName = "Test";

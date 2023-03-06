@@ -778,7 +778,9 @@ declare namespace Q {
     function outerHtml(element: JQuery): string;
 
     function autoFullHeight(element: JQuery): void;
-    function initFullHeightGridPage(gridDiv: JQuery): void;
+    function initFullHeightGridPage(gridDiv: JQuery, opt?: {
+        noRoute?: boolean;
+    }): void;
     function layoutFillHeightValue(element: JQuery): number;
     function layoutFillHeight(element: JQuery): void;
     function setMobileDeviceMode(): void;

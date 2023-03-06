@@ -376,7 +376,9 @@ declare function newBodyDiv(): JQuery;
 declare function outerHtml(element: JQuery): string;
 
 declare function autoFullHeight(element: JQuery): void;
-declare function initFullHeightGridPage(gridDiv: JQuery): void;
+declare function initFullHeightGridPage(gridDiv: JQuery, opt?: {
+    noRoute?: boolean;
+}): void;
 declare function layoutFillHeightValue(element: JQuery): number;
 declare function layoutFillHeight(element: JQuery): void;
 declare function setMobileDeviceMode(): void;

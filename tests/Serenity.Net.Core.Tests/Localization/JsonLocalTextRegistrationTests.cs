@@ -140,7 +140,7 @@ public class JsonLocalTextRegistrationTests
     {
         JsonLocalTextRegistration.AddJsonTexts(
             registry: new MockLocalTextRegistry(), 
-            path: @"C:\s_o_m_e_f_o_l_d_e_r",
+            path: @"C:/s_o_m_e_f_o_l_d_e_r",
             fileSystem: new MockFileSystem());
     }
 
@@ -148,10 +148,10 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Handles_SimpleDictionary()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:\My\my.es.json", @"{x:""5"", ""y.z"": ""a.b.c""}");
+        fileSystem.AddFile(@"C:/My/my.es.json", @"{x:""5"", ""y.z"": ""a.b.c""}");
         
         var registry = new MockLocalTextRegistry();
-        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:\My\", fileSystem);
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("es", "x", "5"), x),
@@ -162,10 +162,10 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Handles_HierarchicalDictionary()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:\My\jp.json", @"{x:""x"",y:{z:{u:{l:""l"",m:""m""},t:""t""}}}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""x"",y:{z:{u:{l:""l"",m:""m""},t:""t""}}}");
 
         var registry = new MockLocalTextRegistry();
-        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:\My\", fileSystem);
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("jp", "x", "x"), x),
@@ -178,10 +178,10 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Skips_NullValues()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:\My\jp.json", @"{x:""x"",y:null}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""x"",y:null}");
 
         var registry = new MockLocalTextRegistry();
-        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:\My\", fileSystem);
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("jp", "x", "x"), x));
@@ -191,14 +191,14 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Determines_LanguageIDs_Properly()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:\My\jp.json", @"{x:""1""}");
-        fileSystem.AddFile(@"C:\My\en-US.json", @"{x:""2""}");
-        fileSystem.AddFile(@"C:\My\texts.en-GB.json", @"{x:""3""}");
-        fileSystem.AddFile(@"C:\My\texts.en-US.en.json", @"{x:""4""}");
-        fileSystem.AddFile(@"C:\My\my.some.long.prefix.tr-TR.json", @"{x:""5""}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""1""}");
+        fileSystem.AddFile(@"C:/My/en-US.json", @"{x:""2""}");
+        fileSystem.AddFile(@"C:/My/texts.en-GB.json", @"{x:""3""}");
+        fileSystem.AddFile(@"C:/My/texts.en-US.en.json", @"{x:""4""}");
+        fileSystem.AddFile(@"C:/My/my.some.long.prefix.tr-TR.json", @"{x:""5""}");
 
         var registry = new MockLocalTextRegistry();
-        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:\My\", fileSystem);
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
         Assert.Collection(registry.AddedList.OrderBy(x => x.languageID),
             x => Assert.Equal(("en", "x", "4"), x),
@@ -212,14 +212,14 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Sorts_Files_ByFilename()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:\My\z.json", @"{x:""1""}");
-        fileSystem.AddFile(@"C:\My\a.json", @"{x:""2""}");
-        fileSystem.AddFile(@"C:\My\t.json", @"{x:""3""}");
-        fileSystem.AddFile(@"C:\My\b.json", @"{x:""4""}");
-        fileSystem.AddFile(@"C:\My\0.json", @"{x:""5""}");
+        fileSystem.AddFile(@"C:/My/z.json", @"{x:""1""}");
+        fileSystem.AddFile(@"C:/My/a.json", @"{x:""2""}");
+        fileSystem.AddFile(@"C:/My/t.json", @"{x:""3""}");
+        fileSystem.AddFile(@"C:/My/b.json", @"{x:""4""}");
+        fileSystem.AddFile(@"C:/My/0.json", @"{x:""5""}");
 
         var registry = new MockLocalTextRegistry();
-        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:\My\", fileSystem);
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
         Assert.Collection(registry.AddedList,
             x => Assert.Equal("5", x.text),

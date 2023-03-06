@@ -8,9 +8,9 @@ public partial class GeneratorConfigTests
     public void Extends_WorksProperly_With_Nested_Objects()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.CreateDirectory(@"C:\a\b\c");
+        fileSystem.CreateDirectory(@"C:/a/b/c");
 
-        fileSystem.WriteAllText(@"C:\a\sergen.a.json",
+        fileSystem.WriteAllText(@"C:/a/sergen.a.json",
             """""
             {
                 "RootNamespace": "A",
@@ -24,7 +24,7 @@ public partial class GeneratorConfigTests
             }
             """"");
 
-        fileSystem.WriteAllText(@"C:\a\b\sergen.b.json",
+        fileSystem.WriteAllText(@"C:/a/b/sergen.b.json",
             """""
             {
                 "Extends": "../sergen.a.json",
@@ -39,7 +39,7 @@ public partial class GeneratorConfigTests
             }
             """"");
 
-        fileSystem.WriteAllText(@"C:\a\b\c\sergen.json",
+        fileSystem.WriteAllText(@"C:/a/b/c/sergen.json",
             """""
             {
                 "Extends": "../sergen.b.json",
@@ -53,7 +53,7 @@ public partial class GeneratorConfigTests
             }
             """"");
 
-        var config = GeneratorConfig.LoadFromFile(fileSystem, @"C:\a\b\c\sergen.json");
+        var config = GeneratorConfig.LoadFromFile(fileSystem, @"C:/a/b/c/sergen.json");
 
         Assert.Equal("../sergen.b.json", config.Extends);
         Assert.Equal("C", config.RootNamespace);

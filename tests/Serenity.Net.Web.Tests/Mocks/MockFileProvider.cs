@@ -5,7 +5,7 @@ public class MockFileProvider : IFileProvider
     public System.IO.Abstractions.IFileSystem FileSystem { get; }
     public string Root { get; }
 
-    public MockFileProvider(string root = @"C:\Testing\Test\", System.IO.Abstractions.IFileSystem fileSystem = null)
+    public MockFileProvider(string root = @"C:/Testing/Test/", System.IO.Abstractions.IFileSystem fileSystem = null)
     {
         FileSystem = fileSystem ?? new MockFileSystem();
         Root = root;
@@ -16,7 +16,7 @@ public class MockFileProvider : IFileProvider
         return new MockDirectoryContents(FileSystem, FileSystem.Path.Combine(Root, subpath));
     }
 
-    public Microsoft.Extensions.FileProviders.IFileInfo GetFileInfo(string subpath)
+    public IFileInfo GetFileInfo(string subpath)
     {
         return new MockFileInfo(FileSystem, FileSystem.Path.Combine(Root, subpath), false);
     }
