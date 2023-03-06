@@ -1,7 +1,7 @@
 import { HtmlContentEditor } from "@/ui/editors/htmlcontenteditor";
 
-test('getCKEditorBasePath returns ~/Scripts/ckeditor/ by default', function() {
-    expect(HtmlContentEditor.getCKEditorBasePath()).toBe('~/Scripts/ckeditor/');
+test('getCKEditorBasePath returns "~/Serenity.Assets/Scripts/ckeditor/" by default', function() {
+    expect(HtmlContentEditor.getCKEditorBasePath()).toBe("~/Serenity.Assets/Scripts/ckeditor/");
 });
 
 test('getCKEditorBasePath returns CKEDITOR_BASEPATH if set', function() {
