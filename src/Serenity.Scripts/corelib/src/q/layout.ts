@@ -8,7 +8,7 @@ export function autoFullHeight(element: JQuery) {
     triggerLayoutOnShow(element);
 }
 
-export function initFullHeightGridPage(gridDiv: JQuery) {
+export function initFullHeightGridPage(gridDiv: JQuery, opt?: { noRoute?: boolean }) {
     $('body').addClass('full-height-page');
     gridDiv.addClass('responsive-height');
 
@@ -46,8 +46,13 @@ export function initFullHeightGridPage(gridDiv: JQuery) {
         $('body').off('layout', layout);
     });
 
-    // ugly, but to it is to make old pages work without having to add this
-    typeof Router != "undefined" && Router.resolve && Router.resolve();
+    if (!opt?.noRoute && 
+        typeof document !== "undefined" &&
+        !$(document.body).attr('data-fhrouteinit')) {
+            $(document.body).attr('data-fhrouteinit', 'true');
+            // ugly, but to it is to make old pages work without having to add this
+            typeof Router !== "undefined" && Router.resolve?.();
+    }
 }
 
 export function layoutFillHeightValue(element: JQuery) {
