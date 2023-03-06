@@ -9,6 +9,12 @@ namespace Serenity.CodeGenerator;
 public class GeneratorConfig
 {
     /// <summary>
+    /// If specified, the settings in this file extends
+    /// settings in a base file similar to tsconfig.json
+    /// </summary>
+    public string Extends { get; set; }
+
+    /// <summary>
     /// The root namespace for the target project. It is recommended
     /// to have this in sergen.json. If not there, it will be auto calculated
     /// from root namespace in CSPROJ file, or derived from project file name
@@ -331,34 +337,32 @@ public class GeneratorConfig
     /// Loads config from given file
     /// </summary>
     /// <param name="fileSystem">File system</param>
-    /// <param name="sergenJson">Sergen.json path</param>
+    /// <param name="path">Sergen.json path</param>
     /// <returns>Deserialized configuration</returns>
     /// <exception cref="ArgumentNullException">fileSystem is null</exception>
-    public static GeneratorConfig LoadFromFile(IGeneratorFileSystem fileSystem,
-        string sergenJson)
+    public static GeneratorConfig LoadFromFile(IFileSystem fileSystem,
+        string path)
     {
         if (fileSystem is null)
             throw new ArgumentNullException(nameof(fileSystem));
 
-        if (!fileSystem.FileExists(sergenJson))
-            return LoadFromJson(null);
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
 
-        return LoadFromJson(fileSystem.ReadAllText(sergenJson));
-    }
+        GeneratorConfig config;
+        if (!fileSystem.FileExists(path))
+            config = new GeneratorConfig();
+        else
+        {
+            config = ExtendsJsonReader.Read<GeneratorConfig>(
+                fileSystem, path, nameof(Extends),
+                options: new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+        }
 
-    /// <summary>
-    /// Loads config from a json string
-    /// </summary>
-    /// <param name="json">JSON string</param>
-    /// <returns>Deserialized config</returns>
-    public static GeneratorConfig LoadFromJson(string json)
-    {
-        var config = System.Text.Json.JsonSerializer.Deserialize<GeneratorConfig>(
-            json.TrimToNull() ?? "{}", new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        config.Connections ??= new List<Connection>();
+        config.Connections ??= new();
         config.RemoveForeignFields ??= new List<string>();
         return config;
     }
