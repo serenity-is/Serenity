@@ -1,12 +1,12 @@
 ﻿
-@{{SERENITYIMPORT "Decorators"}}.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Grid')
-export class {{ClassName}}Grid extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}, any> {
-    protected getColumnsKey() { return {{SERVERTYPEIMPORT ClassName + "Columns"}}.columnsKey; }
-    protected getDialogType() { return {{IMPORTFROM "./" + ClassName + "Dialog" ClassName + "Dialog"}}; }{{if Identity}}
+@{{SERENITYIMPORT "Decorators"}}.registerClass('{{GridFullName}}')
+export class {{GridClassName}} extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}, any> {
+    protected getColumnsKey() { return {{SERVERTYPEIMPORT ColumnsClassName}}.columnsKey; }
+    protected getDialogType() { return {{IMPORTFROM "./" + DialogClassName DialogClassName}}; }{{if Identity}}
     protected getIdProperty() { return {{SERVERTYPEIMPORT RowClassName}}.idProperty; }{{end}}
     protected getInsertPermission() { return {{SERVERTYPEIMPORT RowClassName}}.insertPermission; }
     protected getLocalTextPrefix() { return {{SERVERTYPEIMPORT RowClassName}}.localTextPrefix; }
-    protected getService() { return {{SERVERTYPEIMPORT ClassName + "Service"}}.baseUrl; }
+    protected getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
 
     constructor(container: JQuery) {
         super(container);

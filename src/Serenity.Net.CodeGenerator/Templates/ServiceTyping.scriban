@@ -1,7 +1,7 @@
 ﻿
-namespace {{RootNamespace}}{{DotModule}} {
-    export namespace {{ClassName}}Service {
-        export const baseUrl = '{{ModuleSlash}}{{ClassName}}';
+namespace {{ModuleNamespace}} {
+    export namespace {{ServiceClassName}} {
+        export const baseUrl = '{{ServiceBaseUrl}}';
 
         export declare function Create(request: Serenity.SaveRequest<{{RowClassName}}>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
         export declare function Update(request: Serenity.SaveRequest<{{RowClassName}}>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
@@ -24,7 +24,7 @@ namespace {{RootNamespace}}{{DotModule}} {
             'Retrieve', 
             'List'
         ].forEach(x => {
-            (<any>{{ClassName}}Service)[x] = function (r, s, o) { 
+            (<any>{{ServiceClassName}})[x] = function (r, s, o) { 
                 return Q.serviceRequest(baseUrl + '/' + x, r, s, o); 
             };
             (<any>Methods)[x] = baseUrl + '/' + x;

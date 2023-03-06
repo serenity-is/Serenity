@@ -1,8 +1,8 @@
 ﻿
-namespace {{RootNamespace}}{{DotModule}} {
+namespace {{ModuleNamespace}} {
     export interface {{RowClassName}} {%{{}%}{{for f in Fields}}
-        {{f.Ident}}?: {{f.TSType}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
-        {{k.Ident}}?: {{k.TSType}};{{end}}{{end}}
+        {{f.PropertyName}}?: {{f.TSType}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
+        {{k.PropertyName}}?: {{k.TSType}};{{end}}{{end}}
     }
 
     export namespace {{RowClassName}} {%{{}%}{{if Identity}}
@@ -15,13 +15,13 @@ namespace {{RootNamespace}}{{DotModule}} {
         export const updatePermission = '{{Permission}}';
 
         export namespace Fields {%{{}%}{{for f in Fields}}
-            export declare const {{f.Ident}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
-            export declare const {{k.Ident}};{{end}}{{end}}
+            export declare const {{f.PropertyName}};{{end}}{{for j in Joins}}{{for k in j.Fields}}
+            export declare const {{k.PropertyName}};{{end}}{{end}}
         }
 
         [{{for f in Fields}}{{if !for.first}},{{end}}
-            '{{f.Ident}}'{{end}}{{for j in Joins}}{{for k in j.Fields}},
-            '{{k.Ident}}'{{end}}{{end}}
+            '{{f.PropertyName}}'{{end}}{{for j in Joins}}{{for k in j.Fields}},
+            '{{k.PropertyName}}'{{end}}{{end}}
         ].forEach(x => (<any>Fields)[x] = x);
     }
 }

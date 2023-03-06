@@ -1,12 +1,12 @@
-﻿using static Serenity.Tests.MockModelInputs;
+﻿using static Serenity.Tests.CustomerEntityInputs;
 using Serenity.CodeGenerator;
 using Serenity.Data.Schema;
 
 namespace Serenity.Tests;
 
-public class MockDataSchema : IEntityDataSchema
+public class CustomerDataSchema : IEntityDataSchema
 {
-    public MockDataSchema()
+    public CustomerDataSchema()
     {
         FieldInfos.Add((TestSchema, Customer, new()
         {

@@ -1,16 +1,18 @@
 ﻿
-namespace {{RootNamespace}}{{DotModule}} {
-    export interface {{ClassName}}Form {%{{}%}{{for x in Fields}}{{if x.Ident != Identity}}
-        {{x.Ident}}: Serenity.{{x.TSEditorType}};{{end}}{{end}}
+namespace {{ModuleNamespace}} {
+    export interface {{FormClassName}} {
+        {{~for x in FormFields~}}
+        {{x.PropertyName}}: Serenity.{{x.TSEditorType}};
+        {{~end~}}
     }
 
-    export class {{ClassName}}Form extends Serenity.PrefixedContext {
-        static formKey = '{{ModuleDot}}{{ClassName}}';
+    export class {{FormClassName}} extends Serenity.PrefixedContext {
+        static formKey = '{{FormKey}}';
     }
 
-    [{{for x in Fields}}{{if x.Ident != Identity}}{{if !for.first}},{{end}}
-        ['{{x.Ident}}', () => Serenity.{{x.TSEditorType}}]{{end}}{{end}}
-    ].forEach(x => Object.defineProperty({{ClassName}}Form.prototype, <string>x[0], {
+    [{{for x in FormFields}}{{if !for.first}},{{end}}
+        ['{{x.PropertyName}}', () => Serenity.{{x.TSEditorType}}]{{end}}{{end}}
+    ].forEach(x => Object.defineProperty({{FormClassName}}.prototype, <string>x[0], {
         get: function () {
             return this.w(x[0], (x[1] as any)());
         },

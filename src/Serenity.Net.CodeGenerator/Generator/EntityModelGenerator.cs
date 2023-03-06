@@ -19,15 +19,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         return str2.Length;
     }
 
-    private static string JI(string join, string field)
-    {
-        if (string.Compare(field, join, StringComparison.OrdinalIgnoreCase) == 0)
-            return field;
-        else
-            return join + field;
-    }
-
-    private static string JU(string join, string field)
+    private static string JoinUnderscore(string join, string field)
     {
         if (string.Compare(join, field, StringComparison.OrdinalIgnoreCase) == 0)
             return field;
@@ -47,19 +39,22 @@ public class EntityModelGenerator : IEntityModelGenerator
         };
     }
 
-    private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength)
+    private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength, bool includeFlags)
     {
-        List<AttributeTypeRef> flags;
-        if (fieldInfo.IsIdentity)
-            flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.Identity") };
-        else if (fieldInfo.IsPrimaryKey)
-            flags = fieldInfo.IsNullable ? new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey") } : new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-        else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
-            flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.Insertable", "false"), new AttributeTypeRef("Serenity.ComponentModel.Updatable", "false"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-        else if (!fieldInfo.IsNullable)
-            flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-        else
-            flags = null;
+        List<AttributeTypeRef> flags = null;
+        if (includeFlags)
+        {
+            if (fieldInfo.IsIdentity)
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.Identity") };
+            else if (fieldInfo.IsPrimaryKey)
+                flags = fieldInfo.IsNullable ? new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey") } : new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
+            else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.Insertable", "false"), new AttributeTypeRef("Serenity.ComponentModel.Updatable", "false"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
+            else if (!fieldInfo.IsNullable)
+                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
+            else
+                flags = null;
+        }
 
         var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
         dataType ??= fieldType;
@@ -70,7 +65,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             DataType = dataType,
             IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
             TSType = FieldTypeToTS(fieldType),
-            Ident = PropertyNameFor(fieldInfo.FieldName[prefixLength..]),
+            PropertyName = PropertyNameFor(fieldInfo.FieldName[prefixLength..]),
             Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
             FlagList = flags,
             Name = fieldInfo.FieldName,
@@ -118,30 +113,30 @@ public class EntityModelGenerator : IEntityModelGenerator
 
         model.GlobalUsings.AddRange(inputs.GlobalUsings);
 
-        var fields = inputs.DataSchema.GetFieldInfos(inputs.Schema, inputs.Table);
-        if (!fields.Any(x => x.IsPrimaryKey))
+        var fieldInfos = inputs.DataSchema.GetFieldInfos(inputs.Schema, inputs.Table);
+        if (!fieldInfos.Any(x => x.IsPrimaryKey))
         {
             var primaryKeys = new HashSet<string>(inputs.DataSchema.GetPrimaryKeyFields(inputs.Schema, inputs.Table));
-            foreach (var field in fields)
+            foreach (var field in fieldInfos)
                 field.IsPrimaryKey = primaryKeys.Contains(field.FieldName);
         }
 
-        if (!fields.Any(x => x.IsIdentity))
+        if (!fieldInfos.Any(x => x.IsIdentity))
         {
             var identities = new HashSet<string>(inputs.DataSchema.GetIdentityFields(inputs.Schema, inputs.Table));
-            foreach (var field in fields)
+            foreach (var field in fieldInfos)
                 field.IsIdentity = identities.Contains(field.FieldName);
         }
 
-        var foreigns = inputs.DataSchema.GetForeignKeys(inputs.Schema, inputs.Table)
+        var foreignKeyInfos = inputs.DataSchema.GetForeignKeys(inputs.Schema, inputs.Table)
             .ToLookup(x => x.FKName)
             .Where(x => x.Count() == 1)
             .SelectMany(x => x)
             .ToList();
 
-        foreach (var field in fields)
+        foreach (var field in fieldInfos)
         {
-            var fk = foreigns.FirstOrDefault(x => x.FKColumn == field.FieldName);
+            var fk = foreignKeyInfos.FirstOrDefault(x => x.FKColumn == field.FieldName);
             if (fk != null)
             {
                 field.PKSchema = normalizeSchema(fk.PKSchema);
@@ -150,17 +145,17 @@ public class EntityModelGenerator : IEntityModelGenerator
             }
         }
 
-        var prefix = DeterminePrefixLength(fields, x => x.FieldName);
-        model.FieldPrefix = prefix > 0 ? fields.First().FieldName[..prefix] : "";
+        var prefix = DeterminePrefixLength(fieldInfos, x => x.FieldName);
+        model.FieldPrefix = prefix > 0 ? fieldInfos.First().FieldName[..prefix] : "";
 
-        var identity = fields.FirstOrDefault(f => f.IsIdentity == true);
-        identity ??= fields.FirstOrDefault(f => f.IsPrimaryKey == true);
+        var identity = fieldInfos.FirstOrDefault(f => f.IsIdentity == true);
+        identity ??= fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true);
         if (identity != null)
             model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
         else
         {
-            identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true) ??
-                fields.FirstOrDefault();
+            identity = fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true) ??
+                fieldInfos.FirstOrDefault();
             if (identity != null)
                 model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
         }
@@ -179,7 +174,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 foreach (var s in k.Fields ?? new List<string>())
                 {
                     string n = s.TrimToNull();
-                    if (n == null || !fields.Any(z => z.FieldName[prefix..] == n))
+                    if (n == null || !fieldInfos.Any(z => z.FieldName[prefix..] == n))
                     {
                         skip = true;
                         break;
@@ -200,32 +195,43 @@ public class EntityModelGenerator : IEntityModelGenerator
             }
         }
 
-        var removeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var removeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // these fields are always removed from foreign views as it might be a security
+            // concern for rows that have a fk to user table etc if the user is not careful
+            "pwd",
+            "pass",
+            "passw",
+            "password",
+            "passwordhash",
+            "passwordsalt"
+        };
+
+        var foreignSelection = inputs.Config.ForeignFieldSelection ?? GeneratorConfig.FieldSelection.All;
+
         if (inputs.Config.RemoveForeignFields is { } removeFK)
         {
-            foreach (var s in removeFK)
-            {
-                string n = s.TrimToNull();
-                if (n != null)
-                    removeForeignFields.Add(n);
-            }
+            removeForeignFields.AddRange(removeFK.Select(
+                x => x.TrimToNull()).Where(x => x != null));
         }
 
-        removeForeignFields.Add("password");
-        removeForeignFields.Add("passwordhash");
-        removeForeignFields.Add("passwordsalt");
+        var includeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (inputs.Config.IncludeForeignFields is { } includeFK)
+        {
+            includeForeignFields.AddRange(includeFK.Select(
+                x => x.TrimToNull()).Where(x => x != null));
+        }
 
         if (baseRowFieldset != null &&
             baseRowFieldset.Count > 0)
         {
             model.RowBaseClass = baseRowMatch;
             model.FieldsBaseClass = baseRowMatch + "Fields";
-            fields = fields.Where(f =>
+            fieldInfos = fieldInfos.Where(f =>
             {
                 if (baseRowFieldset.Contains(f.FieldName[prefix..]))
                 {
-                    var ef = ToEntityField(f, prefix);
-                    ef.FlagList = null;
+                    var ef = ToEntityField(f, prefix, includeFlags: false);
                     model.RowBaseFields.Add(ef);
                     return false;
                 }
@@ -236,93 +242,41 @@ public class EntityModelGenerator : IEntityModelGenerator
         if (inputs.Net5Plus)
             model.RowBaseClass = model.RowBaseClass + "<" + model.RowClassName + ".RowFields>";
 
-        var fieldByIdent = new Dictionary<string, EntityField>(StringComparer.OrdinalIgnoreCase);
+        var usedPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var field in fields)
+        void makeUniquePropertyName(EntityField f)
         {
-            var f = ToEntityField(field, prefix);
-
-            if (f.Ident == model.IdField)
-                f.ColAttributeList = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") , new AttributeTypeRef("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""), new AttributeTypeRef("Serenity.ComponentModel.AlignRight") };
-            
             int i = 0;
-            string ident = f.Ident;
-            while (fieldByIdent.ContainsKey(ident))
-                ident = f.Ident + ++i;
-            f.Ident = ident;
-            fieldByIdent[ident] = f;
+            string propertyName = f.PropertyName;
+            while (usedPropertyNames.Contains(propertyName))
+                propertyName = f.PropertyName + ++i;
+            f.PropertyName = propertyName;
+            usedPropertyNames.Add(propertyName);
+        }
 
-            if (f.Name == className && f.FieldType == "String")
+        foreach (var fieldInfo in fieldInfos)
+        {
+            var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true);
+
+            if (tableField.PropertyName == model.Identity)
             {
-                model.NameField = f.Name;
-                f.ColAttributeList ??= new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") };
+                tableField.ColAttributeList ??= new();
+                tableField.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
+                tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""));
+                tableField.ColAttributeList.Add(new("Serenity.ComponentModel.AlignRight"));
+                tableField.OmitInForm = true;
             }
 
-            var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
-            if (foreign != null)
+            makeUniquePropertyName(tableField);
+
+            if (tableField.Name == className && tableField.FieldType == "String")
             {
-                if (f.Title.EndsWith(" Id", StringComparison.Ordinal) && f.Title.Length > 3)
-                    f.Title = f.Title.SafeSubstring(0, f.Title.Length - 3);
-
-                f.PKSchema = normalizeSchema(foreign.PKSchema);
-                f.PKTable = foreign.PKTable;
-                f.PKColumn = foreign.PKColumn;
-
-                var frgfld = inputs.DataSchema.GetFieldInfos(foreign.PKSchema, foreign.PKTable).ToList();
-                int frgPrefix = DeterminePrefixLength(frgfld, z => z.FieldName);
-                var j = new EntityJoin
-                {
-                    Fields = new List<EntityField>(),
-                    Name = PropertyNameFor(f.Name[prefix..])
-                };
-                if (j.Name.EndsWith("Id", StringComparison.Ordinal) || j.Name.EndsWith("ID", StringComparison.Ordinal))
-                    j.Name = j.Name[0..^2];
-                f.ForeignJoinAlias = j.Alias;
-                j.SourceField = f.Ident;
-
-                frgfld = frgfld.Where(y => !removeForeignFields.Contains(y.FieldName)).ToList();
-
-                foreach (var frg in frgfld)
-                {
-                    if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.OrdinalIgnoreCase))
-                        continue;
-                    
-                    var k = ToEntityField(frg, frgPrefix);
-                    k.FlagList = null;
-                    k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName[frgPrefix..]))?.Trim();
-                    k.Ident = JI(j.Name, k.Ident);
-                    i = 0;
-                    ident = k.Ident;
-                    while (fieldByIdent.ContainsKey(ident))
-                        ident = k.Ident + ++i;
-                    k.Ident = ident;
-                    fieldByIdent[ident] = k;
-
-                    var atk = new List<AttributeTypeRef>
-                    {
-                        new AttributeTypeRef("System.ComponentModel.DisplayName", 
-                            "\"" + k.Title + "\"")
-                    };
-                    
-                    k.Expression = j.Alias + ".[" + k.Name + "]";
-
-                    var expr = model.DeclareJoinConstants ?
-                            "$\"{" + j.Alias + "}.[" + k.Name + "]\"" :
-                            ("\"" + k.Expression + "\"");
-
-                    atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", expr));
-                    k.AttributeList = atk;
-
-                    if (f.TextualField == null && k.FieldType == "String")
-                        f.TextualField = k.Ident;
-
-                    j.Fields.Add(k);
-                }
-
-                model.Joins.Add(j);
+                model.NameField = tableField.Name;
+                tableField.ColAttributeList ??= new();
+                tableField.ColAttributeList.Add(new AttributeTypeRef("Serenity.ComponentModel.EditLink"));
             }
 
-            model.Fields.Add(f);
+            model.Fields.Add(tableField);
         }
 
         if (model.NameField == null)
@@ -330,55 +284,136 @@ public class EntityModelGenerator : IEntityModelGenerator
             var fld = model.Fields.FirstOrDefault(z => z.FieldType == "String");
             if (fld != null)
             {
-                model.NameField = fld.Ident;
-                fld.ColAttributeList ??= new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.EditLink") };
+                model.NameField = fld.PropertyName;
+                fld.ColAttributeList ??= new();
+                fld.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
             }
         }
 
-        foreach (var x in model.Fields)
+        foreach (var tableField in model.Fields)
+        {
+            var foreignKeyInfo = foreignKeyInfos.Find((k) => k.FKColumn.Equals(tableField.Name, StringComparison.OrdinalIgnoreCase));
+            if (foreignKeyInfo is null)
+                continue;
+
+            if (tableField.Title.EndsWith(" Id", StringComparison.Ordinal) && tableField.Title.Length > 3)
+                tableField.Title = tableField.Title.SafeSubstring(0, tableField.Title.Length - 3);
+
+            tableField.PKSchema = normalizeSchema(foreignKeyInfo.PKSchema);
+            tableField.PKTable = foreignKeyInfo.PKTable;
+            tableField.PKColumn = foreignKeyInfo.PKColumn;
+
+            var foreignFields = inputs.DataSchema.GetFieldInfos(foreignKeyInfo.PKSchema, foreignKeyInfo.PKTable).ToList();
+            int foreignPrefixLength = DeterminePrefixLength(foreignFields, z => z.FieldName);
+            var entityJoin = new EntityJoin
+            {
+                Fields = new(),
+                Name = PropertyNameFor(tableField.Name[prefix..])
+            };
+
+            if (entityJoin.Name.EndsWith("Id", StringComparison.Ordinal) || entityJoin.Name.EndsWith("ID", StringComparison.Ordinal))
+                entityJoin.Name = entityJoin.Name[0..^2];
+
+            tableField.ForeignJoinAlias = entityJoin.Alias;
+            entityJoin.SourceField = tableField.PropertyName;
+
+            foreach (var foreignField in foreignFields)
+            {
+                if (foreignField.FieldName.Equals(foreignKeyInfo.PKColumn, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (removeForeignFields.Contains(foreignField.FieldName))
+                    continue;
+
+                if (foreignSelection == GeneratorConfig.FieldSelection.None &&
+                    !includeForeignFields.Contains(foreignField.FieldName))
+                    continue;
+
+                var viewField = ToEntityField(foreignField, foreignPrefixLength, includeFlags: false);
+
+                var propName = viewField.PropertyName;
+                viewField.PropertyName = propName.StartsWith(entityJoin.Name, StringComparison.Ordinal) &&
+                    !usedPropertyNames.Contains(propName) ? propName : (entityJoin.Name + propName);
+
+                makeUniquePropertyName(viewField);
+
+                if (tableField.TextualField == null && viewField.FieldType == "String")
+                    tableField.TextualField = viewField.PropertyName;
+                else if (foreignSelection == GeneratorConfig.FieldSelection.NameOnly &&
+                    !includeForeignFields.Contains(foreignField.FieldName))
+                {
+                    usedPropertyNames.Remove(viewField.PropertyName);
+                    continue;
+                }
+
+                viewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
+                    foreignField.FieldName[foreignPrefixLength..]))?.Trim();
+
+                var atk = new List<AttributeTypeRef>
+                {
+                    new AttributeTypeRef("System.ComponentModel.DisplayName",
+                        "\"" + viewField.Title + "\"")
+                };
+
+                viewField.Expression = entityJoin.Alias + ".[" + viewField.Name + "]";
+
+                var expr = model.DeclareJoinConstants ?
+                        "$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"" :
+                        ("\"" + viewField.Expression + "\"");
+
+                atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", expr));
+                viewField.AttributeList = atk;
+
+                entityJoin.Fields.Add(viewField);
+            }
+
+            model.Joins.Add(entityJoin);
+        }
+
+        foreach (var tableField in model.Fields)
         {
             var attrs = new List<AttributeTypeRef>
             {
-                new AttributeTypeRef("System.ComponentModel.DisplayName", "\"" + x.Title + "\"")
+                new("System.ComponentModel.DisplayName", "\"" + tableField.Title + "\"")
             };
 
-            if (x.Ident != x.Name)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Column", "\"" + x.Name + "\"" ));
+            if (tableField.PropertyName != tableField.Name)
+                attrs.Add(new("Serenity.Data.Mapping.Column", "\"" + tableField.Name + "\""));
 
-            if ((x.Size ?? 0) > 0)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Size", x.Size.ToString()));
+            if ((tableField.Size ?? 0) > 0)
+                attrs.Add(new("Serenity.Data.Mapping.Size", tableField.Size.ToString()));
 
-            if (x.Scale > 0)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.Scale", x.Scale.ToString()));
+            if (tableField.Scale > 0)
+                attrs.Add(new("Serenity.Data.Mapping.Scale", tableField.Scale.ToString()));
 
-            if (!x.FlagList.IsEmptyOrNull())
-                attrs.AddRange(x.FlagList);
+            if (!tableField.FlagList.IsEmptyOrNull())
+                attrs.AddRange(tableField.FlagList);
 
-            if (!string.IsNullOrEmpty(x.PKTable))
+            if (!string.IsNullOrEmpty(tableField.PKTable))
             {
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.ForeignKey", "\"" + 
-                    (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", " +
-                    "\"" + x.PKColumn + "\""));
+                attrs.Add(new("Serenity.Data.Mapping.ForeignKey", "\"" +
+                    (string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]")) + "\", " +
+                    "\"" + tableField.PKColumn + "\""));
                 var alias = model.DeclareJoinConstants ?
-                    x.ForeignJoinAlias : ("\"" + x.ForeignJoinAlias + "\"");
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.LeftJoin", alias));
+                    tableField.ForeignJoinAlias : ("\"" + tableField.ForeignJoinAlias + "\"");
+                attrs.Add(new("Serenity.Data.Mapping.LeftJoin", alias));
             }
 
-            if (model.IdField == x.Ident && inputs.Net5Plus)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.IdProperty"));
+            if (model.IdField == tableField.PropertyName && inputs.Net5Plus)
+                attrs.Add(new("Serenity.Data.IdProperty"));
 
-            if (model.NameField == x.Ident)
+            if (model.NameField == tableField.PropertyName)
             {
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.QuickSearch"));
+                attrs.Add(new("Serenity.Data.Mapping.QuickSearch"));
                 if (inputs.Net5Plus)
-                    attrs.Add(new AttributeTypeRef("Serenity.Data.NameProperty"));
+                    attrs.Add(new("Serenity.Data.NameProperty"));
             }
 
-            if (x.TextualField != null)
-                attrs.Add(new AttributeTypeRef("Serenity.Data.Mapping.TextualField", 
-                    "nameof(x.TextualField)"));
+            if (tableField.TextualField != null)
+                attrs.Add(new("Serenity.Data.Mapping.TextualField",
+                    "nameof(" + tableField.TextualField + ")"));
 
-            x.AttributeList = attrs;
+            tableField.AttributeList = attrs;
         }
 
         return model;

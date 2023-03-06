@@ -1,11 +1,11 @@
 ﻿using Serenity.CodeGenerator;
-using static Serenity.Tests.MockModelInputs;
+using static Serenity.Tests.CustomerEntityInputs;
 
 namespace Serenity.Tests;
 
-public class MockEntityModel : EntityModel
+public class CustomerEntityModel : EntityModel
 {
-    public MockEntityModel(bool joinConstants = false)
+    public CustomerEntityModel(bool joinConstants = false)
     {
         Module = TestModule;
         ConnectionKey = TestConnection;
@@ -16,10 +16,9 @@ public class MockEntityModel : EntityModel
         Schema = TestSchema;
         Tablename = Customer;
         Title = Customer;
-        Identity = "CustomerId";
+        Identity = CustomerId;
         RowBaseClass = "Serenity.Data.Row<CustomerRow.RowFields>";
-        Instance = false;
-        NameField = "TestName";
+        NameField = CustomerName;
         FieldPrefix = "";
         AspNetCore = true;
         NET5Plus = true;
@@ -30,17 +29,16 @@ public class MockEntityModel : EntityModel
             FieldType = "Int32",
             DataType = "int",
             TSType = "number",
-            Ident = "CustomerId",
-            Name = "CustomerId",
+            PropertyName = CustomerId,
+            Name = CustomerId,
             Title = "Customer Id",
             FlagList = new() { new("Serenity.Data.Mapping.Identity") },
-            Insertable = false,
-            Updatable = false,
             IsValueType = true,
+            OmitInForm = true,
             Scale = 0,
             AttributeList = new()
             {
-                new("System.ComponentModel.DisplayName", "\"Test Id\""),
+                new("System.ComponentModel.DisplayName", "\"Customer Id\""),
                 new("Serenity.Data.Mapping.Identity"),
                 new("Serenity.Data.Mapping.IdProperty"),
             },
@@ -57,18 +55,16 @@ public class MockEntityModel : EntityModel
             FieldType = "String",
             DataType = "string",
             TSType = "string",
-            Ident = "CustomerName",
-            Name = "CustomerName",
+            PropertyName = CustomerName,
+            Name = CustomerName,
             Title = "Customer Name",
             FlagList = new() { new("Serenity.Data.Mapping.NotNull") },
-            Insertable = false,
-            Updatable = false,
             IsValueType = false,
             Size = 50,
             Scale = 0,
             AttributeList = new()
             {
-                new("System.ComponentModel.DisplayName", "\"Test Name\""),
+                new("System.ComponentModel.DisplayName", "\"Customer Name\""),
                 new("Serenity.Data.Mapping.Size", "50"),
                 new("Serenity.Data.Mapping.NotNull"),
                 new("Serenity.Data.Mapping.QuickSearch"),
@@ -85,24 +81,22 @@ public class MockEntityModel : EntityModel
             FieldType = "Int32",
             DataType = "int",
             TSType = "number",
-            Ident = "CityId",
-            Name = "CityId",
-            Title = "City",
-            PKSchema = "test",
-            PKTable = "City",
-            PKColumn = "CityId",
+            PropertyName = CityId,
+            Name = CityId,
+            Title = City,
+            PKSchema = TestSchema,
+            PKTable = City,
+            PKColumn = CityId,
             ForeignJoinAlias = "jCity",
-            Insertable = false,
-            Updatable = false,
             IsValueType = true,
             Scale = 0,
-            TextualField = "CityCityName",
+            TextualField = "CityName",
             AttributeList = new()
             {
                 new("System.ComponentModel.DisplayName", "\"City\""),
                 new("Serenity.Data.Mapping.ForeignKey", "\"[test].[City]\", \"CityId\""),
                 new("Serenity.Data.Mapping.LeftJoin", joinConstants ? "jCity" : "\"jCity\""),
-                new("Serenity.Data.Mapping.TextualField", "\"CityCityName\"")
+                new("Serenity.Data.Mapping.TextualField", "nameof(CityName)")
             },
         });
 
@@ -117,17 +111,15 @@ public class MockEntityModel : EntityModel
                     FieldType = "String",
                     DataType = "string",
                     TSType = "string",
-                    Ident = "CityCityName",
-                    Name = "CityName",
-                    Title = "City City Name",
-                    Insertable = false,
-                    Updatable = false,
+                    PropertyName = CityName,
+                    Name = CityName,
+                    Title = "City Name",
                     IsValueType = false,
                     Size = 50,
                     Scale = 0,
                     AttributeList = new()
                     {
-                        new("System.ComponentModel.DisplayName", "\"City City Name\""),
+                        new("System.ComponentModel.DisplayName", "\"City Name\""),
                         new("Serenity.Data.Mapping.Expression", 
                             joinConstants ? "$\"{jCity}.[CityName]\"" : "\"jCity.[CityName]\"")
                     },
@@ -138,11 +130,9 @@ public class MockEntityModel : EntityModel
                     FieldType = "Int32",
                     DataType = "int",
                     TSType = "number",
-                    Ident = "CityCountryId",
-                    Name = "CountryId",
+                    PropertyName = "CityCountryId",
+                    Name = CountryId,
                     Title = "City Country Id",
-                    Insertable = false,
-                    Updatable = false,
                     IsValueType = true,
                     Scale = 0,
                     AttributeList = new()

@@ -1,9 +1,9 @@
 ﻿{{USING "Serenity.Services"}}
 {{USING "MyRequest = Serenity.Services.RetrieveRequest"}}
-{{USING "MyResponse = Serenity.Services.RetrieveResponse<" + RootNamespace + DotModule + "." + RowClassName + ">"}}
-{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
+{{USING "MyResponse = Serenity.Services.RetrieveResponse<" + RowFullName + ">"}}
+{{USING "MyRow = " + RowFullName}}
 
-{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+{{NAMESPACE ModuleNamespace}}{{capture block~}}
 public interface I{{ClassName}}RetrieveHandler : IRetrieveHandler<MyRow, MyRequest, MyResponse> {}
 
 public class {{ClassName}}RetrieveHandler : RetrieveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}RetrieveHandler

@@ -1,9 +1,9 @@
 ﻿{{USING "Serenity.Services"}}
 {{USING "MyRequest = Serenity.Services.ListRequest"}}
-{{USING "MyResponse = Serenity.Services.ListResponse<" + RootNamespace + DotModule + "." + RowClassName + ">"}}
-{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
+{{USING "MyResponse = Serenity.Services.ListResponse<" + RowFullName + ">"}}
+{{USING "MyRow = " + RowFullName}}
 
-{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+{{NAMESPACE ModuleNamespace}}{{capture block~}}
 public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> {}
 
 public class {{ClassName}}ListHandler : ListRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}ListHandler

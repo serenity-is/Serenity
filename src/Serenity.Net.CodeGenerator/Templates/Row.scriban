@@ -3,7 +3,7 @@
 {{USING "Serenity.Data.Mapping"}}
 {{USING "System.ComponentModel"}}
 
-{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+{{NAMESPACE ModuleNamespace}}{{capture block~}}
 [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
 [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
 [ReadPermission("{{Permission}}")]
@@ -18,20 +18,20 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
     {{~for x in Fields~}}
 
     [{{ATTRREF x.AttributeList}}]
-    public {{TYPEREF x.PropertyType}} {{x.Ident}}
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}}
     {
-        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this];
-        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.Ident}}[this] = value;
+        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.PropertyName}}[this];
+        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.PropertyName}}[this] = value;
     }
     {{~end~}}
     {{~for j in Joins~}}
     {{~for k in j.Fields~}}
 
     [{{ATTRREF k.AttributeList}}]
-    public {{TYPEREF k.PropertyType}} {{k.Ident}}
+    public {{TYPEREF k.PropertyType}} {{k.PropertyName}}
     {
-        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this];
-        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.Ident}}[this] = value;
+        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.PropertyName}}[this];
+        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.PropertyName}}[this] = value;
     }
     {{~end~}}
     {{~end~}}
@@ -56,12 +56,12 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
     public class RowFields : {{TYPEREF FieldsBaseClass}}
     {
         {{~for x in Fields~}}
-        public {{x.FieldType}}Field {{x.Ident}};
+        public {{x.FieldType}}Field {{x.PropertyName}};
         {{~end~}}
 
         {{~for j in Joins~}}
         {{~for k in j.Fields~}}
-        public {{k.FieldType}}Field {{k.Ident}};
+        public {{k.FieldType}}Field {{k.PropertyName}};
         {{~end~}}
         {{~end~}}
     }

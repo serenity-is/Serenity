@@ -1,13 +1,13 @@
 ﻿@inject Serenity.ITextLocalizer Localizer
 @{
-    ViewData["Title"] = Localizer.Get("Db{{DotModule}}.{{ClassName}}.EntityPlural");
+    ViewData["Title"] = Localizer.Get("{{EntityPluralTextKey}}");
 }
 
 <div id="GridDiv"></div>
 
 <script type="text/javascript">
     jQuery(function () {
-        new {{RootNamespace}}{{DotModule}}.{{ClassName}}Grid($('#GridDiv'), {}).init();
+        new {{GridFullName}}($('#GridDiv'), {}).init();
 
         Q.initFullHeightGridPage($('#GridDiv'));
     });

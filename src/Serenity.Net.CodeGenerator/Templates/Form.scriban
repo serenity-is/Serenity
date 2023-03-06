@@ -1,11 +1,12 @@
-﻿{{USING "Serenity.Web"}}
-{{USING "Serenity.ComponentModel"}}
+﻿{{USING "Serenity.ComponentModel"}}
 
-{{NAMESPACE RootNamespaceDotModuleDot + "Forms"}}{{capture block~}}
-[FormScript("{{ModuleDot}}{{ClassName}}")]
+{{NAMESPACE FormNamespace}}{{capture block~}}
+[FormScript("{{FormKey}}")]
 [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
-public class {{ClassName}}Form
-{%{{}%}{{for x in Fields}}{{if x.Ident != IdField}}
-    public {{TYPEREF x.DataType}} {{x.Ident}} { get; set; }{{end}}{{end}}
+public class {{FormClassName}}
+{
+    {{~for x in FormFields~}}
+    public {{TYPEREF x.DataType}} {{x.PropertyName}} { get; set; }
+    {{~end~}}
 }
 {{~end}}{{NAMESPACEBLOCK block~}}

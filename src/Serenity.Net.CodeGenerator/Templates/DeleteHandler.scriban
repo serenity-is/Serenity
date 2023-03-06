@@ -1,9 +1,9 @@
 ﻿{{USING "Serenity.Services"}}
 {{USING "MyRequest = Serenity.Services.DeleteRequest"}}
 {{USING "MyResponse = Serenity.Services.DeleteResponse"}}
-{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName }}
+{{USING "MyRow = " + RowFullName }}
 
-{{NAMESPACE RootNamespaceDotModule}}{{capture block~}}
+{{NAMESPACE ModuleNamespace}}{{capture block~}}
 public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> {}
 
 public class {{ClassName}}DeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}DeleteHandler

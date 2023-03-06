@@ -174,7 +174,8 @@ public class GeneratorConfig
     /// <summary>
     /// A list of foreign fields to omit from generated code.
     /// This could be used to include some additional fields 
-    /// in the foreign table when ForeignSelection is None or NameOnly
+    /// in the foreign table when ForeignSelection is None or NameOnly.
+    /// Not so useful if ForeignFieldSelection is All
     /// </summary>
     public List<string> IncludeForeignFields { get; set; }
 
@@ -187,9 +188,10 @@ public class GeneratorConfig
     /// This could be used to disable generating code for join fields 
     /// like CreatedBy, ModifiedBy etc, so properties like CustomerCreatedBy,
     /// CustomerModifiedBy etc. won't be generated in OrderRow.
-    /// Will be ignored if ForeignFieldSelection is None or NameOnly
+    /// Not so useful if ForeignFieldSelection is None or NameOnly
     /// </summary>
     public List<string> RemoveForeignFields { get; set; }
+
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
         RemoveForeignFields != null && RemoveForeignFields.Any();

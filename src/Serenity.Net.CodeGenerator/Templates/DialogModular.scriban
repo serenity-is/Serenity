@@ -1,14 +1,14 @@
 ﻿
-@{{SERENITYIMPORT "Decorators"}}.registerClass('{{RootNamespace}}{{DotModule}}.{{ClassName}}Dialog')
-export class {{ClassName}}Dialog extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
-    protected getFormKey() { return {{SERVERTYPEIMPORT ClassName + "Form"}}.formKey; }{{if Identity}}
+@{{SERENITYIMPORT "Decorators"}}.registerClass('{{DialogFullName}}')
+export class {{DialogClassName}} extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
+    protected getFormKey() { return {{SERVERTYPEIMPORT FormClassName}}.formKey; }{{if Identity}}
     protected getIdProperty() { return {{SERVERTYPEIMPORT RowClassName}}.idProperty; }{{end}}
     protected getLocalTextPrefix() { return {{SERVERTYPEIMPORT RowClassName}}.localTextPrefix; }{{if NameField}}
     protected getNameProperty() { return {{SERVERTYPEIMPORT RowClassName}}.nameProperty; }{{end}}
-    protected getService() { return {{SERVERTYPEIMPORT ClassName + "Service"}}.baseUrl; }
+    protected getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
     protected getDeletePermission() { return {{SERVERTYPEIMPORT RowClassName}}.deletePermission; }
     protected getInsertPermission() { return {{SERVERTYPEIMPORT RowClassName}}.insertPermission; }
     protected getUpdatePermission() { return {{SERVERTYPEIMPORT RowClassName}}.updatePermission; }
 
-    protected form = new {{ClassName}}Form(this.idPrefix);
+    protected form = new {{FormClassName}}(this.idPrefix);
 }

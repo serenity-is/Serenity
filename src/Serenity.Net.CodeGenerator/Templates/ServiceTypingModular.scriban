@@ -1,6 +1,6 @@
 ﻿
-export namespace {{ClassName}}Service {
-    export const baseUrl = '{{ModuleSlash}}{{ClassName}}';
+export namespace {{ServiceClassName}} {
+    export const baseUrl = '{{ServiceBaseUrl}}';
 
     export declare function Create(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
     export declare function Update(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
@@ -9,11 +9,11 @@ export namespace {{ClassName}}Service {
     export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
 
     export const Methods {
-        Create: "{{ModuleSlash}}{{ClassName}}/Create",
-        Update: "{{ModuleSlash}}{{ClassName}}/Update",
-        Delete: "{{ModuleSlash}}{{ClassName}}/Delete",
-        Retrieve: "{{ModuleSlash}}{{ClassName}}/Retrieve",
-        List: "{{ModuleSlash}}{{ClassName}}/List"
+        Create: "{{ServiceBaseUrl}}/Create",
+        Update: "{{ServiceBaseUrl}}/Update",
+        Delete: "{{ServiceBaseUrl}}/Delete",
+        Retrieve: "{{ServiceBaseUrl}}/Retrieve",
+        List: "{{ServiceBaseUrl}}/List"
     } as const;
 
     [
@@ -23,7 +23,7 @@ export namespace {{ClassName}}Service {
         'Retrieve', 
         'List'
     ].forEach(x => {
-        (<any>{{ClassName}}Service)[x] = function (r, s, o) { 
+        (<any>{{ServiceClassName}})[x] = function (r, s, o) { 
             return {{QIMPORT "serviceRequest"}}(baseUrl + '/' + x, r, s, o); 
         };
     });

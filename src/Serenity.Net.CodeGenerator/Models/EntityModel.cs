@@ -1,4 +1,6 @@
-﻿namespace Serenity.CodeGenerator;
+﻿using Microsoft.Identity.Client;
+
+namespace Serenity.CodeGenerator;
 
 public class EntityModel
 {
@@ -18,7 +20,6 @@ public class EntityModel
     public bool IsLookup { get; set; }
     public List<EntityField> Fields { get; } = new();
     public List<EntityJoin> Joins { get; } = new();
-    public bool Instance { get; set; }
     public string NameField { get; set; }
     public string FieldPrefix { get; set; }
     public bool AspNetCore { get; set; } = true;
@@ -27,8 +28,11 @@ public class EntityModel
     public bool FileScopedNamespaces { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 
-    public string IdField { get { return Identity; } }
+    public string IdField => Identity;
     public Dictionary<string, object> CustomSettings { get; set; }
+
+    public IEnumerable<EntityField> FormFields => Fields.Where(f => !f.OmitInForm);
+    public IEnumerable<EntityField> GridFields => Fields.Where(f => !f.OmitInGrid);
 
     public string DotModule
     {
@@ -69,6 +73,35 @@ public class EntityModel
     {
         get { return (string.IsNullOrEmpty(RootNamespaceDotModule) ? "" : RootNamespaceDotModule + "."); }
     }
+
+    public string ModuleNamespace => RootNamespaceDotModule;
+    public string ModuleNamespaceDot => RootNamespaceDotModuleDot;
+
+    public string RowFullName => ModuleNamespaceDot + RowClassName;
+
+    public string ColumnsKey => ModuleDot + ClassName;
+    public string ColumnsNamespace => ModuleNamespaceDot + "Columns";
+    public string ColumnsClassName => ClassName + "Columns";
+    public string FormNamespace => ModuleNamespaceDot + "Forms";
+    public string FormKey => ModuleDot + ClassName;
+    public string FormClassName => ClassName + "Form";
+    public string EndpointNamespace => ModuleNamespaceDot + "Endpoints";
+    public string EndpointClassName => ClassName + "Controller";
+    public string EndpointRouteTemplate => "Services/" + ModuleSlash + ClassName + "/[action]";
+
+    public string DialogClassName => ClassName + "Dialog";
+    public string DialogFullName => ModuleNamespaceDot + DialogClassName;
+    public string GridClassName => ClassName + "Grid";
+    public string GridFullName => ModuleNamespaceDot + GridClassName;
+    public string ViewPageClassName => ClassName + "Controller";
+    public string ViewPageNamespace => ModuleNamespaceDot + "Pages";
+    public string ViewPageRoute => ModuleSlash + ClassName;
+    public string ViewPageRoutePrefix => ModuleSlash + ClassName;
+    public string ViewPageIndexPath => "~/Modules/" + ModuleSlash + ClassName + "/" + ClassName + "Index.cshtml";
+    public string ViewPageModulePath => "@/" + Module + "/" + ClassName + "/" + ClassName + "Page";
+    public string ServiceClassName => ClassName + "Service";
+    public string ServiceBaseUrl => ModuleSlash + ClassName;
+    public string EntityPluralTextKey => "Db" + DotModule + ClassName + ".EntityPlural";
 
     public string NavigationCategory
     {

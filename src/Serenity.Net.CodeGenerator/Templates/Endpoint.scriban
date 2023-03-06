@@ -6,10 +6,10 @@
 {{USING "System" }}
 {{USING "System.Data" }}
 {{USING "System.Globalization" }}
-{{USING "MyRow = " + RootNamespace + DotModule + "." + RowClassName}}
+{{USING "MyRow = " + RowFullName }}
 
-{{NAMESPACE RootNamespaceDotModuleDot + "Endpoints"}}{{capture block~}}
-[Route("Services/{{ModuleSlash}}{{ClassName}}/[action]")]
+{{NAMESPACE EndpointNamespace}}{{capture block~}}
+[Route("{{EndpointRouteTemplate}}")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class {{ClassName}}Controller : ServiceEndpoint
 {

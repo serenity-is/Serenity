@@ -1,4 +1,4 @@
 ﻿
-export class {{ClassName}}Columns {
-    static columnsKey = '{{ModuleDot}}{{ClassName}}';
+export class {{ColumnsClassName}} {
+    static columnsKey = '{{ColumnsKey}}';
 }

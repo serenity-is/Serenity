@@ -5,7 +5,10 @@ public class EntityField
     public string FieldType { get; set; }
     public string DataType { get; set; }
     public string TSType { get; set; }
-    public string Ident { get; set; }
+    public string PropertyName { get; set; }
+    public string Ident => PropertyName;
+    public bool OmitInGrid { get; set; }
+    public bool OmitInForm { get; set; }
     public string Name { get; set; }
     public string Title { get; set; }
     public List<AttributeTypeRef> FlagList { get; set; }
@@ -14,8 +17,6 @@ public class EntityField
     public string PKTable { get; set; }
     public string PKColumn { get; set; }
     public string ForeignJoinAlias { get; set; }
-    public bool Insertable { get; set; }
-    public bool Updatable { get; set; }
     public bool IsValueType { get; set; }
     public int? Size { get; set; }
     public int Scale { get; set; }

@@ -5,15 +5,15 @@ namespace Serenity.Tests.CodeGenerator;
 public partial class RowTemplateTests
 {
     [Fact]
-    public void CustomerRow_FileScopedNamespace()
+    public void Customer_FileScopedNamespace()
     {
-        var model = new MockEntityModel
+        var model = new CustomerEntityModel
         {
             FileScopedNamespaces = true
         };
         var actual = RenderTemplate(model);
         
-        var expected = Regex.Replace(ExpectedDefaultTestRowCS,
+        var expected = Regex.Replace(Customer_Expected_Defaults,
             @"^namespace TestNamespace\.TestModule",
             "namespace TestNamespace.TestModule;\n",
             RegexOptions.Multiline);
