@@ -1,5 +1,5 @@
 # Builds and test 
-name: .NET
+name: build
 
 on:
   push:
