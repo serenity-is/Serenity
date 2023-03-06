@@ -15,8 +15,8 @@ public class MockUploadStorage : DiskUploadStorage
     {
         return new MockUploadStorage(new DiskUploadStorageOptions
         {
-            RootPath = "C:/",
+            RootPath = "/",
             RootUrl = "/upload/"
-        }, new MockDiskUploadFileSystem(currentDirectory: "C:/"));
+        }, new MockDiskUploadFileSystem());
     }
 }

@@ -60,18 +60,13 @@ public class GlobFilter
 
             isActive = true;
 
-            var sep = System.IO.Path.DirectorySeparatorChar;
-
-            var s = glob;
-            if (sep == '\\')
-                s = glob.Replace('/', '\\');
+            var s = glob.Replace('\\', '/');
 
             var starDotIndex = s.IndexOf("*.");
 
             // exact match
-            if (s[0] == sep &&
+            if (s[0] == '/' &&
                 s[^1] != '/' &&
-                s[^1] != '\\' &&
                 s.IndexOfAny(AsteriskQue, 1) < 0)
             {
                 exactMatch ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -102,8 +97,8 @@ public class GlobFilter
 
             // subdirectory under root and extension (/bin/some/*.txt)
             if (starDotIndex > 1 &&
-                s[starDotIndex - 1] == sep &&
-                s[0] == sep &&
+                s[starDotIndex - 1] == '/' &&
+                s[0] == '/' &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0 &&
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 1) < 0)
             {
@@ -114,7 +109,7 @@ public class GlobFilter
 
             // extension under root (/*.txt)
             if (starDotIndex == 1 &&
-                s[0] == sep &&
+                s[0] == '/' &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
                 startsWithAndEndsWith ??= new();
@@ -123,23 +118,23 @@ public class GlobFilter
             }
 
             // directory filter at any depth (.git/)
-            if (s[^1] == sep &&
-                s[0] != sep &&
+            if (s[^1] == '/' &&
+                s[0] != '/' &&
                 s.IndexOfAny(AsteriskQue, 1) < 0)
             {
                 contains ??= new List<string>();
 
                 startsWith ??= new List<string>();
 
-                contains.Add(sep.ToString() + s);
+                contains.Add('/'.ToString() + s);
                 startsWith.Add(s);
 
                 continue;
             }
 
             // directory filter at root (/Imports/)
-            if (s[^1] == sep &&
-                s[0] == sep &&
+            if (s[^1] == '/' &&
+                s[0] == '/' &&
                 s.IndexOfAny(AsteriskQue) < 0)
             {
                 startsWith ??= new List<string>();
@@ -150,16 +145,16 @@ public class GlobFilter
 
             // folder than any then extension (App_Data/**/*.log) or (/App_Code/**/*.xyz)
             if (starDotIndex > 4 &&
-                s[starDotIndex - 1] == sep &&
+                s[starDotIndex - 1] == '/' &&
                 s[starDotIndex - 2] == '*' &&
                 s[starDotIndex - 3] == '*' &&
-                s[starDotIndex - 4] == sep &&
+                s[starDotIndex - 4] == '/' &&
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 5) < 0 &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
                 startsWithAndEndsWith ??= new();
 
-                if (s[0] == sep)
+                if (s[0] == '/')
                 {
                     startsWithAndEndsWith.Add(new(s.Substring(1, starDotIndex - 4), true, s[(starDotIndex + 1)..]));
                 }
@@ -167,7 +162,7 @@ public class GlobFilter
                 {
                     containsAndEndsWith ??= new();
                     startsWithAndEndsWith.Add(new(s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
-                    containsAndEndsWith.Add(new(sep.ToString() + s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
+                    containsAndEndsWith.Add(new('/'.ToString() + s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
                 }
 
                 continue;
@@ -177,7 +172,7 @@ public class GlobFilter
             {
                 exactMatch ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                if (s[0] == sep)
+                if (s[0] == '/')
                 {
                     exactMatch.Add(s[..]);
                 }
@@ -187,7 +182,7 @@ public class GlobFilter
 
                     endsWith ??= new List<string>();
 
-                    endsWith.Add(sep + s[..]);
+                    endsWith.Add('/' + s[..]);
                 }
 
                 continue;
@@ -201,7 +196,7 @@ public class GlobFilter
                 continue;
             }
 
-            if (s[0] == sep &&
+            if (s[0] == '/' &&
                 s.Length > 2 &&
                 s[1] == '*' &&
                 s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
@@ -211,7 +206,7 @@ public class GlobFilter
                 continue;
             }
 
-            matchers.Add(ToMatcher(glob));
+            matchers.Add(ToMatcher(s));
         }
     }
 
@@ -237,6 +232,8 @@ public class GlobFilter
     {
         if (string.IsNullOrEmpty(path))
             return false;
+
+        path = path?.Replace('\\', '/');
 
         if (excludeFilter != null &&
             excludeFilter.IsMatch(path))
@@ -340,31 +337,15 @@ public class GlobFilter
     /// Wildcards to regex conversion. Inspired from NuGet source code.
     /// </summary>
     /// <param name="wildcard">The wildcard.</param>
-    /// <returns></returns>
-    public static Regex WildcardToRegex(string wildcard)
+    private static Regex WildcardToRegex(string wildcard)
     {
         var pattern = Regex.Escape(wildcard);
-        if (System.IO.Path.DirectorySeparatorChar == '/')
-        {
-            // regex wildcard adjustments for *nix-style file systems
-            pattern = pattern
-                .Replace(@"\.\*\*", @"\.[^/.]*") // .** should not match on ../file or ./file but will match .file
-                .Replace(@"\*\*/", "(.+/)*") //For recursive wildcards /**/, include the current directory.
-                .Replace(@"\*\*", ".*") // For recursive wildcards that don't end in a slash e.g. **.txt would be treated as a .txt file at any depth
-                .Replace(@"\*", @"[^/]*(/)?") // For non recursive searches, limit it any character that is not a directory separator
-                .Replace(@"\?", "."); // ? translates to a single any character
-        }
-        else
-        {
-            // regex wildcard adjustments for Windows-style file systems
-            pattern = pattern
-                .Replace("/", @"\\") // On Windows, / is treated the same as \.
-                .Replace(@"\.\*\*", @"\.[^\\.]*") // .** should not match on ../file or ./file but will match .file
-                .Replace(@"\*\*\\", @"(.+\\)*") //For recursive wildcards \**\, include the current directory.
-                .Replace(@"\*\*", ".*") // For recursive wildcards that don't end in a slash e.g. **.txt would be treated as a .txt file at any depth
-                .Replace(@"\*", @"[^\\]*") // For non recursive searches, limit it any character that is not a directory separator
-                .Replace(@"\?", "."); // ? translates to a single any character
-        }
+        pattern = pattern
+            .Replace(@"\.\*\*", @"\.[^/.]*") // .** should not match on ../file or ./file but will match .file
+            .Replace(@"\*\*/", "(.+/)*") //For recursive wildcards /**/, include the current directory.
+            .Replace(@"\*\*", ".*") // For recursive wildcards that don't end in a slash e.g. **.txt would be treated as a .txt file at any depth
+            .Replace(@"\*", @"[^/]*(/)?") // For non recursive searches, limit it any character that is not a directory separator
+            .Replace(@"\?", "."); // ? translates to a single any character
 
         return new Regex('^' + pattern + '$', RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant);
     }

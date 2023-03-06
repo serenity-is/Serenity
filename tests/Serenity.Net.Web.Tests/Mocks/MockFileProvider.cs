@@ -5,7 +5,7 @@ public class MockFileProvider : IFileProvider
     public System.IO.Abstractions.IFileSystem FileSystem { get; }
     public string Root { get; }
 
-    public MockFileProvider(string root = @"C:/Testing/Test/", System.IO.Abstractions.IFileSystem fileSystem = null)
+    public MockFileProvider(string root = @"/Testing/Test/", System.IO.Abstractions.IFileSystem fileSystem = null)
     {
         FileSystem = fileSystem ?? new MockFileSystem();
         Root = root;
