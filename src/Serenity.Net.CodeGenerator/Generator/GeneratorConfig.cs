@@ -37,7 +37,6 @@ public class GeneratorConfig
     /// <summary>
     /// When true, enables RowTemplate class generation. This should
     /// only be used when Serenity.Pro.Coder is enabled in the project.
-    /// Not implemented yet.
     /// </summary>
     public bool? EnableRowTemplates { get; set; }
 

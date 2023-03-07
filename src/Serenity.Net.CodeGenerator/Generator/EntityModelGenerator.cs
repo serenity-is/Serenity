@@ -108,6 +108,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             ClassName = className,
             ConnectionKey = inputs.ConnectionKey,
             DeclareJoinConstants = inputs.Config.DeclareJoinConstants ?? false,
+            EnableRowTemplates = inputs.Config.EnableRowTemplates ?? false,
             FileScopedNamespaces = inputs.Config.FileScopedNamespaces ?? false,
             Module = inputs.Module,
             NET5Plus = inputs.Net5Plus,

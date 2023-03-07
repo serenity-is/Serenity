@@ -1,7 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using Serenity.TypeScript.TsTypes;
-
-namespace Serenity.CodeGenerator;
+﻿namespace Serenity.CodeGenerator;
 
 public class EntityModel
 {
@@ -26,6 +23,7 @@ public class EntityModel
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
     public bool DeclareJoinConstants { get; set; }
+    public bool EnableRowTemplates { get; set; }
     public bool FileScopedNamespaces { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 

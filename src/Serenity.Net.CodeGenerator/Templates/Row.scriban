@@ -9,13 +9,29 @@
 [DisplayName("{{Title}}"), InstanceName("{{Title}}")]
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
-public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
+public sealed{{if EnableRowTemplates}} partial{{end}} class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
 {   {{~if DeclareJoinConstants && !Joins.empty?~}}
 
     {{~for j in Joins~}}
     const string {{j.Alias}} = nameof({{j.Alias}});
     {{~end~}}
     {{~end~}}
+    {{~if EnableRowTemplates~}}
+
+    class RowTemplate
+    {   {{~for x in AllFields~}}
+
+        [{{ATTRREF x.AttributeList}}]
+        public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get; set; }
+        {{~end~}}
+    }
+    {{~if FieldsBaseClass != "Serenity.Data.RowFieldsBase"~}}
+
+    public partial class RowFields : {{TYPEREF FieldsBaseClass}}
+    {
+    }
+    {{~end~}}
+    {{~else~}}
     {{~for x in AllFields~}}
 
     [{{ATTRREF x.AttributeList}}]
@@ -53,5 +69,6 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
         public {{x.FieldType}}Field {{x.PropertyName}};
         {{~end~}}
     }
+    {{~end~}}
 }
 {{~end}}{{NAMESPACEBLOCK block~}}
