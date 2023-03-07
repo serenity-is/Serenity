@@ -9,15 +9,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  checkout:
+  setup:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
-  setup:
-    needs: checkout
-    runs-on: ubuntu-latest
-    steps:
     - name: setup .net
       uses: actions/setup-dotnet@v3
       with:
@@ -30,31 +25,16 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18.14.2'
-        cache: 'pnpm'
-        
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-    - name: Restore dependencies
+        cache: 'pnpm'        
+    - name: Restore Dependencies
       run: dotnet restore
       working-directory: "src"
-    - name: Build
+    - name: dotnet build
       run: dotnet build --no-restore
       working-directory: "src"
-      
-  dotnet-tests:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
       working-directory: "src"
-      
-  js-tests:
-    needs: dotnet-tests
-    runs-on: ubuntu-latest
-    steps:
     - name: corelib test
       run: pnpm test
       working-directory: "src/Serenity.Scripts/corelib"
