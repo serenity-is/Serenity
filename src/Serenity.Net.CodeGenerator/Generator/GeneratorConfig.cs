@@ -10,7 +10,11 @@ public class GeneratorConfig
 {
     /// <summary>
     /// If specified, the settings in this file extends
-    /// settings in a base file similar to tsconfig.json
+    /// settings in a base file similar to tsconfig.json.
+    /// This can also be a special string like "defaults@6.6.0" to
+    /// apply defaults introduced in a specific Serenity version.
+    /// See "GeneratorDefaults.cs" file for a list of possible
+    /// version values.
     /// </summary>
     public string Extends { get; set; }
 
