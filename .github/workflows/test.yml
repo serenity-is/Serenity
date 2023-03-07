@@ -97,7 +97,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       working-directory: "src"
 
-  corelib-js-test:
+  js-corelib-tests:
     runs-on: ubuntu-latest
     needs: build
     steps:
