@@ -1,4 +1,5 @@
 ﻿using Microsoft.Identity.Client;
+using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.CodeGenerator;
 
@@ -75,7 +76,7 @@ public class EntityModel
     }
 
     public string ModuleNamespace => RootNamespaceDotModule;
-    public string ModuleNamespaceDot => RootNamespaceDotModuleDot;
+    private string ModuleNamespaceDot => RootNamespaceDotModuleDot;
 
     public string RowFullName => ModuleNamespaceDot + RowClassName;
 
@@ -88,7 +89,6 @@ public class EntityModel
     public string EndpointNamespace => ModuleNamespaceDot + "Endpoints";
     public string EndpointClassName => ClassName + "Controller";
     public string EndpointRouteTemplate => "Services/" + ModuleSlash + ClassName + "/[action]";
-
     public string DialogClassName => ClassName + "Dialog";
     public string DialogFullName => ModuleNamespaceDot + DialogClassName;
     public string GridClassName => ClassName + "Grid";
@@ -102,6 +102,11 @@ public class EntityModel
     public string ServiceClassName => ClassName + "Service";
     public string ServiceBaseUrl => ModuleSlash + ClassName;
     public string EntityPluralTextKey => "Db" + DotModule + ClassName + ".EntityPlural";
+
+    public IEnumerable<EntityField> AllFields => Fields.Concat(JoinFields);
+
+    public IEnumerable<EntityField> JoinFields => Fields.Concat(Joins?.SelectMany(x => 
+        (IEnumerable<EntityField>)x.Fields ?? Array.Empty<EntityField>()) ?? Array.Empty<EntityField>());
 
     public string NavigationCategory
     {

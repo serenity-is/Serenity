@@ -1,4 +1,5 @@
-﻿{{USING "Serenity.ComponentModel"}}
+﻿{{~f = NET5Plus ? "f" : "F"~}}
+{{USING "Serenity.ComponentModel"}}
 {{USING "Serenity.Data"}}
 {{USING "Serenity.Data.Mapping"}}
 {{USING "System.ComponentModel"}}
@@ -15,25 +16,14 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
     const string {{j.Alias}} = nameof({{j.Alias}});
     {{~end~}}
     {{~end~}}
-    {{~for x in Fields~}}
+    {{~for x in AllFields~}}
 
     [{{ATTRREF x.AttributeList}}]
     public {{TYPEREF x.PropertyType}} {{x.PropertyName}}
     {
-        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.PropertyName}}[this];
-        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{x.PropertyName}}[this] = value;
+        get => {{f}}ields.{{x.PropertyName}}[this];
+        set => {{f}}ields.{{x.PropertyName}}[this] = value;
     }
-    {{~end~}}
-    {{~for j in Joins~}}
-    {{~for k in j.Fields~}}
-
-    [{{ATTRREF k.AttributeList}}]
-    public {{TYPEREF k.PropertyType}} {{k.PropertyName}}
-    {
-        get => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.PropertyName}}[this];
-        set => {{if NET5Plus}}fields{{else}}Fields{{end}}.{{k.PropertyName}}[this] = value;
-    }
-    {{~end~}}
     {{~end~}}
 {{~if !NET5Plus~}}
     {{~if Identity~}}
@@ -59,10 +49,8 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
         public {{x.FieldType}}Field {{x.PropertyName}};
         {{~end~}}
 
-        {{~for j in Joins~}}
-        {{~for k in j.Fields~}}
+        {{~for j in JoinFields~}}
         public {{k.FieldType}}Field {{k.PropertyName}};
-        {{~end~}}
         {{~end~}}
     }
 }
