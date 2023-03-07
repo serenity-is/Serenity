@@ -1,4 +1,8 @@
-﻿namespace Serenity.CodeGenerator;
+﻿using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
+using System;
+
+namespace Serenity.CodeGenerator;
 
 /// <summary>
 /// Helper methods for generator config
@@ -97,11 +101,17 @@ public static class GeneratorConfigExtensions
         else
         {
             config = ExtendsJsonReader.Read<GeneratorConfig>(
-                fileSystem, path, nameof(GeneratorConfig.Extends),
+                fileSystem, path,
+                extendsProp: nameof(GeneratorConfig.Extends),
                 options: new System.Text.Json.JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
-                });
+                    PropertyNameCaseInsensitive = true,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter()
+                    }
+                },
+                getDefault: GeneratorDefaults.TryParse);
         }
 
         config.Connections ??= new();

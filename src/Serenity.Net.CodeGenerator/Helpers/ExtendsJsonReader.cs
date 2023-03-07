@@ -6,7 +6,8 @@ namespace Serenity.CodeGenerator;
 public class ExtendsJsonReader
 {
     public static TConfig Read<TConfig>(IFileSystem fileSystem, 
-        string path, string extendsProp, JsonSerializerOptions options)
+        string path, string extendsProp, JsonSerializerOptions options,
+        Func<string, string> getDefault = null)
         where TConfig: class, new()
     {
         string readExtends(JsonDocument doc)
@@ -28,9 +29,13 @@ public class ExtendsJsonReader
                 if (++loop > 100)
                     throw new InvalidOperationException($"Infinite Extends loop detected for json file: {path}!");
 
-                path = fileSystem.Combine(fileSystem.GetDirectoryName(path), extends);
-                using var extendsDoc = JsonDocument.Parse(
-                    fileSystem.ReadAllText(path));
+                var extendsJson = getDefault?.Invoke(extends);
+                if (extendsJson is null)
+                {
+                    path = fileSystem.Combine(fileSystem.GetDirectoryName(path), extends);
+                    extendsJson = fileSystem.ReadAllText(path);
+                }
+                using var extendsDoc = JsonDocument.Parse(extendsJson);
                 extends = readExtends(extendsDoc);
                 var mergedDoc = MergeObjects(extendsDoc.RootElement, currentDoc.RootElement);
                 currentDoc.Dispose();
