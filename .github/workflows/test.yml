@@ -12,29 +12,124 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
     - name: setup .net
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 7.29.0
+
     - name: setup node
       uses: actions/setup-node@v3
       with:
         node-version: '18.14.2'
-        cache: 'pnpm'        
+
+    - uses: pnpm/action-setup@v2.2.4
+      with:
+        version: 7.29.0
+        run_install: false
+
+    - name: pnpm install
+      uses: ./.github/actions/pnpm-install
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Restore Dependencies
       run: dotnet restore
       working-directory: "src"
+
     - name: dotnet build
       run: dotnet build --no-restore
       working-directory: "src"
+
+    - name: Cached build files
+      uses: actions/cache@v3
+      id: build-files
+      env:
+        cache-name: build-files
+      with:
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
+        path: |
+          **/*/bin/*
+          **/*/obj/*
+          **/*/wwwroot/*
+
+  dotnet-tests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: setup .net
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+        fail-on-cache-miss: true
+
+    - name: Cached build files
+      uses: actions/cache@v3
+      id: build-files
+      env:
+        cache-name: build-files
+      with:
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
+        path: |
+          **/*/bin/*
+          **/*/obj/*
+          **/*/wwwroot/*
+        fail-on-cache-miss: true
+
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
       working-directory: "src"
+
+  js-corelib-tests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.14.2'
+
+    - uses: pnpm/action-setup@v2.2.4
+      with:
+        version: 7.29.0
+        run_install: false
+
+    - name: pnpm install
+      uses: ./.github/actions/pnpm-install
+
+    - name: Cached build files
+      uses: actions/cache@v3
+      id: build-files
+      env:
+        cache-name: build-files
+      with:
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
+        path: |
+          **/*/bin/*
+          **/*/obj/*
+          **/*/wwwroot/*
+        fail-on-cache-miss: true
+
     - name: corelib test
       run: pnpm test
       working-directory: "src/Serenity.Scripts/corelib"
