@@ -9,7 +9,7 @@
       </NpmPackageFile>
     </ItemGroup>
   </Target>
-  <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'false'" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
+  <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
     <Exec Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)"  />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
