@@ -29,12 +29,8 @@ public class ExtendsJsonReader
                 if (++loop > 100)
                     throw new InvalidOperationException($"Infinite Extends loop detected for json file: {path}!");
 
-                var extendsJson = getDefault?.Invoke(extends);
-                if (extendsJson is null)
-                {
-                    path = fileSystem.Combine(fileSystem.GetDirectoryName(path), extends);
-                    extendsJson = fileSystem.ReadAllText(path);
-                }
+                var extendsJson = getDefault?.Invoke(extends) ??
+                    fileSystem.ReadAllText(path = fileSystem.Combine(fileSystem.GetDirectoryName(path), extends));
                 using var extendsDoc = JsonDocument.Parse(extendsJson);
                 extends = readExtends(extendsDoc);
                 var mergedDoc = MergeObjects(extendsDoc.RootElement, currentDoc.RootElement);
