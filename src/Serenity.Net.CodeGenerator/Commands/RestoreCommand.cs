@@ -28,6 +28,12 @@ public class RestoreCommand : BaseFileSystemCommand
             return ExitCodes.ProjectNotFound;
         }
 
+        var projectDir = fileSystem.GetDirectoryName(csproj);
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
+
+        if (config?.Restore?.Exclude?.Any(x => x == "**/*") == true)
+            return ExitCodes.Success;
+
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         bool skipPackage(string id)
@@ -42,9 +48,6 @@ public class RestoreCommand : BaseFileSystemCommand
 
             return false;
         }
-
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
 
         GlobFilter include = null;
         if (config.Restore?.Include.IsEmptyOrNull() == false)
@@ -96,6 +99,7 @@ public class RestoreCommand : BaseFileSystemCommand
             }
         }
 
+        if (config?.Restore?.Typings != false)
         try
         {
             var projectRefs = ProjectReferences?.Where(x => 
@@ -247,11 +251,14 @@ public class RestoreCommand : BaseFileSystemCommand
                         relative = "Content/" + relative["content/".Length..];
                     else if (relative.StartsWith("scripts/typings/", StringComparison.OrdinalIgnoreCase))
                     {
-                        relative = "typings/" + relative["Scripts/typings/".Length..];
-                        var tsconfig = fileSystem.Combine(projectDir, "tsconfig.json");
-                        if (!fileSystem.FileExists(tsconfig) ||
-                            !fileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
-                            continue; // old typings only needed for users who didn't fix their tsconfig.json
+                        if (config?.Restore.Typings != false)
+                        {
+                            relative = "typings/" + relative["Scripts/typings/".Length..];
+                            var tsconfig = fileSystem.Combine(projectDir, "tsconfig.json");
+                            if (!fileSystem.FileExists(tsconfig) ||
+                                !fileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
+                                continue; // old typings only needed for users who didn't fix their tsconfig.json
+                        }
                     }
                     else if (relative.StartsWith("scripts/", StringComparison.OrdinalIgnoreCase))
                         relative = "Scripts/" + relative["scripts/".Length..];

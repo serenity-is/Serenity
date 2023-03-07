@@ -171,7 +171,7 @@ public class GeneratorConfig
     public FieldSelection? ForeignFieldSelection { get; set; }
 
     /// <summary>
-    /// A list of foreign fields to omit from generated code.
+    /// A list of foreign fields to include in generated code.
     /// This could be used to include some additional fields 
     /// in the foreign table when ForeignSelection is None or NameOnly.
     /// Not so useful if ForeignFieldSelection is All
@@ -497,10 +497,17 @@ public class GeneratorConfig
         /// List of files (git ignore like) to include while restoring
         /// </summary>
         public string[] Include { get; set; }
+
         /// <summary>
         /// List of files (git ignore like) to exclude while restoring
         /// </summary>
         public string[] Exclude { get; set; }
+
+        /// <summary>
+        /// Set false to disable namespace typings restore
+        /// to typings/ folder.
+        /// </summary>
+        public bool? Typings { get; set; }
     }
 
     /// <summary>
