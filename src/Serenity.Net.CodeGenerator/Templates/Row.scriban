@@ -10,7 +10,7 @@
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
 public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
-{   {{~if DeclareJoinConstants~}}
+{   {{~if DeclareJoinConstants && !Joins.empty?~}}
 
     {{~for j in Joins~}}
     const string {{j.Alias}} = nameof({{j.Alias}});
