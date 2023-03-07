@@ -60,7 +60,7 @@ jobs:
           **/*/obj/*
           **/*/wwwroot/*
 
-  dotnet-test:
+  dotnet-tests:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -97,7 +97,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       working-directory: "src"
 
-  pnpm-test:
+  corelib-js-test:
     runs-on: ubuntu-latest
     needs: build
     steps:
