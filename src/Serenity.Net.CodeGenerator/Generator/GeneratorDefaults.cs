@@ -1,8 +1,9 @@
 ﻿namespace Serenity.CodeGenerator;
 
 /// <summary>
-/// Sergen (or Stargen) and Source Generator Configuration
-/// that is usually stored in sergen.json in project directory
+/// Contains list of default versions that can be used in "extends"
+/// setting like "defaults@6.6.0" in sergen.json to apply a specific
+/// set of defaults.
 /// </summary>
 public class GeneratorDefaults
 {
