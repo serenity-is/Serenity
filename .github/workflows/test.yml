@@ -13,37 +13,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
+    
   setup:
     needs: checkout
     runs-on: ubuntu-latest
     steps:
-    - name: Setup PNPM
-    - uses: pnpm/action-setup@v2
+    - name: setup .net
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: setup pnpm
+      uses: pnpm/action-setup@v2
       with:
         version: 7.29.0
-    - name: Setup Node
+    - name: setup node
       uses: actions/setup-node@v3
       with:
         node-version: '18.14.2'
         cache: 'pnpm'
+        
   build:
     needs: setup
     runs-on: ubuntu-latest
     steps:
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: "src"
     - name: Build
       run: dotnet build --no-restore
+      working-directory: "src"
+      
   dotnet-tests:
     needs: build
     runs-on: ubuntu-latest
     steps:
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
+      working-directory: "src"
+      
   js-tests:
     needs: dotnet-tests
     runs-on: ubuntu-latest
