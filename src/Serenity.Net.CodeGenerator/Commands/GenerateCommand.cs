@@ -66,7 +66,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             Module = GetOption(args, "m").TrimToNull(),
             Identifier = GetOption(args, "i").TrimToNull(),
             PermissionKey = GetOption(args, "p").TrimToNull(),
-            Config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"))
+            Config = fileSystem.LoadGeneratorConfig(projectDir)
         };
 
         var interactive = inputs.Identifier is null;

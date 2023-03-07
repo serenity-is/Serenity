@@ -10,9 +10,9 @@ public class MvcCommand : BaseFileSystemCommand
     public void Run(string csproj)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
 
-        config.MVC ??= new GeneratorConfig.MVCConfig();
+        config.MVC ??= new();
 
         var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 

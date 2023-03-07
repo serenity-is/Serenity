@@ -167,7 +167,6 @@ public class GeneratorConfig
 
     /// <summary>
     /// The set of foreign fields to generate, default is All
-    /// Not implemented yet.
     /// </summary>
     public FieldSelection? ForeignFieldSelection { get; set; }
 
@@ -275,98 +274,6 @@ public class GeneratorConfig
         GenerateService = true;
         GenerateUI = true;
         GenerateCustom = true;
-    }
-
-    /// <summary>
-    /// Returns JSON serialized version
-    /// </summary>
-    public string SaveToJson()
-    {
-        Connections.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
-        foreach (var c in Connections)
-            c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
-
-        return JSON.StringifyIndented(this, 2);
-    }
-
-    /// <summary>
-    /// Returns appsettings files
-    /// </summary>
-    public string[] GetAppSettingsFiles()
-    {
-        if (AppSettingFiles != null &&
-            AppSettingFiles.Length != 0)
-            return AppSettingFiles;
-
-        return new string[]
-        {
-            "appsettings.json",
-            "appsettings.machine.json"
-        };
-    }
-
-    /// <summary>
-    /// Gets root namespace for given project
-    /// </summary>
-    /// <param name="fileSystem">File system</param>
-    /// <param name="csproj">CSProj file</param>
-    /// <returns>Root namespace for given project</returns>
-    /// <exception cref="ArgumentNullException">fileSystem is null</exception>
-    public string GetRootNamespaceFor(IGeneratorFileSystem fileSystem, string csproj)
-    {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
-
-        if (!string.IsNullOrEmpty(RootNamespace))
-            return RootNamespace;
-
-        string rootNamespace = null;
-
-        if (fileSystem.FileExists(csproj)) {
-             rootNamespace = ProjectFileHelper.ExtractPropertyFrom(fileSystem, csproj,
-                xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
-        }
-
-        rootNamespace ??= fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
-
-        if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
-            rootNamespace = rootNamespace[0..^4];
-
-        return rootNamespace;
-    }
-
-    /// <summary>
-    /// Loads config from given file
-    /// </summary>
-    /// <param name="fileSystem">File system</param>
-    /// <param name="path">Sergen.json path</param>
-    /// <returns>Deserialized configuration</returns>
-    /// <exception cref="ArgumentNullException">fileSystem is null</exception>
-    public static GeneratorConfig LoadFromFile(IFileSystem fileSystem,
-        string path)
-    {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
-
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
-
-        GeneratorConfig config;
-        if (!fileSystem.FileExists(path))
-            config = new GeneratorConfig();
-        else
-        {
-            config = ExtendsJsonReader.Read<GeneratorConfig>(
-                fileSystem, path, nameof(Extends),
-                options: new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-        }
-
-        config.Connections ??= new();
-        config.RemoveForeignFields ??= new List<string>();
-        return config;
     }
 
     /// <summary>

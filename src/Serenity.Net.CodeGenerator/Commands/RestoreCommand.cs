@@ -44,7 +44,7 @@ public class RestoreCommand : BaseFileSystemCommand
         }
 
         var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
 
         GlobFilter include = null;
         if (config.Restore?.Include.IsEmptyOrNull() == false)

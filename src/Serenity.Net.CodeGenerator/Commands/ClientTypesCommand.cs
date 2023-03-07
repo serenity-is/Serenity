@@ -12,8 +12,7 @@ public class ClientTypesCommand : BaseFileSystemCommand
     public void Run(string csproj, List<ExternalType> tsTypes)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = GeneratorConfig.LoadFromFile(fileSystem,
-            fileSystem.Combine(projectDir, "sergen.json"));
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
 
         config.ClientTypes ??= new GeneratorConfig.ClientTypesConfig();
 

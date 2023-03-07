@@ -30,7 +30,7 @@ public partial class GenerateCommand
                 return ExitCodes.NoProjectFiles;
 
             var projectDir = fileSystem.GetDirectoryName(csproj);
-            var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
+            var config = fileSystem.LoadGeneratorConfig(projectDir);
 
             if (!string.IsNullOrEmpty(config.CustomTemplates))
                 Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);

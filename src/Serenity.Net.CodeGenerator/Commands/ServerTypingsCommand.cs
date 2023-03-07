@@ -17,7 +17,7 @@ public class ServerTypingsCommand : BaseFileSystemCommand
     public void Run(string csproj, List<ExternalType> tsTypes)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = GeneratorConfig.LoadFromFile(fileSystem, fileSystem.Combine(projectDir, "sergen.json"));
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
 
         if (modules && config.ServerTypings?.ModuleTypings == false)
             return;
