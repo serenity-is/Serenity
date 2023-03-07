@@ -36,9 +36,8 @@ jobs:
       working-directory: "src"
 
     - name: dotnet build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore /p:SkipNodeScripts=true
       working-directory: "src"
-      continue-on-error: true
 
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
