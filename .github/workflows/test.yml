@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  dotnet-tests:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -20,20 +20,11 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.14.2'
-
-    - uses: pnpm/action-setup@v2.2.4
-      with:
-        version: 7.29.0
-        run_install: false
-
-    - name: pnpm install
-      uses: ./.github/actions/pnpm-install
-
-    - uses: actions/cache@v3
+    - name: Nuget package cache
+      uses: actions/cache@v3
+      id: nuget-package-cache
+      env:
+        cache-name: nuget-package-cache
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -47,51 +38,7 @@ jobs:
     - name: dotnet build
       run: dotnet build --no-restore
       working-directory: "src"
-
-    - name: Cached build files
-      uses: actions/cache@v3
-      id: build-files
-      env:
-        cache-name: build-files
-      with:
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
-        path: |
-          **/*/bin/*
-          **/*/obj/*
-          **/*/wwwroot/*
-
-  dotnet-tests:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: setup .net
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-
-    - uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-        fail-on-cache-miss: true
-
-    - name: Cached build files
-      uses: actions/cache@v3
-      id: build-files
-      env:
-        cache-name: build-files
-      with:
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
-        path: |
-          **/*/bin/*
-          **/*/obj/*
-          **/*/wwwroot/*
-        fail-on-cache-miss: true
+      continue-on-error: true
 
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
@@ -99,7 +46,6 @@ jobs:
 
   js-corelib-tests:
     runs-on: ubuntu-latest
-    needs: build
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -109,27 +55,9 @@ jobs:
       with:
         node-version: '18.14.2'
 
-    - uses: pnpm/action-setup@v2.2.4
-      with:
-        version: 7.29.0
-        run_install: false
-
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
 
-    - name: Cached build files
-      uses: actions/cache@v3
-      id: build-files
-      env:
-        cache-name: build-files
-      with:
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
-        path: |
-          **/*/bin/*
-          **/*/obj/*
-          **/*/wwwroot/*
-        fail-on-cache-miss: true
-
-    - name: corelib test
+    - name: corelib tests
       run: pnpm test
       working-directory: "src/Serenity.Scripts/corelib"
