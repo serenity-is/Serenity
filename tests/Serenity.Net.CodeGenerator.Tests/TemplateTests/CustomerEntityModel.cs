@@ -32,17 +32,17 @@ public class CustomerEntityModel : EntityModel
             PropertyName = CustomerId,
             Name = CustomerId,
             Title = "Customer Id",
-            FlagList = new() { new("Serenity.Data.Mapping.Identity") },
+            FlagList = { new("Serenity.Data.Mapping.Identity") },
             IsValueType = true,
             OmitInForm = true,
             Scale = 0,
-            AttributeList = new()
+            AttributeList =
             {
                 new("System.ComponentModel.DisplayName", "\"Customer Id\""),
                 new("Serenity.Data.Mapping.Identity"),
                 new("Serenity.Data.Mapping.IdProperty"),
             },
-            ColAttributeList = new()
+            ColAttributeList =
             {
                 new("Serenity.ComponentModel.EditLink"),
                 new("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""),
@@ -58,11 +58,11 @@ public class CustomerEntityModel : EntityModel
             PropertyName = CustomerName,
             Name = CustomerName,
             Title = "Customer Name",
-            FlagList = new() { new("Serenity.Data.Mapping.NotNull") },
+            FlagList = { new("Serenity.Data.Mapping.NotNull") },
             IsValueType = false,
             Size = 50,
             Scale = 0,
-            AttributeList = new()
+            AttributeList =
             {
                 new("System.ComponentModel.DisplayName", "\"Customer Name\""),
                 new("Serenity.Data.Mapping.Size", "50"),
@@ -70,7 +70,7 @@ public class CustomerEntityModel : EntityModel
                 new("Serenity.Data.Mapping.QuickSearch"),
                 new("Serenity.Data.NameProperty"),
             },
-            ColAttributeList = new()
+            ColAttributeList =
             {
                 new("Serenity.ComponentModel.EditLink")
             }
@@ -91,7 +91,7 @@ public class CustomerEntityModel : EntityModel
             IsValueType = true,
             Scale = 0,
             TextualField = "CityName",
-            AttributeList = new()
+            AttributeList =
             {
                 new("System.ComponentModel.DisplayName", "\"City\""),
                 new("Serenity.Data.Mapping.ForeignKey", "\"[test].[City]\", \"CityId\""),
@@ -104,7 +104,7 @@ public class CustomerEntityModel : EntityModel
         {
             Name = "City",
             SourceField = "CityId",
-            Fields = new()
+            Fields =
             {
                 new()
                 {
@@ -117,7 +117,7 @@ public class CustomerEntityModel : EntityModel
                     IsValueType = false,
                     Size = 50,
                     Scale = 0,
-                    AttributeList = new()
+                    AttributeList =
                     {
                         new("System.ComponentModel.DisplayName", "\"City Name\""),
                         new("Serenity.Data.Mapping.Expression", 
@@ -135,7 +135,7 @@ public class CustomerEntityModel : EntityModel
                     Title = "City Country Id",
                     IsValueType = true,
                     Scale = 0,
-                    AttributeList = new()
+                    AttributeList =
                     {
                         new("System.ComponentModel.DisplayName", "\"City Country Id\""),
                         new("Serenity.Data.Mapping.Expression", 

@@ -104,9 +104,7 @@ public class EntityModel
     public string EntityPluralTextKey => "Db" + DotModule + ClassName + ".EntityPlural";
 
     public IEnumerable<EntityField> AllFields => Fields.Concat(JoinFields);
-
-    public IEnumerable<EntityField> JoinFields => Fields.Concat(Joins?.SelectMany(x => 
-        (IEnumerable<EntityField>)x.Fields ?? Array.Empty<EntityField>()) ?? Array.Empty<EntityField>());
+    public IEnumerable<EntityField> JoinFields => Joins.SelectMany(x => x.Fields);
 
     public string NavigationCategory
     {

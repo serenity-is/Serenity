@@ -6,7 +6,7 @@
 public class {{ColumnsClassName}}
 {
     {{~for x in GridFields~}}
-    {{~if x.ColAttributes~}}
+    {{~if !x.ColAttributes.empty?~}}
     [{{ATTRREF x.ColAttributeList}}]
     {{~end~}}
     {{~if x.TextualField~}}

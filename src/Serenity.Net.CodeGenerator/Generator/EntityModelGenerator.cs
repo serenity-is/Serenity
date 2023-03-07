@@ -41,25 +41,10 @@ public class EntityModelGenerator : IEntityModelGenerator
 
     private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength, bool includeFlags)
     {
-        List<AttributeTypeRef> flags = null;
-        if (includeFlags)
-        {
-            if (fieldInfo.IsIdentity)
-                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.Identity") };
-            else if (fieldInfo.IsPrimaryKey)
-                flags = fieldInfo.IsNullable ? new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey") } : new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.PrimaryKey"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-            else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
-                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.ComponentModel.Insertable", "false"), new AttributeTypeRef("Serenity.ComponentModel.Updatable", "false"), new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-            else if (!fieldInfo.IsNullable)
-                flags = new List<AttributeTypeRef> { new AttributeTypeRef("Serenity.Data.Mapping.NotNull") };
-            else
-                flags = null;
-        }
-
         var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
         dataType ??= fieldType;
         dataType = CodeWriter.ToCSKeyword(dataType) ?? dataType;
-        return new EntityField
+        var entityField = new EntityField
         {
             FieldType = fieldType,
             DataType = dataType,
@@ -67,11 +52,34 @@ public class EntityModelGenerator : IEntityModelGenerator
             TSType = FieldTypeToTS(fieldType),
             PropertyName = PropertyNameFor(fieldInfo.FieldName[prefixLength..]),
             Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
-            FlagList = flags,
             Name = fieldInfo.FieldName,
             Size = fieldInfo.Size == 0 ? null : fieldInfo.Size,
             Scale = fieldInfo.Scale
         };
+
+        if (includeFlags)
+        {
+            var flags = entityField.FlagList;
+            if (fieldInfo.IsIdentity)
+                flags.Add(new("Serenity.Data.Mapping.Identity"));
+            else
+            {
+                bool version = fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion";
+
+                if (fieldInfo.IsPrimaryKey)
+                    flags.Add(new("Serenity.Data.Mapping.PrimaryKey"));
+                else if (version)
+                {
+                    flags.Add(new("Serenity.ComponentModel.Insertable", "false"));
+                    flags.Add(new("Serenity.ComponentModel.Updatable", "false"));
+                }
+                
+                if (!fieldInfo.IsNullable || version)
+                    flags.Add(new("Serenity.Data.Mapping.NotNull"));
+            }
+        }
+
+        return entityField;
     }
 
     public EntityModel GenerateModel(IEntityModelInputs inputs)
@@ -260,7 +268,6 @@ public class EntityModelGenerator : IEntityModelGenerator
 
             if (tableField.PropertyName == model.Identity)
             {
-                tableField.ColAttributeList ??= new();
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
                 tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""));
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.AlignRight"));
@@ -272,7 +279,6 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (tableField.Name == className && tableField.FieldType == "String")
             {
                 model.NameField = tableField.Name;
-                tableField.ColAttributeList ??= new();
                 tableField.ColAttributeList.Add(new AttributeTypeRef("Serenity.ComponentModel.EditLink"));
             }
 
@@ -285,7 +291,6 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (fld != null)
             {
                 model.NameField = fld.PropertyName;
-                fld.ColAttributeList ??= new();
                 fld.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
             }
         }
@@ -307,7 +312,6 @@ public class EntityModelGenerator : IEntityModelGenerator
             int foreignPrefixLength = DeterminePrefixLength(foreignFields, z => z.FieldName);
             var entityJoin = new EntityJoin
             {
-                Fields = new(),
                 Name = PropertyNameFor(tableField.Name[prefix..])
             };
 
@@ -349,11 +353,8 @@ public class EntityModelGenerator : IEntityModelGenerator
                 viewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
                     foreignField.FieldName[foreignPrefixLength..]))?.Trim();
 
-                var atk = new List<AttributeTypeRef>
-                {
-                    new AttributeTypeRef("System.ComponentModel.DisplayName",
-                        "\"" + viewField.Title + "\"")
-                };
+                viewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
+                    "\"" + viewField.Title + "\""));
 
                 viewField.Expression = entityJoin.Alias + ".[" + viewField.Name + "]";
 
@@ -361,8 +362,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                         "$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"" :
                         ("\"" + viewField.Expression + "\"");
 
-                atk.Add(new AttributeTypeRef("Serenity.Data.Mapping.Expression", expr));
-                viewField.AttributeList = atk;
+                viewField.AttributeList.Add(new("Serenity.Data.Mapping.Expression", expr));
 
                 entityJoin.Fields.Add(viewField);
             }
@@ -372,10 +372,9 @@ public class EntityModelGenerator : IEntityModelGenerator
 
         foreach (var tableField in model.Fields)
         {
-            var attrs = new List<AttributeTypeRef>
-            {
-                new("System.ComponentModel.DisplayName", "\"" + tableField.Title + "\"")
-            };
+            var attrs = tableField.AttributeList;
+
+            attrs.Add(new("System.ComponentModel.DisplayName", "\"" + tableField.Title + "\""));
 
             if (tableField.PropertyName != tableField.Name)
                 attrs.Add(new("Serenity.Data.Mapping.Column", "\"" + tableField.Name + "\""));
@@ -412,8 +411,6 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (tableField.TextualField != null)
                 attrs.Add(new("Serenity.Data.Mapping.TextualField",
                     "nameof(" + tableField.TextualField + ")"));
-
-            tableField.AttributeList = attrs;
         }
 
         return model;

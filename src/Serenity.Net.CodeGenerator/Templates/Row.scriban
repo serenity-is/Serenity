@@ -49,8 +49,8 @@ public sealed class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceLis
         public {{x.FieldType}}Field {{x.PropertyName}};
         {{~end~}}
 
-        {{~for j in JoinFields~}}
-        public {{k.FieldType}}Field {{k.PropertyName}};
+        {{~for x in JoinFields~}}
+        public {{x.FieldType}}Field {{x.PropertyName}};
         {{~end~}}
     }
 }
