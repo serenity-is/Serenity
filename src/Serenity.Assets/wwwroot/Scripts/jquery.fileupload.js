@@ -27,17 +27,21 @@
 }(function ($) {
     'use strict';
 
-    // Detect file input support, based on
-    // http://viljamis.com/blog/2012/file-upload-support-on-mobile/
-    $.support.fileInput = !(new RegExp(
-        // Handle devices which give false positives for the feature detection:
-        '(Android (1\\.[0156]|2\\.[01]))' +
+    function supportFileInput() {
+        if ($.support.fileInput != null)
+            return $.support.fileInput;
+        // Detect file input support, based on
+        // http://viljamis.com/blog/2012/file-upload-support-on-mobile/
+        return ($.support.fileInput = !(new RegExp(
+            // Handle devices which give false positives for the feature detection:
+            '(Android (1\\.[0156]|2\\.[01]))' +
             '|(Windows Phone (OS 7|8\\.0))|(XBLWP)|(ZuneWP)|(WPDesktop)' +
             '|(w(eb)?OSBrowser)|(webOS)' +
             '|(Kindle/(1\\.0|2\\.[05]|3\\.0))'
-    ).test(window.navigator.userAgent) ||
-        // Feature detection for all other devices:
-        $('<input type="file">').prop('disabled'));
+        ).test(window.navigator.userAgent) ||
+            // Feature detection for all other devices:
+            $('<input type="file">').prop('disabled')));
+    }
 
     // The FileReader API is not actually used, but works as feature detection,
     // as some Safari versions (5?) support XHR file uploads via the FormData API,
@@ -1252,7 +1256,7 @@
                     paste: this._onPaste
                 });
             }
-            if ($.support.fileInput) {
+            if (supportFileInput()) {
                 this._on(this.options.fileInput, {
                     change: this._onChange
                 });
