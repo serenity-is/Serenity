@@ -2,7 +2,7 @@
     var builder = Criteria.Builder.of(field);
     // workaround for subclassing array until corelib switched to ES6
     //@ts-ignore
-    !builder.eq && (builder.__proto = Criteria.Builder.prototype);
+    !builder.eq && (builder.__proto__ = Criteria.Builder.prototype);
     return builder as Criteria.Builder;
 }
 
