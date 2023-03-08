@@ -7,7 +7,7 @@
 !function(factory) {
     "function" == typeof define && define.amd ? define([ "jquery" ], factory) : factory("object" == typeof exports ? require("jquery") : jQuery);
 }(function($) {
-    var caretTimeoutId, ua = navigator.userAgent, iPhone = /iphone/i.test(ua), chrome = /chrome/i.test(ua), android = /android/i.test(ua);
+    var caretTimeoutId;
     $.mask = {
         definitions: {
             "9": "[0-9]",
@@ -103,7 +103,7 @@
                 function keydownEvent(e) {
                     if (!input.prop("readonly")) {
                         var pos, begin, end, k = e.which || e.keyCode;
-                        oldVal = input.val(), 8 === k || 46 === k || iPhone && 127 === k ? (pos = input.caret(), 
+                        oldVal = input.val(), 8 === k || 46 === k || 127 === k && /iphone/.test(navigator.userAgent) ? (pos = input.caret(), 
                         begin = pos.begin, end = pos.end, end - begin === 0 && (begin = 46 !== k ? seekPrev(begin) : end = seekNext(begin - 1), 
                         end = 46 === k ? seekNext(end) : end), clearBuffer(begin, end), shiftL(begin, end - 1), 
                         e.preventDefault()) : 13 === k ? blurEvent.call(this, e) : 27 === k && (input.val(focusText), 
@@ -174,7 +174,7 @@
                         var pos = checkVal(!0);
                         input.caret(pos), tryFireCompleted();
                     }, 0);
-                }), chrome && android && input.off("input.mask").on("input.mask", androidInputEvent), 
+                }), /chrome/.test(navigator.userAgent) && /android/.test(navigator.userAgent) && input.off("input.mask").on("input.mask", androidInputEvent), 
                 checkVal();
             });
         }
