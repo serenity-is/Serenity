@@ -1366,8 +1366,7 @@ $.fn.extend( {
 
 
 
-// This file is deprecated
-var ie = $.ui.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
+var ie = $.ui.ie = false;
 
 /* UI Mouse */
 var mouseHandled = false;
