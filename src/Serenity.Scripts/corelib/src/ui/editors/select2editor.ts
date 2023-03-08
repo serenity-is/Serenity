@@ -208,6 +208,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     this.abortPendingQuery();
                     select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
                     this.queryPromise = this.asyncSearch(searchQuery, result => {
+                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
                         this.queryPromise = null;
                         query.callback({
                             results: this.mapItems(result.items),
