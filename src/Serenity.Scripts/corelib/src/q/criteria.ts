@@ -1,5 +1,9 @@
 ﻿export function Criteria(field: string): Criteria.Builder {
-    return Criteria.Builder.of(field) as Criteria.Builder;
+    var builder = Criteria.Builder.of(field);
+    // workaround for subclassing array until corelib switched to ES6
+    //@ts-ignore
+    !builder.eq && (builder.__proto = Criteria.Builder.prototype);
+    return builder as Criteria.Builder;
 }
 
 export namespace Criteria {
