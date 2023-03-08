@@ -131,8 +131,7 @@
         'command': 'meta',
         'return': 'enter',
         'escape': 'esc',
-        'plus': '+',
-        'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
+        'plus': '+'
     };
 
     /**
@@ -391,7 +390,10 @@
             key = keys[i];
 
             // normalize key names
-            if (_SPECIAL_ALIASES[key]) {
+            if (key == 'mod') {
+                key = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent) ? 'meta' : 'ctrl'
+            }
+            else if (_SPECIAL_ALIASES[key]) {
                 key = _SPECIAL_ALIASES[key];
             }
 
