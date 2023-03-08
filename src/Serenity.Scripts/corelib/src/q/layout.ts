@@ -79,8 +79,9 @@ export function layoutFillHeight(element: JQuery) {
 }
 
 export function setMobileDeviceMode() {
-    let isMobile = navigator.userAgent.indexOf('Mobi') >= 0 ||
-        (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+    let isMobile = typeof window !== 'undefined' &&
+        (window.matchMedia?.('(max-width: 767px)')?.matches ||
+         window.innerWidth < 768);
 
     if (typeof document === "undefined" || !document.documentElement)
         return;
