@@ -796,7 +796,7 @@ export function parseDate(s: string, dateOrder?: string): any {
         var datePart = parseDate(s.substr(0, s.indexOf(' ')));
         if (!datePart)
             return false;
-        return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + trim(s.substr(s.indexOf(' ' + 1))));
+        return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + trim(s.substr(s.indexOf(' ') + 1)));
     }
 
     let dateVal: any;
