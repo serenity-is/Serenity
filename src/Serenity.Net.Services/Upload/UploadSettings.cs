@@ -5,6 +5,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Upload settings
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class UploadSettings : IOptions<UploadSettings>
 {
     /// <summary>

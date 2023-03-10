@@ -5,6 +5,7 @@ namespace Serenity.Data;
 /// <summary>
 /// Connection string options
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class ConnectionStringOptions : Dictionary<string, ConnectionStringEntry>, 
     IOptions<ConnectionStringOptions>
 {

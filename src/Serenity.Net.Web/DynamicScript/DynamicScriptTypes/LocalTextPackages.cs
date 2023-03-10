@@ -3,6 +3,7 @@
 /// <summary>
 /// Corresponds to LocalTextPackages section of the appsettings.json file
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class LocalTextPackages : Dictionary<string, string>
 {
     /// <summary>

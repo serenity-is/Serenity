@@ -5,6 +5,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Options for css bundling
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class CssBundlingOptions : IOptions<CssBundlingOptions>
 {
     /// <summary>

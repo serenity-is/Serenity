@@ -4,6 +4,7 @@
 /// Determines the transaction isolation level and defer start flag used for
 /// service endpoint action use when creating the UnitOfWork class
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class TransactionSettings
 {
     /// <summary>

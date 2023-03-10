@@ -5,6 +5,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Options for script bundling
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class ScriptBundlingOptions : IOptions<ScriptBundlingOptions>
 {
     /// <summary>

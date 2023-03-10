@@ -3,6 +3,7 @@ namespace Serenity.Reporting;
 /// <summary>
 /// Set of WKHTMLToPdf settings
 /// </summary>
+[DefaultSectionKey(SectionKey)]
 public class WKHtmlToPdfSettings
 {
     /// <summary>
