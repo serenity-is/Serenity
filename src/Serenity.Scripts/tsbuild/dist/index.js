@@ -1,7 +1,8 @@
 import esbuild from "esbuild";
-import { existsSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync } from "fs";
+import { existsSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
 import { exit } from "process";
+import { globSync } from "glob";
 
 export function checkIfTrigger() {
     if (process.argv.slice(2).some(x => x == "--trigger")) {
@@ -29,7 +30,7 @@ export const esbuildOptions = (opt) => {
 
     opt = Object.assign({}, opt);
 
-    var entryPointsRegEx = /(Page|ScriptInit)\.ts$/;
+    var entryPointsRegEx;
     if (opt.entryPointsRegEx !== undefined) {
         entryPointsRegEx = opt.entryPointsRegEx;
         delete opt.entryPointsRegEx;
@@ -42,12 +43,48 @@ export const esbuildOptions = (opt) => {
     }
 
     var entryPoints = opt.entryPoints;
-    if (entryPoints === undefined) {
-        entryPoints = [];
-        entryPointRoots.forEach(root =>
-            scanDir(root)
-                .filter(p => p.match(entryPointsRegEx))
-                .forEach(p => entryPoints.push(root + '/' + p)));
+    if (entryPoints === void 0) {
+        var globs;
+        if (existsSync('sergen.json')) {
+            var json = readFileSync('sergen.json', 'utf8').trim();
+            var cfg = JSON.parse(json || {});
+            globs = cfg?.TSBuild.EntryPoints;
+            if (globs === void 0 &&
+                cfg.Extends &&
+                existsSync(cfg.Extends)) {
+                json = readFileSync(cfg.Extends, 'utf8').trim();
+                cfg = JSON.parse(json || {});
+                globs = cfg?.TSBuild?.EntryPoints;
+            }
+        }
+
+        if (globs == null && !entryPointsRegEx) {
+            globs = ['Modules/**/*Page.ts', 'Modules/**/ScriptInit.ts'];
+        }
+
+        if (globs != null) {
+            var include = globs.filter(x => !x.startsWith('!'));
+            var exclude = globs.filter(x => x.startsWith('!')).map(x => x.substring(1));
+            exclude.push(".git/**");
+            exclude.push("App_Data/**");
+            exclude.push("bin/**");
+            exclude.push("obj/**");
+            exclude.push("node_modules/**");
+            exclude.push("**/node_modules/**");
+
+            entryPoints = globSync(include, {
+                ignore: exclude,
+                nodir: true,
+                matchBase: true
+            });
+        }
+        else {
+            entryPoints = [];
+            entryPointRoots.forEach(root =>
+                scanDir(root)
+                    .filter(p => p.match(entryPointsRegEx))
+                    .forEach(p => entryPoints.push(root + '/' + p)));
+        }
     }
 
     var splitting = opt.splitting;
