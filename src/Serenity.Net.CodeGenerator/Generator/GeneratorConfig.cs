@@ -135,6 +135,17 @@ public class GeneratorConfig
          !Restore.Exclude.IsEmptyOrNull());
 
     /// <summary>
+    /// TSBuild related configuration
+    /// </summary>
+    public TSBuildConfig TSBuild { get; set; }
+
+    /// <summary>Used for Newtonsoft.JSON</summary>
+    public bool ShouldSerializeTSBuild() => TSBuild != null &&
+        (TSBuild.EntryPoints != null ||
+            TSBuild.SourceGenerator != null ||
+            TSBuild.ExtensionData?.Count > 0);
+
+    /// <summary>
     /// List of connections. Is only needed when it is desired to 
     /// work / generated code based on a connection string that 
     /// is not in appsettings.json
@@ -487,8 +498,6 @@ public class GeneratorConfig
         /// Set false to disable the view paths source generator in Serenity.Pro.Coder
         /// </summary>
         public bool? SourceGenerator { get; set; }
-        /// <summary>Used for Newtonsoft.JSON</summary>
-        public bool ShouldSerializeSourceGenerator() => SourceGenerator != null;
     }
 
     /// <summary>
@@ -534,6 +543,25 @@ public class GeneratorConfig
         public string[] AppliedUpgrades { get; set; }
         /// <summary>
         /// Extension data for upgrades
+        /// </summary>
+        [JsonExtensionData]
+        public IDictionary<string, JToken> ExtensionData { get; set; }
+    }
+
+    public class TSBuildConfig
+    {
+        /// <summary>
+        /// List of entry point globs, default is "**/Page.ts", "**/ScriptInit.ts"
+        /// </summary>
+        public List<string> EntryPoints { get; set; }
+
+        /// <summary>
+        /// Should the list of entry points, e.g. ESM be generated, only available with Serenity.Pro.Coder.
+        /// </summary>
+        public bool? SourceGenerator { get; set; }
+
+        /// <summary>
+        /// Extension data for TSBuild
         /// </summary>
         [JsonExtensionData]
         public IDictionary<string, JToken> ExtensionData { get; set; }
