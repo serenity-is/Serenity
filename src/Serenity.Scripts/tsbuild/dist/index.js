@@ -48,7 +48,7 @@ export const esbuildOptions = (opt) => {
         if (existsSync('sergen.json')) {
             var json = readFileSync('sergen.json', 'utf8').trim();
             var cfg = JSON.parse(json || {});
-            globs = cfg?.TSBuild.EntryPoints;
+            globs = cfg?.TSBuild?.EntryPoints;
             if (globs === void 0 &&
                 cfg.Extends &&
                 existsSync(cfg.Extends)) {
