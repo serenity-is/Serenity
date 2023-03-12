@@ -38,7 +38,7 @@ export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
     protected isPanel: boolean;
     protected responsive: boolean;
 
-    protected arrange(): void {
+    public arrange(): void {
         this.element.find('.require-layout').filter(':visible').each(function (i, e) {
             $(e).triggerHandler('layout');
         });

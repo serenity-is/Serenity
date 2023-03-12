@@ -312,7 +312,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         this.tabs && this.tabs.tabs('option', 'active', 0);
     }
 
-    protected arrange(): void {
+    public arrange(): void {
         this.element.find('.require-layout').filter(':visible').each(function (i, e) {
             $(e).triggerHandler('layout');
         });
