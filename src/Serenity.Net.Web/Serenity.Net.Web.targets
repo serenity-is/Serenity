@@ -7,7 +7,7 @@
   </PropertyGroup>
   <Target Name="RestoreTypings"
           BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
-          DependsOnTargets="$(ResolveStaticWebAssetsInputsDependsOn);IncludeTransitiveProjectReferences"
+          DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences"
           Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
     <PropertyGroup>
       <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
