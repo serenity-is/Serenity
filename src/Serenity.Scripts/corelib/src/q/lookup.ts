@@ -34,7 +34,7 @@ export class Lookup<TItem> {
             this.update(items);
     }
 
-    update(value: TItem[]) {
+    update?(value: TItem[]) {
         this.items = [];
         this.itemById = {};
         if (value) {
@@ -50,29 +50,5 @@ export class Lookup<TItem> {
                 }
             }
         }
-    }
-
-    protected get_idField() {
-        return this.idField;
-    }
-
-    protected get_parentIdField() {
-        return this.parentIdField;
-    }
-
-    protected get_textField() {
-        return this.textField;
-    }
-
-    protected get_textFormatter() {
-        return this.textFormatter;
-    }
-
-    protected get_itemById() {
-        return this.itemById;
-    }
-
-    protected get_items() {
-        return this.items;
     }
 }

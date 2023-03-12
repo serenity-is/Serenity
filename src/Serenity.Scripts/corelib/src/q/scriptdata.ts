@@ -6,7 +6,7 @@ import { notifyError } from "./notify";
 import { format } from "./formatting";
 import { PropertyItem, PropertyItemsData } from "./propertyitem";
 import { getStateStore } from "./system";
-import type { Lookup } from "./lookup";
+import { Lookup } from "./lookup";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;

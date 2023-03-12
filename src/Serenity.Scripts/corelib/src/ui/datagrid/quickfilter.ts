@@ -1,5 +1,5 @@
 ﻿import { ListRequest } from "@serenity-is/corelib/q";
-import type { Widget } from "../widgets/widget";
+import { Widget } from "../widgets/widget";
 
 export interface QuickFilterArgs<TWidget> {
     field?: string;

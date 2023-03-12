@@ -1,5 +1,5 @@
 ﻿import { DataChangeInfo } from "../../types/datachangeinfo";
-import type { Widget } from "../widgets/widget";
+import { Widget } from "../widgets/widget";
 
 export namespace SubDialogHelper {
     export function bindToDataChange(dialog: any, owner: Widget<any>,
