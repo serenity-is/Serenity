@@ -137,7 +137,7 @@ interface IDialog {
 declare class IEditDialog {
 }
 interface IEditDialog {
-    load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
 }
 
 declare class IGetEditValue {
@@ -2292,7 +2292,7 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     protected getIsDeletedProperty(): string;
     protected service: string;
     protected getService(): string;
-    load(entityOrId: any, done: () => void, fail: (ex: Exception) => void): void;
+    load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void;
     loadNewAndOpenDialog(asPanel?: boolean): void;
     loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
     protected loadResponse(data: any): void;

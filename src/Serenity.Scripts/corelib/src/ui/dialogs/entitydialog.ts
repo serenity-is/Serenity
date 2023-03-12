@@ -355,7 +355,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return this.service;
     }
 
-    load(entityOrId: any, done: () => void, fail: (ex: Exception) => void): void {
+    load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void {
 
         var action = () => {
 

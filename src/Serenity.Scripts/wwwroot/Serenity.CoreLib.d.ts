@@ -2581,7 +2581,7 @@ declare namespace Serenity {
     class IEditDialog {
     }
     interface IEditDialog {
-        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+        load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
     }
 
     class IGetEditValue {
@@ -4697,7 +4697,7 @@ declare namespace Serenity {
         protected getIsDeletedProperty(): string;
         protected service: string;
         protected getService(): string;
-        load(entityOrId: any, done: () => void, fail: (ex: Q.Exception) => void): void;
+        load(entityOrId: any, done: () => void, fail?: (ex: Q.Exception) => void): void;
         loadNewAndOpenDialog(asPanel?: boolean): void;
         loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
         protected loadResponse(data: any): void;
