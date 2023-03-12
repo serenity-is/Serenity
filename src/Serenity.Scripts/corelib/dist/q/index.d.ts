@@ -422,19 +422,15 @@ interface LookupOptions<TItem> {
     textField?: string;
     textFormatter?(item: TItem): string;
 }
-declare global {
-    namespace Q {
-        interface Lookup<TItem> {
-            items: TItem[];
-            itemById: {
-                [key: string]: TItem;
-            };
-            idField: string;
-            parentIdField: string;
-            textField: string;
-            textFormatter: (item: TItem) => string;
-        }
-    }
+interface Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    textFormatter: (item: TItem) => string;
 }
 declare class Lookup<TItem> {
     items: TItem[];
@@ -563,8 +559,8 @@ declare namespace ScriptData {
 }
 declare function getRemoteData(key: string): any;
 declare function getRemoteDataAsync(key: string): Promise<any>;
-declare function getLookup<TItem>(key: string): Q.Lookup<TItem>;
-declare function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>>;
+declare function getLookup<TItem>(key: string): Lookup<TItem>;
+declare function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
 declare function reloadLookup(key: string): void;
 declare function reloadLookupAsync(key: string): Promise<any>;
 declare function getColumns(key: string): PropertyItem[];

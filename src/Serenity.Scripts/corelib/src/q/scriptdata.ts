@@ -6,6 +6,7 @@ import { notifyError } from "./notify";
 import { format } from "./formatting";
 import { PropertyItem, PropertyItemsData } from "./propertyitem";
 import { getStateStore } from "./system";
+import type { Lookup } from "./lookup";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;
@@ -210,11 +211,11 @@ export async function getRemoteDataAsync(key: string): Promise<any> {
     return await ScriptData.ensureAsync('RemoteData.' + key);
 }
 
-export function getLookup<TItem>(key: string): Q.Lookup<TItem> {
+export function getLookup<TItem>(key: string): Lookup<TItem> {
     return ScriptData.ensure('Lookup.' + key);
 }
 
-export async function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>> {
+export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
     return await ScriptData.ensureAsync('Lookup.' + key);
 }
 

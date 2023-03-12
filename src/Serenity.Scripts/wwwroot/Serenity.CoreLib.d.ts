@@ -824,7 +824,16 @@ declare namespace Q {
         textField?: string;
         textFormatter?(item: TItem): string;
     }
-
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+    }
     class Lookup<TItem> {
         items: TItem[];
         itemById: {
@@ -952,8 +961,8 @@ declare namespace Q {
     }
     function getRemoteData(key: string): any;
     function getRemoteDataAsync(key: string): Promise<any>;
-    function getLookup<TItem>(key: string): Q.Lookup<TItem>;
-    function getLookupAsync<TItem>(key: string): Promise<Q.Lookup<TItem>>;
+    function getLookup<TItem>(key: string): Lookup<TItem>;
+    function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
     function reloadLookup(key: string): void;
     function reloadLookupAsync(key: string): Promise<any>;
     function getColumns(key: string): PropertyItem[];
@@ -1132,18 +1141,7 @@ declare namespace Q {
         function parse(strings: TemplateStringsArray, ...values: any[]): any[];
     }
 }
-declare namespace Q {
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-    }
-}
+
 
 declare namespace Slick {
 

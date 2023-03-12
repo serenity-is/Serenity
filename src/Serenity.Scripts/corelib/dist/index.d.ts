@@ -1,7 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
 /// <reference types="jqueryui" />
-import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ArgumentNullException, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
+import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ArgumentNullException, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
 export { Formatter } from '@serenity-is/corelib/slick';
@@ -1131,14 +1131,14 @@ declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TI
     hasAsyncSource(): boolean;
     destroy(): void;
     protected getLookupKey(): string;
-    protected lookup: Q.Lookup<TItem>;
-    protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>>;
-    protected getLookup(): Q.Lookup<TItem>;
-    protected getItems(lookup: Q.Lookup<TItem>): TItem[];
+    protected lookup: Lookup<TItem>;
+    protected getLookupAsync(): PromiseLike<Lookup<TItem>>;
+    protected getLookup(): Lookup<TItem>;
+    protected getItems(lookup: Lookup<TItem>): TItem[];
     protected getIdField(): any;
-    protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): any;
+    protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
     protected mapItem(item: TItem): Select2Item;
-    protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
+    protected getItemDisabled(item: TItem, lookup: Lookup<TItem>): boolean;
     updateItems(): void;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
     protected getDialogTypeKey(): string;
@@ -2161,7 +2161,7 @@ declare class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIt
     protected getSelectAllText(): string;
     protected cascadeItems(items: TItem[]): TItem[];
     protected filterItems(items: TItem[]): TItem[];
-    protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[];
+    protected getLookupItems(lookup: Lookup<TItem>): TItem[];
     protected getTreeItems(): CheckTreeItem<TItem>[];
     protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
     protected moveSelectedUp(): boolean;

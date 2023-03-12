@@ -1,7 +1,7 @@
 ﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid"
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { Culture, getLookup, htmlEncode, isEmptyOrNull, ListResponse, PropertyItem, ScriptData, trimToNull, tryGetText } from "@serenity-is/corelib/q";
+import { Culture, getLookup, htmlEncode, isEmptyOrNull, ListResponse, Lookup, PropertyItem, ScriptData, trimToNull, tryGetText } from "@serenity-is/corelib/q";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
@@ -552,7 +552,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         });
     }
 
-    protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[] {
+    protected getLookupItems(lookup: Lookup<TItem>): TItem[] {
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 

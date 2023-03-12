@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, reloadLookup, ScriptData } from "@serenity-is/corelib/q";
+import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, Lookup, reloadLookup, ScriptData } from "@serenity-is/corelib/q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -52,17 +52,17 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         return key;
     }
 
-    protected lookup: Q.Lookup<TItem>;
+    protected lookup: Lookup<TItem>;
 
-    protected getLookupAsync(): PromiseLike<Q.Lookup<TItem>> {
+    protected getLookupAsync(): PromiseLike<Lookup<TItem>> {
         return getLookupAsync<TItem>(this.getLookupKey());
     }
 
-    protected getLookup(): Q.Lookup<TItem> {
+    protected getLookup(): Lookup<TItem> {
         return getLookup<TItem>(this.getLookupKey());
     }
 
-    protected getItems(lookup: Q.Lookup<TItem>) {
+    protected getItems(lookup: Lookup<TItem>) {
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 
@@ -70,7 +70,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         return this.lookup != null ? this.lookup.idField : super.getIdField();
     }
 
-    protected getItemText(item: TItem, lookup: Q.Lookup<TItem>) {
+    protected getItemText(item: TItem, lookup: Lookup<TItem>) {
         if (lookup == null)
             return super.itemText(item);
 
@@ -87,7 +87,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         };
     }
 
-    protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>) {
+    protected getItemDisabled(item: TItem, lookup: Lookup<TItem>) {
         return super.itemDisabled(item);
     }
 
