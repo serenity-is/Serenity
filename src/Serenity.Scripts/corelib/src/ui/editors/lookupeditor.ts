@@ -17,7 +17,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
             this.updateItems();
             var self = this;
             ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
-                if (!this.hasAsyncSource())
+                if (!self.hasAsyncSource())
                     self.updateItems();
             });
         }
