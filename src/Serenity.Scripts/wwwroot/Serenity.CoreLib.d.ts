@@ -2975,7 +2975,7 @@ declare namespace Serenity {
         static openPanel(element: JQuery, uniqueName: string): void;
         static closePanel(element: JQuery, e?: JQueryEventObject): void;
         protected onDialogOpen(): void;
-        protected arrange(): void;
+        arrange(): void;
         protected onDialogClose(): void;
         protected addCssClass(): void;
         protected getDialogButtons(): Q.DialogButton[];
@@ -3004,7 +3004,7 @@ declare namespace Serenity {
         protected validator: JQueryValidation.Validator;
         protected isPanel: boolean;
         protected responsive: boolean;
-        protected arrange(): void;
+        arrange(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
         protected initTabs(): void;
