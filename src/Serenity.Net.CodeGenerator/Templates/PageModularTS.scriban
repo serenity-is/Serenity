@@ -1,4 +1,4 @@
 ﻿
-$(function() {
+export default function() {
     {{QIMPORT "initFullHeightGridPage"}}(new {{IMPORTFROM "./" + GridClassName GridClassName}}($('#GridDiv')).element);
-});
+}
