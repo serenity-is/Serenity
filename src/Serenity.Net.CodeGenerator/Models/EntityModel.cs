@@ -85,13 +85,13 @@ public class EntityModel
     public string FormKey => ModuleDot + ClassName;
     public string FormClassName => ClassName + "Form";
     public string EndpointNamespace => ModuleNamespaceDot + "Endpoints";
-    public string EndpointClassName => ClassName + "Controller";
+    public string EndpointClassName => ClassName + (AspNetCore ? "Endpoint" : "Controller");
     public string EndpointRouteTemplate => "Services/" + ModuleSlash + ClassName + "/[action]";
     public string DialogClassName => ClassName + "Dialog";
     public string DialogFullName => ModuleNamespaceDot + DialogClassName;
     public string GridClassName => ClassName + "Grid";
     public string GridFullName => ModuleNamespaceDot + GridClassName;
-    public string ViewPageClassName => ClassName + "Controller";
+    public string ViewPageClassName => ClassName + (AspNetCore ? "Page" : "Controller");
     public string ViewPageNamespace => ModuleNamespaceDot + "Pages";
     public string ViewPageRoute => ModuleSlash + ClassName;
     public string ViewPageRoutePrefix => ModuleSlash + ClassName;

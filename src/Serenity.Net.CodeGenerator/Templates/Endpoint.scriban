@@ -11,7 +11,7 @@
 {{NAMESPACE EndpointNamespace}}{{capture block~}}
 [Route("{{EndpointRouteTemplate}}")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
-public class {{ClassName}}Controller : ServiceEndpoint
+public class {{EndpointClassName}} : ServiceEndpoint
 {
     [HttpPost, AuthorizeCreate(typeof(MyRow))]
     public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,

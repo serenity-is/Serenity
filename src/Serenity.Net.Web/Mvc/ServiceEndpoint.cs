@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace Serenity.Services;
 
@@ -10,14 +11,21 @@ namespace Serenity.Services;
 /// Subclass of controller for service endpoints
 /// </summary>
 [HandleServiceException]
-public abstract class ServiceEndpoint : Controller
+public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncActionFilter, IDisposable
 {
     private IDbConnection connection;
     private UnitOfWork unitOfWork;
     private IRequestContext context;
 
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    /// <inheritdoc />
+    public void Dispose() => Dispose(disposing: true);
+
+    /// <summary>
+    /// Releases all resources currently used by this <see cref="Controller"/> instance.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> if this method is being invoked by the <see cref="Dispose()"/> method,
+    /// otherwise <c>false</c>.</param>
+    protected virtual void Dispose(bool disposing)
     {
         if (unitOfWork != null)
         {
@@ -30,12 +38,14 @@ public abstract class ServiceEndpoint : Controller
             connection.Dispose();
             connection = null;
         }
-
-        base.Dispose(disposing);
     }
 
-    /// <inheritdoc/>
-    public override void OnActionExecuting(ActionExecutingContext context)
+    /// <summary>
+    /// Called before the action method is invoked.
+    /// </summary>
+    /// <param name="context">The action executing context.</param>
+    [NonAction]
+    public virtual void OnActionExecuting(ActionExecutingContext context)
     {
         var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
         if (uowParam != null)
@@ -64,7 +74,6 @@ public abstract class ServiceEndpoint : Controller
             unitOfWork = new UnitOfWork(connection, isolationLevel, deferStart);
 
             context.ActionArguments[uowParam.Name] = unitOfWork;
-            base.OnActionExecuting(context);
             return;
         }
 
@@ -79,15 +88,16 @@ public abstract class ServiceEndpoint : Controller
 
             connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
             context.ActionArguments[cnnParam.Name] = connection;
-            base.OnActionExecuting(context);
             return;
         }
-
-        base.OnActionExecuting(context);
     }
 
-    /// <inheritdoc/>
-    public override void OnActionExecuted(ActionExecutedContext context)
+    /// <summary>
+    /// Called after the action method is invoked.
+    /// </summary>
+    /// <param name="context">The action executed context.</param>
+    [NonAction]
+    public virtual void OnActionExecuted(ActionExecutedContext context)
     {
         if (unitOfWork != null)
         {
@@ -114,8 +124,48 @@ public abstract class ServiceEndpoint : Controller
         }
 
         context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
+    }
 
-        base.OnActionExecuted(context);
+    /// <summary>
+    /// Called before the action method is invoked.
+    /// </summary>
+    /// <param name="context">The action executing context.</param>
+    /// <param name="next">The <see cref="ActionExecutionDelegate"/> to execute. Invoke this delegate in the body
+    /// of <see cref="OnActionExecutionAsync" /> to continue execution of the action.</param>
+    /// <returns>A <see cref="Task"/> instance.</returns>
+    [NonAction]
+    public virtual Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next)
+    {
+        if (context == null)
+        {
+            throw new ArgumentNullException(nameof(context));
+        }
+
+        if (next == null)
+        {
+            throw new ArgumentNullException(nameof(next));
+        }
+
+        OnActionExecuting(context);
+        if (context.Result == null)
+        {
+            var task = next();
+            if (!task.IsCompletedSuccessfully)
+            {
+                return Awaited(this, task);
+            }
+
+            OnActionExecuted(task.Result);
+        }
+
+        return Task.CompletedTask;
+
+        static async Task Awaited(ServiceEndpoint controller, Task<ActionExecutedContext> task)
+        {
+            controller.OnActionExecuted(await task);
+        }
     }
 
     /// <summary>
@@ -125,8 +175,7 @@ public abstract class ServiceEndpoint : Controller
     {
         get
         {
-            if (context == null)
-                context = HttpContext?.RequestServices?.GetRequiredService<IRequestContext>();
+            context ??= HttpContext?.RequestServices?.GetRequiredService<IRequestContext>();
 
             return context;
         }

@@ -74,7 +74,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             return;
         }
 
-        if (TypingsUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "Controller") ||
+        if (TypingsUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "ControllerBase") ||
             TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
         {
             var controllerIdentifier = GetControllerIdentifier(type);

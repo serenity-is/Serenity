@@ -82,7 +82,7 @@ public static class EndpointExtensions
     /// <param name="controller">Controller</param>
     /// <param name="handler">Handler callback</param>
     /// <returns></returns>
-    public static Result<TResponse> ExecuteMethod<TResponse>(this Controller controller, Func<TResponse> handler)
+    public static Result<TResponse> ExecuteMethod<TResponse>(this ControllerBase controller, Func<TResponse> handler)
         where TResponse: ServiceResponse, new()
     {
         TResponse response;
@@ -108,7 +108,7 @@ public static class EndpointExtensions
     /// <param name="controller">Controller</param>
     /// <param name="connectionKey">Connection key</param>
     /// <param name="handler">Handler callback</param>
-    public static Result<TResponse> UseConnection<TResponse>(this Controller controller, string connectionKey, Func<IDbConnection, TResponse> handler)
+    public static Result<TResponse> UseConnection<TResponse>(this ControllerBase controller, string connectionKey, Func<IDbConnection, TResponse> handler)
         where TResponse : ServiceResponse, new()
     {
         TResponse response;
@@ -137,7 +137,7 @@ public static class EndpointExtensions
     /// <param name="controller">Controller</param>
     /// <param name="connectionKey">Connection key</param>
     /// <param name="handler">Handler callback</param>
-    public static Result<TResponse> InTransaction<TResponse>(this Controller controller, string connectionKey, Func<IUnitOfWork, TResponse> handler)
+    public static Result<TResponse> InTransaction<TResponse>(this ControllerBase controller, string connectionKey, Func<IUnitOfWork, TResponse> handler)
         where TResponse : ServiceResponse, new()
     {
         TResponse response;

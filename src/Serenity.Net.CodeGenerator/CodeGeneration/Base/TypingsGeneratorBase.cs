@@ -199,6 +199,10 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
         if (className.EndsWith("Controller", StringComparison.Ordinal))
             className = className[0..^10];
+        else if (className.EndsWith("Endpoint", StringComparison.Ordinal))
+            className = className[0..^8];
+        else if (className.EndsWith("Service", StringComparison.Ordinal))
+            className = className[0..^7];
 
         return className + "Service";
     }
@@ -420,7 +424,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ColumnsScriptAttribute", baseClasses) != null ||
                         TypingsUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                         TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
-                        ((TypingsUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "Controller") ||
+                        ((TypingsUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "ControllerBase") ||
                           TypingsUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
                          fromType.NamespaceOf()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true))
                     {
@@ -880,7 +884,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 #else
                 method.DeclaringType,
 #endif
-                "Microsoft.AspNetCore.Mvc", "Controller"))
+                "Microsoft.AspNetCore.Mvc", "ControllerBase"))
             return false;
 
 #if ISSOURCEGENERATOR
