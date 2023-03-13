@@ -184,7 +184,7 @@ public partial class SqlQuery
                     desc[i] = o.EndsWith(SqlKeywords.Desc, StringComparison.OrdinalIgnoreCase);
 
                     if (desc[i])
-                        order[i] = o.Substring(0, o.Length - SqlKeywords.Desc.Length);
+                        order[i] = o[..^SqlKeywords.Desc.Length];
                     else
                         order[i] = o;
                 }
@@ -346,7 +346,7 @@ public partial class SqlQuery
                 }
 
                 sb.Append(") AS ");
-                sb.Append(useRowNum ? "x__rownum__" : "__num__");
+                sb.Append(useRowNum ? "x__rownum__" : "x__num__");
             }
         }
         
@@ -355,7 +355,7 @@ public partial class SqlQuery
 
         if (useRowNumber)
         {
-            sb.Append(") __results__ WHERE __num__ > ");
+            sb.Append(") x__results__ WHERE x__num__ > ");
             sb.Append(skip);
         }
 
@@ -416,14 +416,14 @@ public partial class SqlQuery
                 sb.Append(SqlKeywords.From);
                 sb.Append('(');
                 sb.Append(SqlKeywords.Select);
-                sb.Append(" 1 as _alias_x_ ");
+                sb.Append(" 1 as x__alias__x ");
             }
 
             appendFromWhereOrderByGroupByHaving(null, false);
 
             if (query.Distinct || (!string.IsNullOrEmpty(query.GroupBy)))
             {
-                sb.Append(") _alias_");
+                sb.Append(") x__alias__");
             }
         }
 

@@ -77,8 +77,8 @@ public class SqlQuery_SkipTake_Tests
         Assert.Equal(
             Normalize.Sql(
                 "SELECT * FROM (\n" +
-                    "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t ORDER BY x) __results__ " +
-                "WHERE __num__ > 10"),
+                    "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS x__num__ FROM t ORDER BY x) x__results__ " +
+                "WHERE x__num__ > 10"),
             Normalize.Sql(
                 query.ToString()));
     }
