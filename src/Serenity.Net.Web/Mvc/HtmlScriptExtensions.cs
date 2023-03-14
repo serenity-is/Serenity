@@ -28,6 +28,9 @@ public static class HtmlScriptExtensions
         if (cssUrl == null)
             throw new ArgumentNullException(nameof(cssUrl));
 
+        if (cssUrl.EndsWith(".js"))
+            cssUrl = cssUrl[..^3] + ".css";
+
         var context = helper.ViewContext.HttpContext;
         var css = context.RequestServices.GetRequiredService<ICssBundleManager>()
             .GetCssBundle(cssUrl);
