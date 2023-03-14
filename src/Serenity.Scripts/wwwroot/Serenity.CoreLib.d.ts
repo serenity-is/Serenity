@@ -3235,7 +3235,6 @@ declare namespace Serenity {
         private maxValue;
         constructor(input: JQuery);
         static useFlatpickr: boolean;
-        static uiPickerZIndexWorkaround(input: JQuery): void;
         static flatPickrOptions(input: JQuery): {
             clickOpens: boolean;
             allowInput: boolean;
@@ -3266,6 +3265,7 @@ declare namespace Serenity {
         static dateInputChange: (e: JQueryEventObject) => void;
         static flatPickrTrigger(input: JQuery): JQuery;
         static dateInputKeyup(e: JQueryEventObject): void;
+        static uiPickerZIndexWorkaround(input: JQuery): void;
     }
 
     class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
