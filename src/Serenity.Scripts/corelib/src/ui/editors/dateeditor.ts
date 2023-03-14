@@ -24,7 +24,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             input.datepicker({
                 showOn: 'button',
                 beforeShow: (inp, inst) => {
-                    return !input.hasClass('readonly') as any;
+                    if (input.hasClass('readonly') as any)
+                        return false as any;
+                    DateEditor.uiPickerZIndexWorkaround(this.element);
+                    return true;
                 },
                 yearRange: (this.yearRange ?? '-100:+50')
             });
@@ -402,6 +405,22 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             input.val(val + Culture.dateSeparator);
         }
     };
+
+    public static uiPickerZIndexWorkaround(input: JQuery) {
+        if (!input?.closest('.ui-dialog').length) 
+            return; 
+        var dialogIndex = parseInt(input.closest('.ui-dialog').css('z-index'), 10);
+        if (dialogIndex == null || isNaN(dialogIndex))
+            return;
+        setTimeout(() => {
+            var widget = input.datepicker('widget');
+            if (!widget?.length)
+                return
+            var zIndex = parseInt(widget.css('z-index'));
+            if (!isNaN(zIndex) && zIndex <= dialogIndex)
+                widget.css('z-index', dialogIndex + 1);
+        }, 0);
+    }    
 }
 
 function jQueryDatepickerInitialization(): boolean {

@@ -817,6 +817,7 @@ declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly 
     private maxValue;
     constructor(input: JQuery);
     static useFlatpickr: boolean;
+    static uiPickerZIndexWorkaround(input: JQuery): void;
     static flatPickrOptions(input: JQuery): {
         clickOpens: boolean;
         allowInput: boolean;

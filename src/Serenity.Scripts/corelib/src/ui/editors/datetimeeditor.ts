@@ -36,7 +36,10 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
             input.datepicker({
                 showOn: 'button',
                 beforeShow: function () {
-                    return !input.hasClass('readonly');
+                    if (input.hasClass('readonly') as any)
+                        return false as any;
+                    DateEditor.uiPickerZIndexWorkaround(this.element);
+                    return true;                    
                 } as any,
                 yearRange: (this.options.yearRange ?? '-100:+50')
             });

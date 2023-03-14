@@ -3235,6 +3235,7 @@ declare namespace Serenity {
         private maxValue;
         constructor(input: JQuery);
         static useFlatpickr: boolean;
+        static uiPickerZIndexWorkaround(input: JQuery): void;
         static flatPickrOptions(input: JQuery): {
             clickOpens: boolean;
             allowInput: boolean;
