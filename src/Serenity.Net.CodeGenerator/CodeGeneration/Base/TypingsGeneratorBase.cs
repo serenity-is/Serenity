@@ -1,4 +1,4 @@
-﻿#if ISSOURCEGENERATOR
+#if ISSOURCEGENERATOR
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Threading;
@@ -641,8 +641,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
-                (tryModule("@serenity-is/corelib") ||
-                 tryModule("@serenity-is/corelib/q") ||
+                (tryModule("@serenity-is/corelib/q") ||
+                 tryModule("@serenity-is/corelib") ||
                  tryModule("@serenity-is/extensions") ||
                  tryModule("@serenity-is/pro.extensions"))))
         {
