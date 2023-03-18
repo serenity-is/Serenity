@@ -112,6 +112,16 @@ test('can parse like and equal with params', () => {
         [[["xyz"], "=", "5"], "and", [["abc"], "like", "test%"]]);
 });
 
+test('can parse in with params', () => {
+    expect(Criteria.parse("(a in @values) and b in @other", { values: [1, 2], other: ['x'] })).toEqual(
+        [[["a"], 'in', [[1, 2]]], 'and', [["b"], 'in', [['x']]]]);
+});
+
+test('can parse in with tagged', () => {
+    expect(Criteria.parse`a in ${[1, 2]}`).toEqual(
+        [["a"], 'in', [[1, 2]]]);
+});
+
 test('can parse tagged where', function () {
     const p1 = 5;
     expect(Criteria.parse`a=${p1}`).toEqual(

@@ -264,7 +264,8 @@ export namespace Criteria {
 
             if (index >= l || expression.charAt(index) != '(') {
                 if (index < l && expression.charAt(index) == '@') {
-                    v = readParam();
+                    readParam();
+                    index = end;
                     return;
                 }
                 throw new ParseError(expression, 'expected parenthesis', index);
@@ -706,7 +707,7 @@ export namespace Criteria {
                 values == null || values[0] == null ? null : name => values[0][name]);
         }
         else if (!values?.length)
-                return internalParse(exprOrStrings.join(''));
+            return internalParse(exprOrStrings.join(''));
 
         var expression = String.raw({ raw: exprOrStrings }, ...values.map((x, i) => '@__' + i));
         return internalParse(expression, name => name?.startsWith('__') ?
