@@ -1,3 +1,8 @@
+## 6.6.1 (2023-03-18)
+
+Bugfixes:
+  - Criteria parser with params failed in some cases, especially with IN statements like 'a in @values'. Note that you can't use parens there, e.g. `a in (@values)` is invalid unlike SQL.
+
 ## 6.6.0 (2023-03-14)
 
 Features:
