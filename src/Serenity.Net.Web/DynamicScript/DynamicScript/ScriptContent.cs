@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.WebUtilities;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
@@ -10,7 +10,7 @@ namespace Serenity.Web;
 /// </summary>
 public class ScriptContent : IScriptContent
 {
-    private readonly bool canCompress;
+    private readonly CompressionLevel compressionLevel;
     private string hash;
     private readonly byte[] content;
     private byte[] gzipContent;
@@ -21,12 +21,12 @@ public class ScriptContent : IScriptContent
     /// </summary>
     /// <param name="content">Content</param>
     /// <param name="time">Time</param>
-    /// <param name="canCompress">Allow compression</param>
+    /// <param name="compressionLevel">Suggested compression level</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public ScriptContent(byte[] content, DateTime time, bool canCompress)
+    public ScriptContent(byte[] content, DateTime time, CompressionLevel compressionLevel)
     {
         this.content = content ?? throw new ArgumentNullException(nameof(content));
-        this.canCompress = canCompress;
+        this.compressionLevel = compressionLevel;
         Time = time;
     }
 
@@ -57,20 +57,20 @@ public class ScriptContent : IScriptContent
     public byte[] Content => content;
 
     /// <inheritdoc/>
-    public bool CanCompress => canCompress;
+    public bool CanCompress => compressionLevel != CompressionLevel.NoCompression;
 
     /// <inheritdoc/>
     public byte[] CompressedContent
     {
         get
         {
-            if (!canCompress)
+            if (!CanCompress)
                 throw new InvalidOperationException("Script does not allow compression!");
 
             if (gzipContent == null)
             {
                 using var cs = new MemoryStream(content.Length);
-                using (var gz = new GZipStream(cs, CompressionMode.Compress))
+                using (var gz = new GZipStream(cs, compressionLevel))
                 {
                     gz.Write(content, 0, content.Length);
                     gz.Flush();
@@ -88,13 +88,21 @@ public class ScriptContent : IScriptContent
     {
         get
         {
-            if (!canCompress)
+            if (!CanCompress)
                 throw new InvalidOperationException("Script does not allow compression!");
 
             if (brotliContent == null)
             {
+                CompressionLevel brotliLevel = compressionLevel switch
+                {
+                    CompressionLevel.Optimal => (CompressionLevel)4,
+                    // level 5-9 almost same compression, and 10+ is much slower
+                    CompressionLevel.SmallestSize => (CompressionLevel)5,
+                    _ => (CompressionLevel)1
+                };
+
                 using var cs = new MemoryStream(content.Length);
-                using (var br = new BrotliStream(cs, CompressionMode.Compress))
+                using (var br = new BrotliStream(cs, brotliLevel))
                 {
                     br.Write(content, 0, content.Length);
                     br.Flush();

@@ -163,7 +163,14 @@ public partial class DynamicScriptManager : IDynamicScriptManager
             {
                 content = utf8Encoding.GetBytes(script.GetScript());
             }
-            return new ScriptContent(content, DateTime.UtcNow, content.Length > 4096);
+
+            var compressionLevel = content.Length < 4096 ? CompressionLevel.NoCompression
+                : ((script.Expiration != TimeSpan.Zero &&
+                    script.Expiration < TimeSpan.FromSeconds(30)) ? CompressionLevel.Fastest :
+                    (name.StartsWith("Bundle", StringComparison.OrdinalIgnoreCase) ? CompressionLevel.SmallestSize :
+                        content.Length < 5 * 1024 * 1024 ? CompressionLevel.Optimal : CompressionLevel.Fastest));
+
+            return new ScriptContent(content, DateTime.UtcNow, compressionLevel);
         }
         
         var groupKey = script.GroupKey;
