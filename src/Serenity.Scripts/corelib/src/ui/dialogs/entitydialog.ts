@@ -1,6 +1,7 @@
 ﻿import { any, Authorization, confirmDialog, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isArray, isEmptyOrNull, localText, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "@serenity-is/corelib/q";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
+import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -204,17 +205,21 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return getAttributes(getInstanceType(this), attrType, true);
     }
 
-    private entityType: string;
+    protected getRowDefinition(): IRowDefinition {
+        return null;
+    }
+
+    private _entityType: string;
 
     protected getEntityType(): string {
 
-        if (this.entityType != null)
-            return this.entityType;
+        if (this._entityType != null)
+            return this._entityType;
 
         var typeAttributes = this.attrs(EntityTypeAttribute);
 
         if (typeAttributes.length === 1)
-            return (this.entityType = typeAttributes[0].value);
+            return (this._entityType = typeAttributes[0].value);
 
         // remove global namespace
         var name = getTypeFullName(getInstanceType(this));
@@ -228,21 +233,21 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         else if (endsWith(name, 'Panel'))
             name = name.substr(0, name.length - 5);
 
-        return (this.entityType = name);
+        return (this._entityType = name);
     }
 
-    private formKey: string;
+    private _formKey: string;
 
     protected getFormKey(): string {
-        if (this.formKey != null)
-            return this.formKey;
+        if (this._formKey != null)
+            return this._formKey;
 
         var attributes = this.attrs(FormKeyAttribute);
 
         if (attributes.length >= 1)
-            return (this.formKey = attributes[0].value);
+            return (this._formKey = attributes[0].value);
 
-        return (this.formKey = this.getEntityType());
+        return (this._formKey = this.getEntityType());
     }
 
     private localTextDbPrefix: string;
@@ -260,14 +265,18 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected getLocalTextPrefix(): string {
-        var attributes = this.attrs(LocalTextPrefixAttribute);
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return rowDefinition.localTextPrefix;
 
-        if (attributes.length >= 1)
-            return attributes[0].value;
+        var attr = this.attrs(LocalTextPrefixAttribute);
+
+        if (attr.length >= 1)
+            return attr[0].value;
 
         return this.getEntityType();
     }
-
+   
     private entitySingular: string;
 
     protected getEntitySingular(): string {
@@ -290,54 +299,60 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return this.entitySingular;
     }
 
-    private nameProperty: string;
+    private _nameProperty: string;
 
     protected getNameProperty(): string {
-        if (this.nameProperty != null)
-            return this.nameProperty;
+        if (this._nameProperty != null)
+            return this._nameProperty;
+
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return this._nameProperty = rowDefinition.nameProperty ?? '';
 
         var attributes = this.attrs(NamePropertyAttribute);
 
         if (attributes.length >= 1)
-            this.nameProperty = attributes[0].value;
-        else
-            this.nameProperty = 'Name';
-
-        return this.nameProperty;
+            return this._nameProperty = attributes[0].value ?? '';
+            
+        return this._nameProperty = 'Name';
     }
 
-    private idProperty: string;
+    private _idProperty: string;
 
     protected getIdProperty(): string {
-        if (this.idProperty != null)
-            return this.idProperty;
+        if (this._idProperty != null)
+            return this._idProperty;
 
-        var attributes = this.attrs(IdPropertyAttribute);
-        if (attributes.length >= 1)
-            this.idProperty = attributes[0].value;
-        else
-            this.idProperty = 'ID';
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return this._idProperty = rowDefinition.idProperty;
 
-        return this.idProperty;
+        var attr = this.attrs(IdPropertyAttribute);
+        if (attr.length === 1)
+            return this._idProperty = attr[0].value ?? '';
+
+        return this._idProperty = 'ID';
     }
 
-    protected isActiveProperty: string;
+    private _isActiveProperty: string;
 
     protected getIsActiveProperty(): string {
-        if (this.isActiveProperty != null)
-            return this.isActiveProperty;
+        if (this._isActiveProperty != null)
+            return this._isActiveProperty;
 
-        var attributes = this.attrs(IsActivePropertyAttribute)
-        if (attributes.length >= 1)
-            this.isActiveProperty = attributes[0].value;
-        else
-            this.isActiveProperty = 'IsActive';
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
 
-        return this.isActiveProperty;
+        var attr = this.attrs(IsActivePropertyAttribute);
+        if (attr.length === 1)
+            return this._isActiveProperty = attr[0].value ?? '';
+
+        return this._isActiveProperty = '';
     }
 
     protected getIsDeletedProperty(): string {
-        return null;
+        return this.getRowDefinition()?.isDeletedProperty;
     }
 
     protected service: string;
@@ -1130,15 +1145,15 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected getInsertPermission(): string {
-        return null;
+        return this.getRowDefinition()?.insertPermission;
     }
 
     protected getUpdatePermission(): string {
-        return null;
+        return this.getRowDefinition()?.updatePermission;
     }
 
     protected getDeletePermission(): string {
-        return null;
+        return this.getRowDefinition()?.deletePermission;
     }
 
     protected hasDeletePermission() {

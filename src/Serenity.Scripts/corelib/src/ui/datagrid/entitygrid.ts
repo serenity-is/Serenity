@@ -71,23 +71,23 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     protected getLocalTextPrefix(): string {
         var result = super.getLocalTextPrefix();
 
-        if (isEmptyOrNull(result)) {
+        if (isEmptyOrNull(result) &&
+            !this.getRowDefinition())
             return this.getEntityType();
-        }
 
         return result;
     }
 
-    private entityType: string;
+    private _entityType: string;
 
     protected getEntityType(): string {
-        if (this.entityType != null)
-            return this.entityType;
+        if (this._entityType != null)
+            return this._entityType;
 
         var attr = this.attrs(EntityTypeAttribute);
 
         if (attr.length === 1) {
-            return (this.entityType = attr[0].value);
+            return (this._entityType = attr[0].value);
         }
 
         var name = getTypeFullName(getInstanceType(this));
@@ -104,49 +104,49 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             name = name.substr(0, name.length - 7);
         }
 
-        this.entityType = name;
+        this._entityType = name;
 
-        return this.entityType;
+        return this._entityType;
     }
 
-    private displayName: string;
+    private _displayName: string;
 
     protected getDisplayName(): string {
-        if (this.displayName != null)
-            return this.displayName;
+        if (this._displayName != null)
+            return this._displayName;
 
         var attr = this.attrs(DisplayNameAttribute);
         if (attr.length >= 1) {
-            this.displayName = attr[0].displayName;
-            this.displayName = LT.getDefault(this.displayName, this.displayName);
+            this._displayName = attr[0].displayName;
+            this._displayName = LT.getDefault(this._displayName, this._displayName);
         }
         else {
-            this.displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural');
-            if (this.displayName == null)
-                this.displayName = this.getEntityType();
+            this._displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural');
+            if (this._displayName == null)
+                this._displayName = this.getEntityType();
         }
 
-        return this.displayName;
+        return this._displayName;
     }
 
-    private itemName: string;
+    private _itemName: string;
 
     protected getItemName(): string {
-        if (this.itemName != null)
-            return this.itemName;
+        if (this._itemName != null)
+            return this._itemName;
 
         var attr = this.attrs(ItemNameAttribute);
         if (attr.length >= 1) {
-            this.itemName = attr[0].value;
-            this.itemName = LT.getDefault(this.itemName, this.itemName);
+            this._itemName = attr[0].value;
+            this._itemName = LT.getDefault(this._itemName, this._itemName);
         }
         else {
-            this.itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
-            if (this.itemName == null)
-                this.itemName = this.getEntityType();
+            this._itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
+            if (this._itemName == null)
+                this._itemName = this.getEntityType();
         }
 
-        return this.itemName;
+        return this._itemName;
     }
 
     protected getAddButtonCaption(): string {
@@ -165,7 +165,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
                 this.addButtonClick();
             },
             disabled: () => !this.hasInsertPermission() || this.readOnly
-            });
+        });
 
         buttons.push(this.newRefreshButton(true));
         buttons.push(ColumnPickerDialog.createToolButton(this as any));
@@ -227,19 +227,19 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         });
     }
 
-    private service: string;
+    private _service: string;
 
     protected getService(): string {
-        if (this.service != null)
-            return this.service;
+        if (this._service != null)
+            return this._service;
 
         var attr = this.attrs(ServiceAttribute);
         if (attr.length >= 1)
-            this.service = attr[0].value;
+            this._service = attr[0].value;
         else
-            this.service = replaceAll(this.getEntityType(), '.', '/');
+            this._service = replaceAll(this.getEntityType(), '.', '/');
 
-        return this.service;
+        return this._service;
     }
 
     protected getViewOptions(): RemoteViewOptions {
@@ -269,7 +269,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     }
 
     protected getInsertPermission(): string {
-        return null;
+        return this.getRowDefinition()?.insertPermission;
     }
 
     protected hasInsertPermission(): boolean {

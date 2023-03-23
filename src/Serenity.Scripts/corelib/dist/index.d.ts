@@ -1828,6 +1828,18 @@ declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
 }
 
+interface IRowDefinition {
+    readonly deletePermission?: string;
+    readonly idProperty?: string;
+    readonly insertPermission?: string;
+    readonly isActiveProperty?: string;
+    readonly isDeletedProperty?: string;
+    readonly localTextPrefix?: string;
+    readonly nameProperty?: string;
+    readonly readPermission?: string;
+    readonly updatePermission?: string;
+}
+
 type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 declare global {
     namespace Slick {
@@ -2004,6 +2016,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     get_readOnly(): boolean;
     set_readOnly(value: boolean): void;
     protected updateInterface(): void;
+    protected getRowDefinition(): IRowDefinition;
     protected getLocalTextDbPrefix(): string;
     protected getLocalTextPrefix(): string;
     protected getIdProperty(): string;

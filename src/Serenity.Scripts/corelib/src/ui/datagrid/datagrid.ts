@@ -17,6 +17,7 @@ import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
+import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
@@ -99,9 +100,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected propertyItemsData: PropertyItemsData;
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
-    private idProperty: string;
-    private isActiveProperty: string;
-    private localTextDbPrefix: string;
     private isDisabled: boolean;
     private slickGridOnSort: any;
     private slickGridOnClick: any;
@@ -1059,18 +1057,29 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         this.toolbar && this.toolbar.updateInterface();
     }
 
-    protected getLocalTextDbPrefix(): string {
-        if (this.localTextDbPrefix == null) {
-            this.localTextDbPrefix = this.getLocalTextPrefix() ?? '';
-            if (this.localTextDbPrefix.length > 0 && !endsWith(this.localTextDbPrefix, '.')) {
-                this.localTextDbPrefix = 'Db.' + this.localTextDbPrefix + '.';
-            }
-        }
+    protected getRowDefinition(): IRowDefinition {
+        return null;
+    }
 
-        return this.localTextDbPrefix;
+    private _localTextDbPrefix: string;
+
+    protected getLocalTextDbPrefix(): string {
+
+        if (this._localTextDbPrefix != null)
+            return this._localTextDbPrefix;
+
+        this._localTextDbPrefix = this.getLocalTextPrefix() ?? '';
+        if (this._localTextDbPrefix.length > 0 && !endsWith(this._localTextDbPrefix, '.'))
+            this._localTextDbPrefix = 'Db.' + this._localTextDbPrefix + '.';
+
+        return this._localTextDbPrefix;
     }
 
     protected getLocalTextPrefix(): string {
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return rowDefinition.localTextPrefix;
+
         var attr = this.attrs(LocalTextPrefixAttribute);
 
         if (attr.length >= 1)
@@ -1078,38 +1087,43 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         return '';
     }
+   
+    private _idProperty: string;
 
     protected getIdProperty(): string {
-        if (this.idProperty == null) {
-            var attr = this.attrs(IdPropertyAttribute);
+        if (this._idProperty != null)
+            return this._idProperty;
 
-            if (attr.length === 1) {
-                this.idProperty = attr[0].value;
-            }
-            else {
-                this.idProperty = 'ID';
-            }
-        }
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return this._idProperty = rowDefinition.idProperty ?? '';
 
-        return this.idProperty;
+        var attr = this.attrs(IdPropertyAttribute);
+        if (attr.length === 1)
+            return this._idProperty = attr[0].value ?? '';
+
+        return this._idProperty = 'ID';
     }
 
     protected getIsDeletedProperty(): string {
-        return null;
+        return this.getRowDefinition()?.isDeletedProperty;
     }
 
-    protected getIsActiveProperty(): string {
-        if (this.isActiveProperty == null) {
-            var attr = this.attrs(IsActivePropertyAttribute);
+    private _isActiveProperty: string;
 
-            if (attr.length === 1) {
-                this.isActiveProperty = attr[0].value;
-            }
-            else {
-                this.isActiveProperty = '';
-            }
-        }
-        return this.isActiveProperty;
+    protected getIsActiveProperty(): string {
+        if (this._isActiveProperty != null)
+            return this._isActiveProperty;
+
+        var rowDefinition = this.getRowDefinition();
+        if (rowDefinition)
+            return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
+
+        var attr = this.attrs(IsActivePropertyAttribute);
+        if (attr.length === 1)
+            return this._isActiveProperty = attr[0].value ?? '';
+
+        return this._isActiveProperty = '';
     }
 
     protected updateDisabledState(): void {

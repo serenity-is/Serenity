@@ -4246,6 +4246,18 @@ declare namespace Serenity {
         function tryGet(key: string): any;
     }
 
+    interface IRowDefinition {
+        readonly deletePermission?: string;
+        readonly idProperty?: string;
+        readonly insertPermission?: string;
+        readonly isActiveProperty?: string;
+        readonly isDeletedProperty?: string;
+        readonly localTextPrefix?: string;
+        readonly nameProperty?: string;
+        readonly readPermission?: string;
+        readonly updatePermission?: string;
+    }
+
     type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 
     interface SettingStorage {
@@ -4399,6 +4411,7 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         protected updateInterface(): void;
+        protected getRowDefinition(): IRowDefinition;
         protected getLocalTextDbPrefix(): string;
         protected getLocalTextPrefix(): string;
         protected getIdProperty(): string;
