@@ -1,3 +1,8 @@
+## 6.6.2 (2023-03-23)
+
+Bugfixes:
+  - Generated navigation link referred to the old page class name ending with Controller
+
 ## 6.6.1 (2023-03-18)
 
 Bugfixes:
