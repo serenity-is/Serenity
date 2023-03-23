@@ -1,4 +1,6 @@
-﻿namespace Serenity.Web;
+﻿using CompressionLevel = System.IO.Compression.CompressionLevel;
+
+namespace Serenity.Web;
 
 /// <summary>
 /// Default implementation for <see cref="IDynamicScriptManager"/>
