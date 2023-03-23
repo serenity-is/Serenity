@@ -1084,8 +1084,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         if (attr.length >= 1)
             return attr[0].value;
-
-        return '';
     }
    
     private _idProperty: string;

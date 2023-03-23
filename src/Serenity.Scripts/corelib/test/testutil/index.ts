@@ -1,11 +1,11 @@
 import { readFileSync } from "fs";
 import { join, resolve } from "path";
-import { URL } from "url";
 
 const root = resolve('./');
 
 const assetsRoot = "~/../../Serenity.Assets/wwwroot/";
 export const jqueryPath = assetsRoot + "jquery/jquery.min.js";
+export const jqueryValidatePath = assetsRoot + "Scripts/jquery.validate.min.js";
 export const corelibPath = "~/out/Serenity.CoreLib.js";
 export const select2Path = assetsRoot + "Scripts/select2.js";
 export const toastrPath = assetsRoot + "Scripts/toastr.js";

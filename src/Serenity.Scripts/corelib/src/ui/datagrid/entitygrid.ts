@@ -71,11 +71,11 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     protected getLocalTextPrefix(): string {
         var result = super.getLocalTextPrefix();
 
-        if (isEmptyOrNull(result) &&
-            !this.getRowDefinition())
-            return this.getEntityType();
-
-        return result;
+        if (result != null ||
+            this.getRowDefinition())
+            return result;
+            
+        return this.getEntityType();
     }
 
     private _entityType: string;

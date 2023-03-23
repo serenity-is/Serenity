@@ -325,7 +325,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         var rowDefinition = this.getRowDefinition();
         if (rowDefinition)
-            return this._idProperty = rowDefinition.idProperty;
+            return this._idProperty = rowDefinition.idProperty ?? '';
 
         var attr = this.attrs(IdPropertyAttribute);
         if (attr.length === 1)
