@@ -339,19 +339,19 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         return DialogTypeRegistry.get(itemType) as any;
     }
 
-    private dialogType: WidgetDialogClass;
+    private _dialogType: WidgetDialogClass;
 
     protected getDialogType(): { new(...args: any[]): Widget<any> } {
 
-        if (this.dialogType != null)
-            return this.dialogType;
+        if (this._dialogType != null)
+            return this._dialogType;
 
         var attr = this.attrs(DialogTypeAttribute);
         if (attr.length >= 1)
-            this.dialogType = attr[0].value;
+            this._dialogType = attr[0].value;
         else
-            this.dialogType = DialogTypeRegistry.get(this.getEntityType());
+            this._dialogType = DialogTypeRegistry.get(this.getEntityType());
 
-        return this.dialogType;
+        return this._dialogType;
     }
 }

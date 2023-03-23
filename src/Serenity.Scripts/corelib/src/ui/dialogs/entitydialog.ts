@@ -250,18 +250,18 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return (this._formKey = this.getEntityType());
     }
 
-    private localTextDbPrefix: string;
+    private _localTextDbPrefix: string;
 
     protected getLocalTextDbPrefix(): string {
-        if (this.localTextDbPrefix != null)
-            return this.localTextDbPrefix;
+        if (this._localTextDbPrefix != null)
+            return this._localTextDbPrefix;
 
-        this.localTextDbPrefix = this.getLocalTextPrefix() ?? '';
+        this._localTextDbPrefix = this.getLocalTextPrefix() ?? '';
 
-        if (this.localTextDbPrefix.length > 0 && !endsWith(this.localTextDbPrefix, '.'))
-            this.localTextDbPrefix = 'Db.' + this.localTextDbPrefix + '.';
+        if (this._localTextDbPrefix.length > 0 && !endsWith(this._localTextDbPrefix, '.'))
+            this._localTextDbPrefix = 'Db.' + this._localTextDbPrefix + '.';
 
-        return this.localTextDbPrefix;
+        return this._localTextDbPrefix;
     }
 
     protected getLocalTextPrefix(): string {
@@ -277,26 +277,26 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return this.getEntityType();
     }
    
-    private entitySingular: string;
+    private _entitySingular: string;
 
     protected getEntitySingular(): string {
-        if (this.entitySingular != null)
-            return this.entitySingular;
+        if (this._entitySingular != null)
+            return this._entitySingular;
 
         var attributes = this.attrs(ItemNameAttribute);
 
         if (attributes.length >= 1) {
-            this.entitySingular = attributes[0].value;
-            this.entitySingular = LT.getDefault(this.entitySingular, this.entitySingular);
+            this._entitySingular = attributes[0].value;
+            this._entitySingular = LT.getDefault(this._entitySingular, this._entitySingular);
         }
         else {
             var es = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
             if (es == null) 
                 es = this.getEntityType();
-            this.entitySingular = es;
+            this._entitySingular = es;
         }
 
-        return this.entitySingular;
+        return this._entitySingular;
     }
 
     private _nameProperty: string;
@@ -355,19 +355,19 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         return this.getRowDefinition()?.isDeletedProperty;
     }
 
-    protected service: string;
+    private _service: string;
 
     protected getService() {
-        if (this.service != null)
-            return this.service;
+        if (this._service != null)
+            return this._service;
 
         var attributes = this.attrs(ServiceAttribute);
         if (attributes.length >= 1)
-            this.service = attributes[0].value;
+            this._service = attributes[0].value;
         else
-            this.service = replaceAll(this.getEntityType(), '.', '/');
+            this._service = replaceAll(this.getEntityType(), '.', '/');
 
-        return this.service;
+        return this._service;
     }
 
     load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void {

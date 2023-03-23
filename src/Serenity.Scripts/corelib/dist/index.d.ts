@@ -1897,6 +1897,10 @@ interface GridPersistanceFlags {
     includeDeleted?: boolean;
 }
 declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
+    private _isDisabled;
+    private _layoutTimer;
+    private _slickGridOnSort;
+    private _slickGridOnClick;
     protected titleDiv: JQuery;
     protected toolbar: Toolbar;
     protected filterBar: FilterDisplayBar;
@@ -1907,9 +1911,6 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected propertyItemsData: PropertyItemsData;
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number;
-    private isDisabled;
-    private slickGridOnSort;
-    private slickGridOnClick;
     view: RemoteView<TItem>;
     slickGrid: Grid;
     openDialogsAsPanel: boolean;
@@ -1918,7 +1919,6 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     static defaultPersistanceStorage: SettingStorage;
     static defaultColumnWidthScale: number;
     static defaultColumnWidthDelta: number;
-    private layoutTimer;
     constructor(container: JQuery, options?: TOptions);
     protected internalInit(): void;
     protected initSync(): void;
@@ -2239,7 +2239,7 @@ declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     protected getDialogTypeFor(itemType: string): {
         new (...args: any[]): Widget<any>;
     };
-    private dialogType;
+    private _dialogType;
     protected getDialogType(): {
         new (...args: any[]): Widget<any>;
     };
@@ -2293,10 +2293,10 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     protected getEntityType(): string;
     private _formKey;
     protected getFormKey(): string;
-    private localTextDbPrefix;
+    private _localTextDbPrefix;
     protected getLocalTextDbPrefix(): string;
     protected getLocalTextPrefix(): string;
-    private entitySingular;
+    private _entitySingular;
     protected getEntitySingular(): string;
     private _nameProperty;
     protected getNameProperty(): string;
@@ -2305,7 +2305,7 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     private _isActiveProperty;
     protected getIsActiveProperty(): string;
     protected getIsDeletedProperty(): string;
-    protected service: string;
+    private _service;
     protected getService(): string;
     load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void;
     loadNewAndOpenDialog(asPanel?: boolean): void;

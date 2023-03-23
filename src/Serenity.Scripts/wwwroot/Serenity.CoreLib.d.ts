@@ -4292,6 +4292,10 @@ declare namespace Serenity {
         includeDeleted?: boolean;
     }
     class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
+        private _isDisabled;
+        private _layoutTimer;
+        private _slickGridOnSort;
+        private _slickGridOnClick;
         protected titleDiv: JQuery;
         protected toolbar: Toolbar;
         protected filterBar: FilterDisplayBar;
@@ -4302,9 +4306,6 @@ declare namespace Serenity {
         protected propertyItemsData: Q.PropertyItemsData;
         protected initialSettings: PersistedGridSettings;
         protected restoringSettings: number;
-        private isDisabled;
-        private slickGridOnSort;
-        private slickGridOnClick;
         view: Slick.RemoteView<TItem>;
         slickGrid: Slick.Grid;
         openDialogsAsPanel: boolean;
@@ -4313,7 +4314,6 @@ declare namespace Serenity {
         static defaultPersistanceStorage: SettingStorage;
         static defaultColumnWidthScale: number;
         static defaultColumnWidthDelta: number;
-        private layoutTimer;
         constructor(container: JQuery, options?: TOptions);
         protected internalInit(): void;
         protected initSync(): void;
@@ -4634,7 +4634,7 @@ declare namespace Serenity {
         protected getDialogTypeFor(itemType: string): {
             new (...args: any[]): Widget<any>;
         };
-        private dialogType;
+        private _dialogType;
         protected getDialogType(): {
             new (...args: any[]): Widget<any>;
         };
@@ -4688,10 +4688,10 @@ declare namespace Serenity {
         protected getEntityType(): string;
         private _formKey;
         protected getFormKey(): string;
-        private localTextDbPrefix;
+        private _localTextDbPrefix;
         protected getLocalTextDbPrefix(): string;
         protected getLocalTextPrefix(): string;
-        private entitySingular;
+        private _entitySingular;
         protected getEntitySingular(): string;
         private _nameProperty;
         protected getNameProperty(): string;
@@ -4700,7 +4700,7 @@ declare namespace Serenity {
         private _isActiveProperty;
         protected getIsActiveProperty(): string;
         protected getIsDeletedProperty(): string;
-        protected service: string;
+        private _service;
         protected getService(): string;
         load(entityOrId: any, done: () => void, fail?: (ex: Q.Exception) => void): void;
         loadNewAndOpenDialog(asPanel?: boolean): void;

@@ -90,6 +90,10 @@ export interface GridPersistanceFlags {
 @Decorators.element("<div/>")
 export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
 
+    private _isDisabled: boolean;
+    private _layoutTimer: number; 
+    private _slickGridOnSort: any;
+    private _slickGridOnClick: any;
     protected titleDiv: JQuery;
     protected toolbar: Toolbar;
     protected filterBar: FilterDisplayBar;
@@ -100,9 +104,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected propertyItemsData: PropertyItemsData;
     protected initialSettings: PersistedGridSettings;
     protected restoringSettings: number = 0;
-    private isDisabled: boolean;
-    private slickGridOnSort: any;
-    private slickGridOnClick: any;
     public view: RemoteView<TItem>;
     public slickGrid: Grid;
     public openDialogsAsPanel: boolean;
@@ -113,8 +114,6 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    private layoutTimer: number; 
-
     constructor(container: JQuery, options?: TOptions) {
         super(container, options);
 
@@ -124,13 +123,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         var layout = function() {
             self.layout();
-            if (self.layoutTimer != null)
-                LayoutTimer.store(self.layoutTimer);
+            if (self._layoutTimer != null)
+                LayoutTimer.store(self._layoutTimer);
         }
         this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
 
         if (this.useLayoutTimer())
-            this.layoutTimer = LayoutTimer.onSizeChange(() => this.element && this.element[0], debounce(layout, 50));
+            this._layoutTimer = LayoutTimer.onSizeChange(() => this.element && this.element[0], debounce(layout, 50));
 
         this.setTitle(this.getInitialTitle());
 
@@ -374,8 +373,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     public destroy() {
-        if (this.layoutTimer) {
-            this.layoutTimer = LayoutTimer.off(this.layoutTimer);
+        if (this._layoutTimer) {
+            this._layoutTimer = LayoutTimer.off(this._layoutTimer);
         }
         if (this.quickFiltersBar) {
             this.quickFiltersBar.destroy();
@@ -578,7 +577,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected bindToSlickEvents() {
         var self = this;
-        this.slickGridOnSort = (e: JQuery, p: any) => {
+        this._slickGridOnSort = (e: JQuery, p: any) => {
             self.view.populateLock();
             try {
                 var sortBy = [];
@@ -617,13 +616,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             this.persistSettings(null);
         };
 
-        this.slickGrid.onSort.subscribe(this.slickGridOnSort);
+        this.slickGrid.onSort.subscribe(this._slickGridOnSort);
 
-        this.slickGridOnClick = (e1: JQueryEventObject, p1: any) => {
+        this._slickGridOnClick = (e1: JQueryEventObject, p1: any) => {
             self.onClick(e1, p1.row, p1.cell);
         }
 
-        this.slickGrid.onClick.subscribe(this.slickGridOnClick);
+        this.slickGrid.onClick.subscribe(this._slickGridOnClick);
 
         this.slickGrid.onColumnsReordered.subscribe((e2: JQueryEventObject, p2: any) => {
             return this.persistSettings(null);
@@ -744,7 +743,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected onViewSubmit(): boolean {
-        if (this.isDisabled || !this.getGridCanLoad()) {
+        if (this._isDisabled || !this.getGridCanLoad()) {
             return false;
         }
 
@@ -1022,9 +1021,9 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     public setIsDisabled(value: boolean): void {
-        if (this.isDisabled !== value) {
-            this.isDisabled = value;
-            if (this.isDisabled) {
+        if (this._isDisabled !== value) {
+            this._isDisabled = value;
+            if (this._isDisabled) {
                 this.view.setItems([], true);
             }
 
@@ -1125,7 +1124,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected updateDisabledState(): void {
-        this.slickContainer.toggleClass('ui-state-disabled', !!this.isDisabled);
+        this.slickContainer.toggleClass('ui-state-disabled', !!this._isDisabled);
     }
 
     protected resizeCanvas(): void {
