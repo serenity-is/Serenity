@@ -1,4 +1,4 @@
-﻿using Serenity.Navigation;
-using MyPages = {{RootNamespace}}{{DotModule}}.Pages;
+using Serenity.Navigation;
+using MyPages = {{ViewPageNamespace}};
 
-[assembly: NavigationLink(int.MaxValue, "{{ModuleSlash}}{{Title}}", typeof(MyPages.{{ClassName}}Controller), icon: null)]
+[assembly: NavigationLink(int.MaxValue, "{{ModuleSlash}}{{Title}}", typeof(MyPages.{{ViewPageClassName}}), icon: null)]
