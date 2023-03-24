@@ -1,3 +1,12 @@
+## 6.6.3 (2023-03-24)
+
+Features:
+  - Adjust brotli and gzip compression levels based on content length, caching duration and bundle type etc. as brotli with its default level is too slow, sometimes 100 times slower than gzip default level
+  - Add getRowDefinition() method to return row type and read idProperty etc. from there.
+
+Bugfixes:
+  - Inline editing required fields that does not have NotNull/Required flag.
+
 ## 6.6.2 (2023-03-23)
 
 Bugfixes:
