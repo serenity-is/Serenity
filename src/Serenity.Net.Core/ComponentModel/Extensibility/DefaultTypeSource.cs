@@ -1,9 +1,9 @@
-﻿namespace Serenity.Abstractions;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Default implementation for a type source
 /// </summary>
-public class DefaultTypeSource : ITypeSource
+public class DefaultTypeSource : ITypeSource, IGetAssemblies
 {
     private readonly IEnumerable<Assembly> assemblies;
 
@@ -54,5 +54,11 @@ public class DefaultTypeSource : ITypeSource
     {
         return assemblies.SelectMany(asm => asm.GetTypes())
             .Where(type => type.GetCustomAttribute(attributeType) != null);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<Assembly> GetAssemblies()
+    {
+        return assemblies;
     }
 }
