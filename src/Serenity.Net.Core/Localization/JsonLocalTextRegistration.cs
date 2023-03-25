@@ -78,22 +78,37 @@ public static class JsonLocalTextRegistration
 
         foreach (var file in files)
         {
-            var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? new();
-            var langID = fileSystem.GetFileNameWithoutExtension(fileSystem.GetFileName(file));
-
-            var idx = langID.LastIndexOf(".");
-            if (idx >= 0)
-                langID = langID[(idx + 1)..];
-
-            if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
-                langID = "";
-            else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
-            {
-                // special case, meta json without languageID
+            var langID = ParseLanguageIdFromPath(path);
+            if (langID is null)
                 continue;
-            }
+
+            var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(
+                fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? new();
 
             AddFromNestedDictionary(texts, "", langID, registry);
         }
+    }
+
+    /// <summary>
+    /// Parses language ID from the file path
+    /// </summary>
+    /// <param name="path">Path</param>
+    public static string? ParseLanguageIdFromPath(string path)
+    {
+        var langID = System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetFileName(path));
+
+        var idx = langID.LastIndexOf(".");
+        if (idx >= 0)
+            langID = langID[(idx + 1)..];
+
+        if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
+            return "";
+        else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
+        {
+            // special case, meta json without languageID
+            return null;
+        }
+        else
+            return langID;
     }
 }

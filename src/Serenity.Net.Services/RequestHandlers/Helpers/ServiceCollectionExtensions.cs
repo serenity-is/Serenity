@@ -280,24 +280,16 @@ public static class ServiceCollectionExtensions
             if (!entry.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                 continue;
 
+            var langID = JsonLocalTextRegistration.ParseLanguageIdFromPath(entry.Name);
+            if (langID is null)
+                continue;
+
             using var stream = entry.CreateReadStream();
             using var sr = new StreamReader(stream);
             string json = sr.ReadToEnd().TrimToNull();
             if (json is null)
                 continue;
             var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-            var langID = Path.GetFileNameWithoutExtension(entry.Name);
-            var idx = langID.LastIndexOf(".");
-            if (idx >= 0)
-                langID = langID[(idx + 1)..];
-
-            if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
-                langID = "";
-            else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
-            {
-                // special case, meta json without languageID
-                continue;
-            }
 
             JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
         }
