@@ -264,7 +264,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     /// <inheritdoc/>
     public IDictionary<LanguageIdKeyPair, string?> GetAllTexts(bool pending)
     {
-        return pending ? approvedTexts : pendingTexts;
+        return pending ? pendingTexts : approvedTexts;
     }
 
     /// <summary>
