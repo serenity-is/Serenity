@@ -90,7 +90,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                 if (languageID == LocalText.InvariantLanguageID)
                     return null;
             }
-            else if (approvedTexts.TryGetValue(k, out s))
+            else if (approvedTexts.TryGetValue(k, out s) &&
+                s != null)
             {
                 // approved is available, return it
                 return s;
@@ -119,7 +120,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                     if (languageID == LocalText.InvariantLanguageID)
                         return null;
                 }
-                else if (approvedTexts.TryGetValue(k, out s))
+                else if (approvedTexts.TryGetValue(k, out s) &&
+                    s != null)
                 {
                     // text available in approved default language
                     return s;
