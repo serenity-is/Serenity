@@ -1,5 +1,3 @@
-﻿using ItemKey = System.Tuple<string, string>;
-
 namespace Serenity.Localization;
 
 /// <summary>
@@ -13,11 +11,11 @@ namespace Serenity.Localization;
 /// some moderator is using the site by registering an ILocalTextContext provider. Thus,
 /// moderators can see unapproved texts while they are logged in to the site.
 /// </remarks>
-public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
+public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, ILanguageFallbacks
 {
-    private readonly ConcurrentDictionary<ItemKey, string?> approvedTexts = new(ItemKeyComparer.Default);
+    private readonly ConcurrentDictionary<LanguageIdKeyPair, string?> approvedTexts = new();
 
-    private readonly ConcurrentDictionary<ItemKey, string?> pendingTexts = new(ItemKeyComparer.Default);
+    private readonly ConcurrentDictionary<LanguageIdKeyPair, string?> pendingTexts = new();
 
     private readonly ConcurrentDictionary<string, string> languageFallbacks = new(StringComparer.OrdinalIgnoreCase);
 
@@ -35,7 +33,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
         if (key == null)
             throw new ArgumentNullException(nameof(languageID));
 
-        approvedTexts[new ItemKey(languageID, key)] = text;
+        approvedTexts[new LanguageIdKeyPair(languageID, key)] = text;
     }
 
     /// <summary>
@@ -54,7 +52,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
         if (key == null)
             throw new ArgumentNullException(nameof(key));
 
-        pendingTexts[new ItemKey(languageID, key)] = text;
+        pendingTexts[new LanguageIdKeyPair(languageID, key)] = text;
     }
 
     /// <summary>
@@ -74,7 +72,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
             throw new ArgumentNullException(nameof(textKey));
 
         // create a key to lookup by language and text key pair
-        var k = new ItemKey(languageID, textKey);
+        var k = new LanguageIdKeyPair(languageID, textKey);
 
         string? s;
 
@@ -109,7 +107,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
                 languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
 
                 // search in fallback or default language
-                k = new ItemKey(languageID, textKey);
+                k = new LanguageIdKeyPair(languageID, textKey);
 
                 if (pendingTexts.TryGetValue(k, out s))
                 {
@@ -151,7 +149,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
                     languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
 
                     // search in fallback or default language
-                    k = new ItemKey(languageID, textKey);
+                    k = new LanguageIdKeyPair(languageID, textKey);
 
                     // search again
                     if (approvedTexts.TryGetValue(k, out s))
@@ -171,21 +169,19 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
         return s;
     }
 
-    /// <summary>
-    /// Sets the language fallback of the specified language.
-    /// When a text is not found in one language, LocalTextRegistry checks its language fallback for
-    /// a translation. Some implicit language fallback definitions exist even if none set. For example, "en" is 
-    /// language fallback ID of "en-US" and "en-UK", "tr" is language fallback ID of "tr-TR". Also, 
-    /// invariant language ID ("") is an implicit fallback of all languages.
-    /// </summary>
-    /// <param name="languageID">Language identifier. (e.g. en-US)</param>
-    /// <param name="languageFallbackID">language fallback identifier. (e.g. en)</param>
-    public void SetLanguageFallback(string languageID, string languageFallbackID)
+    /// <inheritdoc/>
+    public IDictionary<string, string> GetLanguageFallbacks()
+    {
+        return languageFallbacks;
+    }
+
+    /// <inheritdoc/>
+    public void SetLanguageFallback(string languageID, string fallbackID)
     {
         if (languageID == null)
             throw new ArgumentNullException(nameof(languageID));
 
-        languageFallbacks[languageID] = languageFallbackID ?? throw new ArgumentNullException(nameof(languageFallbackID));
+        languageFallbacks[languageID] = fallbackID ?? throw new ArgumentNullException(nameof(fallbackID));
     }
 
     private string? TryGetLanguageFallback(string languageID)
@@ -230,8 +226,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
             {
                 foreach (var item in pendingTexts)
                 {
-                    var key = item.Key.Item2;
-                    if (item.Key.Item1 == currentID && !texts.ContainsKey(key))
+                    var key = item.Key.Key;
+                    if (item.Key.LanguageId == currentID && !texts.ContainsKey(key))
                     {
                         text = TryGet(languageID, key, true);
                         if (text != null)
@@ -242,8 +238,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
 
             foreach (var item in approvedTexts)
             {
-                var key = item.Key.Item2;
-                if (item.Key.Item1 == currentID && !texts.ContainsKey(key))
+                var key = item.Key.Key;
+                if (item.Key.LanguageId == currentID && !texts.ContainsKey(key))
                 {
                     text = TryGet(languageID, key, true);
                     if (text != null)
@@ -263,6 +259,12 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
         return texts;
     }
 
+    /// <inheritdoc/>
+    public IDictionary<LanguageIdKeyPair, string?> GetAllTexts(bool pending)
+    {
+        return pending ? approvedTexts : pendingTexts;
+    }
+
     /// <summary>
     /// Gets all text keys that is currently registered in any language
     /// </summary>
@@ -270,7 +272,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
     {
         var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var k in (pending ? pendingTexts : approvedTexts).Keys)
-            result.Add(k.Item2);
+            result.Add(k.Key);
         return result;
     }
 
@@ -282,22 +284,5 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll
         approvedTexts.Clear();
         pendingTexts.Clear();
         languageFallbacks.Clear();
-    }
-
-    private class ItemKeyComparer : IEqualityComparer<ItemKey>
-    {
-        public static readonly ItemKeyComparer Default = new();
-
-        public bool Equals(ItemKey lhs, ItemKey rhs)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(lhs.Item1, rhs.Item1)
-                && StringComparer.OrdinalIgnoreCase.Equals(lhs.Item2, rhs.Item2);
-        }
-
-        public int GetHashCode(ItemKey tuple)
-        {
-            return StringComparer.OrdinalIgnoreCase.GetHashCode(tuple.Item1)
-                 ^ tuple.Item2.GetHashCode();
-        }
     }
 }
