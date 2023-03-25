@@ -1,3 +1,5 @@
+using Serenity.Localization;
+
 namespace Serenity.Abstractions;
 
 /// <summary>
