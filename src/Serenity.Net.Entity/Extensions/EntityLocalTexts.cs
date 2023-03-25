@@ -1,4 +1,4 @@
-﻿namespace Serenity.Localization;
+namespace Serenity.Localization;
 
 /// <summary>
 /// EntityLocalTexts
@@ -48,6 +48,14 @@ public static class EntityLocalTexts
                             field.Caption = new InitializedLocalText(key, lt.Key);
                         }
                     }
+                }
+                else if (lt is null && 
+                    languageID == LocalText.InvariantLanguageID)
+                {
+                    var key = field.AutoTextKey;
+                    var text = field.PropertyName ?? field.Name;
+                    provider.Add(languageID, key, text);
+                    field.Caption = new InitializedLocalText(field.AutoTextKey, text);
                 }
             }
 
