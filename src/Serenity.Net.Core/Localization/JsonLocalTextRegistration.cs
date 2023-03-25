@@ -78,7 +78,7 @@ public static class JsonLocalTextRegistration
 
         foreach (var file in files)
         {
-            var langID = ParseLanguageIdFromPath(path);
+            var langID = ParseLanguageIdFromPath(file);
             if (langID is null)
                 continue;
 
