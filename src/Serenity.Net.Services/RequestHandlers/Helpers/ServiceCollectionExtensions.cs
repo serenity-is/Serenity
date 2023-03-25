@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Serenity.Localization;
@@ -213,6 +213,7 @@ public static class ServiceCollectionExtensions
         var typeSource = provider.GetRequiredService<ITypeSource>();
         var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
         var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();
+        textRegistry.AddFormTexts(typeSource);
         textRegistry.AddNestedTexts(typeSource);
         textRegistry.AddEnumTexts(typeSource);
         textRegistry.AddNestedPermissions(typeSource);
