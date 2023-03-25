@@ -115,12 +115,5 @@
     "Dialogs.OkButton": "تائید",
     "Dialogs.RestoreHint": "Restore",
     "Dialogs.WarningTitle": "هشدار",
-    "Dialogs.YesButton": "بلی",
-    "Enums.CustomFieldType.Boolean": "منطقی",
-    "Enums.CustomFieldType.Date": "تاریخ",
-    "Enums.CustomFieldType.DateTime": "تاریخ-زمان",
-    "Enums.CustomFieldType.Decimal": "عدد اعشار",
-    "Enums.CustomFieldType.Int32": "عدد صحیح",
-    "Enums.CustomFieldType.Int64": "عدد صحیح مضاعف",
-    "Enums.CustomFieldType.String": "مقدار رشته ای"
+    "Dialogs.YesButton": "بلی"
 }

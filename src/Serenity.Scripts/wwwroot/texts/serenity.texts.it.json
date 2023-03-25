@@ -136,7 +136,6 @@
     "Validation.Required": "Questo campo è obbligatorio.",
     "Validation.UnexpectedError": "Si è verificato un errore inaspettato!",
     "Validation.UniqueConstraint": "Esiste un altro record con lo stesso valore '{0}'!",
-    "Validation.UniqueViolation": "Esiste un altro record con lo stesso valore '{0}'!",
     "Validation.Url": "Per favore, immettere un URL valido (es. http://www.site.com).",
     "Validation.Username": "Non è uno nome utente valido.",
     "Validation.UsernameExists": "Questo nome utente è già utilizzato. Per favore, sceglierne un altro.",

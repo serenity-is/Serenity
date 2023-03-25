@@ -86,7 +86,6 @@
     "Controls.ImageUpload.MaxHeight": "¡La imagen cargada debe estar por debajo de {0} píxeles de altura!",
     "Controls.ImageUpload.MaxWidth": "¡La imagen subida debe estar por debajo de {0} píxeles de ancho!",
     "Controls.ImageUpload.MinHeight": "Uploaded image should be at least {0} pixels in height!",
-    "Controls.ImageUpload.MinHieght": "¡La imagen cargada debe tener por lo menos {0} píxeles de altura!",
     "Controls.ImageUpload.MinWidth": "¡La imagen cargada debe tener al menos {0} píxeles de ancho!",
     "Controls.ImageUpload.NotAnImageFile": "¡El archivo subido no es una imagen!",
     "Controls.ImageUpload.UploadFileTooBig": "El archivo subido debe ser menor de {0}",

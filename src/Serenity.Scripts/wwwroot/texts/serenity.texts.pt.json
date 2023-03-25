@@ -136,7 +136,6 @@
     "Validation.Required": "Este campo é obrigatório.",
     "Validation.UnexpectedError": "Ocorreu um erro inesperado!",
     "Validation.UniqueConstraint": "Existe outro registo com os mesmos '{0}' valores)!",
-    "Validation.UniqueViolation": "Violação única!",
     "Validation.Url": "Por favor insira um URL válido (por exemplo http://www.site.com).",
     "Validation.Username": "Não é um nome de utilizador válido.",
     "Validation.UsernameExists": "Este nome de utilizador já está sendo usado. Por favor, escolha outro.",
