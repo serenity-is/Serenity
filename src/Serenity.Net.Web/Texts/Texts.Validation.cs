@@ -23,7 +23,7 @@ internal static partial class Texts
         public static LocalText Url = "Please enter a valid URL (e.g. http://www.site.com).";
         public static LocalText Username = "Not a valid username.";
         public static LocalText UsernameExists = "This username is already used. Please choose another.";
-        public static LocalText Xss = "Invalid value! (don't use '&lt;' and '&amp;')";
+        public static LocalText Xss = "Invalid value! (don't use '<' and '&')";
         public static LocalText InvalidFormMessage = "Please validate empty or invalid inputs (marked with red) before submitting the form.";
         public static LocalText UniqueConstraint = "Another record with the same '{0}' value(s) exists!";
         public static LocalText MinDate = "Please enter a date after '{0}'.";

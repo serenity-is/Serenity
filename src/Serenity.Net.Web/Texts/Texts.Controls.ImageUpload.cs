@@ -12,7 +12,7 @@ internal static partial class Texts
             public static LocalText ColorboxCurrent = "image {current} / {total}";
             public static LocalText ColorboxPrior = "prior";
             public static LocalText ColorboxNext = "next";
-            public static LocalText ColorboxClose = "next";
+            public static LocalText ColorboxClose = "close";
         }
     }
 }
