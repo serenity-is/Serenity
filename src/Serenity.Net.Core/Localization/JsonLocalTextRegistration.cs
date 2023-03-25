@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Serenity.Localization;
 
@@ -85,8 +85,13 @@ public static class JsonLocalTextRegistration
             if (idx >= 0)
                 langID = langID[(idx + 1)..];
 
-            if (langID.ToLowerInvariant() == "invariant")
+            if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
                 langID = "";
+            else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
+            {
+                // special case, meta json without languageID
+                continue;
+            }
 
             AddFromNestedDictionary(texts, "", langID, registry);
         }

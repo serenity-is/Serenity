@@ -291,8 +291,13 @@ public static class ServiceCollectionExtensions
             if (idx >= 0)
                 langID = langID[(idx + 1)..];
 
-            if (langID.ToLowerInvariant() == "invariant")
+            if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
                 langID = "";
+            else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
+            {
+                // special case, meta json without languageID
+                continue;
+            }
 
             JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
         }
