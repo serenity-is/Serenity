@@ -1,4 +1,4 @@
-﻿namespace Serenity.Navigation;
+namespace Serenity.Navigation;
 
 /// <summary>
 /// Defines a navigation group, which are usually the icons on the sidebar band
@@ -12,8 +12,8 @@ public class NavigationGroupAttribute : NavigationItemAttribute
     /// <param name="order">Order</param>
     /// <param name="title">Title</param>
     /// <param name="icon">Icon class</param>
-    public NavigationGroupAttribute(int order, string title, string icon = null)
-        : base(order, title, (string)null, null, icon)
+    public NavigationGroupAttribute(int order, string title, string? icon = null)
+        : base(order, title, null, null, icon)
     {
     }
 
@@ -22,7 +22,7 @@ public class NavigationGroupAttribute : NavigationItemAttribute
     /// </summary>
     /// <param name="title">Title</param>
     /// <param name="icon">Icon</param>
-    public NavigationGroupAttribute(string title, string icon = null)
+    public NavigationGroupAttribute(string title, string? icon = null)
         : this(int.MaxValue, title, icon)
     {
     }
@@ -35,7 +35,7 @@ public class NavigationGroupAttribute : NavigationItemAttribute
     /// the list should be ["B/", "C/"]. To move B and C themselves under A,
     /// list should be ["B", "C"].
     /// </summary>
-    public string[] Include { get; set; }
+    public string[]? Include { get; set; }
 
     /// <summary>
     /// This group automatically includes siblings that does not match any other groups

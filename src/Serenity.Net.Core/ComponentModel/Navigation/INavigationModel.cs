@@ -1,4 +1,4 @@
-﻿namespace Serenity.Navigation;
+namespace Serenity.Navigation;
 
 /// <summary>
 /// Navigation model abstraction
@@ -8,7 +8,7 @@ public interface INavigationModel
     /// <summary>
     /// Active navigation item
     /// </summary>
-    NavigationItem ActiveItem { get; }
+    NavigationItem? ActiveItem { get; }
 
     /// <summary>
     /// Navigation items in the active path

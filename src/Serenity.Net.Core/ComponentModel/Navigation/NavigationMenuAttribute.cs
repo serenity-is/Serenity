@@ -1,4 +1,4 @@
-﻿namespace Serenity.Navigation;
+namespace Serenity.Navigation;
 
 /// <summary>
 /// Navigation menu without a link
@@ -12,8 +12,8 @@ public class NavigationMenuAttribute : NavigationItemAttribute
     /// <param name="order">Order</param>
     /// <param name="icon">Icon</param>
     /// <param name="title">Title</param>
-    public NavigationMenuAttribute(int order, string title, string icon = null)
-        : base(order, title, (string)null, null, icon)
+    public NavigationMenuAttribute(int order, string title, string? icon = null)
+        : base(order, title, null, null, icon)
     {
     }
 
@@ -22,8 +22,8 @@ public class NavigationMenuAttribute : NavigationItemAttribute
     /// </summary>
     /// <param name="icon">Icon</param>
     /// <param name="title">Title</param>
-    public NavigationMenuAttribute(string title, string icon = null)
-        : base(int.MaxValue, title, (string)null, null, icon)
+    public NavigationMenuAttribute(string title, string? icon = null)
+        : base(int.MaxValue, title, null, null, icon)
     {
     }
 }

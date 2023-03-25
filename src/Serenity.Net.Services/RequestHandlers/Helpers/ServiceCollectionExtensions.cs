@@ -213,6 +213,7 @@ public static class ServiceCollectionExtensions
         var typeSource = provider.GetRequiredService<ITypeSource>();
         var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
         var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();
+        textRegistry.AddNavigationTexts(typeSource);
         textRegistry.AddFormTexts(typeSource);
         textRegistry.AddNestedTexts(typeSource);
         textRegistry.AddEnumTexts(typeSource);

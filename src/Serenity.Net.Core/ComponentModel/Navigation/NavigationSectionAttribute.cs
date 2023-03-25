@@ -1,4 +1,4 @@
-﻿namespace Serenity.Navigation;
+namespace Serenity.Navigation;
 
 /// <summary>
 /// Navigation section attribute
@@ -12,7 +12,7 @@ public class NavigationSectionAttribute : NavigationGroupAttribute
     /// <param name="order">Display order</param>
     /// <param name="title">Title</param>
     /// <param name="icon">Icon class</param>
-    public NavigationSectionAttribute(int order, string title, string icon = null)
+    public NavigationSectionAttribute(int order, string title, string? icon = null)
         : base(order, title, icon)
     {
     }
@@ -22,7 +22,7 @@ public class NavigationSectionAttribute : NavigationGroupAttribute
     /// </summary>
     /// <param name="title">Title</param>
     /// <param name="icon">Icon class</param>
-    public NavigationSectionAttribute(string title, string icon = null)
+    public NavigationSectionAttribute(string title, string? icon = null)
         : this(int.MaxValue, title, icon)
     {
     }
