@@ -6,67 +6,67 @@ static partial class WebTexts
     {
         public static class FilterPanel
         {
-            public static LocalText AddFilter = "add criteria";
-            public static LocalText All = "<all>";
-            public static LocalText And = "and";
-            public static LocalText AndInParens = "(and)";
-            public static LocalText ChangeAndOr = "click to switch between AND/OR";
-            public static LocalText CurrentFilter = "Active Filter: {0}";
-            public static LocalText SelectField = "---select field---";
-            public static LocalText RemoveField = "remove criteria";
-            public static LocalText InvalidOperator = "invalid operator";
-            public static LocalText InvalidDate = "invalid date!";
-            public static LocalText InvalidNumber = "invalid number!";
-            public static LocalText Or = "or";
-            public static LocalText OrInParens = "(or)";
-            public static LocalText ResetButton = "reset";
-            public static LocalText SearchButton = "apply filter";
-            public static LocalText ValueRequired = "value required!";
-            public static LocalText GroupBy = "--group--";
-            public static LocalText ThenBy = "--then by--";
-            public static LocalText ApplyGroups = "apply grouping";
-            public static LocalText ClearGroups = "clear grouping";
-            public static LocalText DialogTitle = "Edit Filter";
-            public static LocalText EditFilter = "edit filter";
-            public static LocalText ResetFilterHint = "clear filter";
-            public static LocalText EffectiveFilter = "Active Filter:";
-            public static LocalText EffectiveEmpty = "none";
-            public static LocalText FixErrorsMessage = "Please fix errors that are marked in red";
+            public static readonly LocalText AddFilter = "add criteria";
+            public static readonly LocalText All = "<all>";
+            public static readonly LocalText And = "and";
+            public static readonly LocalText AndInParens = "(and)";
+            public static readonly LocalText ChangeAndOr = "click to switch between AND/OR";
+            public static readonly LocalText CurrentFilter = "Active Filter: {0}";
+            public static readonly LocalText SelectField = "---select field---";
+            public static readonly LocalText RemoveField = "remove criteria";
+            public static readonly LocalText InvalidOperator = "invalid operator";
+            public static readonly LocalText InvalidDate = "invalid date!";
+            public static readonly LocalText InvalidNumber = "invalid number!";
+            public static readonly LocalText Or = "or";
+            public static readonly LocalText OrInParens = "(or)";
+            public static readonly LocalText ResetButton = "reset";
+            public static readonly LocalText SearchButton = "apply filter";
+            public static readonly LocalText ValueRequired = "value required!";
+            public static readonly LocalText GroupBy = "--group--";
+            public static readonly LocalText ThenBy = "--then by--";
+            public static readonly LocalText ApplyGroups = "apply grouping";
+            public static readonly LocalText ClearGroups = "clear grouping";
+            public static readonly LocalText DialogTitle = "Edit Filter";
+            public static readonly LocalText EditFilter = "edit filter";
+            public static readonly LocalText ResetFilterHint = "clear filter";
+            public static readonly LocalText EffectiveFilter = "Active Filter:";
+            public static readonly LocalText EffectiveEmpty = "none";
+            public static readonly LocalText FixErrorsMessage = "Please fix errors that are marked in red";
 
             public static class OperatorNames
             {
-                public static LocalText @true = "yes";
-                public static LocalText @false = "no";
-                public static LocalText contains = "contains";
-                public static LocalText startswith = "starts with";
-                public static LocalText eq = "equal";
-                public static LocalText ne = "not equal";
-                public static LocalText gt = "greater than";
-                public static LocalText ge = "greater than or equal";
-                public static LocalText lt = "less than";
-                public static LocalText le = "less than or equal";
-                public static LocalText bw = "between";
-                public static LocalText @in = "in";
-                public static LocalText isnull = "is null";
-                public static LocalText isnotnull = "is not null";
+                public static readonly LocalText @true = "yes";
+                public static readonly LocalText @false = "no";
+                public static readonly LocalText contains = "contains";
+                public static readonly LocalText startswith = "starts with";
+                public static readonly LocalText eq = "equal";
+                public static readonly LocalText ne = "not equal";
+                public static readonly LocalText gt = "greater than";
+                public static readonly LocalText ge = "greater than or equal";
+                public static readonly LocalText lt = "less than";
+                public static readonly LocalText le = "less than or equal";
+                public static readonly LocalText bw = "between";
+                public static readonly LocalText @in = "in";
+                public static readonly LocalText isnull = "is null";
+                public static readonly LocalText isnotnull = "is not null";
             }
 
             public static class OperatorFormats
             {
-                public static LocalText @true = "{0} = yes";
-                public static LocalText @false = "{0} = no";
-                public static LocalText contains = "{0} contains '{1}'";
-                public static LocalText startswith = "{0} starts with '{1}'";
-                public static LocalText eq = "{0} = {1}";
-                public static LocalText ne = "{0} <> {1}";
-                public static LocalText gt = "{0} > {1}";
-                public static LocalText ge = "{0} >= {1}";
-                public static LocalText lt = "{0} < {1}";
-                public static LocalText le = "{0} <= {1}";
-                public static LocalText bw = "{0} is between {1} and {2}";
-                public static LocalText @in = "{0} is one of [{1}]";
-                public static LocalText isnull = "{0} is null";
-                public static LocalText isnotnull = "{0} is not null";
+                public static readonly LocalText @true = "{0} = yes";
+                public static readonly LocalText @false = "{0} = no";
+                public static readonly LocalText contains = "{0} contains '{1}'";
+                public static readonly LocalText startswith = "{0} starts with '{1}'";
+                public static readonly LocalText eq = "{0} = {1}";
+                public static readonly LocalText ne = "{0} <> {1}";
+                public static readonly LocalText gt = "{0} > {1}";
+                public static readonly LocalText ge = "{0} >= {1}";
+                public static readonly LocalText lt = "{0} < {1}";
+                public static readonly LocalText le = "{0} <= {1}";
+                public static readonly LocalText bw = "{0} is between {1} and {2}";
+                public static readonly LocalText @in = "{0} is one of [{1}]";
+                public static readonly LocalText isnull = "{0} is null";
+                public static readonly LocalText isnotnull = "{0} is not null";
             }
         }
     }
