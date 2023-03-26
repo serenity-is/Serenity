@@ -221,6 +221,8 @@ public static class ServiceCollectionExtensions
         var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
         textRegistry.AddRowTexts(rowInstances);
 
+        textRegistry.AddJsonResourceTexts(typeSource);
+
         if (webFileProvider is not null)
         {
             textRegistry.AddJsonTexts(webFileProvider, "Serenity.Scripts/texts");

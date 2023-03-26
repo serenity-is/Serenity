@@ -90,25 +90,88 @@ public static class JsonLocalTextRegistration
     }
 
     /// <summary>
+    /// Adds json texts from embedded resources
+    /// </summary>
+    /// <param name="registry">The text registry</param>
+    /// <param name="typeSource">Type source</param>
+    /// <returns>The text registry</returns>
+    /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
+    public static ILocalTextRegistry AddJsonResourceTexts(this ILocalTextRegistry registry, ITypeSource typeSource)
+    {
+        if (registry is null)
+            throw new ArgumentNullException(nameof(registry));
+
+        if (typeSource is null)
+            throw new ArgumentNullException(nameof(typeSource));
+
+        if (typeSource is not IGetAssemblies getAssemblies)
+            return registry;
+
+        return AddJsonResourceTexts(registry, getAssemblies.GetAssemblies().ToArray());
+    }
+
+    /// <summary>
+    /// Adds json texts from embedded resources
+    /// </summary>
+    /// <param name="registry">The text registry</param>
+    /// <param name="assemblies">List of assemblies</param>
+    /// <returns>The text registry</returns>
+    /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
+    public static ILocalTextRegistry AddJsonResourceTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
+    {
+        if (assemblies is null)
+            throw new ArgumentNullException(nameof(assemblies));
+
+        foreach (var assembly in assemblies)
+        {
+            var resourceNames = assembly.GetManifestResourceNames();
+            foreach (var resourceName in resourceNames.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+            {
+                if (!resourceName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (!resourceName.Contains(".texts."))
+                    continue;
+
+                var langID = ParseLanguageIdFromPath(resourceName);
+                if (langID is null)
+                    continue;
+
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                using var sr = new System.IO.StreamReader(stream);
+                string? json = sr.ReadToEnd().TrimToNull();
+                if (json is null)
+                    continue;
+                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                if (texts is not null)
+                    AddFromNestedDictionary(texts, "", langID, registry);
+            }
+        }
+
+        return registry;
+    }
+
+    private static readonly Regex IsoLanguageIdRegex =
+        new("^[a-z][a-z](-[A-Z][A-Z])?$");
+
+    /// <summary>
     /// Parses language ID from the file path
     /// </summary>
     /// <param name="path">Path</param>
     public static string? ParseLanguageIdFromPath(string path)
     {
-        var langID = System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetFileName(path));
+        var langID = System.IO.Path.GetFileNameWithoutExtension(
+            System.IO.Path.GetFileName(path));
 
         var idx = langID.LastIndexOf(".");
         if (idx >= 0)
             langID = langID[(idx + 1)..];
 
-        if (string.Equals(langID, "invariant", StringComparison.OrdinalIgnoreCase))
+        if (langID == "invariant")
             return "";
-        else if (string.Equals(langID, "texts", StringComparison.OrdinalIgnoreCase))
-        {
-            // special case, meta json without languageID
+        else if (!IsoLanguageIdRegex.IsMatch(langID))
             return null;
-        }
-        else
-            return langID;
+
+        return langID;
     }
 }

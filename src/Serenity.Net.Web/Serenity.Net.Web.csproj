@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Web</AssemblyName>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,6 +6,8 @@
     <Description>Contains Web application related types...</Description>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="texts\**\*.json" />
+    <EmbeddedResource Include="texts\**\*.json" WithCulture="false" Culture="" />
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <None Include="Serenity.Net.Web.targets" Pack="true" PackagePath="build" Visible="false" />
