@@ -5,6 +5,10 @@
       $(CompileTypeScriptDependsOn)
     </CompileTypeScriptDependsOn>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="texts\resources\**\*.json" />
+    <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
+  </ItemGroup>  
   <Target Name="RestoreTypings"
           BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
           DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences"
