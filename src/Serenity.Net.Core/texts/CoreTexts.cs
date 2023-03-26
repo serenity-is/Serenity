@@ -1,7 +1,7 @@
-namespace Serenity.Core;
+namespace Serenity;
 
 [NestedLocalTexts]
-internal static class CoreTexts
+public static class CoreTexts
 {
     public static class Authorization
     {

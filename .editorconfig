@@ -16,7 +16,7 @@ trim_trailing_whitespace = false
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
 
-[*Texts.*.cs]
+[*Texts*.cs]
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
 # CA2211: Non-constant fields should not be visible
