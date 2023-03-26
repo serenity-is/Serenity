@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
@@ -183,25 +183,20 @@ public class ImageChecker
     /// <param name="localizer">Text localizer</param>
     public string FormatErrorMessage(ImageCheckResult result, ITextLocalizer localizer)
     {
-        var format = localizer.Get("Enums.ImageCheckResult." + Enum.GetName(typeof(ImageCheckResult), result));
-        switch (result)
+        var format = localizer.Get("Enums." + 
+            (typeof(ImageCheckResult).GetAttribute<EnumKeyAttribute>()?.Value ??
+             typeof(ImageCheckResult).FullName) + "." +
+            Enum.GetName(typeof(ImageCheckResult), result));
+
+        return result switch
         {
-            case ImageCheckResult.DataSizeTooHigh:
-                return string.Format(format, MaxDataSize, DataSize);
-            case ImageCheckResult.SizeMismatch:
-                return string.Format(format, MinWidth, MinHeight, Width, Height);
-            case ImageCheckResult.WidthMismatch:
-            case ImageCheckResult.WidthTooHigh:
-                return string.Format(format, MaxWidth, Width);
-            case ImageCheckResult.WidthTooLow:
-                return string.Format(format, MinWidth, Width);
-            case ImageCheckResult.HeightMismatch:
-            case ImageCheckResult.HeightTooHigh:
-                return string.Format(format, MaxHeight, Height);
-            case ImageCheckResult.HeightTooLow:
-                return string.Format(format, MinHeight, Height);
-            default:
-                return format;
-        }
+            ImageCheckResult.DataSizeTooHigh => string.Format(format, MaxDataSize, DataSize),
+            ImageCheckResult.SizeMismatch => string.Format(format, MinWidth, MinHeight, Width, Height),
+            ImageCheckResult.WidthMismatch or ImageCheckResult.WidthTooHigh => string.Format(format, MaxWidth, Width),
+            ImageCheckResult.WidthTooLow => string.Format(format, MinWidth, Width),
+            ImageCheckResult.HeightMismatch or ImageCheckResult.HeightTooHigh => string.Format(format, MaxHeight, Height),
+            ImageCheckResult.HeightTooLow => string.Format(format, MinHeight, Height),
+            _ => format,
+        };
     }
 }
