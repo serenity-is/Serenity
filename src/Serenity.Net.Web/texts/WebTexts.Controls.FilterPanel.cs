@@ -1,8 +1,8 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
-internal static partial class WebTexts
+static partial class WebTexts
 {
-    public static partial class Controls
+    static partial class Controls
     {
         public static class FilterPanel
         {

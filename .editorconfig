@@ -1,0 +1,23 @@
+root=true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+
+[*.{css,csproj,json,props,targets}]
+indent_size=2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*Endpoint.cs]
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
+
+[*Texts.*.cs]
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = none

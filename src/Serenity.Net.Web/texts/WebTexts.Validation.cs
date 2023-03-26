@@ -1,6 +1,6 @@
 namespace Serenity.Web;
 
-internal static partial class WebTexts
+static partial class WebTexts
 {
     public static class Validation
     {
