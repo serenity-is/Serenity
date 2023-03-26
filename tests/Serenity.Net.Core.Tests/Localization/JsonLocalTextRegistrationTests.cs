@@ -1,4 +1,4 @@
-﻿using Serenity.Localization;
+using Serenity.Localization;
 
 namespace Serenity.Tests.Localization;
 
@@ -212,11 +212,11 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Sorts_Files_ByFilename()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/z.json", @"{x:""1""}");
-        fileSystem.AddFile(@"C:/My/a.json", @"{x:""2""}");
-        fileSystem.AddFile(@"C:/My/t.json", @"{x:""3""}");
-        fileSystem.AddFile(@"C:/My/b.json", @"{x:""4""}");
-        fileSystem.AddFile(@"C:/My/0.json", @"{x:""5""}");
+        fileSystem.AddFile(@"C:/My/zz.json", @"{x:""1""}");
+        fileSystem.AddFile(@"C:/My/bb.json", @"{x:""2""}");
+        fileSystem.AddFile(@"C:/My/tt.json", @"{x:""3""}");
+        fileSystem.AddFile(@"C:/My/cc.json", @"{x:""4""}");
+        fileSystem.AddFile(@"C:/My/aa.json", @"{x:""5""}");
 
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);

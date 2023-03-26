@@ -33,7 +33,14 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         if (key == null)
             throw new ArgumentNullException(nameof(languageID));
 
-        approvedTexts[new LanguageIdKeyPair(languageID, key)] = text;
+        if (text is null)
+        {
+            // probably null entry in texts.xy.json, save it to remember the key only
+            var pair = new LanguageIdKeyPair(LocalText.InvariantLanguageID, key);
+            approvedTexts.GetOrAdd(pair, (string?)null);
+        }
+        else
+            approvedTexts[new LanguageIdKeyPair(languageID, key)] = text;
     }
 
     /// <summary>
@@ -90,8 +97,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                 if (languageID == LocalText.InvariantLanguageID)
                     return null;
             }
-            else if (approvedTexts.TryGetValue(k, out s) &&
-                s != null)
+            else if (approvedTexts.TryGetValue(k, out s))
             {
                 // approved is available, return it
                 return s;
@@ -120,8 +126,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                     if (languageID == LocalText.InvariantLanguageID)
                         return null;
                 }
-                else if (approvedTexts.TryGetValue(k, out s) &&
-                    s != null)
+                else if (approvedTexts.TryGetValue(k, out s))
                 {
                     // text available in approved default language
                     return s;

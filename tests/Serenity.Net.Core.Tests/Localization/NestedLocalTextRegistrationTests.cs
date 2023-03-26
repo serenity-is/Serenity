@@ -1,4 +1,4 @@
-﻿using Serenity.Localization;
+using Serenity.Localization;
 
 namespace Serenity.Tests.Localization;
 
@@ -86,13 +86,13 @@ public class NestedLocalTextRegistrationTests
         var registry = new MockLocalTextRegistry();
         registry.AddNestedTexts(new MockTypeSource(typeof(NestedTexts)));
 
-        Assert.IsType<InitializedLocalText>(NestedTexts.Y.Y1);
-        Assert.IsType<InitializedLocalText>(NestedTexts.Y.Y2);
-        Assert.IsType<InitializedLocalText>(NestedTexts.Y.YI.Y3);
-        Assert.IsType<InitializedLocalText>(NestedTexts.Y4);
+        Assert.NotNull(((ILocalText)NestedTexts.Y.Y1).OriginalKey);
+        Assert.NotNull(((ILocalText)NestedTexts.Y.Y2).OriginalKey);
+        Assert.NotNull(((ILocalText)NestedTexts.Y.YI.Y3).OriginalKey);
+        Assert.NotNull(((ILocalText)NestedTexts.Y4).OriginalKey);
 
         Assert.Equal("Y.Y1", NestedTexts.Y.Y1.Key);
-        Assert.Equal("1", ((InitializedLocalText)NestedTexts.Y.Y1).InitialText);
+        Assert.Equal("1", ((ILocalText)NestedTexts.Y.Y1).OriginalKey);
     }
 
     [Fact]

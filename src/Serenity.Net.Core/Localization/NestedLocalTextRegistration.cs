@@ -1,4 +1,4 @@
-﻿namespace Serenity.Localization;
+namespace Serenity.Localization;
 
 /// <summary>
 /// Contains helper methods for registration of local texts in nested static classes.
@@ -41,20 +41,13 @@ public static class NestedLocalTextRegistration
         {
             var fi = member as FieldInfo;
             if (fi != null &&
-                fi.FieldType == typeof(LocalText))
-            {
-                if (fi.GetValue(null) is LocalText value)
-                {
-                    if (value is InitializedLocalText initialized)
-                    {
-                        provider.Add(languageID, initialized.Key, initialized.InitialText);
-                    }
-                    else
-                    {
-                        provider.Add(languageID, prefix + fi.Name, value.Key);
-                        fi.SetValue(null, new InitializedLocalText(prefix + fi.Name, value.Key));
-                    }
-                }
+                fi.FieldType == typeof(LocalText) &&
+                fi.GetValue(null) is ILocalText value)
+            { 
+                if (value.OriginalKey is null)
+                    value.ReplaceKey(prefix + fi.Name);
+
+                provider.Add(languageID, value.Key, value.OriginalKey);
             }
         }
 

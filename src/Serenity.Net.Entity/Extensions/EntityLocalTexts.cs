@@ -27,45 +27,40 @@ public static class EntityLocalTexts
         foreach (var row in rowInstances)
         {
             var fields = row.Fields;
-            var prefix = fields.LocalTextPrefix;
 
-            foreach (var field in row.Fields)
+            foreach (var field in fields)
             {
-                LocalText lt = field.Caption;
-                if (lt != null &&
-                    !lt.Key.IsEmptyOrNull())
+                if (field.Caption is not ILocalText lt)
                 {
-                    if (lt is InitializedLocalText initialized)
-                    {
-                        provider.Add(languageID, initialized.Key, initialized.InitialText);
-                    }
-                    else
-                    {
-                        if (!lt.Key.StartsWith("Db."))
-                        {
-                            var key = "Db." + prefix + "." + (field.PropertyName ?? field.Name);
-                            provider.Add(languageID, key, lt.Key);
-                            field.Caption = new InitializedLocalText(key, lt.Key);
-                        }
-                    }
+                    if (languageID != LocalText.InvariantLanguageID)
+                        continue;
+
+                    lt = field.Caption = new LocalText(field.PropertyName ?? field.Name);
                 }
-                else if (lt is null && 
-                    languageID == LocalText.InvariantLanguageID)
+
+                if (string.IsNullOrEmpty(lt.Key))
+                    continue;
+
+                if (lt.OriginalKey is null)
                 {
-                    var key = field.AutoTextKey;
-                    var text = field.PropertyName ?? field.Name;
-                    provider.Add(languageID, key, text);
-                    field.Caption = new InitializedLocalText(field.AutoTextKey, text);
+                    if (lt.Key.StartsWith("Db."))
+                        continue;
+
+                    lt.ReplaceKey(field.AutoTextKey);
                 }
+
+                provider.Add(languageID, lt.Key, lt.OriginalKey);
             }
 
             var displayName = row.GetType().GetCustomAttribute<DisplayNameAttribute>();
             if (displayName != null)
-                provider.Add(languageID, "Db." + prefix + ".EntityPlural", displayName.DisplayName);
+                provider.Add(languageID, "Db." + fields.LocalTextPrefix + ".EntityPlural", 
+                    displayName.DisplayName);
 
             var instanceName = row.GetType().GetCustomAttribute<InstanceNameAttribute>();
             if (instanceName != null)
-                provider.Add(languageID, "Db." + prefix + ".EntitySingular", instanceName.InstanceName);
+                provider.Add(languageID, "Db." + fields.LocalTextPrefix + ".EntitySingular",
+                    instanceName.InstanceName);
         }
     }
 }

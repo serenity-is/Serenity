@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Base Field class
@@ -135,16 +135,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The automatic text key.
     /// </value>
-    public string AutoTextKey
-    {
-        get
-        {
-            if (autoTextKey == null)
-                autoTextKey = "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
-
-            return autoTextKey;
-        }
-    }
+    public string AutoTextKey => autoTextKey ??= "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
 
     /// <summary>
     /// Gets the size.
@@ -655,9 +646,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     {
         if (caption is null)
         {
-            if (autoTextKey == null)
-                autoTextKey = "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
-
+            autoTextKey ??= "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
             return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
         }
 
@@ -668,7 +657,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// Converts to string.
     /// </summary>
     /// <returns>
-    /// A <see cref="System.String" /> that represents this instance.
+    /// A <see cref="string" /> that represents this instance.
     /// </returns>
     public override string ToString()
     {

@@ -1,10 +1,13 @@
-﻿namespace Serenity;
+using Serenity.Localization;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Serenity;
 
 /// <summary>
 /// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 
 /// from String.
 /// </summary>
-public class LocalText
+public class LocalText : ILocalText
 {
     /// <summary>
     /// Invariant language ID is an empty string
@@ -62,4 +65,22 @@ public class LocalText
     {
         return localizer?.TryGet(Key) ?? Key;
     }
+
+    private string? originalKey;
+
+    string? ILocalText.OriginalKey => originalKey;
+
+    void ILocalText.ReplaceKey(string newKey)
+    {
+        if (newKey is null)
+            throw new ArgumentNullException(nameof(newKey));
+
+        if (originalKey != null)
+            throw new InvalidOperationException("Local text already has an original key!");
+
+        originalKey = Key;
+        Key = newKey;
+    }
 }
+
+    
