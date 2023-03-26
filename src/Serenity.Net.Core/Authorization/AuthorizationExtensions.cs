@@ -38,7 +38,7 @@ public static class AuthorizationExtensions
 
         if (!permissions.HasPermission(permission))
             throw new ValidationError("AccessDenied", null,
-                Core.Texts.Authorization.AccessDenied.ToString(localizer));
+                Core.CoreTexts.Authorization.AccessDenied.ToString(localizer));
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public static class AuthorizationExtensions
     {
         if (!IsLoggedIn(userAccessor))
             throw new ValidationError("NotLoggedIn", null,
-                Core.Texts.Authorization.NotLoggedIn.ToString(localizer));
+                Core.CoreTexts.Authorization.NotLoggedIn.ToString(localizer));
     }
 
     /// <summary>

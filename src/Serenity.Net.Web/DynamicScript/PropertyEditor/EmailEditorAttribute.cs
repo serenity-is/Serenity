@@ -57,7 +57,7 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
         var value = context.Value.ToString();
 
         if (!EmailPattern.IsMatch(value))
-            return Web.Texts.Validation.Email.ToString(context.Localizer);
+            return Web.WebTexts.Validation.Email.ToString(context.Localizer);
 
         return null;
     }

@@ -38,6 +38,8 @@
     <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-readme.md" Pack="true" PackagePath="\README.md">
         <Link>Properties\README.md</Link>
     </None>
+    <Content Remove="texts\**\*.json" />
+    <EmbeddedResource Include="texts\**\*.json" WithCulture="false" Culture="" />
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
   <ItemGroup>
