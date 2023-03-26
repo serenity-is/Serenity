@@ -1,6 +1,4 @@
 {
-  "Authorization.AccessDenied": "Bu işlem için gerekli haklara sahip değilsiniz!",
-  "Authorization.NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!",
   "Controls.CheckTreeEditor.SelectAll": "Tümünü Seç",
   "Controls.ColumnPickerDialog.HiddenColumns": "Gizli Kolonlar",
   "Controls.ColumnPickerDialog.HideHint": "Sakla",
@@ -115,7 +113,6 @@
   "Controls.SelectEditor.InplaceAdd": "Yeni Tanımla",
   "Controls.SelectEditor.InplaceEdit": "Düzenle",
   "Controls.SelectEditor.NoResultsClickToDefine": "*** Sonuç bulunamadı. Yeni tanımlamak için tıklayınız ***",
-  "Db.Shared.RecordId": "ID",
   "Dialogs.AlertTitle": "Hata",
   "Dialogs.CancelButton": "İptal",
   "Dialogs.ConfirmationTitle": "Onay",
@@ -151,7 +148,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": null,
-  "Services.GenericErrorMessage": null,
   "Validation.ArgumentIsNull": "{0} istek parametresi boş girilmiş!",
   "Validation.ArgumentOutOfRange": "{0} istek parametresi izin verilen aralıkta değil!",
   "Validation.CaptchaMismatch": "Doğru kod girilmelidir. Eğer karakterleri göremiyorsanız, resme tıklayarak yeni bir tane ürettirebilirsiniz.",

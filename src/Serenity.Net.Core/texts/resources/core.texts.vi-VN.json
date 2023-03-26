@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Ủy quyền bị từ chối cho yêu cầu này!",
+  "Authorization.NotLoggedIn": "Ủy quyền là bắt buộc cho yêu cầu này!",
+  "Db.Shared.RecordId": "Id",
+  "Services.GenericErrorMessage": null
+}

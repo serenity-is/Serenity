@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "دسترسی کاربر شما برای اجرای درخواست رد شد!",
+  "Authorization.NotLoggedIn": "برای اجرای درخواست شما نیاز به حق دسترسی است!",
+  "Db.Shared.RecordId": null,
+  "Services.GenericErrorMessage": null
+}

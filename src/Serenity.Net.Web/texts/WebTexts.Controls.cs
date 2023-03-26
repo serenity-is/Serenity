@@ -1,9 +1,9 @@
 
 namespace Serenity.Web;
 
-static partial class WebTexts
+public static partial class WebTexts
 {
-    static partial class Controls
+    public static partial class Controls
     {
         public static class CheckTreeEditor
         {

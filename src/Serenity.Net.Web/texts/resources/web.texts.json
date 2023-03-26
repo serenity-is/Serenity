@@ -1,7 +1,5 @@
 {
   "__comment__": "Auto generated template, don't modify!",
-  "Authorization.AccessDenied": "Authorization has been denied for this request!",
-  "Authorization.NotLoggedIn": "Authorization is required for this request!",
   "Controls.CheckTreeEditor.SelectAll": "Select All",
   "Controls.ColumnPickerDialog.HiddenColumns": "Hidden Columns",
   "Controls.ColumnPickerDialog.HideHint": "hide",
@@ -116,7 +114,6 @@
   "Controls.SelectEditor.InplaceAdd": "Define New",
   "Controls.SelectEditor.InplaceEdit": "Edit",
   "Controls.SelectEditor.NoResultsClickToDefine": "*** No results. Click to define a new one ***",
-  "Db.Shared.RecordId": "ID",
   "Dialogs.AlertTitle": "Alert",
   "Dialogs.CancelButton": "Cancel",
   "Dialogs.ConfirmationTitle": "Confirm",
@@ -152,7 +149,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": "Image width must be exactly {0} pixels, but it is {1} pixels!",
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": "Image width must be lower than {0} pixels, but it is {1} pixels!",
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": "Image width must be higher than {0} pixels, but it is {1} pixels!",
-  "Services.GenericErrorMessage": "An error occurred while processing your request.",
   "Validation.ArgumentIsNull": "Argument {0} is null!",
   "Validation.ArgumentOutOfRange": "Argument {0} is out of range!",
   "Validation.CaptchaMismatch": "Incorrect code entered. You can generate a new one by clicking image, if you can't see the characters clearly.",

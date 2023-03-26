@@ -1,6 +1,4 @@
 {
-  "Authorization.AccessDenied": "আপনার কাছে এটি করার অনুমতি নেই!",
-  "Authorization.NotLoggedIn": "আপনাকে এই কর্মের জন্য লগ ইন করতে হবে!",
   "Controls.CheckTreeEditor.SelectAll": "সবগুলো নির্বাচন করুন",
   "Controls.ColumnPickerDialog.HiddenColumns": "লুকানো কলাম",
   "Controls.ColumnPickerDialog.HideHint": "লুকান",
@@ -115,7 +113,6 @@
   "Controls.SelectEditor.InplaceAdd": "নতুন সংজ্ঞা",
   "Controls.SelectEditor.InplaceEdit": "সম্পাদন",
   "Controls.SelectEditor.NoResultsClickToDefine": "*** ফলাফল নাই। নতুন একটি অন্তর্ভুক্ত করতে ক্লিক করুন ***",
-  "Db.Shared.RecordId": "আইডি",
   "Dialogs.AlertTitle": "ত্রুটি",
   "Dialogs.CancelButton": "বাতিল",
   "Dialogs.ConfirmationTitle": "অনুমোদন",
@@ -151,7 +148,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": null,
-  "Services.GenericErrorMessage": null,
   "Validation.ArgumentIsNull": "আর্গুমেন্ট {0} নাল!",
   "Validation.ArgumentOutOfRange": "আর্গুমেন্ট {0} সীমার বাইরে!",
   "Validation.CaptchaMismatch": "ভুল কোড প্রবেশ করিয়েছেন। ইমেজ ক্লিক করে আপনি একটি নতুন তৈরি করতে পারেন, যদি আপনি অক্ষর স্পষ্টভাবে দেখতে না পারেন।",

@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Autorización denegada",
+  "Authorization.NotLoggedIn": "Esta petición requiere autorización",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": null
+}

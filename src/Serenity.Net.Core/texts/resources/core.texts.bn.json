@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "আপনার কাছে এটি করার অনুমতি নেই!",
+  "Authorization.NotLoggedIn": "আপনাকে এই কর্মের জন্য লগ ইন করতে হবে!",
+  "Db.Shared.RecordId": "আইডি",
+  "Services.GenericErrorMessage": null
+}

@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": null,
+  "Authorization.NotLoggedIn": null,
+  "Db.Shared.RecordId": "序号",
+  "Services.GenericErrorMessage": null
+}

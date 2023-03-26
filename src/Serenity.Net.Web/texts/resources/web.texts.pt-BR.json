@@ -1,6 +1,4 @@
 {
-  "Authorization.AccessDenied": "Autorização foi negada para este pedido!",
-  "Authorization.NotLoggedIn": "Autorização necessária para este pedido!",
   "Controls.CheckTreeEditor.SelectAll": null,
   "Controls.ColumnPickerDialog.HiddenColumns": null,
   "Controls.ColumnPickerDialog.HideHint": null,
@@ -115,7 +113,6 @@
   "Controls.SelectEditor.InplaceAdd": "Adicionar",
   "Controls.SelectEditor.InplaceEdit": "Editar",
   "Controls.SelectEditor.NoResultsClickToDefine": "Sem resultados, clique para definir",
-  "Db.Shared.RecordId": "ID",
   "Dialogs.AlertTitle": "Alerta",
   "Dialogs.CancelButton": "Cancelar",
   "Dialogs.ConfirmationTitle": "Confirmar",
@@ -151,7 +148,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": null,
-  "Services.GenericErrorMessage": null,
   "Validation.ArgumentIsNull": "Argumento {0} é nulo!",
   "Validation.ArgumentOutOfRange": "Argumento {0} está fora do intervalo!",
   "Validation.CaptchaMismatch": "Código incorrecto inserido. Pode gerar um novo clicando na imagem, caso não os caracteres estejam ilegíveis.",

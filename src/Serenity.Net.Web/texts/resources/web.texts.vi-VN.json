@@ -1,6 +1,4 @@
 {
-  "Authorization.AccessDenied": "Ủy quyền bị từ chối cho yêu cầu này!",
-  "Authorization.NotLoggedIn": "Ủy quyền là bắt buộc cho yêu cầu này!",
   "Controls.CheckTreeEditor.SelectAll": null,
   "Controls.ColumnPickerDialog.HiddenColumns": "Các cột ẩn",
   "Controls.ColumnPickerDialog.HideHint": "Ẩn",
@@ -115,7 +113,6 @@
   "Controls.SelectEditor.InplaceAdd": "Thêm mới",
   "Controls.SelectEditor.InplaceEdit": "Chỉnh sửa",
   "Controls.SelectEditor.NoResultsClickToDefine": "*** Không có kết quả. Nhấn vào đây để thêm mới ***",
-  "Db.Shared.RecordId": "Id",
   "Dialogs.AlertTitle": "Báo động",
   "Dialogs.CancelButton": "Hủy bỏ",
   "Dialogs.ConfirmationTitle": "Xác nhận",
@@ -151,7 +148,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": null,
-  "Services.GenericErrorMessage": null,
   "Validation.ArgumentIsNull": "Tham số {0} rỗng!",
   "Validation.ArgumentOutOfRange": "Tham số {0} nằm ngoài khoảng hợp lệ!",
   "Validation.CaptchaMismatch": "Mã nhập không đúng. Bạn có thể tạo ra mã mới bằng cách nhấn vào hình ảnh nếu bạn không thể nhìn thấy rõ ràng các ký tự.",

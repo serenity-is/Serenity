@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Zugriff verweigert!",
+  "Authorization.NotLoggedIn": "Anmeldung erforderlich!",
+  "Db.Shared.RecordId": null,
+  "Services.GenericErrorMessage": null
+}

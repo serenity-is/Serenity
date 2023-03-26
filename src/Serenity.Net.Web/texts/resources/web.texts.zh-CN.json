@@ -1,6 +1,4 @@
 {
-  "Authorization.AccessDenied": null,
-  "Authorization.NotLoggedIn": null,
   "Controls.CheckTreeEditor.SelectAll": null,
   "Controls.ColumnPickerDialog.HiddenColumns": null,
   "Controls.ColumnPickerDialog.HideHint": null,
@@ -115,7 +113,6 @@
   "Controls.SelectEditor.InplaceAdd": "创建",
   "Controls.SelectEditor.InplaceEdit": "编辑",
   "Controls.SelectEditor.NoResultsClickToDefine": "*** 没有数据. 点击并添加一条新数据 ***",
-  "Db.Shared.RecordId": "序号",
   "Dialogs.AlertTitle": "警告",
   "Dialogs.CancelButton": "取消",
   "Dialogs.ConfirmationTitle": "确认",
@@ -151,7 +148,6 @@
   "Enums.Serenity.Web.ImageCheckResult.WidthMismatch": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooHigh": null,
   "Enums.Serenity.Web.ImageCheckResult.WidthTooLow": null,
-  "Services.GenericErrorMessage": null,
   "Validation.ArgumentIsNull": "参数{0}为空!",
   "Validation.ArgumentOutOfRange": "参数{0}超出范围!",
   "Validation.CaptchaMismatch": "认证码错误。如果看不清楚，请点击图片刷新一个新认证码。",

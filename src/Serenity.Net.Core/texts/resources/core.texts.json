@@ -1,0 +1,7 @@
+{
+  "__comment__": "Auto generated template, don't modify!",
+  "Authorization.AccessDenied": "Authorization has been denied for this request!",
+  "Authorization.NotLoggedIn": "Authorization is required for this request!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "An error occurred while processing your request."
+}

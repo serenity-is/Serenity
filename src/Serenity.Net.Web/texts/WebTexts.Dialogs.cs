@@ -1,7 +1,7 @@
 
 namespace Serenity.Web;
 
-static partial class WebTexts
+public static partial class WebTexts
 {
     public static class Dialogs
     {
