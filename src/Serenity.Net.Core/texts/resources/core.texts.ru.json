@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Авторизация по этому запросу отклонена!",
+  "Authorization.AccessDenied": "Авторизация была отклонена для этого запроса!",
   "Authorization.NotLoggedIn": "Для этого запроса требуется авторизация!",
   "Db.Shared.RecordId": "Код",
-  "Services.GenericErrorMessage": null
+  "Services.GenericErrorMessage": "При обработке вашего запроса произошла ошибка."
 }

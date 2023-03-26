@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": null,
-  "Authorization.NotLoggedIn": null,
-  "Db.Shared.RecordId": "序号",
-  "Services.GenericErrorMessage": null
+  "Authorization.AccessDenied": "此请求已被拒绝授权！",
+  "Authorization.NotLoggedIn": "此请求需要授权！",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "处理您的请求时出现错误。"
 }

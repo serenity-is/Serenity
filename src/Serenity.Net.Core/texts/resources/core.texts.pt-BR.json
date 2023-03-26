@@ -1,6 +1,6 @@
 {
   "Authorization.AccessDenied": "Autorização foi negada para este pedido!",
-  "Authorization.NotLoggedIn": "Autorização necessária para este pedido!",
+  "Authorization.NotLoggedIn": "Autorização é necessária para este pedido!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": null
+  "Services.GenericErrorMessage": "Ocorreu um erro durante o processamento do seu pedido"
 }

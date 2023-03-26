@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Zugriff verweigert!",
-  "Authorization.NotLoggedIn": "Anmeldung erforderlich!",
+  "Authorization.AccessDenied": "Die Autorisierung wurde für diese Anfrage verweigert!",
+  "Authorization.NotLoggedIn": "Für diese Anfrage ist eine Autorisierung erforderlich!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten."
 }
