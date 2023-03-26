@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serenity;
 
@@ -38,7 +38,7 @@ public static class AuthorizationExtensions
 
         if (!permissions.HasPermission(permission))
             throw new ValidationError("AccessDenied", null,
-                Core.CoreTexts.Authorization.AccessDenied.ToString(localizer));
+                CoreTexts.Authorization.AccessDenied.ToString(localizer));
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public static class AuthorizationExtensions
     {
         if (!IsLoggedIn(userAccessor))
             throw new ValidationError("NotLoggedIn", null,
-                Core.CoreTexts.Authorization.NotLoggedIn.ToString(localizer));
+                CoreTexts.Authorization.NotLoggedIn.ToString(localizer));
     }
 
     /// <summary>
