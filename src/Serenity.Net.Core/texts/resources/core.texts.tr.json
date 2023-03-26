@@ -2,5 +2,5 @@
   "Authorization.AccessDenied": "Bu işlem için gerekli haklara sahip değilsiniz!",
   "Authorization.NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": null
+  "Services.GenericErrorMessage": "İsteğiniz işlenirken bir hata oluştu."
 }
