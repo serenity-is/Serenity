@@ -31,7 +31,7 @@
   "Validation.EntityNotFound": "রেকর্ড পাওয়া যায়নি। এটি মুছে ফেলা হতে পারে অথবা আপনার প্রয়োজনীয় অনুমতি নেই!",
   "Validation.EntityReadAccessViolation": "আপনার যথারীতি পাতার রেকর্ড {0} এর জন্য আবশ্যক অনুমতি নেই: {1}",
   "Validation.EntityWriteAccessViolation": "আপনার যথারীতি পরিবর্তন করতে প্রয়োজনীয় অনুমতি নেই {0} রেকর্ড সঙ্গে কী: {1}",
-  "Validation.FieldInvalidDateRange": "ভ্যালিডেশন",
+  "Validation.FieldInvalidDateRange": null,
   "Validation.FieldInvalidValue": "ক্ষেত্রের {1} জন্য অবৈধ {0} মান!",
   "Validation.FieldIsReadOnly": "ফিল্ড {0} শুধুমাত্র পঠনযোগ্য!",
   "Validation.FieldIsRequired": "{0} ক্ষেত্রটি আবশ্যক!",
