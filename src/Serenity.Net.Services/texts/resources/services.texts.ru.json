@@ -37,5 +37,5 @@
   "Validation.FieldIsRequired": "Поле {0} обязательно!",
   "Validation.Recaptcha": "Докажите, что вы не робот.",
   "Validation.RequestIsNull": "Запрос не определён!",
-  "Validation.UnexpectedError": "Возникло неожиданное исключение!",
+  "Validation.UnexpectedError": "Возникло неожиданное исключение!"
 }
