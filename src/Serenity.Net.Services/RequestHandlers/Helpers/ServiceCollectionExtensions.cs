@@ -201,11 +201,11 @@ public static class ServiceCollectionExtensions
     /// Adds nested texts, enum texts, permission texts, row texts and json local text assets
     /// </summary>
     /// <param name="provider">The service provider that will be used to locate text registry and other types</param>
-    /// <param name="webFileProvider">If passed, json texts from static web assets will be added from Serenity.Scripts,
-    /// and any assembly with a JsonLocalTextAssetsAttribute attribute</param>
+    /// <param name="webFileProvider">If passed, json texts from static web assets will be added from 
+    /// any assembly with a JsonLocalTextAssetsAttribute attribute</param>
     /// <returns>Local text registry</returns>
     /// <exception cref="ArgumentNullException">Provider is null</exception>
-    public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider webFileProvider)
+    public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider webFileProvider = null)
     {
         if (provider == null)
             throw new ArgumentNullException(nameof(provider));
@@ -213,23 +213,46 @@ public static class ServiceCollectionExtensions
         var typeSource = provider.GetRequiredService<ITypeSource>();
         var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
         var rowTypeRegistry = provider.GetRequiredService<IRowTypeRegistry>();
+
+        AddBaseTexts(textRegistry, typeSource, rowTypeRegistry);
+
+        if (webFileProvider is not null)
+        {
+            foreach (var attr in typeSource.GetAssemblyAttributes<JsonLocalTextAssetsAttribute>())
+                if (!string.IsNullOrEmpty(attr.Path))
+                    textRegistry.AddJsonTexts(webFileProvider, attr.Path);
+        }
+
+        return textRegistry;
+    }
+
+    /// <summary>
+    /// Adds nested texts, enum texts, permission texts, row texts and json local text assets
+    /// </summary>
+    /// <param name="textRegistry">Target text registry</param>
+    /// <param name="typeSource">Type source from which to discover text sources</param>
+    /// <param name="rowTypeRegistry">Row type registry</param>
+    /// <param name="includeResources">True to include resource texts</param>
+    /// <returns>Local text registry</returns>
+    /// <exception cref="ArgumentNullException">textRegistry or typeSource is null</exception>
+    public static ILocalTextRegistry AddBaseTexts(this ILocalTextRegistry textRegistry, ITypeSource typeSource,
+        IRowTypeRegistry rowTypeRegistry = null, bool includeResources = true)
+    {
+        if (textRegistry is null)
+            throw new ArgumentNullException(nameof(textRegistry));
+
         textRegistry.AddNavigationTexts(typeSource);
         textRegistry.AddFormTexts(typeSource);
         textRegistry.AddNestedTexts(typeSource);
         textRegistry.AddEnumTexts(typeSource);
         textRegistry.AddNestedPermissions(typeSource);
+
+        rowTypeRegistry ??= new DefaultRowTypeRegistry(typeSource);
         var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
         textRegistry.AddRowTexts(rowInstances);
 
-        textRegistry.AddJsonResourceTexts(typeSource);
-
-        if (webFileProvider is not null)
-        {
-            textRegistry.AddJsonTexts(webFileProvider, "Serenity.Scripts/texts");
-            foreach (var attr in typeSource.GetAssemblyAttributes<JsonLocalTextAssetsAttribute>())
-                if (!string.IsNullOrEmpty(attr.Path))
-                    textRegistry.AddJsonTexts(webFileProvider, attr.Path);
-        }
+        if (includeResources)
+            textRegistry.AddJsonResourceTexts(typeSource);
 
         return textRegistry;
     }
