@@ -1,6 +1,6 @@
-{
-  "Authorization.AccessDenied": null,
-  "Authorization.NotLoggedIn": null,
-  "Db.Shared.RecordId": null,
-  "Services.GenericErrorMessage": null
+﻿{
+  "Authorization.AccessDenied" : "تم رفض التصريح بالوصول!",
+  "Authorization.NotLoggedIn" : "مطلوب التصريح بالوصول لهذا الطلب!",
+  "Db.Shared.RecordId" : "معرف",
+  "Services.GenericErrorMessage" : "حدث خطأ أثناء معالجة طلبك."
 }
