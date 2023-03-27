@@ -1,6 +1,6 @@
 {
-  "Authorization has been denied for this request!": "Odmítnut přístup k autorizaci pro tuto žádost!",
-  "Authorization is required for this request!": "Pro tuto žádost je požadována autorizace!",
-  "ID": "ID",
-  "An error occurred while processing your request.": "Při zpracování vaší žádosti došlo k chybě."
+  "Authorization.AccessDenied": "Odmítnut přístup k autorizaci pro tuto žádost!",
+  "Authorization.NotLoggedIn": "Pro tuto žádost je požadována autorizace!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "Při zpracování vaší žádosti došlo k chybě."
 }
