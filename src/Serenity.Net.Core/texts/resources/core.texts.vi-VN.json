@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Quyền truy cập bị từ chối cho yêu cầu này!",
-  "Authorization.NotLoggedIn": "Yêu cầu này yêu cầu phải được xác thực!",
+  "Authorization.AccessDenied": "Yêu cầu này đã bị từ chối!",
+  "Authorization.NotLoggedIn": "Yêu cầu này cần phải được cấp phép!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Đã xảy ra lỗi khi xử lý yêu cầu của bạn."
+  "Services.GenericErrorMessage": "Khi xử lý yêu cầu của bạn, xảy ra lỗi"
 }

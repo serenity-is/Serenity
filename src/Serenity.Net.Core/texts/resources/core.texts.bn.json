@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "আপনার কাছে এটি করার অনুমতি নেই!",
-  "Authorization.NotLoggedIn": "আপনাকে এই কর্মের জন্য লগ ইন করতে হবে!",
+  "Authorization.AccessDenied": "এই অনুরোধের জন্য অনুমোদন প্রত্যাখ্যাত করা হয়েছে!",
+  "Authorization.NotLoggedIn": "এই অনুরোধটির জন্য অনুমোদনকারীর প্রয়োজন!",
   "Db.Shared.RecordId": "আইডি",
-  "Services.GenericErrorMessage": null
+  "Services.GenericErrorMessage": "আপনার অনুরোধটি প্রক্রিয়াকরণের সময় ত্রুটি ঘটেছে।"
 }

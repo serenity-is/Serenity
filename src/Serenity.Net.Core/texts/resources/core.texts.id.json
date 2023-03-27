@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Otorisasi telah ditolak untuk permintaan ini!",
-  "Authorization.NotLoggedIn": "Otorisasi diperlukan untuk permintaan ini!",
+  "Authorization.AccessDenied": "Permintaan ini telah ditolak!",
+  "Authorization.NotLoggedIn": "Autorisasi diperlukan untuk permintaan ini!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Terjadi kesalahan saat memproses permintaan Anda."
+  "Services.GenericErrorMessage": "Sedang memproses permintaan Anda, terjadi kesalahan"
 }

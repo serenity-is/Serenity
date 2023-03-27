@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "دسترسی مجوز برای این درخواست رد شده است!",
-  "Authorization.NotLoggedIn": "دسترسی مجوز برای این درخواست مورد نیاز است!",
+  "Authorization.AccessDenied": "دسترسی به این درخواست منفی شده است!",
+  "Authorization.NotLoggedIn": "این درخواست برای اجازه یافتن مورد نیاز است!",
   "Db.Shared.RecordId": "شناسه",
-  "Services.GenericErrorMessage": "خطایی در هنگام پردازش درخواست شما رخ داده است."
+  "Services.GenericErrorMessage": "در هنگام پردازش درخواست شما خطایی رخ داده است"
 }

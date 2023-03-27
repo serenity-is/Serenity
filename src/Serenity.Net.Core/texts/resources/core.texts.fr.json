@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Autorisation refusée pour cette requête !",
-  "Authorization.NotLoggedIn": "L'autorisation est requise pour cette demande !",
+  "Authorization.AccessDenied": "La demande a été refusée!",
+  "Authorization.NotLoggedIn": "Une autorisation est nécessaire pour cette demande !",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Une erreur est survenue lors du traitement de votre demande."
+  "Services.GenericErrorMessage": "Une erreur s'est produite lors du traitement de votre demande"
 }

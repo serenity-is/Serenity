@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "拒絕此請求的授權！",
-  "Authorization.NotLoggedIn": "需要授權以執行此請求！",
-  "Db.Shared.RecordId": "識別編號",
+  "Authorization.AccessDenied": "此請求已被拒絕！",
+  "Authorization.NotLoggedIn": "此請求需要授權！",
+  "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "處理您的請求時發生錯誤。"
 }

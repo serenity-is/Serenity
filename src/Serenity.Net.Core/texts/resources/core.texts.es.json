@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Se ha denegado la autorización para esta solicitud!",
-  "Authorization.NotLoggedIn": "Se requiere autorización para esta solicitud!",
+  "Authorization.AccessDenied": "¡Se ha denegado la autorización para esta solicitud!",
+  "Authorization.NotLoggedIn": "¡Se requiere autorización para esta solicitud!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Se ha producido un error al procesar su solicitud"
 }

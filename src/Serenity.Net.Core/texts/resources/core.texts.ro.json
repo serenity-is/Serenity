@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "Autorizarea a fost refuzată pentru această cerere!",
-  "Authorization.NotLoggedIn": "Autorizarea este necesară pentru această cerere!",
+  "Authorization.AccessDenied": "Această solicitare a fost respinsă!",
+  "Authorization.NotLoggedIn": "Autorizarea este necesară pentru această solicitare!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "A apărut o eroare în timpul procesării cererii dvs."
+  "Services.GenericErrorMessage": "A apărut o eroare în timpul procesării solicitării dumneavoastră"
 }
