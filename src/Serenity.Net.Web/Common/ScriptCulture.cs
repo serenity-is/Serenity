@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Culture options that are passed to the client side
@@ -23,7 +23,9 @@ public class ScriptCulture
         DateOrder = DateHelper.DateOrderString(order);
         DateFormat = DateHelper.DefaultDateFormat(order);
         DateTimeFormat = DateHelper.DefaultDateTimeFormat(order);
-        DateSeparator = DateTime.MaxValue.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString();
+        DateSeparator = string.IsNullOrEmpty(culture.DateTimeFormat.DateSeparator) ?
+            DateTime.Now.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString() :
+            culture.DateTimeFormat.DateSeparator;
         DecimalSeparator = culture.NumberFormat.NumberDecimalSeparator;
         GroupSeparator = culture.NumberFormat.NumberGroupSeparator;
     }
