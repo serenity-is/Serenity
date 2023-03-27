@@ -1,6 +1,6 @@
-﻿{
-  "Authorization.AccessDenied" : "تم رفض التصريح بالوصول!",
-  "Authorization.NotLoggedIn" : "مطلوب التصريح بالوصول لهذا الطلب!",
-  "Db.Shared.RecordId" : "معرف",
-  "Services.GenericErrorMessage" : "حدث خطأ أثناء معالجة طلبك."
+{
+  "Authorization.AccessDenied": "تم رفض التصريح بالوصول!",
+  "Authorization.NotLoggedIn": "مطلوب التصريح بالوصول لهذا الطلب!",
+  "Db.Shared.RecordId": "معرف",
+  "Services.GenericErrorMessage": "حدث خطأ أثناء معالجة طلبك."
 }
