@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "このリクエストの承認が拒否されました！",
+  "Authorization.NotLoggedIn": "このリクエストには認証が必要です！",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "リクエストの処理中にエラーが発生しました。"
+}

@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Autoryzacja została odrzucona dla tego żądania!",
+  "Authorization.NotLoggedIn": "Autoryzacja jest wymagana dla tego żądania!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "Wystąpił błąd podczas przetwarzania żądania."
+}

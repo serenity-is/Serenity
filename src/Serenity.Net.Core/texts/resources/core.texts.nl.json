@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Autorisatie is geweigerd voor deze aanvraag!",
+  "Authorization.NotLoggedIn": "Autorisatie is vereist voor deze aanvraag!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "Er is een fout opgetreden tijdens de verwerking van uw aanvraag."
+}

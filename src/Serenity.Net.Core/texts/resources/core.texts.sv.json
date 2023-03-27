@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "Behörigheten har nekats för denna begäran!",
+  "Authorization.NotLoggedIn": "Behörighet krävs för denna begäran!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "Ett fel inträffade när din begäran bearbetades."
+}

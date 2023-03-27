@@ -1,0 +1,6 @@
+{
+  "Authorization.AccessDenied": "이 요청에 대한 권한이 거부되었습니다!",
+  "Authorization.NotLoggedIn": "이 요청에는 권한이 필요합니다!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "요청 처리 중 오류가 발생했습니다."
+}

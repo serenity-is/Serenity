@@ -1,0 +1,6 @@
+{
+  "Authorization has been denied for this request!": "Odmítnut přístup k autorizaci pro tuto žádost!",
+  "Authorization is required for this request!": "Pro tuto žádost je požadována autorizace!",
+  "ID": "ID",
+  "An error occurred while processing your request.": "Při zpracování vaší žádosti došlo k chybě."
+}

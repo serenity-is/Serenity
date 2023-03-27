@@ -1,0 +1,6 @@
+{
+  "Authorization has been denied for this request!" : "تم رفض التصريح بالوصول!",
+  "Authorization is required for this request!" : "مطلوب التصريح بالوصول لهذا الطلب!",
+  "ID" : "معرف",
+  "An error occurred while processing your request." : "حدث خطأ أثناء معالجة طلبك."
+}
