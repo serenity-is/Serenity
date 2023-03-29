@@ -529,7 +529,7 @@ public class GeneratorConfig
     {
         /// <summary>
         /// Initial type of project. Available options are
-        /// "Free" e.g. Serene, "Premium" e.g. StartSharp
+        /// "Community" e.g. Serene, "Premium" e.g. StartSharp
         /// </summary>
         public string InitialType { get; set; }
         /// <summary>
