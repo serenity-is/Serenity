@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -244,7 +244,8 @@ public static class HtmlScriptExtensions
             var services = page.ViewContext.HttpContext.RequestServices;
             var registry = services.GetRequiredService<ILocalTextRegistry>();
             var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
-            return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending);
+            var includes = packages.Value.TryGetValue(package, out var s) ? s : "";
+            return new LocalTextScript(registry, package, includes, languageId, isPending);
         });
 
         return scriptManager.GetScriptText(scriptName);

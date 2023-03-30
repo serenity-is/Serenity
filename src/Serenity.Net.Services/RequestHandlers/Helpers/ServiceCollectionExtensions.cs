@@ -242,7 +242,7 @@ public static class ServiceCollectionExtensions
             throw new ArgumentNullException(nameof(textRegistry));
 
         textRegistry.AddNavigationTexts(typeSource);
-        textRegistry.AddFormTexts(typeSource);
+        textRegistry.AddPropertyItemsTexts(typeSource);
         textRegistry.AddNestedTexts(typeSource);
         textRegistry.AddEnumTexts(typeSource);
         textRegistry.AddNestedPermissions(typeSource);

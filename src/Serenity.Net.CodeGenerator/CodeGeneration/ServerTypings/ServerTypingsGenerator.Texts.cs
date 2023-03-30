@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -72,9 +72,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 filter = new Regex(fb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
 
-            var list = localTextKeys.Where(x => 
+            var list = localTextKeys.Where(x =>
                     !string.IsNullOrWhiteSpace(x) &&
-                    (filter == null || filter.IsMatch(x)) &&
+                    (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
+                     (filter == null || filter.IsMatch(x))) &&
                     x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
                 .ToList();
 

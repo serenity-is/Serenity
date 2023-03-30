@@ -239,7 +239,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         }
 
         if (text != null && startsWith(text, '`')) {
-            text = text.substr(1);
+            text = text.substring(1);
         }
 
         if (!isEmptyOrNull(this.options.localTextPrefix)) {

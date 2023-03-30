@@ -1,4 +1,4 @@
-﻿using SerenityIs.Administration;
+using SerenityIs.Administration;
 using System.IO;
 
 namespace Serenity.Web;
@@ -13,6 +13,7 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     private readonly string includes;
     private readonly bool isPending;
     private readonly ILocalTextRegistry registry;
+    private readonly string package;
 
     /// <summary>
     /// Creates a new instance of the class
@@ -26,10 +27,11 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     public LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending)
     {
         this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        this.package = package ?? throw new ArgumentNullException(nameof(package));
         this.includes = includes;
         this.languageId = languageId;
         this.isPending = isPending;
-        scriptName = GetScriptName(package ?? throw new ArgumentNullException(nameof(package)), languageId, isPending);
+        scriptName = GetScriptName(package, languageId, isPending);
     }
 
     /// <inheritdoc/>
@@ -68,7 +70,7 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
         if (!packages.TryGetValue(package, out string includes))
             includes = null;
 
-        return GetLocalTextPackageScript(registry, includes, languageId, isPending);
+        return GetLocalTextPackageScript(registry, includes, languageId, isPending, package);
     }
 
     /// <summary>
@@ -78,11 +80,12 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     /// <param name="includes">Includes regex</param>
     /// <param name="languageId">Language ID</param>
     /// <param name="isPending">True to include pending text</param>
+    /// <param name="packageId">Package ID</param>
     /// <exception cref="ArgumentNullException">Registry is null</exception>
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
-        string includes, string languageId, bool isPending)
+        string includes, string languageId, bool isPending, string packageId = null)
     {
-        var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending).ToList();
+        var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
         StringBuilder jwBuilder = new("Q.LT.add(");
@@ -172,6 +175,6 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     /// <inheritdoc/>
     public override string GetScript()
     {
-        return GetLocalTextPackageScript(registry, includes, languageId, isPending);
+        return GetLocalTextPackageScript(registry, includes, languageId, isPending, package);
     }  
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serenity.Localization;
 using Serenity.Web;
@@ -21,12 +21,12 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
     /// <param name="localTextRegistry">Local text registry</param>
     /// <param name="localTextPackages">Package list</param>
     /// <param name="httpContextAccessor">HTTP context accessor</param>
-    /// <exception cref="System.ArgumentNullException">One of arguments is null</exception>
+    /// <exception cref="ArgumentNullException">One of arguments is null</exception>
     public LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages, IHttpContextAccessor httpContextAccessor)
     {
-        this.localTextRegistry = localTextRegistry ?? throw new System.ArgumentNullException(nameof(localTextRegistry));
-        this.localTextPackages = localTextPackages ?? throw new System.ArgumentNullException(nameof(localTextPackages));
-        this.httpContextAccessor = httpContextAccessor ?? throw new System.ArgumentNullException(nameof(httpContextAccessor));
+        this.localTextRegistry = localTextRegistry ?? throw new ArgumentNullException(nameof(localTextRegistry));
+        this.localTextPackages = localTextPackages ?? throw new ArgumentNullException(nameof(localTextPackages));
+        this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
     
     /// <inheritdoc/>
@@ -58,9 +58,10 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
     /// <param name="includes">Includes regex</param>
     /// <param name="languageId">Language ID</param>
     /// <param name="isPending">True to include pending text</param>
+    /// <param name="packageId">Package ID</param>
     /// <exception cref="ArgumentNullException">Registry is null</exception>
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
-        string includes, string languageId, bool isPending)
+        string includes, string languageId, bool isPending, string packageId = null)
     {
         if (registry == null)
             throw new ArgumentNullException(nameof(registry));
@@ -68,14 +69,15 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
         var result = new Dictionary<string, string>();
 
         if (string.IsNullOrEmpty(includes))
-            return result;
+            includes = "$^";
 
         var regex = new Regex(includes, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         var texts = registry is LocalTextRegistry ltr ? 
             ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
 
         foreach (var pair in texts)
-            if (regex.IsMatch(pair.Key))
+            if (regex.IsMatch(pair.Key) ||
+                (packageId == "Site" && LocalTextPackages.DefaultSitePackageIncludes.IsMatch(pair.Key)))
                 result[pair.Key] = pair.Value;
 
         return result;
@@ -89,6 +91,6 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
         if (localTextPackages?.Value.TryGetValue(packageId, out var includes) != true)
             includes = "^$";
 
-        return GetPackageData(localTextRegistry, includes, languageId, false);
+        return GetPackageData(localTextRegistry, includes, languageId, false, packageId);
     }
 }
