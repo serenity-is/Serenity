@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -6,6 +6,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         var attr = source.GetAttribute<HintAttribute>();
         if (attr != null)
-            item.Hint = attr.Hint;
+            item.Hint = GetLocalizableTextValue(source, attr.Hint,
+                () => source.Property?.Name + "_Hint");
     }
 }

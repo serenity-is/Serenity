@@ -1,4 +1,5 @@
 using Serenity.Web;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Serenity.Localization;
 
@@ -28,23 +29,8 @@ public static class PropertyItemsLocalTextRegistration
 
         foreach (var type in typeSource.GetTypes())
         {
-            var formAttr = type.GetAttribute<FormScriptAttribute>();
-            string? itemsKey;
-            if (formAttr is null)
-            {
-                var columnsAttr = type.GetAttribute<ColumnsScriptAttribute>();
-                if (columnsAttr is null)
-                    continue;
-
-                itemsKey = columnsAttr.Key;
-            }
-            else
-                itemsKey = formAttr.Key;
-
-            if (string.IsNullOrEmpty(itemsKey))
-                itemsKey = type.FullName;
-
-            var textPrefix = (formAttr is null ? "Columns." : "Forms.") + itemsKey + ".";
+            if (GetPropertyItemsTextPrefix(type) is not string textPrefix)
+                continue;
 
             void addText(string key, string text)
             {
@@ -53,8 +39,7 @@ public static class PropertyItemsLocalTextRegistration
 
             bool tryAddKey(string text)
             {
-                if (LocalTextKeyLike.IsMatch(text) &&
-                    LocalTextPackages.DefaultSitePackageIncludes.IsMatch(text))
+                if (MightBeLocalTextKey(text))
                 {
                     if (registry.TryGet(languageID, text, false) is null)
                         registry.Add(languageID, text, null);
@@ -102,5 +87,43 @@ public static class PropertyItemsLocalTextRegistration
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Gets form/column local text key prefix for given type
+    /// </summary>
+    /// <param name="type">Type with form/column attribute</param>
+    public static string? GetPropertyItemsTextPrefix(Type type)
+    {
+        var formAttr = type.GetAttribute<FormScriptAttribute>();
+        string? itemsKey;
+        if (formAttr is null)
+        {
+            var columnsAttr = type.GetAttribute<ColumnsScriptAttribute>();
+            if (columnsAttr is null)
+                return null;
+
+            itemsKey = columnsAttr.Key;
+        }
+        else
+            itemsKey = formAttr.Key;
+
+        if (string.IsNullOrEmpty(itemsKey))
+            itemsKey = type.FullName;
+
+        return (formAttr is null ? "Columns." : "Forms.") + itemsKey + ".";
+    }
+
+    /// <summary>
+    /// Returns true if the text value can be a local text key
+    /// that could be passed to the client side
+    /// </summary>
+    /// <param name="text">Key or text</param>
+    /// <returns></returns>
+    public static bool MightBeLocalTextKey(string text)
+    {
+        return !string.IsNullOrEmpty(text) &&
+            LocalTextKeyLike.IsMatch(text) &&
+            LocalTextPackages.DefaultSitePackageIncludes.IsMatch(text);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -6,7 +6,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         var attr = source.GetAttribute<TabAttribute>();
         if (attr != null)
-            item.Tab = attr.Value;
+            item.Tab = GetLocalizableTextValue(source, attr.Value,
+                () => "Tabs." + attr.Value);
         else if (Items != null && Items.Count > 0)
             item.Tab = Items[^1].Tab;
     }
