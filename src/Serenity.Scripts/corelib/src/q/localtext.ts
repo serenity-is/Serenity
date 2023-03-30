@@ -99,12 +99,18 @@ export class LT {
     constructor(private key: string) {
     }
 
+    static add(key: string, value: string): void;
     static add(obj: any, pre?: string) {
         if (!obj) {
             return;
         }
         
         let table = getTable();
+
+        if (typeof obj === "string") {
+            table[obj] = pre;
+            return;
+        }
 
         pre = pre || '';
         for (let k of Object.keys(obj)) {
