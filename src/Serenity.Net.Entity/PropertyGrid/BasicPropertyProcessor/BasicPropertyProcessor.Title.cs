@@ -9,7 +9,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     private string GetLocalizableTextValue(IPropertySource source, string text,
         Func<string> getSuffix)
     {
-        if (PropertyItemsLocalTextRegistration.MightBeLocalTextKey(text))
+        if (PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(text))
             return text;
 
         if (propertyItemsTextPrefix is null)

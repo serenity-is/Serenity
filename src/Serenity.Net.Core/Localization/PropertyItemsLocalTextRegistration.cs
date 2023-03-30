@@ -32,59 +32,36 @@ public static class PropertyItemsLocalTextRegistration
             if (GetPropertyItemsTextPrefix(type) is not string textPrefix)
                 continue;
 
-            void addText(string key, string text)
+            void addText(string text, string suffix)
             {
-                registry.Add(languageID, key, text);
-            }
+                if (string.IsNullOrEmpty(text))
+                    return;
 
-            bool tryAddKey(string text)
-            {
-                if (MightBeLocalTextKey(text))
+                if (IsLocalTextKeyCandidate(text))
                 {
                     if (registry.TryGet(languageID, text, false) is null)
                         registry.Add(languageID, text, null);
-                    return true;
                 }
-
-                return false;
+                else if (suffix is not null)
+                    registry.Add(languageID, textPrefix + suffix, text);
             }
 
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
-                var category = member.GetCustomAttribute<CategoryAttribute>();
-                if (category != null && !string.IsNullOrEmpty(category.Category))
-                {
-                    if (!tryAddKey(category.Category))
-                        addText(textPrefix + "Categories." + category.Category, category.Category);
-                }
+                if (member.GetCustomAttribute<CategoryAttribute>()?.Category is string category)
+                    addText(category, "Categories." + category);
 
-                var tab = member.GetCustomAttribute<TabAttribute>();
-                if (tab != null && !string.IsNullOrEmpty(tab.Value))
-                {
-                    if (!tryAddKey(tab.Value))
-                        addText(textPrefix + "Tabs." + tab.Value, tab.Value);
-                }
+                if (member.GetCustomAttribute<TabAttribute>()?.Value is string tab)
+                    addText(tab, "Tabs." + tab);
 
-                var displayName = member.GetCustomAttribute<DisplayNameAttribute>();
-                if (displayName != null && !string.IsNullOrEmpty(displayName.DisplayName))
-                {
-                    if (!tryAddKey(displayName.DisplayName))
-                        addText(textPrefix + member.Name, displayName.DisplayName);
-                }
+                if (member.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName is string displayName)
+                    addText(displayName, member.Name);
 
-                var hint = member.GetCustomAttribute<HintAttribute>();
-                if (hint != null && !string.IsNullOrEmpty(hint.Hint))
-                {
-                    if (!tryAddKey(hint.Hint))
-                        addText(textPrefix + member.Name + "_Hint", hint.Hint);
-                }
+                if (member.GetCustomAttribute<HintAttribute>()?.Hint is string hint)
+                    addText(hint, member.Name + "_Hint");
 
-                var plholder = member.GetCustomAttribute<PlaceholderAttribute>();
-                if (plholder != null && !string.IsNullOrEmpty(plholder.Value))
-                {
-                    if (!tryAddKey(plholder.Value))
-                        addText(textPrefix + member.Name + "_Placeholder", plholder.Value);
-                }
+                if (member.GetCustomAttribute<PlaceholderAttribute>()?.Value is string placeholder)
+                    addText(placeholder, member.Name + "_Placeholder");
             }
         }
     }
@@ -120,7 +97,7 @@ public static class PropertyItemsLocalTextRegistration
     /// </summary>
     /// <param name="text">Key or text</param>
     /// <returns></returns>
-    public static bool MightBeLocalTextKey(string text)
+    public static bool IsLocalTextKeyCandidate(string text)
     {
         return !string.IsNullOrEmpty(text) &&
             LocalTextKeyLike.IsMatch(text) &&
