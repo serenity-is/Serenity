@@ -811,7 +811,7 @@ declare namespace Q {
         private key;
         static empty: LT;
         constructor(key: string);
-        static add(obj: any, pre?: string): void;
+        static add(key: string, value: string): void;
         get(): string;
         toString(): string;
         static initializeTextClass: (type: any, prefix: string) => void;

@@ -49,7 +49,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             .appendTo(this.element)
             .data('qffield', opt.field).children();
 
-        var title = opt.title;
+        var title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
             title = this.options.getTitle ? this.options.getTitle(opt) : null;
             if (title == null) {
