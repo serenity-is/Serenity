@@ -6,8 +6,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         var attr = source.GetAttribute<TabAttribute>();
         if (attr != null)
-            item.Tab = GetLocalizableTextValue(source, attr.Value,
+        {
+            item.Tab = GetLocalizableTextValue<TabAttribute>(source, attr.Value,
                 () => "Tabs." + attr.Value);
+        }
         else if (Items != null && Items.Count > 0)
             item.Tab = Items[^1].Tab;
     }

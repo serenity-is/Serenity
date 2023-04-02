@@ -4,9 +4,11 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private void SetHint(IPropertySource source, PropertyItem item)
     {
-        var attr = source.GetAttribute<HintAttribute>();
+        HintAttribute attr = source.GetAttribute<HintAttribute>();
         if (attr != null)
-            item.Hint = GetLocalizableTextValue(source, attr.Hint,
+        {
+            item.Hint = GetLocalizableTextValue<HintAttribute>(source, attr.Hint, 
                 () => source.Property?.Name + "_Hint");
+        }
     }
 }

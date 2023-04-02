@@ -6,7 +6,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         var attr = source.GetAttribute<PlaceholderAttribute>();
         if (attr != null)
-            item.Placeholder = GetLocalizableTextValue(source, attr.Value,
+        {
+            item.Placeholder = GetLocalizableTextValue<PlaceholderAttribute>(source, attr.Value,
                 () => source.Property?.Name + "_Placeholder");
+        }
     }
 }
