@@ -8,7 +8,7 @@ namespace Serenity.Localization;
 /// </summary>
 public static class PropertyItemsLocalTextRegistration
 {
-    private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9]*\.)+[A-Z][A-za-z0-9]*$", RegexOptions.Compiled);
+    private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9_]*\.)+[A-Z][A-za-z0-9_]*$", RegexOptions.Compiled);
 
     /// <summary>
     /// Adds local text translations defined implicitly by DisplayName, Tab, Placeholder,
