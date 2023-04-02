@@ -42,15 +42,12 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
     private void SetTitle(IPropertySource source, PropertyItem item)
     {
-        if (source.Property != null)
+        var attr = source.Property?.GetCustomAttribute<DisplayNameAttribute>(false);
+        if (attr != null)
         {
-            var attr = source.Property.GetCustomAttribute<DisplayNameAttribute>(false);
-            if (attr != null)
-            {
-                item.Title = GetLocalizableTextValue<DisplayNameAttribute>(source, attr.DisplayName,
-                    () => source.Property?.Name, ignoreField: true);
-                return;
-            }
+            item.Title = GetLocalizableTextValue<DisplayNameAttribute>(source, attr.DisplayName,
+                () => source.Property?.Name, ignoreField: true);
+            return;
         }
 
         if (item.Title == null)
@@ -58,12 +55,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             var basedOnField = source.BasedOnField;
 
             if (basedOnField is not null)
-            {
-                item.Title = basedOnField.Caption is not null ?
-                    basedOnField.Caption.Key : basedOnField.AutoTextKey;
-            }
+                item.Title = basedOnField.Caption?.Key ?? basedOnField.AutoTextKey;
             else
-                item.Title = item.Name;
+                item.Title = source.Property?.Name;
         }
     }
 }
