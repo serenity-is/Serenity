@@ -123,4 +123,80 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal($"Forms.{typeof(CategoryWithRegularText).FullName}.Categories.{category}",
             item.Category);
     }
+
+    [LocalTextPrefix("MyRow")]
+    public class CategoryWithRowRow : Row<CategoryWithRowRow.RowFields>
+    {
+        public string FormOnly { get; set; }
+
+        public string FormOnlyTextKey { get; set; }
+
+        [Category("O")]
+        public string FormOverride { get; set; }
+
+        [Category("Site.CustomRowTextKey")]
+        public string FormOverrideTextKey { get; set; }
+
+        [Category("R")]
+        public string RowOnly { get; set; }
+
+        [Category("Site.CustomRowOnlyTextKey")]
+        public string RowOnlyTextKey { get; set; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField FormOnly;
+            public StringField FormOnlyTextKey;
+            public StringField FormOverride;
+            public StringField FormOverrideTextKey;
+            public StringField RowOnly;
+            public StringField RowOnlyTextKey;
+        }
+    }
+
+    [FormScript("MyForm"), BasedOnRow(typeof(CategoryWithRowRow))]
+    private class CategoryWithRowForm
+    {
+        [Category("A")]
+        public string NotMapped { get; set; }
+
+        [Category("B")]
+        public string FormOnly { get; set; }
+
+        [Category("Site.FormOnlyTextKey")]
+        public string FormOnlyTextKey { get; set; }
+
+        [Category("C")]
+        public string FormOverride { get; set; }
+
+        [Category("Site.FormCustomTextKeyOverride")]
+        public string FormOverrideTextKey { get; set; }
+
+        public string RowOnly { get; set; }
+
+        public string RowOnlyTextKey { get; set; }
+    }
+
+    [Theory]
+    [InlineData("NotMapped", "Forms.MyForm.Categories.A")]
+    [InlineData("FormOnly", "Forms.MyForm.Categories.B")]
+    [InlineData("FormOnlyTextKey", "Site.FormOnlyTextKey")]
+    [InlineData("FormOverride", "Forms.MyForm.Categories.C")]
+    [InlineData("FormOverrideTextKey", "Site.FormCustomTextKeyOverride")]
+    [InlineData("RowOnly", "Db.MyRow.Categories.R")]
+    [InlineData("RowOnlyTextKey", "Site.CustomRowOnlyTextKey")]
+    public void Category_Should_Use_Row_Properties_If_Available(string propertyName,
+        string key)
+    {
+        var processor = new BasicPropertyProcessor();
+
+        var item = new PropertyItem();
+        var property = typeof(CategoryWithRowForm).GetProperty(propertyName);
+        var source = new PropertyInfoSource(property,
+            new CategoryWithRowRow());
+
+        processor.Process(source, item);
+
+        Assert.Equal(key, item.Category);
+    }
 }

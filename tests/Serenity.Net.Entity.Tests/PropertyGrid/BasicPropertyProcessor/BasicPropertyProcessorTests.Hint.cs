@@ -1,3 +1,4 @@
+using Serenity.Localization;
 using Serenity.PropertyGrid;
 
 namespace Serenity.Tests.Entity;
@@ -122,5 +123,81 @@ public partial class BasicPropertyProcessorTests
 
         Assert.Equal($"Forms.{typeof(HintWithRegularText).FullName}.{propertyName}_Hint",
             item.Hint);
+    }
+
+    [LocalTextPrefix("MyRow")]
+    public class HintWithRowRow : Row<HintWithRowRow.RowFields>
+    {
+        public string FormOnly { get; set; }
+
+        public string FormOnlyTextKey { get; set; }
+
+        [Hint("O")]
+        public string FormOverride { get; set; }
+
+        [Hint("Site.CustomRowTextKey")]
+        public string FormOverrideTextKey { get; set; }
+
+        [Hint("R")]
+        public string RowOnly { get; set; }
+
+        [Hint("Site.CustomRowOnlyTextKey")]
+        public string RowOnlyTextKey { get; set; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField FormOnly;
+            public StringField FormOnlyTextKey;
+            public StringField FormOverride;
+            public StringField FormOverrideTextKey;
+            public StringField RowOnly;
+            public StringField RowOnlyTextKey;
+        }
+    }
+
+    [FormScript("MyForm"), BasedOnRow(typeof(HintWithRowRow))]
+    private class HintWithRowForm
+    {
+        [Hint("A")]
+        public string NotMapped { get; set; }
+
+        [Hint("B")]
+        public string FormOnly { get; set; }
+
+        [Hint("Site.FormOnlyTextKey")]
+        public string FormOnlyTextKey { get; set; }
+
+        [Hint("C")]
+        public string FormOverride { get; set; }
+
+        [Hint("Site.FormCustomTextKeyOverride")]
+        public string FormOverrideTextKey { get; set; }
+
+        public string RowOnly { get; set; }
+
+        public string RowOnlyTextKey { get; set; }
+    }
+
+    [Theory]
+    [InlineData("NotMapped", "Forms.MyForm.NotMapped_Hint")]
+    [InlineData("FormOnly", "Forms.MyForm.FormOnly_Hint")]
+    [InlineData("FormOnlyTextKey", "Site.FormOnlyTextKey")]
+    [InlineData("FormOverride", "Forms.MyForm.FormOverride_Hint")]
+    [InlineData("FormOverrideTextKey", "Site.FormCustomTextKeyOverride")]
+    [InlineData("RowOnly", "Db.MyRow.RowOnly_Hint")]
+    [InlineData("RowOnlyTextKey", "Site.CustomRowOnlyTextKey")]
+    public void Hint_Should_Use_Row_Properties_If_Available(string propertyName,
+        string key)
+    {
+        var processor = new BasicPropertyProcessor();
+
+        var item = new PropertyItem();
+        var property = typeof(HintWithRowForm).GetProperty(propertyName);
+        var source = new PropertyInfoSource(property,
+            new HintWithRowRow());
+
+        processor.Process(source, item);
+
+        Assert.Equal(key, item.Hint);
     }
 }
