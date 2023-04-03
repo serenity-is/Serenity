@@ -1,4 +1,4 @@
-﻿using Serenity.Localization;
+using Serenity.Localization;
 
 namespace Serenity.Tests.Localization;
 
@@ -27,7 +27,7 @@ public class LocalTextRegistryTests
     }
 
     [Fact]
-    public void LocalTextRegistry_Add_DoesntTrimAny()
+    public void Add_DoesntTrimAny()
     {
         var registry = new LocalTextRegistry();
         registry.Add("  es  ", " key ", " translation ");
@@ -37,7 +37,7 @@ public class LocalTextRegistryTests
     }
 
     [Fact]
-    public void LocalTextRegistry_Add_OverridesExisting()
+    public void Add_OverridesExisting()
     {
         var registry = new LocalTextRegistry();
         registry.Add("es", "key", "oldTranslation");
@@ -95,7 +95,7 @@ public class LocalTextRegistryTests
     }
 
     [Fact]
-    public void LocalTextRegistry_AddPending_DoesntOverrideApprovedText()
+    public void AddPending_DoesntOverrideApprovedText()
     {
         var registry = new LocalTextRegistry();
         registry.Add("es", "key", "approvedTranslation");
@@ -108,5 +108,66 @@ public class LocalTextRegistryTests
         registry.AddPending("es", "key", "pendingTranslation2");
         Assert.Equal("pendingTranslation2", registry.TryGet("es", "key", pending: true));
         Assert.Equal("approvedTranslation", registry.TryGet("es", "key", pending: false));
+    }
+
+    [Fact]
+    public void TryGet_Throws_ArgumentNull_If_TextKey_Or_LanguageID_IsNull()
+    {
+        var registry = new LocalTextRegistry();
+        Assert.Throws<ArgumentNullException>(() => registry.TryGet(null, "X", false));
+        Assert.Throws<ArgumentNullException>(() => registry.TryGet("X", null, false));
+    }
+
+    [Fact]
+    public void TryGet_Returns_Pending_Value_IfAvailable()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddPending("tr", "TestKey", "PendingValue");
+        registry.Add("tr", "TestKey", "ApprovedValue");
+        Assert.Equal("PendingValue", registry.TryGet("tr", "TestKey", pending: true));
+    }
+
+    [Fact]
+    public void TryGet_Returns_Null_If_PendingValue_IsNull()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddPending(LocalText.InvariantLanguageID, "TestKey", null);
+        registry.Add(LocalText.InvariantLanguageID, "TestKey", "ApprovedValue");
+        Assert.Null(registry.TryGet("tr", "TestKey", pending: true));
+    }
+
+    [Fact]
+    public void Four_Letter_Language_Fallbacks_Are_Calculated_Automatically()
+    {
+        var registry = new LocalTextRegistry();
+        registry.TryGet("tr-TR", "Test", false);
+        registry.TryGet("en-GB", "Test", false);
+        registry.TryGet("en-US", "Test", false);
+        Assert.Collection(registry.GetLanguageFallbacks().OrderBy(x => x.Key),
+            x =>
+            {
+                Assert.Equal("en", x.Key);
+                Assert.Equal("", x.Value);
+            }, 
+            x =>
+            {
+                Assert.Equal("en-GB", x.Key);
+                Assert.Equal("en", x.Value);
+            },
+            x =>
+            {
+                Assert.Equal("en-US", x.Key);
+                Assert.Equal("en", x.Value);
+            },
+            x =>
+            {
+                Assert.Equal("tr", x.Key);
+                Assert.Equal("", x.Value);
+            },
+            x =>
+            {
+                Assert.Equal("tr-TR", x.Key);
+                Assert.Equal("tr", x.Value);
+            });
     }
 }

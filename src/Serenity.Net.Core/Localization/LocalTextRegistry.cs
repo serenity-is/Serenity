@@ -77,103 +77,29 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
         if (textKey == null)
             throw new ArgumentNullException(nameof(textKey));
-
-        // create a key to lookup by language and text key pair
-        var k = new LanguageIdKeyPair(languageID, textKey);
-
-        string? s;
-
-        if (pending)
+        
+        var circularCheck = 0;
+        LanguageIdKeyPair k;
+        do
         {
-            // first search in pending texts
-            if (pendingTexts.TryGetValue(k, out s))
+            k = new LanguageIdKeyPair(languageID, textKey);
+
+            if (pending && pendingTexts.TryGetValue(k, out string? s))
             {
-                // pending text is available, return it
                 if (s != null)
                     return s;
-
-                // pending text is null, it means marked for deletion, 
-                // if this is default language, return key itself
-                if (languageID == LocalText.InvariantLanguageID)
-                    return null;
             }
             else if (approvedTexts.TryGetValue(k, out s))
-            {
-                // approved is available, return it
                 return s;
-            }
-            else if (languageID == LocalText.InvariantLanguageID)
-            {
-                // if language is default language, return text key
+            
+            if (languageID == LocalText.InvariantLanguageID)
                 return null;
-            }
 
-            var circularCheck1 = 0;
-            while (true)
-            {
-                languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
-
-                // search in fallback or default language
-                k = new LanguageIdKeyPair(languageID, textKey);
-
-                if (pendingTexts.TryGetValue(k, out s))
-                {
-                    // text available in pending language fallback
-                    if (s != null)
-                        return s;
-
-                    // if marked for deletion in default language, return key itself
-                    if (languageID == LocalText.InvariantLanguageID)
-                        return null;
-                }
-                else if (approvedTexts.TryGetValue(k, out s))
-                {
-                    // text available in approved default language
-                    return s;
-                }
-                else if (languageID == LocalText.InvariantLanguageID)
-                {
-                    // not in pending nor approved, or circular reference, return key itself
-                    return null;
-                }
-
-                // check for possible circular Fallbacks
-                if (circularCheck1++ >= 10)
-                    return null;
-
-                // try again for language fallback...
-            }
+            languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
         }
+        while (circularCheck++ < 10);
 
-        if (!approvedTexts.TryGetValue(k, out s))
-        {
-            // couldn't find, if requested language is not DefaultLanguageID, search in it too
-            if (languageID != LocalText.InvariantLanguageID)
-            {
-                int circularCheck2 = 0;
-                while (true)
-                {
-                    languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
-
-                    // search in fallback or default language
-                    k = new LanguageIdKeyPair(languageID, textKey);
-
-                    // search again
-                    if (approvedTexts.TryGetValue(k, out s))
-                        return s;
-
-                    if (languageID == LocalText.InvariantLanguageID ||
-                        circularCheck2++ >= 10)
-                        return null;
-                }
-            }
-
-            // couldn't find in requested language or its Fallbacks, return key itself
-            return null;
-        }
-
-        // found in requested language, return it
-        return s;
+        return null;
     }
 
     /// <inheritdoc/>
@@ -193,19 +119,24 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
     private string? TryGetLanguageFallback(string languageID)
     {
-        if (languageFallbacks.TryGetValue(languageID, out string fallback))
-            return fallback;
-
-        if (languageID == LocalText.InvariantLanguageID)
+        if (string.IsNullOrEmpty(languageID))
             return null;
 
-        var idx = languageID.LastIndexOf('-');
-        if (idx >= 1)
-            return languageID.SafeSubstring(0, idx);
+        return languageFallbacks.GetOrAdd(languageID, static id =>
+        {
+            if (id.Length == 5 &&
+                id[2] == '-' &&
+                id[0] >= 'a' && id[0] <= 'z' &&
+                id[1] >= 'a' && id[1] <= 'z' &&
+                id[3] >= 'A' && id[3] <= 'Z' &&
+                id[4] >= 'A' && id[4] <= 'Z')
+            {
+                return id[..2];
+            }
 
-        return LocalText.InvariantLanguageID;
+            return LocalText.InvariantLanguageID;
+        });
     }
-
 
     /// <summary>
     ///   Gets all available text keys (that has a translation in language or any of its
@@ -222,46 +153,40 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
             throw new ArgumentNullException(nameof(languageID));
 
         var texts = new Dictionary<string, string>();
-        string? text;
 
         var currentID = languageID;
-        int tries = 0;
+        int circularCheck = 0;
 
-        while (true)
+        void scanItems(IEnumerable<KeyValuePair<LanguageIdKeyPair, string?>> items)
+        {
+            foreach (var item in items)
+            {
+                if (item.Key.LanguageId != currentID)
+                    continue;
+
+                var key = item.Key.Key;
+
+                if (texts.ContainsKey(key))
+                    continue;
+
+                if (TryGet(languageID, key, pending) is string text)
+                    texts[key] = text;
+            }
+        }
+
+        do
         {
             if (pending)
-            {
-                foreach (var item in pendingTexts)
-                {
-                    var key = item.Key.Key;
-                    if (item.Key.LanguageId == currentID && !texts.ContainsKey(key))
-                    {
-                        text = TryGet(languageID, key, true);
-                        if (text != null)
-                            texts[key] = text;
-                    }
-                }
-            }
+                scanItems(pendingTexts);
 
-            foreach (var item in approvedTexts)
-            {
-                var key = item.Key.Key;
-                if (item.Key.LanguageId == currentID && !texts.ContainsKey(key))
-                {
-                    text = TryGet(languageID, key, true);
-                    if (text != null)
-                        texts[key] = text;
-                }
-            }
+            scanItems(approvedTexts);
 
-            tries++;
-
-            if (tries > 10 ||
-                currentID == LocalText.InvariantLanguageID)
+            if (currentID == LocalText.InvariantLanguageID)
                 break;
 
             currentID = TryGetLanguageFallback(currentID) ?? LocalText.InvariantLanguageID;
         }
+        while (circularCheck++ < 10);
 
         return texts;
     }
