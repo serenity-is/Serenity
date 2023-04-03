@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "Lookup" editor with "async" set to true.
@@ -6,6 +6,11 @@
 /// <seealso cref="CustomEditorAttribute" />
 public partial class AsyncLookupEditorAttribute : LookupEditorAttribute
 {
+    /// <summary>
+    /// Editor type key
+    /// </summary>
+    public new const string Key = "Lookup";
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AsyncLookupEditorAttribute"/> class.
     /// </summary>

@@ -76,7 +76,6 @@ export * from "./ui/dialogs/entitydialog";
 
 // legacy
 export * from "./ui/widgets/reporting";
-export * from "./ui/editors/asynclookupeditor";
 export * from "./ui/widgets/scriptcontext";
 export * from "./interfaces/iasyncinit";
 export * from "./ui/widgets/wx";

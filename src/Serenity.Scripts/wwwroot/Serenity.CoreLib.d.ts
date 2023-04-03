@@ -4808,11 +4808,6 @@ declare namespace Serenity {
         }
     }
 
-    class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-        constructor(hidden: JQuery, opt: LookupEditorOptions);
-        getLookupKey(): string;
-    }
-
     interface ScriptContext {
     }
     class ScriptContext {
