@@ -1,3 +1,8 @@
+## 6.6.5 (2023-04-04)
+
+Bugfixes:
+  - [BREAKING CHANGE] removing legacy AsyncLookupEditor from corelib as it is getting mixed up with AsyncLookupEditorAttribute in server side which is just a LookupEditor with Async = true
+  
 ## 6.6.4 (2023-04-03)
 
 Features:
