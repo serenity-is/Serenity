@@ -1,3 +1,24 @@
+## 6.6.4 (2023-04-03)
+
+Features:
+  - Added default support for new languages including Arabic, Bengalese, Czech, French, Hindi, Indonesian, Japanese, Korean, Dutch, Romanian, Swedish, Chinese Traditional. Used machine translation for all these languages in addition to the existing languages. As these may not always be the best possible translations, any pull requests with improved texts are welcome.
+  - Used embedded resources under texts/resources folder for JSON translation files instead of static web assets under wwwroot/texts as these files are not meant to be directly accessed via web. This will also reduce number of published files, and simplify deployment.
+  - Introduced quick filter option in Translations page to show/hide user translated and text that has any translation in the target language. There are also buttons to export translated values / original values to make translation easier. Each translation resource folder also contains a template JSON file in English language that can be used as source.
+  - ITypeSource may return its assemblies if available via the new IGetAssemblies interface
+  - Introduce LanguageIdKeyPair to use as dictionary key in LocalTextRegistry.
+  - Added IGetAllTexts interface to LocalTextRegistry to return all registered texts
+  - Added ILanguageFallbacks interface for LocalTextRegistry to get/set language fallbacks.
+  - Added initialization support to LocalText directly, so that readonly localtexts can be used in nested text classes without having analyzer warnings
+  - PropertyItemsLocalTextRegistration to register texts defined implicitly via DisplayName, Tab, Category, Hint, Placeholder attributes in Forms/Columns so that they can be seen/translated in Translations page
+  - Also handle Hint, Placeholder, Category, Tab attributes for Row/Entity local text registration
+  - NavigationLocalTextRegistration to register texts for navigation items from attributes
+  - Moved NavigationItemAttribute down to Serenity.Core from Serenity.Web
+  - Site local text package has a default regex that will be included in addition to anything you define in appsettings.bundles.json, so you may remove LocalTextPackages section from your appsettings.json unless you included some additional texts there.
+
+Bugfixes:
+  - Fix fields without displayname attributes are shown with their local text keys in grids/forms. Use the propertyname as implicit display name.
+  - Crash in Arabic culture in the constructor of ScriptCulture
+
 ## 6.6.3 (2023-03-24)
 
 Features:
