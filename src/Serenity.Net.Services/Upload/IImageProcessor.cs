@@ -1,5 +1,6 @@
-﻿using Serenity.Web;
 using System.IO;
+
+namespace Serenity.Web;
 
 /// <summary>
 /// Image processor abstraction

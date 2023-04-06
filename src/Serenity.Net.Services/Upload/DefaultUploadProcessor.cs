@@ -1,4 +1,4 @@
-﻿
+
 using System.IO;
 
 namespace Serenity.Web;
@@ -12,6 +12,7 @@ public class DefaultUploadProcessor : IUploadProcessor
     private readonly IUploadStorage uploadStorage;
     private readonly IUploadValidator uploadValidator;
     private readonly IExceptionLogger logger;
+    private readonly IUploadAVScanner avScanner;
 
     /// <summary>
     /// Creates a new instance of the class
@@ -20,14 +21,17 @@ public class DefaultUploadProcessor : IUploadProcessor
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="uploadValidator">Upload validator</param>
     /// <param name="logger">Exception logger</param>
+    /// <param name="avScanner">Optional antivirus scanner</param>
     /// <exception cref="ArgumentNullException"></exception>
     public DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
-        IExceptionLogger logger = null)
+        IExceptionLogger logger = null,
+        IUploadAVScanner avScanner = null)
     {
         this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
         this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
         this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
         this.logger = logger;
+        this.avScanner = avScanner;
     }
 
     /// <inheritdoc/>
@@ -41,6 +45,8 @@ public class DefaultUploadProcessor : IUploadProcessor
 
         if (options is null)
             throw new ArgumentNullException(nameof(options));
+
+        avScanner?.Scan(stream, filename);
 
         var result = new ProcessedUploadInfo
         {
