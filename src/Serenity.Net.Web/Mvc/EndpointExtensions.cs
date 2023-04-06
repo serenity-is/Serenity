@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace Serenity.Services;
 
@@ -89,6 +90,31 @@ public static class EndpointExtensions
         try
         {
             response = handler();
+        }
+        catch (Exception exception)
+        {
+            response = exception.ConvertToResponse<TResponse>(controller.HttpContext);
+            controller.HttpContext.Response.Clear();
+            controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+        }
+
+        return new Result<TResponse>(response);
+    }
+
+    /// <summary>
+    /// Executes an action method and converts any exception to a service response
+    /// </summary>
+    /// <typeparam name="TResponse">Response type</typeparam>
+    /// <param name="controller">Controller</param>
+    /// <param name="handler">Handler callback</param>
+    /// <returns></returns>
+    public static async Task<Result<TResponse>> ExecuteMethodAsync<TResponse>(this ControllerBase controller, Func<Task<TResponse>> handler)
+        where TResponse : ServiceResponse, new()
+    {
+        TResponse response;
+        try
+        {
+            response = await handler();
         }
         catch (Exception exception)
         {
