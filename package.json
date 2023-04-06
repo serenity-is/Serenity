@@ -26,6 +26,9 @@
       "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@1.4.14"
     }
   },
+  "scripts": {
+    "tsc": "pnpm -r --no-bail --filter !*workspace-serenity --filter !*tsbuild exec tsc -p ./src/tsconfig.json"
+  },
   "private": true,
   "license": "MIT",
   "type": "module"
