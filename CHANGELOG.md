@@ -1,3 +1,19 @@
+## 6.7.0 (2023-04-06)
+
+Features:
+
+  - **[WARNING!]** This release focuses on addressing potential security issues that were recently discovered by Fabian Densborn from SEC Consult. Serene/StartSharp users must either create a new project from the 6.7.0+ template or manually apply the relevant changes from this commit to their existing applications after updating Serenity packages to 6.7.0+: https://github.com/serenity-is/serene/commit/6dce8162f4382badd429a9f0f1470acb64e8c4fd
+    
+  - Serenity.is would like to express gratitude to Fabian Densborn for his discovery, analysis, and coordination, as well as the SEC Consult Vulnerability Lab (https://www.sec-consult.com) for responsibly reporting the identified issues and collaborating with us as we addressed them.
+    
+  - Added the option to use ClamAV (https://www.clamav.net/) as an antivirus scanner for temporary uploads. To enable it, add `services.ConfigureSection<Serenity.Extensions.ClamAVSettings>(Configuration);` and `services.AddSingleton<IUploadAVScanner, Serenity.Extensions.ClamAVUploadScanner>();` to your Startup.cs after upgrading to Serenity/Serenity.Extensions 6.7.0+. Consult ClamAV documentation on how to install it on your platform. This feature will be enabled by default once these changes have been made in Startup.cs. If you want to disable it for development purposes, set ClamAV:Enabled to false in your appsettings.Development.json (not recommended for production!).
+    
+  - Added extensionless and `.htm`/`.html` to the upload file extensions blacklist by default. An attacker can include malicious scripts in such an HTML file, send an administrative user a link to that file via email, and if the administrative user is already logged in to the site while clicking the link, the script can call services, perform actions, etc. on behalf of the user as the cookies are sent by the browser.
+    
+  - Ensured that the Forgot password page does not reveal information to identify whether a user with the entered email exists.
+    
+  - Ensured that reset password tokens can only be used once. They already expired in 3 hours, but if an attacker could see the link within that time frame (e.g., by eavesdropping), they could use it to change the password again.
+
 ## 6.6.6 (2023-04-04)
 
 Bugfixes:
