@@ -404,7 +404,7 @@ declare function dbText(prefix: string): ((key: string) => string);
 declare function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
 declare function tryGetText(key: string): string;
 declare function dbTryText(prefix: string): ((key: string) => string);
-declare function proxyTexts(o: Object, p: string, t: Object): Object;
+declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
 declare class LT {
     private key;
     static empty: LT;
