@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
@@ -43,7 +43,8 @@ public class DefaultUploadValidator : IUploadValidator
 
         if ((constraints.ExtensionBlacklist ?? UploadOptions.DefaultExtensionBlacklist)
             .Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-            .Any(x => string.Equals(x.Trim(), fileExtension, StringComparison.OrdinalIgnoreCase)))
+            .Any(x => string.Equals(x.Trim(), fileExtension, StringComparison.OrdinalIgnoreCase) ||
+                (x.Trim() == "." && string.IsNullOrEmpty(fileExtension))))
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
                 UploadTexts.Controls.ImageUpload.ExtensionBlacklisted.ToString(localizer),
                 fileExtension));

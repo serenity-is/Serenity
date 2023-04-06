@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Constraints of the uploaded file size.
@@ -21,7 +21,7 @@ public interface IUploadFileConstraints : IUploadOptions
 
     /// <summary>
     /// Contains extensions that are considered dangerous / disallowed.
-    /// Default is ".asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.dll;.jar;.jsp;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs"
+    /// Default is ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;.dll;.jar;.jsp;.htaccess;.htpasswd;.html;.htm;.lnk;.php;.ps1;.vbe;.vbs"
     /// </summary>
     public string? ExtensionBlacklist { get; }
 

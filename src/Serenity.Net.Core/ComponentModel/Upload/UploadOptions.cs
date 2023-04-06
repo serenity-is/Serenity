@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 
 namespace Serenity.ComponentModel;
 
@@ -99,8 +99,8 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     /// <summary>
     /// Default list of blacklisted extensions;
     /// </summary>
-    public const string DefaultExtensionBlacklist = ".asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;" +
-        ".dll;.jar;.jsp;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs";
+    public const string DefaultExtensionBlacklist = ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;" +
+        ".dll;.jar;.jsp;.htm;.html;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs";
 
     /// <inheritdoc/>
     public string? ExtensionBlacklist { get; set; }
