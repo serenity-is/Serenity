@@ -13,6 +13,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(text))
             return text;
 
+        if (string.IsNullOrEmpty(text))
+            return text;
+
         bool fromField = !ignoreField && 
             source.BasedOnField is not null &&
             source.Property?.GetAttribute<TAttribute>(false) is null &&

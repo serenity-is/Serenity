@@ -144,6 +144,17 @@ public partial class BasicPropertyProcessorTests
         [DisplayName("Site.CustomRowOnlyTextKey")]
         public string RowOnlyTextKey { get; set; }
 
+        public string WithEmptyStringInForm { get; set; }
+
+        [DisplayName("")]
+        public string WithEmptyStringInForm2 { get; set; }
+
+        [DisplayName(null)]
+        public string WithNullStringInForm { get; set; }
+
+        [DisplayName(null)]
+        public string WithNullStringInForm2 { get; set; }
+
         public class RowFields : RowFieldsBase
         {
             public StringField FormOnly;
@@ -176,6 +187,18 @@ public partial class BasicPropertyProcessorTests
         public string RowOnly { get; set; }
 
         public string RowOnlyTextKey { get; set; }
+
+        [DisplayName("")]
+        public string WithEmptyStringInForm { get; set; }
+
+        [DisplayName("")]
+        public string WithEmptyStringInForm2 { get; set; }
+
+        [DisplayName(null)]
+        public string WithNullStringInForm { get; set; }
+
+        [DisplayName(null)]
+        public string WithNullStringInForm2 { get; set; }
     }
 
     [Theory]
@@ -186,6 +209,10 @@ public partial class BasicPropertyProcessorTests
     [InlineData("FormOverrideTextKey", "Site.FormCustomTextKeyOverride")]
     [InlineData("RowOnly", "Db.MyRow.RowOnly")]
     [InlineData("RowOnlyTextKey", "Site.CustomRowOnlyTextKey")]
+    [InlineData("WithEmptyStringInForm", "")]
+    [InlineData("WithEmptyStringInForm2", "")]
+    [InlineData("WithNullStringInForm", null)]
+    [InlineData("WithNullStringInForm2", null)]
     public void Title_Should_Use_Row_Properties_If_Available(string propertyName,
         string key)
     {

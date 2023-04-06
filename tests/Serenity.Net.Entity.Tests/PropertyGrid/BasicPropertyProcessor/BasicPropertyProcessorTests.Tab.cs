@@ -143,6 +143,16 @@ public partial class BasicPropertyProcessorTests
         [Tab("Site.CustomRowOnlyTextKey")]
         public string RowOnlyTextKey { get; set; }
 
+        public string EmptyString { get; set; }
+
+        [Tab("")]
+        public string EmptyString2 { get; set; }
+
+        public string NullString { get; set; }
+
+        [Tab(null)]
+        public string NullString2 { get; set; }
+
         public class RowFields : RowFieldsBase
         {
             public StringField FormOnly;
@@ -175,6 +185,18 @@ public partial class BasicPropertyProcessorTests
         public string RowOnly { get; set; }
 
         public string RowOnlyTextKey { get; set; }
+
+        [Tab("")]
+        public string EmptyString { get; set; }
+
+        [Tab("")]
+        public string EmptyString2 { get; set; }
+
+        [Tab(null)]
+        public string NullString { get; set; }
+
+        [Tab(null)]
+        public string NullString2 { get; set; }
     }
 
     [Theory]
@@ -185,6 +207,10 @@ public partial class BasicPropertyProcessorTests
     [InlineData("FormOverrideTextKey", "Site.FormCustomTextKeyOverride")]
     [InlineData("RowOnly", "Db.MyRow.Tabs.R")]
     [InlineData("RowOnlyTextKey", "Site.CustomRowOnlyTextKey")]
+    [InlineData("EmptyString", "")]
+    [InlineData("EmptyString2", "")]
+    [InlineData("NullString", null)]
+    [InlineData("NullString2", null)]
     public void Tab_Should_Use_Row_Properties_If_Available(string propertyName,
         string key)
     {

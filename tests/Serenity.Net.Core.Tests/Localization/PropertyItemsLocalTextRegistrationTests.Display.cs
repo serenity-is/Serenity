@@ -123,6 +123,12 @@ public partial class PropertyItemsLocalTextRegistrationTests
 
         [DisplayName("Date of Birth")]
         public string DOB { get; set; }
+
+        [DisplayName("")]
+        public string EmptyString { get; set; }
+
+        [DisplayName(null)]
+        public string NullString { get; set; }
     }
 
     [Fact]
