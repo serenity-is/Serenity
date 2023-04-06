@@ -99,8 +99,8 @@ export let Culture: Locale = {
 (function() {
     let k: string;
     for (k in Invariant)
-        if (Culture[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
-            Culture[k] = Invariant[k];
+        if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
+            (Culture as any)[k] = (Invariant as any)[k];
 
     if (typeof document !== "undefined" && (k = trimToNull((document.querySelector('script#ScriptCulture') || {}).innerHTML)) != null) {
         var sc = JSON.parse(k);
@@ -114,8 +114,8 @@ export let Culture: Locale = {
         delete sc.groupSeparator;
         delete sc.decimal;
         for (k in sc) {
-            if (Culture[k] === undefined && Object.prototype.hasOwnProperty.call(sc, k))
-                Culture[k.charAt(0).toLowerCase() + k.substr(1)] = sc[k];
+            if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(sc, k))
+                (Culture as any)[k.charAt(0).toLowerCase() + k.substr(1)] = sc[k];
         }
     }
 })();

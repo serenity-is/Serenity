@@ -30,7 +30,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             return;
         }
 
-        var oldRequests = jQuery["active"];
+        var oldRequests = (jQuery as any)["active"];
 
         var parts = args.route.split('/');
         if (!!(parts.length === 2 && parts[0] === 'edit')) {
@@ -48,7 +48,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         else
             return;
 
-        if (jQuery["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
+        if ((jQuery as any)["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
             $(document).one('ajaxStop', () => {
                 setTimeout(() => Router.resolve('#' + args.parts.join('/+/')), 1);
             });

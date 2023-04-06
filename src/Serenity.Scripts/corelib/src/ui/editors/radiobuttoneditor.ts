@@ -27,9 +27,9 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
         if (!isEmptyOrNull(this.options.lookupKey)) {
             var lookup = getLookup(this.options.lookupKey);
             for (var item of lookup.items) {
-                var textValue = item[lookup.textField];
+                var textValue = (item as any)[lookup.textField];
                 var text = (textValue == null ? '' : textValue.toString());
-                var idValue = item[lookup.idField];
+                var idValue = (item as any)[lookup.idField];
                 var id = (idValue == null ? '' : idValue.toString());
                 this.addRadio(id, text);
             }

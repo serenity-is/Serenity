@@ -26,7 +26,6 @@
       "@serenity-is/corelib/slick": ["./slick"]
     },
     "outDir": "../out",
-    "suppressImplicitAnyIndexErrors": true,
     "target": "ES5",
     "lib": [
       "ES5",

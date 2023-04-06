@@ -105,7 +105,7 @@ export function resetBSVersionCheck() {
     _isBS5Plus = undefined;
 }
 
-const defaultTxt = {
+const defaultTxt: Record<string, string> = {
     AlertTitle: 'Alert',
     InformationTitle: 'Information',
     WarningTitle: 'Warning',

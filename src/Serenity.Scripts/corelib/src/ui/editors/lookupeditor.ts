@@ -75,7 +75,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         if (lookup == null)
             return super.itemText(item);
 
-        var textValue = lookup.textFormatter ? lookup.textFormatter(item) : item[lookup.textField];
+        var textValue = lookup.textFormatter ? lookup.textFormatter(item) : (item as any)[lookup.textField];
         return textValue == null ? '' : textValue.toString();
     }
 
@@ -135,7 +135,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
     }
 
     protected setCreateTermOnNewEntity(entity: TItem, term: string) {
-        entity[this.getLookup().textField] = term;
+        (entity as any)[this.getLookup().textField] = term;
     }
 
     protected editDialogDataChange() {

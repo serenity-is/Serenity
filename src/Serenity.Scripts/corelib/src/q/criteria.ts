@@ -560,7 +560,7 @@ export namespace Criteria {
         return tokens;
     }
     
-    const operatorPrecedence = {
+    const operatorPrecedence: Record<string, number> = {
         '=': 4,
         '>': 4,
         '<': 4,

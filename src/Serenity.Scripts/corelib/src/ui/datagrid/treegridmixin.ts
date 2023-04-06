@@ -85,7 +85,7 @@ export class TreeGridMixin<TItem> {
 
         var byId = toGrouping(items, getId);
         var byParentId = toGrouping(items, getParentId);
-        var visited = {};
+        var visited: Record<string, boolean> = {};
 
         function takeChildren(theParentId: any) {
             if (visited[theParentId])

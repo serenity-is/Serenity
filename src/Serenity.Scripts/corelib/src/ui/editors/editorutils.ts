@@ -33,7 +33,7 @@ export namespace EditorUtils {
     var dummy: PropertyItem = { name: '_' };
 
     export function getValue(editor: Widget<any>): any {
-        var target = {};
+        var target: Record<string, any> = {};
         saveValue(editor, dummy, target);
         return target['_'];
     }
@@ -223,7 +223,7 @@ export namespace EditorUtils {
         container.addClass('readonly-container').find(".editor")
             .not('.container-readonly')
             .each((i, e) => {
-                var w = $(e).tryGetWidget(Widget);
+                var w = $(e).tryGetWidget(Widget) as any;
                 if (w != null) {
 
                     if (w['get_readOnly']) {

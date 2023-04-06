@@ -292,5 +292,5 @@ if (typeof globalThis !== "undefined") {
     const Q = (globalThis as any).Q || ((globalThis as any).Q = {});
     for (var i in exported)
         if (Q[i] == null)
-            Q[i] = exported[i];
+            Q[i] = (exported as any)[i];
 }

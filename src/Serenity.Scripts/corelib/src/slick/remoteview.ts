@@ -125,7 +125,7 @@ export class RemoteView<TEntity> {
         var idProperty: string;
         var items: any[] = [];
         var rows: any[] = [];
-        var idxById = {};
+        var idxById: Record<any, number> = {};
         var rowsById: any = null;
         var filter: any = null;
         var updated: any = null;
@@ -1264,7 +1264,7 @@ export class RemoteView<TEntity> {
             function storeCellCssStyles(hash: any) {
                 hashById = {};
                 for (var row in hash) {
-                    var id: any = rows[row][idProperty];
+                    var id: any = (rows as any)[row][idProperty];
                     hashById[id] = hash[row];
                 }   
             }
@@ -1273,7 +1273,7 @@ export class RemoteView<TEntity> {
                 if (hashById) {
                     inHandler = true;
                     ensureRowsByIdCache();
-                    var newHash = {};
+                    var newHash: Record<number, any> = {};
                     for (var id in hashById) {
                         var row = rowsById[id];
                         if (row != undefined) {

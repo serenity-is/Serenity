@@ -156,7 +156,7 @@ export function parseQueryString(s?: string): {} {
         qs = location.search.substring(1, location.search.length);
     else
         qs = s || '';
-    let result = {};
+    let result: Record<string, string> = {};
     let parts = qs.split('&');
     for (let i = 0; i < parts.length; i++) {
         let pair = parts[i].split('=');

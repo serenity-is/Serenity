@@ -192,8 +192,8 @@ export class Toolbar extends Widget<ToolbarOptions> {
             });
         }
 
-        if (!!(!isEmptyOrNull(b.hotkey) && window['Mousetrap'] != null)) {
-            this.mouseTrap = this.mouseTrap || window['Mousetrap'](
+        if (!!(!isEmptyOrNull(b.hotkey) && window['Mousetrap' as any] != null)) {
+            this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
                 b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
             this.mouseTrap.bind(b.hotkey, function (e1: BaseJQueryEventObject, action: any) {

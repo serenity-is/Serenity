@@ -11,7 +11,7 @@ export namespace ValidationHelper {
         if (validateBeforeSave != null && validateBeforeSave() === false) {
             return false;
         }
-        valSettings['abortHandler'] = validatorAbortHandler;
+        (valSettings as any)['abortHandler'] = validatorAbortHandler;
         valSettings['submitHandler'] = function () {
             if (submitHandler != null) {
                 submitHandler();

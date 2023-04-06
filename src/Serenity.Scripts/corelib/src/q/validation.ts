@@ -8,9 +8,9 @@ import { htmlEncode } from "./html";
 
 if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validator.addMethod) {
 
-    if ($.validator["prototype"].showLabel) {
-        var orgShowLabel = $.validator["prototype"].showLabel;
-        $.validator["prototype"].showLabel = function(element: any, message: any) {
+    if (($.validator as any)["prototype"].showLabel) {
+        var orgShowLabel = ($.validator as any)["prototype"].showLabel;
+        ($.validator as any)["prototype"].showLabel = function(element: any, message: any) {
             if (message != null)
                 message = htmlEncode(message);
             orgShowLabel.call(this, element, message);
@@ -216,7 +216,7 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
                 }
             }
 
-            $.validator["prototype"].defaultShowErrors.call(this);
+            ($.validator as any)["prototype"].defaultShowErrors.call(this);
         }
     }
 }

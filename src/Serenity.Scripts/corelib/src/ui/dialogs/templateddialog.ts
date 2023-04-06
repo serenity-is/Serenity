@@ -164,7 +164,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         
         var title = this.element.data('dialogtitle') ?? this.getDialogTitle() ?? '';
         var opt = this.getModalOptions();
-        opt["show"] = false;
+        (opt as any)["show"] = false;
         var modalClass = "s-Modal";
         
         if (opt.modalClass)

@@ -107,7 +107,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected getEntityNameFieldValue(): any {
-        return (this.get_entity()[this.getNameProperty()] ?? '').toString();
+        return ((this.get_entity() as any)[this.getNameProperty()] ?? '').toString();
     }
 
     protected getEntityTitle(): string {
@@ -142,10 +142,10 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         var isDeletedProperty = this.getIsDeletedProperty();
         if (isDeletedProperty) {
-            return !!this.get_entity()[isDeletedProperty];
+            return !!(this.get_entity() as any)[isDeletedProperty];
         }
 
-        var value = this.get_entity()[this.getIsActiveProperty()];
+        var value = (this.get_entity() as any)[this.getIsActiveProperty()];
         if (value == null) {
             return false;
         }
@@ -435,7 +435,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         var idField = this.getIdProperty();
 
         if (idField != null)
-            this.set_entityId(entity[idField]);
+            this.set_entityId((entity as any)[idField]);
         
         this.set_entity(entity);
 
@@ -648,7 +648,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
                     for (var language of Object.keys(response.Localizations)) {
                         var entity = response.Localizations[language];
                         for (var key of Object.keys(entity)) {
-                            copy[language + '$' + key] = entity[key];
+                            (copy as any)[language + '$' + key] = entity[key];
                         }
                     }
                 }
@@ -664,7 +664,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected setLocalizationGridCurrentValues(): void {
-        var valueByName = {};
+        var valueByName: Record<string, any> = {};
 
         this.localizationGrid.enumerateItems((item, widget) => {
             if (item.name.indexOf('$') < 0 && widget.element.is(':input')) {
@@ -685,7 +685,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     }
 
     protected getLocalizationGridValue(): any {
-        var value = {};
+        var value: any = {};
         this.localizationGrid.save(value);
 
         for (var k of Object.keys(value)) {
@@ -830,8 +830,8 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         if (this.isEditMode()) {
             var idField = this.getIdProperty();
-            if (idField != null && entity[idField] == null) {
-                entity[idField] = this.get_entityId();
+            if (idField != null && (entity as any)[idField] == null) {
+                (entity as any)[idField] = this.get_entityId();
             }
         }
 
@@ -1021,7 +1021,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected getCloningEntity(): TItem {
 
-        var clone: TItem = new Object() as any;
+        var clone: any = new Object();
         clone = extend(clone, this.get_entity());
 
         var idField = this.getIdProperty();

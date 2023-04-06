@@ -49,7 +49,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         LazyLoadHelper.executeOnceWhenShown(this.element, () => {
             var config = this.getConfig();
-            window['CKEDITOR'] && window['CKEDITOR'].replace(id, config);
+            (window as any)['CKEDITOR'] && (window as any)['CKEDITOR'].replace(id, config);
         });
     }
 
@@ -64,10 +64,10 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     }
 
     protected getLanguage(): string {
-        if (!window['CKEDITOR'])
+        if (!(window as any)['CKEDITOR'])
             return 'en';
 
-        var CKEDITOR = window['CKEDITOR'];
+        var CKEDITOR = (window as any)['CKEDITOR'];
 
         var lang = (trimToNull($('html').attr('lang')) ?? 'en');
         if (!!CKEDITOR.lang.languages[lang]) {
@@ -133,7 +133,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
     protected getEditorInstance() {
         var id = this.element.attr('id');
-        return window['CKEDITOR'].instances[id];
+        return (window as any)['CKEDITOR'].instances[id];
     }
 
     destroy(): void {
@@ -206,7 +206,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     }
 
     static includeCKEditor(): void {
-        if (window['CKEDITOR']) {
+        if ((window as any)['CKEDITOR']) {
             return;
         }
 

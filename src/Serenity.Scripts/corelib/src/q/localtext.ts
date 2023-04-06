@@ -60,7 +60,7 @@ export function dbTryText(prefix: string): ((key: string) => string) {
     }
 }
 
-export function proxyTexts(o: Object, p: string, t: Object): Object {
+export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
     if (typeof window != 'undefined' && window['Proxy']) {
         return new window['Proxy'](o, {
             get: (x: Object, y: string) => {

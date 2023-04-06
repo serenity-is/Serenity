@@ -414,7 +414,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
 
         if (activeFieldName) {
-            var value = item[activeFieldName];
+            var value = (item as any)[activeFieldName];
             if (value == null) {
                 return null;
             }
@@ -434,7 +434,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             }
         }
         else {
-            return item[deletedFieldName] ? 'deleted' : null;
+            return (item as any)[deletedFieldName] ? 'deleted' : null;
         }
 
         return null;

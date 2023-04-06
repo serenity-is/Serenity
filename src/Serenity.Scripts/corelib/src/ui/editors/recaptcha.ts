@@ -15,7 +15,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
         super(div, opt);
 
         this.element.addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
-        if (!!(window['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
+        if (!!((window as any)['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
             var src = 'https://www.google.com/recaptcha/api.js';
             var lng = this.options.language;
             if (lng == null) {
@@ -28,7 +28,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
         var valInput = $('<input />').insertBefore(this.element)
             .attr('id', this.uniqueName + '_validate').val('x');
 
-        var gro = {};
+        var gro: Record<string, string> = {};
         gro['visibility'] = 'hidden';
         gro['width'] = '0px';
         gro['height'] = '0px';

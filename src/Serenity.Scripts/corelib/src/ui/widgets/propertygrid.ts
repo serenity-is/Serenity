@@ -381,7 +381,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     private getCategoryOrder(items: PropertyItem[]) {
         var order = 0;
-        var result = {};
+        var result = {} as any;
         var categoryOrder = trimToNull(this.options.categoryOrder);
         if (categoryOrder != null) {
             var split = categoryOrder.split(';');
@@ -390,7 +390,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 if (x == null) {
                     continue;
                 }
-                if (result[x] != null) {
+                if (result[x] as any != null) {
                     continue;
                 }
                 result[x] = order++;
@@ -412,8 +412,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
     private createCategoryLinks(container: JQuery, items: PropertyItem[]) {
         var idx = 0;
-        var itemIndex = {};
-        var itemCategory = {};
+        var itemIndex: Record<string, number> = {};
+        var itemCategory: Record<string, string> = {};
         for (var x of items) {
             var name1 = x.name;
             var cat1 = x.category;
@@ -453,7 +453,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             return c;
         });
 
-        var categoryIndexes = {};
+        var categoryIndexes: Record<string, number> = {};
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             var category = { $: itemCategory[item.name] };

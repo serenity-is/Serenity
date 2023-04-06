@@ -45,7 +45,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
 
     protected updateItems(): void {
         var items = this.getTreeItems();
-        var itemById = {};
+        var itemById: Record<any, TItem> = {};
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             item.children = [];
@@ -297,7 +297,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
     }
 
     protected getDelimited() {
-        return !!!!this.options['delimited'];
+        return !!!!(this.options as any)['delimited'];
     }
 
     protected anyDescendantsSelected(item: TItem): boolean {
@@ -360,7 +360,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         if (!this.moveSelectedUp()) {
             return;
         }
-        var oldIndexes = {};
+        var oldIndexes: Record<string, number> = {};
         var list = this.view.getItems();
         var i = 0;
         for (var $t1 = 0; $t1 < list.length; $t1++) {
@@ -418,7 +418,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
 
     private set_value(value: string | string[]) {
 
-        var selected = {};
+        var selected: Record<string, boolean> = {};
         if (value != null) {
             if (typeof value == "string") {
                 value = value.split(',')
@@ -531,7 +531,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         var fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = x[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -547,7 +547,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         var fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = x[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -560,8 +560,8 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         var lookup = getLookup<TItem>(this.options.lookupKey);
         var items = this.getLookupItems(lookup);
         return items.map(item => <CheckTreeItem<TItem>>{
-            id: (item[lookup.idField] ?? "").toString(),
-            text: (item[lookup.textField] ?? "").toString(),
+            id: ((item as any)[lookup.idField] ?? "").toString(),
+            text: ((item as any)[lookup.textField] ?? "").toString(),
             source: item
         });
     }

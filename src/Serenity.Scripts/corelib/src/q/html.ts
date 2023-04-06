@@ -45,7 +45,7 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string): 
     }
 }
 
-const esc = {
+const esc: Record<string, string> = {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',

@@ -147,7 +147,7 @@ export namespace AggregateFormatting {
         var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
         var text = tryGetText("Enums.Serenity.SummaryType." + textKey) ?? textKey;
     
-        var value = totals[aggType][column.field];
+        var value = (totals as any)[aggType][column.field];
         var formattedValue = formatValue(column, value);
     
         return "<span class='aggregate agg-" + aggType + "'  title='" + htmlEncode(text) + "'>" +
@@ -161,7 +161,7 @@ export namespace AggregateFormatting {
 
         if (formatter != null) {
             var item = new NonDataRow();
-            item[column.field] = value;
+            (item as any)[column.field] = value;
             try {
                 return formatter({ column, escape, item, value });
             }
@@ -184,7 +184,7 @@ export namespace AggregateFormatting {
         var text: string = null;
     
         ["sum", "avg", "min", "max", "cnt"].forEach(function (aggType) {
-            if (text == null && totals[aggType] && totals[aggType][column.field] != null) {
+            if (text == null && (totals as any)[aggType] && (totals as any)[aggType][column.field] != null) {
                 text = formatMarkup(totals, column, aggType);
                 return false;
             }

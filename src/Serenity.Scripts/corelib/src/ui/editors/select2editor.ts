@@ -107,7 +107,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     protected getTypeDelay() {
-        return (this.options['typeDelay'] ?? 200);
+        return ((this.options as any)['typeDelay'] ?? 200);
     }
 
     protected emptyItemText() {
@@ -116,26 +116,26 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     protected getPageSize(): number {
-        return this.options['pageSize'] ?? 100;
+        return (this.options as any)['pageSize'] ?? 100;
     }
 
     protected getIdField() {
-        return this.options['idField'];
+        return (this.options as any)['idField'];
     }
 
     protected itemId(item: TItem): string {
-        var value = item[this.getIdField()];
+        var value = (item as any)[this.getIdField()];
         if (value == null)
             return '';
         return value.toString();
     }
 
     protected getTextField() {
-        return this.options['textField'] ?? this.getIdField();
+        return (this.options as any)['textField'] ?? this.getIdField();
     }
 
     protected itemText(item: TItem): string {
-        var value = item[this.getTextField()];
+        var value = (item as any)[this.getTextField()];
         if (value == null)
             return '';
         return value.toString();
@@ -429,7 +429,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 if (index < 0 || index >= this.get_values().length) {
                     return;
                 }
-                e3['editItem'] = values1[index];
+                (e3 as any)['editItem'] = values1[index];
                 this.inplaceCreateClick(e3);
             });
         }
@@ -826,7 +826,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         var fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = x[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -842,7 +842,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         var fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = x[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -871,11 +871,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected initNewEntity(entity: TItem) {
         if (!isEmptyOrNull(this.get_cascadeField())) {
-            entity[this.get_cascadeField()] = this.get_cascadeValue();
+            (entity as any)[this.get_cascadeField()] = this.get_cascadeValue();
         }
 
         if (!isEmptyOrNull(this.get_filterField())) {
-            entity[this.get_filterField()] = this.get_filterValue();
+            (entity as any)[this.get_filterField()] = this.get_filterValue();
         }
 
         if (this.onInitNewEntity != null) {
@@ -900,7 +900,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected inplaceCreateClick(e: JQueryEventObject) {
 
         if (this.get_readOnly() &&
-            ((this.isMultiple() && !e['editItem']) || !this.value))
+            ((this.isMultiple() && !(e as any)['editItem']) || !this.value))
             return;
 
         this.createEditDialog(dialog => {
@@ -946,7 +946,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 }
             }, true);
 
-            var editItem = e['editItem'];
+            var editItem = (e as any)['editItem'];
             if (editItem != null) {
                 dialog.load(editItem, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);

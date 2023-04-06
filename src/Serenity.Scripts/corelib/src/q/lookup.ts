@@ -44,7 +44,7 @@ export class Lookup<TItem> {
         var idField = this.idField;
         if (idField) {
             for (var r of this.items) {
-                var v = r[idField];
+                var v = (r as any)[idField];
                 if (v != null) {
                     this.itemById[v] = r;
                 }

@@ -672,7 +672,7 @@ export namespace SlickFormatting {
                 return encode ? htmlEncode(text) : text;
             }
 
-            return itemLinkText(itemType, ctx.item[idField],
+            return itemLinkText(itemType, (ctx.item as any)[idField],
                 (getText == null ? ctx.value : getText(ctx)),
                 (cssClass == null ? '' : cssClass(ctx)), encode);
         };
@@ -743,7 +743,7 @@ export namespace SlickTreeHelper {
     export function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any,
         getParentId: (x: TItem) => any, setCollapsed?: boolean): void {
         var depth = 0;
-        var depths = {};
+        var depths: Record<any, any> = {};
         for (var line = 0; line < items.length; line++) {
             var item = items[line];
             if (line > 0) {
