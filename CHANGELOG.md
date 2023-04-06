@@ -1,3 +1,8 @@
+## 6.6.6 (2023-04-04)
+
+Bugfixes:
+  - Fix empty text can't be used as DisplayName in forms/columns
+
 ## 6.6.5 (2023-04-04)
 
 Bugfixes:
