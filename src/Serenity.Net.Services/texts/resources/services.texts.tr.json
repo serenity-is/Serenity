@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Yüklenen dosya uzantısına ({0}) izin verilmiyor!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Yüklenen dosya uzantısı ({0}) izin verilen uzantılar listesinde değil: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Yüklenen dosyanın virüs taraması yapılırken bir hata oluştu!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Yüklenen resim uzantısı ({0}) biçimiyle ({1}) eşleşmiyor!",
+  "Controls.ImageUpload.InfectedFile": "Yüklenen dosya virüs içerebilir!",
+  "Controls.ImageUpload.InfectedFileOrError": "Yüklenen dosya bir virüs içerebilir veya AV taraması sırasında bir hata oluştu!",
   "Controls.ImageUpload.MaxHeight": "Yüklenen resmin yüksekliği {0} pikselin altında olmalı!",
   "Controls.ImageUpload.MaxWidth": "Yüklenen resmin genişliği {0} pikselin altında olmalıdır!",
   "Controls.ImageUpload.MinHeight": "Yüklenen resmin yüksekliği en az {0} piksel olmalıdır!",

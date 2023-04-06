@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Загрузка файла с расширением '{0}' не разрешена!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Загруженное расширение файла '{0}' отсутствует в списке разрешенных расширений: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Произошла ошибка при сканировании загруженного файла на наличие вирусов!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Загруженное расширение изображения ({0}) не соответствует его формату ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Загруженный файл может содержать вирус!",
+  "Controls.ImageUpload.InfectedFileOrError": "Загруженный файл может содержать вирус или произошла ошибка во время сканирования AV!",
   "Controls.ImageUpload.MaxHeight": "Загруженное изображение должно быть ниже {0} пикселей по высоте!",
   "Controls.ImageUpload.MaxWidth": "Загруженное изображение должно быть меньше {0} пикселей в ширину!",
   "Controls.ImageUpload.MinHeight": "Загруженное изображение должно быть не менее {0} пикселей в высоту!",

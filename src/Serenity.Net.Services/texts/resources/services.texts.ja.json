@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "アップロードされたファイルの拡張子 '{0}' は許可されていません！",
   "Controls.ImageUpload.ExtensionNotAllowed": "アップロードされたファイルの拡張子 '{0}' は許可された拡張子のリストにありません: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "アップロードされたファイルをウイルススキャン中にエラーが発生しました！",
   "Controls.ImageUpload.ImageExtensionMismatch": "アップロードされた画像の拡張子（{0}）は、その形式（{1}）と一致しません！",
+  "Controls.ImageUpload.InfectedFile": "アップロードされたファイルにウイルスが含まれている可能性があります！",
+  "Controls.ImageUpload.InfectedFileOrError": "アップロードされたファイルにはウイルスが含まれる可能性があり、AVスキャン中にエラーが発生しました！",
   "Controls.ImageUpload.MaxHeight": "アップロードされた画像は、高さ{0}ピクセル以下でなければなりません！",
   "Controls.ImageUpload.MaxWidth": "アップロードされた画像は、幅 {0} ピクセル以下である必要があります！",
   "Controls.ImageUpload.MinHeight": "アップロードした画像の高さは、少なくとも{0}ピクセルでなければなりません！",

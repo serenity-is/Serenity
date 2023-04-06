@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Nahrání souboru s příponou '{0}' není povoleno!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Nahraný soubor s příponou '{0}' není v seznamu povolených přípon: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Při skenování nahrávaného souboru na viry došlo k chybě!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Nahraný obrázek ({0}) neodpovídá jeho formátu ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Nahraný soubor může obsahovat vir!",
+  "Controls.ImageUpload.InfectedFileOrError": "Nahraný soubor může obsahovat vir nebo došlo k chybě během AV skenování!",
   "Controls.ImageUpload.MaxHeight": "Nahraný obrázek by měl být pod {0} pixelů výšky!",
   "Controls.ImageUpload.MaxWidth": "Nahraný obrázek by měl být pod {0} pixelů v šířce!",
   "Controls.ImageUpload.MinHeight": "Nahraný obrázek by měl být alespoň {0} pixelů vysoký!",

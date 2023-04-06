@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "업로드된 파일 확장자 '{0}'은 허용되지 않습니다!",
   "Controls.ImageUpload.ExtensionNotAllowed": "업로드 된 파일 확장자 '{0}'은 허용된 확장자 목록에 없습니다: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "업로드 된 파일을 바이러스 스캔하는 동안 오류가 발생했습니다!",
   "Controls.ImageUpload.ImageExtensionMismatch": "업로드 된 이미지 확장자 ({0})가 그 형식 ({1})과 일치하지 않습니다!",
+  "Controls.ImageUpload.InfectedFile": "업로드한 파일에 바이러스가 있을 수 있습니다!",
+  "Controls.ImageUpload.InfectedFileOrError": "업로드한 파일에 바이러스가 있을 수 있거나 AV 스캔 중에 오류가 발생했습니다!",
   "Controls.ImageUpload.MaxHeight": "업로드 된 이미지는 높이 {0} 픽셀 이하여야합니다!",
   "Controls.ImageUpload.MaxWidth": "업로드 된 이미지는 너비 {0} 픽셀 이하여야합니다!",
   "Controls.ImageUpload.MinHeight": "업로드 된 이미지의 높이는 최소 {0} 픽셀 이상이어야합니다!",

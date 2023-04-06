@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "अपलोड की गई फ़ाइल एक्सटेंशन '{0}' की अनुमति नहीं है!",
   "Controls.ImageUpload.ExtensionNotAllowed": "अपलोड की गई फ़ाइल एक्सटेंशन '{0}' अनुमतियों की सूची में नहीं है: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "वायरस के लिए अपलोड की गई फ़ाइल की स्कैनिंग करते समय एक त्रुटि हुई!",
   "Controls.ImageUpload.ImageExtensionMismatch": "अपलोड की गई छवि एक्सटेंशन ({0}) उसके प्रारूप ({1}) के साथ मेल नहीं खाता!",
+  "Controls.ImageUpload.InfectedFile": "अपलोड की गई फ़ाइल में वायरस हो सकता है!",
+  "Controls.ImageUpload.InfectedFileOrError": "अपलोड की गई फ़ाइल में वायरस हो सकता है या AV स्कैन के दौरान त्रुटि हुई!",
   "Controls.ImageUpload.MaxHeight": "अपलोड की गई छवि {0} पिक्सेल ऊंचाई तक होनी चाहिए!",
   "Controls.ImageUpload.MaxWidth": "अपलोड की गई छवि {0} पिक्सेल की चौड़ाई तक होनी चाहिए!",
   "Controls.ImageUpload.MinHeight": "अपलोड की गई छवि की ऊंचाई कम से कम {0} पिक्सेल होनी चाहिए!",

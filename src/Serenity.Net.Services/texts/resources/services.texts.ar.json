@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "تم تحميل ملحق الملف '{0}' غير مسموح به!",
   "Controls.ImageUpload.ExtensionNotAllowed": "تم تحميل ملحق الملف '{0}' ليس في قائمة الملحقات المسموح بها: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "حدث خطأ أثناء فحص الملف المرفوع للفيروسات!",
   "Controls.ImageUpload.ImageExtensionMismatch": "تحميل الصورة المرفقة ({0}) لا يتطابق مع تنسيقها ({1})!",
+  "Controls.ImageUpload.InfectedFile": "قد يحتوي الملف المحمّل على فيروس!",
+  "Controls.ImageUpload.InfectedFileOrError": "قد يحتوي الملف المحمّل على فيروس أو حدث خطأ أثناء فحص AV!",
   "Controls.ImageUpload.MaxHeight": "تحميل الصورة يجب أن تكون تحت {0} بكسل في الارتفاع!",
   "Controls.ImageUpload.MaxWidth": "تحميل الصورة يجب أن تكون تحت {0} بكسل في العرض!",
   "Controls.ImageUpload.MinHeight": "تحميل الصورة يجب أن تكون على الأقل {0} بكسل في الارتفاع!",

@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Încărcarea fișierului cu extensia '{0}' nu este permisă!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Extensia fișierului încărcat '{0}' nu se află în lista extensiilor permise: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "A apărut o eroare în timpul scanării fișierului încărcat pentru viruși!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Extensia de imagine încărcată ({0}) nu se potrivește cu formatul său ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Fișierul încărcat poate conține un virus!",
+  "Controls.ImageUpload.InfectedFileOrError": "Fișierul încărcat poate conține un virus sau a apărut o eroare în timpul scanării antivirus!",
   "Controls.ImageUpload.MaxHeight": "Imaginea încărcată trebuie să fie sub {0} pixeli în înălțime!",
   "Controls.ImageUpload.MaxWidth": "Imaginea încărcată trebuie să fie sub {0} pixeli în lățime!",
   "Controls.ImageUpload.MinHeight": "Imaginea încărcată trebuie să aibă cel puțin {0} pixeli în înălțime!",

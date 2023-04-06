@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "上传的文件扩展名 '{0}' 不允许！",
   "Controls.ImageUpload.ExtensionNotAllowed": "上传的文件扩展名 '{0}' 不在允许的扩展名列表中: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "扫描上传文件时出错！",
   "Controls.ImageUpload.ImageExtensionMismatch": "上传的图像扩展名（{0}）与其格式（{1}）不匹配！",
+  "Controls.ImageUpload.InfectedFile": "上传的文件可能包含病毒！",
+  "Controls.ImageUpload.InfectedFileOrError": "上传的文件可能包含病毒或在 AV 扫描期间发生错误！",
   "Controls.ImageUpload.MaxHeight": "上传的图像应该在{0}像素以下！",
   "Controls.ImageUpload.MaxWidth": "上传的图像应该在宽度{0}像素以下！",
   "Controls.ImageUpload.MinHeight": "上传的图像高度至少为{0}像素！",

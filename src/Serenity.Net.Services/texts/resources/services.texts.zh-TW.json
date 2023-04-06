@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "上傳的檔案副檔名 '{0}' 不被允許！",
   "Controls.ImageUpload.ExtensionNotAllowed": "上傳的檔案副檔名 '{0}' 不在允許的副檔名清單中: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "掃描上傳的檔案時出現錯誤！",
   "Controls.ImageUpload.ImageExtensionMismatch": "上傳的圖像副檔名（{0}）與其格式（{1}）不匹配！",
+  "Controls.ImageUpload.InfectedFile": "上傳的檔案可能包含病毒！",
+  "Controls.ImageUpload.InfectedFileOrError": "上傳的檔案可能包含病毒或在 AV 掃描期間發生錯誤！",
   "Controls.ImageUpload.MaxHeight": "上傳的圖像應該在{0}像素以下！",
   "Controls.ImageUpload.MaxWidth": "上傳的圖片應該在寬度{0}像素以下！",
   "Controls.ImageUpload.MinHeight": "上傳的圖像高度至少為{0}像素！",

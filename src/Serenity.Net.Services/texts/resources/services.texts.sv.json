@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Uppladdning av filändelsen '{0}' är inte tillåten!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Den uppladdade filändelsen '{0}' finns inte i listan över tillåtna filändelser: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Ett fel inträffade vid skanning av den uppladdade filen för virus!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Uppladdad bildfil ({0}) matchar inte dess format ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Uppladdad fil kan innehålla virus!",
+  "Controls.ImageUpload.InfectedFileOrError": "Uppladdad fil kan innehålla ett virus eller ett fel uppstod under AV-skanningen!",
   "Controls.ImageUpload.MaxHeight": "Den uppladdade bilden ska vara under {0} pixlar i höjd!",
   "Controls.ImageUpload.MaxWidth": "Uppladdad bild bör vara under {0} pixlar i bredd!",
   "Controls.ImageUpload.MinHeight": "Den uppladdade bilden ska vara minst {0} pixlar hög!",

@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "پسوند فایل بارگذاری شده '{0}' مجاز نیست!",
   "Controls.ImageUpload.ExtensionNotAllowed": "پسوند فایل بارگذاری شده '{0}' در لیست پسوندهای مجاز وجود ندارد: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "هنگام اسکن فایل آپلود شده برای ویروس، خطایی رخ داده است!",
   "Controls.ImageUpload.ImageExtensionMismatch": "افزونه تصویر بارگذاری شده ({0}) با فرمت آن ({1}) مطابقت ندارد!",
+  "Controls.ImageUpload.InfectedFile": "فایل آپلود شده ممکن است شامل ویروس باشد!",
+  "Controls.ImageUpload.InfectedFileOrError": "فایل آپلود شده ممکن است شامل ویروس یا هنگام اسکن AV خطا رخ داده باشد!",
   "Controls.ImageUpload.MaxHeight": "تصویر بارگذاری شده باید تحت {0} پیکسل در ارتفاع باشد!",
   "Controls.ImageUpload.MaxWidth": "تصویر بارگذاری شده باید تحت {0} پیکسل در عرض باشد!",
   "Controls.ImageUpload.MinHeight": "تصویر بارگذاری شده باید حداقل {0} پیکسل در ارتفاع باشد!",

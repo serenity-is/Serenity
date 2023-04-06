@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Unggahan ekstensi file '{0}' tidak diizinkan!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Ekstensi file yang diunggah '{0}' tidak ada dalam daftar ekstensi yang diizinkan: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Terjadi kesalahan saat memindai file yang diunggah untuk virus!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Unggahan ekstensi gambar ({0}) tidak cocok dengan formatnya ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Berkas yang diunggah mungkin mengandung virus!",
+  "Controls.ImageUpload.InfectedFileOrError": "Berkas yang diunggah mungkin mengandung virus atau terjadi kesalahan selama pemindaian AV!",
   "Controls.ImageUpload.MaxHeight": "Gambar yang diunggah harus di bawah {0} piksel tinggi!",
   "Controls.ImageUpload.MaxWidth": "Gambar yang diunggah harus di bawah {0} piksel dalam lebar!",
   "Controls.ImageUpload.MinHeight": "Gambar yang diunggah harus setidaknya {0} piksel tingginya!",

@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Tải lên tệp mở rộng '{0}' không được phép!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Phần mở rộng của tệp đã tải lên '{0}' không có trong danh sách các phần mở rộng được phép: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Đã xảy ra lỗi khi quét tệp được tải lên để phát hiện virus!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Tập tin hình ảnh tải lên ({0}) không khớp với định dạng của nó ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Tệp đã tải lên có thể chứa virus!",
+  "Controls.ImageUpload.InfectedFileOrError": "Tệp đã tải lên có thể chứa virus hoặc xảy ra lỗi trong quá trình quét AV!",
   "Controls.ImageUpload.MaxHeight": "Hình ảnh đã tải lên phải dưới {0} pixel chiều cao!",
   "Controls.ImageUpload.MaxWidth": "Hình ảnh đã tải lên phải dưới {0} pixel trong chiều rộng!",
   "Controls.ImageUpload.MinHeight": "Hình ảnh được tải lên phải có chiều cao ít nhất là {0} pixel!",

@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Przesłanie pliku o rozszerzeniu '{0}' nie jest dozwolone!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Rozszerzenie przesłanego pliku '{0}' nie znajduje się na liście dozwolonych rozszerzeń: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Wystąpił błąd podczas skanowania przesłanego pliku pod kątem wirusów!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Załadowany rozszerzenie obrazu ({0}) nie pasuje do jego formatu ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Wgrany plik może zawierać wirusa!",
+  "Controls.ImageUpload.InfectedFileOrError": "Wgrany plik może zawierać wirusa lub wystąpił błąd podczas skanowania AV!",
   "Controls.ImageUpload.MaxHeight": "Przesłany obraz powinien być poniżej {0} pikseli wysokości!",
   "Controls.ImageUpload.MaxWidth": "Przesłany obraz powinien być poniżej {0} pikseli w szerokości!",
   "Controls.ImageUpload.MinHeight": "Przesłany obraz powinien mieć co najmniej {0} pikseli wysokości!",

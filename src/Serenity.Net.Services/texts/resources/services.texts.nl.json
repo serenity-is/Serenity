@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "Het uploaden van bestandsextensie '{0}' is niet toegestaan!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Het geüploade bestandsextensie '{0}' staat niet in de lijst met toegestane extensies: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "Er is een fout opgetreden bij het scannen van het geüploade bestand op virussen!",
   "Controls.ImageUpload.ImageExtensionMismatch": "Geüploade afbeeldingsextensie ({0}) komt niet overeen met het formaat ({1})!",
+  "Controls.ImageUpload.InfectedFile": "Het geüploade bestand kan een virus bevatten!",
+  "Controls.ImageUpload.InfectedFileOrError": "Het geüploade bestand kan een virus bevatten of er is een fout opgetreden tijdens het AV-scanproces!",
   "Controls.ImageUpload.MaxHeight": "Geüploade afbeelding moet onder {0} pixels in hoogte zijn!",
   "Controls.ImageUpload.MaxWidth": "Geüploade afbeelding moet onder {0} pixels in breedte zijn!",
   "Controls.ImageUpload.MinHeight": "Geüploade afbeelding moet minstens {0} pixels hoog zijn!",

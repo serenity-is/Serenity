@@ -1,7 +1,10 @@
 {
   "Controls.ImageUpload.ExtensionBlacklisted": "¡La extensión de archivo cargada '{0}' no está permitida!",
   "Controls.ImageUpload.ExtensionNotAllowed": "¡La extensión de archivo cargada '{0}' no está en la lista de extensiones permitidas: '{1}'!",
+  "Controls.ImageUpload.FailedScan": "¡Se produjo un error al escanear el archivo cargado en busca de virus!",
   "Controls.ImageUpload.ImageExtensionMismatch": "La extensión de imagen cargada ({0}) no coincide con su formato ({1})!",
+  "Controls.ImageUpload.InfectedFile": "¡El archivo cargado puede contener un virus!",
+  "Controls.ImageUpload.InfectedFileOrError": "¡El archivo cargado puede contener un virus o se produjo un error durante el análisis de AV!",
   "Controls.ImageUpload.MaxHeight": "¡La imagen cargada debe estar debajo de {0} píxeles de altura!",
   "Controls.ImageUpload.MaxWidth": "¡La imagen subida debe estar bajo {0} píxeles de ancho!",
   "Controls.ImageUpload.MinHeight": "¡La imagen cargada debe tener al menos {0} píxeles de alto!",
