@@ -20,12 +20,6 @@ public interface IUploadFileConstraints : IUploadOptions
     public string? AllowedExtensions { get; }
 
     /// <summary>
-    /// Contains extensions that are considered dangerous / disallowed.
-    /// Default is ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;.dll;.jar;.jsp;.htaccess;.htpasswd;.html;.htm;.lnk;.php;.ps1;.vbe;.vbs"
-    /// </summary>
-    public string? ExtensionBlacklist { get; }
-
-    /// <summary>
     /// Semicolon separated list of image extensions. The default list is 
     /// ".gif;.jpg;.jpeg;.png;"
     /// If specified, only these set of file extensions are considered

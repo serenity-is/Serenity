@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 
 namespace Serenity.ComponentModel;
 
@@ -146,12 +146,8 @@ public abstract class BaseUploadEditorAttribute : CustomEditorAttribute,
     /// <inheritdoc/>
     public string? FilenameFormat { get; set; }
 
-
     /// <inheritdoc/>
     public string? AllowedExtensions { get; set; }
-
-    /// <inheritdoc/>
-    public string? ExtensionBlacklist { get; set; } = UploadOptions.DefaultExtensionBlacklist;
 
     /// <inheritdoc/>
     public string? ImageExtensions { get; set; } = UploadOptions.DefaultImageExtensions;

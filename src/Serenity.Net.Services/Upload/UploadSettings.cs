@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Serenity.Web;
 
@@ -12,6 +12,22 @@ public class UploadSettings : IOptions<UploadSettings>
     /// The default section key in appsettings.json
     /// </summary>
     public const string SectionKey = "UploadSettings";
+
+    /// <summary>
+    /// List of blacklisted extensions;
+    /// </summary>
+    public string ExtensionBlacklist { get; set; } = ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;" +
+        ".dll;.jar;.jsp;.htm;.html;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs";
+
+    /// <summary>
+    /// List of whitelisted extensions; Even if an extension is in this list,
+    /// it won't be allowed if it is also in the ExtensionBlacklist
+    /// </summary>
+    public string ExtensionWhitelist { get; set; } = 
+        ".3gp;.7z;.ai;.avi;.bmp;.csv;.doc;.docx;.eps;.jpg;.jpeg;.json;" + 
+        ".gif;.gz;.ico;.mpg;.mpeg;.mp3;.mp4;.mkv;.pdf;.png;.ppt;.pptx;.psd;" +
+        ".rar;.rtf;.svg;.tif;.tiff;.txt;.wav;.webm;.webp;.xls;.xlsx;.xml;" + 
+        ".xps;.zip;";
 
     /// <summary>
     /// Root path for uploads, default is "App_Data/upload/"

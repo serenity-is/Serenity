@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using System.IO;
 
 namespace Serenity.Web;
@@ -9,6 +10,7 @@ public class DefaultUploadValidator : IUploadValidator
 {
     private readonly IImageProcessor imageProcessor;
     private readonly ITextLocalizer localizer;
+    private readonly IOptions<UploadSettings> uploadSettings;
     private readonly IExceptionLogger logger;
 
     /// <summary>
@@ -16,12 +18,16 @@ public class DefaultUploadValidator : IUploadValidator
     /// </summary>
     /// <param name="imageProcessor">Image processor</param>
     /// <param name="localizer">Text localizer</param>
+    /// <param name="uploadSettings">Upload settings</param>
     /// <param name="logger">Exception logger</param>
     /// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
-    public DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer, IExceptionLogger logger = null)
+    public DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer, 
+        IExceptionLogger logger = null,
+        IOptions<UploadSettings> uploadSettings = null)
     {
         this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
         this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+        this.uploadSettings = uploadSettings ?? new UploadSettings();
         this.logger = logger;
     }
 
@@ -41,10 +47,15 @@ public class DefaultUploadValidator : IUploadValidator
         isImageExtension = false;
         var fileExtension = Path.GetExtension(filename);
 
-        if ((constraints.ExtensionBlacklist ?? UploadOptions.DefaultExtensionBlacklist)
-            .Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-            .Any(x => string.Equals(x.Trim(), fileExtension, StringComparison.OrdinalIgnoreCase) ||
-                (x.Trim() == "." && string.IsNullOrEmpty(fileExtension))))
+        var extensionBlacklist = uploadSettings.Value.ExtensionBlacklist;
+        if (IsExtensionInTheList(extensionBlacklist, fileExtension))
+            throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                UploadTexts.Controls.ImageUpload.ExtensionBlacklisted.ToString(localizer),
+                fileExtension));
+
+        var extensionWhitelist = uploadSettings.Value.ExtensionWhitelist;
+        if (!string.IsNullOrEmpty(extensionWhitelist) &&
+            !IsExtensionInTheList(extensionWhitelist, fileExtension))
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
                 UploadTexts.Controls.ImageUpload.ExtensionBlacklisted.ToString(localizer),
                 fileExtension));
@@ -61,16 +72,12 @@ public class DefaultUploadValidator : IUploadValidator
                 UploadFormatting.FileSizeDisplay(constraints.MaxSize)));
 
         var allowedExtensions = constraints.AllowedExtensions;
-        if (!string.IsNullOrEmpty(allowedExtensions))
+        if (!string.IsNullOrEmpty(allowedExtensions) &&
+            !IsExtensionInTheList(allowedExtensions, fileExtension))
         {
-            if (!allowedExtensions.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim())
-                .Any(x => string.Equals(x, fileExtension, StringComparison.OrdinalIgnoreCase)))
-            {
-                throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    UploadTexts.Controls.ImageUpload.ExtensionNotAllowed.ToString(localizer),
-                    fileExtension, constraints.AllowedExtensions));
-            }
+            throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
+                UploadTexts.Controls.ImageUpload.ExtensionNotAllowed.ToString(localizer),
+                fileExtension, constraints.AllowedExtensions));
         }
 
         var imageExtensions = constraints.ImageExtensions ?? UploadOptions.DefaultImageExtensions;
@@ -92,6 +99,28 @@ public class DefaultUploadValidator : IUploadValidator
         }
 
         isImageExtension = true;
+    }
+
+    private static readonly char[] extSep = new char[] { ',', ';' };
+
+    private bool IsExtensionInTheList(string extensionList, string extension)
+    {
+        if (string.IsNullOrEmpty(extensionList))
+            return false;
+
+        extension = extension?.Trim();
+
+        foreach (var x in extensionList.Split(extSep, StringSplitOptions.RemoveEmptyEntries))
+        {
+            string ext = x.Trim();
+            if (ext == "." && string.IsNullOrEmpty(extension))
+                return true;
+
+            if (string.Equals(ext, extension, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
