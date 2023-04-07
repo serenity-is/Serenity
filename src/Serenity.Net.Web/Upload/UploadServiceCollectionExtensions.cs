@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -27,6 +27,7 @@ public static class UploadServiceCollectionExtensions
         collection.TryAddSingleton<IUploadValidator, DefaultUploadValidator>();
         collection.TryAddSingleton<IImageProcessor, DefaultImageProcessor>();
         collection.TryAddSingleton<IUploadProcessor, DefaultUploadProcessor>();
+        collection.TryAddSingleton<IUploadFileResponder, DefaultUploadFileResponder>();
     }
 
     /// <summary>
