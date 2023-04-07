@@ -1,3 +1,11 @@
+## 6.7.1 (2023-04-07)
+
+Features:
+  - Added IUploadFileResponder interface, whose default implementation will only send text/plain, application/pdf, and ones whose mime type starting with image/ as inline, and rest as application/octet-stream with content-disposition attachment for security purposes. Please use it in your FilePage.cs Read method. See the latest `FilePage.cs` in StartSharp/Serene repository.
+  - [BREAKING CHANGE] moving ExtensionBlacklist to UploadSettings from IUploadOptions. Added an ExtensionWhitelist that only allows usual extensions by default (.3gp;.7z;.ai;.avi;.bmp;.csv;.doc;.docx;.eps;.jpg;.jpeg;.json;.gif;.gz;.ico;.mpg;.mpeg;.mp3;.mp4;.mkv;.pdf;.png;.ppt;.pptx;.psd;.rar;.rtf;.svg;.tif;.tiff;.txt;.wav;.webm;.webp;.xls;.xlsx;.xml;.xps;.zip;). You'll need to override them in appsettings.json if you need more extensions (UploadSettings:ExtensionWhitelist, UploadSettings:ExtensionBlacklist)
+  - updated missing translations in Serene/StartSharp/Serenity
+  - use ASP.NET Core's FileExtensionContentTypeProvider instead of manually listing known mime types
+
 ## 6.7.0 (2023-04-06)
 
 Features:
