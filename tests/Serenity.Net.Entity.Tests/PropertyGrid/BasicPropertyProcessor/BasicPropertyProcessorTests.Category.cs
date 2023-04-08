@@ -101,14 +101,22 @@ public partial class BasicPropertyProcessorTests
         [Category("ID")]
         public string SomeID { get; set; }
 
+        [Category("")]
+        public string Empty { get; set; }
+
         [Category("Date of Birth")]
         public string DOB { get; set; }
+
+        [Category(null)]
+        public string Null { get; set; }
     }
 
     [Theory]
     [InlineData(nameof(CategoryWithRegularText.StartDate), "Starting Date")]
     [InlineData(nameof(CategoryWithRegularText.SomeID), "ID")]
     [InlineData(nameof(CategoryWithRegularText.DOB), "Date of Birth")]
+    [InlineData(nameof(CategoryWithRegularText.Empty), "")]
+    [InlineData(nameof(CategoryWithRegularText.Null), null)]
     public void Category_Should_Use_CategoryAttribute_With_Regular_Text_AsIs(
         string propertyName, string category)
     {
@@ -120,7 +128,8 @@ public partial class BasicPropertyProcessorTests
 
         processor.Process(source, item);
 
-        Assert.Equal($"Forms.{typeof(CategoryWithRegularText).FullName}.Categories.{category}",
+        Assert.Equal(string.IsNullOrEmpty(category) ? category : 
+            $"Forms.{typeof(CategoryWithRegularText).FullName}.Categories.{category}",
             item.Category);
     }
 
@@ -175,6 +184,11 @@ public partial class BasicPropertyProcessorTests
         public string RowOnly { get; set; }
 
         public string RowOnlyTextKey { get; set; }
+
+        [Category("Category Before")]
+        public string CategoryBefore { get; set; }
+        [Category("")]
+        public string CategoryEmpty { get; set; }
     }
 
     [Theory]
@@ -185,6 +199,8 @@ public partial class BasicPropertyProcessorTests
     [InlineData("FormOverrideTextKey", "Site.FormCustomTextKeyOverride")]
     [InlineData("RowOnly", "Db.MyRow.Categories.R")]
     [InlineData("RowOnlyTextKey", "Site.CustomRowOnlyTextKey")]
+    [InlineData("CategoryBefore", "Forms.MyForm.Categories.Category Before")]
+    [InlineData("CategoryEmpty", "")]
     public void Category_Should_Use_Row_Properties_If_Available(string propertyName,
         string key)
     {
