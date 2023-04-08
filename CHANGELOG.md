@@ -35,7 +35,7 @@ Bugfixes:
 ## 6.6.4 (2023-04-03)
 
 Features:
-  - Added default support for new languages including Arabic, Bengalese, Czech, French, Hindi, Indonesian, Japanese, Korean, Dutch, Romanian, Swedish, Chinese Traditional. Used machine translation for all these languages in addition to the existing languages. As these may not always be the best possible translations, any pull requests with improved texts are welcome.
+  - Added default support for new languages including Arabic, Bangla, Czech, French, Hindi, Indonesian, Japanese, Korean, Dutch, Romanian, Swedish, Chinese Traditional. Used machine translation for all these languages in addition to the existing languages. As these may not always be the best possible translations, any pull requests with improved texts are welcome.
   - Used embedded resources under texts/resources folder for JSON translation files instead of static web assets under wwwroot/texts as these files are not meant to be directly accessed via web. This will also reduce number of published files, and simplify deployment.
   - Introduced quick filter option in Translations page to show/hide user translated and text that has any translation in the target language. There are also buttons to export translated values / original values to make translation easier. Each translation resource folder also contains a template JSON file in English language that can be used as source.
   - ITypeSource may return its assemblies if available via the new IGetAssemblies interface
