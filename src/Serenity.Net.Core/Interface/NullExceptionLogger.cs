@@ -1,8 +1,9 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Null exception logger that logs nothing
 /// </summary>
+[Obsolete("Please log exceptions directly via .NET's ILogger interface")]
 public class NullExceptionLogger : IExceptionLogger
 {
     private NullExceptionLogger()

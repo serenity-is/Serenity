@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
@@ -9,19 +9,17 @@ namespace Serenity.Web;
 public class UploadProcessor : ProcessedUploadInfo
 {
     private readonly IUploadStorage storage;
-    private readonly IExceptionLogger logger;
 
     /// <summary>
     /// Creates a new instance of the class
     /// </summary>
     /// <param name="storage">Upload storage</param>
-    /// <param name="logger">Exception logger</param>
+    /// <param name="_">Exception logger, not used.</param>
     /// <exception cref="ArgumentNullException">Storage is null</exception>
-    public UploadProcessor(IUploadStorage storage, IExceptionLogger logger = null)
+    public UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null)
     {
         ThumbBackColor = null;
         this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        this.logger = logger;
     }
 
     /// <summary>
@@ -75,7 +73,7 @@ public class UploadProcessor : ProcessedUploadInfo
 
         var imageProcessor = new DefaultImageProcessor();
         var uploadProcessor = new DefaultUploadProcessor(new DefaultImageProcessor(),
-            storage, new DefaultUploadValidator(imageProcessor, localizer, logger), logger);
+            storage, new DefaultUploadValidator(imageProcessor, localizer));
 
         var result = uploadProcessor.Process(fileContent, "___tempfile__" + extension, options);
         ErrorMessage = result.ErrorMessage;

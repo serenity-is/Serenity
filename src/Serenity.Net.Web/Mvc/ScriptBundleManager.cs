@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Serenity.Web;
@@ -21,7 +22,7 @@ public class ScriptBundleManager : IScriptBundleManager
     private readonly IDynamicScriptManager scriptManager;
     private readonly IWebHostEnvironment hostEnvironment;
     private readonly IHttpContextAccessor contextAccessor;
-    private readonly IExceptionLogger logger;
+    private readonly ILogger<ScriptBundleManager> logger;
     private readonly ScriptBundlingOptions options;
 
     [ThreadStatic]
@@ -34,10 +35,10 @@ public class ScriptBundleManager : IScriptBundleManager
     /// <param name="scriptManager">Dynamic script manager</param>
     /// <param name="hostEnvironment">Web host environment</param>
     /// <param name="contextAccessor">HTTP context accessor</param>
-    /// <param name="logger">Exception logger</param>
+    /// <param name="logger">Logger</param>
     /// <exception cref="ArgumentNullException">One of arguments is null</exception>
     public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
+        IHttpContextAccessor contextAccessor = null, ILogger<ScriptBundleManager> logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
@@ -167,7 +168,7 @@ public class ScriptBundleManager : IScriptBundleManager
                                     }
                                     catch (Exception ex)
                                     {
-                                        ex.Log(logger);
+                                        logger?.LogError(ex, "Error minifying script: {script}", scriptName);
                                     }
                                 }
 
@@ -231,7 +232,7 @@ public class ScriptBundleManager : IScriptBundleManager
                             }
                             catch (Exception ex)
                             {
-                                ex.Log(logger);
+                                logger?.LogError(ex, "Error minifying script: {script}", sourceFile);
                                 return code;
                             }
                         }

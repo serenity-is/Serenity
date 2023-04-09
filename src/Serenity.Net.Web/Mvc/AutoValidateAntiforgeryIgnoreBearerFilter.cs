@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,7 +11,6 @@ namespace Serenity.Web;
 
 internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFilter, IAntiforgeryPolicy
 {
-    private const string NotMostEffectiveFilter = "NotMostEffectiveFilter: {interface}";
     private const string AntiforgeryTokenInvalid = "Skipping the execution of current filter as its not the most effective filter implementing the policy {FilterPolicy}.";
 
     private readonly IAntiforgery antiforgery;
@@ -35,7 +34,6 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
         if (!context.IsEffectivePolicy<IAntiforgeryPolicy>(this))
         {
-            logger.LogWarning(NotMostEffectiveFilter, nameof(IAntiforgeryPolicy));
             return;
         }
 

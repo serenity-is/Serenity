@@ -1,8 +1,9 @@
-﻿namespace Serenity.Abstractions;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Exception logger abstraction
 /// </summary>
+[Obsolete("Please log exceptions directly via .NET's ILogger interface")]
 public interface IExceptionLogger
 {
     /// <summary>

@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Serenity.Web;
@@ -21,7 +22,7 @@ public class CssBundleManager : ICssBundleManager
     private readonly IDynamicScriptManager scriptManager;
     private readonly IWebHostEnvironment hostEnvironment;
     private readonly IHttpContextAccessor contextAccessor;
-    private readonly IExceptionLogger logger;
+    private readonly ILogger<CssBundleManager> logger;
     private readonly CssBundlingOptions options;
 
     [ThreadStatic]
@@ -37,7 +38,7 @@ public class CssBundleManager : ICssBundleManager
     /// <param name="logger">Exception logger</param>
     /// <exception cref="ArgumentNullException"></exception>
     public CssBundleManager(IOptions<CssBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor contextAccessor = null, IExceptionLogger logger = null)
+        IHttpContextAccessor contextAccessor = null, ILogger<CssBundleManager> logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
@@ -183,7 +184,7 @@ public class CssBundleManager : ICssBundleManager
                                     }
                                     catch (Exception ex)
                                     {
-                                        ex.Log(logger);
+                                        logger?.LogError(ex, "Error while minifying {script}", scriptName);
                                     }
                                 }
 
@@ -246,7 +247,7 @@ public class CssBundleManager : ICssBundleManager
                                 }
                                 catch (Exception ex)
                                 {
-                                    ex.Log(logger);
+                                    logger?.LogError(ex, "Error minifying CSS: {sourceFile}", sourceFile);
                                 }
                             }
                         }

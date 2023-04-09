@@ -1,4 +1,5 @@
 
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace Serenity.Web;
@@ -11,7 +12,7 @@ public class DefaultUploadProcessor : IUploadProcessor
     private readonly IImageProcessor imageProcessor;
     private readonly IUploadStorage uploadStorage;
     private readonly IUploadValidator uploadValidator;
-    private readonly IExceptionLogger logger;
+    private readonly ILogger<DefaultUploadProcessor> logger;
     private readonly IUploadAVScanner avScanner;
 
     /// <summary>
@@ -20,11 +21,11 @@ public class DefaultUploadProcessor : IUploadProcessor
     /// <param name="imageProcessor">Image processor</param>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="uploadValidator">Upload validator</param>
-    /// <param name="logger">Exception logger</param>
+    /// <param name="logger">Logger</param>
     /// <param name="avScanner">Optional antivirus scanner</param>
     /// <exception cref="ArgumentNullException"></exception>
     public DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
-        IExceptionLogger logger = null,
+        ILogger<DefaultUploadProcessor> logger = null,
         IUploadAVScanner avScanner = null)
     {
         this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
@@ -94,7 +95,7 @@ public class DefaultUploadProcessor : IUploadProcessor
             {
                 result.ErrorMessage = ex.Message;
                 result.Success = false;
-                ex.Log(logger);
+                logger?.LogError(ex, "Error occured while processing upload!");
             }
         }
         finally

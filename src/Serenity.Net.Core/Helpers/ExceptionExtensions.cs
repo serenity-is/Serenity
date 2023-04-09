@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Exception data extensions
@@ -24,6 +24,7 @@ public static class ExceptionExtensions
     /// <param name="exception">Exception</param>
     /// <param name="logger">Logger</param>
     /// <param name="category">Optional category</param>
+    [Obsolete("Please log exceptions directly via .NET's ILogger interface")]
     public static void Log(this Exception exception, IExceptionLogger logger, string? category = null)
     {
         try

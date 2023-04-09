@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace Serenity.Web;
@@ -16,12 +17,12 @@ public class ImageChecker
     /// <param name="image">When method returns contains the image object. 
     /// If returnImage false it will contain null</param>
     /// <param name="formatInfo">Contains image format info on return</param>
-    /// <param name="exLogger">Exception logger</param>
+    /// <param name="logger">Logger</param>
     /// <returns>Image validation result. One of <see cref="ImageCheckResult"/> values. 
     /// If the result is one of GIFImage, JPEGImage, PNGImage, the checking is successful. 
     /// Rest of results are invalid.</returns>
     public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage,
-        out object image, out ImageFormatInfo formatInfo, IExceptionLogger exLogger = null)
+        out object image, out ImageFormatInfo formatInfo, ILogger logger = null)
     {
         if (inputStream is null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -50,7 +51,7 @@ public class ImageChecker
         }
         catch (Exception ex)
         {
-            ex.Log(exLogger);
+            logger?.LogError(ex, "Error seeking input stream");
             return ImageCheckResult.StreamReadError;
         }
 
@@ -73,7 +74,7 @@ public class ImageChecker
         }
         catch (Exception ex)
         {
-            ex.Log(exLogger);
+            logger?.LogError(ex, "Error loading image");
 
             // couldn't load image
             return ImageCheckResult.InvalidImage;

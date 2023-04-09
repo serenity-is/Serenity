@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
 
@@ -11,7 +12,7 @@ public class DefaultUploadValidator : IUploadValidator
     private readonly IImageProcessor imageProcessor;
     private readonly ITextLocalizer localizer;
     private readonly IOptions<UploadSettings> uploadSettings;
-    private readonly IExceptionLogger logger;
+    private readonly ILogger<DefaultUploadValidator> logger;
 
     /// <summary>
     /// Creates a new instance of the class
@@ -22,7 +23,7 @@ public class DefaultUploadValidator : IUploadValidator
     /// <param name="logger">Exception logger</param>
     /// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
     public DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer, 
-        IExceptionLogger logger = null,
+        ILogger<DefaultUploadValidator> logger = null,
         IOptions<UploadSettings> uploadSettings = null)
     {
         this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
@@ -149,8 +150,8 @@ public class DefaultUploadValidator : IUploadValidator
                 MaxHeight = constraints.MaxHeight
             };
 
-            ImageCheckResult result = checker.CheckStream(stream, imageProcessor, returnImage: true, out var imageObj,
-                out var formatInfo, logger);
+            ImageCheckResult result = checker.CheckStream(stream, imageProcessor, returnImage: true, 
+                out var imageObj, out var formatInfo, logger);
 
             image = imageObj;
 

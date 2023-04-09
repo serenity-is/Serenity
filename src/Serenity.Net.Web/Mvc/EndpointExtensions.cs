@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Serenity.Services;
@@ -21,7 +22,7 @@ public static class EndpointExtensions
         where TResponse : ServiceResponse, new()
     {
         return ConvertToResponse<TResponse>(exception,
-            httpContext?.RequestServices?.GetService<IExceptionLogger>(),
+            httpContext?.RequestServices?.GetService<ILogger<ServiceEndpoint>>(),
             httpContext?.RequestServices?.GetService<ITextLocalizer>(),
             string.Equals(httpContext?.RequestServices.GetService<IWebHostEnvironment>()?
                 .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase));
@@ -35,11 +36,11 @@ public static class EndpointExtensions
     /// <param name="logger">Exception logger</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="showDetails">True to show details</param>
-    public static TResponse ConvertToResponse<TResponse>(this Exception exception, IExceptionLogger logger, 
+    public static TResponse ConvertToResponse<TResponse>(this Exception exception, ILogger logger, 
         ITextLocalizer localizer, bool showDetails)
         where TResponse: ServiceResponse, new()
     {
-        exception.Log(logger);
+        logger?.LogError(exception, "Error occured during service request!");
 
         var response = new TResponse();
         
