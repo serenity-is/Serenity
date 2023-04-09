@@ -45,7 +45,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
             }
             catch (AntiforgeryValidationException exception)
             {
-                logger.LogWarning(exception, AntiforgeryTokenInvalid, exception.Message);
+                logger?.LogWarning(exception, AntiforgeryTokenInvalid, exception.Message);
                 context.Result = new AntiforgeryValidationFailedResult();
             }
         }
