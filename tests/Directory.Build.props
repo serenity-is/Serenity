@@ -1,8 +1,9 @@
-﻿<Project>
+<Project>
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>  
     <IsPackable>false</IsPackable>
     <RootNamespace>Serenity.Tests</RootNamespace>
+    <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
