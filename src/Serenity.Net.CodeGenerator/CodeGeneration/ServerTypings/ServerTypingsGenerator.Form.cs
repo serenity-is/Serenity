@@ -1,4 +1,4 @@
-﻿#if !ISSOURCEGENERATOR
+#if !ISSOURCEGENERATOR
 using Mono.Cecil.Cil;
 #endif
 using Microsoft.CodeAnalysis;
@@ -379,14 +379,17 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         var typeNumber = new Dictionary<string, int>();
                         foreach (var s in propertyTypes)
                         {
-                            if (!typeNumber.ContainsKey(s))
+                            var typeName = s;
+                            SplitGenericArguments(ref typeName);
+
+                            if (!typeNumber.ContainsKey(typeName))
                             {
                                 cw.Indented("var w");
                                 sb.Append(typeNumber.Count);
                                 sb.Append(" = ");
-                                sb.Append(s);
+                                sb.Append(typeName);
                                 sb.AppendLine(";");
-                                typeNumber[s] = typeNumber.Count;
+                                typeNumber[typeName] = typeNumber.Count;
                             }
                         }
                         sb.AppendLine();
