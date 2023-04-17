@@ -415,7 +415,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                                 cw.Indented("'");
                                 sb.Append(propertyNames[i]);
                                 sb.Append("', w");
-                                sb.Append(typeNumber[propertyTypes[i]]);
+                                var typeName = propertyTypes[i];
+                                SplitGenericArguments(ref typeName);
+                                sb.Append(typeNumber[typeName]);
                                 sb.Append("");
                             }
 
