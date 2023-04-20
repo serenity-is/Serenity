@@ -59,7 +59,7 @@ export const esbuildOptions = (opt) => {
         }
 
         if (globs == null && !entryPointsRegEx) {
-            globs = ['Modules/**/*Page.ts', 'Modules/**/ScriptInit.ts'];
+            globs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts'];
         }
 
         if (globs != null) {
