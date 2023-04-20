@@ -73,6 +73,7 @@ export * from "./ui/datagrid/treegridmixin";
 export * from "./ui/editors/checktreeeditor";
 export * from "./ui/datagrid/entitygrid";
 export * from "./ui/dialogs/entitydialog";
+export * from "./ui/widgets/jsx";
 
 // legacy
 export * from "./ui/widgets/reporting";

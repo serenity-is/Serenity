@@ -24,16 +24,18 @@
       "@serenity-is/corelib/slick": ["../src/slick"]
     },
     "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
     "lib": [
       "ES5",
       "ES2015",
       "DOM"
     ],
     "noEmitHelpers": false,
-    "jsx": "react"
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "include": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }

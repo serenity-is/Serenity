@@ -12,6 +12,7 @@
     "jest-environment-jsdom": "29.3.1",
     "jest_workaround": "0.69.0",
     "jquery": "3.6.1",
+    "jsx-dom": "8.0.5",
     "rollup": "2.79.1",
     "rollup-plugin-dts": "4.2.3",
     "terser": "5.16.0",
