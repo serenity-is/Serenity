@@ -62,7 +62,7 @@ function _widgetFactory(this: any, props: any) {
     return widget.element[0];
 }
 
-type WidgetProps<P> = P & {
+type JsxDomWidgetProps<P> = P & {
     children?: any | undefined,
     required?: boolean,
     id?: string,
@@ -76,12 +76,12 @@ type WidgetProps<P> = P & {
     value?: any,
 }
 
-interface WidgetFactory<P = {}, TElement extends Element = HTMLElement> {
-    (props: WidgetProps<P>, context?: any): TElement | null
+interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
+    (props: JsxDomWidgetProps<P>, context?: any): TElement | null
 }
 
 export function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(
-    type: new (element: JQuery, options?: TOptions) => TWidget): WidgetFactory<TOptions & { ref?: (r: TWidget) => void }> {
+    type: new (element: JQuery, options?: TOptions) => TWidget): JsxDomWidget<TOptions & { ref?: (r: TWidget) => void }> {
     return _widgetFactory.bind(type);
 }
 
