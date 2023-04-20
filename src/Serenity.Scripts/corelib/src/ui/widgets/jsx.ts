@@ -1,6 +1,6 @@
 ﻿import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget } from "./widget";
+import { Widget, WidgetComponentProps } from "./widget";
 
 function _widgetFactory(this: any, props: any) {
 
@@ -62,18 +62,9 @@ function _widgetFactory(this: any, props: any) {
     return widget.element[0];
 }
 
-type JsxDomWidgetProps<P> = P & {
-    children?: any | undefined,
-    required?: boolean,
-    id?: string,
-    name?: string,
-    placeholder?: string,
-    class?: string,
-    maxLength?: number,
-    oneWay?: number,
-    readOnly?: boolean,
-    setOptions?: any,
-    value?: any,
+type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
+    children?: any | undefined;
+    class?: string;
 }
 
 interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
