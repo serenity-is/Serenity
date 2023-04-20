@@ -4766,23 +4766,14 @@ declare namespace Serenity {
         protected getFallbackTemplate(): string;
     }
 
-    type WidgetProps<P> = P & {
+    type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
         children?: any | undefined;
-        required?: boolean;
-        id?: string;
-        name?: string;
-        placeholder?: string;
         class?: string;
-        maxLength?: number;
-        oneWay?: number;
-        readOnly?: boolean;
-        setOptions?: any;
-        value?: any;
     };
-    interface WidgetFactory<P = {}, TElement extends Element = HTMLElement> {
-        (props: WidgetProps<P>, context?: any): TElement | null;
+    interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
+        (props: JsxDomWidgetProps<P>, context?: any): TElement | null;
     }
-    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: new (element: JQuery, options?: TOptions) => TWidget): WidgetFactory<TOptions & {
+    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: new (element: JQuery, options?: TOptions) => TWidget): JsxDomWidget<TOptions & {
         ref?: (r: TWidget) => void;
     }>;
 
