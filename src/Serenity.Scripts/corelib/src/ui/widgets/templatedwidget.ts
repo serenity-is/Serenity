@@ -128,12 +128,14 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         this.element.html(widgetMarkup);
     }
 
-    protected useIdPrefix(): { [key: string]: string; Form: string; Tabs: string; Toolbar: string; PropertyGrid: string; } {
+    protected useIdPrefix(): IdPrefixType {
         return useIdPrefix(this.idPrefix);
     }
 }
 
-export function useIdPrefix(prefix: string): { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string } {
+type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
+
+export function useIdPrefix(prefix: string): IdPrefixType {
     return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
 }
 
@@ -142,6 +144,6 @@ const idPrefixHandler = {
         if (p.startsWith('#'))
             return '#' + target._ + p.substring(1);
 
-        return this + p;
+        return target._ + p;
     }
 };

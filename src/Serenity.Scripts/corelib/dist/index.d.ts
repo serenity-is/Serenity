@@ -521,21 +521,16 @@ declare class TemplatedWidget<TOptions> extends Widget<TOptions> {
     protected getFallbackTemplate(): string;
     protected getTemplate(): string;
     protected renderContents(): void;
-    protected useIdPrefix(): {
-        [key: string]: string;
-        Form: string;
-        Tabs: string;
-        Toolbar: string;
-        PropertyGrid: string;
-    };
+    protected useIdPrefix(): IdPrefixType;
 }
-declare function useIdPrefix(prefix: string): {
+type IdPrefixType = {
     [key: string]: string;
     Form: string;
     Tabs: string;
     Toolbar: string;
     PropertyGrid: string;
 };
+declare function useIdPrefix(prefix: string): IdPrefixType;
 
 declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected tabs: JQuery;
