@@ -672,7 +672,7 @@ declare class InvalidCastException extends Exception {
 }
 
 declare function validatorAbortHandler(validator: any): void;
-declare function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
+declare function validateOptions(options?: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
 
 declare function loadValidationErrorMessages(): void;
 declare function getHighlightTarget(el: HTMLElement): HTMLElement;

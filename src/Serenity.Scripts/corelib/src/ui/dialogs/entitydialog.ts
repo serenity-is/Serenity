@@ -902,6 +902,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         list.push({
             title: localText('Controls.EntityDialog.SaveButton'),
+            action: 'save-and-close',
             cssClass: 'save-and-close-button',
             icon: 'fa-check-circle text-purple',
             hotkey: 'alt+s',
@@ -917,6 +918,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         list.push({
             title: '',
             hint: localText('Controls.EntityDialog.ApplyChangesButton'),
+            action: 'apply-changes',
             cssClass: 'apply-changes-button',
             icon: 'fa-clipboard-check text-purple',
             hotkey: 'alt+a',
@@ -957,6 +959,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         list.push({
             title: localText('Controls.EntityDialog.UndeleteButton'),
+            action: 'undo-delete',
             cssClass: 'undo-delete-button',
             onClick: () => {
                 if (this.isDeleted()) {
@@ -972,6 +975,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         if (this.useViewMode()) {
             list.push({
                 title: localText('Controls.EntityDialog.EditButton'),
+                action: 'delete',
                 cssClass: 'edit-button',
                 icon: 'fa-edit',
                 onClick: () => {
@@ -989,12 +993,14 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         list.push({
             title: localText('Controls.EntityDialog.LocalizationButton'),
+            action: 'localization',
             cssClass: 'localization-button',
             onClick: () => this.localizationButtonClick()
         });
 
         list.push({
             title: localText('Controls.EntityDialog.CloneButton'),
+            action: 'clone',
             cssClass: 'clone-button',
             icon: 'fa-clone',
             onClick: () => {

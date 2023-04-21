@@ -3,6 +3,7 @@ import { htmlEncode, isEmptyOrNull, startsWith } from "@serenity-is/corelib/q";
 import { Widget } from "./widget";
 
 export interface ToolButton {
+    action?: string;
     title?: string;
     hint?: string;
     cssClass?: string;
@@ -133,6 +134,9 @@ export class Toolbar extends Widget<ToolbarOptions> {
         var btn = $('<div class="tool-button"><div class="button-outer">' +
             '<span class="button-inner"></span></div></div>')
             .appendTo(container);
+
+        if (b.action != null)
+            btn.attr('data-action', b.action);
 
         if (b.separator === 'right' || b.separator === 'both') {
             $('<div class="separator"></div>').appendTo(container);

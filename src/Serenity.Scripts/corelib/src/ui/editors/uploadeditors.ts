@@ -92,6 +92,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
         return [
             {
                 title: this.addFileButtonText(),
+                action: 'add-file',
                 cssClass: 'add-file-button',
                 onClick: function () {
                 }
@@ -99,6 +100,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
             {
                 title: '',
                 hint: localText('Controls.ImageUpload.DeleteButtonHint'),
+                action: 'delete',
                 cssClass: 'delete-button',
                 onClick: () => {
                     this.entity = null;
@@ -349,6 +351,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     protected getToolButtons(): ToolButton[] {
         return [{
             title: this.addFileButtonText(),
+            action: 'add-file',
             cssClass: 'add-file-button',
             onClick: function () {
             }

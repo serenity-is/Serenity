@@ -468,6 +468,7 @@ declare global {
 }
 
 interface ToolButton {
+    action?: string;
     title?: string;
     hint?: string;
     cssClass?: string;

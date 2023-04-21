@@ -1074,7 +1074,7 @@ declare namespace Q {
     }
 
     function validatorAbortHandler(validator: any): void;
-    function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
+    function validateOptions(options?: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
 
     function loadValidationErrorMessages(): void;
     function getHighlightTarget(el: HTMLElement): HTMLElement;
@@ -2886,6 +2886,7 @@ declare namespace Serenity {
     }
 
     interface ToolButton {
+        action?: string;
         title?: string;
         hint?: string;
         cssClass?: string;

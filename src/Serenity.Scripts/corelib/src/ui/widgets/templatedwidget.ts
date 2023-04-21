@@ -8,7 +8,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
     private static templateNames: { [key: string]: string } = {};
 
     protected byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id);
+        return $('#' + this.idPrefix + id, this.element);
     }
 
     private byID<TWidget>(id: string, type: { new (...args: any[]): TWidget }) {
