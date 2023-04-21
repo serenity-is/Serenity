@@ -13,38 +13,50 @@ export function clearOptions(select: JQuery) {
     select.html('');
 }
 
-export function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery {
+export function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery {
 
-    var context = element?.length ? element[0].getRootNode() : document;
-
-    let elementId = element.attr('id');
-    if (isEmptyOrNull(elementId)) {
-        return $('#' + relativeId, context);
+    var contextWasNull;
+    if (context == null && element?.length) {
+        context = element[0].getRootNode() as Element;
+        contextWasNull = true;
     }
 
-    let result = $('#' + elementId + relativeId, context);
-    if (result.length > 0) {
-        return result;
-    }
-
-    result = $('#' + elementId + '_' + relativeId, context);
-
-    if (result.length > 0) {
-        return result;
-    }
-
-    while (true) {
-        let idx = elementId.lastIndexOf('_',);
-        if (idx <= 0) {
+    function search() {
+        let elementId = element.attr('id');
+        if (isEmptyOrNull(elementId)) {
             return $('#' + relativeId, context);
         }
 
-        elementId = elementId.substr(0, idx);
+        let result = $('#' + elementId + relativeId, context);
+        if (result.length > 0) {
+            return result;
+        }
+
         result = $('#' + elementId + '_' + relativeId, context);
 
         if (result.length > 0) {
             return result;
         }
+
+        while (true) {
+            let idx = elementId.lastIndexOf('_',);
+            if (idx <= 0) {
+                return $('#' + relativeId, context);
+            }
+
+            elementId = elementId.substr(0, idx);
+            result = $('#' + elementId + '_' + relativeId, context);
+
+            if (result.length > 0) {
+                return result;
+            }
+        }
+    }
+
+    var r = search();
+    if (!r.length && contextWasNull && typeof document !== "undefined") {
+        context = undefined;
+        return search();
     }
 }
 
