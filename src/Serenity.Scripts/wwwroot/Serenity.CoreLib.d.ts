@@ -2939,7 +2939,21 @@ declare namespace Serenity {
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
         protected renderContents(): void;
+        protected useIdPrefix(): {
+            [key: string]: string;
+            Form: string;
+            Tabs: string;
+            Toolbar: string;
+            PropertyGrid: string;
+        };
     }
+    function useIdPrefix(prefix: string): {
+        [key: string]: string;
+        Form: string;
+        Tabs: string;
+        Toolbar: string;
+        PropertyGrid: string;
+    };
 
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         protected tabs: JQuery;

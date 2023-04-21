@@ -11,7 +11,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         return $('#' + this.idPrefix + id, this.element);
     }
 
-    private byID<TWidget>(id: string, type: { new (...args: any[]): TWidget }) {
+    private byID<TWidget>(id: string, type: { new(...args: any[]): TWidget }) {
         return this.byId(id).getWidget(type);
     }
 
@@ -39,7 +39,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         if (cachedName != null) {
             return cachedName;
         }
-        
+
         while (type && type !== Widget) {
             var name = TemplatedWidget.noGeneric(getTypeFullName(type));
 
@@ -95,7 +95,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
             if (template != null)
                 return template;
         }
-            
+
         template = getTemplate(templateName);
 
         if (template == null) {
@@ -127,4 +127,21 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
 
         this.element.html(widgetMarkup);
     }
+
+    protected useIdPrefix(): { [key: string]: string; Form: string; Tabs: string; Toolbar: string; PropertyGrid: string; } {
+        return useIdPrefix(this.idPrefix);
+    }
 }
+
+export function useIdPrefix(prefix: string): { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string } {
+    return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
+}
+
+const idPrefixHandler = {
+    get(target: any, p: string) {
+        if (p.startsWith('#'))
+            return '#' + target._ + p.substring(1);
+
+        return this + p;
+    }
+};
