@@ -58,6 +58,7 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string, c
         context = undefined;
         return search();
     }
+    return r;
 }
 
 const esc: Record<string, string> = {
