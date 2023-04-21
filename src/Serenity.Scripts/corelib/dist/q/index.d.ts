@@ -364,7 +364,7 @@ declare function splitDateString(s: string): string[];
 declare function addOption(select: JQuery, key: string, text: string): void;
 declare function addEmptyOption(select: JQuery): void;
 declare function clearOptions(select: JQuery): void;
-declare function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+declare function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery;
 /**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String to be HTML encoded

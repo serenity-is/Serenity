@@ -766,7 +766,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+    function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery;
     /**
      * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
      * @param s String to be HTML encoded
