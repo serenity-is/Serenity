@@ -58,7 +58,7 @@ export function validatorAbortHandler(validator: any) {
     };
 };
 
-export function validateOptions(options: JQueryValidation.ValidationOptions) {
+export function validateOptions(options?: JQueryValidation.ValidationOptions) {
     var opt = baseValidateOptions();
     delete opt.showErrors;
     return extend(extend(opt, {

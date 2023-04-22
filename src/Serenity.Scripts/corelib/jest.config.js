@@ -1,6 +1,6 @@
 export default {
   testEnvironment: 'jsdom',
-  testMatch: ['<rootDir>/test/**/*.spec.ts'],
+  testMatch: ['<rootDir>/test/**/*.spec.ts*'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@serenity-is/corelib/q$': '<rootDir>/src/q',
@@ -14,11 +14,18 @@ export default {
       jsc: {
         parser: {
           syntax: "typescript",
-          decorators: true
+          decorators: true,
+          tsx: true
         },
         keepClassNames: true,
         experimental: {
           plugins: [["jest_workaround", {}]]
+        },
+        transform: {
+          react: {
+            pragma: 'h',
+            pragmaFrag: 'Fragment'
+          }
         }
       },
       module: {

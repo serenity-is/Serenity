@@ -72,6 +72,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
 
         return {
             hint: localText("Controls.ColumnPickerDialog.Title"),
+            action: 'column-picker',
             cssClass: "column-picker-button",
             icon: 'fa-th-list text-blue',
             onClick: onClick

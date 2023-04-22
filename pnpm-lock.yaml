@@ -44,6 +44,9 @@ importers:
       jquery:
         specifier: 3.6.1
         version: 3.6.1
+      jsx-dom:
+        specifier: 8.0.5
+        version: 8.0.5
       rollup:
         specifier: 2.79.1
         version: 2.79.1
@@ -1530,6 +1533,10 @@ packages:
       cssom: 0.3.8
     dev: true
 
+  /csstype@3.1.2:
+    resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
+    dev: true
+
   /data-urls@3.0.2:
     resolution: {integrity: sha512-Jy/tj3ldjZJo63sVAvg6LHt2mHvl4V6AgRAmNDtLdm7faqtsx+aJG42rsyCo9JCoRVKwPFzKlIPx3DIibwSIaQ==}
     engines: {node: '>=12'}
@@ -2515,6 +2522,12 @@ packages:
 
   /jsonc-parser@3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
+    dev: true
+
+  /jsx-dom@8.0.5:
+    resolution: {integrity: sha512-Dt4PLuFFm16Qj1TH0GSx6LdrfnrPSh5lEHG87Hd4lv9nDWGD3ZtUdp5RXH7GyEWI0E+19eoUDFcyO5dnJQ/4IQ==}
+    dependencies:
+      csstype: 3.1.2
     dev: true
 
   /kleur@3.0.3:

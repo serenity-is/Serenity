@@ -766,7 +766,7 @@ declare namespace Q {
     function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+    function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery;
     /**
      * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
      * @param s String to be HTML encoded
@@ -1074,7 +1074,7 @@ declare namespace Q {
     }
 
     function validatorAbortHandler(validator: any): void;
-    function validateOptions(options: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
+    function validateOptions(options?: JQueryValidation.ValidationOptions): JQueryValidation.ValidationOptions;
 
     function loadValidationErrorMessages(): void;
     function getHighlightTarget(el: HTMLElement): HTMLElement;
@@ -2886,6 +2886,7 @@ declare namespace Serenity {
     }
 
     interface ToolButton {
+        action?: string;
         title?: string;
         hint?: string;
         cssClass?: string;
@@ -2938,7 +2939,16 @@ declare namespace Serenity {
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
         protected renderContents(): void;
+        protected useIdPrefix(): IdPrefixType;
     }
+    type IdPrefixType = {
+        [key: string]: string;
+        Form: string;
+        Tabs: string;
+        Toolbar: string;
+        PropertyGrid: string;
+    };
+    function useIdPrefix(prefix: string): IdPrefixType;
 
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         protected tabs: JQuery;
@@ -4765,6 +4775,17 @@ declare namespace Serenity {
         protected useViewMode(): boolean;
         protected getFallbackTemplate(): string;
     }
+
+    type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
+        children?: any | undefined;
+        class?: string;
+    };
+    interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
+        (props: JsxDomWidgetProps<P>, context?: any): TElement | null;
+    }
+    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: new (element: JQuery, options?: TOptions) => TWidget): JsxDomWidget<TOptions & {
+        ref?: (r: TWidget) => void;
+    }>;
 
     namespace Reporting {
         interface ReportDialogOptions {

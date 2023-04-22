@@ -8,10 +8,10 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
     private static templateNames: { [key: string]: string } = {};
 
     protected byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id);
+        return $('#' + this.idPrefix + id, this.element);
     }
 
-    private byID<TWidget>(id: string, type: { new (...args: any[]): TWidget }) {
+    private byID<TWidget>(id: string, type: { new(...args: any[]): TWidget }) {
         return this.byId(id).getWidget(type);
     }
 
@@ -39,7 +39,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         if (cachedName != null) {
             return cachedName;
         }
-        
+
         while (type && type !== Widget) {
             var name = TemplatedWidget.noGeneric(getTypeFullName(type));
 
@@ -95,7 +95,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
             if (template != null)
                 return template;
         }
-            
+
         template = getTemplate(templateName);
 
         if (template == null) {
@@ -127,4 +127,23 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
 
         this.element.html(widgetMarkup);
     }
+
+    protected useIdPrefix(): IdPrefixType {
+        return useIdPrefix(this.idPrefix);
+    }
 }
+
+type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
+
+export function useIdPrefix(prefix: string): IdPrefixType {
+    return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
+}
+
+const idPrefixHandler = {
+    get(target: any, p: string) {
+        if (p.startsWith('#'))
+            return '#' + target._ + p.substring(1);
+
+        return target._ + p;
+    }
+};

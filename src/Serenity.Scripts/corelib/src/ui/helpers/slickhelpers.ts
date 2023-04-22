@@ -305,6 +305,7 @@ export namespace GridSelectAllButtonHelper {
         }
         return {
             title: text,
+            action: "select-all",
             cssClass: 'select-all-button',
             onClick: function () {
                 var grid = getGrid();
