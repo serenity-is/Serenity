@@ -19,11 +19,11 @@
       <Pack>true</Pack>
       <PackagePath>content\Content\serenity\</PackagePath>
     </None>
-    <Content Include="corelib\out\Serenity.CoreLib.js;corelib\out\Serenity.CoreLib.js.map;corelib\out\Serenity.CoreLib.min.js">
+    <Content Include="..\..\packages\corelib\out\Serenity.CoreLib.js;..\..\packages\corelib\out\Serenity.CoreLib.js.map;..\..\packages\corelib\out\Serenity.CoreLib.min.js">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\</PackagePath>
     </Content>
-    <Content Include="corelib\out\Serenity.CoreLib.d.ts">
+    <Content Include="..\..\packages\corelib\out\Serenity.CoreLib.d.ts">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\;content\Scripts\typings\serenity\;typings\serenity.corelib\index.d.ts</PackagePath>
     </Content>
@@ -34,8 +34,8 @@
     <EmbeddedResource Remove="node_modules\**" />
     <TypeScriptCompile Remove="**\node_modules\**;*\out\**;*\dist\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
-    <ToCompileCoreLib Include="corelib\src\**\*.ts;corelib\src\tsconfig.json;corelib\build\build.js;corelib\node_modules\@serenity-is\*\*.d.ts;corelib\rollup.config.js;corelib\package.json"></ToCompileCoreLib>
-    <NpmPackageFile Include="corelib\package.json" />
+    <ToCompileCoreLib Include="..\..\packages\corelib\src\**\*.ts;..\..\packages\corelib\src\tsconfig.json;..\..\packages\corelib\build\build.js;..\..\packages\corelib\node_modules\@serenity-is\*\*.d.ts;..\..\packages\corelib\rollup.config.js;..\..\packages\corelib\package.json"></ToCompileCoreLib>
+    <NpmPackageFile Include="..\..\packages\corelib\package.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.9.4">
@@ -45,6 +45,6 @@
   </ItemGroup>
   <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" 
           Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
-    <Exec Command="pnpm run build" WorkingDirectory=".\corelib" />
+    <Exec Command="pnpm run build" WorkingDirectory="..\..\packages\corelib" />
   </Target>
 </Project>

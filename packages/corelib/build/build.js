@@ -12,7 +12,7 @@ const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
 
 const require = createRequire(import.meta.url);
 const sleekRoot = resolve(join(require.resolve('@serenity-is/sleekgrid/build/defines'), '..', '..'));
-const assetsSlick = resolve(join(root, '..', '..', 'Serenity.Assets', 'wwwroot', 'Scripts', 'SlickGrid'));
+const assetsSlick = resolve(join(root, '..', '..', 'src', 'Serenity.Assets', 'wwwroot', 'Scripts', 'SlickGrid'));
 
 const minify = true;
 for (var esmOpt of [

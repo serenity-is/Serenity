@@ -54,7 +54,7 @@
     "framework"
   ],
   "license": "MIT",
-  "repository": "https://github.com/serenity-is/serenity/src/Serenity.Scripts/corelib",
+  "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
     "build": "rollup -c && node build/build",
     "test": "pnpm build && pnpm jest"

@@ -60,7 +60,7 @@ importers:
         specifier: 4.9.3
         version: 4.9.3
 
-  src/Serenity.Scripts/corelib:
+  packages/corelib:
     dependencies:
       '@serenity-is/sleekgrid':
         specifier: 1.5.5
@@ -79,7 +79,7 @@ importers:
         specifier: 2.4.1
         version: 2.4.1
 
-  src/Serenity.Scripts/tsbuild:
+  packages/tsbuild:
     dependencies:
       esbuild:
         specifier: 0.16.14

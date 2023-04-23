@@ -59,4 +59,4 @@ jobs:
 
     - name: corelib tests
       run: pnpm test
-      working-directory: "src/Serenity.Scripts/corelib"
+      working-directory: "packages/corelib"

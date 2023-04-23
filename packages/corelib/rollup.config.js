@@ -323,11 +323,12 @@ export default [
                         fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
                         fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
 
-                        fs.copyFileSync('./out/Serenity.CoreLib.min.js', '../wwwroot/Serenity.CoreLib.min.js');
-                        fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', '../wwwroot/Serenity.CoreLib.min.js.map');
-                        fs.copyFileSync('./out/Serenity.CoreLib.d.ts', '../wwwroot/Serenity.CoreLib.d.ts');
-                        fs.copyFileSync('./out/Serenity.CoreLib.js', '../wwwroot/Serenity.CoreLib.js');
-                        fs.copyFileSync('./out/Serenity.CoreLib.js.map', '../wwwroot/Serenity.CoreLib.js.map');
+                        const wwwroot = '../../src/Serenity.Scripts/wwwroot';
+                        fs.copyFileSync('./out/Serenity.CoreLib.min.js', `${wwwroot}/Serenity.CoreLib.min.js`);
+                        fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', `${wwwroot}/Serenity.CoreLib.min.js.map`);
+                        fs.copyFileSync('./out/Serenity.CoreLib.d.ts', `${wwwroot}/Serenity.CoreLib.d.ts`);
+                        fs.copyFileSync('./out/Serenity.CoreLib.js', `${wwwroot}/Serenity.CoreLib.js`);
+                        fs.copyFileSync('./out/Serenity.CoreLib.js.map', `${wwwroot}/Serenity.CoreLib.js.map`);
                     }
                 }
             }
