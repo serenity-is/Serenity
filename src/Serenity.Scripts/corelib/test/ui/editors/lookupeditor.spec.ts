@@ -1,8 +1,7 @@
 import { LookupEditor } from "@/ui/editors/lookupeditor";
-import { corelibPath, jqueryPath, select2Path, toastrPath, loadExternalScripts } from "../../testutil"
 import { Lookup, ScriptData } from "@/q";
 
-loadExternalScripts(window, jqueryPath, corelibPath, select2Path, toastrPath);
+//loadExternalScripts(window, jqueryPath, corelibPath, select2Path, toastrPath);
 
 let oldWindowAlert: any;
 beforeAll(() => {

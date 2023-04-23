@@ -1,4 +1,5 @@
-﻿import { jQueryPatch } from "../../patch/jquerypatch";
+﻿import $ from "@optmod/jquery";
+import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, replaceAll, startsWith } from "@serenity-is/corelib/q";

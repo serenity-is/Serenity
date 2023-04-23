@@ -1,4 +1,7 @@
-﻿declare global {
+﻿export { }
+
+declare global {
+
     namespace Select2 {
         namespace util {
             function stripDiacritics(input: string): string;
@@ -96,5 +99,3 @@
         select2(cmd: 'data'): Select2Data;
     }
 }
-
-export {}

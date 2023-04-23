@@ -1,12 +1,13 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { Authorization, PropertyItem, any, isArray, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
+import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { any, Authorization, isArray, isEmptyOrNull, isTrimmedEmpty, PropertyItem, startsWith, localText, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
+import Select2 from "@optmod/select2";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;

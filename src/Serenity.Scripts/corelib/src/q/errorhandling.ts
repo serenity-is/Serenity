@@ -28,9 +28,6 @@ export namespace ErrorHandling {
                 host.indexOf("127.0.0.1") < 0)
                 return;
 
-            if (!window['toastr'])
-                return;
-
             var errorInfo = JSON.stringify(error || {});
 
             message =

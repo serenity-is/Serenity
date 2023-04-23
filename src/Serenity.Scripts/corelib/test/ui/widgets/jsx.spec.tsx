@@ -584,7 +584,6 @@ describe('jsx: widget integration', () => {
         var ed: StringEditor;
         window.$ = window.jQuery = $;
         var el = <StringEditor_ ref={x => ed = x } readOnly={true} />;
-        console.log(el);
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();

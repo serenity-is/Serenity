@@ -8,8 +8,7 @@
     "@serenity-is/sleekgrid": "1.5.5",
     "@types/jquery": "2.0.48",
     "@types/jqueryui": "1.12.6",
-    "@types/jquery.validation": "1.16.7",
-    "@types/toastr": "2.1.39"
+    "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
     "tslib": "2.4.1"

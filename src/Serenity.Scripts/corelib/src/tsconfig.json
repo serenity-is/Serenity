@@ -18,12 +18,12 @@
     "types": [
       "jquery",
       "jquery.validation",
-      "jqueryui",
-      "toastr"
+      "jqueryui"
     ],
     "paths": {
       "@serenity-is/corelib/q": ["./q"],
-      "@serenity-is/corelib/slick": ["./slick"]
+      "@serenity-is/corelib/slick": ["./slick"],
+      "@optmod/*": ["./globals/*-optmod"]
     },
     "outDir": "../out",
     "target": "ES5",

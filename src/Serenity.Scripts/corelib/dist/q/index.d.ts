@@ -1,6 +1,5 @@
 /// <reference types="jquery" />
 /// <reference types="jqueryui" />
-/// <reference types="toastr" />
 /// <reference types="jquery.validation" />
 type Grouping<TItem> = {
     [key: string]: TItem[];
@@ -444,6 +443,47 @@ declare class Lookup<TItem> {
     constructor(options: LookupOptions<TItem>, items?: TItem[]);
     update?(value: TItem[]): void;
 }
+
+type ToastType = {
+    info?: string;
+    error?: string;
+    warning?: string;
+    success?: string;
+};
+type ToastContainerOptions = {
+    containerId?: string;
+    positionClass?: string;
+    target?: string;
+};
+type ToastrOptions<T = ToastType> = ToastContainerOptions & {
+    tapToDismiss?: boolean;
+    toastClass?: string;
+    showDuration?: number;
+    onShown?: () => void;
+    hideDuration?: number;
+    onHidden?: () => void;
+    closeMethod?: boolean;
+    closeDuration?: number | false;
+    closeEasing?: boolean;
+    closeOnHover?: boolean;
+    extendedTimeOut?: number;
+    iconClasses?: T;
+    iconClass?: string;
+    positionClass?: string;
+    timeOut?: number;
+    titleClass?: string;
+    messageClass?: string;
+    escapeHtml?: boolean;
+    target?: string;
+    closeHtml?: string;
+    closeClass?: string;
+    newestOnTop?: boolean;
+    preventDuplicates?: boolean;
+    onclick?: (event: MouseEvent) => void;
+    onCloseClick?: (event: Event) => void;
+    closeButton?: boolean;
+    rtl?: boolean;
+};
 
 declare let defaultNotifyOptions: ToastrOptions;
 declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;

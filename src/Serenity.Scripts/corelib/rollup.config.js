@@ -7,8 +7,14 @@ import { basename, resolve } from "path";
 
 var pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
+const external = [
+    ...builtinModules,
+    ...(pkg.dependencies == null ? [] : Object.keys(pkg.dependencies)),
+    ...(pkg.devDependencies == null ? [] : Object.keys(pkg.devDependencies)),
+    ...(pkg.peerDependencies == null ? [] : Object.keys(pkg.peerDependencies))
+]
+
 var globals = {
-    'jquery': '$',
     'flatpickr': 'flatpickr',
     'tslib': 'this.window || this',
     '@serenity-is/sleekgrid': 'this.Slick = this.Slick || {}'
@@ -202,9 +208,6 @@ var extendGlobals = function () {
                     });
                     b[fileName].code = src;
                 }
-                else if (code && /(Globals\/.*|Globals|Globals\..*)\.d\.ts$/i.test(fileName) && code.indexOf('declare global') < 0) {
-                    dtsOutputs.push(code);
-                }
             }
         }
     }
@@ -226,13 +229,6 @@ async function minifyScript(fileName) {
     fs.writeFileSync(fileName.replace(/\.js$/, '.min.js'), minified.code);
     fs.writeFileSync(fileName.replace(/\.js$/, '.min.js.map'), minified.map);
 }
-
-const external = [
-    ...builtinModules,
-    ...(pkg.dependencies == null ? [] : Object.keys(pkg.dependencies)),
-    ...(pkg.devDependencies == null ? [] : Object.keys(pkg.devDependencies)),
-    ...(pkg.peerDependencies == null ? [] : Object.keys(pkg.peerDependencies))
-]
 
 const mergeRefTypes = (src) => {
     var refTypes = [];
@@ -320,6 +316,7 @@ export default [
                     
                         fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
                         await minifyScript('./out/Serenity.CoreLib.js');
+                        !fs.existsSync('./dist') && fs.mkdirSync('./dist');
                         !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
                         fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
                         !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');

@@ -28,15 +28,6 @@
         "index.d.ts",
         "LICENSE"
       ]
-    },
-    {
-      "provider": "unpkg",
-      "library": "@types/toastr@2.1.39",
-      "destination": "types/toastr/",
-      "files": [
-        "index.d.ts",
-        "LICENSE"
-      ]
     }
   ]
 }
