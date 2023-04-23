@@ -88,7 +88,7 @@ export function positionToastContainer(create: boolean, options?: ToastrOptions)
     if (!container || !container.classList.contains('position-toast'))
         return;
 
-    var dialog = $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last();
+    var dialog = typeof $ !== "undefined" ? $(window.document.body).children('.ui-dialog:visible, .modal.in, .modal.show').last() : [] as any;
     if (dialog.length > 0) {
         var position = dialog.position();
         container.classList.add('positioned-toast');

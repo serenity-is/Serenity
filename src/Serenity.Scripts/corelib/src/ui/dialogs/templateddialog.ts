@@ -4,6 +4,7 @@ import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dial
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
+import "@optmod/jquery-validation";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {

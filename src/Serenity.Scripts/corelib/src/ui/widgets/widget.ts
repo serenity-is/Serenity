@@ -260,6 +260,6 @@ export declare interface Widget<TOptions> {
     changeSelect2(handler: (e: JQueryEventObject) => void): void;
 }
 
-if (typeof jQuery === "function") {
+if (typeof $ === "function") {
     jQueryPatch(jQuery);
 }

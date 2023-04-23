@@ -1,4 +1,5 @@
 ﻿import { extend } from "./system"
+import $ from "@optmod/jquery";
 
 export interface JQBlockUIOptions {
     useTimeout?: boolean;   
@@ -12,12 +13,14 @@ function blockUIWithCheck(opt: JQBlockUIOptions) {
         return;
     }
 
-    if (($ as any).blockUI) {
+    if (($ as any)?.blockUI) {
         ($ as any).blockUI(opt);
     }
-    else {
-        $('<div class="blockUI blockOverlay" style="z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;"></div>')
-            .appendTo(document.body);
+    else if (typeof document !== "undefined") {
+        var div = document.createElement("div");
+        div.className = "blockUI blockOverlay";
+        div.setAttribute("style", "z-index: 2000; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;");
+        document.body.appendChild(div);
     }
     blockUICount++;
 }
@@ -58,8 +61,8 @@ export function blockUndo() {
     }
 
     blockUICount--;
-    if (($ as any).unblockUI)
+    if (($ as any)?.unblockUI)
         ($ as any).unblockUI({ fadeOut: 0 });
-    else 
-        $(document.body).children('.blockUI.blockOverlay').remove();
+    else if (typeof document !== "undefined")
+        document.body.querySelector('>.blockUI.blockOverlay')?.remove();
 }

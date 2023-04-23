@@ -2,6 +2,7 @@
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { getNested, getGlobalThis, initializeTypes } from "./system";
+import $ from "@optmod/jquery";
 
 export function autoFullHeight(element: JQuery) {
     element.css('height', '100%');

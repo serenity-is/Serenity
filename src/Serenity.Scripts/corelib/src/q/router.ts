@@ -1,5 +1,6 @@
 ﻿import { startsWith } from "./strings";
 import { closePanel } from "./dialogs";
+import $ from "@optmod/jquery";
 
 export interface HandleRouteEventArgs {
     handled: boolean,
