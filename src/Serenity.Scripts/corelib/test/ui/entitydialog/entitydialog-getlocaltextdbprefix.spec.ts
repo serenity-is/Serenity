@@ -1,6 +1,7 @@
 import { Decorators, LocalTextPrefixAttribute } from "@/decorators";
 import { addAttribute } from "@/q";
 import { EntityDialog } from "@/ui/dialogs/entitydialog";
+import $ from "jquery";
 
 function getLocalTextDbPrefix(dialog: EntityDialog<any, any>): string {
     return dialog["getLocalTextDbPrefix"]();

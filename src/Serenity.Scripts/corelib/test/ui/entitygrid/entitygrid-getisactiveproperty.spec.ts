@@ -1,9 +1,6 @@
 import { IsActivePropertyAttribute } from "@/decorators";
 import { addAttribute } from "@/q";
 import { EntityGrid } from "@/ui/datagrid/entitygrid";
-import { jqueryPath, loadExternalScripts } from "../../testutil"
-
-loadExternalScripts(window, jqueryPath);
 
 function getIsActiveProperty(grid: EntityGrid<any, any>): string {
     return grid["getIsActiveProperty"]();

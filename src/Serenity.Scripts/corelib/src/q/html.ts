@@ -1,6 +1,5 @@
 ﻿import { localText } from "./localtext";
 import { isEmptyOrNull } from "./strings";
-import $ from "@optmod/jquery";
 
 export function addOption(select: JQuery, key: string, text: string) {
     $('<option/>').val(key).text(text).appendTo(select);

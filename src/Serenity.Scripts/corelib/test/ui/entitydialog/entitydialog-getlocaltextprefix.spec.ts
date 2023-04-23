@@ -1,9 +1,7 @@
 import { LocalTextPrefixAttribute, Decorators } from "@/decorators";
 import { addAttribute } from "@/q";
 import { EntityDialog } from "@/ui/dialogs/entitydialog";
-import { jqueryPath, jqueryValidatePath, loadExternalScripts, toastrPath } from "../../testutil"
-
-loadExternalScripts(window, jqueryPath, jqueryValidatePath, toastrPath);
+import $ from "jquery";
 
 function getLocalTextPrefix(dialog: EntityDialog<any, any>): string {
     return dialog["getLocalTextPrefix"]();

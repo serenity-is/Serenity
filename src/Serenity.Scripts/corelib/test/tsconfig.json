@@ -20,7 +20,8 @@
     "paths": {
       "@/*": [ "../src/*" ],
       "@serenity-is/corelib/q": ["../src/q"],
-      "@serenity-is/corelib/slick": ["../src/slick"]
+      "@serenity-is/corelib/slick": ["../src/slick"],
+      "@optmod/*": ["./testutil/*-optmod"]
     },
     "noImplicitAny": false,
     "lib": [

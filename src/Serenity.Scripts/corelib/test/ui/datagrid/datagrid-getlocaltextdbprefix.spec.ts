@@ -1,9 +1,7 @@
 import { LocalTextPrefixAttribute } from "@/decorators";
 import { addAttribute } from "@/q";
 import { DataGrid } from "@/ui/datagrid/datagrid";
-import { jqueryPath, loadExternalScripts } from "../../testutil"
-
-loadExternalScripts(window, jqueryPath);
+import $ from "jquery";
 
 function getLocalTextDbPrefix(grid: DataGrid<any, any>): string {
     return grid["getLocalTextDbPrefix"]();

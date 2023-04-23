@@ -1,5 +1,3 @@
-import { alertDialog, resetBSVersionCheck } from "@/q";
-
 /**
  * @jest-environment jsdom
  */
@@ -22,9 +20,9 @@ function setupDummyJQueryForModal(callback) {
             appendTo: function () {
                 return this;
             },
-			one: function() {
-				return this;
-			},
+            one: function () {
+                return this;
+            },
             modal: function () {
                 expect(this._html).toBe(html);
                 callback(html);
@@ -33,12 +31,11 @@ function setupDummyJQueryForModal(callback) {
     } as any;
 }
 
-test('BS3 is detected when modal version starts with 3', function() {
+test('BS3 is detected when modal version starts with 3', function () {
 
-    jest.isolateModules(function() {
-        resetBSVersionCheck();
+    jest.isolateModules(function () {
         var passedHtml;
-        setupDummyJQueryForModal(function(html) {
+        setupDummyJQueryForModal(function (html) {
             passedHtml = html;
         });
         try {
@@ -49,8 +46,8 @@ test('BS3 is detected when modal version starts with 3', function() {
                     }
                 }
             }
-
-            alertDialog("hello");
+            var dialogs = require("@/q/dialogs");
+            dialogs.alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
 
@@ -67,12 +64,11 @@ test('BS3 is detected when modal version starts with 3', function() {
 });
 
 
-test('BS4 is detected when modal version does not exist', function() {
-    
-    jest.isolateModules(function() {
-        resetBSVersionCheck();
+test('BS4 is detected when modal version does not exist', function () {
+
+    jest.isolateModules(function () {
         var passedHtml;
-        setupDummyJQueryForModal(function(html) {
+        setupDummyJQueryForModal(function (html) {
             passedHtml = html;
         });
         try {
@@ -81,7 +77,8 @@ test('BS4 is detected when modal version does not exist', function() {
                 }
             }
 
-            alertDialog("hello");
+            var dialogs = require("@/q/dialogs");
+            dialogs.alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
 
@@ -98,12 +95,11 @@ test('BS4 is detected when modal version does not exist', function() {
     });
 });
 
-test('BS4 is detected when modal version is something other than 3', function() {
+test('BS4 is detected when modal version is something other than 3', function () {
 
-    jest.isolateModules(function() {
-        resetBSVersionCheck();
+    jest.isolateModules(function () {
         var passedHtml;
-        setupDummyJQueryForModal(function(html) {
+        setupDummyJQueryForModal(function (html) {
             passedHtml = html;
         });
         try {
@@ -113,11 +109,12 @@ test('BS4 is detected when modal version is something other than 3', function() 
                         VERSION: '4.1.0'
                     }
                 }
-            }           
+            }
 
-            alertDialog("hello");
+            var dialogs = require("@/q/dialogs");
+            dialogs.alertDialog("hello");
 
-            expect(passedHtml).not.toBeNull();
+            expect(passedHtml).toBeDefined();
 
             var idx1 = passedHtml.indexOf('class="close"');
             var idx2 = passedHtml.indexOf('<h5');
@@ -128,6 +125,6 @@ test('BS4 is detected when modal version is something other than 3', function() 
         finally {
             delete global.$;
             delete global.jQuery;
-        } 
+        }
     });
 });

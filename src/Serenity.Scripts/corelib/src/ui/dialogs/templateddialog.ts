@@ -4,7 +4,7 @@ import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dial
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
-import "@optmod/jquery-validation";
+import validator from "@optmod/jquery-validation";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
@@ -229,7 +229,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         var form = this.byId('Form');
         if (form.length > 0) {
             var valOptions = this.getValidatorOptions();
-            this.validator = form.validate(validateOptions(valOptions));
+            this.validator = (validator || form.validate) && form.validate(validateOptions(valOptions));
         }
     }
 

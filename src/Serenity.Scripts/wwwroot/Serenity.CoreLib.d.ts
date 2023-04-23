@@ -571,7 +571,6 @@ declare namespace Q {
     }
     function isBS3(): boolean;
     function isBS5Plus(): boolean;
-    function resetBSVersionCheck(): void;
     function bsModalMarkup(title: string, body: string, modalClass?: string): string;
     function dialogButtonToBS(x: DialogButton): string;
     function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;

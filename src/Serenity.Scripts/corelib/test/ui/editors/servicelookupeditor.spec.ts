@@ -1,5 +1,4 @@
 import { ServiceLookupEditor } from "@/ui/editors/servicelookupeditor";
-import { corelibPath, jqueryPath, select2Path, toastrPath, loadExternalScripts } from "../../testutil"
 import { ServiceOptions, ServiceResponse } from "@/q";
 
 let oldWindowAlert: any;

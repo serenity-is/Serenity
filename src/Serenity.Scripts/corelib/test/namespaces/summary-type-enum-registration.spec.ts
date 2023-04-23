@@ -1,8 +1,12 @@
-import { corelibPath, loadExternalScripts } from "../testutil"
+import { loadNSCorelib } from "../testutil";
 
-test('summary type enum is registered', function() {
-    loadExternalScripts(window, corelibPath);
-    const Q = (window as any).Q;
+beforeEach(() => {
+    jest.resetModules();
+});
+
+test('summary type enum is registered', function () {
+    loadNSCorelib(window);
+    const Q = (window as any)?.Q;
     expect(Q).toBeDefined();
     const QSummaryType = Q.SummaryType;
     expect(QSummaryType).toBeDefined();
@@ -13,5 +17,4 @@ test('summary type enum is registered', function() {
     expect(Serenity.EnumTypeRegistry).toBeDefined();
     const fromRegistry = Serenity.EnumTypeRegistry.tryGet('Serenity.SummaryType')
     expect(fromRegistry).toBeDefined();
-
 });

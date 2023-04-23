@@ -3,6 +3,7 @@ import { extend } from "./system";
 import { htmlEncode } from "./html";
 import { startsWith } from "./strings";
 import { tryGetText } from "./localtext";
+import $ from "@optmod/jquery";
 
 export interface DialogButton {
     text?: string;
@@ -98,11 +99,6 @@ export function isBS5Plus(): boolean {
         return _isBS5Plus;
     // @ts-ignore
     return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
-}
-
-export function resetBSVersionCheck() {
-    _isBS3 = undefined;
-    _isBS5Plus = undefined;
 }
 
 const defaultTxt: Record<string, string> = {

@@ -1,9 +1,6 @@
 import { IsActivePropertyAttribute } from "@/decorators";
 import { addAttribute } from "@/q";
 import { DataGrid } from "@/ui/datagrid/datagrid";
-import { jqueryPath, loadExternalScripts } from "../../testutil"
-
-loadExternalScripts(window, jqueryPath);
 
 function getIsActiveProperty(grid: DataGrid<any, any>): string {
     return grid["getIsActiveProperty"]();
