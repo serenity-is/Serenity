@@ -64,5 +64,5 @@ export function blockUndo() {
     if (($ as any)?.unblockUI)
         ($ as any).unblockUI({ fadeOut: 0 });
     else if (typeof document !== "undefined")
-        document.body.querySelector('>.blockUI.blockOverlay')?.remove();
+        document.body.querySelector(':scope > .blockUI.blockOverlay')?.remove();
 }
