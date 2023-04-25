@@ -3,7 +3,7 @@ import { extend } from "./system";
 import { htmlEncode } from "./html";
 import { startsWith } from "./strings";
 import { tryGetText } from "./localtext";
-import $ from "@optmod/jquery";
+import $ from "@optionaldeps/jquery";
 
 export interface DialogButton {
     text?: string;
@@ -35,8 +35,8 @@ export interface AlertOptions extends CommonDialogOptions {
 
 
 // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
-if (typeof $ !== "undefined" && $.fn && $.fn.button && $.ui && $.ui.button && ($.fn.button as any).noConflict) {
-    ($.fn as any).btn = ($.fn.button as any).noConflict();
+if (typeof $ !== "undefined" && ($.fn as any)?.button && ($ as any).ui?.button && ($ as any).fn?.button?.noConflict) {
+    ($.fn as any).btn = ($ as any).fn.button.noConflict();
 }
 
 function toIconClass(icon: string): string {
@@ -50,7 +50,7 @@ function toIconClass(icon: string): string {
 }
 
 function uiDialogMessage(options: CommonDialogOptions, message: string, dialogClass: string) {
-    var opt = extend(<JQueryUI.DialogOptions>{
+    var opt = extend(<any>{
         modal: true,
         width: '40%',
         maxWidth: 450,
@@ -61,7 +61,7 @@ function uiDialogMessage(options: CommonDialogOptions, message: string, dialogCl
                 options.onOpen.call(this);
         },
         close: function () {
-            $(this).dialog('destroy');
+            ($(this) as any).dialog?.('destroy');
             if (options.onClose)
                 options.onClose.call(this, options.result);
         }
@@ -72,16 +72,16 @@ function uiDialogMessage(options: CommonDialogOptions, message: string, dialogCl
     if (options.buttons) {
         opt.buttons = options.buttons.map(x => {
             var btn = dialogButtonToUI(x);
-            btn.click = function(e) {
+            btn.click = function(e: any) {
                 options.result = x.result;
-                $(this).dialog('close');
+                ($(this) as any).dialog('close');
                 x.click && x.click.call(this, e);
             }
             return btn;
         });
     }
 
-    return $('<div>' + message + '</div>').dialog(opt);
+    return ($('<div>' + message + '</div>') as any).dialog(opt);
 }
 
 let _isBS3: boolean;
@@ -142,12 +142,12 @@ export function dialogButtonToBS(x: DialogButton) {
     return `<button class="btn ${x.cssClass ? x.cssClass : ''}"${x.hint ? (' title="' + htmlEncode(x.hint) + '"') : ''}>${text}</button>`;
 }
 
-export function dialogButtonToUI(x: DialogButton) {
+export function dialogButtonToUI(x: DialogButton): any {
     var text = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
     if (iconClass != null)
         text = '<i class="' + iconClass + "><i> ";
-    return <JQueryUI.DialogButtonOptions>{
+    return <any>{
         text: text,
         attr: !x.cssClass ? undefined : {
             "class": x.cssClass
@@ -208,13 +208,13 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
 let _useBrowserDialogs: boolean;
 function useBrowserDialogs() {
     if (_useBrowserDialogs == null) {
-        _useBrowserDialogs = typeof $ === 'undefined' || ((!$.ui || !$.ui.dialog) && (!$.fn || !(($.fn as any).modal)));
+        _useBrowserDialogs = typeof $ === 'undefined' || ((!($ as any).ui || !($ as any).ui?.dialog) && (!$.fn || !(($.fn as any).modal)));
     }
     return _useBrowserDialogs;
 }
 
 function useBSModal(options: CommonDialogOptions): boolean {
-    return !!((!$.ui || !$.ui.dialog) || Config.bootstrapMessages || (options && options.bootstrap));
+    return !!((!($ as any).ui || !($ as any).ui?.dialog) || Config.bootstrapMessages || (options && options.bootstrap));
 }
 
 function messageHtml(message: string, options?: CommonDialogOptions): string {
@@ -357,7 +357,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
 
     let doc: any;
     let e = $('<div style="overflow: hidden"><iframe></iframe></div>');
-    let settings: IFrameDialogOptions = extend<any>(<JQueryUI.DialogOptions>{
+    let settings: IFrameDialogOptions = extend<any>({
         autoOpen: true,
         modal: true,
         width: '60%',
@@ -377,10 +377,10 @@ export function iframeDialog(options: IFrameDialogOptions) {
             doc.open();
             doc.write('');
             doc.close();
-            e.dialog('destroy').html('');
+            (e as any).dialog?.('destroy').html('');
         }
     }, options);
-    e.dialog(settings as any);
+    (e as any).dialog?.(settings as any);
 }
 
 export function informationDialog(message: string, onOk: () => void, options?: ConfirmOptions) {

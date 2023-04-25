@@ -4,7 +4,7 @@ import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dial
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
-import validator from "@optmod/jquery-validation";
+import validator from "@optionaldeps/jquery.validation";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
@@ -52,7 +52,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         return i;
     }
 
-    private static applyCssSizes(opt: JQueryUI.DialogOptions, dialogClass: string) {
+    private static applyCssSizes(opt: any, dialogClass: string) {
         let size: number;
         let dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
         try {
@@ -79,15 +79,15 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     };
 
     public destroy(): void {
-        this.tabs && this.tabs.tabs('destroy');
+        (this.tabs as any)?.tabs?.('destroy');
         this.tabs = null;
-        this.toolbar && this.toolbar.destroy();
+        (this.toolbar as any)?.toolbar?.destroy?.();
         this.toolbar = null;
         this.validator && this.byId('Form').remove();
         this.validator = null;
         if (this.element != null &&
             this.element.hasClass('ui-dialog-content')) {
-            this.element.dialog('destroy');
+            (this.element as any)?.dialog?.('destroy');
             this.element.removeClass('ui-dialog-content');
         }
         else if (this.element != null &&
@@ -107,7 +107,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
         this.element.removeClass('hidden');
 
-        this.element.dialog(this.getDialogOptions());
+        (this.element as any)?.dialog?.(this.getDialogOptions());
         this.element.closest('.ui-dialog').on('resize', e => this.arrange());
 
         let type = getInstanceType(this);
@@ -263,12 +263,12 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         }
         else {
             this.initDialog();
-            this.element.dialog('open');
+            (this.element as any).dialog?.('open');
         }
     }
 
     private useBSModal() {
-        return !!((!$.ui || !$.ui.dialog) || TemplatedDialog.bootstrapModal);
+        return !!((!($ as any).ui || !($ as any).ui?.dialog) || TemplatedDialog.bootstrapModal);
     }
 
     public static bootstrapModal: boolean;
@@ -310,7 +310,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         if (!$(document.documentElement).hasClass('mobile-device'))
             $(':input', this.element).not('button').eq(0).focus();
         this.arrange();
-        this.tabs && this.tabs.tabs('option', 'active', 0);
+        this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
     }
 
     public arrange(): void {
@@ -350,8 +350,8 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         return undefined;
     }
 
-    protected getDialogOptions(): JQueryUI.DialogOptions {
-        var opt: JQueryUI.DialogOptions = {};
+    protected getDialogOptions(): any {
+        var opt: any = {};
         var dialogClass = 's-Dialog ' + this.getCssClass();
         opt.dialogClass = dialogClass;
         var buttons = this.getDialogButtons();
@@ -374,7 +374,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
     public dialogClose(): void {
         if (this.element.hasClass('ui-dialog-content'))
-            this.element.dialog().dialog('close');
+            (this.element as any).dialog?.().dialog?.('close');
         else if (this.element.hasClass('modal-body'))
             (this.element.closest('.modal') as any).modal('hide');
         else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
@@ -384,7 +384,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
     public get dialogTitle(): string {
         if (this.element.hasClass('ui-dialog-content'))
-            return this.element.dialog('option', 'title');
+            return (this.element as any).dialog?.('option', 'title');
         else if (this.element.hasClass('modal-body'))
             return this.element.closest('.modal').find('.modal-header').children('h5').text();
 
@@ -422,7 +422,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         this.element.data('dialogtitle', value);
 
         if (this.element.hasClass('ui-dialog-content'))
-            this.element.dialog('option', 'title', value);
+            (this.element as any).dialog?.('option', 'title', value);
         else if (this.element.hasClass('modal-body')) {
             this.element.closest('.modal').find('.modal-header').children('h5').text(value ?? '');
         }
@@ -444,12 +444,12 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         if (tabsDiv.length === 0) {
             return;
         }
-        this.tabs = tabsDiv.tabs({});
+        this.tabs = (tabsDiv as any).tabs?.({});
         this.tabs.bind('tabsactivate', () => this.arrange());
     }
 
     protected handleResponsive(): void {
-        var dlg = this.element.dialog();
+        var dlg = (this.element as any)?.dialog();
         var uiDialog = this.element.closest('.ui-dialog');
         if ($(document.documentElement).hasClass('mobile-device')) {
             var data = this.element.data('responsiveData');

@@ -1,4 +1,4 @@
-﻿import "@optmod/jquery";
+﻿import "@optionaldeps/jquery";
 
 const _Select2 = typeof Select2 !== "undefined" ? Select2 : undefined;
 

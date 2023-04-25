@@ -7,7 +7,7 @@ import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
-import Select2 from "@optmod/select2";
+import Select2 from "@optionaldeps/select2";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;

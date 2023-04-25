@@ -1,4 +1,5 @@
-﻿import $ from "@optmod/jquery";
+﻿/// <reference types="jquery" />
+import $ from "@optionaldeps/jquery";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
@@ -217,7 +218,7 @@ if (typeof $ !== "undefined" && $.fn) {
         return null;
     };
 
-    ($.fn as any).getWidget = function<TWidget>(this: JQuery, type: { new (...args: any[]): TWidget }) {
+    $.fn.getWidget = function<TWidget>(this: JQuery, type: { new (...args: any[]): TWidget }) {
         if (this == null) {
             throw new ArgumentNullException('element');
         }

@@ -1,6 +1,5 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-/// <reference types="jqueryui" />
 import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ArgumentNullException, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
@@ -561,7 +560,7 @@ declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected onDialogClose(): void;
     protected addCssClass(): void;
     protected getDialogButtons(): DialogButton[];
-    protected getDialogOptions(): JQueryUI.DialogOptions;
+    protected getDialogOptions(): any;
     protected getDialogTitle(): string;
     dialogClose(): void;
     get dialogTitle(): string;
@@ -724,7 +723,7 @@ declare class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> 
     protected afterInit(): void;
     protected useAsync(): boolean;
     destroy(): void;
-    protected getDialogOptions(): JQueryUI.DialogOptions;
+    protected getDialogOptions(): any;
     protected getDialogButtons(): DialogButton[];
     protected okClick(): void;
     protected okClickValidated(): void;
@@ -2074,7 +2073,7 @@ declare class ColumnPickerDialog extends TemplatedDialog<any> {
         text: string;
         click: () => void;
     }[];
-    protected getDialogOptions(): JQueryUI.DialogOptions;
+    protected getDialogOptions(): any;
     private getTitle;
     private allowHide;
     private createLI;
@@ -2244,8 +2243,8 @@ declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     protected initDialog(dialog: Widget<any>): void;
     protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
     protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-    protected getDialogOptions(): JQueryUI.DialogOptions;
-    protected getDialogOptionsFor(itemType: string): JQueryUI.DialogOptions;
+    protected getDialogOptions(): any;
+    protected getDialogOptionsFor(itemType: string): any;
     protected getDialogTypeFor(itemType: string): {
         new (...args: any[]): Widget<any>;
     };

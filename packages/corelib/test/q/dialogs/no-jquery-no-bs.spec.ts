@@ -3,8 +3,8 @@ import { alertDialog, confirmDialog, informationDialog, warningDialog, iframeDia
 test('Q.alertDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
-    (global as any).window = global;
-    global.alert = function(message) {
+    (globalThis as any).window = globalThis;
+    globalThis.alert = function(message) {
         alertCount++;
         alertMessage = message;
     }
@@ -14,8 +14,8 @@ test('Q.alertDialog uses window.alert when no BS/jQuery UI loaded', function() {
         expect(alertMessage).toBe('test message');
     } 
     finally {
-        delete global.alert;
-        delete global.window;
+        delete globalThis.alert;
+        delete globalThis.window;
     }
 });
 
@@ -23,8 +23,8 @@ test('Q.informationDialog uses window.alert when no BS/jQuery UI loaded', functi
     var alertCount = 0;
     var alertMessage = null;
     try {
-        (global as any).window = global;
-        global.alert = function(message) {
+        (globalThis as any).window = globalThis;
+        globalThis.alert = function(message) {
             alertCount++;
             alertMessage = message;
         }
@@ -34,16 +34,16 @@ test('Q.informationDialog uses window.alert when no BS/jQuery UI loaded', functi
         expect(alertMessage).toBe('test message');
     }
     finally {
-        delete global.alert;
-        delete global.window;
+        delete globalThis.alert;
+        delete globalThis.window;
     }
 });
 
 test('Q.warningDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
-    (global as any).window = global;
-    global.alert = function(message) {
+    (globalThis as any).window = globalThis;
+    globalThis.alert = function(message) {
         alertCount++;
         alertMessage = message;
     }
@@ -54,16 +54,16 @@ test('Q.warningDialog uses window.alert when no BS/jQuery UI loaded', function()
         expect(alertMessage).toBe('test message');
     }
     finally {
-        delete global.alert;
-        delete global.window;
+        delete globalThis.alert;
+        delete globalThis.window;
     }
 });
 
 test('Q.confirmDialog uses window.confirm when no BS/jQuery UI loaded', function() {
     var confirmCount = 0;           
     var confirmMessage: string = null;
-    (global as any).window = global;
-    global.confirm = function(message) {
+    (globalThis as any).window = globalThis;
+    globalThis.confirm = function(message) {
         confirmCount++;
         confirmMessage = message;
         return true;
@@ -78,16 +78,16 @@ test('Q.confirmDialog uses window.confirm when no BS/jQuery UI loaded', function
         expect(onYesCalled).toBe(true);
     }
     finally {
-        delete global.confirm;
-        delete global.window;
+        delete globalThis.confirm;
+        delete globalThis.window;
     }
 });
 
 test('Q.iframeDialog uses window.alert when no BS/jQuery UI loaded', function() {
     var alertCount = 0;
     var alertMessage = null;
-    (global as any).window = global;
-    global.alert = function(message) {
+    (globalThis as any).window = globalThis;
+    globalThis.alert = function(message) {
         alertCount++;
         alertMessage = message;
     }
@@ -100,7 +100,7 @@ test('Q.iframeDialog uses window.alert when no BS/jQuery UI loaded', function() 
         expect(alertMessage).toBe(testHtml);
     }
     finally {
-        delete global.alert;
-        delete global.window;
+        delete globalThis.alert;
+        delete globalThis.window;
     }
 });

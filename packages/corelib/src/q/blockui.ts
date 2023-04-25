@@ -1,5 +1,5 @@
 ﻿import { extend } from "./system"
-import $ from "@optmod/jquery";
+import $ from "@optionaldeps/jquery";
 
 export interface JQBlockUIOptions {
     useTimeout?: boolean;   

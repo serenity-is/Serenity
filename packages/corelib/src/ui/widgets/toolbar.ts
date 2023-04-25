@@ -39,7 +39,7 @@ export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
             }
 
             var menu = this.options.menu;
-            menu.show().position({
+            (menu.show() as any).position?.({
                 my: this.options.positionMy ?? 'left top',
                 at: this.options.positionAt ?? 'left bottom',
                 of: this.element
@@ -51,8 +51,8 @@ export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
             });
         });
 
-        this.options.menu.hide().appendTo(document.body)
-            .addClass('s-PopupMenu').menu();
+        (this.options.menu.hide().appendTo(document.body)
+            .addClass('s-PopupMenu') as any).menu?.();
     }
 
     destroy() {

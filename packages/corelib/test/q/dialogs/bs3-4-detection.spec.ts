@@ -3,7 +3,7 @@
  */
 
 function setupDummyJQueryForModal(callback) {
-    global.$ = global.jQuery = function dummyJQueryForModal(html) {
+    globalThis.$ = globalThis.jQuery = function dummyJQueryForModal(html) {
         return {
             _html: html,
             html: function () {
@@ -39,14 +39,14 @@ test('BS3 is detected when modal version starts with 3', function () {
             passedHtml = html;
         });
         try {
-            (global.$ as any).fn = {
+            (globalThis.$ as any).fn = {
                 modal: {
                     Constructor: {
                         VERSION: '3.3.1'
                     }
                 }
             }
-            var dialogs = require("@/q/dialogs");
+            var dialogs = globalThis.require("@/q/dialogs");
             dialogs.alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
@@ -57,8 +57,8 @@ test('BS3 is detected when modal version starts with 3', function () {
             expect(idx2).toBeGreaterThan(idx1);
         }
         finally {
-            delete global.$;
-            delete global.jQuery;
+            delete globalThis.$;
+            delete globalThis.jQuery;
         }
     });
 });
@@ -72,12 +72,12 @@ test('BS4 is detected when modal version does not exist', function () {
             passedHtml = html;
         });
         try {
-            (global.$ as any).fn = {
+            (globalThis.$ as any).fn = {
                 modal: {
                 }
             }
 
-            var dialogs = require("@/q/dialogs");
+            var dialogs = globalThis.require("@/q/dialogs");
             dialogs.alertDialog("hello");
 
             expect(passedHtml).not.toBeNull();
@@ -89,8 +89,8 @@ test('BS4 is detected when modal version does not exist', function () {
             expect(idx1).toBeGreaterThan(idx2);
         }
         finally {
-            delete global.$;
-            delete global.jQuery;
+            delete globalThis.$;
+            delete globalThis.jQuery;
         }
     });
 });
@@ -103,7 +103,7 @@ test('BS4 is detected when modal version is something other than 3', function ()
             passedHtml = html;
         });
         try {
-            (global.$ as any).fn = {
+            (globalThis.$ as any).fn = {
                 modal: {
                     Constructor: {
                         VERSION: '4.1.0'
@@ -111,7 +111,7 @@ test('BS4 is detected when modal version is something other than 3', function ()
                 }
             }
 
-            var dialogs = require("@/q/dialogs");
+            var dialogs = globalThis.require("@/q/dialogs");
             dialogs.alertDialog("hello");
 
             expect(passedHtml).toBeDefined();
@@ -123,8 +123,10 @@ test('BS4 is detected when modal version is something other than 3', function ()
             expect(idx1).toBeGreaterThan(idx2);
         }
         finally {
-            delete global.$;
-            delete global.jQuery;
+            delete globalThis.$;
+            delete globalThis.jQuery;
         }
     });
 });
+
+export {}

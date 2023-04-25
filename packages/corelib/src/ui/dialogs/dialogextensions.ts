@@ -3,7 +3,7 @@
 export namespace DialogExtensions {
 
     export function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery {
-        var dlg = dialog.dialog();
+        var dlg = (dialog as any)?.dialog?.();
         dlg.dialog('option', 'resizable', true);
         if (mw != null) {
             dlg.dialog('option', 'minWidth', mw);

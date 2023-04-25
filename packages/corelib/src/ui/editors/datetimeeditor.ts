@@ -30,10 +30,10 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
             // @ts-ignore
             flatpickr(input[0], this.getFlatpickrOptions());
         }
-        else if ($.fn.datepicker) {
+        else if (($.fn as any)?.datepicker) {
             input.addClass('dateQ');
 
-            input.datepicker({
+            (input as any).datepicker({
                 showOn: 'button',
                 beforeShow: function () {
                     if (input.hasClass('readonly') as any)

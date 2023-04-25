@@ -112,7 +112,7 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
                         }
                     }
 
-                    if ($.fn.tooltip) {
+                    if (($.fn as any).tooltip) {
                         var $el: any;
                         var hl = getHighlightTarget(el);
                         if (hl)
@@ -120,7 +120,7 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
                         else
                             $el = $(el);
 
-                        $.fn.tooltip && $el.tooltip({
+                        ($.fn as any).tooltip && $el.tooltip({
                             title: validator.errorList[0].message,
                             trigger: 'manual'
                         }).tooltip('show');

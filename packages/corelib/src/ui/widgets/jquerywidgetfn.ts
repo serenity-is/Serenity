@@ -1,4 +1,6 @@
-﻿declare global {
+﻿/// <reference types="jquery" />
+
+declare global {
     interface JQuery {
         getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
         tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;

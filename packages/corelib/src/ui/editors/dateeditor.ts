@@ -20,10 +20,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             // @ts-ignore
             flatpickr(input[0], DateEditor.flatPickrOptions(input));
         }
-        else if ($.fn.datepicker) {
-            input.datepicker({
+        else if (($.fn as any)?.datepicker) {
+            (input as any).datepicker({
                 showOn: 'button',
-                beforeShow: (inp, inst) => {
+                beforeShow: (inp: any, inst: any) => {
                     if (input.hasClass('readonly') as any)
                         return false as any;
                     DateEditor.uiPickerZIndexWorkaround(this.element);
@@ -413,7 +413,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         if (dialogIndex == null || isNaN(dialogIndex))
             return;
         setTimeout(() => {
-            var widget = input.datepicker('widget');
+            var widget = (input as any).datepicker('widget');
             if (!widget?.length)
                 return
             var zIndex = parseInt(widget.css('z-index'));
@@ -424,20 +424,20 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
 }
 
 function jQueryDatepickerInitialization(): boolean {
-    if (!$.datepicker || !$.datepicker.regional || !$.datepicker.regional.en)
+    if (!($ as any).datepicker?.regional?.en)
         return false;
     let order = Culture.dateOrder;
     let s = Culture.dateSeparator;
     let culture = ($('html').attr('lang') || 'en').toLowerCase();
-    if (!$.datepicker.regional[culture]) {
+    if (!($ as any).datepicker.regional[culture]) {
         culture = culture.split('-')[0];
-        if (!$.datepicker.regional[culture]) {
+        if (!($ as any).datepicker.regional[culture]) {
             culture = 'en';
         }
     }
-    $.datepicker.setDefaults($.datepicker.regional['en']);
-    $.datepicker.setDefaults($.datepicker.regional[culture]);
-    $.datepicker.setDefaults({
+    ($ as any).datepicker.setDefaults(($ as any).datepicker.regional['en']);
+    ($ as any).datepicker.setDefaults(($ as any).datepicker.regional[culture]);
+    ($ as any).datepicker.setDefaults({
         dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
             (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                 'dd' + s + 'mm' + s + 'yy')),
@@ -449,8 +449,8 @@ function jQueryDatepickerInitialization(): boolean {
         changeYear: true
     });
 
-    if ($.ui && $.ui.version <= '1.12.1') {
-        $.datepicker.setDefaults({
+    if (($ as any).ui && ($ as any).ui.version <= '1.12.1') {
+        ($ as any).datepicker.setDefaults({
             buttonImage: null,
             buttonImageOnly: false,
             buttonText: '<i class="fa fa-calendar"></i>'

@@ -14,11 +14,11 @@ export namespace TabsExtensions {
             return;
         }
 
-        if (isDisabled && index === tabs.tabs('option', 'active')) {
-            tabs.tabs('option', 'active', 0);
+        if (isDisabled && index === (tabs as any).tabs('option', 'active')) {
+            (tabs as any).tabs?.('option', 'active', 0);
         }
 
-        tabs.tabs(isDisabled ? 'disable' : 'enable', index);
+        (tabs as any).tabs?.(isDisabled ? 'disable' : 'enable', index);
     }
 
     export function toggle(tabs: JQuery, tabKey: string, visible: boolean) {
@@ -34,8 +34,8 @@ export namespace TabsExtensions {
             return;
         }
 
-        if (!visible && index === tabs.tabs('option', 'active')) {
-            tabs.tabs('option', 'active', 0);
+        if (!visible && index === (tabs as any).tabs?.('option', 'active')) {
+            (tabs as any).tabs?.('option', 'active', 0);
         }
 
         tabs.children('ul').children('li').eq(index).toggle(visible);
@@ -44,7 +44,7 @@ export namespace TabsExtensions {
     export function activeTabKey(tabs: JQuery) {
         var href = tabs.children('ul')
             .children('li')
-            .eq(tabs.tabs('option', 'active'))
+            .eq((tabs as any).tabs?.('option', 'active'))
             .children('a')
             .attr('href')
             .toString();
@@ -84,8 +84,8 @@ export namespace TabsExtensions {
         if (index == null) {
             return;
         }
-        if (index !== tabs.tabs('option', 'active')) {
-            tabs.tabs('option', 'active', index);
+        if (index !== (tabs as any).tabs?.('option', 'active')) {
+            (tabs as any).tabs?.('option', 'active', index);
         }
     }
 }

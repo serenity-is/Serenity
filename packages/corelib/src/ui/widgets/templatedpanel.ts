@@ -15,7 +15,7 @@ export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
 
     destroy() {
         if (this.tabs) {
-            this.tabs.tabs('destroy');
+            (this.tabs as any).tabs?.('destroy');
             this.tabs = null;
         }
 
@@ -57,7 +57,7 @@ export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
         if (tabsDiv.length === 0) {
             return;
         }
-        this.tabs = tabsDiv.tabs({});
+        this.tabs = (tabsDiv as any).tabs?.({});
     }
 
     protected initToolbar(): void {

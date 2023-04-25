@@ -1,5 +1,4 @@
 /// <reference types="jquery" />
-/// <reference types="jqueryui" />
 /// <reference types="jquery.validation" />
 type Grouping<TItem> = {
     [key: string]: TItem[];
@@ -171,7 +170,7 @@ declare function isBS3(): boolean;
 declare function isBS5Plus(): boolean;
 declare function bsModalMarkup(title: string, body: string, modalClass?: string): string;
 declare function dialogButtonToBS(x: DialogButton): string;
-declare function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;
+declare function dialogButtonToUI(x: DialogButton): any;
 declare function alertDialog(message: string, options?: AlertOptions): void;
 /** @obsolete use alertDialog */
 declare const alert: typeof alertDialog;

@@ -16,15 +16,12 @@
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "types": [
-      "jquery",
-      "jquery.validation",
-      "jqueryui"
     ],
     "rootDir": "./src",
     "paths": {
       "@serenity-is/corelib/q": ["./src/q"],
       "@serenity-is/corelib/slick": ["./src/slick"],
-      "@optmod/*": ["./src/globals/*-optmod"]
+      "@optionaldeps/*": ["./src/globals/*-module"]
     },
     "outDir": "./out",
     "target": "ES5",

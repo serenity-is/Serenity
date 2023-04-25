@@ -9,7 +9,7 @@ import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetDialogClass } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
-import $ from "@optmod/jquery"
+import $ from "@optionaldeps/jquery"
 
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
@@ -322,11 +322,11 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         return dialog;
     }
 
-    protected getDialogOptions(): JQueryUI.DialogOptions {
+    protected getDialogOptions(): any {
         return {};
     }
 
-    protected getDialogOptionsFor(itemType: string): JQueryUI.DialogOptions {
+    protected getDialogOptionsFor(itemType: string): any {
         if (itemType === this.getItemType())
             return this.getDialogOptions();
 

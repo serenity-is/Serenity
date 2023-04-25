@@ -5,11 +5,11 @@ const root = resolve('./');
 
 const nscorelibPath = "~/out/Serenity.CoreLib.js";
 
-export function loadNSCorelib(window: any) {
+export function loadNSCorelib(window) {
     loadExternalScripts(window, nscorelibPath);
 }
 
-export function loadExternalScripts(window: any, ...scripts: string[]) {
+export function loadExternalScripts(window, ...scripts) {
     scripts.forEach(path => {
         if (path.startsWith('~/'))
             path = join(root, path.substring(2));

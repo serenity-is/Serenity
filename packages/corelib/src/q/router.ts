@@ -1,6 +1,6 @@
 ﻿import { startsWith } from "./strings";
 import { closePanel } from "./dialogs";
-import $ from "@optmod/jquery";
+import $ from "@optionaldeps/jquery";
 
 export interface HandleRouteEventArgs {
     handled: boolean,
@@ -170,7 +170,7 @@ export namespace Router {
             for (var i = same; i < dialogs.length; i++) {
                 var d = $(dialogs[i]);
                 if (d.hasClass('ui-dialog-content'))
-                    d.dialog('close');
+                    (d as any).dialog?.('close');
                 else if (d.hasClass('s-Panel'))
                     closePanel(d);
             }

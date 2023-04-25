@@ -12,16 +12,15 @@
       "jquery",
       "jquery.validation",
       "jqueryui",
-      "jest",
-      "node"
+      "jest"
     ],
-    "outDir": "../../dist/test",
-    "baseUrl": ".",
+    "rootDir": "../",
+    "outDir": "../out/test",
     "paths": {
       "@/*": [ "../src/*" ],
       "@serenity-is/corelib/q": ["../src/q"],
       "@serenity-is/corelib/slick": ["../src/slick"],
-      "@optmod/*": ["./testutil/*-optmod"]
+      "@optionaldeps/*": ["./testutil/*-module"]
     },
     "noImplicitAny": false,
     "lib": [
@@ -35,8 +34,12 @@
     "jsxFragmentFactory": "Fragment"
   },
   "include": [
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
+    "../src/globals/jquery-globals.ts",
+    "../src/globals/jquery.validation-globals.ts",
+    "../src/globals/select2-globals.ts",
+    "../src/ui/widgets/jquerywidgetfn.ts",
+    "./**/*.spec.ts",
+    "./**/*.spec.tsx"
   ],
   "exclude": []
 }

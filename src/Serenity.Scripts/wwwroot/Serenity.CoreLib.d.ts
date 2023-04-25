@@ -1,5 +1,4 @@
 /// <reference types="jquery" />
-/// <reference types="jqueryui" />
 /// <reference types="jquery.validation" />
 
 /******************************************************************************
@@ -573,7 +572,7 @@ declare namespace Q {
     function isBS5Plus(): boolean;
     function bsModalMarkup(title: string, body: string, modalClass?: string): string;
     function dialogButtonToBS(x: DialogButton): string;
-    function dialogButtonToUI(x: DialogButton): JQueryUI.DialogButtonOptions;
+    function dialogButtonToUI(x: DialogButton): any;
     function alertDialog(message: string, options?: AlertOptions): void;
     /** @obsolete use alertDialog */
     const alert: typeof alertDialog;
@@ -3018,7 +3017,7 @@ declare namespace Serenity {
         protected onDialogClose(): void;
         protected addCssClass(): void;
         protected getDialogButtons(): Q.DialogButton[];
-        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogOptions(): any;
         protected getDialogTitle(): string;
         dialogClose(): void;
         get dialogTitle(): string;
@@ -3181,7 +3180,7 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogOptions(): any;
         protected getDialogButtons(): Q.DialogButton[];
         protected okClick(): void;
         protected okClickValidated(): void;
@@ -4508,7 +4507,7 @@ declare namespace Serenity {
             text: string;
             click: () => void;
         }[];
-        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogOptions(): any;
         private getTitle;
         private allowHide;
         private createLI;
@@ -4678,8 +4677,8 @@ declare namespace Serenity {
         protected initDialog(dialog: Widget<any>): void;
         protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
         protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getDialogOptionsFor(itemType: string): JQueryUI.DialogOptions;
+        protected getDialogOptions(): any;
+        protected getDialogOptionsFor(itemType: string): any;
         protected getDialogTypeFor(itemType: string): {
             new (...args: any[]): Widget<any>;
         };

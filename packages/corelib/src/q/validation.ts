@@ -5,19 +5,20 @@ import { tryGetText } from "./localtext";
 import { parseDate, parseHourAndMin, parseDayHourAndMin, parseDecimal, parseInteger } from "./formatting";
 import { isBS3 } from "./dialogs";
 import { htmlEncode } from "./html";
+import validator from "@optionaldeps/jquery.validation";
 
-if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validator.addMethod) {
+if (validator && validator.methods && validator.addMethod) {
 
-    if (($.validator as any)["prototype"].showLabel) {
-        var orgShowLabel = ($.validator as any)["prototype"].showLabel;
-        ($.validator as any)["prototype"].showLabel = function(element: any, message: any) {
+    if ((validator as any).prototype.showLabel) {
+        var orgShowLabel = (validator as any).prototype.showLabel;
+        (validator as any).prototype.showLabel = function(element: any, message: any) {
             if (message != null)
                 message = htmlEncode(message);
             orgShowLabel.call(this, element, message);
         }
     }
 
-    $.validator.addMethod('customValidate', function (value: any, element: any) {
+    validator.addMethod('customValidate', function (value: any, element: any) {
         var result = this.optional(element) as any;
         if (element == null || !!result) {
             return result;
@@ -46,7 +47,7 @@ if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validato
         return $(e).data('customValidationMessage');
     });
 
-    $.validator.addMethod("dateQ", function (value, element) {
+    validator.addMethod("dateQ", function (value, element) {
         var o = this.optional(element);
         if (o)
             return o;
@@ -60,7 +61,7 @@ if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validato
         return z.getTime() === d.getTime();
     });
 
-    $.validator.addMethod("dateTimeQ", function (value, element) {
+    validator.addMethod("dateTimeQ", function (value, element) {
         var o = this.optional(element);
         if (o)
             return o;
@@ -69,25 +70,25 @@ if (typeof $ !== "undefined" && $.validator && $.validator.methods && $.validato
         return !!d;
     });        
 
-    $.validator.addMethod("hourAndMin", function (value, element) {
+    validator.addMethod("hourAndMin", function (value, element) {
         return this.optional(element) || !isNaN(parseHourAndMin(value));
     });
 
-    $.validator.addMethod("dayHourAndMin", function (value, element) {
+    validator.addMethod("dayHourAndMin", function (value, element) {
         return this.optional(element) || !isNaN(parseDayHourAndMin(value));
     });
 
-    $.validator.addMethod("decimalQ", function (value, element) {
+    validator.addMethod("decimalQ", function (value, element) {
         return this.optional(element) || !isNaN(parseDecimal(value));
     });
 
-    $.validator.addMethod("integerQ", function (value, element) {
+    validator.addMethod("integerQ", function (value, element) {
         return this.optional(element) || !isNaN(parseInteger(value));
     });
 
-    let oldEmail = $.validator.methods['email'];
+    let oldEmail = validator.methods['email'];
     let emailRegex: RegExp = null;
-    $.validator.addMethod("email", function (value, element) {
+    validator.addMethod("email", function (value, element) {
         if (Config.emailAllowOnlyAscii)
             return oldEmail.call(this, value, element);
 
@@ -114,9 +115,9 @@ export function loadValidationErrorMessages() {
     const addMsg = (m: string, k: string) => {
         var txt = tryGetText("Validation." + k);
         if (txt)
-            $.validator.messages[m] = txt;
-        else if (!$.validator.messages[m])
-            $.validator.messages[m] = k + "?";
+            validator.messages[m] = txt;
+        else if (!validator.messages[m])
+            validator.messages[m] = k + "?";
     }
 
     addMsg("required", "Required");
@@ -132,11 +133,13 @@ export function loadValidationErrorMessages() {
     addMsg("url", "Url");
 }
 
-function setTooltip(el: JQuery, val: string): JQuery {
+function setTooltip(el: JQuery, val: string, show: boolean): JQuery {
     if (isBS3())
-        el.attr('data-original-title', val || '').tooltip('fixTitle');
+        (el.attr('data-original-title', val || '') as any)?.tooltip?.('fixTitle');
     else
-        el.attr('title', val || '').tooltip('_fixTitle');
+        (el.attr('title', val || '') as any)?.tooltip?.('_fixTitle');
+    if (show != null)
+        (el as any).tooltip?.(show ? 'show' : 'hide');
     return el;
 }
 
@@ -191,7 +194,7 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
             }
         },
         showErrors: function () {
-            if ($.fn.tooltip) {
+            if (($?.fn as any)?.tooltip) {
                 var i: number, elements: any, error: any, $el: any, hl: any;
                 for (i = 0; this.errorList[i]; i++) {
                     error = this.errorList[i];
@@ -201,9 +204,9 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
                     else
                         $el = $(error.element);
                     if (i != 0)
-                        setTooltip($el, '').tooltip('hide');
+                        setTooltip($el, '', false);
                     else
-                        setTooltip($el, error.message).tooltip('show');
+                        setTooltip($el, error.message, true);
                 }
 
                 for (i = 0, elements = this.validElements(); elements[i]; i++) {
@@ -212,11 +215,11 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
                         $el = $(hl);
                     else
                         $el = $(error.element);
-                    setTooltip($el, '').tooltip('hide');
+                    setTooltip($el, '', false);
                 }
             }
 
-            ($.validator as any)["prototype"].defaultShowErrors.call(this);
+            (validator as any)["prototype"].defaultShowErrors.call(this);
         }
     }
 }
