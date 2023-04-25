@@ -1,4 +1,4 @@
-import { Lookup } from "@/q/lookup";
+import { Lookup } from "./lookup";
 
 test('itemById is populated', function() {
     var item1 = { x: 5, n: 'Item5' };

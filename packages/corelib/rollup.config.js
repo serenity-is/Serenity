@@ -262,7 +262,8 @@ export default [
             typescript({
                 tsconfig: 'tsconfig.json',
                 outDir: './out',
-                sourceRoot: resolve('./corelib')
+                sourceRoot: resolve('./corelib'),
+                exclude: ["**/*.spec.ts", "**/*.spec.tsx"]
             }),
             extendGlobals()
         ],
