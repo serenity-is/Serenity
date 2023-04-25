@@ -1,4 +1,4 @@
-import { useIdPrefix } from '@/ui/widgets/templatedwidget';
+import { useIdPrefix } from './templatedwidget';
 
 describe('useIdPrefix', () => {
 

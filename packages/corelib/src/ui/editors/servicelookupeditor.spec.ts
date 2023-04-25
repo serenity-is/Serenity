@@ -1,5 +1,5 @@
-import { ServiceLookupEditor } from "@/ui/editors/servicelookupeditor";
-import { ServiceOptions, ServiceResponse } from "@/q";
+import { ServiceLookupEditor } from "./servicelookupeditor";
+import { type ListResponse, type ServiceOptions, type ServiceResponse } from "../../q/servicetypes";
 
 let oldWindowAlert: any;
 beforeAll(() => {
@@ -34,8 +34,8 @@ test('ServiceLookupEditor loads items from service', () => {
 
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
             ]
         };
 
@@ -71,7 +71,7 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
         expect(document.body.querySelector(".select2-active")).not.toBeNull();
         expect(options.url).toBe("/Services/Test/List");
 
-        const response = {
+        const response: ListResponse<any> = {
             Entities: []
         };
 
@@ -108,9 +108,9 @@ test('ServiceLookupEditor can search items', () => {
 
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
-            ].filter(x =>  containsText == null || containsText === "" || x.text.indexOf(containsText) >= 0)
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
+            ].filter(x => containsText == null || containsText === "" || x.text.indexOf(containsText) >= 0)
         };
 
         options.onSuccess(response);
@@ -148,9 +148,9 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
         const containsText = options.request.ContainsText;
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
-            ].filter(x =>  containsText == null || containsText === "" || x.text.indexOf(containsText) >= 0)
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
+            ].filter(x => containsText == null || containsText === "" || x.text.indexOf(containsText) >= 0)
         };
 
         options.onSuccess(response);
@@ -186,7 +186,7 @@ test('ServiceLookupEditor aborts previous requests', () => {
     if (debounceDelay == null)
         throw new Error("getTypeDelay is null");
 
-    let containsTexts = [];
+    let containsTexts: any[] = [];
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
@@ -194,8 +194,8 @@ test('ServiceLookupEditor aborts previous requests', () => {
 
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
             ]
         };
 
@@ -243,8 +243,8 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
     if (debounceDelay == null)
         throw new Error("getTypeDelay is null");
 
-    let containsTexts = [];
-    let successCallbacks = [];
+    let containsTexts: any[] = [];
+    let successCallbacks: (() => void)[] = [];
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
@@ -252,8 +252,8 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
 
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
             ]
         };
 
@@ -322,17 +322,17 @@ test('ServiceLookupEditor aborts while request is pending', () => {
     if (debounceDelay == null)
         throw new Error("getTypeDelay is null");
 
-    let containsTexts = [];
-    let successCallbacks = [];
-    let abortedTexts = [];
+    let containsTexts: any[] = [];
+    let successCallbacks: (() => void)[] = [];
+    let abortedTexts: any[] = [];
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
 
         const response = {
             Entities: [
-                {id: 1, text: "Test"},
-                {id: 2, text: "Test2"}
+                { id: 1, text: "Test" },
+                { id: 2, text: "Test2" }
             ]
         };
 

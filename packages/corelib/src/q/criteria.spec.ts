@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 import { Criteria } from "./criteria";
 
 describe("Criteria Builder", () => {

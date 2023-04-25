@@ -1,5 +1,4 @@
-﻿/// <reference types="jquery" />
-import $ from "@optionaldeps/jquery";
+﻿import $ from "@optionaldeps/jquery";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";

@@ -179,7 +179,7 @@ describe("Bootstrap noConflict", function () {
         }
     });
 
-    test('noConflict called if jQuery ui button widget exists and $.fn.button has noConflict method', async function () {
+    it('noConflict called if jQuery ui button widget exists and $.fn.button has noConflict method', async function () {
         setupDummyJQuery();
         try {
             var noConflictCalled = false;

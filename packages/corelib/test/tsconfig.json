@@ -29,9 +29,8 @@
       "DOM"
     ],
     "noEmitHelpers": false,
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsx": "react-jsx",
+    "jsxImportSource": "jsx-dom"
   },
   "include": [
     "../src/globals/jquery-globals.ts",

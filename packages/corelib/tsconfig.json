@@ -16,12 +16,19 @@
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "types": [
+      "jest"
     ],
     "rootDir": "./src",
     "paths": {
-      "@serenity-is/corelib/q": ["./src/q"],
-      "@serenity-is/corelib/slick": ["./src/slick"],
-      "@optionaldeps/*": ["./src/globals/*-module"]
+      "@serenity-is/corelib/q": [
+        "./src/q"
+      ],
+      "@serenity-is/corelib/slick": [
+        "./src/slick"
+      ],
+      "@optionaldeps/*": [
+        "./src/globals/*-module"
+      ]
     },
     "outDir": "./out",
     "target": "ES5",
@@ -32,7 +39,10 @@
     ],
     "noEmitHelpers": false,
     "importHelpers": false,
-    "jsx": "react"
+    "jsx": "react-jsx",
+    "jsxImportSource": "jsx-dom"
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

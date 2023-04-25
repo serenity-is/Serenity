@@ -25,8 +25,8 @@ export default {
         },
         transform: {
           react: {
-            pragma: 'h',
-            pragmaFrag: 'Fragment'
+            runtime: 'automatic',
+            importSource: 'jsx-dom'
           }
         }
       },

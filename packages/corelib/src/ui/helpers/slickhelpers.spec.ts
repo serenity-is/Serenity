@@ -1,5 +1,5 @@
-import { localText, LT } from "@/q";
-import { PropertyItemSlickConverter } from "@/ui/helpers/slickhelpers";
+import { LT } from "../../q/localtext";
+import { PropertyItemSlickConverter } from "./slickhelpers";
 
 describe('SlickHelpers.toSlickColumn', () => {
     it('tries to load a localText with the items name as key', () => {

@@ -1,7 +1,7 @@
-import { StringEditor } from '@/ui/editors/stringeditor';
-import { h, Fragment, FC } from 'jsx-dom';
-import $ from "../../testutil/jquery-nano";
-import { jsxDomWidget as jsxDomWidget } from '@/ui/widgets/jsx';
+import { StringEditor } from '../editors/stringeditor';
+import { type FC } from 'jsx-dom';
+import $ from "@optionaldeps/jquery";
+import { jsxDomWidget } from './jsx';
 
 test('render childless element', function () {
     const element = <br />;
@@ -34,15 +34,15 @@ test('render array of children', function () {
     const element = (
         <div>
             {[
-                <span key={0}>0</span>,
-                <span key={1}>1</span>,
+                <span data-key={0}>0</span>,
+                <span data-key={1}>1</span>,
             ]}
 
             <span>2</span>
         </div>
     );
 
-    expect(element.outerHTML).toBe('<div><span key="0">0</span><span key="1">1</span><span>2</span></div>');
+    expect(element.outerHTML).toBe('<div><span data-key="0">0</span><span data-key="1">1</span><span>2</span></div>');
 });
 
 test('render number child', function () {
@@ -239,8 +239,8 @@ test('assign styles', function () {
 
 test('assign styles with dashed property names', function () {
     const style = {
-        'padding-top': 10,
-        'font-size': 12,
+        paddingTop: 10,
+        fontSize: 12,
     };
 
     // ts-expect-error TODO: update the types
@@ -351,8 +351,9 @@ test('attach event listeners but drop the dash after on', function () {
     const addEventListener = jest.spyOn(EventTarget.prototype, 'addEventListener');
 
     const handler = function () { };
+    const assignProps = { onremoteinput: handler, onRemoteinput: handler };
     const element = (
-        <a href="#" onremoteinput={handler} onRemoteinput={handler}>
+        <a href="#" {...assignProps}>
             Download
         </a>
     );
@@ -457,11 +458,11 @@ const _ = <>
     <Children>
         <Children>
             <input type="button"
-                onclick={console.log}
+                onClick={console.log}
                 style=""
-                autocaptialize='off' />
-            <div style={{}} contenteditable></div>
-            <svg id='svg' draggable='true'>
+                autoCapitalize='off' />
+            <div style={{}} contentEditable></div>
+            <svg id='svg'>
                 <g>
                     <path />
                 </g>
@@ -514,7 +515,7 @@ describe('jsx: fragments', () => {
     it('return Document Fragment', () => expect((<></>)).toBeInstanceOf(DocumentFragment));
 
     it('preserve children', () => {
-        const fragment = Array.from<HTMLElement>((<><div>1</div><div>2</div></>).children);
+        const fragment = Array.from((<><div>1</div><div>2</div></>).children);
         expect(fragment.length).toBe(2);
         expect(fragment[0].textContent).toBe('1');
         expect(fragment[1].textContent).toBe('2');
@@ -583,7 +584,7 @@ describe('jsx: widget integration', () => {
     it('can create input', () => {
         var ed: StringEditor;
         window.$ = window.jQuery = $;
-        var el = <StringEditor_ ref={x => ed = x } readOnly={true} />;
+        var el = <StringEditor_ ref={x => ed = x} readOnly={true} />;
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();
