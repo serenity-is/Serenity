@@ -11,7 +11,8 @@ namespace Serenity.Web;
 
 internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFilter, IAntiforgeryPolicy
 {
-    private const string AntiforgeryTokenInvalid = "Skipping the execution of current filter as its not the most effective filter implementing the policy {FilterPolicy}.";
+    private const string AntiforgeryTokenInvalid = "Antiforgery token validation failed. {Message}";
+    private const string NotMostEffectiveFilter = "Skipping the execution of current filter as its not the most effective filter implementing the policy {FilterPolicy}.";
 
     private readonly IAntiforgery antiforgery;
     private readonly ILogger logger;
@@ -34,6 +35,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
         if (!context.IsEffectivePolicy<IAntiforgeryPolicy>(this))
         {
+            logger?.LogTrace(NotMostEffectiveFilter, typeof(IAntiforgeryPolicy));
             return;
         }
 
