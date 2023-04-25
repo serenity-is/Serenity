@@ -1,5 +1,5 @@
 import $ from "@optionaldeps/jquery"
-import { loadExternalScripts, loadNSCorelib } from "../testutil"
+import { loadNSCorelib } from "../testutil"
 
 test('works when a dummy jQuery ui object exists', function() {
     ($ as any).ui = {};

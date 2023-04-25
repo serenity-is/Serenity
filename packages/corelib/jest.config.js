@@ -6,7 +6,7 @@ export default {
     '^@serenity-is/corelib/q$': '<rootDir>/src/q',
     '^@serenity-is/corelib/slick$': '<rootDir>/src/slick',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid',
-    '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-module',
+    '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
     '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
