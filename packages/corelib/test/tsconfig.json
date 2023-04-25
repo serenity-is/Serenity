@@ -1,5 +1,5 @@
 ﻿{
-  "extends": "../src/tsconfig.json",
+  "extends": "../tsconfig.json",
   "compileOnSave": false,
   "compilerOptions": {
     "noEmit": true,
@@ -37,5 +37,6 @@
   "include": [
     "**/*.spec.ts",
     "**/*.spec.tsx"
-  ]
+  ],
+  "exclude": []
 }

@@ -260,7 +260,7 @@ export default [
         ],
         plugins: [
             typescript({
-                tsconfig: 'src/tsconfig.json',
+                tsconfig: 'tsconfig.json',
                 outDir: './out',
                 sourceRoot: resolve('./corelib')
             }),

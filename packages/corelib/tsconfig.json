@@ -3,7 +3,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "declaration": true,
-    "declarationDir": "../out",
+    "declarationDir": "./out",
     "emitBOM": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
@@ -20,12 +20,13 @@
       "jquery.validation",
       "jqueryui"
     ],
+    "rootDir": "./src",
     "paths": {
-      "@serenity-is/corelib/q": ["./q"],
-      "@serenity-is/corelib/slick": ["./slick"],
-      "@optmod/*": ["./globals/*-optmod"]
+      "@serenity-is/corelib/q": ["./src/q"],
+      "@serenity-is/corelib/slick": ["./src/slick"],
+      "@optmod/*": ["./src/globals/*-optmod"]
     },
-    "outDir": "../out",
+    "outDir": "./out",
     "target": "ES5",
     "lib": [
       "ES5",
@@ -36,5 +37,5 @@
     "importHelpers": false,
     "jsx": "react"
   },
-  "exclude": ["**/*.spec.ts"]
+  "include": ["src"]
 }
