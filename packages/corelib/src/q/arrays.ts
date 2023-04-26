@@ -1,14 +1,8 @@
-﻿export type Grouping<TItem> = { [key: string]: TItem[] };
-
-/**
+﻿/**
  * Tests if any of array elements matches given predicate
  */
-export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean {
-    for (let x of array)
-        if (predicate(x))
-            return true;
-
-    return false;
+export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean) : boolean {
+    return array.some(predicate);
 }
 
 /**
@@ -33,76 +27,6 @@ export function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): 
             return x;
 
     throw new Error("first:No element satisfies the condition.!");
-}
-
-/**
- * Gets index of first element in an array that matches given predicate
- */
-export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
-    for (var i = 0; i < array.length; i++)
-        if (predicate(array[i]))
-            return i;
-
-    return -1;
-}
-
-/**
- * Inserts an item to the array at specified index
- */
-export function insert(obj: any, index: number, item: any): void {
-    if (obj.insert)
-        obj.insert(index, item);
-    else if (Object.prototype.toString.call(obj) === '[object Array]')
-        obj.splice(index, 0, item);
-    else
-        throw new Error("Object does not support insert!");
-}
-
-/**
- * Determines if the object is an array
- */
-export function isArray(obj: any): boolean {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-}
-
-/**
-* Gets first element in an array that matches given predicate.
-* Throws an error if no matches is found, or there are multiple matches.
-*/
-export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
-    let match: any;
-    let found = false;
-    for (let x of array)
-        if (predicate(x)) {
-            if (found)
-                throw new Error("single:sequence contains more than one element.");
-
-            found = true;
-            match = x;
-        }
-
-    if (!found)
-        throw new Error("single:No element satisfies the condition.");
-
-    return match;
-}
-
-/**
- * Maps an array into a dictionary with keys determined by specified getKey() callback,
- * and values that are arrays containing elements for a particular key.
- */
-export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem> {
-    let lookup: Grouping<TItem> = {};
-    for (let x of items) {
-        let key = getKey(x) || "";
-        let d = lookup[key];
-        if (!d) {
-            d = lookup[key] = [];
-        }
-
-        d.push(x);
-    }
-    return lookup;
 }
 
 
@@ -148,6 +72,76 @@ export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Group
     }
 
     return result;
+}
+
+/**
+ * Gets index of first element in an array that matches given predicate
+ */
+export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
+    for (var i = 0; i < array.length; i++)
+        if (predicate(array[i]))
+            return i;
+
+    return -1;
+}
+
+/**
+ * Inserts an item to the array at specified index
+ */
+export function insert(obj: any, index: number, item: any): void {
+    if (obj.insert)
+        obj.insert(index, item);
+    else if (Array.isArray(obj))
+        obj.splice(index, 0, item);
+    else
+        throw new Error("Object does not support insert!");
+}
+
+/**
+ * Determines if the object is an array
+ */
+export const isArray = Array.isArray;
+
+/**
+* Gets first element in an array that matches given predicate.
+* Throws an error if no matches is found, or there are multiple matches.
+*/
+export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
+    let match: any;
+    let found = false;
+    for (let x of array)
+        if (predicate(x)) {
+            if (found)
+                throw new Error("single:sequence contains more than one element.");
+
+            found = true;
+            match = x;
+        }
+
+    if (!found)
+        throw new Error("single:No element satisfies the condition.");
+
+    return match;
+}
+
+export type Grouping<TItem> = { [key: string]: TItem[] };
+
+/**
+ * Maps an array into a dictionary with keys determined by specified getKey() callback,
+ * and values that are arrays containing elements for a particular key.
+ */
+export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem> {
+    let lookup: Grouping<TItem> = {};
+    for (let x of items) {
+        let key = getKey(x) ?? "";
+        let d = lookup[key];
+        if (!d) {
+            d = lookup[key] = [];
+        }
+
+        d.push(x);
+    }
+    return lookup;
 }
 
 /**

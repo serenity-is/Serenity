@@ -1,5 +1,5 @@
-﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Criteria, delegateCombine, delegateRemove, formatDate, isArray, isEmptyOrNull, isTrimmedEmpty, ListRequest, notifyWarning, parseDate, localText, toId, tryGetText } from "@serenity-is/corelib/q";
+﻿import { ArgumentNullException, Criteria, ListRequest, delegateCombine, delegateRemove, formatDate, isEmptyOrNull, isTrimmedEmpty, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/corelib/q";
+import { Decorators } from "../../decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -208,7 +208,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 return [EditorUtils.getValue(w1), EditorUtils.getValue(end)];
             },
             loadState: function (w2, state) {
-                if (state == null || !isArray(state) || state.length !== 2) {
+                if (state == null || !Array.isArray(state) || state.length !== 2) {
                     state = [null, null];
                 }
 
@@ -295,7 +295,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 return [EditorUtils.getValue(w1), EditorUtils.getValue(end)];
             },
             loadState: function (w2, state) {
-                if (state == null || !isArray(state) || state.length !== 2) {
+                if (state == null || !Array.isArray(state) || state.length !== 2) {
                     state = [null, null];
                 }
                 EditorUtils.setValue(w2, state[0]);

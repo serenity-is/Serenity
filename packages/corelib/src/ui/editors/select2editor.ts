@@ -1,4 +1,5 @@
-﻿import { Authorization, PropertyItem, any, isArray, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
+﻿import Select2 from "@optionaldeps/select2";
+import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -7,7 +8,6 @@ import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
-import Select2 from "@optionaldeps/select2";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;
@@ -497,7 +497,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
-        if(isArray(val)) {
+        if(Array.isArray(val)) {
             this.set_values(val);
         }
         else {
@@ -552,7 +552,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         var val;
         if (this.element.data('select2')) {
             val = this.element.select2('val');
-            if (val != null && isArray(val)) {
+            if (val != null && Array.isArray(val)) {
                 return val.join(',');
             }
         }
@@ -627,7 +627,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             return [];
         }
 
-        if (isArray(val)) {
+        if (Array.isArray(val)) {
             return val;
         }
 
