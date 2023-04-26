@@ -57,7 +57,7 @@
   "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
     "build": "rollup -c && node build/build",
-    "test": "pnpm build && pnpm jest"
+    "test": "pnpm build && pnpm jest --coverage"
   },
   "type": "module"
 }

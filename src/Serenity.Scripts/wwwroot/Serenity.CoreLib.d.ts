@@ -402,9 +402,6 @@ declare function __createBinding(object: object, target: object, key: PropertyKe
 
 
 declare namespace Q {
-    type Grouping<TItem> = {
-        [key: string]: TItem[];
-    };
     /**
      * Tests if any of array elements matches given predicate
      */
@@ -418,28 +415,6 @@ declare namespace Q {
      * Throws an error if no match is found.
      */
     function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    /**
-     * Gets index of first element in an array that matches given predicate
-     */
-    function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
-    /**
-     * Inserts an item to the array at specified index
-     */
-    function insert(obj: any, index: number, item: any): void;
-    /**
-     * Determines if the object is an array
-     */
-    function isArray(obj: any): boolean;
-    /**
-    * Gets first element in an array that matches given predicate.
-    * Throws an error if no matches is found, or there are multiple matches.
-    */
-    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    /**
-     * Maps an array into a dictionary with keys determined by specified getKey() callback,
-     * and values that are arrays containing elements for a particular key.
-     */
-    function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem>;
     type Group<TItem> = {
         order: number;
         key: string;
@@ -457,6 +432,31 @@ declare namespace Q {
      * Resulting object contains group objects in order and a dictionary to access by key.
      */
     function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Groups<TItem>;
+    /**
+     * Gets index of first element in an array that matches given predicate
+     */
+    function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
+    /**
+     * Inserts an item to the array at specified index
+     */
+    function insert(obj: any, index: number, item: any): void;
+    /**
+     * Determines if the object is an array
+     */
+    const isArray: (arg: any) => arg is any[];
+    /**
+    * Gets first element in an array that matches given predicate.
+    * Throws an error if no matches is found, or there are multiple matches.
+    */
+    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    type Grouping<TItem> = {
+        [key: string]: TItem[];
+    };
+    /**
+     * Maps an array into a dictionary with keys determined by specified getKey() callback,
+     * and values that are arrays containing elements for a particular key.
+     */
+    function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem>;
     /**
      * Gets first element in an array that matches given predicate.
      * Returns null if no match is found.
