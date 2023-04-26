@@ -1174,7 +1174,6 @@ declare namespace Q {
 
 
 declare namespace Slick {
-
     /***
      * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
      */
@@ -1797,7 +1796,10 @@ declare namespace Slick {
     	groupingPanelHeight?: number;
     	groupTotalsFormatter?: (p1?: GroupTotals<TItem>, p2?: Column<TItem>, grid?: any) => string;
     	headerRowHeight?: number;
-    	jQuery?: JQueryStatic;
+    	jQuery?: {
+    		ready: any;
+    		fn: any;
+    	};
     	leaveSpaceForNewRows?: boolean;
     	layoutEngine?: LayoutEngine;
     	minBuffer?: number;
@@ -1931,7 +1933,10 @@ declare namespace Slick {
     	readonly onSort: EventEmitter<ArgsSort, IEventData>;
     	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
     	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
-    	constructor(container: JQuery | HTMLElement, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+    	constructor(container: HTMLElement | {
+    		jquery: string;
+    		length: number;
+    	}, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
     	private createGroupingPanel;
     	private bindAncestorScroll;
     	init(): void;
@@ -1954,7 +1959,7 @@ declare namespace Slick {
     	getSelectionModel(): SelectionModel;
     	private colIdOrIdxToCell;
     	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
-    	getCanvases(): JQuery | HTMLElement[];
+    	getCanvases(): any | HTMLElement[];
     	getActiveCanvasNode(e?: IEventData): HTMLElement;
     	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
     	private getViewports;
@@ -2358,7 +2363,7 @@ declare namespace Slick {
     	constructor(opt?: GroupItemMetadataProviderOptions);
     	static readonly defaults: GroupItemMetadataProviderOptions;
     	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string;
-    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): any;
+    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): string;
     	init(grid: typeof this.grid): void;
     	readonly pluginName = "GroupItemMetadataProvider";
     	destroy(): void;

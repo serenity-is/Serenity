@@ -966,7 +966,7 @@ Slick._ = (() => {
           }, e);
         }
         this._selectedRows = [];
-        var hash = {}, cols = this._cols;
+        hash = {}, cols = this._cols;
         for (var i = 0; i < ranges.length; i++) {
           for (var j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
             if (!hash[j]) {

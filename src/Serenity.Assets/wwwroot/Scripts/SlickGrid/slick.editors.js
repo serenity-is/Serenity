@@ -176,8 +176,7 @@ Slick._ = (() => {
     }
     destroy() {
       $.datepicker.dpDiv.stop(true, true);
-      $(this._input).datepicker("hide");
-      $(this._input).datepicker("destroy");
+      $(this._input).datepicker("hide").datepicker("destroy");
       super.destroy();
     }
     show() {
