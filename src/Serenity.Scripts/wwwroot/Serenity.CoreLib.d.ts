@@ -464,17 +464,50 @@ declare namespace Q {
     function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
 
     interface UserDefinition {
+        /**
+         * Username of the logged user
+         */
         Username?: string;
+        /**
+         * Display name of the logged user
+         */
         DisplayName?: string;
+        /**
+         * This indicates that the user is a super "admin", e.g. assumed to have all the permissions available.
+         * It does not mean a member of Administrators, who might not have some of the permissions */
         IsAdmin?: boolean;
+        /**
+         * A hashset of permission keys that the current user have, explicitly assigned or via its
+         * roles. Note that client side permission checks should only be used for UI enable/disable etc.
+         * You should not rely on client side permission checks and always re-check permissions server side.
+         */
         Permissions?: {
             [key: string]: boolean;
         };
     }
 
+    /**
+     * Contains permission related functions.
+     * Note: We use a namespace here both for compatibility and allow users to override
+     * these functions easily in ES modules environment, which is normally hard to do.
+     */
     namespace Authorization {
         function hasPermission(permission: string): boolean;
+        function hasPermissionAsync(permission: string): Promise<boolean>;
+        function isLoggedInAsync(): Promise<boolean>;
+        function userDefinitionAsync(): Promise<UserDefinition>;
+        function usernameAsync(): Promise<string>;
+        /**
+         * Checks if the hashset contains the specified permission, also handling logical "|" and "&" operators
+         * @param permissionSet Set of permissions
+         * @param permission Permission key or a permission expression containing & | operators
+         * @returns true if set contains permission
+         */
+        function isPermissionInSet(permissionSet: {
+            [key: string]: boolean;
+        }, permission: string): boolean;
         function validatePermission(permission: string): void;
+        function validatePermissionAsync(permission: string): Promise<void>;
     }
     namespace Authorization {
         let isLoggedIn: boolean;
@@ -981,20 +1014,20 @@ declare namespace Q {
         function bindToChange(name: string, regClass: string, onChange: () => void): void;
         function triggerChange(name: string): void;
         function unbindFromChange(regClass: string): void;
-        function ensure(name: string): any;
-        function ensureAsync(name: string): Promise<any>;
-        function reload(name: string): any;
-        function reloadAsync(name: string): Promise<any>;
+        function ensure<TData = any>(name: string): TData;
+        function ensureAsync<TData = any>(name: string): Promise<TData>;
+        function reload<TData = any>(name: string): TData;
+        function reloadAsync<TData = any>(name: string): Promise<TData>;
         function canLoad(name: string): boolean;
         function setRegisteredScripts(scripts: any[]): void;
         function set(name: string, value: any): void;
     }
-    function getRemoteData(key: string): any;
-    function getRemoteDataAsync(key: string): Promise<any>;
+    function getRemoteData<TData = any>(key: string): TData;
+    function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
     function getLookup<TItem>(key: string): Lookup<TItem>;
     function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
-    function reloadLookup(key: string): void;
-    function reloadLookupAsync(key: string): Promise<any>;
+    function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
+    function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
     function getColumns(key: string): PropertyItem[];
     function getColumnsData(key: string): PropertyItemsData;
     function getColumnsAsync(key: string): Promise<PropertyItem[]>;

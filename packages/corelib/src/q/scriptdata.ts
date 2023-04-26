@@ -148,7 +148,7 @@ export namespace ScriptData {
         throw new Error(message);
     }
 
-    export function ensure(name: string) {
+    export function ensure<TData = any>(name: string): TData {
         var data = getLoadedData(name);
         if (data == null) {
             loadScriptData(name);
@@ -162,7 +162,7 @@ export namespace ScriptData {
         return data;
     }
 
-    export async function ensureAsync(name: string): Promise<any> {
+    export async function ensureAsync<TData = any>(name: string): Promise<TData> {
         var data = getLoadedData(name);
         if (data != null)
             return data;
@@ -173,14 +173,14 @@ export namespace ScriptData {
         return data;
     }
 
-    export function reload(name: string) {
+    export function reload<TData = any>(name: string): TData {
         getHash(name, true);
         loadScriptData(name);
         var data = getLoadedData(name);
         return data;
     }
 
-    export async function reloadAsync(name: string) {
+    export async function reloadAsync<TData = any>(name: string): Promise<TData> {
         getHash(name, true);
         await loadScriptDataAsync(name);
         return getLoadedData(name);
@@ -203,11 +203,11 @@ export namespace ScriptData {
     }
 }
 
-export function getRemoteData(key: string) {
+export function getRemoteData<TData = any>(key: string): TData {
     return ScriptData.ensure('RemoteData.' + key);
 }
 
-export async function getRemoteDataAsync(key: string): Promise<any> {
+export async function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
     return await ScriptData.ensureAsync('RemoteData.' + key);
 }
 
@@ -219,11 +219,11 @@ export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>
     return await ScriptData.ensureAsync('Lookup.' + key);
 }
 
-export function reloadLookup(key: string) {
-    ScriptData.reload('Lookup.' + key);
+export function reloadLookup<TItem = any>(key: string): Lookup<TItem> {
+    return ScriptData.reload('Lookup.' + key);
 }
 
-export async function reloadLookupAsync(key: string): Promise<any> {
+export async function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>> {
     return await ScriptData.reloadAsync('Lookup.' + key);
 }
 
