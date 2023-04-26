@@ -20,7 +20,7 @@
       "@/*": [ "../src/*" ],
       "@serenity-is/corelib/q": ["../src/q"],
       "@serenity-is/corelib/slick": ["../src/slick"],
-      "@optionaldeps/*": ["./testutil/*-module"]
+      "@optionaldeps/*": ["./testutil/*-testmodule"]
     },
     "noImplicitAny": false,
     "lib": [

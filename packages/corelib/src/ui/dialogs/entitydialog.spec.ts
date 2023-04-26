@@ -2,7 +2,6 @@ import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPr
 import { PropertyItemsData } from "../../q/propertyitem";
 import { addAttribute } from "../../q/system";
 import { EntityDialog } from "./entitydialog";
-import $ from "jquery";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {
     return dialog["getIdProperty"]();
