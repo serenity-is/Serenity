@@ -43,9 +43,9 @@ export namespace Authorization {
             return true;
 
         if (permission == "" || permission == "?")
-            return await Authorization.isLoggedInAsync();
+            return await Authorization.isLoggedInAsync;
 
-        var ud = await Authorization.userDefinitionAsync();
+        var ud = await Authorization.userDefinitionAsync;
         if (!ud)
             return false;
 
@@ -53,20 +53,6 @@ export namespace Authorization {
             return true;
 
         return isPermissionInSet(ud.Permissions, permission);
-    }
-
-    export async function isLoggedInAsync(): Promise<boolean> {
-        var ud = await Authorization.userDefinitionAsync();
-        return ud?.Username?.length > 0;
-    }
-
-    export async function userDefinitionAsync(): Promise<UserDefinition> {
-        return await getRemoteDataAsync("UserData") as UserDefinition;
-    }
-
-    export async function usernameAsync(): Promise<string> {
-        var ud = await Authorization.userDefinitionAsync();
-        return ud?.Username;
     }
 
     /**
@@ -124,32 +110,51 @@ export namespace Authorization {
 
 export declare namespace Authorization {
     export let isLoggedIn: boolean;
+    export let isLoggedInAsync: Promise<boolean>;
     export let username: string;
+    export let usernameAsync: Promise<string>;
     export let userDefinition: UserDefinition;
+    export let userDefinitionAsync: Promise<UserDefinition>;
 }
 
-Object.defineProperty(Authorization, "userDefinition", {
+Object.defineProperty(Authorization, "isLoggedIn", {
     get: function () {
-        return getRemoteData("UserData");
+        return !!(Authorization.userDefinition?.Username?.length);
     },
     configurable: true
 });
 
-Object.defineProperty(Authorization, "isLoggedIn", {
+Object.defineProperty(Authorization, "isLoggedInAsync", {
+    get: async function () {
+        return !!((await Authorization.userDefinitionAsync)?.Username?.length);
+    },
+    configurable: true
+});
+
+Object.defineProperty(Authorization, "userDefinition", {
     get: function () {
-        var ud = Authorization.userDefinition;
-        return ud && !!ud.Username;
+        return getRemoteData<UserDefinition>("UserData");
+    },
+    configurable: true
+});
+
+Object.defineProperty(Authorization, "userDefinitionAsync", {
+    get: async function () {
+        return await getRemoteDataAsync<UserDefinition>("UserData");
     },
     configurable: true
 });
 
 Object.defineProperty(Authorization, "username", {
     get: function () {
-        var ud = Authorization.userDefinition;
-        if (ud)
-            return ud.Username;
+        return Authorization.userDefinition?.Username;
+    },
+    configurable: true
+});
 
-        return null;
+Object.defineProperty(Authorization, "usernameAsync", {
+    get: async function () {
+        return (await Authorization.userDefinitionAsync)?.Username;
     },
     configurable: true
 });
