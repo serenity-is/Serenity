@@ -1,6 +1,23 @@
 import { Criteria } from "./criteria";
 
-describe("Criteria Builder", () => {
+describe("Criteria.isEmpty", () => {
+    it('returns true for null, undefined, empty array and array with one empty string', () => {
+        expect(Criteria.isEmpty(null)).toBe(true);
+        expect(Criteria.isEmpty(undefined)).toBe(true);
+        expect(Criteria.isEmpty([])).toBe(true);
+        expect(Criteria.isEmpty([""])).toBe(true);
+    });
+
+    it('returns false for any other array', () => {
+        expect(Criteria.isEmpty([[]])).toBe(false);
+        expect(Criteria.isEmpty([1])).toBe(false);
+        expect(Criteria.isEmpty([[false]])).toBe(false);
+        expect(Criteria.isEmpty(["a"])).toBe(false);
+        expect(Criteria.isEmpty(["0"])).toBe(false);
+    });
+});
+
+describe("Criteria function", () => {
     it('should handle comparison operators with string values', () => {
         expect(Criteria('a').eq('b')).toEqual([['a'], '=', 'b']);
         expect(Criteria('a').gt('b')).toEqual([['a'], '>', 'b']);
@@ -46,6 +63,7 @@ describe("Criteria Builder", () => {
         expect(Criteria('a').notLike('b%')).toEqual([['a'], 'not like', 'b%']);
         expect(Criteria('a').startsWith('b')).toEqual([['a'], 'like', 'b%']);
         expect(Criteria('a').endsWith('b')).toEqual([['a'], 'like', '%b']);
+        expect(Criteria('a').contains('b')).toEqual([['a'], 'like', '%b%']);
     });
 
     it('should handle is null operators', () => {

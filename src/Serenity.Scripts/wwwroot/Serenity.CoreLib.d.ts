@@ -564,17 +564,42 @@ declare namespace Q {
         notLoggedInHandler: Function;
     };
 
+    interface DebouncedFunction<T extends (...args: any[]) => any> {
+        /**
+         * Call the original function, but applying the debounce rules.
+         *
+         * If the debounced function can be run immediately, this calls it and returns its return
+         * value.
+         *
+         * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+         * function was not invoked yet.
+         */
+        (...args: Parameters<T>): ReturnType<T> | undefined;
+        /**
+         * Throw away any pending invocation of the debounced function.
+         */
+        clear(): void;
+        /**
+         * If there is a pending invocation of the debounced function, invoke it immediately and return
+         * its return value.
+         *
+         * Otherwise, return the value from the last invocation, or undefined if the debounced function
+         * was never invoked.
+         */
+        flush(): ReturnType<T> | undefined;
+    }
     /**
      * Returns a function, that, as long as it continues to be invoked, will not
-     * be triggered. The function will be called after it stops being called for
-     * N milliseconds. If `immediate` is passed, trigger the function on the
-     * leading edge, instead of the trailing. The function also has a property 'clear'
-     * that is a function which will clear the timer to prevent previously scheduled executions.
+     * be triggered. The function also has a property 'clear' that can be used
+     * to clear the timer to prevent previously scheduled executions, and flush method
+     * to invoke scheduled executions now if any.
+     * @param wait The function will be called after it stops being called for
+     * N milliseconds.
+     * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
      *
      * @source underscore.js
      */
-    function debounce(func: Function, wait?: number, immediate?: boolean): any;
-    function mockDebounce(f: typeof debounce): void;
+    function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
     interface DialogButton {
         text?: string;
@@ -1154,55 +1179,56 @@ declare namespace Q {
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 
-    function Criteria(field: string): Criteria.Builder;
-    namespace Criteria {
-        function isEmpty(c: any[]): boolean;
-        function join(c1: any[], op: string, c2: any[]): any[];
-        function paren(c: any[]): any[];
-        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function not(c: any[]): (string | any[])[];
-        enum Operator {
-            paren = "()",
-            not = "not",
-            isNull = "is null",
-            isNotNull = "is not null",
-            exists = "exists",
-            and = "and",
-            or = "or",
-            xor = "xor",
-            eq = "=",
-            ne = "!=",
-            gt = ">",
-            ge = ">=",
-            lt = "<",
-            le = "<=",
-            in = "in",
-            notIn = "not in",
-            like = "like",
-            notLike = "not like"
-        }
-        class Builder extends Array {
-            bw(fromInclusive: any, toInclusive: any): Array<any>;
-            contains(value: string): Array<any>;
-            endsWith(value: string): Array<any>;
-            eq(value: any): Array<any>;
-            gt(value: any): Array<any>;
-            ge(value: any): Array<any>;
-            in(values: any[]): Array<any>;
-            isNull(): Array<any>;
-            isNotNull(): Array<any>;
-            le(value: any): Array<any>;
-            lt(value: any): Array<any>;
-            ne(value: any): Array<any>;
-            like(value: any): Array<any>;
-            startsWith(value: string): Array<any>;
-            notIn(values: any[]): Array<any>;
-            notLike(value: any): Array<any>;
-        }
-        function parse(expression: string, params?: any): any[];
-        function parse(strings: TemplateStringsArray, ...values: any[]): any[];
+    class CriteriaBuilder extends Array {
+        bw(fromInclusive: any, toInclusive: any): Array<any>;
+        contains(value: string): Array<any>;
+        endsWith(value: string): Array<any>;
+        eq(value: any): Array<any>;
+        gt(value: any): Array<any>;
+        ge(value: any): Array<any>;
+        in(values: any[]): Array<any>;
+        isNull(): Array<any>;
+        isNotNull(): Array<any>;
+        le(value: any): Array<any>;
+        lt(value: any): Array<any>;
+        ne(value: any): Array<any>;
+        like(value: any): Array<any>;
+        startsWith(value: string): Array<any>;
+        notIn(values: any[]): Array<any>;
+        notLike(value: any): Array<any>;
     }
+    function parseCriteria(expression: string, params?: any): any[];
+    function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+    enum CriteriaOperator {
+        paren = "()",
+        not = "not",
+        isNull = "is null",
+        isNotNull = "is not null",
+        exists = "exists",
+        and = "and",
+        or = "or",
+        xor = "xor",
+        eq = "=",
+        ne = "!=",
+        gt = ">",
+        ge = ">=",
+        lt = "<",
+        le = "<=",
+        in = "in",
+        notIn = "not in",
+        like = "like",
+        notLike = "not like"
+    }
+    const Criteria: ((field: string) => CriteriaBuilder) & {
+        and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        Operator: typeof CriteriaOperator;
+        isEmpty(c: any[]): boolean;
+        join(c1: any[], op: string, c2: any[]): any[];
+        not(c: any[]): (string | any[])[];
+        or(c1: any[], c2: any[], ...rest: any[][]): any[];
+        paren(c: any[]): any[];
+        parse: typeof parseCriteria;
+    };
 }
 
 
