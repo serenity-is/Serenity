@@ -37,6 +37,7 @@
     "../src/globals/jquery.validation-globals.ts",
     "../src/globals/select2-globals.ts",
     "../src/ui/widgets/jquerywidgetfn.ts",
+    "./testutil/*.ts",
     "./**/*.spec.ts",
     "./**/*.spec.tsx"
   ],

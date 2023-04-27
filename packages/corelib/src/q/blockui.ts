@@ -1,9 +1,8 @@
-﻿import { extend } from "./system"
-import $ from "@optionaldeps/jquery";
+﻿import $ from "@optionaldeps/jquery";
 
 export interface JQBlockUIOptions {
-    useTimeout?: boolean;   
-}  
+    useTimeout?: boolean;
+}
 
 let blockUICount: number = 0;
 
@@ -34,7 +33,7 @@ function blockUIWithCheck(opt: JQBlockUIOptions) {
  * div is 2000, so a higher z-order shouldn't be used in page.
  */
 export function blockUI(options: JQBlockUIOptions) {
-    options = extend(<any>{
+    options = Object.assign(<any>{
         baseZ: 2000,
         message: '',
         overlayCSS: {
