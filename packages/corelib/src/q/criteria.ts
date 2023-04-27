@@ -151,9 +151,7 @@ function tokenize(expression: string): Token[] {
                 break;
         }
 
-        v = parseFloat(expression.substr(index, end - index + 1));
-        if (isNaN(v))
-            throw new ParseError(expression, 'invalid number', index);
+        v = parseFloat(expression.substring(index, end + 1));
     }
 
     function readIdentifier() {
@@ -489,14 +487,16 @@ const operatorPrecedence: Record<string, number> = {
     '<=': 4,
     '<>': 4,
     '!=': 4,
-    'like': 4,
-    'not like': 4,
-    'in': 4,
-    'is null': 4,
-    'is not null': 4,
-    'not': 5,
-    'and': 6,
-    'or': 7,
+    'like': 5,
+    'not like': 5,
+    'in': 5,
+    'not in': 5,
+    'is null': 5,
+    'is not null': 5,
+    'not': 6,
+    'and': 7,
+    'xor': 8,
+    'or': 9
 }
 
 function shuntingYard(tokens: Token[]): Token[] {
@@ -509,7 +509,7 @@ function shuntingYard(tokens: Token[]): Token[] {
             if (precedence != null) {
                 while (stack.length) {
                     var prev = stack[stack.length - 1];
-                    if (prev.t !== TOKEN_OPERATOR)
+                    if (prev.t !== TOKEN_OPERATOR || prev.v == '(')
                         break;
                     var prevPrecedence = operatorPrecedence[prev.v];
                     if (prevPrecedence == null || prevPrecedence > precedence)
@@ -532,7 +532,7 @@ function shuntingYard(tokens: Token[]): Token[] {
 
                 stack.pop();
             }
-            else
+            else 
                 result.push(token);
         }
         else
@@ -544,7 +544,7 @@ function shuntingYard(tokens: Token[]): Token[] {
 
         if (tok.t == TOKEN_OPERATOR &&
             (tok.v === '(' || tok.v === ')'))
-            throw "Mismatched parentheses in permission expression!";
+            throw "Mismatched parentheses in criteria expression!";
 
         result.push(tok);
     }
@@ -627,11 +627,11 @@ export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...v
         return internalParse(exprOrStrings,
             values == null || values[0] == null ? null : name => values[0][name]);
     }
-    else if (!values?.length)
+    else if (!values.length)
         return internalParse(exprOrStrings.join(''));
 
     var expression = String.raw({ raw: exprOrStrings }, ...values.map((x, i) => '@__' + i));
-    return internalParse(expression, name => name?.startsWith('__') ?
+    return internalParse(expression, name => name.startsWith('__') ?
         values[parseInt(name.substring(2), 10)] : void 0);
 }
 
@@ -660,8 +660,8 @@ export const Criteria = Object.assign(
     function Criteria(field: string) {
         var builder = CriteriaBuilder.of(field);
         // workaround for subclassing array until corelib switched to ES6
-        //@ts-ignore
-        !builder.eq && (builder.__proto__ = CriteriaBuilder.prototype);
+        /* istanbul ignore next */
+        !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
         return builder as CriteriaBuilder
     },
     {
