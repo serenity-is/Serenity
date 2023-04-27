@@ -494,9 +494,6 @@ declare namespace Q {
     namespace Authorization {
         function hasPermission(permission: string): boolean;
         function hasPermissionAsync(permission: string): Promise<boolean>;
-        function isLoggedInAsync(): Promise<boolean>;
-        function userDefinitionAsync(): Promise<UserDefinition>;
-        function usernameAsync(): Promise<string>;
         /**
          * Checks if the hashset contains the specified permission, also handling logical "|" and "&" operators
          * @param permissionSet Set of permissions
@@ -511,8 +508,11 @@ declare namespace Q {
     }
     namespace Authorization {
         let isLoggedIn: boolean;
+        let isLoggedInAsync: Promise<boolean>;
         let username: string;
+        let usernameAsync: Promise<string>;
         let userDefinition: UserDefinition;
+        let userDefinitionAsync: Promise<UserDefinition>;
     }
 
     interface JQBlockUIOptions {
