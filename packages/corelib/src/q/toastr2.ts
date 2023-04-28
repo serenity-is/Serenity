@@ -1,4 +1,6 @@
-﻿// adapted from https://raw.githubusercontent.com/JPeer264/toastr2/master/src/Toastr.ts
+﻿// adapted from https://github.com/JPeer264/toastr2
+
+import { htmlEncode } from "./html";
 
 type Required<T> = {
     [P in keyof T]-?: T[P];
@@ -22,7 +24,6 @@ export type ToastContainerOptions = {
 export type ToastrOptions<T = ToastType> = ToastContainerOptions & {
     tapToDismiss?: boolean;
     toastClass?: string;
-
     showDuration?: number;
     onShown?: () => void;
     hideDuration?: number;
@@ -31,9 +32,7 @@ export type ToastrOptions<T = ToastType> = ToastContainerOptions & {
     closeDuration?: number | false;
     closeEasing?: boolean;
     closeOnHover?: boolean;
-
     extendedTimeOut?: number;
-    iconClasses?: T;
     iconClass?: string;
     positionClass?: string;
     timeOut?: number; // Set timeOut and extendedTimeOut to 0 to make it sticky
@@ -46,7 +45,6 @@ export type ToastrOptions<T = ToastType> = ToastContainerOptions & {
     newestOnTop?: boolean;
     preventDuplicates?: boolean;
     onclick?: (event: MouseEvent) => void;
-
     onCloseClick?: (event: Event) => void;
     closeButton?: boolean;
     rtl?: boolean;
@@ -63,7 +61,6 @@ const initialOptions: Required<ToastrOptions> = {
     tapToDismiss: true,
     toastClass: 'toast',
     containerId: 'toast-container',
-
     showDuration: 300,
     onShown: () => { },
     hideDuration: 1000,
@@ -72,14 +69,7 @@ const initialOptions: Required<ToastrOptions> = {
     closeDuration: false,
     closeEasing: false,
     closeOnHover: true,
-
     extendedTimeOut: 1000,
-    iconClasses: {
-        error: 'toast-error',
-        info: 'toast-info',
-        success: 'toast-success',
-        warning: 'toast-warning',
-    },
     iconClass: 'toast-info',
     positionClass: 'toast-top-right',
     timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
@@ -92,10 +82,8 @@ const initialOptions: Required<ToastrOptions> = {
     newestOnTop: true,
     preventDuplicates: false,
     rtl: false,
-
     onCloseClick: () => { },
     closeButton: false,
-
     onclick: () => { },
 }
 
@@ -157,7 +145,7 @@ export class Toastr {
     ): HTMLElement | null {
         return this.notify({
             type: this.toastType.error,
-            iconClass: this.options.iconClasses.error,
+            iconClass: 'toast-error',
             message,
             title,
         }, opt);
@@ -170,7 +158,7 @@ export class Toastr {
     ): HTMLElement | null {
         return this.notify({
             type: this.toastType.warning,
-            iconClass: this.options.iconClasses.warning,
+            iconClass: 'toast-warning',
             message,
             title,
         }, opt);
@@ -183,7 +171,7 @@ export class Toastr {
     ): HTMLElement | null {
         return this.notify({
             type: this.toastType.success,
-            iconClass: this.options.iconClasses.success,
+            iconClass: 'toast-success',
             message,
             title,
         }, opt);
@@ -196,7 +184,7 @@ export class Toastr {
     ): HTMLElement | null {
         return this.notify({
             type: this.toastType.info,
-            iconClass: this.options.iconClasses.info,
+            iconClass: 'toast-info',
             message,
             title,
         }, opt);
@@ -355,17 +343,6 @@ export class Toastr {
             this.publish(response);
         };
 
-        const escapeHtml = (source: string | null): string => {
-            const newSource = source !== null ? source : '';
-
-            return newSource
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        };
-
         const setAria = (): void => {
             let ariaValue = '';
 
@@ -433,7 +410,7 @@ export class Toastr {
             if (map.title) {
                 let suffix = map.title;
                 if (opt.escapeHtml) {
-                    suffix = escapeHtml(map.title);
+                    suffix = htmlEncode(map.title);
                 }
                 $titleElement.innerHTML = suffix;
                 toggleClass($titleElement, opt.titleClass, true);
@@ -446,7 +423,7 @@ export class Toastr {
                 let suffix = map.message;
 
                 if (opt.escapeHtml) {
-                    suffix = escapeHtml(map.message);
+                    suffix = htmlEncode(map.message);
                 }
 
                 $messageElement.innerHTML = suffix;
@@ -495,13 +472,9 @@ export class Toastr {
         };
 
         personalizeToast();
-
         displayToast();
-
         handleEvents();
-
         this.publish(response);
-
         return toastElement;
     }
 }
