@@ -1,4 +1,6 @@
+// @ts-ignore
 import { readFileSync } from "fs";
+// @ts-ignore
 import { join, resolve } from "path";
 
 const root = resolve('./');
