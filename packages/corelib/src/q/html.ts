@@ -1,71 +1,67 @@
 ﻿import { localText } from "./localtext";
-import { isEmptyOrNull } from "./strings";
-
-export function addOption(select: JQuery, key: string, text: string) {
-    $('<option/>').val(key).text(text).appendTo(select);
-}
+import $ from "@optionaldeps/jquery";
 
 export function addEmptyOption(select: JQuery) {
     addOption(select, '', localText("Controls.SelectEditor.EmptyItemText"));
 }
 
+export function addOption(select: JQuery | HTMLSelectElement, key: string, text: string) {
+    $('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select);
+}
+
+/** @obsolete use htmlEncode as it also encodes quotes */
+export const attrEncode = htmlEncode;
+
 export function clearOptions(select: JQuery) {
     select.html('');
 }
 
-export function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery {
+export function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
+export function findElementWithRelativeId(element: JQuery | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | Element {
 
-    var contextWasNull;
-    if (context == null && element?.length) {
-        context = element[0].getRootNode() as Element;
-        contextWasNull = true;
+    const isJQuery = element instanceof $ && element != null;
+    const from: HTMLElement = isJQuery ? (element as JQuery).get(0) : element as HTMLElement;
+    const doc = typeof document === "undefined" ? null : document;
+
+    if (from == null)
+        return null;
+
+    var noContext = false;
+    if (context === undefined) {
+        context = from.getRootNode() as HTMLElement;
+        noContext = true;
     }
 
-    function search() {
-        let elementId = element.attr('id');
-        if (isEmptyOrNull(elementId)) {
-            return $('#' + relativeId, context);
+    let elementId = (element as HTMLElement).id ?? "";
+    while (true) {
+        var res = context?.querySelector("#" + elementId + relativeId);
+        
+        if (!res && noContext)
+            res = doc?.getElementById(elementId + relativeId);
+
+        if (!res && elementId.length) {
+            res = context?.querySelector("#" + elementId + "_" + relativeId);
+            if (!res && noContext)
+                res = doc?.getElementById(elementId + "_" + relativeId);
         }
 
-        let result = $('#' + elementId + relativeId, context);
-        if (result.length > 0) {
-            return result;
-        }
+        if (res || !elementId.length)
+            return isJQuery ? $(res ?? null) : (res ?? null);
 
-        result = $('#' + elementId + '_' + relativeId, context);
-
-        if (result.length > 0) {
-            return result;
-        }
-
-        while (true) {
-            let idx = elementId.lastIndexOf('_',);
-            if (idx <= 0) {
-                return $('#' + relativeId, context);
-            }
-
-            elementId = elementId.substr(0, idx);
-            result = $('#' + elementId + '_' + relativeId, context);
-
-            if (result.length > 0) {
-                return result;
-            }
-        }
+        let idx = elementId.lastIndexOf('_');
+        if (idx <= 0)
+            elementId = "";
+        else
+            elementId = elementId.substring(0, idx);
     }
-
-    var r = search();
-    if (!r.length && contextWasNull && typeof document !== "undefined") {
-        context = undefined;
-        return search();
-    }
-    return r;
 }
 
 const esc: Record<string, string> = {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": "&apos;",
+    "'": "&#39;",
     '&': '&amp;',
 }
 
@@ -86,9 +82,6 @@ export function htmlEncode(s: any): string {
 
     return s.replace(/[<>"'&]/g, escFunc)
 }
-
-/** @obsolete use htmlEncode as it also encodes quotes */
-export const attrEncode = htmlEncode;
 
 export function newBodyDiv(): JQuery {
     return $('<div/>').appendTo(document.body);
