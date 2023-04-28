@@ -818,17 +818,18 @@ declare namespace Q {
     function parseDate(s: string, dateOrder?: string): any;
     function splitDateString(s: string): string[];
 
-    function addOption(select: JQuery, key: string, text: string): void;
     function addEmptyOption(select: JQuery): void;
+    function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
+    /** @obsolete use htmlEncode as it also encodes quotes */
+    const attrEncode: typeof htmlEncode;
     function clearOptions(select: JQuery): void;
-    function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery;
+    function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+    function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
     /**
      * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
      * @param s String to be HTML encoded
      */
     function htmlEncode(s: any): string;
-    /** @obsolete use htmlEncode as it also encodes quotes */
-    const attrEncode: typeof htmlEncode;
     function newBodyDiv(): JQuery;
     function outerHtml(element: JQuery): string;
 
@@ -925,7 +926,6 @@ declare namespace Q {
         closeEasing?: boolean;
         closeOnHover?: boolean;
         extendedTimeOut?: number;
-        iconClasses?: T;
         iconClass?: string;
         positionClass?: string;
         timeOut?: number;
@@ -1091,12 +1091,12 @@ declare namespace Q {
     function padLeft(s: string | number, len: number, ch?: string): any;
     function startsWith(s: string, prefix: string): boolean;
     function toSingleLine(str: string): string;
-    var trimEnd: (s: string) => string;
-    var trimStart: (s: string) => string;
+    var trimEnd: (s: string) => any;
+    var trimStart: (s: string) => any;
     function trim(s: string): string;
     function trimToEmpty(s: string): string;
     function trimToNull(s: string): string;
-    function replaceAll(s: string, f: string, r: string): string;
+    function replaceAll(str: string, find: string, replace: string): string;
     function zeroPad(n: number, digits: number): string;
 
     type Dictionary<TItem> = {

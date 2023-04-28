@@ -416,17 +416,18 @@ declare function parseDayHourAndMin(s: string): number;
 declare function parseDate(s: string, dateOrder?: string): any;
 declare function splitDateString(s: string): string[];
 
-declare function addOption(select: JQuery, key: string, text: string): void;
 declare function addEmptyOption(select: JQuery): void;
+declare function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
+/** @obsolete use htmlEncode as it also encodes quotes */
+declare const attrEncode: typeof htmlEncode;
 declare function clearOptions(select: JQuery): void;
-declare function findElementWithRelativeId(element: JQuery, relativeId: string, context?: JQuery | Element): JQuery;
+declare function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+declare function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
 /**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String to be HTML encoded
  */
 declare function htmlEncode(s: any): string;
-/** @obsolete use htmlEncode as it also encodes quotes */
-declare const attrEncode: typeof htmlEncode;
 declare function newBodyDiv(): JQuery;
 declare function outerHtml(element: JQuery): string;
 
@@ -523,7 +524,6 @@ type ToastrOptions<T = ToastType> = ToastContainerOptions & {
     closeEasing?: boolean;
     closeOnHover?: boolean;
     extendedTimeOut?: number;
-    iconClasses?: T;
     iconClass?: string;
     positionClass?: string;
     timeOut?: number;
@@ -689,12 +689,12 @@ declare function isTrimmedEmpty(s: string): boolean;
 declare function padLeft(s: string | number, len: number, ch?: string): any;
 declare function startsWith(s: string, prefix: string): boolean;
 declare function toSingleLine(str: string): string;
-declare var trimEnd: (s: string) => string;
-declare var trimStart: (s: string) => string;
+declare var trimEnd: (s: string) => any;
+declare var trimStart: (s: string) => any;
 declare function trim(s: string): string;
 declare function trimToEmpty(s: string): string;
 declare function trimToNull(s: string): string;
-declare function replaceAll(s: string, f: string, r: string): string;
+declare function replaceAll(str: string, find: string, replace: string): string;
 declare function zeroPad(n: number, digits: number): string;
 
 type Dictionary<TItem> = {
