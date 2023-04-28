@@ -230,6 +230,38 @@ describe("findElementWithRelativeId", () => {
         }
     });
 
+    it("can find quick filter cascade editor ID's", () => {
+        const city = document.createElement("div");
+        city.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_City";
+        var country = document.createElement("div");
+        country.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_Country";
+        document.body.append(country);
+        document.body.append(city);
+        try {
+            expect(findElementWithRelativeId(city, "Country") === country).toBe(true);
+        }
+        finally {
+            city.remove();
+            country.remove();
+        }
+    });
+
+    it("can find quick filter cascade editor ID's with jQuery", () => {
+        const city = document.createElement("div");
+        city.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_City";
+        var country = document.createElement("div");
+        country.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_Country";
+        document.body.append(country);
+        document.body.append(city);
+        try {
+            expect(findElementWithRelativeId($(city), "Country")?.get?.(0) === country).toBe(true);
+        }
+        finally {
+            city.remove();
+            country.remove();
+        }
+    });    
+
     it("won't search document if the context is passed", () => {
         var target = document.createElement("div");
         const from = document.createElement("div");

@@ -33,27 +33,27 @@ export function findElementWithRelativeId(element: JQuery | HTMLElement, relativ
         noContext = true;
     }
 
-    let elementId = (element as HTMLElement).id ?? "";
+    let fromId = from.id ?? "";
     while (true) {
-        var res = context?.querySelector("#" + elementId + relativeId);
+        var res = context?.querySelector("#" + fromId + relativeId);
         
         if (!res && noContext)
-            res = doc?.getElementById(elementId + relativeId);
+            res = doc?.getElementById(fromId + relativeId);
 
-        if (!res && elementId.length) {
-            res = context?.querySelector("#" + elementId + "_" + relativeId);
+        if (!res && fromId.length) {
+            res = context?.querySelector("#" + fromId + "_" + relativeId);
             if (!res && noContext)
-                res = doc?.getElementById(elementId + "_" + relativeId);
+                res = doc?.getElementById(fromId + "_" + relativeId);
         }
 
-        if (res || !elementId.length)
+        if (res || !fromId.length)
             return isJQuery ? $(res ?? null) : (res ?? null);
 
-        let idx = elementId.lastIndexOf('_');
+        let idx = fromId.lastIndexOf('_');
         if (idx <= 0)
-            elementId = "";
+            fromId = "";
         else
-            elementId = elementId.substring(0, idx);
+            fromId = fromId.substring(0, idx);
     }
 }
 
