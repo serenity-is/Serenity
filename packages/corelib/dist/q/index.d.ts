@@ -185,9 +185,7 @@ declare namespace Authorization {
     * Throws an error if the current user does not have the specified permission.
     * @param permission Permission key. It may contain logical operators like A&B|C.
     * @example
-    * ```ts
     * await Authorization.validatePermissionAsync("A&B|C");
-    * ```
     */
     function validatePermissionAsync(permission: string): Promise<void>;
 }
@@ -197,7 +195,6 @@ declare namespace Authorization {
      * is not already loaded.
      * @returns `true` if the user is logged in, `false` otherwise.
      * @example
-     * ```ts
      * if (Authorization.isLoggedIn) {
      *     // do something
      * }
@@ -207,7 +204,6 @@ declare namespace Authorization {
      * Checks if the current user is logged in.
      * @returns `true` if the user is logged in, `false` otherwise.
      * @example
-     * ```ts
      * if (await Authorization.isLoggedInAsync) {
      *     // do something
      * }
@@ -217,7 +213,6 @@ declare namespace Authorization {
      * is not already loaded.
      * @returns Username for currently logged user.
      * @example
-     * ```ts
      * if (Authorization.username) {
      *     // do something
      * }
@@ -226,7 +221,6 @@ declare namespace Authorization {
     /** Returns the username for currently logged user.
      * @returns Username for currently logged user.
      * @example
-     * ```ts
      * if (await Authorization.usernameAsync) {
      *     // do something
      * }
@@ -236,7 +230,6 @@ declare namespace Authorization {
      * is not already loaded.
      * @returns User data for currently logged user.
      * @example
-     * ```ts
      * if (Authorization.userDefinition.IsAdmin) {
      *     // do something
      * }
@@ -245,7 +238,6 @@ declare namespace Authorization {
     /** Returns the user data for currently logged user.
      * @returns User data for currently logged user.
      * @example
-     * ```ts
      * if ((await Authorization.userDefinitionAsync).IsAdmin) {
      *     // do something
      * }
@@ -1034,8 +1026,7 @@ declare class CriteriaBuilder extends Array {
  * @param expression The criteria expression.
  * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
  * @example
- * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 })
- *    => [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
  */
 declare function parseCriteria(expression: string, params?: any): any[];
 /**
@@ -1046,8 +1037,7 @@ declare function parseCriteria(expression: string, params?: any): any[];
  * @param values The tagged template arguments.
  * @example
  * var a = 5, b = 4;
- * parseCriteria`A >= ${a} and B < ${b}`
- *    => [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
  */
 declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
 declare enum CriteriaOperator {

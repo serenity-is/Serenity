@@ -129,9 +129,7 @@ export namespace Authorization {
     * Throws an error if the current user does not have the specified permission.
     * @param permission Permission key. It may contain logical operators like A&B|C.
     * @example 
-    * ```ts
     * await Authorization.validatePermissionAsync("A&B|C");
-    * ```
     */
     export async function validatePermissionAsync(permission: string): Promise<void> {
         if (!(await hasPermissionAsync(permission))) {
@@ -147,7 +145,6 @@ export declare namespace Authorization {
      * is not already loaded.
      * @returns `true` if the user is logged in, `false` otherwise. 
      * @example 
-     * ```ts
      * if (Authorization.isLoggedIn) {
      *     // do something
      * }
@@ -158,7 +155,6 @@ export declare namespace Authorization {
      * Checks if the current user is logged in.
      * @returns `true` if the user is logged in, `false` otherwise. 
      * @example 
-     * ```ts
      * if (await Authorization.isLoggedInAsync) {
      *     // do something
      * }
@@ -169,7 +165,6 @@ export declare namespace Authorization {
      * is not already loaded.
      * @returns Username for currently logged user.
      * @example 
-     * ```ts
      * if (Authorization.username) {
      *     // do something
      * } 
@@ -179,7 +174,6 @@ export declare namespace Authorization {
     /** Returns the username for currently logged user.
      * @returns Username for currently logged user.
      * @example 
-     * ```ts
      * if (await Authorization.usernameAsync) {
      *     // do something
      * }
@@ -190,7 +184,6 @@ export declare namespace Authorization {
      * is not already loaded.
      * @returns User data for currently logged user.
      * @example 
-     * ```ts
      * if (Authorization.userDefinition.IsAdmin) {
      *     // do something
      * }
@@ -200,7 +193,6 @@ export declare namespace Authorization {
     /** Returns the user data for currently logged user.
      * @returns User data for currently logged user.
      * @example 
-     * ```ts
      * if ((await Authorization.userDefinitionAsync).IsAdmin) {
      *     // do something
      * }
