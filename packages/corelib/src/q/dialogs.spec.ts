@@ -4,43 +4,50 @@ beforeEach(() => {
 
 describe("Bootstrap version detection", () => {
 
-    function setupDummyJQueryForModal(callback: (s: string) => void) {
-        globalThis.$ = globalThis.jQuery = function dummyJQueryForModal(html: string) {
+    function setupDummyJQueryForModal(callback: (s: string | HTMLElement) => void) {
+        jest.unmock('@optionaldeps/jquery')
+        jest.mock('@optionaldeps/jquery', () => {
             return {
-                _html: html,
-                html: function () {
-                    return <string>null;
-                },
-                eq: function () {
-                    return this;
-                },
-                find: function () {
-                    return this;
-                },
-                click: function () {
-                },
-                appendTo: function () {
-                    return this;
-                },
-                one: function () {
-                    return this;
-                },
-                modal: function () {
-                    expect(this._html).toBe(html);
-                    callback(html);
-                }
+                __esModule: true,
+                default: function dummyJQueryForModal(html: string | HTMLElement) {
+                    return {
+                        _html: html,
+                        html: function () {
+                            return <string>null;
+                        },
+                        eq: function () {
+                            return this;
+                        },
+                        find: function () {
+                            return this;
+                        },
+                        click: function () {
+                        },
+                        appendTo: function () {
+                            return this;
+                        },
+                        one: function () {
+                            return this;
+                        },
+                        modal: function () {
+                            expect(this._html).toBe(html);
+                            callback(html);
+                        }
+                    }
+                } as any as JQueryStatic
             }
-        } as any;
+        });        
     }
 
     it('detects BS3 when modal version starts with 3', async function () {
 
         var passedHtml: string;
         setupDummyJQueryForModal(function (html) {
-            passedHtml = html;
+            passedHtml = typeof html === 'string' ? html : html.outerHTML;
         });
         try {
-            (globalThis.$ as any).fn = {
+            var $ = (await import("@optionaldeps/jquery")).default as any;
+            $.fn = {
                 modal: {
                     Constructor: {
                         VERSION: '3.3.1'
@@ -50,7 +57,7 @@ describe("Bootstrap version detection", () => {
             var dialogs = await import("./dialogs");
             dialogs.alertDialog("hello");
 
-            expect(passedHtml).not.toBeNull();
+            expect(passedHtml).toBeDefined();
 
             var idx1 = passedHtml.indexOf('class="close"');
             var idx2 = passedHtml.indexOf('<h5');
@@ -67,10 +74,11 @@ describe("Bootstrap version detection", () => {
     it('detects BS4 when modal version does not exist', async function () {
         var passedHtml: string;
         setupDummyJQueryForModal(function (html) {
-            passedHtml = html;
+            passedHtml = typeof html === 'string' ? html : html.outerHTML;
         });
         try {
-            (globalThis.$ as any).fn = {
+            var $ = (await import("@optionaldeps/jquery")).default as any;
+            ($ as any).fn = {
                 modal: {
                 }
             }
@@ -78,7 +86,7 @@ describe("Bootstrap version detection", () => {
             var dialogs = await import("./dialogs");
             dialogs.alertDialog("hello");
 
-            expect(passedHtml).not.toBeNull();
+            expect(passedHtml).toBeDefined();
 
             var idx1 = passedHtml.indexOf('class="close"');
             var idx2 = passedHtml.indexOf('<h5');
@@ -96,10 +104,11 @@ describe("Bootstrap version detection", () => {
 
         var passedHtml: string;
         setupDummyJQueryForModal(function (html) {
-            passedHtml = html;
+            passedHtml = typeof html === 'string' ? html : html.outerHTML;
         });
         try {
-            (globalThis.$ as any).fn = {
+            var $ = (await import("@optionaldeps/jquery")).default as any;
+            ($ as any).fn = {
                 modal: {
                     Constructor: {
                         VERSION: '4.1.0'
@@ -127,14 +136,22 @@ describe("Bootstrap version detection", () => {
 
 describe("Bootstrap noConflict", function () {
     function setupDummyJQuery() {
-        globalThis.$ = globalThis.jQuery = function () {
+        jest.unmock('@optionaldeps/jquery')
+        jest.mock('@optionaldeps/jquery', () => {
             return {
-                html: function (): any {
-                    return null;
+                __esModule: true,
+                default: Object.assign(function() {
+                    return {
+                        html: function (): any {
+                            return null;
+                        }
+                    }
                 },
+                {
+                    fn: {}
+                }) as any
             }
-        } as any;
-        (globalThis.$ as any).fn = {};
+        });                
     }
 
     function uiButton() {
@@ -145,64 +162,48 @@ describe("Bootstrap noConflict", function () {
 
     it('does not call noConflict if no jQuery ui button widget', async function () {
         setupDummyJQuery();
-        try {
-            var noConflictCalled = false;
-            (globalThis.$ as any).ui = {};
-            (globalThis.$ as any).fn.button = {
-                noConflict: function () {
-                    noConflictCalled = true;
-                }
+        var $ = (await import("@optionaldeps/jquery")).default as any;
+        var noConflictCalled = false;
+        ($ as any).ui = {};
+        ($ as any).fn.button = {
+            noConflict: function () {
+                noConflictCalled = true;
             }
-            await import("./dialogs");
-            expect(noConflictCalled).toBe(false);
         }
-        finally {
-            delete globalThis.$;
-            delete globalThis.jQuery;
-        }
+        await import("./dialogs");
+        expect(noConflictCalled).toBe(false);
     });
 
     it('skips noConflict if button does not have noConflict method', async function () {
         setupDummyJQuery();
-        try {
-            (globalThis.$ as any).ui = {
-                button: function () {
-                }
-            };
-            (globalThis.$ as any).fn.button = {
+        var $ = (await import("@optionaldeps/jquery")).default as any;
+        ($ as any).ui = {
+            button: function () {
             }
-            await import("./dialogs");
+        };
+        ($ as any).fn.button = {
         }
-        finally {
-            delete globalThis.$;
-            delete globalThis.jQuery;
-        }
+        await import("./dialogs");
     });
 
     it('noConflict called if jQuery ui button widget exists and $.fn.button has noConflict method', async function () {
         setupDummyJQuery();
-        try {
-            var noConflictCalled = false;
+        var noConflictCalled = false;
+        var $ = (await import("@optionaldeps/jquery")).default as any;
+        (bsButton as any).noConflict = function () {
+            noConflictCalled = true;
+            ($ as any).fn.button = uiButton;
+            return bsButton;
+        };
 
-            (bsButton as any).noConflict = function () {
-                noConflictCalled = true;
-                (globalThis.$ as any).fn.button = uiButton;
-                return bsButton;
-            };
-
-            (globalThis.$ as any).fn.button = bsButton;
-            (globalThis.$ as any).ui = {
-                button: uiButton
-            };
-            await import("./dialogs");
-            expect(noConflictCalled).toBe(true);
-            expect(($.fn as any).button).toBe(uiButton);
-            expect(($.fn as any).btn).toBe(bsButton);
-        }
-        finally {
-            delete globalThis.$;
-            delete globalThis.jQuery;
-        }
+        ($ as any).fn.button = bsButton;
+        ($ as any).ui = {
+            button: uiButton
+        };
+        await import("./dialogs");
+        expect(noConflictCalled).toBe(true);
+        expect(($.fn as any).button).toBe(uiButton);
+        expect(($.fn as any).btn).toBe(bsButton);
     });
 });
 

@@ -737,63 +737,168 @@ declare namespace Q {
      */
     function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
+    /**
+     * Options for a message dialog button
+     */
     interface DialogButton {
+        /** Button text */
         text?: string;
+        /** Button hint */
         hint?: string;
+        /** Button icon */
         icon?: string;
-        click?: (e: JQueryEventObject) => void;
+        /** Click handler */
+        click?: (e: MouseEvent) => void;
+        /** CSS class for button */
         cssClass?: string;
+        /** HTML encode button text. Default is true. */
         htmlEncode?: boolean;
+        /** The code that is returned from message dialog function when this button is clicked */
         result?: string;
     }
+    /**
+     * Options that apply to all message dialog types
+     */
     interface CommonDialogOptions {
+        /** Event handler that is called when dialog is opened */
         onOpen?: () => void;
+        /** Event handler that is called when dialog is closed */
         onClose?: (result: string) => void;
+        /** Dialog title */
         title?: string;
+        /** HTML encode the message, default is true */
         htmlEncode?: boolean;
+        /** Wrap the message in a <pre> element, so that line endings are preserved, default is true */
         preWrap?: boolean;
+        /** Dialog css class. Default is based on the message dialog type */
         dialogClass?: string;
+        /** List of buttons to show on the dialog */
         buttons?: DialogButton[];
+        /** Class to use for the modal element for Bootstrap dialogs */
         modalClass?: string;
+        /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
         bootstrap?: boolean;
+        /** The result code of the button used to close the dialog is returned via this variable in the options object */
         result?: string;
     }
+    /** Returns true if Bootstrap 3 is loaded */
+    function isBS3(): boolean;
+    /** Returns true if Bootstrap 5+ is loaded */
+    function isBS5Plus(): boolean;
+    /**
+     * Builds HTML DIV element for a Bootstrap modal dialog
+     * @param title Modal title
+     * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
+     * @param modalClass Optional class to add to the modal element
+     * @param escapeHtml True to html encode body, default is true
+     * @returns
+     */
+    function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
+    function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
+    function dialogButtonToUI(x: DialogButton): any;
+    /**
+     * Additional options for Alert dialogs
+     */
     interface AlertOptions extends CommonDialogOptions {
+        /** The title of OK button, or false to hide the OK button */
         okButton?: string | boolean;
+        /** CSS class for OK button */
         okButtonClass?: string;
     }
-    function isBS3(): boolean;
-    function isBS5Plus(): boolean;
-    function bsModalMarkup(title: string, body: string, modalClass?: string): string;
-    function dialogButtonToBS(x: DialogButton): string;
-    function dialogButtonToUI(x: DialogButton): any;
+    /**
+     * Displays an alert dialog
+     * @param message The message to display
+     * @param options Additional options.
+     * @see AlertOptions
+     * @example
+     * alertDialog("An error occured!"); }
+     */
     function alertDialog(message: string, options?: AlertOptions): void;
     /** @obsolete use alertDialog */
     const alert: typeof alertDialog;
+    /** Additional options for confirm dialog */
     interface ConfirmOptions extends CommonDialogOptions {
+        /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
         yesButton?: string | boolean;
+        /** CSS class for the Yes button. */
         yesButtonClass?: string;
+        /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
         noButton?: string | boolean;
+        /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
         cancelButton?: string | boolean;
+        /** Event handler for cancel button click */
         onCancel?: () => void;
+        /** Event handler for no button click */
         onNo?: () => void;
     }
+    /**
+     * Display a confirmation dialog
+     * @param message The message to display
+     * @param onYes Callback for Yes button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * confirmDialog("Are you sure you want to delete?", () => {
+     *     // do something when yes is clicked
+     * }
+     */
     function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
     /** @obsolete use confirmDialog */
     const confirm: typeof confirmDialog;
+    /** Options for `iframeDialog` **/
     interface IFrameDialogOptions {
         html?: string;
     }
+    /**
+     * Display a dialog that shows an HTML block, which is usually returned from server callbacks in an IFRAME
+     * @param options The options
+     */
     function iframeDialog(options: IFrameDialogOptions): void;
-    function informationDialog(message: string, onOk: () => void, options?: ConfirmOptions): void;
+    /**
+     * Display an information dialog
+     * @param message The message to display
+     * @param onOk Callback for OK button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * informationDialog("Operation complete", () => {
+     *     // do something when OK is clicked
+     * }
+     */
+    function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
     /** @obsolete use informationDialog */
     const information: typeof informationDialog;
-    function successDialog(message: string, onOk: () => void, options?: ConfirmOptions): void;
+    /**
+     * Display a success dialog
+     * @param message The message to display
+     * @param onOk Callback for OK button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * successDialog("Operation complete", () => {
+     *     // do something when OK is clicked
+     * }
+     */
+    function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
     /** @obsolete use successDialog */
     const success: typeof successDialog;
+    /**
+     * Display a warning dialog
+     * @param message The message to display
+     * @param options Additional options.
+     * @see AlertOptions
+     * @example
+     * warningDialog("Something is odd!");
+     */
     function warningDialog(message: string, options?: AlertOptions): void;
     /** @obsolete use warningDialog */
     const warning: typeof warningDialog;
+    /**
+     * Closes a panel, triggering panelbeforeclose and panelclose events.
+     * If the panelbeforeclose prevents the default, the operation is cancelled.
+     * @param element The panel element
+     * @param e  The event triggering the close
+     */
     function closePanel(element: JQuery, e?: JQueryEventObject): void;
 
     interface ServiceError {
@@ -954,20 +1059,58 @@ declare namespace Q {
     function parseDate(s: string, dateOrder?: string): any;
     function splitDateString(s: string): string[];
 
-    function addEmptyOption(select: JQuery): void;
+    /**
+     * Adds an empty option to the select.
+     * @param select the select element
+     */
+    function addEmptyOption(select: JQuery | HTMLSelectElement): void;
+    /**
+     * Adds an option to the select.
+     */
     function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
     /** @obsolete use htmlEncode as it also encodes quotes */
     const attrEncode: typeof htmlEncode;
+    /** Clears the options in the select element */
     function clearOptions(select: JQuery): void;
+    /**
+     * Finds the first element with the given relative id to the source element.
+     * It can handle underscores in the source element id.
+     * @param element the source element
+     * @param relativeId the relative id to the source element
+     * @param context the context element (optional)
+     * @returns the element with the given relative id to the source element.
+     */
     function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+    /**
+     * Finds the first element with the given relative id to the source element.
+     * It can handle underscores in the source element id.
+     * @param element the source element
+     * @param relativeId the relative id to the source element
+     * @param context the context element (optional)
+     * @returns the element with the given relative id to the source element.
+     */
     function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
     /**
      * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
-     * @param s String to be HTML encoded
+     * @param s String (or number etc.) to be HTML encoded
      */
     function htmlEncode(s: any): string;
+    /**
+     * Creates a new DIV and appends it to the body.
+     * @returns the new DIV element.
+     */
     function newBodyDiv(): JQuery;
+    /**
+     * Returns the outer HTML of the element.
+     */
     function outerHtml(element: JQuery): string;
+    /**
+     * Toggles the class on the element handling spaces like jQuery addClass does.
+     * @param el the element
+     * @param cls the class to toggle
+     * @param remove if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+     */
+    function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
     function autoFullHeight(element: JQuery): void;
     function initFullHeightGridPage(gridDiv: JQuery, opt?: {
@@ -1244,19 +1387,82 @@ declare namespace Q {
     function postToUrl(options: PostToUrlOptions): void;
     function resolveUrl(url: string): string;
 
+    /**
+     * Checks if the string ends with the specified substring.
+     * @param s String to check.
+     * @param suffix Suffix to check.
+     * @returns True if the string ends with the specified substring.
+     */
     function endsWith(s: string, suffix: string): boolean;
+    /**
+     * Checks if the string is empty or null.
+     * @param s String to check.
+     * @returns True if the string is empty or null.
+     */
     function isEmptyOrNull(s: string): boolean;
+    /**
+     * Checks if the string is empty or null or whitespace.
+     * @param s String to check.
+     * @returns True if the string is empty or null or whitespace.
+     */
     function isTrimmedEmpty(s: string): boolean;
+    /**
+     * Pads the string to the left with the specified character.
+     * @param s String to pad.
+     * @param len Target length of the string.
+     * @param ch Character to pad with.
+     * @returns Padded string.
+     */
     function padLeft(s: string | number, len: number, ch?: string): any;
+    /**
+     * Checks if the string starts with the prefix
+     * @param s String to check.
+     * @param prefix Prefix to check.
+     * @returns True if the string starts with the prefix.
+     */
     function startsWith(s: string, prefix: string): boolean;
+    /**
+     * Converts the string to single line by removing line end characters
+     * @param str String to convert.
+     */
     function toSingleLine(str: string): string;
+    /**
+     * Trims the whitespace characters from the end of the string
+     */
     var trimEnd: (s: string) => any;
+    /**
+     * Trims the whitespace characters from the start of the string
+     */
     var trimStart: (s: string) => any;
+    /**
+     * Trims the whitespace characters from the start and end of the string
+     * This returns empty string even when the string is null or undefined.
+     */
     function trim(s: string): string;
+    /**
+     * Trims the whitespace characters from the start and end of the string
+     * Returns empty string if the string is null or undefined.
+     */
     function trimToEmpty(s: string): string;
+    /**
+     * Trims the whitespace characters from the start and end of the string
+     * Returns null if the string is null, undefined or whitespace.
+     */
     function trimToNull(s: string): string;
+    /**
+     * Replaces all occurrences of the search string with the replacement string.
+     * @param str String to replace.
+     * @param find String to find.
+     * @param replace String to replace with.
+     * @returns Replaced string.
+     */
     function replaceAll(str: string, find: string, replace: string): string;
-    function zeroPad(n: number, digits: number): string;
+    /**
+     * Pads the start of string to make it the specified length.
+     * @param s String to pad.
+     * @param len Target length of the string.
+     */
+    function zeroPad(n: number, len: number): string;
 
     type Dictionary<TItem> = {
         [key: string]: TItem;

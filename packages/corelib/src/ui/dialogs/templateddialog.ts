@@ -171,8 +171,8 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         if (opt.modalClass)
             modalClass += ' ' + opt.modalClass;
 
-        var markup = bsModalMarkup(title, '', modalClass);
-        var modal = $(markup).eq(0).appendTo(document.body).addClass('flex-layout');
+        var div = bsModalMarkup(title, '', modalClass);
+        var modal = $(div).appendTo(document.body).addClass('flex-layout');
         modal.one('shown.bs.modal.' + this.uniqueName, () => {
             this.element.triggerHandler('shown.bs.modal');
             this.onDialogOpen();

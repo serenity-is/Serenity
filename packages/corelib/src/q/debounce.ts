@@ -1,4 +1,4 @@
-﻿interface DebouncedFunction<T extends (...args: any[]) => any> {
+﻿export interface DebouncedFunction<T extends (...args: any[]) => any> {
     /**
      * Call the original function, but applying the debounce rules.
      *

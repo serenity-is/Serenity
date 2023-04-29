@@ -1,6 +1,6 @@
 ﻿// adapted from https://github.com/JPeer264/toastr2
 
-import { htmlEncode } from "./html";
+import { htmlEncode, toggleClass } from "./html";
 
 export type ToastContainerOptions = {
     containerId?: string;
@@ -457,20 +457,6 @@ export class Toastr {
         this.publish(response);
         return toastElement;
     }
-}
-
-function toggleClass(el: Element, cls: string, remove?: boolean) {
-    if (cls == null || !cls.length)
-        return;
-
-    if (cls.indexOf(' ') < 0) {
-        el.classList.toggle(cls, remove);
-        return;
-    }
-
-    var k = cls.split(' ').map(x => x.trim()).filter(x => x.length);
-    for (var a of k)
-        el.classList.toggle(a, remove);
 }
 
 initialInstance = new Toastr();
