@@ -3,8 +3,7 @@ export default {
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@serenity-is/corelib/q$': '<rootDir>/src/q',
-    '^@serenity-is/corelib/slick$': '<rootDir>/src/slick',
+    '^@serenity-is/corelib/(.*)$': '<rootDir>/src/$1',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid',
     '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
     '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',

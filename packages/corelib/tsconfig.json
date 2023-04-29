@@ -20,11 +20,8 @@
     ],
     "rootDir": "./src",
     "paths": {
-      "@serenity-is/corelib/q": [
-        "./src/q"
-      ],
-      "@serenity-is/corelib/slick": [
-        "./src/slick"
+      "@serenity-is/corelib/*": [
+        "./src/*"
       ],
       "@optionaldeps/*": [
         "./src/globals/*-module"
