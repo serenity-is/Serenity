@@ -520,16 +520,6 @@ declare class Lookup<TItem> {
     update?(value: TItem[]): void;
 }
 
-type Required<T> = {
-    [P in keyof T]-?: T[P];
-};
-type ToastType = {
-    info?: string;
-    error?: string;
-    warning?: string;
-    success?: string;
-};
-type RequiredToastType = Required<ToastType>;
 type ToastContainerOptions = {
     containerId?: string;
     positionClass?: string;
@@ -563,11 +553,16 @@ type ToastrOptions = ToastContainerOptions & {
     closeButton?: boolean;
     rtl?: boolean;
 };
+type NotifyMap = {
+    type: string;
+    iconClass: string;
+    title?: string;
+    message?: string;
+};
 declare class Toastr {
     private listener;
     private toastId;
     private previousToast;
-    private toastType;
     options: ToastrOptions;
     constructor(options?: ToastrOptions);
     private createContainer;
@@ -876,4 +871,4 @@ declare namespace Criteria {
     var parse: typeof parseCriteria;
 }
 
-export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaOperator, Culture, DateFormat, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, Group, Grouping, Groups, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RequiredToastType, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, ToastType, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, DateFormat, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, Group, Grouping, Groups, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NotifyMap, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

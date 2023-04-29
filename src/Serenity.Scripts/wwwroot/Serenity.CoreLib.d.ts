@@ -922,16 +922,6 @@ declare namespace Q {
         update?(value: TItem[]): void;
     }
 
-    type Required<T> = {
-        [P in keyof T]-?: T[P];
-    };
-    type ToastType = {
-        info?: string;
-        error?: string;
-        warning?: string;
-        success?: string;
-    };
-    type RequiredToastType = Required<ToastType>;
     type ToastContainerOptions = {
         containerId?: string;
         positionClass?: string;
@@ -965,11 +955,16 @@ declare namespace Q {
         closeButton?: boolean;
         rtl?: boolean;
     };
+    type NotifyMap = {
+        type: string;
+        iconClass: string;
+        title?: string;
+        message?: string;
+    };
     class Toastr {
         private listener;
         private toastId;
         private previousToast;
-        private toastType;
         options: ToastrOptions;
         constructor(options?: ToastrOptions);
         private createContainer;
@@ -2794,6 +2789,18 @@ declare namespace Serenity {
         function tryGet(key: string): any;
     }
 
+    interface IRowDefinition {
+        readonly deletePermission?: string;
+        readonly idProperty?: string;
+        readonly insertPermission?: string;
+        readonly isActiveProperty?: string;
+        readonly isDeletedProperty?: string;
+        readonly localTextPrefix?: string;
+        readonly nameProperty?: string;
+        readonly readPermission?: string;
+        readonly updatePermission?: string;
+    }
+
     class EnumKeyAttribute {
         value: string;
         constructor(value: string);
@@ -4404,18 +4411,6 @@ declare namespace Serenity {
         function get(key: string): any;
         function reset(): void;
         function tryGet(key: string): any;
-    }
-
-    interface IRowDefinition {
-        readonly deletePermission?: string;
-        readonly idProperty?: string;
-        readonly insertPermission?: string;
-        readonly isActiveProperty?: string;
-        readonly isDeletedProperty?: string;
-        readonly localTextPrefix?: string;
-        readonly nameProperty?: string;
-        readonly readPermission?: string;
-        readonly updatePermission?: string;
     }
 
     type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
