@@ -7,11 +7,22 @@ const andOrRegex = /[|&]/;
 
 /**
  * Contains permission related functions.
- * Note: We use a namespace here both for compatibility and allow users to override
+ * 
+ * ## Note
+ * We use a namespace here both for compatibility and for allowing users to override
  * these functions easily in ES modules environment, which is normally hard to do.
  */
 export namespace Authorization {
 
+    /** 
+     * Checks if the current user has the permission specified.
+     * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+     * 
+     * > Please prefer the `hasPermissionAsync` variant as this may block the UI thread if the `UserData` script is not already loaded.
+     * @param permission Permission key. It may contain logical operators like A&B|C.
+     * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions, 
+     * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+     */
     export function hasPermission(permission: string) {
         if (permission == null)
             return false;
@@ -35,6 +46,14 @@ export namespace Authorization {
         return isPermissionInSet(ud.Permissions, permission);
     }
 
+    /** 
+     * Checks if the current user has the permission specified.
+     * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+     * 
+     * @param permission Permission key. It may contain logical operators like A&B|C.
+     * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions, 
+     * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+     */
     export async function hasPermissionAsync(permission: string): Promise<boolean> {
         if (permission == null)
             return false;

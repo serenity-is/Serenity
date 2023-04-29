@@ -488,11 +488,30 @@ declare namespace Q {
 
     /**
      * Contains permission related functions.
-     * Note: We use a namespace here both for compatibility and allow users to override
+     *
+     * ## Note
+     * We use a namespace here both for compatibility and for allowing users to override
      * these functions easily in ES modules environment, which is normally hard to do.
      */
     namespace Authorization {
+        /**
+         * Checks if the current user has the permission specified.
+         * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+         *
+         * > Please prefer the `hasPermissionAsync` variant as this may block the UI thread if the `UserData` script is not already loaded.
+         * @param permission Permission key. It may contain logical operators like A&B|C.
+         * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
+         * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+         */
         function hasPermission(permission: string): boolean;
+        /**
+         * Checks if the current user has the permission specified.
+         * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+         *
+         * @param permission Permission key. It may contain logical operators like A&B|C.
+         * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
+         * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+         */
         function hasPermissionAsync(permission: string): Promise<boolean>;
         /**
          * Checks if the hashset contains the specified permission, also handling logical "|" and "&" operators
@@ -903,18 +922,22 @@ declare namespace Q {
         update?(value: TItem[]): void;
     }
 
+    type Required<T> = {
+        [P in keyof T]-?: T[P];
+    };
     type ToastType = {
         info?: string;
         error?: string;
         warning?: string;
         success?: string;
     };
+    type RequiredToastType = Required<ToastType>;
     type ToastContainerOptions = {
         containerId?: string;
         positionClass?: string;
         target?: string;
     };
-    type ToastrOptions<T = ToastType> = ToastContainerOptions & {
+    type ToastrOptions = ToastContainerOptions & {
         tapToDismiss?: boolean;
         toastClass?: string;
         showDuration?: number;
@@ -942,6 +965,30 @@ declare namespace Q {
         closeButton?: boolean;
         rtl?: boolean;
     };
+    class Toastr {
+        private listener;
+        private toastId;
+        private previousToast;
+        private toastType;
+        options: ToastrOptions;
+        constructor(options?: ToastrOptions);
+        private createContainer;
+        getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
+        error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        subscribe(callback: (response: Toastr) => void): void;
+        publish(args: Toastr): void;
+        clear(toastElement?: HTMLElement | null, clearOptions?: {
+            force?: boolean;
+        }): void;
+        remove(toastElement?: HTMLElement | null): void;
+        removeToast(toastElement: HTMLElement, options?: ToastrOptions): void;
+        private clearContainer;
+        private clearToast;
+        private notify;
+    }
 
     let defaultNotifyOptions: ToastrOptions;
     function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
@@ -5002,6 +5049,25 @@ declare namespace Serenity {
         set_value(value: string): void;
         set value(v: string);
     }
+
+    /**
+     *
+     * This is the main entry point for `@serenity-is/corelib` package.
+     *
+     * The types from this module are available by importing from "@serenity-is/corelib":
+     *
+     * ```ts
+     * import { EntityGrid } from "serenity-is/corelib"
+     *
+     * export class MyGrid extends EntityGrid<MyRow, any> {
+     * }
+     * ```
+     *
+     * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` namespace.
+     * > e.g. `Serenity.EntityGrid`
+     * @packageDocumentation
+     * @module corelib
+     */
 
     type Constructor<T> = new (...args: any[]) => T;
 }

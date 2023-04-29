@@ -1,4 +1,23 @@
-﻿export * from "./globals/select2-globals"
+﻿/** 
+ * 
+ * This is the main entry point for `@serenity-is/corelib` package.
+ * 
+ * The types from this module are available by importing from "@serenity-is/corelib":
+ * 
+ * ```ts
+ * import { EntityGrid } from "serenity-is/corelib"
+ * 
+ * export class MyGrid extends EntityGrid<MyRow, any> {
+ * }
+ * ```
+ *   
+ * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` namespace.
+ * > e.g. `Serenity.EntityGrid`
+ * @packageDocumentation
+ * @module corelib
+ */
+
+export * from "./globals/select2-globals"
 export * from "./globals/jquery-globals"
 export * from "./globals/jquery.validation-globals"
 
@@ -7,6 +26,7 @@ export { ColumnSelection, RetrieveColumnSelection, SummaryType, Criteria } from 
 
 export * from "./interfaces";
 export * from "./types";
+export * from "./ui/datagrid/irowdefinition";
 export * from "./ui/datagrid/islickformatter";
 export * from "./decorators";
 export * from "./ui/helpers/lazyloadhelper";

@@ -2,26 +2,13 @@
 
 import { htmlEncode } from "./html";
 
-type Required<T> = {
-    [P in keyof T]-?: T[P];
-}
-
-export type ToastType = {
-    info?: string;
-    error?: string;
-    warning?: string;
-    success?: string;
-};
-
-export type RequiredToastType = Required<ToastType>;
-
 export type ToastContainerOptions = {
     containerId?: string;
     positionClass?: string;
     target?: string;
 }
 
-export type ToastrOptions<T = ToastType> = ToastContainerOptions & {
+export type ToastrOptions = ToastContainerOptions & {
     tapToDismiss?: boolean;
     toastClass?: string;
     showDuration?: number;
@@ -50,14 +37,14 @@ export type ToastrOptions<T = ToastType> = ToastContainerOptions & {
     rtl?: boolean;
 }
 
-type NotifyMap = {
+export type NotifyMap = {
     type: string;
     iconClass: string;
     title?: string;
     message?: string;
 }
 
-const initialOptions: Required<ToastrOptions> = {
+const initialOptions: ToastrOptions = {
     tapToDismiss: true,
     toastClass: 'toast',
     containerId: 'toast-container',
@@ -95,13 +82,6 @@ export class Toastr {
     private toastId = 0;
 
     private previousToast: string | null = null;
-
-    private toastType: RequiredToastType = {
-        info: 'info',
-        error: 'error',
-        warning: 'warning',
-        success: 'success',
-    };
 
     public options: ToastrOptions;
 
@@ -144,7 +124,7 @@ export class Toastr {
         opt?: ToastrOptions,
     ): HTMLElement | null {
         return this.notify({
-            type: this.toastType.error,
+            type: 'error',
             iconClass: 'toast-error',
             message,
             title,
@@ -157,7 +137,7 @@ export class Toastr {
         opt?: ToastrOptions,
     ): HTMLElement | null {
         return this.notify({
-            type: this.toastType.warning,
+            type: 'warning',
             iconClass: 'toast-warning',
             message,
             title,
@@ -170,7 +150,7 @@ export class Toastr {
         opt?: ToastrOptions,
     ): HTMLElement | null {
         return this.notify({
-            type: this.toastType.success,
+            type: 'success',
             iconClass: 'toast-success',
             message,
             title,
@@ -183,7 +163,7 @@ export class Toastr {
         opt?: ToastrOptions,
     ): HTMLElement | null {
         return this.notify({
-            type: this.toastType.info,
+            type: 'info',
             iconClass: 'toast-info',
             message,
             title,

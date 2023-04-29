@@ -1,4 +1,4 @@
-﻿class CriteriaBuilder extends Array {
+﻿export class CriteriaBuilder extends Array {
     bw(fromInclusive: any, toInclusive: any): Array<any> {
         return [[this, '>=', fromInclusive], 'and', [this, '<=', toInclusive]];
     }

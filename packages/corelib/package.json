@@ -58,7 +58,8 @@
   "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
     "build": "rollup -c && node build/build",
-    "test": "pnpm build && pnpm jest --coverage"
+    "test": "pnpm build && pnpm jest --coverage",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --name \"@serenity-is\" --readme ./build/api-readme.md --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#line={line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src/q src/slick src"
   },
   "type": "module"
 }
