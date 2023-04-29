@@ -1,5 +1,6 @@
 ﻿import $ from "@optionaldeps/jquery";
 
+/** Options for the BlockUI plugin. */
 export interface JQBlockUIOptions {
     useTimeout?: boolean;
 }
@@ -53,6 +54,9 @@ export function blockUI(options: JQBlockUIOptions) {
     }
 }
 
+/**
+ * Unblocks the page. 
+ */
 export function blockUndo() {
     if (blockUICount > 1) {
         blockUICount--;

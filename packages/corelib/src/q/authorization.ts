@@ -112,6 +112,12 @@ export namespace Authorization {
         return false;
     }
 
+    /**
+     * Throws an error if the current user does not have the specified permission. 
+     * Prefer `await validatePermissionAsync()` as this one might block the UI if the `UserData`
+     * is not already loaded.
+     * @param permission Permission key. It may contain logical operators like A&B|C.
+     */
     export function validatePermission(permission: string) {
         if (!hasPermission(permission)) {
             notifyError(localText("Authorization.AccessDenied"));
@@ -119,6 +125,14 @@ export namespace Authorization {
         }
     }
 
+    /**
+    * Throws an error if the current user does not have the specified permission.
+    * @param permission Permission key. It may contain logical operators like A&B|C.
+    * @example 
+    * ```ts
+    * await Authorization.validatePermissionAsync("A&B|C");
+    * ```
+    */
     export async function validatePermissionAsync(permission: string): Promise<void> {
         if (!(await hasPermissionAsync(permission))) {
             notifyError(localText("Authorization.AccessDenied"));
@@ -128,11 +142,69 @@ export namespace Authorization {
 }
 
 export declare namespace Authorization {
+    /** 
+     * Checks if the current user is logged in. Prefer `isLoggedInAsync` as this one might block the UI if the `UserData`
+     * is not already loaded.
+     * @returns `true` if the user is logged in, `false` otherwise. 
+     * @example 
+     * ```ts
+     * if (Authorization.isLoggedIn) {
+     *     // do something
+     * }
+     */
     export let isLoggedIn: boolean;
+
+    /** 
+     * Checks if the current user is logged in.
+     * @returns `true` if the user is logged in, `false` otherwise. 
+     * @example 
+     * ```ts
+     * if (await Authorization.isLoggedInAsync) {
+     *     // do something
+     * }
+     */
     export let isLoggedInAsync: Promise<boolean>;
+
+    /** Returns the username for currently logged user. Prefer `usernameAsync` as this one might block the UI if the `UserData`
+     * is not already loaded.
+     * @returns Username for currently logged user.
+     * @example 
+     * ```ts
+     * if (Authorization.username) {
+     *     // do something
+     * } 
+     */
     export let username: string;
+
+    /** Returns the username for currently logged user.
+     * @returns Username for currently logged user.
+     * @example 
+     * ```ts
+     * if (await Authorization.usernameAsync) {
+     *     // do something
+     * }
+     */
     export let usernameAsync: Promise<string>;
+
+    /** Returns the user data for currently logged user. Prefer `userDefinitionAsync` as this one might block the UI if the `UserData`
+     * is not already loaded.
+     * @returns User data for currently logged user.
+     * @example 
+     * ```ts
+     * if (Authorization.userDefinition.IsAdmin) {
+     *     // do something
+     * }
+     */
     export let userDefinition: UserDefinition;
+
+    /** Returns the user data for currently logged user.
+     * @returns User data for currently logged user.
+     * @example 
+     * ```ts
+     * if ((await Authorization.userDefinitionAsync).IsAdmin) {
+     *     // do something
+     * }
+     */
     export let userDefinitionAsync: Promise<UserDefinition>;
 }
 

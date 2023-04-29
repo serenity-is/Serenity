@@ -403,50 +403,93 @@ declare function __createBinding(object: object, target: object, key: PropertyKe
 
 declare namespace Q {
     /**
-     * Tests if any of array elements matches given predicate
+     * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
+     * @param array Array to test.
+     * @param predicate Predicate to test elements.
+     * @returns True if any element matches.
      */
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     /**
-     * Counts number of array elements that matches a given predicate
+     * Counts number of array elements that matches a given predicate.
+     * @param array Array to test.
+     * @param predicate Predicate to test elements.
      */
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
     /**
-     * Gets first element in an array that matches given predicate.
+     * Gets first element in an array that matches given predicate similar to LINQ's First.
      * Throws an error if no match is found.
+     * @param array Array to test.
+     * @param predicate Predicate to test elements.
+     * @returns First element that matches.
      */
     function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    type Group<TItem> = {
+    /**
+     * A group item returned by `groupBy()`.
+     */
+    type GroupByElement<TItem> = {
+        /** index of the item in `inOrder` array */
         order: number;
+        /** key of the group */
         key: string;
+        /** the items in the group */
         items: TItem[];
+        /** index of the first item of this group in the original array */
         start: number;
     };
-    type Groups<TItem> = {
+    /**
+     * Return type of the `groupBy` function.
+     */
+    type GroupByResult<TItem> = {
         byKey: {
-            [key: string]: Group<TItem>;
+            [key: string]: GroupByElement<TItem>;
         };
-        inOrder: Group<TItem>[];
+        inOrder: GroupByElement<TItem>[];
     };
     /**
      * Groups an array with keys determined by specified getKey() callback.
      * Resulting object contains group objects in order and a dictionary to access by key.
+     * This is similar to LINQ's ToLookup function with some additional details like start index.
+     * @param items Array to group.
+     * @param getKey Function that returns key for each item.
+     * @returns GroupByResult object.
      */
-    function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Groups<TItem>;
+    function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): GroupByResult<TItem>;
     /**
-     * Gets index of first element in an array that matches given predicate
+     * Gets index of first element in an array that matches given predicate.
+     * @param array Array to test.
+     * @param predicate Predicate to test elements.
      */
     function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
     /**
-     * Inserts an item to the array at specified index
+     * Inserts an item to the array at specified index. Prefer Array.splice unless
+     * you need to support IE.
+     * @param obj Array or array like object to insert to.
+     * @param index Index to insert at.
+     * @param item Item to insert.
+     * @throws Error if object does not support insert.
+     * @example
+     * insert([1, 2, 3], 1, 4); // [1, 4, 2, 3]
+     * insert({ insert: (index, item) => { this.splice(index, 0, item); } }
      */
     function insert(obj: any, index: number, item: any): void;
     /**
-     * Determines if the object is an array
+     * Determines if the object is an array. Prefer Array.isArray over this function (e.g. `Array.isArray(obj)`).
+     * @param obj Object to test.
+     * @returns True if the object is an array.
+     * @example
+     * isArray([1, 2, 3]); // true
+     * isArray({}); // false
      */
     const isArray: (arg: any) => arg is any[];
     /**
     * Gets first element in an array that matches given predicate.
     * Throws an error if no matches is found, or there are multiple matches.
+    * @param array Array to test.
+    * @param predicate Predicate to test elements.
+    * @returns First element that matches.
+    * @example
+    * first([1, 2, 3], x => x == 2); // 2
+    * first([1, 2, 3], x => x == 4); // throws error.
     */
     function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
     type Grouping<TItem> = {
@@ -455,11 +498,22 @@ declare namespace Q {
     /**
      * Maps an array into a dictionary with keys determined by specified getKey() callback,
      * and values that are arrays containing elements for a particular key.
+     * @param items Array to map.
+     * @param getKey Function that returns key for each item.
+     * @returns Grouping object.
+     * @example
+     * toGrouping([1, 2, 3], x => x % 2 == 0 ? "even" : "odd"); // { odd: [1, 3], even: [2] }
      */
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem>;
     /**
-     * Gets first element in an array that matches given predicate.
+     * Gets first element in an array that matches given predicate (similar to LINQ's FirstOrDefault).
      * Returns null if no match is found.
+     * @param array Array to test.
+     * @param predicate Predicate to test elements.
+     * @returns First element that matches.
+     * @example
+     * tryFirst([1, 2, 3], x => x == 2); // 2
+     * tryFirst([1, 2, 3], x => x == 4); // null
      */
     function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
 
@@ -522,18 +576,86 @@ declare namespace Q {
         function isPermissionInSet(permissionSet: {
             [key: string]: boolean;
         }, permission: string): boolean;
+        /**
+         * Throws an error if the current user does not have the specified permission.
+         * Prefer `await validatePermissionAsync()` as this one might block the UI if the `UserData`
+         * is not already loaded.
+         * @param permission Permission key. It may contain logical operators like A&B|C.
+         */
         function validatePermission(permission: string): void;
+        /**
+        * Throws an error if the current user does not have the specified permission.
+        * @param permission Permission key. It may contain logical operators like A&B|C.
+        * @example
+        * ```ts
+        * await Authorization.validatePermissionAsync("A&B|C");
+        * ```
+        */
         function validatePermissionAsync(permission: string): Promise<void>;
     }
     namespace Authorization {
+        /**
+         * Checks if the current user is logged in. Prefer `isLoggedInAsync` as this one might block the UI if the `UserData`
+         * is not already loaded.
+         * @returns `true` if the user is logged in, `false` otherwise.
+         * @example
+         * ```ts
+         * if (Authorization.isLoggedIn) {
+         *     // do something
+         * }
+         */
         let isLoggedIn: boolean;
+        /**
+         * Checks if the current user is logged in.
+         * @returns `true` if the user is logged in, `false` otherwise.
+         * @example
+         * ```ts
+         * if (await Authorization.isLoggedInAsync) {
+         *     // do something
+         * }
+         */
         let isLoggedInAsync: Promise<boolean>;
+        /** Returns the username for currently logged user. Prefer `usernameAsync` as this one might block the UI if the `UserData`
+         * is not already loaded.
+         * @returns Username for currently logged user.
+         * @example
+         * ```ts
+         * if (Authorization.username) {
+         *     // do something
+         * }
+         */
         let username: string;
+        /** Returns the username for currently logged user.
+         * @returns Username for currently logged user.
+         * @example
+         * ```ts
+         * if (await Authorization.usernameAsync) {
+         *     // do something
+         * }
+         */
         let usernameAsync: Promise<string>;
+        /** Returns the user data for currently logged user. Prefer `userDefinitionAsync` as this one might block the UI if the `UserData`
+         * is not already loaded.
+         * @returns User data for currently logged user.
+         * @example
+         * ```ts
+         * if (Authorization.userDefinition.IsAdmin) {
+         *     // do something
+         * }
+         */
         let userDefinition: UserDefinition;
+        /** Returns the user data for currently logged user.
+         * @returns User data for currently logged user.
+         * @example
+         * ```ts
+         * if ((await Authorization.userDefinitionAsync).IsAdmin) {
+         *     // do something
+         * }
+         */
         let userDefinitionAsync: Promise<UserDefinition>;
     }
 
+    /** Options for the BlockUI plugin. */
     interface JQBlockUIOptions {
         useTimeout?: boolean;
     }
@@ -546,6 +668,9 @@ declare namespace Q {
      * div is 2000, so a higher z-order shouldn't be used in page.
      */
     function blockUI(options: JQBlockUIOptions): void;
+    /**
+     * Unblocks the page.
+     */
     function blockUndo(): void;
 
     var Config: {
@@ -1221,25 +1346,111 @@ declare namespace Q {
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
 
+    /**
+     * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+     */
     class CriteriaBuilder extends Array {
+        /**
+         * Creates a between criteria.
+         * @param fromInclusive from value
+         * @param toInclusive to value
+         */
         bw(fromInclusive: any, toInclusive: any): Array<any>;
+        /**
+         * Creates a contains criteria
+         * @param value contains value
+         */
         contains(value: string): Array<any>;
+        /**
+         * Creates a endsWith criteria
+         * @param value endsWith value
+         */
         endsWith(value: string): Array<any>;
+        /**
+         * Creates an equal (=) criteria
+         * @param value equal value
+         */
         eq(value: any): Array<any>;
+        /**
+         * Creates a greater than criteria
+         * @param value greater than value
+         */
         gt(value: any): Array<any>;
+        /**
+         * Creates a greater than or equal criteria
+         * @param value greater than or equal value
+         */
         ge(value: any): Array<any>;
+        /**
+         * Creates a in criteria
+         * @param values in values
+         */
         in(values: any[]): Array<any>;
+        /**
+         * Creates a IS NULL criteria
+         */
         isNull(): Array<any>;
+        /**
+         * Creates a IS NOT NULL criteria
+         */
         isNotNull(): Array<any>;
+        /**
+         * Creates a less than or equal to criteria
+         * @param value less than or equal to value
+         */
         le(value: any): Array<any>;
+        /**
+         * Creates a less than criteria
+         * @param value less than value
+         */
         lt(value: any): Array<any>;
+        /**
+         * Creates a not equal criteria
+         * @param value not equal value
+         */
         ne(value: any): Array<any>;
+        /**
+         * Creates a LIKE criteria
+         * @param value like value
+         */
         like(value: any): Array<any>;
+        /**
+         * Creates a STARTS WITH criteria
+         * @param value startsWith value
+         */
         startsWith(value: string): Array<any>;
+        /**
+         * Creates a NOT IN criteria
+         * @param values array of NOT IN values
+         */
         notIn(values: any[]): Array<any>;
+        /**
+         * Creates a NOT LIKE criteria
+         * @param value not like value
+         */
         notLike(value: any): Array<any>;
     }
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
+     * @param expression The criteria expression.
+     * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+     * @example
+     * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 })
+     *    => [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
     function parseCriteria(expression: string, params?: any): any[];
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The expression may contain parameter placeholders like `A >= ${p1}`
+     * where p1 is a variable in the scope.
+     * @param strings The string fragments.
+     * @param values The tagged template arguments.
+     * @example
+     * var a = 5, b = 4;
+     * parseCriteria`A >= ${a} and B < ${b}`
+     *    => [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
     function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
     enum CriteriaOperator {
         paren = "()",
@@ -1261,6 +1472,10 @@ declare namespace Q {
         like = "like",
         notLike = "not like"
     }
+    /**
+     * Creates a new criteria builder containg the passed field name.
+     * @param field The field name.
+     */
     function Criteria(field: string): CriteriaBuilder;
     namespace Criteria {
         var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
