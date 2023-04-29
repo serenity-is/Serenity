@@ -532,7 +532,7 @@ function shuntingYard(tokens: Token[]): Token[] {
 
                 stack.pop();
             }
-            else 
+            else
                 result.push(token);
         }
         else
@@ -656,55 +656,58 @@ export enum CriteriaOperator {
     notLike = "not like"
 }
 
-export const Criteria = Object.assign(
-    function Criteria(field: string) {
-        var builder = CriteriaBuilder.of(field);
-        // workaround for subclassing array until corelib switched to ES6
-        /* istanbul ignore next */
-        !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
-        return builder as CriteriaBuilder
-    },
-    {
-        and(c1: any[], c2: any[], ...rest: any[][]): any[] {
-            var result = Criteria.join(c1, 'and', c2);
-            if (rest) {
-                for (let k of rest)
-                    result = Criteria.join(result, 'and', k);
-            }
+export function Criteria(field: string) {
+    var builder = CriteriaBuilder.of(field);
+    // workaround for subclassing array until corelib switched to ES6
+    /* istanbul ignore next */
+    !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
+    return builder as CriteriaBuilder
+}
 
-            return result;
-        },
-        Operator: CriteriaOperator,
-        isEmpty(c: any[]): boolean {
-            return c == null ||
-                c.length === 0 ||
-                (c.length === 1 && typeof c[0] === "string" && c[0].length === 0);
-        },
-        join(c1: any[], op: string, c2: any[]): any[] {
-            if (Criteria.isEmpty(c1))
-                return c2;
-
-            if (Criteria.isEmpty(c2))
-                return c1;
-
-            return [c1, op, c2];
-        },
-        not(c: any[]) {
-            return ['not', c]
-        },
-        or(c1: any[], c2: any[], ...rest: any[][]): any[] {
-            var result = Criteria.join(c1, 'or', c2);
-
-            if (rest) {
-                for (let k of rest)
-                    result = Criteria.join(result, 'or', k);
-            }
-
-            return result;
-        },
-        paren(c: any[]): any[] {
-            return Criteria.isEmpty(c) ? c : ['()', c];
-        },
-        parse: parseCriteria
+Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
+    var result = Criteria.join(c1, 'and', c2);
+    if (rest) {
+        for (let k of rest)
+            result = Criteria.join(result, 'and', k);
     }
-);
+
+    return result;
+};
+
+Criteria.Operator = CriteriaOperator;
+Criteria.isEmpty = function isEmpty(c: any[]): boolean {
+    return c == null ||
+        c.length === 0 ||
+        (c.length === 1 && typeof c[0] === "string" && c[0].length === 0);
+};
+
+Criteria.join = function join(c1: any[], op: string, c2: any[]): any[] {
+    if (Criteria.isEmpty(c1))
+        return c2;
+
+    if (Criteria.isEmpty(c2))
+        return c1;
+
+    return [c1, op, c2];
+};
+
+Criteria.not = function not(c: any[]) {
+    return ['not', c]
+}
+
+Criteria.or = function or(c1: any[], c2: any[], ...rest: any[][]) {
+    var result = Criteria.join(c1, 'or', c2);
+
+    if (rest) {
+        for (let k of rest)
+            result = Criteria.join(result, 'or', k);
+    }
+
+    return result;
+}
+
+Criteria.paren = function parent(c: any[]): any[] {
+    return Criteria.isEmpty(c) ? c : ['()', c];
+}
+
+Criteria.parse = parseCriteria;

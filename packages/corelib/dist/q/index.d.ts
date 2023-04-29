@@ -817,15 +817,16 @@ declare enum CriteriaOperator {
     like = "like",
     notLike = "not like"
 }
-declare const Criteria: ((field: string) => CriteriaBuilder) & {
-    and(c1: any[], c2: any[], ...rest: any[][]): any[];
-    Operator: typeof CriteriaOperator;
-    isEmpty(c: any[]): boolean;
-    join(c1: any[], op: string, c2: any[]): any[];
-    not(c: any[]): (string | any[])[];
-    or(c1: any[], c2: any[], ...rest: any[][]): any[];
-    paren(c: any[]): any[];
-    parse: typeof parseCriteria;
-};
+declare function Criteria(field: string): CriteriaBuilder;
+declare namespace Criteria {
+    var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var Operator: typeof CriteriaOperator;
+    var isEmpty: (c: any[]) => boolean;
+    var join: (c1: any[], op: string, c2: any[]) => any[];
+    var not: (c: any[]) => (string | any[])[];
+    var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var paren: (c: any[]) => any[];
+    var parse: typeof parseCriteria;
+}
 
 export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaOperator, Culture, DateFormat, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, Group, Grouping, Groups, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

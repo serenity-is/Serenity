@@ -1219,16 +1219,17 @@ declare namespace Q {
         like = "like",
         notLike = "not like"
     }
-    const Criteria: ((field: string) => CriteriaBuilder) & {
-        and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        Operator: typeof CriteriaOperator;
-        isEmpty(c: any[]): boolean;
-        join(c1: any[], op: string, c2: any[]): any[];
-        not(c: any[]): (string | any[])[];
-        or(c1: any[], c2: any[], ...rest: any[][]): any[];
-        paren(c: any[]): any[];
-        parse: typeof parseCriteria;
-    };
+    function Criteria(field: string): CriteriaBuilder;
+    namespace Criteria {
+        var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var Operator: typeof CriteriaOperator;
+        var isEmpty: (c: any[]) => boolean;
+        var join: (c1: any[], op: string, c2: any[]) => any[];
+        var not: (c: any[]) => (string | any[])[];
+        var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var paren: (c: any[]) => any[];
+        var parse: typeof parseCriteria;
+    }
 }
 
 
