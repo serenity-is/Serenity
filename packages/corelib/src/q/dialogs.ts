@@ -4,6 +4,7 @@ import { htmlEncode, toggleClass } from "./html";
 import { startsWith } from "./strings";
 import { tryGetText } from "./localtext";
 import $ from "@optionaldeps/jquery";
+import bootstrap from "@optionaldeps/bootstrap";
 
 /**
  * Options for a message dialog button
@@ -109,14 +110,13 @@ export function isBS3(): boolean {
     if (_isBS3 != null)
         return _isBS3;
     // @ts-ignore
-    return (_isBS3 = !!($.fn.modal && $.fn.modal.Constructor && $.fn.modal.Constructor.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
+    return (_isBS3 = !!(typeof $ !== "undefined" && $?.fn?.modal?.Constructor?.VERSION && ($.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
 }
 
 /** Returns true if Bootstrap 5+ is loaded */
 export function isBS5Plus(): boolean {
     if (_isBS5Plus != null)
         return _isBS5Plus;
-    // @ts-ignore
     return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
 }
 
@@ -166,17 +166,17 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
 }
 
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
-    var text = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
     if (iconClass != null)
-        text = '<i class="' + htmlEncode(iconClass) + "><i>" + (text ? (" " + text) : "");
+        html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     var button = document.createElement("button");
     button.classList.add("btn");
     if (x.cssClass?.length)
         toggleClass(button, x.cssClass, true);
     if (x.hint?.length)
         button.setAttribute("title", x.hint);
-    button.innerHTML = text;
+    button.innerHTML = html;
     return button;
 }
 
@@ -210,7 +210,6 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
         button.addEventListener("click", e => {
             options.result = x.result;
             if (rawBS5) {
-                // @ts-ignore 
                 bootstrap.Modal.getInstance(modalDiv)?.hide();
             }
             else 
@@ -226,6 +225,7 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
     }
 
     if (rawBS5) {
+        document.body.appendChild(modalDiv);
         if (options.onOpen)
             modalDiv.addEventListener("shown.bs.modal", options.onOpen);
 
@@ -239,7 +239,6 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
         });
 
         document.body.appendChild(modalDiv);
-        // @ts-ignore
         new bootstrap.Modal(modalDiv, {
             backdrop: false,
         }).show();
@@ -288,7 +287,7 @@ function useBrowserDialogs() {
 }
 
 function useBSModal(options: CommonDialogOptions): boolean {
-    return !!((!($ as any).ui || !($ as any).ui?.dialog) || Config.bootstrapMessages || (options && options.bootstrap));
+    return Config?.bootstrapMessages || options?.bootstrap || !($ as any)?.ui?.dialog;
 }
 
 function messageHtml(message: string, options?: CommonDialogOptions): string {

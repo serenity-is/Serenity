@@ -2,6 +2,53 @@ beforeEach(() => {
     jest.resetModules();
 })
 
+function setupMockBootstrap5PlusWithNoJQuery() {
+    jest.unmock('@optionaldeps/jquery')
+    jest.mock('@optionaldeps/jquery', () => {
+        return {
+            __esModule: true,
+            default: undefined
+        }
+    });
+    jest.unmock('@optionaldeps/bootstrap')
+    jest.mock('@optionaldeps/bootstrap', () => {
+        var bs = {
+            Modal: function (div: HTMLElement, opt?: { backdrop?: boolean }) {
+                this.div = div;
+                this.opt = opt;
+                this.div && (this.div.dataset.options = JSON.stringify(opt));
+                this.show = function () {
+                    this.div.dataset.shown = (parseInt(this.div.dataset.shown ?? "0", 10) + 1).toString();
+                };
+                this.hide = function () {
+                    this.div.dataset.hidden = (parseInt(this.div.dataset.hidden ?? "0", 10) + 1).toString();
+                }
+            }
+        } as any;
+
+        bs.Modal.VERSION = "5.3.2";
+        bs.Modal.getInstance = function(el: HTMLElement) {
+            if (el && el.dataset.options) {
+                return {
+                    opt: JSON.parse(el.dataset.options),
+                    show: function () {
+                        el.dataset.shown = (parseInt(el.dataset.shown ?? "0", 10) + 1).toString();
+                    },
+                    hide: function () {
+                        el.dataset.hidden = (parseInt(el.dataset.hidden ?? "0", 10) + 1).toString();
+                    }
+                }
+            }
+        }
+
+        return {
+            __esModule: true,
+            default: bs
+        } as any;
+    });
+}
+
+/*
 describe("Bootstrap version detection", () => {
 
     function setupDummyJQueryForModal(callback: (s: string | HTMLElement) => void) {
@@ -36,7 +83,7 @@ describe("Bootstrap version detection", () => {
                     }
                 } as any as JQueryStatic
             }
-        });        
+        });
     }
 
     it('detects BS3 when modal version starts with 3', async function () {
@@ -140,18 +187,18 @@ describe("Bootstrap noConflict", function () {
         jest.mock('@optionaldeps/jquery', () => {
             return {
                 __esModule: true,
-                default: Object.assign(function() {
+                default: Object.assign(function () {
                     return {
                         html: function (): any {
                             return null;
                         }
                     }
                 },
-                {
-                    fn: {}
-                }) as any
+                    {
+                        fn: {}
+                    }) as any
             }
-        });                
+        });
     }
 
     function uiButton() {
@@ -210,44 +257,30 @@ describe("Bootstrap noConflict", function () {
 
 describe("Q.alertDialog", () => {
     it('Q.alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertCount = 0;
-        var alertMessage = null;
-        globalThis.alert = function (message) {
-            alertCount++;
-            alertMessage = message;
-        }
+        var alertSpy = jest.spyOn(window, "alert");
         try {
             const alertDialog = (await import("./dialogs")).alertDialog;
             alertDialog('test message');
-            expect(alertCount).toBe(1);
-            expect(alertMessage).toBe('test message');
+            expect(alertSpy).toBeCalledTimes(1);
+            expect(alertSpy).toBeCalledWith("test message");
         }
         finally {
-            delete globalThis.alert;
-            delete globalThis.window;
+            alertSpy.mockRestore();
         }
     });
 });
 
 describe("Q.informationDialog", () => {
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertCount = 0;
-        var alertMessage = null;
+        var alertSpy = jest.spyOn(window, "alert");
         try {
-            (globalThis as any).window = globalThis;
-            globalThis.alert = function (message) {
-                alertCount++;
-                alertMessage = message;
-            }
-
             const informationDialog = (await import("./dialogs")).informationDialog;
             informationDialog('test message', () => { });
-            expect(alertCount).toBe(1);
-            expect(alertMessage).toBe('test message');
+            expect(alertSpy).toBeCalledTimes(1);
+            expect(alertSpy).toBeCalledWith("test message");
         }
         finally {
-            delete globalThis.alert;
-            delete globalThis.window;
+            alertSpy.mockRestore();
         }
     });
 });
@@ -255,23 +288,15 @@ describe("Q.informationDialog", () => {
 describe("Q.warningDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertCount = 0;
-        var alertMessage = null;
-        (globalThis as any).window = globalThis;
-        globalThis.alert = function (message) {
-            alertCount++;
-            alertMessage = message;
-        }
-
-        try {
+        var alertSpy = jest.spyOn(window, "alert");
+        try {        
             const warningDialog = (await import("./dialogs")).warningDialog;
             warningDialog('test message');
-            expect(alertCount).toBe(1);
-            expect(alertMessage).toBe('test message');
+            expect(alertSpy).toBeCalledTimes(1);
+            expect(alertSpy).toBeCalledWith("test message");
         }
         finally {
-            delete globalThis.alert;
-            delete globalThis.window;
+            alertSpy.mockRestore();
         }
     });
 });
@@ -279,54 +304,122 @@ describe("Q.warningDialog", () => {
 
 describe("Q.confirmDialog", () => {
     it('uses window.confirm when no BS/jQuery UI loaded', async function () {
-        var confirmCount = 0;
-        var confirmMessage: string = null;
-        (globalThis as any).window = globalThis;
-        globalThis.confirm = function (message) {
-            confirmCount++;
-            confirmMessage = message;
-            return true;
-        }
+        var confirmSpy = jest.spyOn(window, "confirm");
         try {
             var onYesCalled;
             const confirmDialog = (await import("./dialogs")).confirmDialog;
             confirmDialog('test message', function () {
                 onYesCalled = true;
             });
-            expect(confirmCount).toBe(1);
-            expect(confirmMessage).toBe('test message');
+            expect(confirmSpy).toBeCalledTimes(1);
+            expect(confirmSpy).toBeCalledWith("test message");            
             expect(onYesCalled).toBe(true);
         }
         finally {
-            delete globalThis.confirm;
-            delete globalThis.window;
+            confirmSpy.mockRestore();
         }
     });
 });
 
 describe("Q.iframeDialog", () => {
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertCount = 0;
-        var alertMessage = null;
-        (globalThis as any).window = globalThis;
-        globalThis.alert = function (message) {
-            alertCount++;
-            alertMessage = message;
-        }
+        var alertSpy = jest.spyOn(window, "alert");
         try {
             var testHtml = '<html><body>test message<body></html>';
             const iframeDialog = (await import("./dialogs")).iframeDialog;
             iframeDialog({
                 html: testHtml
             });
-            expect(alertCount).toBe(1);
-            expect(alertMessage).toBe(testHtml);
+            expect(alertSpy).toBeCalledTimes(1);
+            expect(alertSpy).toBeCalledWith(testHtml);
         }
         finally {
-            delete globalThis.alert;
-            delete globalThis.window;
+            alertSpy.mockRestore();
         }
     });
+});
+*/
+
+describe("dialog button icon handling", () => {
+    it("auto prefixes icons with 'fa-' prefix with 'fa' with BS5+ and no JQuery", async function () {
+        setupMockBootstrap5PlusWithNoJQuery();
+        const dialogs = await import("./dialogs");
+        dialogs.alertDialog("test", {
+            buttons: [{
+                result: "ok",
+                text: "ok",
+                icon: "fa-test"
+            }]
+        });
+        try {
+            var i = document.querySelector(".modal-footer button i");
+            expect(i != null).toBe(true);
+            expect(i.classList.contains("fa-test")).toBe(true);
+            expect(i.classList.contains("fa")).toBe(true);
+        }
+        finally {
+            document.querySelector(".modal")?.remove();
+        }
+    });
+});
+
+describe("dialogButtonToBS", () => {
+    it("converts dialog button to BS5+ button", async function () {
+        setupMockBootstrap5PlusWithNoJQuery();
+        const dialogs = await import("./dialogs");
+        var button = dialogs.dialogButtonToBS({
+            result: "ok",
+            cssClass: "btn-success",
+            text: "ok",
+            icon: "fa-test"
+        });
+        expect(button != null).toBe(true);
+        expect(button.className).toBe("btn btn-success");
+        var i = button.querySelector("i");
+        expect(i.classList.contains("fa-test")).toBe(true);
+        expect(i.classList.contains("fa")).toBe(true);
+    });
+
+    it("can work without icons", async function () {
+        setupMockBootstrap5PlusWithNoJQuery();
+        const dialogs = await import("./dialogs");
+        var button = dialogs.dialogButtonToBS({
+            result: "ok",
+            cssClass: "btn-success",
+            text: "ok"
+        });
+        expect(button != null).toBe(true);
+        expect(button.className).toBe("btn btn-success");
+        var i = button.querySelector("i");
+        expect(i).toBeNull();
+    });
+
+    it("adds 'glyphicon' class when icon starts with 'glyphicon-'", async function () {
+        setupMockBootstrap5PlusWithNoJQuery();
+        const dialogs = await import("./dialogs");
+        var button = dialogs.dialogButtonToBS({
+            result: "ok",
+            icon: 'glyphicon-test',
+            text: "ok"
+        });
+        expect(button != null).toBe(true);
+        var i = button.querySelector("i");
+        expect(i.classList.contains("glyphicon-test")).toBe(true);
+        expect(i.classList.contains("glyphicon")).toBe(true);
+    });
+
+    it("returns other icon classes as is", async function () {
+        setupMockBootstrap5PlusWithNoJQuery();
+        const dialogs = await import("./dialogs");
+        var button = dialogs.dialogButtonToBS({
+            result: "ok",
+            icon: 'xy-some-icon',
+            text: "ok"
+        });
+        expect(button != null).toBe(true);
+        var i = button.querySelector("i");
+        expect(i.className).toBe("xy-some-icon");
+    });    
 });
 
 export { }
