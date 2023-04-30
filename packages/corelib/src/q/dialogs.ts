@@ -37,7 +37,7 @@ export interface CommonDialogOptions {
     title?: string;
     /** HTML encode the message, default is true */
     htmlEncode?: boolean;
-    /** Wrap the message in a <pre> element, so that line endings are preserved, default is true */
+    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
     /** Dialog css class. Default is based on the message dialog type */
     dialogClass?: string;
