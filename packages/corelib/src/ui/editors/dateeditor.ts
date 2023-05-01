@@ -223,9 +223,11 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             input.val(val.substr(0, 2) + Culture.dateSeparator + val.substr(2, 2) + Culture.dateSeparator + val.substr(4));
         }
         val = input.val() ?? '';
-        if (!!(val.length >= 5 && parseDate(val) !== false)) {
+        if (val.length >= 5) {
             var d = parseDate(val);
-            input.val(formatDate(d, null));
+            if (d && !isNaN(d.valueOf())) {
+                input.val(formatDate(d, null));
+            }
         }
     };
 

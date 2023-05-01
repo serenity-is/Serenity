@@ -53,7 +53,7 @@ if (validator && validator.methods && validator.addMethod) {
             return o;
 
         var d = parseDate(value);
-        if (!d)
+        if (!d || isNaN(d.valueOf()))
             return false;
 
         var z = new Date(d);
@@ -67,7 +67,10 @@ if (validator && validator.methods && validator.addMethod) {
             return o;
 
         var d = parseDate(value);
-        return !!d;
+        if (!d || isNaN(d.valueOf()))
+            return false;
+
+        return true;
     });        
 
     validator.addMethod("hourAndMin", function (value, element) {

@@ -162,29 +162,35 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
             },
             handler: function (args) {
-                var active1 = !isTrimmedEmpty(args.widget.value);
-                var active2 = !isTrimmedEmpty(end.value);
-                if (active1 && !parseDate(args.widget.element.val())) {
-                    active1 = false;
-                    notifyWarning(localText('Validation.DateInvalid'), '', null);
-                    args.widget.element.val('');
+                var date1 = parseDate(args.widget.value);
+                if (date1) {
+                    if (isNaN(date1.valueOf())) {
+                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        args.widget.element.val('');
+                        date1 = null;
+                    }
+                    else {
+                        args.request.Criteria = Criteria.and(args.request.Criteria, 
+                            Criteria(args.field).ge(args.widget.value));   
+                    }
                 }
-                if (active2 && !parseDate(end.element.val())) {
-                    active2 = false;
-                    notifyWarning(localText('Validation.DateInvalid'), '', null);
-                    end.element.val('');
+
+                var date2 = parseDate(end.value);
+                if (date2) {
+                    if (isNaN(date2?.valueOf())) {
+                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        end.element.val('');
+                        date2 = null;
+                    }
+                    else {
+                        var next = new Date(end.valueAsDate.valueOf());
+                        next.setDate(next.getDate() + 1);
+                        args.request.Criteria = Criteria.and(args.request.Criteria,
+                            Criteria(args.field).lt(formatDate(next, 'yyyy-MM-dd')));
+                    }
                 }
-                args.active = active1 || active2;
-                if (active1) {
-                    args.request.Criteria = Criteria.and(args.request.Criteria, 
-                        Criteria(args.field).ge(args.widget.value));
-                }
-                if (active2) {
-                    var next = new Date(end.valueAsDate.valueOf());
-                    next.setDate(next.getDate() + 1);
-                    args.request.Criteria = Criteria.and(args.request.Criteria,
-                        Criteria(args.field).lt(formatDate(next, 'yyyy-MM-dd')));
-                }
+
+                args.active = !!(date1 || date2);
             },
             displayText: function (w, l) {
                 var v1 = EditorUtils.getDisplayText(w);
@@ -251,27 +257,33 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
                 });
             },
             handler: function (args) {
-                var active1 = !isTrimmedEmpty(args.widget.value);
-                var active2 = !isTrimmedEmpty(end.value);
-                if (active1 && !parseDate(args.widget.element.val())) {
-                    active1 = false;
-                    notifyWarning(localText('Validation.DateInvalid'), '', null);
-                    args.widget.element.val('');
+                var date1 = parseDate(args.widget.value);
+                if (date1) {
+                    if (isNaN(date1?.valueOf())) {
+                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        args.widget.element.val('');
+                        date1 = null;
+                    } 
+                    else {
+                        args.request.Criteria = Criteria.and(args.request.Criteria,
+                            Criteria(args.field).ge(args.widget.value));
+                    }
                 }
-                if (active2 && !parseDate(end.element.val())) {
-                    active2 = false;
-                    notifyWarning(localText('Validation.DateInvalid'), '', null);
-                    end.element.val('');
+
+                var date2 = parseDate(end.value);
+                if (date2) {
+                    if (isNaN(date2?.valueOf())) {
+                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        end.element.val('');
+                        date2 = null;
+                    }
+                    else {
+                        args.request.Criteria = Criteria.and(args.request.Criteria,
+                            Criteria(args.field).le(end.value));
+                    }
                 }
-                args.active = active1 || active2;
-                if (active1) {
-                    args.request.Criteria = Criteria.and(args.request.Criteria,
-                        Criteria(args.field).ge(args.widget.value));
-                }
-                if (active2) {
-                    args.request.Criteria = Criteria.and(args.request.Criteria,
-                        Criteria(args.field).le(end.value));
-                }
+                
+                args.active = !!(date1 || date2);
             },
             displayText: function (w, l) {
                 var v1 = EditorUtils.getDisplayText(w);

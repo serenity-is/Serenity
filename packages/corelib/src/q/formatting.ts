@@ -70,18 +70,22 @@ export function compareStringFactory(order: string): ((a: string, b: string) => 
         if (a == b)
             return 0;
         
+        let c: number;
         for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
             let x = a.charAt(i), y = b.charAt(i);
-            if (x === y)
+            if (x === y) {
                 continue;
+            }
             let ix = o[x], iy = o[y];
             if (ix != null && iy != null)
                 return ix < iy ? -1 : 1;
-            let c = x.localeCompare(y);
+            c = x.localeCompare(y);
             if (c == 0)
                 continue;
             return c;
         }
+        if (c != null)
+            return c;
         return a.localeCompare(b);
     }
 }       
@@ -522,10 +526,9 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
 
     let date: Date;
     if (typeof d == "string") {
-        var res = parseDate(d, locale == null ? null : locale.dateOrder);
-        if (!res)
+        date = parseDate(d, locale == null ? null : locale.dateOrder);
+        if (!date || isNaN(date.valueOf()))
             return d;
-        date = res as Date;
     }
     else
         date = d;
@@ -536,7 +539,6 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
         return date.toDateString();
     if (format == 'it')
         return date.toTimeString();
-
     
     if (locale == null)
         locale = Culture;
@@ -722,16 +724,17 @@ export function formatISODateTimeUTC(d: Date): string {
 let isoRegexp = /(\d{4,})(?:-(\d{1,2})(?:-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?(?:(Z)|([+-])(\d{1,2})(?::(\d{1,2}))?)?)?)?)?/;
 
 export function parseISODateTime(s: string): Date {
-    if (!s || !s.length)
-        return null;
+    if (s == null)
+        return;
 
-    s = s + "";
-    if (typeof (s) != "string" || s.length === 0)
-        return null;
+    if (typeof s !== "string")
+         s = s + "";
 
-    let res = s.match(isoRegexp);
-    if (typeof (res) == "undefined" || res === null)
-        return null;
+    if (!s.length)
+        return;
+
+    if (!isoRegexp.test(s))
+        return new Date(NaN);
 
     return new Date(s + (s.length == 10 ? "T00:00:00" : ""));
 }
@@ -779,24 +782,24 @@ export function parseDayHourAndMin(s: string): number {
     }
 }
 
-export function parseDate(s: string, dateOrder?: string): any {
+export function parseDate(s: string, dateOrder?: string): Date {
     if (!s || !s.length)
-        return null;
+        return void 0;
 
     if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
         (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
         var res = parseISODateTime(s);
         if (res == null)
-            return false;
+            return;
         return res;
     }
 
     s = trim(s);
     if (s.indexOf(' ') > 0 && s.indexOf(':') > s.indexOf(' ') + 1) {
-        var datePart = parseDate(s.substr(0, s.indexOf(' ')));
-        if (!datePart)
-            return false;
-        return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + trim(s.substr(s.indexOf(' ') + 1)));
+        var datePart = parseDate(s.substring(0, s.indexOf(' ')));
+        if (!datePart || isNaN(datePart.valueOf()))
+            return new Date(NaN);
+        return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + trim(s.substring(s.indexOf(' ') + 1)));
     }
 
     let dateVal: any;
@@ -804,7 +807,7 @@ export function parseDate(s: string, dateOrder?: string): any {
     let d: number, m: number, y: number;
     dArray = splitDateString(s);
     if (!dArray)
-        return false;
+        return new Date(NaN);
 
     if (dArray.length == 3) {
         dateOrder = dateOrder || Culture.dateOrder;
@@ -828,7 +831,7 @@ export function parseDate(s: string, dateOrder?: string): any {
         }
 
         if (isNaN(d) || isNaN(m) || isNaN(y) || d < 1 || d > 31 || m < 0 || m > 11 || y > 9999 || y < 0)
-            return false;
+            return new Date(NaN);
 
         if (y < 100) {
             let fullYear = new Date().getFullYear();
@@ -838,20 +841,20 @@ export function parseDate(s: string, dateOrder?: string): any {
         try {
             dateVal = new Date(y, m, d);
             if (isNaN(dateVal.getFullYear()))
-                return false;
+                return new Date(NaN);;
         }
         catch (e) {
-            return false;
+            return new Date(NaN);
         }
     }
     else if (dArray.length == 1) {
         try {
             dateVal = new Date(dArray[0]);
             if (isNaN(dateVal.getFullYear()))
-                return false;
+                return new Date(NaN);
         }
         catch (e) {
-            return false;
+            return new Date(NaN);
         }
     }
     return dateVal;
