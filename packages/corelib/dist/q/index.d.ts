@@ -654,7 +654,7 @@ declare function formatISODateTimeUTC(d: Date): string;
 declare function parseISODateTime(s: string): Date;
 declare function parseHourAndMin(value: string): number;
 declare function parseDayHourAndMin(s: string): number;
-declare function parseDate(s: string, dateOrder?: string): any;
+declare function parseDate(s: string, dateOrder?: string): Date;
 declare function splitDateString(s: string): string[];
 
 /**

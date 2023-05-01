@@ -263,7 +263,7 @@ export default [
                 tsconfig: 'tsconfig.json',
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
-                exclude: ["**/*.spec.ts", "**/*.spec.tsx"]
+                exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
             }),
             extendGlobals()
         ],

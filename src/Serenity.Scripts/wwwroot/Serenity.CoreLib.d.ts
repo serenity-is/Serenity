@@ -1056,7 +1056,7 @@ declare namespace Q {
     function parseISODateTime(s: string): Date;
     function parseHourAndMin(value: string): number;
     function parseDayHourAndMin(s: string): number;
-    function parseDate(s: string, dateOrder?: string): any;
+    function parseDate(s: string, dateOrder?: string): Date;
     function splitDateString(s: string): string[];
 
     /**
