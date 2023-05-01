@@ -366,7 +366,7 @@ interface CommonDialogOptions {
     title?: string;
     /** HTML encode the message, default is true */
     htmlEncode?: boolean;
-    /** Wrap the message in a <pre> element, so that line endings are preserved, default is true */
+    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
     /** Dialog css class. Default is based on the message dialog type */
     dialogClass?: string;
@@ -448,7 +448,7 @@ interface IFrameDialogOptions {
     html?: string;
 }
 /**
- * Display a dialog that shows an HTML block, which is usually returned from server callbacks in an IFRAME
+ * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
  * @param options The options
  */
 declare function iframeDialog(options: IFrameDialogOptions): void;
@@ -497,7 +497,7 @@ declare const warning: typeof warningDialog;
  * @param element The panel element
  * @param e  The event triggering the close
  */
-declare function closePanel(element: JQuery, e?: JQueryEventObject): void;
+declare function closePanel(element: JQuery | HTMLElement, e?: Event): void;
 
 interface ServiceError {
     Code?: string;

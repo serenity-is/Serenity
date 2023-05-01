@@ -747,7 +747,6 @@ export enum CriteriaOperator {
 export function Criteria(field: string) {
     var builder = CriteriaBuilder.of(field);
     // workaround for subclassing array until corelib switched to ES6
-    /* istanbul ignore next */
     !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
     return builder as CriteriaBuilder
 }

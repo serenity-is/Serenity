@@ -768,7 +768,7 @@ declare namespace Q {
         title?: string;
         /** HTML encode the message, default is true */
         htmlEncode?: boolean;
-        /** Wrap the message in a <pre> element, so that line endings are preserved, default is true */
+        /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
         preWrap?: boolean;
         /** Dialog css class. Default is based on the message dialog type */
         dialogClass?: string;
@@ -850,7 +850,7 @@ declare namespace Q {
         html?: string;
     }
     /**
-     * Display a dialog that shows an HTML block, which is usually returned from server callbacks in an IFRAME
+     * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
      * @param options The options
      */
     function iframeDialog(options: IFrameDialogOptions): void;
@@ -899,7 +899,7 @@ declare namespace Q {
      * @param element The panel element
      * @param e  The event triggering the close
      */
-    function closePanel(element: JQuery, e?: JQueryEventObject): void;
+    function closePanel(element: JQuery | HTMLElement, e?: Event): void;
 
     interface ServiceError {
         Code?: string;

@@ -53,7 +53,7 @@ export interface CommonDialogOptions {
 }
 
 // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
-if (typeof $ !== "undefined" && ($.fn as any)?.button && ($ as any).ui?.button && ($ as any).fn?.button?.noConflict) {
+if (typeof $ !== "undefined" && ($.fn as any)?.button?.noConflict && ($ as any).ui?.button) {
     ($.fn as any).btn = ($ as any).fn.button.noConflict();
 }
 
@@ -67,7 +67,7 @@ function toIconClass(icon: string): string {
     return icon;
 }
 
-function uiDialogMessage(options: CommonDialogOptions, message: string, dialogClass: string) {
+function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialogClass: string) {
     var opt = extend(<any>{
         modal: true,
         width: '40%',
@@ -99,7 +99,7 @@ function uiDialogMessage(options: CommonDialogOptions, message: string, dialogCl
         });
     }
 
-    return ($('<div>' + message + '</div>') as any).dialog(opt);
+    return ($('<div>' + bodyHtml + '</div>') as any).dialog(opt);
 }
 
 let _isBS3: boolean;
@@ -168,7 +168,7 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
-    if (iconClass != null)
+    if (iconClass?.length)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     var button = document.createElement("button");
     button.classList.add("btn");
@@ -181,21 +181,21 @@ export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
 }
 
 export function dialogButtonToUI(x: DialogButton): any {
-    var text = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
-    if (iconClass != null)
-        text = '<i class="' + iconClass + "><i> ";
-    return <any>{
-        text: text,
-        attr: !x.cssClass ? undefined : {
-            "class": x.cssClass
-        },
+    if (iconClass?.length)
+        html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
+    var button = {
+        text: html,
         click: x.click
-    }
+    } as any;
+    if (x.cssClass?.length)
+        button.cssClass = x.cssClass;
+    return button;
 }
 
-function bsModalMessage(options: CommonDialogOptions, message: string, modalClass: string, escapeHtml: boolean = true) {
-    var modalDiv = bsModalMarkup(options.title, message, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""), escapeHtml);
+function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalClass: string) {
+    var modalDiv = bsModalMarkup(options.title, bodyHtml, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""), false);
     var footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
     var rawBS5 = typeof $ === "undefined" && isBS5Plus();
 
@@ -240,7 +240,7 @@ function bsModalMessage(options: CommonDialogOptions, message: string, modalClas
 
         document.body.appendChild(modalDiv);
         new bootstrap.Modal(modalDiv, {
-            backdrop: false,
+            backdrop: false
         }).show();
     }
     else {
@@ -287,10 +287,10 @@ function useBrowserDialogs() {
 }
 
 function useBSModal(options: CommonDialogOptions): boolean {
-    return Config?.bootstrapMessages || options?.bootstrap || !($ as any)?.ui?.dialog;
+    return Config.bootstrapMessages || options.bootstrap || !($ as any)?.ui?.dialog;
 }
 
-function messageHtml(message: string, options?: CommonDialogOptions): string {
+function getMessageBodyHtml(message: string, options?: CommonDialogOptions): string {
     var encode = options == null || options.htmlEncode == null || options.htmlEncode;
     if (encode)
         message = htmlEncode(message);
@@ -324,13 +324,17 @@ export function alertDialog(message: string, options?: AlertOptions) {
         return;
     }
 
+    options ??= {};
     let useBS = useBSModal(options);
 
-    options = extend({
-        htmlEncode: true,
-        okButton: txt('OkButton'),
-        title: txt('AlertTitle')
-    }, options);
+    if (options.htmlEncode == null)
+        options.htmlEncode = true;
+
+    if (options.okButton == null)
+        options.okButton = txt('OkButton');
+
+    if (options.title == null)
+        options.title = txt('AlertTitle')
 
     if (options.buttons == null) {
         options.buttons = [];
@@ -343,12 +347,12 @@ export function alertDialog(message: string, options?: AlertOptions) {
         }
     }
 
-    message = messageHtml(message, options);
+    var bodyHtml = getMessageBodyHtml(message, options);
 
     if (useBS)
-        bsModalMessage(options, message, options.modalClass ?? "s-AlertModal", false);
+        internalBSModal(options, bodyHtml, options.modalClass ?? "s-AlertModal");
     else
-        uiDialogMessage(options, message, options.dialogClass ?? "s-AlertDialog");
+        internalUIDialog(options, bodyHtml, options.dialogClass ?? "s-AlertDialog");
 }
 
 /** @obsolete use alertDialog */
@@ -388,14 +392,20 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         return;
     }
 
+    options ??= {};
     let useBS = useBSModal(options);
 
-    options = extend(<ConfirmOptions>{
-        htmlEncode: true,
-        yesButton: txt('YesButton'),
-        noButton: txt('NoButton'),
-        title: txt('ConfirmationTitle')
-    }, options);
+    if (options.htmlEncode == null)
+        options.htmlEncode = true;
+
+    if (options.yesButton == null) 
+        options.yesButton = txt('YesButton');
+
+    if (options.noButton == null)
+        options.noButton = txt('NoButton');
+
+    if (typeof options.title === "undefined")
+        options.title = txt('ConfirmationTitle');
 
     if (options.buttons == null) {
         options.buttons = [];
@@ -425,11 +435,11 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         }
     }
 
-    message = messageHtml(message, options);
+    message = getMessageBodyHtml(message, options);
     if (useBS)
-        bsModalMessage(options, message, options.modalClass ?? "s-ConfirmModal");
+        internalBSModal(options, message, options.modalClass ?? "s-ConfirmModal");
     else
-        uiDialogMessage(options, message, options.dialogClass ?? "s-ConfirmDialog");
+        internalUIDialog(options, message, options.dialogClass ?? "s-ConfirmDialog");
 }
 
 /** @obsolete use confirmDialog */
@@ -441,7 +451,7 @@ export interface IFrameDialogOptions {
 }
 
 /** 
- * Display a dialog that shows an HTML block, which is usually returned from server callbacks in an IFRAME 
+ * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
  * @param options The options
  */
 export function iframeDialog(options: IFrameDialogOptions) {
@@ -451,26 +461,32 @@ export function iframeDialog(options: IFrameDialogOptions) {
         return;
     }
 
-    if (useBSModal(options as any)) {
-        bsModalMessage({
-            title: txt('AlertTitle'),
-            modalClass: 'modal-lg',
-            onOpen: function () {
-                doc = (<HTMLIFrameElement>($(this).find('iframe').css({
-                    border: 'none',
-                    width: '100%',
-                    height: '100%'
-                })[0])).contentDocument;
+    var doc: Document;
+    function onOpen(div: HTMLElement) {
+        if (div) {
+            var iframe = div.appendChild(document.createElement('iframe'));
+            iframe.setAttribute("style", "border: none; width: 100%; height: 100%;");
+            doc = iframe.contentDocument;
+            if (doc) {
                 doc.open();
                 doc.write(options.html);
                 doc.close();
             }
-        }, '<div style="overflow: hidden"><iframe></iframe></div>', 's-IFrameModal');
+        }
+    }
+
+    if (useBSModal(options as any)) {
+        internalBSModal({
+            title: txt('AlertTitle'),
+            modalClass: 'modal-lg',
+            onOpen: function() { onOpen(this.querySelector(".modal-body>div")) }
+        }, '<div style="overflow: hidden"></div>', 's-IFrameModal');
         return;
     }
 
-    let doc: any;
-    let e = $('<div style="overflow: hidden"><iframe></iframe></div>');
+    var div = document.createElement('div');
+    div.style.overflow = "hidden";
+    document.body.appendChild(div);
     let settings: IFrameDialogOptions = extend<any>({
         autoOpen: true,
         modal: true,
@@ -478,23 +494,13 @@ export function iframeDialog(options: IFrameDialogOptions) {
         height: '400',
         title: txt('AlertTitle'),
         open: function () {
-            doc = (<HTMLIFrameElement>(e.find('iframe').css({
-                border: 'none',
-                width: '100%',
-                height: '100%'
-            })[0])).contentDocument;
-            doc.open();
-            doc.write(settings.html);
-            doc.close();
+            onOpen(div);
         },
         close: function () {
-            doc.open();
-            doc.write('');
-            doc.close();
-            (e as any).dialog?.('destroy').html('');
+            ($(div) as any).dialog?.('destroy').html('')?.remove?.();
         }
     }, options);
-    (e as any).dialog?.(settings as any);
+    ($(div) as any).dialog?.(settings);
 }
 
 /** 
@@ -585,27 +591,55 @@ export const warning = warningDialog;
  * @param element The panel element
  * @param e  The event triggering the close
  */
-export function closePanel(element: JQuery, e?: JQueryEventObject) {
+export function closePanel(element: JQuery | HTMLElement, e?: Event) {
 
-    if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
+    var el: HTMLElement = (typeof $ !== "undefined" && element instanceof $) ? (element as any).get?.(0) : element;
+    if (!el || !el.classList.contains("s-Panel") || el.classList.contains("hidden"))
         return;
 
-    var query = $.Event(e as any);
-    (query as any).type = 'panelbeforeclose';
-    query.target = element[0];
-    element.trigger(query);
-    if (query.isDefaultPrevented())
-        return;
+    var uniqueName: string;
+    if (typeof $ !== "undefined") {
+        var $beforeEvent = $.Event(e as any);
+        ($beforeEvent as any).type = 'panelbeforeclose';
+        $beforeEvent.target = el
+        $(element).trigger($beforeEvent);
+        if ($beforeEvent.isDefaultPrevented())
+            return;
+        uniqueName = $(el).data('paneluniquename');
+    }
+    else {
+        var closeEvent = new Event("panelbeforeclose");
+        el.dispatchEvent(closeEvent);
+        if (closeEvent.defaultPrevented)
+            return;
+        uniqueName = el.dataset.paneluniquename;
+    }
 
-    element.addClass('hidden');
-    var uniqueName = element.data('paneluniquename') || new Date().getTime();
+    el.classList.add("hidden");
+
+    uniqueName ||= new Date().getTime().toString();
+
     var klass = 'panel-hidden-' + uniqueName;
-    $('.' + klass).removeClass(klass).removeClass('panel-hidden');
-    $(window).triggerHandler('resize');
-    $('.require-layout:visible').triggerHandler('layout');
+    document.querySelectorAll(klass).forEach(e => e.classList.remove("panel-hidden"));
 
-    e = $.Event(e as any);
-    (e as any).type = 'panelclose';
-    (e as any).target = element[0];
-    element.trigger(e);
+    if (typeof $ !== "undefined") {
+        $(window).triggerHandler('resize');
+        $('.require-layout:visible').triggerHandler('layout');
+        var $closeEvent = $.Event(e as any);
+        ($closeEvent as any).type = 'panelclose';
+        $closeEvent.target = el;
+        $(el).trigger($closeEvent);
+    }
+    else {
+        var resizeEvent = new Event("resize");
+        window.dispatchEvent(resizeEvent);
+
+        var layoutEvent = new Event("layout");
+        document.querySelectorAll(".require-layout").forEach(rl => {
+            rl.dispatchEvent(layoutEvent);
+        });
+
+        var closeEvent = new Event("panelclose");
+        el.dispatchEvent(closeEvent);
+    }
 }
