@@ -786,15 +786,15 @@ export function parseDate(s: string, dateOrder?: string): Date {
     if (!s || !s.length)
         return void 0;
 
+    s = trim(s);
+    if (!s.length)
+        return void 0;
+
     if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
         (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
-        var res = parseISODateTime(s);
-        if (res == null)
-            return;
-        return res;
+        return parseISODateTime(s);
     }
 
-    s = trim(s);
     if (s.indexOf(' ') > 0 && s.indexOf(':') > s.indexOf(' ') + 1) {
         var datePart = parseDate(s.substring(0, s.indexOf(' ')));
         if (!datePart || isNaN(datePart.valueOf()))
@@ -802,14 +802,12 @@ export function parseDate(s: string, dateOrder?: string): Date {
         return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + trim(s.substring(s.indexOf(' ') + 1)));
     }
 
-    let dateVal: any;
-    let dArray: any;
     let d: number, m: number, y: number;
-    dArray = splitDateString(s);
-    if (!dArray)
-        return new Date(NaN);
-
+    let dArray = splitDateString(s);
     if (dArray.length == 3) {
+        if (dArray.some(x => !/^[0-9]+$/.test(x)))
+            return new Date(NaN);
+
         dateOrder = dateOrder || Culture.dateOrder;
         switch (dateOrder) {
             case "dmy":
@@ -838,26 +836,19 @@ export function parseDate(s: string, dateOrder?: string): Date {
             let shortYearCutoff = (fullYear % 100) + 10;
             y += fullYear - fullYear % 100 + (y <= shortYearCutoff ? 0 : -100);
         }
-        try {
-            dateVal = new Date(y, m, d);
-            if (isNaN(dateVal.getFullYear()))
-                return new Date(NaN);;
-        }
-        catch (e) {
-            return new Date(NaN);
-        }
+
+        return new Date(y, m, d);
     }
     else if (dArray.length == 1) {
         try {
-            dateVal = new Date(dArray[0]);
-            if (isNaN(dateVal.getFullYear()))
-                return new Date(NaN);
+            return new Date(dArray[0]);
         }
         catch (e) {
             return new Date(NaN);
         }
     }
-    return dateVal;
+
+    return new Date(NaN);
 }
 
 export function splitDateString(s: string): string[] {

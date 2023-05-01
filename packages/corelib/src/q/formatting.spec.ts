@@ -210,18 +210,69 @@ describe("splitDateString", () => {
 });
 
 describe("parseDate", () => {
-    it("returns undefined for null, undefined and empty string", async function () {
+    it("returns undefined for null, undefined, empty string and whitespace", async function () {
         var formatting = (await import("./formatting"));
         expect(formatting.parseDate(null)).toBeUndefined();
         expect(formatting.parseDate(undefined)).toBeUndefined();
         expect(formatting.parseDate("")).toBeUndefined();
+        expect(formatting.parseDate("   ")).toBeUndefined();
     });
 
     it("returns false for malformed iso date string", async function () {
         var formatting = (await import("./formatting"));
         expect(formatting.parseDate("2023-00-01")?.valueOf()).toBeNaN();
         expect(formatting.parseDate("2023-01-X1")?.valueOf()).toBeNaN();
+    });
 
+    it("can handle iso like dates with space between date/time parts", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDate("2023-01-05 16:30")).toEqual(new Date(2023, 0, 5, 16, 30));
+        expect(formatting.parseDate("2023-00-05 16:30")?.valueOf()).toBeNaN();
+    });
+
+    it("can handle date only with ymd order", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.dateOrder = "ymd";
+        expect(formatting.parseDate("2023/03/05")).toEqual(new Date(2023, 2, 5));
+    });
+
+    it("can handle date only with mdy order", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.dateOrder = "mdy";
+        expect(formatting.parseDate("11/23/2023")).toEqual(new Date(2023, 10, 23));
+    });
+
+    it("returns NaN if a part is not a number or out of range", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.dateOrder = "dmy";
+        expect(formatting.parseDate("01/X1/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("01/01/20X3")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("X1/01/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("32/02/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("15/14/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("15/-1/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("15/0/2023")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("15/1/-1")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("2014-25-23")?.valueOf()).toBeNaN();
+        expect(formatting.parseDate("2014/03")?.valueOf()).toBeNaN();
+    });
+
+    it("handles two digit years", async function () {
+        var formatting = (await import("./formatting"));
+        jest.useFakeTimers();
+        try {
+            jest.setSystemTime(new Date(2023, 1, 1));
+            expect(formatting.parseDate("15/1/01")).toEqual(new Date(2001, 0, 15));
+            expect(formatting.parseDate("15/1/99")).toEqual(new Date(1999, 0, 15));
+        }
+        finally {
+            jest.useRealTimers();
+        }
+    });
+
+    it("handles JS date string", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDate("Tue May 02 2023")).toEqual(new Date(2023, 4, 2));
     });
 });
 
