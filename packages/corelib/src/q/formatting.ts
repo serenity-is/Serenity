@@ -526,8 +526,11 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
 
     let date: Date;
     if (typeof d == "string") {
-        date = parseDate(d, locale == null ? null : locale.dateOrder);
-        if (!date || isNaN(date.valueOf()))
+        date = parseDate(d, locale?.dateOrder);
+        if (!date)
+            return '';
+
+        if (isNaN(date.valueOf()))
             return d;
     }
     else
@@ -550,7 +553,6 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
             case "g": format = (locale.dateTimeFormat ?? Culture.dateTimeFormat).replace(":ss", ""); break;
             case "G": format = (locale.dateTimeFormat ?? Culture.dateTimeFormat); break;
             case "s": format = "yyyy-MM-ddTHH:mm:ss"; break;
-            case 'd': format = (locale.dateFormat ?? Culture.dateFormat);
             case 't': format = (locale.dateTimeFormat && locale.dateFormat) ? locale.dateTimeFormat.replace(locale.dateFormat + " ", "") : "HH:mm"; break;
             case 'u':
             case 'U':
@@ -654,13 +656,12 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
                 part = padLeft(date.getMilliseconds(), 3, '0');
                 break;
             case 'ff':
-                part = padLeft(date.getMilliseconds(), 3).substr(0, 2);
+                part = padLeft(date.getMilliseconds(), 3, '0').substr(0, 2);
                 break;
             case 'f':
-                part = padLeft(date.getMilliseconds(), 3).charAt(0);
+                part = padLeft(date.getMilliseconds(), 3, '0').charAt(0);
                 break;
             case 'z':
-            case 'Z':
                 part = date.getTimezoneOffset() / 60;
                 part = ((part >= 0) ? '-' : '+') + Math.floor(Math.abs(part));
                 break;
@@ -668,10 +669,10 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
             case 'zzz':
                 part = date.getTimezoneOffset() / 60;
                 part = ((part >= 0) ? '-' : '+') +
-                    Math.floor(padLeft(Math.abs(part), 2, '0'));
+                    padLeft(Math.floor(Math.abs(part)), 2, '0');
                 if (fs == 'zzz') {
                     part += (locale.timeSeparator ?? Culture.timeSeparator) +
-                        Math.abs(padLeft(date.getTimezoneOffset() % 60, 2, '0'));
+                        padLeft(Math.abs(date.getTimezoneOffset() % 60), 2, '0');
                 }
                 break;
             default:
@@ -687,10 +688,10 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
 }
 
 export function formatDayHourAndMin(n: number): string {
+    if (n == null)
+        return "";
     if (n === 0)
         return '0';
-    else if (!n)
-        return '';
     let days = Math.floor(n / 24 / 60);
     let txt = "";
     if (days > 0) {
@@ -741,6 +742,8 @@ export function parseISODateTime(s: string): Date {
 
 export function parseHourAndMin(value: string) {
     let v = trim(value);
+    if (!v.length)
+        return;
     if (v.length < 4 || v.length > 5)
         return NaN;
     let h: number, m: number;
@@ -762,24 +765,24 @@ export function parseHourAndMin(value: string) {
 export function parseDayHourAndMin(s: string): number {
     let days: number;
     let v = trim(s);
-    if (!v)
-        return NaN;
+    if (!v.length)
+        return;
     let p = v.split('.');
-    if (p.length == 0 || p.length > 2)
-        return NaN;
     if (p.length == 1) {
         days = parseInteger(p[0]);
         if (!isNaN(days))
             return days * 24 * 60;
         return parseHourAndMin(p[0]);
     }
-    else {
+    else if (p.length == 2) {
         days = parseInteger(p[0]);
         let hm = parseHourAndMin(p[1]);
-        if (isNaN(days) || isNaN(hm))
+        if (isNaN(days) || !hm || isNaN(hm))
             return NaN;
         return days * 24 * 60 + hm;
     }
+    else
+        return NaN;
 }
 
 export function parseDate(s: string, dateOrder?: string): Date {
