@@ -451,7 +451,11 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
 }
 
 export function parseInteger(s: string): number {
+    if (s == null)
+        return null;
     s = trim(s.toString());
+    if (!s.length)
+        return null;
     let ts = Culture.groupSeparator;
     if (s && s.length && s.indexOf(ts) > 0) {
         s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
@@ -507,15 +511,13 @@ export function toId(id: any): any {
         return null;
     if (typeof id == "number")
         return id;
-    id = $.trim(id);
-    if (id == null || !id.length)
+    if (typeof id == "string")
+        id = trim(id);
+    if (!id.length)
         return null;
     if (id.length >= 15 || !(/^-?\d+$/.test(id)))
         return id;
-    let v = parseInt(id, 10);
-    if (isNaN(v))
-        return id;
-    return v;
+    return parseInt(id, 10);
 }
 
 var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
@@ -726,13 +728,13 @@ let isoRegexp = /(\d{4,})(?:-(\d{1,2})(?:-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?:
 
 export function parseISODateTime(s: string): Date {
     if (s == null)
-        return;
+        return null;
 
     if (typeof s !== "string")
          s = s + "";
 
     if (!s.length)
-        return;
+        return null;
 
     if (!isoRegexp.test(s))
         return new Date(NaN);
@@ -743,7 +745,7 @@ export function parseISODateTime(s: string): Date {
 export function parseHourAndMin(value: string) {
     let v = trim(value);
     if (!v.length)
-        return;
+        return null;
     if (v.length < 4 || v.length > 5)
         return NaN;
     let h: number, m: number;
@@ -766,7 +768,7 @@ export function parseDayHourAndMin(s: string): number {
     let days: number;
     let v = trim(s);
     if (!v.length)
-        return;
+        return null;
     let p = v.split('.');
     if (p.length == 1) {
         days = parseInteger(p[0]);
@@ -787,11 +789,11 @@ export function parseDayHourAndMin(s: string): number {
 
 export function parseDate(s: string, dateOrder?: string): Date {
     if (!s || !s.length)
-        return void 0;
+        return null;
 
     s = trim(s);
     if (!s.length)
-        return void 0;
+        return null;
 
     if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
         (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
@@ -857,7 +859,7 @@ export function parseDate(s: string, dateOrder?: string): Date {
 export function splitDateString(s: string): string[] {
     s = trim(s);
     if (!s.length)
-        return;
+        return null;
     if (s.indexOf("/") >= 0)
         return s.split("/");
     else if (s.indexOf(".") >= 0)

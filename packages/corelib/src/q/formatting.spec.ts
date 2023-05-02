@@ -184,12 +184,12 @@ describe("compareStringFactory", () => {
 });
 
 describe("splitDateString", () => {
-    it("returns undefined for null, undefined and empty string", async function () {
+    it("returns null for null, undefined and empty string", async function () {
         var formatting = (await import("./formatting"));
-        expect(formatting.splitDateString(null)).toBeUndefined();
-        expect(formatting.splitDateString(undefined)).toBeUndefined();
-        expect(formatting.splitDateString("")).toBeUndefined();
-        expect(formatting.splitDateString("  ")).toBeUndefined();
+        expect(formatting.splitDateString(null)).toBeNull();
+        expect(formatting.splitDateString(undefined)).toBeNull();
+        expect(formatting.splitDateString("")).toBeNull();
+        expect(formatting.splitDateString("  ")).toBeNull();
     });
 
     it("can handle '/', '.', '\\', '-' as separator", async function () {
@@ -212,12 +212,12 @@ describe("splitDateString", () => {
 });
 
 describe("parseDate", () => {
-    it("returns undefined for null, undefined, empty string and whitespace", async function () {
+    it("returns null for null, undefined, empty string and whitespace", async function () {
         var formatting = (await import("./formatting"));
-        expect(formatting.parseDate(null)).toBeUndefined();
-        expect(formatting.parseDate(undefined)).toBeUndefined();
-        expect(formatting.parseDate("")).toBeUndefined();
-        expect(formatting.parseDate("   ")).toBeUndefined();
+        expect(formatting.parseDate(null)).toBeNull();
+        expect(formatting.parseDate(undefined)).toBeNull();
+        expect(formatting.parseDate("")).toBeNull();
+        expect(formatting.parseDate("   ")).toBeNull();
     });
 
     it("returns false for malformed iso date string", async function () {
@@ -279,11 +279,11 @@ describe("parseDate", () => {
 });
 
 describe("parseISODateTime", () => {
-    it("returns undefined for null, undefined and empty string", async function () {
+    it("returns null for null, undefined and empty string", async function () {
         var formatting = (await import("./formatting"));
-        expect(formatting.parseISODateTime(null)).toBeUndefined();
-        expect(formatting.parseISODateTime(undefined)).toBeUndefined();
-        expect(formatting.parseISODateTime("")).toBeUndefined();
+        expect(formatting.parseISODateTime(null)).toBeNull();
+        expect(formatting.parseISODateTime(undefined)).toBeNull();
+        expect(formatting.parseISODateTime("")).toBeNull();
     });
 
     it("returns invalid date for malformed iso date string", async function () {
@@ -305,12 +305,12 @@ describe("parseISODateTime", () => {
 });
 
 describe("parseDayHourAndMin", () => {
-    it("returns undefined for null, undefined and empty string", async function () {
+    it("returns null for null, undefined and empty string", async function () {
         var formatting = (await import("./formatting"));
-        expect(formatting.parseDayHourAndMin(null)).toBeUndefined();
-        expect(formatting.parseDayHourAndMin(undefined)).toBeUndefined();
-        expect(formatting.parseDayHourAndMin("")).toBeUndefined();
-        expect(formatting.parseDayHourAndMin("   ")).toBeUndefined();
+        expect(formatting.parseDayHourAndMin(null)).toBeNull();
+        expect(formatting.parseDayHourAndMin(undefined)).toBeNull();
+        expect(formatting.parseDayHourAndMin("")).toBeNull();
+        expect(formatting.parseDayHourAndMin("   ")).toBeNull();
     });
 
     it("returns number of minutes for day.hour:min", async function () {
@@ -344,12 +344,12 @@ describe("parseDayHourAndMin", () => {
 });
 
 describe("parseHourAndMin", () => {
-    it("returns undefined for null, undefined and empty string", async function () {
+    it("returns null for null, undefined and empty string", async function () {
         var formatting = (await import("./formatting"));
-        expect(formatting.parseHourAndMin(null)).toBeUndefined();
-        expect(formatting.parseHourAndMin(undefined)).toBeUndefined();
-        expect(formatting.parseHourAndMin("")).toBeUndefined();
-        expect(formatting.parseHourAndMin("   ")).toBeUndefined();
+        expect(formatting.parseHourAndMin(null)).toBeNull();
+        expect(formatting.parseHourAndMin(undefined)).toBeNull();
+        expect(formatting.parseHourAndMin("")).toBeNull();
+        expect(formatting.parseHourAndMin("   ")).toBeNull();
     });
 
     it("returns number of minutes for hour:min", async function () {
@@ -608,4 +608,129 @@ describe("formatDate", () => {
         expect(formatting.formatDate(date, "h zzz", locale)).toBe("3 +02:00");
         expect(formatting.formatDate(date, "h zzz")).toBe("3 +02:00");
     });
+});
+
+describe("toId", () => {
+    it("returns undefined for undefined, null, empty string, whitespace", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.toId(undefined)).toBeNull();
+        expect(formatting.toId(null)).toBeNull();
+        expect(formatting.toId("")).toBeNull();
+        expect(formatting.toId(" ")).toBeNull();
+    });
+
+    it("returns numbers as is", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.toId(5)).toBe(5);
+        expect(formatting.toId(-1)).toBe(-1);
+        expect(formatting.toId(3.5)).toBe(3.5);
+    });
+
+    it("returns strings longer than 15 as is", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.toId("1234567890123456")).toBe("1234567890123456");
+        expect(formatting.toId("ab34567890123456")).toBe("ab34567890123456");
+    });
+
+    it("returns strings containing non digits as is", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.toId("ab3456789")).toBe("ab3456789");
+    });
+
+    it("returns strings containing all digits as number", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.toId("3456789")).toBe(3456789);
+        expect(formatting.toId("-1234567890")).toBe(-1234567890);
+    });
+
+});
+
+describe("parseDecimal", () => {
+    it("returns null for undefined, null, empty string, whitespace", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDecimal(undefined)).toBeNull();
+        expect(formatting.parseDecimal(null)).toBeNull();
+        expect(formatting.parseDecimal("")).toBeNull();
+        expect(formatting.parseDecimal(" ")).toBeNull();
+    });
+
+    it("returns numbers as is", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDecimal("5")).toBe(5);
+        expect(formatting.parseDecimal("-1")).toBe(-1);
+        expect(formatting.parseDecimal("3.5")).toBe(3.5);
+    });
+
+    it("trims strings", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDecimal(" 5.0 ")).toBe(5);
+        expect(formatting.parseDecimal(" 5 ")).toBe(5);
+    });
+
+    it("returns NaN for strings containing non digits", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseDecimal("ab3456789")).toBeNaN();
+    });
+
+    it("can handle group separator", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.groupSeparator = ",";
+        formatting.Culture.decimalSeparator = ".";
+        expect(formatting.parseDecimal("3,245,148.4")).toBe(3245148.4);
+        expect(formatting.parseDecimal("-3,245,148.4")).toBe(-3245148.4);
+    });
+
+    it("can use Culture decimal separator", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.groupSeparator = ".";
+        formatting.Culture.decimalSeparator = ",";
+        expect(formatting.parseDecimal("3.245.148,4")).toBe(3245148.4);
+        expect(formatting.parseDecimal("-3.245.148,4")).toBe(-3245148.4);
+        expect(formatting.parseDecimal("-3245148,4")).toBe(-3245148.4);
+    });
+});
+
+describe("parseInteger", () => {
+    it("returns null for undefined, null, empty string, whitespace", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseInteger(undefined)).toBeNull();
+        expect(formatting.parseInteger(null)).toBeNull();
+        expect(formatting.parseInteger("")).toBeNull();
+        expect(formatting.parseInteger(" ")).toBeNull();
+    });
+
+    it("returns integer numbers as is", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseInteger("5")).toBe(5);
+        expect(formatting.parseInteger("-1")).toBe(-1);
+        expect(formatting.parseInteger("3")).toBe(3);
+    });
+
+    it("trims strings", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseInteger(" 5 ")).toBe(5);
+    });
+
+    it("returns NaN for strings containing non digits", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.parseInteger("ab3456789")).toBeNaN();
+    });
+
+    it("can handle group separator", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.groupSeparator = ",";
+        formatting.Culture.decimalSeparator = ".";
+        expect(formatting.parseInteger("3,245,148")).toBe(3245148);
+        expect(formatting.parseInteger("-3,245,148")).toBe(-3245148);
+    });
+
+    it("can use Culture group separator", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.groupSeparator = ".";
+        expect(formatting.parseDecimal("3.245.148")).toBe(3245148);
+        expect(formatting.parseDecimal("-3.245.148")).toBe(-3245148);
+        expect(formatting.parseDecimal("-3245148")).toBe(-3245148);
+    });
+
+
 });
