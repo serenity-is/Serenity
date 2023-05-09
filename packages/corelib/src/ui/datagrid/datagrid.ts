@@ -458,11 +458,11 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         if (delta !== 0 || scale !== 1) {
             for (var col of columns) {
                 if (typeof col.width === "number")
-                    col.width = col.width * scale + delta;
+                    col.width = Math.round(col.width * scale + delta);
                 if (typeof col.minWidth === "number")
-                    col.minWidth = col.minWidth * scale + delta;
+                    col.minWidth = Math.round(col.minWidth * scale + delta);
                 if (typeof col.maxWidth === "number")
-                    col.maxWidth = col.maxWidth * scale + delta;
+                    col.maxWidth = Math.round(col.maxWidth * scale + delta);
             }
         }
 
