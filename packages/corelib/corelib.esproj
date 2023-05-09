@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.74-alpha">
+  <PropertyGroup>
+    <StartupCommand></StartupCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
+    <BuildCommand>pnpm build</BuildCommand>
+    <ProductionBuildCommand>pnpm build</ProductionBuildCommand>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+    <DefaultItemExcludes>$(DefaultItemExcludes);out\**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>
