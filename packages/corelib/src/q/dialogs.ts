@@ -620,7 +620,7 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
     uniqueName ||= new Date().getTime().toString();
 
     var klass = 'panel-hidden-' + uniqueName;
-    document.querySelectorAll(klass).forEach(e => e.classList.remove("panel-hidden"));
+    document.querySelectorAll('.' + klass).forEach(e => e.classList.remove("panel-hidden"));
 
     if (typeof $ !== "undefined") {
         $(window).triggerHandler('resize');
