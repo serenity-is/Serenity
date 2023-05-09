@@ -489,6 +489,12 @@ describe("Q.informationDialog", () => {
             alertSpy.mockRestore();
         }
     });
+
+
+    it('is aliased by obsolete inform', async function () {
+        const dialogs = (await import("./dialogs"));
+        expect(dialogs.information).toBe(dialogs.informationDialog);
+    });        
 });
 
 describe("Q.warningDialog", () => {
@@ -506,6 +512,11 @@ describe("Q.warningDialog", () => {
         finally {
             alertSpy.mockRestore();
         }
+    });
+
+    it('is aliased by obsolete warning', async function () {
+        const dialogs = (await import("./dialogs"));
+        expect(dialogs.warning).toBe(dialogs.warningDialog);
     });
 });
 
@@ -641,6 +652,11 @@ describe("Q.confirmDialog", () => {
             modal?.remove();
         }
     });
+
+    it('is aliased by obsolete confirm', async function () {
+        const dialogs = (await import("./dialogs"));
+        expect(dialogs.confirm).toBe(dialogs.confirmDialog);
+    });
 });
 
 describe("Q.successDialog", () => {
@@ -662,6 +678,11 @@ describe("Q.successDialog", () => {
             alertSpy.mockRestore();
         }
     });
+
+    it('is aliased by obsolete success', async function () {
+        const dialogs = (await import("./dialogs"));
+        expect(dialogs.success).toBe(dialogs.successDialog);
+    });    
 });
 
 
@@ -986,7 +1007,154 @@ describe("closePanel", () => {
         finally {
             div.remove();
         }
-    });    
+    });
+
+    it("removes .panel-hidden from other panels that were hidden by this one with jQuery", async function () {
+        var $ = (await import("@optionaldeps/jquery")).default;
+        document.body.classList.add(".panels-container");
+        var div1 = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        div1.addClass("panel-hidden").attr("data-panelhiddenby", "test"); 
+        var div2 = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        div2.addClass("panel-hidden").attr("data-panelhiddenby", "test2");
+        var div3 = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        div3.attr('data-paneluniquename', 'test');
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel(div3);
+            expect(div1.hasClass("panel-hidden")).toBe(false);
+            expect(div2.hasClass("panel-hidden")).toBe(true);
+            expect(div3.hasClass("hidden")).toBe(true);
+            expect(div3.hasClass("panel-hidden")).toBe(false);
+        }
+        finally {
+            div1.remove();
+            div2.remove();
+            div3.remove();
+            document.body.classList.remove("panels-container");
+        }
+    
+    });
+
+    it("removes .panel-hidden from other panels that were hidden by this one with undefined jQuery", async function () {
+        mockUndefinedJQuery();
+        document.body.classList.add(".panels-container");
+        var div1 = document.body.appendChild(document.createElement("div"));
+        div1.classList.add("s-Panel");
+        div1.classList.add("panel-hidden");
+        div1.setAttribute("data-panelhiddenby", "test");
+
+        var div2 = document.body.appendChild(document.createElement("div"));
+        div2.classList.add("s-Panel");
+        div2.classList.add("panel-hidden");
+        div2.setAttribute("data-panelhiddenby", "test2");
+
+        var div3 = document.body.appendChild(document.createElement("div"));
+        div3.classList.add("s-Panel");
+        div3.setAttribute("data-paneluniquename", "test");
+
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel(div3);
+            expect(div1.classList.contains("panel-hidden")).toBe(false);
+            expect(div2.classList.contains("panel-hidden")).toBe(true);
+            expect(div3.classList.contains("hidden")).toBe(true);
+            expect(div3.classList.contains("panel-hidden")).toBe(false);
+        }
+        finally {
+            div1.remove();
+            div2.remove();
+            div3.remove();
+            document.body.classList.remove("panels-container");
+        }
+    });
+
+    it("triggers layout event for elements with .require-layout class where offsetWidth > 0 without jQuery", async function () {
+        mockUndefinedJQuery();
+        document.body.classList.add(".panels-container");
+        var div = document.body.appendChild(document.createElement("div"));
+        Object.defineProperty(div, "offsetWidth", { value: 1 });
+        div.classList.add("require-layout");
+        var layoutCalls = 0;
+        div.addEventListener("layout", e => layoutCalls++);
+
+        var div2 = document.body.appendChild(document.createElement("div"));
+        div2.classList.add("s-Panel");
+        div2.setAttribute("data-paneluniquename", "test");
+
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel(div2);
+            expect(layoutCalls).toBe(1);
+        }
+        finally {
+            div.remove();
+        }
+    });
+
+    it("triggers layout event for elements with .require-layout class where offsetHeight > 0 without jQuery", async function () {
+        mockUndefinedJQuery();
+        document.body.classList.add(".panels-container");
+        var div = document.body.appendChild(document.createElement("div"));
+        Object.defineProperty(div, "offsetHeight", { value: 1 });
+        div.classList.add("require-layout");
+        var layoutCalls = 0;
+        div.addEventListener("layout", e => layoutCalls++);
+
+        var div2 = document.body.appendChild(document.createElement("div"));
+        div2.classList.add("s-Panel");
+        div2.setAttribute("data-paneluniquename", "test");
+
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel(div2);
+            expect(layoutCalls).toBe(1);
+        }
+        finally {
+            div.remove();
+        }
+    });
+
 });
+
+describe("openPanel", () => {
+    it("ignores when element is null or undefined", async function () {
+        var dialogs = (await import("./dialogs"));
+        dialogs.closePanel(null);
+        expect(true).toBe(true);
+        dialogs.closePanel(undefined);
+        expect(true).toBe(true);
+    });
+
+    it("ignores when element already has hidden class", async function () {
+        var div = document.createElement("div");
+        div.className = "s-Panel hidden test";
+        var dialogs = (await import("./dialogs"));
+        dialogs.closePanel(div);
+        expect(div.classList.contains("test")).toBe(true);
+        expect(div.classList.contains("hidden")).toBe(true);
+    });
+
+    it("can open panel via jQuery", async function () {
+        var $ = (await import("@optionaldeps/jquery")).default;
+        document.body.classList.add("panels-container");
+        var div1 = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        var div2 = $(`<div class="s-Panel"/>`);
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.openPanel(div2);
+            expect(div1.hasClass("panel-hidden")).toBe(true);
+            expect(div1.attr("data-panelhiddenby") != null).toBe(true);
+            expect(div2.attr("data-paneluniquename")).toBe(div1.attr('data-panelhiddenby'));
+            expect(div2.hasClass("hidden")).toBe(false);
+            expect(div2.hasClass("panel-hidden")).toBe(false);
+        }
+        finally {
+            div1.remove();
+            div2.remove();
+        }
+    });
+});
+
+export { }
 
 export { }

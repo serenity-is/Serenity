@@ -617,10 +617,9 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
 
     var uniqueName = el.dataset.paneluniquename;
     if (uniqueName?.length) {
-        var hiddenBy = 'panel-hidden-' + uniqueName;
-        document.querySelectorAll('.' + hiddenBy).forEach(e => {
+        document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
             e.classList.remove("panel-hidden")
-            e.classList.remove(hiddenBy);
+            e.removeAttribute("data-panelhiddenby");
         });
     }
 
@@ -648,11 +647,11 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
 export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
 
     var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement
+    if (!el)
+        return;
     var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
     el.dataset.paneluniquename = uniqueName ?? el.id ?? new Date().getTime().toString();
-    var hiddenBy = 'panel-hidden-' + uniqueName;
-
     function hide(e: HTMLElement) {
         if (e === el ||
             e.tagName === "LINK" ||
@@ -662,7 +661,7 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
             return;
 
         e.classList.add("panel-hidden");
-        e.classList.add(hiddenBy);
+        e.setAttribute('data-panelhiddenby', el.dataset.paneluniquename);
     }
 
     if (container) {
