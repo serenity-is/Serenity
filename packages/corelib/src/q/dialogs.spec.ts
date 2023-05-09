@@ -1,4 +1,4 @@
-import { CommonDialogOptions } from "./dialogs";
+import type { CommonDialogOptions } from "./dialogs";
 
 beforeEach(() => {
     jest.resetModules();
@@ -865,7 +865,7 @@ describe("dialogButtonToBS", () => {
 describe("bsModalMarkup", () => {
     it("html encodes by default", async function () {
         const dialogs = (await import("./dialogs"));
-        var div = dialogs.bsModalMarkup("test", "<div>x</div>", /*modalClass*/null);
+        var div = dialogs.bsModalMarkup("test", "<div>x</div>", null);
         expect(div.className).toBe("modal");
         expect(div.querySelector(".modal-body")?.textContent).toBe("<div>x</div>");
     });
@@ -951,6 +951,42 @@ describe("closePanel", () => {
             div.remove();
         }
     });
+
+    it("can be cancelled with preventDefault with Undefined jQuery", async function () {
+        mockUndefinedJQuery();
+        var div = document.body.appendChild(document.createElement("div"));
+        try {
+            div.classList.add("s-Panel");
+            div.addEventListener("panelbeforeclose", e => {
+                e.preventDefault();
+            });
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel(div);
+            expect(div.classList.contains("panel-hidden")).toBe(false);
+            expect(div.classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            div.remove();
+        }
+    });
+
+    it("can be cancelled with preventDefault with jQuery", async function () {
+        var $ = (await import("@optionaldeps/jquery")).default;
+        var div = document.body.appendChild(document.createElement("div"));
+        try {
+            div.classList.add("s-Panel");
+            $(div).on("panelbeforeclose", e => {
+                e.preventDefault();
+            });
+            var dialogs = (await import("./dialogs"));
+            dialogs.closePanel($(div));
+            expect(div.classList.contains("panel-hidden")).toBe(false);
+            expect(div.classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            div.remove();
+        }
+    });    
 });
 
 export { }

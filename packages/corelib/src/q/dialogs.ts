@@ -212,7 +212,7 @@ function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalCl
             if (rawBS5) {
                 bootstrap.Modal.getInstance(modalDiv)?.hide();
             }
-            else 
+            else
                 ($(modalDiv) as any).modal('hide');
             x.click && x.click.call(this, e);
         });
@@ -398,7 +398,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
     if (options.htmlEncode == null)
         options.htmlEncode = true;
 
-    if (options.yesButton == null) 
+    if (options.yesButton == null)
         options.yesButton = txt('YesButton');
 
     if (options.noButton == null)
@@ -479,7 +479,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
         internalBSModal({
             title: txt('AlertTitle'),
             modalClass: 'modal-lg',
-            onOpen: function() { onOpen(this.querySelector(".modal-body>div")) }
+            onOpen: function () { onOpen(this.querySelector(".modal-body>div")) }
         }, '<div style="overflow: hidden"></div>', 's-IFrameModal');
         return;
     }
@@ -593,36 +593,38 @@ export const warning = warningDialog;
  */
 export function closePanel(element: JQuery | HTMLElement, e?: Event) {
 
-    var el: HTMLElement = (typeof $ !== "undefined" && element instanceof $) ? (element as any).get?.(0) : element;
+    var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement;
     if (!el || !el.classList.contains("s-Panel") || el.classList.contains("hidden"))
         return;
 
-    var uniqueName: string;
-    if (typeof $ !== "undefined") {
+    if ($) {
         var $beforeEvent = $.Event(e as any);
         ($beforeEvent as any).type = 'panelbeforeclose';
         $beforeEvent.target = el
         $(element).trigger($beforeEvent);
         if ($beforeEvent.isDefaultPrevented())
             return;
-        uniqueName = $(el).data('paneluniquename');
     }
     else {
-        var closeEvent = new Event("panelbeforeclose");
+        var closeEvent = new Event("panelbeforeclose", { cancelable: true });
         el.dispatchEvent(closeEvent);
-        if (closeEvent.defaultPrevented)
+        if (closeEvent.defaultPrevented) {
             return;
-        uniqueName = el.dataset.paneluniquename;
+        }
     }
 
     el.classList.add("hidden");
 
-    uniqueName ||= new Date().getTime().toString();
+    var uniqueName = el.dataset.paneluniquename;
+    if (uniqueName?.length) {
+        var hiddenBy = 'panel-hidden-' + uniqueName;
+        document.querySelectorAll('.' + hiddenBy).forEach(e => {
+            e.classList.remove("panel-hidden")
+            e.classList.remove(hiddenBy);
+        });
+    }
 
-    var klass = 'panel-hidden-' + uniqueName;
-    document.querySelectorAll('.' + klass).forEach(e => e.classList.remove("panel-hidden"));
-
-    if (typeof $ !== "undefined") {
+    if ($) {
         $(window).triggerHandler('resize');
         $('.require-layout:visible').triggerHandler('layout');
         var $closeEvent = $.Event(e as any);
@@ -631,15 +633,57 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
         $(el).trigger($closeEvent);
     }
     else {
-        var resizeEvent = new Event("resize");
-        window.dispatchEvent(resizeEvent);
+        window.dispatchEvent(new Event("resize"));
 
         var layoutEvent = new Event("layout");
-        document.querySelectorAll(".require-layout").forEach(rl => {
-            rl.dispatchEvent(layoutEvent);
+        document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
+            if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
+                rl.dispatchEvent(layoutEvent);
         });
 
-        var closeEvent = new Event("panelclose");
-        el.dispatchEvent(closeEvent);
+        el.dispatchEvent(new Event("panelclose"));
     }
+}
+
+export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
+
+    var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement
+    var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
+
+    el.dataset.paneluniquename = uniqueName ?? el.id ?? new Date().getTime().toString();
+    var hiddenBy = 'panel-hidden-' + uniqueName;
+
+    function hide(e: HTMLElement) {
+        if (e === el ||
+            e.tagName === "LINK" ||
+            e.tagName === "SCRIPT" ||
+            e.classList.contains('panel-hidden') ||
+            ((e.classList.contains("ui-dialog") || e.classList.contains("ui-widget-overlay")) && e.offsetWidth <= 0 && e.offsetHeight <= 0))
+            return;
+
+        e.classList.add("panel-hidden");
+        e.classList.add(hiddenBy);
+    }
+
+    if (container) {
+        var c = container.children;
+        const cl = c.length;
+        for (var i = 0; i < cl; i++) {
+            hide(c[i] as HTMLElement);
+        }
+
+        if (el.parentElement !== container)
+            container.appendChild(el);
+    }
+
+    document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(hide);
+
+    el.classList.remove("hidden");
+    el.classList.remove("panel-hidden");
+    el.classList.add("s-Panel");
+
+    if ($)
+        $(el).trigger('panelopen');
+    else
+        el.dispatchEvent(new Event("panelopen"));
 }

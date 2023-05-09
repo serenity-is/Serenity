@@ -1,6 +1,6 @@
 ﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, parseInteger, positionToastContainer, validateOptions } from "@serenity-is/corelib/q";
+import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, openPanel, parseInteger, positionToastContainer, validateOptions } from "@serenity-is/corelib/q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
@@ -254,7 +254,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                 });
             }
 
-            TemplatedDialog.openPanel(this.element, this.uniqueName);
+            openPanel(this.element, this.uniqueName);
             this.setupPanelTitle();
         }
         else if (this.useBSModal()) {
@@ -274,32 +274,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     public static bootstrapModal: boolean;
 
     public static openPanel(element: JQuery, uniqueName: string) {
-        var container = $('.panels-container');
-        if (!container.length)
-            container = $('section.content');
-
-        element.data('paneluniquename', uniqueName);
-
-        if (container.length) {
-            container = container.last();
-            container.children()
-                .not(element)
-                .not('.panel-hidden')
-                .addClass('panel-hidden panel-hidden-' + uniqueName);
-
-            if (element[0].parentElement !== container[0])
-                element.appendTo(container);
-        }
-
-        $('.ui-dialog:visible, .ui-widget-overlay:visible, .modal.show, .modal.in')
-            .not(element)
-            .addClass('panel-hidden panel-hidden-' + uniqueName);
-
-        element
-            .removeClass('hidden')
-            .removeClass('panel-hidden')
-            .addClass('s-Panel')
-            .trigger('panelopen');
+        return openPanel(element, uniqueName);
     }
 
     public static closePanel(element: JQuery, e?: JQueryEventObject) {

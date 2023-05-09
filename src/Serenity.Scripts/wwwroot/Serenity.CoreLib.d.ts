@@ -900,6 +900,7 @@ declare namespace Q {
      * @param e  The event triggering the close
      */
     function closePanel(element: JQuery | HTMLElement, e?: Event): void;
+    function openPanel(element: JQuery | HTMLElement, uniqueName: string): void;
 
     interface ServiceError {
         Code?: string;
