@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.sln text eol=crlf
+*.d.ts -text
+**/wwwroot/**/* -text
+**/dist/**/* -text
