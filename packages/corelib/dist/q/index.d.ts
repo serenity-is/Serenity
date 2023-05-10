@@ -498,7 +498,7 @@ declare const warning: typeof warningDialog;
  * @param e  The event triggering the close
  */
 declare function closePanel(element: JQuery | HTMLElement, e?: Event): void;
-declare function openPanel(element: JQuery | HTMLElement, uniqueName: string): void;
+declare function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
 
 interface ServiceError {
     Code?: string;
