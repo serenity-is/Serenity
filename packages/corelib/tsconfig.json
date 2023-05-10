@@ -10,6 +10,7 @@
     "inlineSources": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
+    "newLine": "lf",
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "ES2020",
