@@ -159,13 +159,12 @@ export function importAsGlobalsPlugin(mapping) {
             build.onResolve({ filter }, (args) => {
                 if (!mapping[args.path])
                     throw new Error("Unknown global: " + args.path);
-                return { path: args.path, namespace: "external-global" };
+                return { path: mapping[args.path], namespace: "external-global" };
             });
 
-            build.onLoad({ filter, namespace: "external-global" },
+            build.onLoad({ filter: /.*/, namespace: "external-global" },
                 async (args) => {
-                    const global = mapping[args.path];
-                    return { contents: `module.exports = ${global};`, loader: "js" };
+                    return { contents: `module.exports = ${args.path};`, loader: "js" };
                 });
         }
     };
