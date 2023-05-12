@@ -290,7 +290,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
         case 'e': 
         case 'E':
             if (precision == -1)
-                s = num.toExponential();
+                s = num.toExponential(6);
             else
                 s = num.toExponential(precision);
             if (fs == 'E')

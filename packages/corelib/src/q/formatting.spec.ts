@@ -109,6 +109,44 @@ describe("Q.formatNumber", () => {
         expect(formatNumber(1, "','0','")).toBe(',1,');
         expect(formatNumber(1, "\\,0\\,")).toBe(',1,');
     });
+
+    it('handles decimal format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(1234.5, 'D')).toBe('1234');
+        expect(formatNumber(1234.5, 'd')).toBe('1234');
+        expect(formatNumber(1234.5, 'D6')).toBe('001234');
+        expect(formatNumber(-1234.5, 'D6')).toBe('-001234');
+        expect(formatNumber(-1234.5, 'd6')).toBe('-001234');
+    });
+
+    it('handles hex format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(255, 'X')).toBe('FF');
+        expect(formatNumber(255, 'X4')).toBe('00FF');
+        expect(formatNumber(255, 'x')).toBe('ff');
+        expect(formatNumber(255, 'x4')).toBe('00ff');
+        // can't handle negative hex yet as it would require target number of bits
+        // expect(formatNumber(-1, 'x')).toBe('ff');
+        // expect(formatNumber(-1, 'x4')).toBe('ffff');
+    });
+
+    it('handles exponantional format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(1052.0329112756, 'E')).toBe('1.052033E+3');
+        expect(formatNumber(1052.0329112756, 'e')).toBe('1.052033e+3');
+        expect(formatNumber(-1052.0329112756, 'e2')).toBe('-1.05e+3');
+        expect(formatNumber(-1052.0329112756, 'E2')).toBe('-1.05E+3');
+    });
+
 });
 
 describe("Invariant.stringCompare", () => {
