@@ -67,7 +67,7 @@ type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
     class?: string;
 }
 
-interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
+export interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
     (props: JsxDomWidgetProps<P>, context?: any): TElement | null
 }
 
