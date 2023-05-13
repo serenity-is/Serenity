@@ -151,9 +151,9 @@ Task("Compile")
     StartProcess("powershell", new ProcessSettings 
     { 
         Arguments = @"npx tsc -p ..\..\Serenity.Net.CodeGenerator\Resource\tsconfig.json", 
-        WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts", "corelib") 
+        WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
     });
-               
+
     writeHeader("Building Serenity.Net.sln");
     MSBuild(System.IO.Path.Combine(src, "Serenity.Net.sln"), s => {
         s.SetConfiguration(configuration);
@@ -181,7 +181,7 @@ Task("Test")
         StartProcess("powershell", new ProcessSettings 
         { 
             Arguments = "npx jest", 
-            WorkingDirectory = System.IO.Path.Combine(src, "Serenity.Scripts", "corelib") 
+            WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
         });
 
 });

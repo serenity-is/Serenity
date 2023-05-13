@@ -1,3 +1,34 @@
+## 6.7.2 (2023-05-13)
+
+Features:
+  - Generated API documentation for `@serenity-is/corelib` and `@serenity-is/sleekgrid` packages via `TypeDoc` and made them available at `https://serenity.is/docs` under `Api Reference (TypeScript)` section.
+  - Added `jsx-dom` integration which is a library similar to React. but which directly creates HTML elements instead of using a `VDOM`. It offers better compatibility with existing Serenity `Widget` structure that use `jQuery` and contains code that modify `DOM` directly. It will mostly be used in `renderContents()` method instead of the `getTemplate()` so that events can be bound at widget creation, and references to elements can be acquired. There is currently no dependency to `jsx-dom` in `@serenity-is/corelib` itself but it exposes a `jsxDomWidget` method than can be used to create a `jsx-dom` compatible functional component from a widget type, like `var StringEditor_ = jsxDomWidget(StringEditor); <StringEditor_ readonly={true} maxlength={50} />`.
+  - Switched to JSX automatic runtime (https://www.typescriptlang.org/tsconfig#jsxImportSource) in `StartSharp` by setting `"jsx": "react-jsx"` and `"jsxImportSource": "jsx-dom"` in `tsconfig.json`. If you need to use `React` or `Preact` etc. in one your `.tsx` files, you may switch the runtime by adding a pragma comment on top of the file like `/** @jsxImportSource react */`.
+  - `**/*Page.tsx` files are also considered as ESM entry points for `esbuild` in `tsbuild` and `sergen`.
+  - Adapted membership page codes in StartSharp to use `jsx-dom` by renaming them first from `XYZPage.ts` to `XYZPage.tsx` and using `renderContents` instead of `getTemplate`.
+  - Added `useIdPrefix()` and `Widget.useIdPrefix()` methods to make it easier to generate unique ID's based on the Widget's idPrefix in `jsx-dom` based code similar to `~_` prefix in classic templates.
+  - `findElementWithId` method can optionally accept a context parameter that controls where the search is performed. This is useful for detached elements (e.g. not added to document yet) created by `jsx-dom` to locate cascading etc. elements.
+  - Replaced `toastr` with an embedded version rewritten in TypeScript adapted from `https://raw.githubusercontent.com/JPeer264/toastr2/master/src/Toastr.ts`. This will make it possible to show notifications which failed when `toastr.js` is not loaded in the page. You may remove `toastr.js` from `appsettings.bundles.json` but leave `toastr.css` for now as it is still required.
+  - CardViewMixin can accept `jsx-dom` based card templates in addition to React ones.
+  - Moved `corelib` and `tsbuild` to root `packages/` folder from `src/Serenity.Scripts/` in Serenity repository.
+  - Improved `globalExternals` optimization in `tsbuild` so that it generates less number of chunks on build.
+  - Increased test coverage for `@serenity-is/corelib/q` methods and refactored test files (`.spec.ts`) to be next to the files (`.ts`) they have tests for.
+  - Added async versions of Authorization script methods like `Q.Authorization.userDefinitionAsync` which should be preffered over sync counterparts where possible.
+  - IExceptionLogger interface is obsolete! Please log exceptions directly via .NET's ILogger interface and its LogError method. StartSharp users should replace `app.UseExceptional()` line with `app.UseExceptionalLogger()` in Startup.cs, which also enables implicit logging to `StackExchange.Exceptional` via `InformationalException` type.
+  - Added InformationalException type that will be used to log via ILogger interface to Exceptional
+  - Updated `@serenity-is/sleekgrid` to 1.6.0.
+  - [Breaking Change] parseDate and parseISODateTime functions returns an Invalid Date instance (e.g. its `.valueOf()` method returns `NaN`) instead of "false" or "null" as they used to be, which was a wrong decision at time. It was causing invalid dates to be considered equal to empty dates sometimes. Javascript `Date` constructor also returns a Date instance with `NaN` value for invalid dates.
+  - Round calculated width when scale / delta parameters are specified in DataGrid, which is true for latest theme.
+  - Normalized all the line endings to LF in Serenity, common-features and StartSharp repository via a `.gitattributes` file.
+  - Made DefaultRowTypeRegistry use typeSource on every call to the AllRowTypes (#6776) so that if the ITypeSource implementation returns a dynamic list of types, it can pick them.
+  - Introduced new `UI Elements` sample pages containing Bootstrap components, Icon classes etc. [StartSharp]
+  - Removed RuntimeCompilation as Hot Reload does the same thing [StartSharp]
+
+Bugfixes:
+  - Referencing generic types in generated form type short name assignments which caused problems with `Widget<any>` in TypeScript
+  - AutoValidateAntiforgeryIgnoreBearerFilter were logging another message when antiforgery validation failed
+  - Fix lazy android check in jquery.maskedinput.js introduced a few versions back.
+
 ## 6.7.1 (2023-04-07)
 
 Features:
