@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "tsc": "pnpm -r --no-bail --filter !*workspace-serenity --filter !*tsbuild exec tsc -p ./src/tsconfig.json"
+    "tsc": "pnpm -r --no-bail --filter !*workspace-serenity --filter !*tsbuild exec tsc"
   },
   "private": true,
   "license": "MIT",
