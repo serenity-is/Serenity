@@ -1136,12 +1136,25 @@ describe("openPanel", () => {
 
     it("can open panel via jQuery", async function () {
         var $ = (await import("@optionaldeps/jquery")).default;
+
         document.body.classList.add("panels-container");
         var div1 = $(`<div class="s-Panel"/>`).appendTo(document.body);
         var div2 = $(`<div class="s-Panel"/>`);
+        var openingPanel, openedPanel;
+        const panelOpening = function(e: any, args: any) {
+            openingPanel = args?.panel;
+        }
+        const panelOpened = function(e: any, args: any) {
+            openedPanel = args?.panel;
+        }
+        $(window).on('panelopening', panelOpening);
+        $(window).on('panelopened', panelOpened);
+
         try {
             var dialogs = (await import("./dialogs"));
             dialogs.openPanel(div2);
+            expect(openingPanel).toBe(div2[0]);
+            expect(openedPanel).toBe(div2[0]);
             expect(div1.hasClass("panel-hidden")).toBe(true);
             expect(div1.attr("data-panelhiddenby") != null).toBe(true);
             expect(div2.attr("data-paneluniquename")).toBe(div1.attr('data-panelhiddenby'));
@@ -1149,12 +1162,49 @@ describe("openPanel", () => {
             expect(div2.hasClass("panel-hidden")).toBe(false);
         }
         finally {
+            $(window).off('panelopening', panelOpening);
+            $(window).off('panelopened', panelOpened);
             div1.remove();
             div2.remove();
         }
     });
-});
 
-export { }
+    it("can open panel without jQuery", async function () {
+        mockUndefinedJQuery();
+        document.body.classList.add("panels-container");
+        var div1 = document.body.appendChild(document.createElement('div'));
+        div1.className = "s-Panel";
+        var div2 = document.createElement('div');
+        div2.className = "s-Panel";
+        var openingPanel, openedPanel;
+        const panelOpening = function(e: any) {
+            openingPanel = e?.panel;
+        }
+        const panelOpened = function(e: any) {
+            openedPanel = e?.panel;
+        }
+        window.addEventListener('panelopening', panelOpening);
+        window.addEventListener('panelopened', panelOpened);
+
+        try {
+            var dialogs = (await import("./dialogs"));
+            dialogs.openPanel(div2);
+            expect(openingPanel).toBe(div2);
+            expect(openedPanel).toBe(div2);
+            expect(div1.classList.contains("panel-hidden")).toBe(true);
+            expect(div1.getAttribute("data-panelhiddenby") != null).toBe(true);
+            expect(div2.getAttribute("data-paneluniquename")).toBe(div1.getAttribute('data-panelhiddenby'));
+            expect(div2.classList.contains("hidden")).toBe(false);
+            expect(div2.classList.contains("panel-hidden")).toBe(false);
+        }
+        finally {
+            window.removeEventListener('panelopening', panelOpening);
+            window.removeEventListener('panelopened', panelOpened);
+            div1.remove();
+            div2.remove();
+        }
+    });
+
+});
 
 export { }

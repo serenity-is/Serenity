@@ -654,9 +654,9 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
         $(window).trigger('panelopening', { panel: el });
     }
     else {
-        var opened = new Event("panelopening") as any;
-        opened.panel = el;
-        window.dispatchEvent(opened);
+        var opening = new Event("panelopening") as any;
+        opening.panel = el;
+        window.dispatchEvent(opening);
     }
 
     var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
