@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
+using Texts = Serenity.Web.UploadTexts.Controls.ImageUpload;
 
 namespace Serenity.Web;
 
@@ -48,36 +49,44 @@ public class DefaultUploadValidator : IUploadValidator
         isImageExtension = false;
         var fileExtension = Path.GetExtension(filename);
 
-        var extensionBlacklist = uploadSettings.Value.ExtensionBlacklist;
-        if (IsExtensionInTheList(extensionBlacklist, fileExtension))
-            throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.ExtensionBlacklisted.ToString(localizer),
-                fileExtension));
+        var settings = uploadSettings?.Value;
 
-        var extensionWhitelist = uploadSettings.Value.ExtensionWhitelist;
-        if (!string.IsNullOrEmpty(extensionWhitelist) &&
-            !IsExtensionInTheList(extensionWhitelist, fileExtension))
-            throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.ExtensionBlacklisted.ToString(localizer),
+        if ((!IsExtensionIn(settings.ExtensionBlacklistExclude, fileExtension) &&
+             IsExtensionIn(settings.ExtensionBlacklist, fileExtension)) ||
+            IsExtensionIn(settings.ExtensionBlacklistInclude, fileExtension))
+        {
+            throw new ValidationError("ExtensionInBlacklist", 
+                string.Format(CultureInfo.CurrentCulture,
+                Texts.ExtensionBlacklisted.ToString(localizer),
+                fileExtension));
+        }
+
+        if ((!string.IsNullOrEmpty(settings.ExtensionWhitelist) ||
+             !string.IsNullOrEmpty(settings.ExtensionWhitelistInclude)) &&
+            (IsExtensionIn(settings.ExtensionWhitelistExclude, fileExtension) || 
+             !IsExtensionIn(settings.ExtensionWhitelist, fileExtension)) &&
+            !IsExtensionIn(settings.ExtensionWhitelistInclude, fileExtension))
+            throw new ValidationError("ExtensionNotInWhitelist", string.Format(CultureInfo.CurrentCulture,
+                Texts.ExtensionBlacklisted.ToString(localizer),
                 fileExtension));
 
         var size = stream.Length;
         if (constraints.MinSize != 0 && size < constraints.MinSize)
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.UploadFileTooSmall.ToString(localizer),
+                Texts.UploadFileTooSmall.ToString(localizer),
                 UploadFormatting.FileSizeDisplay(constraints.MinSize)));
 
         if (constraints.MaxSize != 0 && size > constraints.MaxSize)
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.UploadFileTooBig.ToString(localizer),
+                Texts.UploadFileTooBig.ToString(localizer),
                 UploadFormatting.FileSizeDisplay(constraints.MaxSize)));
 
         var allowedExtensions = constraints.AllowedExtensions;
         if (!string.IsNullOrEmpty(allowedExtensions) &&
-            !IsExtensionInTheList(allowedExtensions, fileExtension))
+            !IsExtensionIn(allowedExtensions, fileExtension))
         {
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.ExtensionNotAllowed.ToString(localizer),
+                Texts.ExtensionNotAllowed.ToString(localizer),
                 fileExtension, constraints.AllowedExtensions));
         }
 
@@ -92,10 +101,10 @@ public class DefaultUploadValidator : IUploadValidator
 
             if (string.IsNullOrEmpty(imageExtensions))
                 throw new ValidationError(
-                    UploadTexts.Controls.ImageUpload.NotAnImageFile.ToString(localizer));
+                    Texts.NotAnImageFile.ToString(localizer));
 
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                UploadTexts.Controls.ImageUpload.NotAnImageWithExtensions.ToString(localizer),
+                Texts.NotAnImageWithExtensions.ToString(localizer),
                 fileExtension, constraints.ImageExtensions));
         }
 
@@ -104,7 +113,7 @@ public class DefaultUploadValidator : IUploadValidator
 
     private static readonly char[] extSep = new char[] { ',', ';' };
 
-    private bool IsExtensionInTheList(string extensionList, string extension)
+    private bool IsExtensionIn(string extensionList, string extension)
     {
         if (string.IsNullOrEmpty(extensionList))
             return false;
@@ -174,7 +183,7 @@ public class DefaultUploadValidator : IUploadValidator
                     StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    UploadTexts.Controls.ImageUpload.ImageExtensionMismatch.ToString(localizer),
+                    Texts.ImageExtensionMismatch.ToString(localizer),
                     fileExtension, formatInfo.MimeType));
             }
         }
