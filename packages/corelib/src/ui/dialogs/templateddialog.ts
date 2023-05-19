@@ -254,7 +254,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                 });
             }
 
-            openPanel(this.element, this.uniqueName);
+            TemplatedDialog.openPanel(this.element, this.uniqueName);
             this.setupPanelTitle();
         }
         else if (this.useBSModal()) {

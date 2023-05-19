@@ -649,6 +649,16 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
     var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement
     if (!el)
         return;
+
+    if ($) {
+        $(window).trigger('panelopening', { panel: el });
+    }
+    else {
+        var opened = new Event("panelopening") as any;
+        opened.panel = el;
+        window.dispatchEvent(opened);
+    }
+
     var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
     el.dataset.paneluniquename = uniqueName ?? el.id ?? new Date().getTime().toString();
@@ -681,8 +691,14 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
     el.classList.remove("panel-hidden");
     el.classList.add("s-Panel");
 
-    if ($)
+    if ($) {
         $(el).trigger('panelopen');
-    else
+        $(window).trigger('panelopened', { panel: el });
+    }
+    else {
         el.dispatchEvent(new Event("panelopen"));
+        var opened = new Event("panelopened") as any;
+        opened.panel = el;
+        window.dispatchEvent(opened);
+    }
 }
