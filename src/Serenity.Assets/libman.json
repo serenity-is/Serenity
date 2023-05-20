@@ -17,7 +17,7 @@
       ]
     },
     {
-      "library": "bootstrap-icons@1.10.2",
+      "library": "bootstrap-icons@1.10.5",
       "destination": "wwwroot/bootstrap-icons/",
       "files": [
         "font/bootstrap-icons.css",
