@@ -106,7 +106,7 @@ export let Culture: Locale = {
         if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
             (Culture as any)[k] = (Invariant as any)[k];
 
-    if (typeof document !== "undefined" && (k = trimToNull((document.querySelector('script#ScriptCulture') || {}).innerHTML)) != null) {
+    if (typeof document !== "undefined" && (k = trimToNull(document.querySelector('script#ScriptCulture')?.textContent)) != null) {
         var sc = JSON.parse(k);
         if (sc.DecimalSeparator != null)
             Culture.decimalSeparator = sc.DecimalSeparator;
@@ -115,8 +115,8 @@ export let Culture: Locale = {
         else if (Culture.groupSeparator == Culture.decimalSeparator)
             Culture.groupSeparator = Culture.decimalSeparator == '.' ? ',' : '.';
 
-        delete sc.groupSeparator;
-        delete sc.decimal;
+        delete sc.GroupSeparator;
+        delete sc.DecimalSeparator;
         for (k in sc) {
             if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(sc, k))
                 (Culture as any)[k.charAt(0).toLowerCase() + k.substr(1)] = sc[k];

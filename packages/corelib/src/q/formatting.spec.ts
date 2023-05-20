@@ -810,4 +810,144 @@ describe("formatNumber", () => {
 
 });
 
+describe("ScriptCulture", () => {
+    it("ignores a script element with ScriptCulture ID but empty content", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.innerText = "    ";
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture).toBeDefined();
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("ignores a script element with ScriptCulture ID but empty JSON content", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.innerHTML = "{}";
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture).toBeDefined();
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("uses a script element with ScriptCulture ID", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.innerHTML = '{ "DecimalSeparator": "&" }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.decimalSeparator).toBe('&');
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("can handle when GroupSeparator is specified same with DecimalSeparator", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = '{ "DecimalSeparator": "&", "GroupSeparator": "&" }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.decimalSeparator).toBe('&');
+            expect(formatting.Culture.groupSeparator).toBe(',');
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("can handle when GroupSeparator is specified same with Culture.DecimalSeparator", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = '{ "GroupSeparator": "." }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.decimalSeparator).toBe('.');
+            expect(formatting.Culture.groupSeparator).toBe(',');
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("can switch GroupSeparator when DecimalSeparator is specified the same", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = '{ "DecimalSeparator": "," }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.decimalSeparator).toBe(',');
+            expect(formatting.Culture.groupSeparator).toBe('.');
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("can set GroupSeparator", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = '{ "GroupSeparator": "$" }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.decimalSeparator).toBe('.');
+            expect(formatting.Culture.groupSeparator).toBe('$');
+        }
+        finally {
+            script.remove();
+        }
+    });
+
+    it("can set other Culture members by lowercasing first letter", async () => {
+        var script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = '{ "DateSeparator": "_", "TimeSeparator": "?" }';
+            var formatting = (await import("./formatting"));
+            expect(formatting.Culture.dateSeparator).toBe('_');
+            expect(formatting.Culture.timeSeparator).toBe('?');
+        }
+        finally {
+            script.remove();
+        }
+    });    
+});
+
+describe("turkishLocaleToUpper", () => {
+    it("ignores returns empty values as is", async () => {
+        var formatting = (await import("./formatting"));
+        expect(formatting.turkishLocaleToUpper("")).toBe("");
+        expect(formatting.turkishLocaleToUpper(null)).toBe(null);
+        expect(formatting.turkishLocaleToUpper(undefined)).toBe(undefined);
+    });
+
+    it("converts i to İ and ı to I", async () => {
+        var formatting = (await import("./formatting"));
+        expect(formatting.turkishLocaleToUpper("xıIiİıİia")).toBe("XIIİİIİİA");
+    });
+});
+
+describe("turkishLocaleCompare", () => {
+    it("is same with Culture.stringCompare", async () => {
+        var formatting = (await import("./formatting"));
+        expect(formatting.turkishLocaleCompare).toBe(formatting.Culture.stringCompare);
+    });
+});
+
 export {}
