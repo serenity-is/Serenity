@@ -949,17 +949,22 @@ describe("closePanel", () => {
     it("can close panel via jQuery", async function () {
         var $ = (await import("@optionaldeps/jquery")).default;
         var div = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        var closingPanel: any;
         var closedPanel: any;
-        var panelClosing = (e: any) => closedPanel = e.panel;
+        var panelClosing = (e: any) => closingPanel = e.panel;
+        var panelClosed = (e: any) => closedPanel = e.panel;
         $(window).on('panelclosing', panelClosing);
+        $(window).on('panelclosed', panelClosed);
         try {
             var dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
             expect(div.hasClass("hidden")).toBe(true);
+            expect(closingPanel).toBe(div[0]);
             expect(closedPanel).toBe(div[0]);
         }
         finally {
             $(window).off('panelclosing', panelClosing);
+            $(window).off('panelclosed', panelClosed);
             div.remove();
         }
     });
@@ -967,18 +972,23 @@ describe("closePanel", () => {
     it("can close panel with Undefined jQuery", async function () {
         mockUndefinedJQuery();
         var div = document.body.appendChild(document.createElement("div"));
+        var closingPanel: any;
         var closedPanel: any;
-        var panelClosing = (e: any) => closedPanel = e.panel;
+        var panelClosing = (e: any) => closingPanel = e.panel;
+        var panelClosed = (e: any) => closedPanel = e.panel;
         window.addEventListener('panelclosing', panelClosing);
+        window.addEventListener('panelclosed', panelClosed);
         try {
             div.classList.add("s-Panel");
             var dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
             expect(div.classList.contains("hidden")).toBe(true);
+            expect(closingPanel).toBe(div);
             expect(closedPanel).toBe(div);
         }
         finally {
             window.removeEventListener('panelclosing', panelClosing);
+            window.removeEventListener('panelclosed', panelClosed);
             div.remove();
         }
     });

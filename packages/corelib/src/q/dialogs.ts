@@ -636,6 +636,8 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
         event.type = 'panelclose';
         event.target = el;
         $(el).trigger(event);
+        event = $.Event("panelclosed", { panel: el });
+        $(window).trigger(event);
     }
     else {
         window.dispatchEvent(new Event("resize"));
@@ -647,6 +649,9 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
         });
 
         el.dispatchEvent(new Event("panelclose"));
+        event = new Event("panelclosed");
+        event.panel = el;
+        window.dispatchEvent(event);
     }
 }
 
