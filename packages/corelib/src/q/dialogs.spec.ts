@@ -949,12 +949,17 @@ describe("closePanel", () => {
     it("can close panel via jQuery", async function () {
         var $ = (await import("@optionaldeps/jquery")).default;
         var div = $(`<div class="s-Panel"/>`).appendTo(document.body);
+        var closedPanel: any;
+        var panelClosing = (e: any) => closedPanel = e.panel;
+        $(window).on('panelclosing', panelClosing);
         try {
             var dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
             expect(div.hasClass("hidden")).toBe(true);
+            expect(closedPanel).toBe(div[0]);
         }
         finally {
+            $(window).off('panelclosing', panelClosing);
             div.remove();
         }
     });
@@ -962,13 +967,18 @@ describe("closePanel", () => {
     it("can close panel with Undefined jQuery", async function () {
         mockUndefinedJQuery();
         var div = document.body.appendChild(document.createElement("div"));
+        var closedPanel: any;
+        var panelClosing = (e: any) => closedPanel = e.panel;
+        window.addEventListener('panelclosing', panelClosing);
         try {
             div.classList.add("s-Panel");
             var dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
             expect(div.classList.contains("hidden")).toBe(true);
+            expect(closedPanel).toBe(div);
         }
         finally {
+            window.removeEventListener('panelclosing', panelClosing);
             div.remove();
         }
     });
@@ -1141,11 +1151,11 @@ describe("openPanel", () => {
         var div1 = $(`<div class="s-Panel"/>`).appendTo(document.body);
         var div2 = $(`<div class="s-Panel"/>`);
         var openingPanel, openedPanel;
-        const panelOpening = function(e: any, args: any) {
-            openingPanel = args?.panel;
+        const panelOpening = function(e: any) {
+            openingPanel = e?.panel;
         }
-        const panelOpened = function(e: any, args: any) {
-            openedPanel = args?.panel;
+        const panelOpened = function(e: any) {
+            openedPanel = e?.panel;
         }
         $(window).on('panelopening', panelOpening);
         $(window).on('panelopened', panelOpened);

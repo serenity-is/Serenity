@@ -597,20 +597,26 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
     if (!el || !el.classList.contains("s-Panel") || el.classList.contains("hidden"))
         return;
 
+    var event: any;
     if ($) {
-        var $beforeEvent = $.Event(e as any);
-        ($beforeEvent as any).type = 'panelbeforeclose';
-        $beforeEvent.target = el
-        $(element).trigger($beforeEvent);
-        if ($beforeEvent.isDefaultPrevented())
+        event = $.Event(e as any);
+        event.type = 'panelbeforeclose';
+        event.target = el
+        $(element).trigger(event);
+        if (event.isDefaultPrevented())
             return;
+        event = $.Event("panelclosing", { panel: el });
+        $(window).trigger(event);
     }
     else {
-        var closeEvent = new Event("panelbeforeclose", { cancelable: true });
-        el.dispatchEvent(closeEvent);
-        if (closeEvent.defaultPrevented) {
+        event = new Event("panelbeforeclose", { cancelable: true });
+        el.dispatchEvent(event);
+        if (event.defaultPrevented) {
             return;
         }
+        event = new Event("panelclosing");
+        event.panel = el;
+        window.dispatchEvent(event);
     }
 
     el.classList.add("hidden");
@@ -626,10 +632,10 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
     if ($) {
         $(window).triggerHandler('resize');
         $('.require-layout:visible').triggerHandler('layout');
-        var $closeEvent = $.Event(e as any);
-        ($closeEvent as any).type = 'panelclose';
-        $closeEvent.target = el;
-        $(el).trigger($closeEvent);
+        event = $.Event(e as any);
+        event.type = 'panelclose';
+        event.target = el;
+        $(el).trigger(event);
     }
     else {
         window.dispatchEvent(new Event("resize"));
@@ -649,14 +655,16 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
     var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement
     if (!el)
         return;
+    var event: any;
 
     if ($) {
-        $(window).trigger('panelopening', { panel: el });
+        event = $.Event('panelopening', { panel: el });
+        $(window).trigger(event);
     }
     else {
-        var opening = new Event("panelopening") as any;
-        opening.panel = el;
-        window.dispatchEvent(opening);
+        event = new Event("panelopening") as any;
+        event.panel = el;
+        window.dispatchEvent(event);
     }
 
     var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
@@ -693,12 +701,13 @@ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
 
     if ($) {
         $(el).trigger('panelopen');
-        $(window).trigger('panelopened', { panel: el });
+        event = $.Event('panelopened', { panel: el });
+        $(window).trigger(event);
     }
     else {
         el.dispatchEvent(new Event("panelopen"));
-        var opened = new Event("panelopened") as any;
-        opened.panel = el;
-        window.dispatchEvent(opened);
+        event = new Event("panelopened") as any;
+        event.panel = el;
+        window.dispatchEvent(event);
     }
 }
