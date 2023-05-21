@@ -1,3 +1,10 @@
+## 6.7.5 (2023-05-21)
+
+Features:
+  - added ExtensionBlacklistInclude, ExtensionBlacklistExclude, ExtensionWhitelistInclude and ExtensionWhitelistExclude that allows including, excluding extensions from defaults without having to write all the extensions again
+  - update bootstrap icons to 1.10.5
+  - trigger panelopening, panelopened, panelclosing, panelclosed events on window while a panel is closing / opening
+  
 ## 6.7.2 (2023-05-13)
 
 Features:
