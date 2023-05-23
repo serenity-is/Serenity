@@ -19,6 +19,7 @@ public class ScriptBundleManager : IScriptBundleManager
     private Dictionary<string, List<string>> bundleIncludes;
 
     private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
+    private readonly IScriptMinifier scriptMinifier;
     private readonly IDynamicScriptManager scriptManager;
     private readonly IWebHostEnvironment hostEnvironment;
     private readonly IHttpContextAccessor contextAccessor;
@@ -33,14 +34,19 @@ public class ScriptBundleManager : IScriptBundleManager
     /// </summary>
     /// <param name="options">Options</param>
     /// <param name="scriptManager">Dynamic script manager</param>
+    /// <param name="scriptMinifier">Script minifier</param>
     /// <param name="hostEnvironment">Web host environment</param>
     /// <param name="contextAccessor">HTTP context accessor</param>
     /// <param name="logger">Logger</param>
     /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-    public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
+    public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, 
+        IScriptMinifier scriptMinifier,
+        IDynamicScriptManager scriptManager, 
+        IWebHostEnvironment hostEnvironment,
         IHttpContextAccessor contextAccessor = null, ILogger<ScriptBundleManager> logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+        this.scriptMinifier = scriptMinifier ?? throw new ArgumentNullException(nameof(scriptMinifier));
         this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
         this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
         this.contextAccessor = contextAccessor;
@@ -162,7 +168,10 @@ public class ScriptBundleManager : IScriptBundleManager
                                 {
                                     try
                                     {
-                                        var result = NUglify.Uglify.Js(code);
+                                        var result = scriptMinifier.MinifyScript(code, new()
+                                        {
+                                            LineBreakThreshold = 1000
+                                        });
                                         if (!result.HasErrors)
                                             code = result.Code;
                                     }
@@ -222,9 +231,9 @@ public class ScriptBundleManager : IScriptBundleManager
 
                             try
                             {
-                                var result = NUglify.Uglify.Js(code, new NUglify.JavaScript.CodeSettings 
+                                var result = scriptMinifier.MinifyScript(code, new()
                                 { 
-                                    LineBreakThreshold = 1000 
+                                    LineBreakThreshold = 1000
                                 });
                                 if (result.HasErrors)
                                     return code;

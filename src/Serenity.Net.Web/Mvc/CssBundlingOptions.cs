@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Serenity.Web;
 
@@ -38,7 +38,7 @@ public class CssBundlingOptions : IOptions<CssBundlingOptions>
 
     /// <summary>
     /// Should a ".min.css" file that exists in file system be used if available,
-    /// instead of minifiying the file in memory.
+    /// instead of minifying the file in memory.
     /// </summary>
     public bool? UseMinCSS { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Serenity.Web;
 
@@ -54,7 +54,7 @@ public class ScriptBundlingOptions : IOptions<ScriptBundlingOptions>
 
     /// <summary>
     /// Should a ".min.js" file that exists in file system be used if available,
-    /// instead of minifiying the file in memory.
+    /// instead of minifying the file in memory.
     /// </summary>
     public bool? UseMinJS { get; set; }
 

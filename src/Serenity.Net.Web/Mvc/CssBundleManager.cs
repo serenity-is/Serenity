@@ -20,6 +20,7 @@ public class CssBundleManager : ICssBundleManager
 
     private const string errorLines = "\r\n/*\r\n!!!ERROR: {0}!!!\r\n*/\r\n";
     private readonly IDynamicScriptManager scriptManager;
+    private readonly ICssMinifier cssMinifier;
     private readonly IWebHostEnvironment hostEnvironment;
     private readonly IHttpContextAccessor contextAccessor;
     private readonly ILogger<CssBundleManager> logger;
@@ -33,15 +34,21 @@ public class CssBundleManager : ICssBundleManager
     /// </summary>
     /// <param name="options">Options</param>
     /// <param name="scriptManager">Dynamic script manager</param>
+    /// <param name="cssMinifier"></param>
     /// <param name="hostEnvironment">Web host environment</param>
     /// <param name="contextAccessor">HTTP context accessor</param>
     /// <param name="logger">Exception logger</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public CssBundleManager(IOptions<CssBundlingOptions> options, IDynamicScriptManager scriptManager, IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor contextAccessor = null, ILogger<CssBundleManager> logger = null)
+    public CssBundleManager(IOptions<CssBundlingOptions> options,
+        IDynamicScriptManager scriptManager, 
+        ICssMinifier cssMinifier,
+        IWebHostEnvironment hostEnvironment,
+        IHttpContextAccessor contextAccessor = null, 
+        ILogger<CssBundleManager> logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
+        this.cssMinifier = cssMinifier ?? throw new ArgumentNullException(nameof(cssMinifier));
         this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
         this.contextAccessor = contextAccessor;
         this.logger = logger;
@@ -178,7 +185,11 @@ public class CssBundleManager : ICssBundleManager
                                 {
                                     try
                                     {
-                                        var result = NUglify.Uglify.Css(code);
+                                        var result = cssMinifier.MinifyCss(code, new()
+                                        {
+                                            LineBreakThreshold = 1000
+                                        });
+
                                         if (!result.HasErrors)
                                             code = result.Code;
                                     }
@@ -238,7 +249,7 @@ public class CssBundleManager : ICssBundleManager
 
                                 try
                                 {
-                                    var result = NUglify.Uglify.Css(code, new NUglify.Css.CssSettings
+                                    var result = cssMinifier.MinifyCss(code, new()
                                     {
                                         LineBreakThreshold = 1000
                                     });

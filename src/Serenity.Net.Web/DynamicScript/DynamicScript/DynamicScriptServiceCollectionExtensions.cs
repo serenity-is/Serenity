@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -84,6 +84,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
+        collection.TryAddSingleton<ICssMinifier, NuglifyMinifier>();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
     }
 
@@ -120,6 +121,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
+        collection.TryAddSingleton<IScriptMinifier, NuglifyMinifier>();
         collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
     }
 
