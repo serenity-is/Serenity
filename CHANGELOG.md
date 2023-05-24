@@ -1,3 +1,20 @@
+## 6.7.6 (2023-05-24)
+
+Features:
+  - Abstracted script and css minifier dependencies, so that another minifier can be used instead of NUglify for bundling
+  - Added experimental `esbuild` based minifier [StartSharp]
+  - Updated preact in Serenity.Assets to 10.14.1
+  - Added `/** jsxImportSource jsx-dom */` to files where jsx-dom are used, so that it can understood which library is used without relying on the default in tsconfig.json
+  - Rewrote EmailClient with ES modules and preact, removed Serenity.Pro.UI package as it was only ever used by EmailClient. [StartSharp]
+  - Improve look and feel of e-mail client [StartSharp]
+  - Added a mock IMAP server implementation to EmailClient for demo purposes
+  - [BREAKING CHANGE] `Serenity.Pro.UI` package is now obsoleted as it was only used by the old email client. It will not get any new versions and you should remove its reference from your project file.
+  - Changed default jsxImportSource back to `preact` in tsconfig.json [StartSharp]
+  - `<environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Development" />` line which was in `web.config` for development purposes is removed. If you deploy to IIS and did not remove that line in your production site after publishing, you should.
+
+Bugfixes:
+  - Resolve issue with enum / select editors causing display text to be saved instead of value in dropdown editors [StartSharp]
+
 ## 6.7.5 (2023-05-21)
 
 Features:

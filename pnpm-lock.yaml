@@ -36,8 +36,8 @@ importers:
         specifier: 0.69.0
         version: 0.69.0(@swc/core@1.3.42)(@swc/jest@0.2.24)
       jsx-dom:
-        specifier: 8.0.5
-        version: 8.0.5
+        specifier: 8.0.6
+        version: 8.0.6
       rollup:
         specifier: 2.79.1
         version: 2.79.1
@@ -2505,8 +2505,8 @@ packages:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
     dev: true
 
-  /jsx-dom@8.0.5:
-    resolution: {integrity: sha512-Dt4PLuFFm16Qj1TH0GSx6LdrfnrPSh5lEHG87Hd4lv9nDWGD3ZtUdp5RXH7GyEWI0E+19eoUDFcyO5dnJQ/4IQ==}
+  /jsx-dom@8.0.6:
+    resolution: {integrity: sha512-e8+YkFB0U0+mxyFHc0YW3z8iz2tJ9f50v65b5I9ATSVz8KvHaNKeeSiVkeRY0tphGMEwjkyfZBNAw1dgF6AN7Q==}
     dependencies:
       csstype: 3.1.2
     dev: true
