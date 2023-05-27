@@ -58,10 +58,10 @@ export namespace ErrorHandling {
      */
     export function isDevelopmentMode() {
         var host = (window.location.host ?? "").toLowerCase();
-        return (host != "localhost" &&
-            host != "127.0.0.1" &&
-            host != "::1" &&
-            !host.endsWith(".local") &&
-            !host.endsWith(".localhost"));
+        return (host === "localhost" ||
+            host === "127.0.0.1" ||
+            host === "::1" ||
+            host.endsWith(".local") ||
+            host.endsWith(".localhost"));
     }
 }
