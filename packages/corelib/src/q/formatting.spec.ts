@@ -67,88 +67,6 @@ describe("Q.formatDate", () => {
     });
 });
 
-describe("Q.formatNumber", () => {
-    it('formats with "." as decimal separator', async function () {
-        var formatting = (await import("./formatting"));
-        const Culture = formatting.Culture;
-        const formatNumber = formatting.formatNumber;
-        Culture.decimalSeparator = '.';
-        Culture.groupSeparator = ',';
-        expect(formatNumber(1, '0.00')).toBe('1.00');
-        expect(formatNumber(1, '0.0000')).toBe('1.0000');
-        expect(formatNumber(1234, '#,##0')).toBe('1,234');
-        expect(formatNumber(1234.5, '#,##0.##')).toBe('1,234.5');
-        expect(formatNumber(1234.5678, '#,##0.##')).toBe('1,234.57');
-        expect(formatNumber(1234.5, '#,##0.00')).toBe('1,234.50');
-    });
-
-    it('formats with "," as decimal separator', async function () {
-        var formatting = (await import("./formatting"));
-        const Culture = formatting.Culture;
-        const formatNumber = formatting.formatNumber;
-        Culture.decimalSeparator = ',';
-        Culture.groupSeparator = '.';
-        expect(formatNumber(1, '0.00')).toBe('1,00');
-        expect(formatNumber(1, '0.0000')).toBe('1,0000');
-        expect(formatNumber(1234, '#,##0')).toBe('1.234');
-        expect(formatNumber(1234.5, '#,##0.##')).toBe('1.234,5');
-        expect(formatNumber(1234.5678, '#,##0.##')).toBe('1.234,57');
-        expect(formatNumber(1234.5, '#,##0.00')).toBe('1.234,50');
-    });
-
-
-    it('formats number with prefix and suffix', async function () {
-        var formatting = (await import("./formatting"));
-        const formatNumber = formatting.formatNumber;
-        const Culture = formatting.Culture;
-        Culture.decimalSeparator = '.';
-        expect(formatNumber(1234.5, '$#,##0.##')).toBe('$1,234.5');
-        expect(formatNumber(1234.5, 'R #,##0.##')).toBe('R 1,234.5');
-        expect(formatNumber(1234.5, '#,##0.## TL')).toBe('1,234.5 TL');
-        expect(formatNumber(1, "','0")).toBe(',1');
-        expect(formatNumber(1, "','0','")).toBe(',1,');
-        expect(formatNumber(1, "\\,0\\,")).toBe(',1,');
-    });
-
-    it('handles decimal format specifier', async function () {
-        var formatting = (await import("./formatting"));
-        const formatNumber = formatting.formatNumber;
-        const Culture = formatting.Culture;
-        Culture.decimalSeparator = '.';
-        expect(formatNumber(1234.5, 'D')).toBe('1234');
-        expect(formatNumber(1234.5, 'd')).toBe('1234');
-        expect(formatNumber(1234.5, 'D6')).toBe('001234');
-        expect(formatNumber(-1234.5, 'D6')).toBe('-001234');
-        expect(formatNumber(-1234.5, 'd6')).toBe('-001234');
-    });
-
-    it('handles hex format specifier', async function () {
-        var formatting = (await import("./formatting"));
-        const formatNumber = formatting.formatNumber;
-        const Culture = formatting.Culture;
-        Culture.decimalSeparator = '.';
-        expect(formatNumber(255, 'X')).toBe('FF');
-        expect(formatNumber(255, 'X4')).toBe('00FF');
-        expect(formatNumber(255, 'x')).toBe('ff');
-        expect(formatNumber(255, 'x4')).toBe('00ff');
-        // can't handle negative hex yet as it would require target number of bits
-        // expect(formatNumber(-1, 'x')).toBe('ff');
-        // expect(formatNumber(-1, 'x4')).toBe('ffff');
-    });
-
-    it('handles exponantional format specifier', async function () {
-        var formatting = (await import("./formatting"));
-        const formatNumber = formatting.formatNumber;
-        const Culture = formatting.Culture;
-        Culture.decimalSeparator = '.';
-        expect(formatNumber(1052.0329112756, 'E')).toBe('1.052033E+3');
-        expect(formatNumber(1052.0329112756, 'e')).toBe('1.052033e+3');
-        expect(formatNumber(-1052.0329112756, 'e2')).toBe('-1.05e+3');
-        expect(formatNumber(-1052.0329112756, 'E2')).toBe('-1.05E+3');
-    });
-
-});
-
 describe("Invariant.stringCompare", () => {
     it("uses string js string comparison", async function () {
         var formatting = (await import("./formatting"));
@@ -772,6 +690,7 @@ describe("parseInteger", () => {
 });
 
 describe("formatNumber", () => {
+
     it("returns empty string for undefined, null", async function () {
         var formatting = (await import("./formatting"));
         expect(formatting.formatNumber(undefined)).toBe("");
@@ -786,6 +705,85 @@ describe("formatNumber", () => {
         expect(formatting.formatNumber(NaN, null, locale)).toBe("NaNNN");
         locale.nanSymbol = null;
         expect(formatting.formatNumber(NaN, null, locale)).toBe("NaN");
+    });
+
+    it('formats with "." as decimal separator', async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        const formatNumber = formatting.formatNumber;
+        Culture.decimalSeparator = '.';
+        Culture.groupSeparator = ',';
+        expect(formatNumber(1, '0.00')).toBe('1.00');
+        expect(formatNumber(1, '0.0000')).toBe('1.0000');
+        expect(formatNumber(1234, '#,##0')).toBe('1,234');
+        expect(formatNumber(1234.5, '#,##0.##')).toBe('1,234.5');
+        expect(formatNumber(1234.5678, '#,##0.##')).toBe('1,234.57');
+        expect(formatNumber(1234.5, '#,##0.00')).toBe('1,234.50');
+    });
+
+    it('formats with "," as decimal separator', async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        const formatNumber = formatting.formatNumber;
+        Culture.decimalSeparator = ',';
+        Culture.groupSeparator = '.';
+        expect(formatNumber(1, '0.00')).toBe('1,00');
+        expect(formatNumber(1, '0.0000')).toBe('1,0000');
+        expect(formatNumber(1234, '#,##0')).toBe('1.234');
+        expect(formatNumber(1234.5, '#,##0.##')).toBe('1.234,5');
+        expect(formatNumber(1234.5678, '#,##0.##')).toBe('1.234,57');
+        expect(formatNumber(1234.5, '#,##0.00')).toBe('1.234,50');
+    });
+
+
+    it('formats number with prefix and suffix', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(1234.5, '$#,##0.##')).toBe('$1,234.5');
+        expect(formatNumber(1234.5, 'R #,##0.##')).toBe('R 1,234.5');
+        expect(formatNumber(1234.5, '#,##0.## TL')).toBe('1,234.5 TL');
+        expect(formatNumber(1, "','0")).toBe(',1');
+        expect(formatNumber(1, "','0','")).toBe(',1,');
+        expect(formatNumber(1, "\\,0\\,")).toBe(',1,');
+    });
+
+    it('handles decimal format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(1234.5, 'D')).toBe('1234');
+        expect(formatNumber(1234.5, 'd')).toBe('1234');
+        expect(formatNumber(1234.5, 'D6')).toBe('001234');
+        expect(formatNumber(-1234.5, 'D6')).toBe('-001234');
+        expect(formatNumber(-1234.5, 'd6')).toBe('-001234');
+    });
+
+    it('handles hex format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(255, 'X')).toBe('FF');
+        expect(formatNumber(255, 'X4')).toBe('00FF');
+        expect(formatNumber(255, 'x')).toBe('ff');
+        expect(formatNumber(255, 'x4')).toBe('00ff');
+        // can't handle negative hex yet as it would require target number of bits
+        // expect(formatNumber(-1, 'x')).toBe('ff');
+        // expect(formatNumber(-1, 'x4')).toBe('ffff');
+    });
+
+    it('handles exponantional format specifier', async function () {
+        var formatting = (await import("./formatting"));
+        const formatNumber = formatting.formatNumber;
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatNumber(1052.0329112756, 'E')).toBe('1.052033E+3');
+        expect(formatNumber(1052.0329112756, 'e')).toBe('1.052033e+3');
+        expect(formatNumber(-1052.0329112756, 'e2')).toBe('-1.05e+3');
+        expect(formatNumber(-1052.0329112756, 'E2')).toBe('-1.05E+3');
     });
 
     it("returns .toString() if format is null, undefined, empty string or 'i'", async function () {
@@ -808,6 +806,187 @@ describe("formatNumber", () => {
         expect(formatting.formatNumber(54321.15, "#,##0.00", "!")).toBe("54,321!15");
     });
 
+    it("handles fixed point format specifier", async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatting.formatNumber(1234.567, "f")).toBe("1234.57");
+        expect(formatting.formatNumber(1234.567, "F1")).toBe("1234.6");
+        expect(formatting.formatNumber(1234.567, "F2")).toBe("1234.57");
+        expect(formatting.formatNumber(1234.567, "F3")).toBe("1234.567");
+        expect(formatting.formatNumber(1234.567, "F4")).toBe("1234.5670");
+        expect(formatting.formatNumber(-1234.567, "f")).toBe("-1234.57");
+        expect(formatting.formatNumber(-1234.567, "F1")).toBe("-1234.6");
+        expect(formatting.formatNumber(-1234.567, "F2")).toBe("-1234.57");
+        expect(formatting.formatNumber(-1234.567, "F3")).toBe("-1234.567");
+        expect(formatting.formatNumber(-1234.567, "F4")).toBe("-1234.5670");
+        Culture.decimalDigits = 3;
+        expect(formatting.formatNumber(1234.567, "f")).toBe("1234.567");
+        Culture.decimalDigits = 4;
+        var locale = Object.assign({}, Culture, {
+            decimalDigits: null
+        });
+        expect(formatting.formatNumber(1234.567, "f", locale)).toBe("1234.5670");
+        locale.decimalSeparator = ",";
+        expect(formatting.formatNumber(1234.567, "f", locale)).toBe("1234,5670");
+    });
+
+    it("handles numberic format specifier", async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatting.formatNumber(1234.567, "n")).toBe("1,234.57");
+        expect(formatting.formatNumber(1234.567, "n1")).toBe("1,234.6");
+        expect(formatting.formatNumber(1234.567, "n2")).toBe("1,234.57");
+        expect(formatting.formatNumber(1234.567, "N3")).toBe("1,234.567");
+        expect(formatting.formatNumber(1234.567, "N4")).toBe("1,234.5670");
+        expect(formatting.formatNumber(-1234.567, "N")).toBe("-1,234.57");
+        expect(formatting.formatNumber(-1234.567, "N1")).toBe("-1,234.6");
+        expect(formatting.formatNumber(-1234.567, "N2")).toBe("-1,234.57");
+        expect(formatting.formatNumber(-1234.567, "N3")).toBe("-1,234.567");
+        expect(formatting.formatNumber(-1234.567, "N4")).toBe("-1,234.5670");
+        Culture.decimalDigits = 3;
+        expect(formatting.formatNumber(1234.567, "n")).toBe("1,234.567");
+        Culture.decimalDigits = 4;
+        var locale = Object.assign({}, Culture, {
+            decimalDigits: null
+        });
+        expect(formatting.formatNumber(1234.567, "n", locale)).toBe("1,234.5670");
+        locale.decimalSeparator = ",";
+        locale.groupSeparator = ".";
+        expect(formatting.formatNumber(1234.567, "n", locale)).toBe("1.234,5670");
+        expect(formatting.formatNumber(12.567, "n", locale)).toBe("12,5670");
+    });
+
+    it("handles currency format specifier", async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        Culture.currencySymbol = '₺';
+        expect(formatting.formatNumber(1234.567, "c")).toBe("1,234.57₺");
+        expect(formatting.formatNumber(1234.567, "c1")).toBe("1,234.6₺");
+        expect(formatting.formatNumber(1234.567, "c2")).toBe("1,234.57₺");
+        expect(formatting.formatNumber(1234.567, "C3")).toBe("1,234.567₺");
+        expect(formatting.formatNumber(1234.567, "c4")).toBe("1,234.5670₺");
+        expect(formatting.formatNumber(-1234.567, "C")).toBe("-1,234.57₺");
+        expect(formatting.formatNumber(-1234.567, "c1")).toBe("-1,234.6₺");
+        expect(formatting.formatNumber(-1234.567, "C2")).toBe("-1,234.57₺");
+        expect(formatting.formatNumber(-1234.567, "c3")).toBe("-1,234.567₺");
+        expect(formatting.formatNumber(-1234.567, "C4")).toBe("-1,234.5670₺");
+        Culture.decimalDigits = 3;
+        expect(formatting.formatNumber(1234.567, "c")).toBe("1,234.567₺");
+        Culture.decimalDigits = 4;
+        Culture.currencySymbol = '?';
+        var locale = Object.assign({}, Culture, {
+            decimalDigits: null
+        });
+        expect(formatting.formatNumber(1234.567, "c", locale)).toBe("1,234.5670?");
+        locale.decimalSeparator = ",";
+        locale.groupSeparator = ".";
+        expect(formatting.formatNumber(1234.567, "c", locale)).toBe("1.234,5670?");
+        expect(formatting.formatNumber(12.567, "c", locale)).toBe("12,5670?");
+    });
+
+    it("handles currency percent specifier", async function () {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        Culture.currencySymbol = '₺';
+        expect(formatting.formatNumber(12.567, "p")).toBe("1,256.70%");
+        expect(formatting.formatNumber(12.567, "p1")).toBe("1,256.7%");
+        expect(formatting.formatNumber(12.567, "p2")).toBe("1,256.70%");
+        expect(formatting.formatNumber(12.567, "p3")).toBe("1,256.700%");
+        expect(formatting.formatNumber(12.567, "p4")).toBe("1,256.7000%");
+        expect(formatting.formatNumber(-12.567, "p")).toBe("-1,256.70%");
+        expect(formatting.formatNumber(-12.567, "p1")).toBe("-1,256.7%");
+        expect(formatting.formatNumber(-12.567, "p2")).toBe("-1,256.70%");
+        expect(formatting.formatNumber(-12.567, "p3")).toBe("-1,256.700%");
+        expect(formatting.formatNumber(-12.567, "p4")).toBe("-1,256.7000%");
+        Culture.decimalDigits = 3;
+        expect(formatting.formatNumber(12.567, "p")).toBe("1,256.700%");
+        Culture.decimalDigits = 4;
+        Culture.percentSymbol = '?';
+        var locale = Object.assign({}, Culture, {
+            decimalDigits: null
+        });
+        expect(formatting.formatNumber(12.567, "p", locale)).toBe("1,256.7000?");
+        locale.decimalSeparator = ",";
+        locale.groupSeparator = ".";
+        expect(formatting.formatNumber(12.567, "p", locale)).toBe("1.256,7000?");
+    });
+
+    it("handles start zero padding", async function() {
+        var formatting = (await import("./formatting"));
+        const Culture = formatting.Culture;
+        Culture.decimalSeparator = '.';
+        expect(formatting.formatNumber(1.23, "000")).toBe("001");
+    });
+});
+
+describe("format", () => {
+    it("handles double braces", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.format("{{{0}}}", "abc")).toBe("{abc}");
+    });
+
+    it("formats null and undefined as empty string", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.format("{0}", null)).toBe("");
+        expect(formatting.format("x{0}y", null)).toBe("xy");
+        expect(formatting.format("{0}", undefined)).toBe("");
+        expect(formatting.format("x{0}y", undefined)).toBe("xy");
+    });
+
+    it("handles number format specifiers", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.format("{0:000}", 5)).toBe("005");
+    });
+
+    it("handles date format specifiers", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.format("{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
+    });
+    
+    it("calls obj.format if available", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.format("{0:x}", {format: (s: string) => s})).toBe("x");
+    });
+});
+
+
+describe("localeFormat", () => {
+    it("handles double braces", async function () {
+        var formatting = (await import("./formatting"));
+        var locale = Object.assign({}, formatting.Culture);
+        expect(formatting.localeFormat(locale, "{{{0}}}", "abc")).toBe("{abc}");
+    });
+
+    it("formats null and undefined as empty string", async function () {
+        var formatting = (await import("./formatting"));
+        var locale = Object.assign({}, formatting.Culture);
+        expect(formatting.localeFormat(locale, "{0}", null)).toBe("");
+        expect(formatting.localeFormat(locale, "x{0}y", null)).toBe("xy");
+        expect(formatting.localeFormat(locale, "{0}", undefined)).toBe("");
+        expect(formatting.localeFormat(locale, "x{0}y", undefined)).toBe("xy");
+    });
+
+    it("handles number format specifiers", async function () {
+        var formatting = (await import("./formatting"));
+        var locale = Object.assign({}, formatting.Culture);
+        expect(formatting.localeFormat(locale, "{0:000}", 5)).toBe("005");
+    });
+
+    it("handles date format specifiers", async function () {
+        var formatting = (await import("./formatting"));
+        var locale = Object.assign({}, formatting.Culture);
+        expect(formatting.localeFormat(locale, "{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
+    });
+    
+    it("calls obj.localeFormat if available", async function () {
+        var formatting = (await import("./formatting"));
+        var locale = Object.assign({}, formatting.Culture);
+        expect(formatting.localeFormat(locale, "{0:x}", {format: (s: string) => s})).toBe("x");
+    });
 });
 
 describe("ScriptCulture", () => {

@@ -194,18 +194,12 @@ function _formatString(format: string, l: Locale, values: IArguments, from: numb
             if (value == null) {
                 return '';
             }
-            var type = getInstanceType(value);
-            if (type == Number || type == Date) {
-                var formatSpec = null;
-                var formatIndex = m.indexOf(':');
-                if (formatIndex > 0) {
-                    formatSpec = m.substring(formatIndex + 1, m.length - 1);
-                }
-                return _formatObject(value, formatSpec, l);
+            var formatSpec = null;
+            var formatIndex = m.indexOf(':');
+            if (formatIndex > 0) {
+                formatSpec = m.substring(formatIndex + 1, m.length - 1);
             }
-            else {
-                return value.toString();
-            }
+            return _formatObject(value, formatSpec, l);
         });
 };
 
@@ -214,7 +208,7 @@ export function format(format: string, ...prm: any[]): string {
     return _formatString(format, Culture, arguments, 1);
 }
 
-export function localeFormat(format: string, l: Locale, ...prm: any[]): string {
+export function localeFormat(l: Locale, format: string, ...prm: any[]): string {
     return _formatString(format, l, arguments, 2);
 }
 
@@ -223,8 +217,9 @@ function _formatObject(obj: any, format: string, fmt?: Locale): string {
         return formatNumber(obj, format, fmt);
     else if (Object.prototype.toString.call(obj) === '[object Date]')
         return formatDate(obj, format, fmt);
-    else
-        return obj.format(format);
+    else if (obj.format)
+        return obj.format(format, fmt ?? Culture);
+    return String(obj);
 };
 
 export let round = (n: number, d?: number, rounding?: boolean) => {
@@ -306,7 +301,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             s = num.toFixed(precision).toString();
             if (precision && (dec != '.')) {
                 var index = s.indexOf('.');
-                s = s.substr(0, index) + dec + s.substr(index + 1);
+                s = s.substring(0, index) + dec + s.substring(index + 1);
             }
             if ((fs == 'n') || (fs == 'N')) {
                 s = insertGroupSeperator(s, dec, grp, neg);
@@ -317,15 +312,20 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             if (precision == -1) {
                 precision = fmt.decimalDigits ?? Culture.decimalDigits;
             }
-            if (fs === 'p' || fs == 'P')
+            var symbol: string;
+            if (fs === 'p' || fs == 'P') {
                 num *= 100;
-            s = Math.abs(num).toFixed(precision).toString();
+                symbol = fmt.percentSymbol ?? Culture.percentSymbol;
+            }
+            else {
+                symbol = fmt.currencySymbol ?? Culture.currencySymbol;
+            }
+            s = num.toFixed(precision).toString();
             if (precision && (dec != '.')) {
                 var index = s.indexOf('.');
-                s = s.substr(0, index) + dec + s.substr(index + 1);
+                s = s.substring(0, index) + dec + s.substring(index + 1);
             }
-            s = insertGroupSeperator(s, dec, grp, neg);
-            s = localeFormat("0", fmt, s);
+            s = insertGroupSeperator(s, dec, grp, neg) + symbol;
             break;
             
         default:
