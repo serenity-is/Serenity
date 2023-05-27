@@ -786,13 +786,19 @@ describe("formatNumber", () => {
         expect(formatNumber(-1052.0329112756, 'E2')).toBe('-1.05E+3');
     });
 
-    it("returns .toString() if format is null, undefined, empty string or 'i'", async function () {
+    it("returns .toString() with decimal replaced if format is null or empty string", async function () {
         var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = "!";
         formatting.Culture.decimalSeparator = "*";
-        expect(formatting.formatNumber(5.3, null)).toBe("5.3");
-        expect(formatting.formatNumber(5.3, undefined)).toBe("5.3");
-        expect(formatting.formatNumber(5.3, "")).toBe("5.3");
+        expect(formatting.formatNumber(5.3, null)).toBe("5*3");
+        expect(formatting.formatNumber(5.3, undefined)).toBe("5*3");
+        expect(formatting.formatNumber(5.3, "")).toBe("5*3");
+    });
+
+    it("returns .toString() if format is 'i'", async function () {
+        var formatting = (await import("./formatting"));
+        formatting.Culture.groupSeparator = "!";
+        formatting.Culture.decimalSeparator = "*";
         expect(formatting.formatNumber(5.3, "i")).toBe("5.3");
     });
 

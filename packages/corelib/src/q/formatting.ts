@@ -1,38 +1,66 @@
 ﻿import { padLeft, startsWith, trim, trimToNull, zeroPad } from "./strings";
-import { getInstanceType } from "./system";
 
+/**
+ * Interface for number formatting, similar to .NET's NumberFormatInfo
+ */
 export interface NumberFormat {
+    /** Decimal separator */
     decimalSeparator: string;
+    /** Group separator */
     groupSeparator?: string;
+    /** Number of digits after decimal separator */
     decimalDigits?: number;
+    /** Positive sign */
     positiveSign?: string;
+    /** Negative sign */
     negativeSign?: string;
+    /** Zero symbol */
     nanSymbol?: string;
+    /** Percentage symbol */
     percentSymbol?: string;
+    /** Currency symbol */
     currencySymbol?: string;
 }
 
+/** Interface for date formatting, similar to .NET's DateFormatInfo */
 export interface DateFormat {
+    /** Date separator */
     dateSeparator?: string;
+    /** Default date format string */
     dateFormat?: string;
+    /** Date order, like dmy, or ymd */
     dateOrder?: string;
+    /** Default date time format string */
     dateTimeFormat?: string;
+    /** AM designator */
     amDesignator?: string;
+    /** PM designator */
     pmDesignator?: string;
+    /** Time separator */
     timeSeparator?: string;
+    /** First day of week, 0 = Sunday, 1 = Monday */
     firstDayOfWeek?: number;
+    /** Array of day names */
     dayNames?: string[];
+    /** Array of short day names */
     shortDayNames?: string[];
+    /** Array of two letter day names */
     minimizedDayNames?: string[];
+    /** Array of month names */
     monthNames?: string[];
+    /** Array of short month names */
     shortMonthNames?: string[];
 }
 
+/** Interface for a locale, similar to .NET's CultureInfo */
 export interface Locale extends NumberFormat, DateFormat {
+    /** Locale string comparison function, similar to .NET's StringComparer */
     stringCompare?: (a: string, b: string) => number;
+    /** Locale string to upper case function */
     toUpper?: (a: string) => string;
 }
 
+/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
 export let Invariant: Locale = {
     decimalSeparator: '.',
     groupSeparator: ',',
@@ -49,14 +77,18 @@ export let Invariant: Locale = {
     pmDesignator: 'PM',
     timeSeparator: ':',
     firstDayOfWeek: 0,
-    dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-    shortDayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-    minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
-    monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
-    shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',''],
+    dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    shortDayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    minimizedDayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', ''],
+    shortMonthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', ''],
     stringCompare: (a, b) => a < b ? -1 : (a > b ? 1 : 0)
 }
 
+/** 
+ * Factory for a function that compares two strings, based on a character order 
+ * passed in the `order` argument.
+ */
 export function compareStringFactory(order: string): ((a: string, b: string) => number) {
 
     var o: { [key: string]: number } = {};
@@ -64,12 +96,12 @@ export function compareStringFactory(order: string): ((a: string, b: string) => 
         o[order.charAt(z)] = z + 1;
     }
 
-    return function(a: string, b: string) {
+    return function (a: string, b: string) {
         a = a || "";
         b = b || "";
         if (a == b)
             return 0;
-        
+
         let c: number;
         for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
             let x = a.charAt(i), y = b.charAt(i);
@@ -88,8 +120,15 @@ export function compareStringFactory(order: string): ((a: string, b: string) => 
             return c;
         return a.localeCompare(b);
     }
-}       
+}
 
+/**
+ * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
+ * settings passed from a `<script>` element in the page with id `ScriptCulture`
+ * containing a JSON object if available. This element is generally created in 
+ * the _LayoutHead.cshtml file for Serenity applications, so that the culture
+ * settings determined server, can be passed to the client.
+ */
 export let Culture: Locale = {
     decimalSeparator: '.',
     groupSeparator: ',',
@@ -100,7 +139,7 @@ export let Culture: Locale = {
     stringCompare: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
 };
 
-(function() {
+(function () {
     let k: string;
     for (k in Invariant)
         if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))
@@ -124,14 +163,29 @@ export let Culture: Locale = {
     }
 })();
 
-// for backwards compatibility
+/**
+ * A string to lowercase function that handles special Turkish
+ * characters like 'ı'. Left in for compatibility reasons.
+ */
+export function turkishLocaleToLower(a: string): string {
+    if (!a)
+        return a;
+    return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toLowerCase();
+}
+
+/**
+ * A string to uppercase function that handles special Turkish
+ * characters like 'ı'. Left in for compatibility reasons.
+ */
 export function turkishLocaleToUpper(a: string): string {
     if (!a)
         return a;
     return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
 }
 
-// for backwards compatibility
+/**
+ * This is an alias for Culture.stringCompare, left in for compatibility reasons.
+ */
 export let turkishLocaleCompare = Culture.stringCompare;
 
 function insertGroupSeperator(num: string, dec: string, grp: string, neg: string) {
@@ -171,12 +225,12 @@ function insertGroupSeperator(num: string, dec: string, grp: string, neg: string
         var part = num.substr(startIndex, length);
         if (s.length)
             s = part + grp + s;
-        else 
+        else
             s = part;
         index -= length;
     }
 
-    if (negative) 
+    if (negative)
         s = '-' + s;
     return decPart ? s + decPart : s;
 }
@@ -204,10 +258,18 @@ function _formatString(format: string, l: Locale, values: IArguments, from: numb
 };
 
 
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using current `Culture` locale settings.
+ */
 export function format(format: string, ...prm: any[]): string {
     return _formatString(format, Culture, arguments, 1);
 }
 
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using the locale passed as the first argument.
+ */
 export function localeFormat(l: Locale, format: string, ...prm: any[]): string {
     return _formatString(format, l, arguments, 2);
 }
@@ -222,6 +284,13 @@ function _formatObject(obj: any, format: string, fmt?: Locale): string {
     return String(obj);
 };
 
+/** 
+ * Rounds a number to specified digits or an integer number if digits are not specified.
+ * @param n the number to round 
+ * @param d the number of digits to round to. default is zero.
+ * @param rounding whether to use banker's rounding
+ * @returns the rounded number 
+ */
 export let round = (n: number, d?: number, rounding?: boolean) => {
     var m = Math.pow(10, d || 0);
     n *= m;
@@ -234,24 +303,37 @@ export let round = (n: number, d?: number, rounding?: boolean) => {
     return Math.round(n) / m;
 };
 
+/**
+ * Truncates a number to an integer number.
+ */
 export let trunc = (n: number): number => n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null;
 
+/**
+ * Formats a number using the current `Culture` locale (or the passed locale) settings.
+ * It supports format specifiers similar to .NET numeric formatting strings.
+ * @param num the number to format
+ * @param format the format specifier. default is 'g'.
+ */
 export function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string {
-    
+
     if (num == null)
         return "";
-    
+
     var fmt: NumberFormat = typeof decOrLoc !== "string" ? (decOrLoc ?? Culture) : {
         decimalSeparator: decOrLoc,
         groupSeparator: grp ?? (decOrLoc == "," ? "." : ",")
     }
-    
+
     if (isNaN(num)) {
         return fmt.nanSymbol ?? Culture.nanSymbol;
     }
-    
-    if (format == null || (format.length == 0) || (format == 'i')) {
+
+    if (format === 'i') {
         return num.toString();
+    }
+
+    if (format == null || format == '') {
+        format = 'g';
     }
 
     var dec = fmt.decimalSeparator ?? Culture.decimalSeparator;
@@ -262,12 +344,21 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
     var precision = -1;
 
     if (format.length > 1) {
-        precision = parseInt(format.substr(1), 10);
+        precision = parseInt(format.substring(1), 10);
     }
-    
+
     var fs = format.charAt(0);
     switch (fs) {
-        case 'd': 
+        case 'g':
+        case 'G':
+            if (precision != -1)
+                s = num.toFixed(precision);
+            else
+                s = num.toString();
+            if (dec != '.')
+                s = s.replace('.', dec);
+            break;
+        case 'd':
         case 'D':
             s = parseInt(Math.abs(num) as any).toString();
             if (precision != -1)
@@ -282,7 +373,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             if (precision != -1)
                 s = padLeft(s, precision, '0');
             break;
-        case 'e': 
+        case 'e':
         case 'E':
             if (precision == -1)
                 s = num.toExponential(6);
@@ -291,7 +382,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             if (fs == 'E')
                 s = s.toUpperCase();
             break;
-        case 'f': 
+        case 'f':
         case 'F':
         case 'n':
         case 'N':
@@ -327,7 +418,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             }
             s = insertGroupSeperator(s, dec, grp, neg) + symbol;
             break;
-            
+
         default:
             var prefix = '';
             var mid = '';
@@ -387,7 +478,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             }
             else
                 num = Math.round(num);
-    
+
             let ones = Math.floor(num);
             if (num < 0)
                 ones = Math.ceil(num);
@@ -396,7 +487,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
                 of = format;
             else
                 of = format.substring(0, format.indexOf("."));
-    
+
             let op = "";
             if (!(ones == 0 && of.substr(of.length - 1) == '#')) {
                 // find how many digits are in the group
@@ -413,7 +504,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
                         gc = 0;
                     }
                 }
-    
+
                 // account for any pre-data padding
                 if (of.length > op.length) {
                     let padStart = of.indexOf('0');
@@ -432,18 +523,18 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
                     }
                 }
             }
-    
+
             if (!op && of.indexOf('0', of.length - 1) !== -1)
                 op = '0';
-    
+
             r = op + r;
             if (num < 0)
                 r = neg + r;
-    
+
             if (r.lastIndexOf(dec) == r.length - 1) {
                 r = r.substring(0, r.length - 1);
             }
-    
+
             return prefix + r + suffix;
     }
 
@@ -538,13 +629,13 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
     else
         date = d;
 
-    if (format == 'i') 
+    if (format == 'i')
         return date.toString();
     if (format == 'id')
         return date.toDateString();
     if (format == 'it')
         return date.toTimeString();
-    
+
     if (locale == null)
         locale = Culture;
 
@@ -585,7 +676,7 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
         var fs = match[0];
         var part: any = fs;
         switch (fs) {
-            case '/': 
+            case '/':
                 part = locale.dateSeparator ?? Culture.dateSeparator;
                 break;
             case 'dddd':
@@ -667,7 +758,7 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
                 part = date.getTimezoneOffset() / 60;
                 part = ((part >= 0) ? '-' : '+') + Math.floor(Math.abs(part));
                 break;
-            case 'zz': 
+            case 'zz':
             case 'zzz':
                 part = date.getTimezoneOffset() / 60;
                 part = ((part >= 0) ? '-' : '+') +
@@ -731,7 +822,7 @@ export function parseISODateTime(s: string): Date {
         return null;
 
     if (typeof s !== "string")
-         s = s + "";
+        s = s + "";
 
     if (!s.length)
         return null;
