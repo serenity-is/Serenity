@@ -603,48 +603,144 @@ interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
 }
 
 declare namespace ErrorHandling {
+    /**
+     * Shows a service error as an alert dialog. If the error
+     * is null, has no message or code, it shows "??ERROR??".
+     */
     function showServiceError(error: ServiceError): void;
+    /**
+     * Runtime error handler that shows a runtime error as a notification
+     * by default only in development mode (@see isDevelopmentMode)
+     * This function is assigned as window.onerror handler in
+     * ScriptInit.ts for Serenity applications so that developers
+     * can notice an error without having to check the browser console.
+     */
     function runtimeErrorHandler(message: string, filename?: string, lineno?: number, colno?: number, error?: Error): void;
+    /**
+     * Determines if the current environment is development mode.
+     * The runtimeErrorHandler (window.onerror) shows error notifications only
+     * when this function returns true. The default implementation considers
+     * the environment as development mode if the host is localhost, 127.0.0.1, ::1,
+     * or a domain name that ends with .local/.localhost.
+     * @returns true if the current environment is development mode, false otherwise.
+     */
+    function isDevelopmentMode(): boolean;
 }
 
+/**
+ * Interface for number formatting, similar to .NET's NumberFormatInfo
+ */
 interface NumberFormat {
+    /** Decimal separator */
     decimalSeparator: string;
+    /** Group separator */
     groupSeparator?: string;
+    /** Number of digits after decimal separator */
     decimalDigits?: number;
+    /** Positive sign */
     positiveSign?: string;
+    /** Negative sign */
     negativeSign?: string;
+    /** Zero symbol */
     nanSymbol?: string;
+    /** Percentage symbol */
     percentSymbol?: string;
+    /** Currency symbol */
     currencySymbol?: string;
 }
+/** Interface for date formatting, similar to .NET's DateFormatInfo */
 interface DateFormat {
+    /** Date separator */
     dateSeparator?: string;
+    /** Default date format string */
     dateFormat?: string;
+    /** Date order, like dmy, or ymd */
     dateOrder?: string;
+    /** Default date time format string */
     dateTimeFormat?: string;
+    /** AM designator */
     amDesignator?: string;
+    /** PM designator */
     pmDesignator?: string;
+    /** Time separator */
     timeSeparator?: string;
+    /** First day of week, 0 = Sunday, 1 = Monday */
     firstDayOfWeek?: number;
+    /** Array of day names */
     dayNames?: string[];
+    /** Array of short day names */
     shortDayNames?: string[];
+    /** Array of two letter day names */
     minimizedDayNames?: string[];
+    /** Array of month names */
     monthNames?: string[];
+    /** Array of short month names */
     shortMonthNames?: string[];
 }
+/** Interface for a locale, similar to .NET's CultureInfo */
 interface Locale extends NumberFormat, DateFormat {
+    /** Locale string comparison function, similar to .NET's StringComparer */
     stringCompare?: (a: string, b: string) => number;
+    /** Locale string to upper case function */
     toUpper?: (a: string) => string;
 }
+/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
 declare let Invariant: Locale;
+/**
+ * Factory for a function that compares two strings, based on a character order
+ * passed in the `order` argument.
+ */
 declare function compareStringFactory(order: string): ((a: string, b: string) => number);
+/**
+ * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
+ * settings passed from a `<script>` element in the page with id `ScriptCulture`
+ * containing a JSON object if available. This element is generally created in
+ * the _LayoutHead.cshtml file for Serenity applications, so that the culture
+ * settings determined server, can be passed to the client.
+ */
 declare let Culture: Locale;
+/**
+ * A string to lowercase function that handles special Turkish
+ * characters like 'ı'. Left in for compatibility reasons.
+ */
+declare function turkishLocaleToLower(a: string): string;
+/**
+ * A string to uppercase function that handles special Turkish
+ * characters like 'ı'. Left in for compatibility reasons.
+ */
 declare function turkishLocaleToUpper(a: string): string;
+/**
+ * This is an alias for Culture.stringCompare, left in for compatibility reasons.
+ */
 declare let turkishLocaleCompare: (a: string, b: string) => number;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using current `Culture` locale settings.
+ */
 declare function format(format: string, ...prm: any[]): string;
-declare function localeFormat(format: string, l: Locale, ...prm: any[]): string;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using the locale passed as the first argument.
+ */
+declare function localeFormat(l: Locale, format: string, ...prm: any[]): string;
+/**
+ * Rounds a number to specified digits or an integer number if digits are not specified.
+ * @param n the number to round
+ * @param d the number of digits to round to. default is zero.
+ * @param rounding whether to use banker's rounding
+ * @returns the rounded number
+ */
 declare let round: (n: number, d?: number, rounding?: boolean) => number;
+/**
+ * Truncates a number to an integer number.
+ */
 declare let trunc: (n: number) => number;
+/**
+ * Formats a number using the current `Culture` locale (or the passed locale) settings.
+ * It supports format specifiers similar to .NET numeric formatting strings.
+ * @param num the number to format
+ * @param format the format specifier. default is 'g'.
+ */
 declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
 declare function parseInteger(s: string): number;
 declare function parseDecimal(s: string): number;
@@ -1283,4 +1379,4 @@ declare namespace Criteria {
     var parse: typeof parseCriteria;
 }
 
-export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, DateFormat, DebouncedFunction, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, GroupByElement, GroupByResult, Grouping, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NotifyMap, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, DateFormat, DebouncedFunction, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, GroupByElement, GroupByResult, Grouping, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NotifyMap, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setMobileDeviceMode, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
