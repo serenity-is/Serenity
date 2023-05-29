@@ -43,7 +43,7 @@ Features:
   - Improved `globalExternals` optimization in `tsbuild` so that it generates less number of chunks on build.
   - Increased test coverage for `@serenity-is/corelib/q` methods and refactored test files (`.spec.ts`) to be next to the files (`.ts`) they have tests for.
   - Added async versions of Authorization script methods like `Q.Authorization.userDefinitionAsync` which should be preffered over sync counterparts where possible.
-  - IExceptionLogger interface is obsolete! Please log exceptions directly via .NET's ILogger interface and its LogError method. StartSharp users should replace `app.UseExceptional()` line with `app.UseExceptionalLogger()` in Startup.cs, which also enables implicit logging to `StackExchange.Exceptional` via `InformationalException` type.
+  - IExceptionLogger interface is obsolete! Please log exceptions directly via .NET's ILogger interface and its LogError method. StartSharp users should replace `app.UseExceptional()` line with `app.UseExceptionLogger()` in Startup.cs, which also enables implicit logging to `StackExchange.Exceptional` via `InformationalException` type.
   - Added InformationalException type that will be used to log via ILogger interface to Exceptional
   - Updated `@serenity-is/sleekgrid` to 1.6.0.
   - [Breaking Change] parseDate and parseISODateTime functions returns an Invalid Date instance (e.g. its `.valueOf()` method returns `NaN`) instead of "false" or "null" as they used to be, which was a wrong decision at time. It was causing invalid dates to be considered equal to empty dates sometimes. Javascript `Date` constructor also returns a Date instance with `NaN` value for invalid dates.
