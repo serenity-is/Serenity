@@ -1,4 +1,4 @@
-root=true
+root = true
 
 [*]
 indent_style = space
@@ -7,7 +7,7 @@ end_of_line = lf
 charset = utf-8
 
 [*.{css,csproj,esproj,json,props,targets}]
-indent_size=2
+indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
