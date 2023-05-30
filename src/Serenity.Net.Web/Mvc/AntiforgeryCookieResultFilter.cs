@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -29,7 +29,7 @@ public class AntiforgeryCookieResultFilterAttribute : ResultFilterAttribute
         {
             var tokens = antiforgery.GetAndStoreTokens(context.HttpContext);
             context.HttpContext.Response.Cookies.Append("CSRF-TOKEN", tokens.RequestToken, 
-                new CookieOptions() { HttpOnly = false });
+                new CookieOptions() { HttpOnly = false, SameSite = SameSiteMode.Lax });
         }
     }
 }
