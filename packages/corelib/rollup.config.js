@@ -321,8 +321,10 @@ export default [
                         !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
                         fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
                         !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');
-                        fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
-                        fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
+                        fs.writeFileSync('./dist/slick/index.d.ts', fs.readFileSync('./out/slick/index.bundle.d.ts').toString()
+                            .replace(/from\s*['"]@serenity-is\/corelib\/q['"]/g, 'from "../q"'));
+                        fs.writeFileSync('./dist/index.d.ts', fs.readFileSync('./out/index.bundle.d.ts').toString()
+                            .replace(/from\s*['"]@serenity-is\/corelib\/(q|slick)['"]/g, 'from "./$1"'));
 
                         const wwwroot = '../../src/Serenity.Scripts/wwwroot';
                         fs.copyFileSync('./out/Serenity.CoreLib.min.js', `${wwwroot}/Serenity.CoreLib.min.js`);
