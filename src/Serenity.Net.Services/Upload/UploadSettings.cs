@@ -36,8 +36,8 @@ public class UploadSettings : IOptions<UploadSettings>
     /// it won't be allowed if it is also in the ExtensionBlacklist
     /// </summary>
     public string ExtensionWhitelist { get; set; } = ".3gp;.7z;.ai;.avi;.bmp;.csv;.doc;.docx;.eps;.jpg;.jpeg;.json;" +
-        ".gif;.gz;.ico;.mpg;.mpeg;.mp3;.mp4;.mkv;.pdf;.png;.ppt;.pptx;.psd;" +
-        ".rar;.rtf;.svg;.tif;.tiff;.txt;.wav;.webm;.webp;.xls;.xlsx;.xml;" +
+        ".gif;.gz;.ico;.mpg;.mpeg;.mp3;.mp4;.mkv;.mpp;.pdf;.png;.ppt;.pptx;.psd;" +
+        ".rar;.rtf;.svg;.tif;.tiff;.txt;.vsd;.vsdx;.wav;.webm;.webp;.xls;.xlsx;.xml;" +
         ".xps;.zip;";
 
     /// <summary>
