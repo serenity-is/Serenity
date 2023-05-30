@@ -4,7 +4,6 @@
     "experimentalDecorators": true,
     "declaration": true,
     "declarationDir": "./out",
-    "emitBOM": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "inlineSources": true,

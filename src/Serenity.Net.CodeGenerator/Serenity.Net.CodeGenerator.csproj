@@ -16,8 +16,6 @@
     <Content Include="Resource\tsconfig.json">
       <Pack>false</Pack>
     </Content>
-    <EmbeddedResource Include="Resource\Serenity.CodeGeneration.js" />
-    <EmbeddedResource Include="Resource\typescriptServices.js" />
     <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
