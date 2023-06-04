@@ -192,13 +192,13 @@ function insertGroupSeperator(num: string, dec: string, grp: string, neg: string
     var decPart = null;
     var decIndex = num.indexOf(dec);
     if (decIndex > 0) {
-        decPart = num.substr(decIndex);
+        decPart = num.substring(decIndex);
         num = num.substr(0, decIndex);
     }
 
     var negative = startsWith(num, neg);
     if (negative) {
-        num = num.substr(1);
+        num = num.substring(1);
     }
 
     var groupSize = 3;
@@ -222,7 +222,7 @@ function insertGroupSeperator(num: string, dec: string, grp: string, neg: string
         if (!length)
             break;
 
-        var part = num.substr(startIndex, length);
+        var part = num.substring(startIndex, startIndex + length);
         if (s.length)
             s = part + grp + s;
         else
