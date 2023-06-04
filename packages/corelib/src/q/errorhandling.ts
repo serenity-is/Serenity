@@ -10,7 +10,7 @@ export namespace ErrorHandling {
      * is null, has no message or code, it shows "??ERROR??".
      */
     export function showServiceError(error: ServiceError) {
-        alertDialog(error?.Message ?? error.Code ?? "??ERROR??");
+        alertDialog(error?.Message ?? error?.Code ?? "??ERROR??");
     }
 
     /**
@@ -23,15 +23,15 @@ export namespace ErrorHandling {
     export function runtimeErrorHandler(message: string, filename?: string,
         lineno?: number, colno?: number, error?: Error) {
         try {
-            if (!isDevelopmentMode())
+            if (!ErrorHandling.isDevelopmentMode())
                 return;
-            var errorInfo = JSON.stringify(error || {});
+            var errorInfo = error?.stack ?? error?.toString();
 
             message =
                 '<p></p><p>Message: ' + htmlEncode(message) +
                 '</p><p>File: ' + htmlEncode(filename) +
                 ', Line: ' + lineno + ', Column: ' + colno +
-                (errorInfo != "{}" ? '</p><p>Error: ' : "") + '</p>';
+                (errorInfo ? ('</p><p>' + htmlEncode(errorInfo)) : "") + '</p>';
 
             window.setTimeout(function () {
                 try {
@@ -57,11 +57,11 @@ export namespace ErrorHandling {
      * @returns true if the current environment is development mode, false otherwise. 
      */
     export function isDevelopmentMode() {
-        var host = (window.location.host ?? "").toLowerCase();
-        return (host === "localhost" ||
-            host === "127.0.0.1" ||
-            host === "::1" ||
-            host.endsWith(".local") ||
-            host.endsWith(".localhost"));
+        var hostname = (window.location.hostname ?? "").toLowerCase();
+        return (hostname === "localhost" ||
+            hostname === "127.0.0.1" ||
+            hostname === "[::1]" ||
+            hostname.endsWith(".local") ||
+            hostname.endsWith(".localhost"));
     }
 }
