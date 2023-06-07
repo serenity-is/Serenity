@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,10 +31,8 @@ public class DefaultReportFactory : IReportFactory
     /// <inheritdoc />
     public IReport Create(string reportKey, string reportOptions, bool validatePermission)
     {
-        var reportInfo = reportRegistry.GetReport(reportKey, validatePermission: validatePermission);
-        if (reportInfo == null)
-            throw new ArgumentOutOfRangeException(nameof(reportKey));
-
+        var reportInfo = reportRegistry.GetReport(reportKey, validatePermission: validatePermission) 
+            ?? throw new ArgumentOutOfRangeException(nameof(reportKey));
         var requestServices = httpContextAccessor?.HttpContext?.RequestServices ??
             serviceProvider;
 

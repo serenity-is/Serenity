@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Default report registry implementation
@@ -80,23 +80,24 @@ public class ReportRegistry : IReportRegistry
         foreach (var type in types)
         {
             var attr = type.GetCustomAttribute<ReportAttribute>(false);
-            if (attr != null)
+            // reports without a ReportAttribute should not be executed for security reasons
+            if (attr == null)
+                continue;
+
+            var report = new Report(type, localizer);
+            var key = report.Key.TrimToNull() ?? type.FullName;
+
+            reportByKeyNew[key] = report;
+
+            var category = report.Category.Key;
+
+            if (!reportsByCategoryNew.TryGetValue(category, out List<Report> reports))
             {
-                var report = new Report(type, localizer);
-                var key = report.Key.TrimToNull() ?? type.FullName;
-
-                reportByKeyNew[key] = report;
-
-                var category = report.Category.Key;
-
-                if (!reportsByCategoryNew.TryGetValue(category, out List<Report> reports))
-                {
-                    reports = new List<Report>();
-                    reportsByCategoryNew[category] = reports;
-                }
-
-                reports.Add(report);
+                reports = new List<Report>();
+                reportsByCategoryNew[category] = reports;
             }
+
+            reports.Add(report);
         }
 
         reportsByCategory = reportsByCategoryNew;
