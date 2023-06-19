@@ -54,8 +54,8 @@ declare global {
 }
 
 export interface SettingStorage {
-    getItem(key: string): string;
-    setItem(key: string, value: string): void;
+    getItem(key: string): string | Promise<string>;
+    setItem(key: string, value: string): void | Promise<void>;
 }
 
 export interface PersistedGridColumn {
@@ -171,9 +171,12 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         this.updateInterface();
 
         this.initialSettings = this.getCurrentSettings(null);
-        this.restoreSettings(null, null);
-
-        window.setTimeout(() => this.initialPopulate(), 0);   
+        
+        var restoreResult = this.restoreSettings(null, null);
+        if ((restoreResult as any)?.then)
+            (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
+        else
+            window.setTimeout(() => this.initialPopulate(), 0);
     }
 
     protected initSync() {
@@ -1231,27 +1234,39 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return Authorization.hasPermission(item.readPermission);
     }
 
-    protected getPersistedSettings(): PersistedGridSettings {
+    protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings> {
         var storage = this.getPersistanceStorage();
         if (storage == null)
             return null;
 
-        var json = trimToNull(storage.getItem(this.getPersistanceKey()));
-        if (json != null && startsWith(json, '{') && endsWith(json, '}'))
-            return JSON.parse(json);
+        function fromJson(json: string) {
+            json = trimToNull(json as string);
+            if (json != null && startsWith(json, '{') && endsWith(json, '}'))
+                return JSON.parse(json);
+            return null;
+        }
 
-        return null;
+        var jsonOrPromise = storage.getItem(this.getPersistanceKey());
+        if ((jsonOrPromise as any)?.then)
+            return (jsonOrPromise as Promise<string>).then(json => fromJson(json));
+
+        return fromJson(jsonOrPromise as string);
     }
 
-    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void {
-        if (!this.slickGrid)
-            return;
+    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void | Promise<void> {
+        if (settings != null)
+            return this.restoreSettingsFrom(settings, flags);
 
-        if (settings == null) {
-            settings = this.getPersistedSettings();
-            if (settings == null)
-                return;
-        }
+        var settingsOrPromise = this.getPersistedSettings();
+        if ((settingsOrPromise as any)?.then)
+            return (settingsOrPromise as Promise<PersistedGridSettings>).then((s) => this.restoreSettingsFrom(s));
+
+        this.restoreSettingsFrom(settingsOrPromise as PersistedGridSettings);
+    }
+
+    protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistanceFlags): void {
+        if (!this.slickGrid || !settings)
+            return;
 
         var columns = this.slickGrid.getColumns();
         var colById: { [key: string]: Column } = null;
@@ -1401,14 +1416,14 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
     }
 
-    protected persistSettings(flags?: GridPersistanceFlags): void {
+    protected persistSettings(flags?: GridPersistanceFlags): void | Promise<void> {
         var storage = this.getPersistanceStorage();
         if (!storage) {
             return;
         }
 
         var settings = this.getCurrentSettings(flags);
-        storage.setItem(this.getPersistanceKey(), JSON.stringify(settings));
+        return storage.setItem(this.getPersistanceKey(), JSON.stringify(settings));
     }
 
     protected getCurrentSettings(flags?: GridPersistanceFlags) {

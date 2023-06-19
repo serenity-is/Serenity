@@ -56,8 +56,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
                 (grid as any).allColumns = picker.allColumns;
                 var visible = picker.allColumns.filter(x => x.visible === true);
                 grid.getGrid().setColumns(visible);
-                (grid as any).persistSettings();
-                grid.getView().populate();
+                Promise.resolve((grid as any).persistSettings()).then(() => grid.getView().populate());
             };
 
             Router && Router.dialog && Router.dialog((grid as any).element, picker.element, () => "columns");

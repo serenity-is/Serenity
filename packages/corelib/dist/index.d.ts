@@ -1875,8 +1875,8 @@ declare global {
     }
 }
 interface SettingStorage {
-    getItem(key: string): string;
-    setItem(key: string, value: string): void;
+    getItem(key: string): string | Promise<string>;
+    setItem(key: string, value: string): void | Promise<void>;
 }
 interface PersistedGridColumn {
     id: string;
@@ -2049,9 +2049,10 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected getPersistanceKey(): string;
     protected gridPersistanceFlags(): GridPersistanceFlags;
     protected canShowColumn(column: Column): boolean;
-    protected getPersistedSettings(): PersistedGridSettings;
-    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
-    protected persistSettings(flags?: GridPersistanceFlags): void;
+    protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings>;
+    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void | Promise<void>;
+    protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistanceFlags): void;
+    protected persistSettings(flags?: GridPersistanceFlags): void | Promise<void>;
     protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
     getElement(): JQuery;
     getGrid(): Grid;
