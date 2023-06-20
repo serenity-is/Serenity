@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 
 namespace Serenity.Data;
 
@@ -22,7 +22,7 @@ public static partial class SqlMapper
     public static int Execute(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Execute(cnn, SqlHelper.FixCommandText(sql, cnn.GetDialect()), param, transaction, commandTimeout, commandType);
+        return Dapper.SqlMapper.Execute(cnn, SqlConversions.Translate(sql, cnn), param, transaction, commandTimeout, commandType);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public static partial class SqlMapper
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql, cnn.GetDialect()), param, transaction, buffered, commandTimeout, commandType);
+        return Dapper.SqlMapper.Query(cnn, SqlConversions.Translate(sql, cnn), param, transaction, buffered, commandTimeout, commandType);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public static partial class SqlMapper
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
+        return Dapper.SqlMapper.Query(cnn, SqlConversions.Translate(sql, cnn), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public static partial class SqlMapper
     public static IEnumerable<TValue> Query<TValue>(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query<TValue>(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
+        return Dapper.SqlMapper.Query<TValue>(cnn, SqlConversions.Translate(sql, cnn), sql.Params == null ? null : new DynamicParameters(sql.Params), transaction, buffered, commandTimeout, commandType);
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public static partial class SqlMapper
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param, IDbTransaction transaction)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), param, transaction);
+        return Dapper.SqlMapper.Query(cnn, SqlConversions.Translate(sql, cnn), param, transaction);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public static partial class SqlMapper
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param, CommandType? commandType)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), param, null, true, null, commandType);
+        return Dapper.SqlMapper.Query(cnn, SqlConversions.Translate(sql, cnn), param, null, true, null, commandType);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public static partial class SqlMapper
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param, IDbTransaction transaction, CommandType? commandType)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), param, transaction, true, null, commandType);
+        return Dapper.SqlMapper.Query(cnn, SqlConversions.Translate(sql, cnn), param, transaction, true, null, commandType);
     }
 
     /// <summary>
@@ -141,6 +141,6 @@ public static partial class SqlMapper
     public static IEnumerable<T> Query<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
-        return Dapper.SqlMapper.Query<T>(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), param, transaction, buffered, commandTimeout, commandType);
+        return Dapper.SqlMapper.Query<T>(cnn, SqlConversions.Translate(sql, cnn), param, transaction, buffered, commandTimeout, commandType);
     }
 }

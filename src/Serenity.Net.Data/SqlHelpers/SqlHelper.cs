@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.IO;
@@ -51,19 +51,10 @@ public static class SqlHelper
     /// <param name="commandText">The command text.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>Fixed query.</returns>
+    [Obsolete("Use SqlConversions.Translate")]
     public static string FixCommandText(string commandText, ISqlDialect dialect)
     {
-        commandText = DatabaseCaretReferences.Replace(commandText);
-
-        var openBracket = dialect.OpenQuote;
-        if (openBracket != '[')
-            commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
-
-        var paramPrefix = dialect.ParameterPrefix;
-        if (paramPrefix != '@')
-            commandText = ParamPrefixReplacer.Replace(commandText, paramPrefix);
-
-        return commandText;
+        return SqlConversions.Translate(commandText, dialect);
     }
 
     /// <summary>
@@ -213,7 +204,7 @@ public static class SqlHelper
 
         IDbCommand command = connection.CreateCommand();
 
-        commandText = FixCommandText(commandText, connection.GetDialect());
+        commandText = SqlConversions.Translate(commandText, connection);
         command.CommandText = commandText;
         return command;
     }

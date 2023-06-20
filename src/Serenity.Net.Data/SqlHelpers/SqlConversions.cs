@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Value to SQL constant expression conversions
@@ -175,5 +175,56 @@ public static class SqlConversions
             return Null;
 
         return value.Value.ToString(Invariants.NumberFormat);
+    }
+
+    /// <summary>
+    /// Translates the command text to target connection dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// </summary>
+    /// <param name="commandText">The command text.</param>
+    /// <param name="connection">The connection.</param>
+    /// <returns>Translated query.</returns>
+    public static string Translate(string commandText, IDbConnection connection)
+    {
+        return Translate(commandText, connection.GetDialect());
+    }
+
+    /// <summary>
+    /// Translates the command text to target dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// </summary>
+    /// <param name="commandText">The command text.</param>
+    /// <param name="dialect">The dialect.</param>
+    /// <returns>Translated query.</returns>
+    public static string Translate(string commandText, ISqlDialect dialect)
+    {
+        if (dialect is null)
+            throw new ArgumentNullException(nameof(dialect));
+
+        commandText = DatabaseCaretReferences.Replace(commandText);
+
+        var openBracket = dialect.OpenQuote;
+        if (openBracket != '[')
+            commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
+
+        var paramPrefix = dialect.ParameterPrefix;
+        if (paramPrefix != '@')
+            commandText = ParamPrefixReplacer.Replace(commandText, paramPrefix);
+
+        return commandText;
+    }
+
+
+    /// <summary>
+    /// Translates the command text to target connection dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// If the query already has a dialect set, it uses that instead of the connection one.
+    /// </summary>
+    /// <param name="query">The sql query.</param>
+    /// <param name="connection">The connection to get dialect from.</param>
+    /// <returns>Translated query.</returns>
+    public static string Translate(IQueryWithParams query, IDbConnection connection)
+    {
+        if (query == null)
+            throw new ArgumentNullException(nameof(query));
+
+        return Translate(query.ToString(), connection.GetDialect());
     }
 }
