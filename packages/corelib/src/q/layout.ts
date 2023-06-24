@@ -79,25 +79,11 @@ export function layoutFillHeight(element: JQuery) {
     }
 }
 
-export function setMobileDeviceMode() {
-    let isMobile = typeof window !== 'undefined' &&
-        (window.matchMedia?.('(max-width: 767px)')?.matches ||
+export function isMobileView() {
+    return typeof window !== 'undefined' &&
+        (window.matchMedia?.('(max-width: 767px)')?.matches ??
          window.innerWidth < 768);
-
-    if (typeof document === "undefined" || !document.documentElement)
-        return;
-
-    if (document.documentElement.classList.contains('mobile-device')) {
-        if (!isMobile) {
-            document.documentElement.classList.remove('mobile-device');
-        }
-    }
-    else if (isMobile) {
-        document.documentElement.classList.add('mobile-device');
-    }
 }
-
-setMobileDeviceMode();
 
 function initOnLoad() {
     var globalObj = getGlobalThis();
@@ -107,13 +93,6 @@ function initOnLoad() {
             if (obj != null)
                 initializeTypes(obj, ns + ".", 3);
         }
-    }
-
-    if (typeof window !== "undefined") {
-        if (typeof $ !== "undefined")
-            $(window).bind('resize', setMobileDeviceMode);
-        else
-            window.addEventListener('resize', setMobileDeviceMode);
     }
 }
 

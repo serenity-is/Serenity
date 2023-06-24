@@ -1,6 +1,6 @@
 ﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, layoutFillHeight, newBodyDiv, openPanel, parseInteger, positionToastContainer, validateOptions } from "@serenity-is/corelib/q";
+import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, isMobileView, layoutFillHeight, newBodyDiv, openPanel, parseInteger, positionToastContainer, validateOptions } from "@serenity-is/corelib/q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
@@ -282,7 +282,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     }
 
     protected onDialogOpen(): void {
-        if (!$(document.documentElement).hasClass('mobile-device'))
+        if (!isMobileView())
             $(':input', this.element).not('button').eq(0).focus();
         this.arrange();
         this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
@@ -426,7 +426,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected handleResponsive(): void {
         var dlg = (this.element as any)?.dialog();
         var uiDialog = this.element.closest('.ui-dialog');
-        if ($(document.documentElement).hasClass('mobile-device')) {
+        if (isMobileView()) {
             var data = this.element.data('responsiveData');
             if (!data) {
                 data = {};

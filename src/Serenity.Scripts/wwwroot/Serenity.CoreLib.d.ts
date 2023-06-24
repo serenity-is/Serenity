@@ -1215,7 +1215,7 @@ declare namespace Q {
     }): void;
     function layoutFillHeightValue(element: JQuery): number;
     function layoutFillHeight(element: JQuery): void;
-    function setMobileDeviceMode(): void;
+    function isMobileView(): boolean;
     function triggerLayoutOnShow(element: JQuery): void;
     function centerDialog(el: JQuery): void;
 

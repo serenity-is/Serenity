@@ -1,4 +1,6 @@
-﻿export function jQueryPatch($: any) {
+﻿import { isMobileView } from "../q";
+
+export function jQueryPatch($: any) {
     
     function applyJQueryUIFixes(): boolean {
         if (typeof $ == "undefined" || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)
@@ -13,7 +15,7 @@
 
         (function (orig) {
             $.ui.dialog.prototype._focusTabbable = function () {
-                if ($(document.documentElement).hasClass('mobile-device')) {
+                if (isMobileView) {
                     this.uiDialog && this.uiDialog.focus();
                     return;
                 }
