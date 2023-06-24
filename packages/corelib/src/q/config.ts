@@ -12,7 +12,7 @@
     emailAllowOnlyAscii: true,
 
     /**
-     * @Obsolete defaulted to false before for backward compatibility, now its true by default
+     * @Obsolete defaulted to false before for backward compatibility, now it is true by default
      */
     responsiveDialogs: true,
 

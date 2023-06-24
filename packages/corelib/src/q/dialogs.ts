@@ -165,6 +165,10 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
     return div;
 }
 
+/** Converts a `DialogButton` declaration to Bootstrap button element 
+ * @param x Dialog button declaration
+ * @returns Bootstrap button element
+*/
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
@@ -180,6 +184,10 @@ export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     return button;
 }
 
+/** Converts a `DialogButton` declaration to jQuery UI button type
+ * @param x Dialog button declaration
+ * @returns jQuery UI button type
+ */
 export function dialogButtonToUI(x: DialogButton): any {
     var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
@@ -586,7 +594,7 @@ export function warningDialog(message: string, options?: AlertOptions) {
 export const warning = warningDialog;
 
 /** 
- * Closes a panel, triggering panelbeforeclose and panelclose events.
+ * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
  * If the panelbeforeclose prevents the default, the operation is cancelled.
  * @param element The panel element
  * @param e  The event triggering the close
@@ -655,7 +663,15 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
     }
 }
 
-export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
+/** 
+ * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
+ * and panelopening and panelopened events on the window.
+ * If the panelbeforeopen prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
+ * @param e The event triggering the open
+ */
+ export function openPanel(element: JQuery | HTMLElement, uniqueName?: string) {
 
     var el = ($ && element instanceof $) ? (element as JQuery).get(0) : element as HTMLElement
     if (!el)

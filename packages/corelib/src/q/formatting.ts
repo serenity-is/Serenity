@@ -313,6 +313,7 @@ export let trunc = (n: number): number => n != null ? (n > 0 ? Math.floor(n) : M
  * It supports format specifiers similar to .NET numeric formatting strings.
  * @param num the number to format
  * @param format the format specifier. default is 'g'.
+ * See .NET numeric formatting strings documentation for more information.
  */
 export function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string {
 
@@ -541,6 +542,13 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
     return s;
 }
 
+/**
+ * Converts a string to an integer. The difference between parseInt and parseInteger 
+ * is that parseInteger will return null if the string is empty or null, whereas
+ * parseInt will return NaN and parseInteger will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
 export function parseInteger(s: string): number {
     if (s == null)
         return null;
@@ -556,6 +564,13 @@ export function parseInteger(s: string): number {
     return parseInt(s, 10);
 }
 
+/**
+ * Converts a string to a decimal. The difference between parseFloat and parseDecimal
+ * is that parseDecimal will return null if the string is empty or null, whereas
+ * parseFloat will return NaN and parseDecimal will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
 export function parseDecimal(s: string): number {
     if (s == null)
         return null;
@@ -576,6 +591,12 @@ export function parseDecimal(s: string): number {
     return parseFloat(s.toString().replace(Culture.decimalSeparator, '.'));
 }
 
+/** 
+ * Rounds a number to a specified number of decimal places.
+ * @param n the number to round
+ * @param dec the number of decimal places to round to
+ * @returns the rounded number
+ */
 function roundNumber(n: number, dec?: number): number {
     let power = Math.pow(10, dec || 0);
     let value = (Math.round(n * power) / power).toString();
@@ -597,6 +618,13 @@ function roundNumber(n: number, dec?: number): number {
     return parseFloat(value);
 }
 
+/**
+ * Converts a string to an ID. If the string is a number, it is returned as-is.
+ * If the string is empty, null or whitespace, null is returned.
+ * Otherwise, it is converted to a number if possible. If the string is not a
+ * valid number or longer than 14 digits, the trimmed string is returned as-is.
+ * @param id the string to convert to an ID
+ */
 export function toId(id: any): any {
     if (id == null)
         return null;
@@ -613,6 +641,33 @@ export function toId(id: any): any {
 
 var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
 
+/** 
+ * Formats a date using the specified format string and optional culture.
+ * Supports .NET style format strings including custom formats.
+ * See .NET documentation for supported formats.
+ * @param d the date to format. If null, it returns empty string.
+ * @param format the format string to use. If null, it uses the current culture's default format.
+ * 'G' uses the culture's datetime format.
+ * 'g' uses the culture's datetime format with secs removed. 
+ * 'd' uses the culture's date format.
+ * 't' uses the culture's time format.
+ * 'u' uses the sortable ISO format with UTC time.
+ * 'U' uses the culture's date format with UTC time.
+ * @param locale the locale to use
+ * @returns the formatted date
+ * @example
+ * // returns "2019-01-01"
+ * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
+ * @example
+ * // returns "2019-01-01 12:00:00"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
+ * @example
+ * // returns "2019-01-01 12:00:00.000"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
+ * @example
+ * // returns "2019-01-01 12:00:00.000 AM"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+ */
 export function formatDate(d: Date | string, format?: string, locale?: Locale) {
     if (!d)
         return '';
@@ -780,6 +835,10 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
     return sb.join('');
 }
 
+/**
+ * Formats a number containing number of minutes into a string in the format "d.hh:mm".
+ * @param n The number of minutes.
+ */
 export function formatDayHourAndMin(n: number): string {
     if (n == null)
         return "";
@@ -799,6 +858,10 @@ export function formatDayHourAndMin(n: number): string {
     return txt;
 }
 
+/**
+ * Formats a date as the ISO 8601 UTC date/time format.
+ * @param n The number of minutes.
+ */
 export function formatISODateTimeUTC(d: Date): string {
     if (d == null)
         return "";
@@ -817,6 +880,10 @@ export function formatISODateTimeUTC(d: Date): string {
 
 let isoRegexp = /(\d{4,})(?:-(\d{1,2})(?:-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?(?:(Z)|([+-])(\d{1,2})(?::(\d{1,2}))?)?)?)?)?/;
 
+/**
+ * Parses a string in the ISO 8601 UTC date/time format.
+ * @param s The string to parse.
+ */
 export function parseISODateTime(s: string): Date {
     if (s == null)
         return null;
@@ -833,7 +900,12 @@ export function parseISODateTime(s: string): Date {
     return new Date(s + (s.length == 10 ? "T00:00:00" : ""));
 }
 
-export function parseHourAndMin(value: string) {
+/**
+ * Parses a time string in the format "hh:mm" into a number containing number of minutes.
+ * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
+ * @param s The string to parse.
+ */
+export function parseHourAndMin(value: string): number {
     let v = trim(value);
     if (!v.length)
         return null;
@@ -855,6 +927,11 @@ export function parseHourAndMin(value: string) {
     return h * 60 + m;
 }
 
+/**
+ * Parses a string in the format "d.hh:mm" into a number containing number of minutes.
+ * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
+ * Returns NULL if the string is empty or whitespace.
+ */
 export function parseDayHourAndMin(s: string): number {
     let days: number;
     let v = trim(s);
@@ -878,6 +955,12 @@ export function parseDayHourAndMin(s: string): number {
         return NaN;
 }
 
+/**
+ * Parses a string to a date. If the string is empty or whitespace, returns null.
+ * Returns a NaN Date if the string is not a valid date.
+ * @param s The string to parse.
+ * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
+  */
 export function parseDate(s: string, dateOrder?: string): Date {
     if (!s || !s.length)
         return null;
@@ -947,6 +1030,11 @@ export function parseDate(s: string, dateOrder?: string): Date {
     return new Date(NaN);
 }
 
+/**
+ * Splits a date string into an array of strings, each containing a single date part.
+ * It can handle separators "/", ".", "-" and "\".
+ * @param s The string to split.
+ */
 export function splitDateString(s: string): string[] {
     s = trim(s);
     if (!s.length)

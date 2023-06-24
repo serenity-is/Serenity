@@ -719,6 +719,9 @@ export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...v
         values[parseInt(name.substring(2), 10)] : void 0);
 }
 
+/**
+ * Enumeration of Criteria operator keys.
+ */
 export enum CriteriaOperator {
     paren = "()",
     not = "not",
@@ -767,7 +770,7 @@ Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
     return result;
 };
 
-/** Provides access to the `CriteriaOperator` enum */
+/** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
 Criteria.Operator = CriteriaOperator;
 
 /** 
