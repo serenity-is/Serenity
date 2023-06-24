@@ -21,13 +21,25 @@ export function initFullHeightGridPage(gridDiv: JQuery, opt?: { noRoute?: boolea
             gridDiv.css('height', '1px').css('overflow', 'hidden');
         }
 
-        layoutFillHeight(gridDiv);
-
-        if (inPageContent) {
-            gridDiv.css('overflow', '');
+        var vc = gridDiv.children('.view-container:visible').first();
+        if (vc.length) {
+            vc.hide();
+            gridDiv.children('.grid-container').show();
+            try {
+                layoutFillHeight(gridDiv);
+                gridDiv.triggerHandler('layout');
+            }
+            finally {
+                gridDiv.children('.grid-container').hide();
+                vc.show();
+            }
         }
-
-        gridDiv.triggerHandler('layout');
+        else {
+            layoutFillHeight(gridDiv);
+            if (inPageContent)
+                gridDiv.css('overflow', '');
+            gridDiv.triggerHandler('layout');
+        }
     };
 
     if ($('body').hasClass('has-layout-event')) {
