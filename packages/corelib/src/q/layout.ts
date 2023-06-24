@@ -4,11 +4,6 @@ import { Router } from "./router";
 import { getNested, getGlobalThis, initializeTypes } from "./system";
 import $ from "@optionaldeps/jquery";
 
-export function autoFullHeight(element: JQuery) {
-    element.css('height', '100%');
-    triggerLayoutOnShow(element);
-}
-
 export function initFullHeightGridPage(gridDiv: JQuery, opt?: { noRoute?: boolean }) {
     $('body').addClass('full-height-page');
     gridDiv.addClass('responsive-height');
