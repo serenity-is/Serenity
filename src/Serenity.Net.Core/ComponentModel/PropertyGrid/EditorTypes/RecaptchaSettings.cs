@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Serenity.ComponentModel;
+﻿namespace Serenity.Web;
 
 /// <summary>
 /// Settings for Recaptcha integration
+/// Get your keys from https://www.google.com/recaptcha/admin/ 
+/// Generate keys for the V2, not V3
 /// </summary>
-public class RecaptchaSettings : IOptions<RecaptchaSettings>
+[DefaultSectionKey(SectionKey)]
+public class RecaptchaSettings
 {
+    /// <summary>Default section key for Recaptcha settings</summary>
+    public const string SectionKey = "Recaptcha";
+
     /// <summary>
     /// Gets or sets the site key.
     /// </summary>
@@ -22,9 +26,4 @@ public class RecaptchaSettings : IOptions<RecaptchaSettings>
     /// The secret key.
     /// </value>
     public string? SecretKey { get; set; }
-
-    /// <summary>
-    /// Returns this
-    /// </summary>
-    public RecaptchaSettings Value => this;
 }
