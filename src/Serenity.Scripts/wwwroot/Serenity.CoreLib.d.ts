@@ -1309,6 +1309,7 @@ declare namespace Q {
 
     function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
         noRoute?: boolean;
+        setHeight?: boolean;
     }): void;
     function layoutFillHeightValue(element: JQuery): number;
     function layoutFillHeight(element: JQuery): void;

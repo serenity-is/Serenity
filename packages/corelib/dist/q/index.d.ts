@@ -907,6 +907,7 @@ declare function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
 declare function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
     noRoute?: boolean;
+    setHeight?: boolean;
 }): void;
 declare function layoutFillHeightValue(element: JQuery): number;
 declare function layoutFillHeight(element: JQuery): void;

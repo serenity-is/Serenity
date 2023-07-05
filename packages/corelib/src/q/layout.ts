@@ -4,12 +4,16 @@ import { Router } from "./router";
 import { getNested, getGlobalThis, initializeTypes } from "./system";
 import $ from "@optionaldeps/jquery";
    
-export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean }) {
+export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean, setHeight?: boolean }) {
     var el = ($ && gridDiv instanceof $) ? (gridDiv as JQuery).get(0) : gridDiv as HTMLElement
     document.documentElement?.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
+    let setHeight = opt?.setHeight ?? (!el.classList.contains('s-DataGrid') &&
+        !el.classList.contains('s-Panel'));
+
     let layout = function () {
+        setHeight && layoutFillHeight($(el));
         $ ? $(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
     };
 
