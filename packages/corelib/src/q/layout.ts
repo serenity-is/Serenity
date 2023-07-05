@@ -3,44 +3,20 @@ import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { getNested, getGlobalThis, initializeTypes } from "./system";
 import $ from "@optionaldeps/jquery";
-
-export function initFullHeightGridPage(gridDiv: JQuery, opt?: { noRoute?: boolean }) {
-    $('body').addClass('full-height-page');
-    gridDiv.addClass('responsive-height');
+   
+export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean }) {
+    var el = ($ && gridDiv instanceof $) ? (gridDiv as JQuery).get(0) : gridDiv as HTMLElement
+    document.documentElement?.classList.add('full-height-page');
+    el.classList.add('responsive-height');
 
     let layout = function () {
-        let inPageContent = gridDiv.parent().hasClass('page-content') ||
-            gridDiv.parent().is('section.content');
-
-        if (inPageContent) {
-            gridDiv.css('height', '1px').css('overflow', 'hidden');
-        }
-
-        var vc = gridDiv.children('.view-container:visible').first();
-        if (vc.length) {
-            vc.hide();
-            gridDiv.children('.grid-container').show();
-            try {
-                layoutFillHeight(gridDiv);
-                gridDiv.triggerHandler('layout');
-            }
-            finally {
-                gridDiv.children('.grid-container').hide();
-                vc.show();
-            }
-        }
-        else {
-            layoutFillHeight(gridDiv);
-            if (inPageContent)
-                gridDiv.css('overflow', '');
-            gridDiv.triggerHandler('layout');
-        }
+        $ ? $(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
     };
 
     if ($('body').hasClass('has-layout-event')) {
         $('body').bind('layout', layout);
     }
-    else if ((window as any).Metronic) {
+    else if ((window as any).Metronic?.addResizeHandler) {
         (window as any).Metronic.addResizeHandler(layout);
     }
     else {
@@ -49,8 +25,8 @@ export function initFullHeightGridPage(gridDiv: JQuery, opt?: { noRoute?: boolea
 
     layout();
 
-    gridDiv.one('remove', () => {
-        $(window).off('layout', layout);
+    $ && $(el).one('remove', () => {
+        $(window).off('resize', layout);
         $('body').off('layout', layout);
     });
 

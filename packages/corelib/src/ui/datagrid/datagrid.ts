@@ -215,27 +215,14 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
         if (shouldAutoHeight) {
-            if (this.element[0] && this.element[0].style.height != "auto")
-                this.element[0].style.height = "auto";
-
             if (!madeAutoHeight) {
-
-                this.slickContainer.css('height', 'auto')
-                    .children('.slick-pane').each((i, e: HTMLElement) => {
-                        if (e.style.height != null && e.style.height != "auto")
-                            e.style.height = "auto";
-                    });
-
                 this.slickGrid.setOptions({ autoHeight: true });
             }
         }
-        else {
-            if (madeAutoHeight) {
-                this.slickContainer.children('.slick-viewport').css('height', 'auto');
-                this.slickGrid.setOptions({ autoHeight: false });
-            }
-
-            layoutFillHeight(this.slickContainer);
+        else if (madeAutoHeight) {
+            this.slickContainer.css('height', '');
+            this.slickContainer.children('.slick-viewport').css('height', '');
+            this.slickGrid.setOptions({ autoHeight: false });
         }
 
         this.slickGrid.resizeCanvas();

@@ -275,7 +275,7 @@ declare var Config: {
      */
     emailAllowOnlyAscii: boolean;
     /**
-     * @Obsolete defaulted to false before for backward compatibility, now its true by default
+     * @Obsolete defaulted to false before for backward compatibility, now it is true by default
      */
     responsiveDialogs: boolean;
     /**
@@ -392,7 +392,15 @@ declare function isBS5Plus(): boolean;
  * @returns
  */
 declare function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
+/** Converts a `DialogButton` declaration to Bootstrap button element
+ * @param x Dialog button declaration
+ * @returns Bootstrap button element
+*/
 declare function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
+/** Converts a `DialogButton` declaration to jQuery UI button type
+ * @param x Dialog button declaration
+ * @returns jQuery UI button type
+ */
 declare function dialogButtonToUI(x: DialogButton): any;
 /**
  * Additional options for Alert dialogs
@@ -492,12 +500,20 @@ declare function warningDialog(message: string, options?: AlertOptions): void;
 /** @obsolete use warningDialog */
 declare const warning: typeof warningDialog;
 /**
- * Closes a panel, triggering panelbeforeclose and panelclose events.
+ * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
  * If the panelbeforeclose prevents the default, the operation is cancelled.
  * @param element The panel element
  * @param e  The event triggering the close
  */
 declare function closePanel(element: JQuery | HTMLElement, e?: Event): void;
+/**
+ * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
+ * and panelopening and panelopened events on the window.
+ * If the panelbeforeopen prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
+ * @param e The event triggering the open
+ */
 declare function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
 
 interface ServiceError {
@@ -740,18 +756,100 @@ declare let trunc: (n: number) => number;
  * It supports format specifiers similar to .NET numeric formatting strings.
  * @param num the number to format
  * @param format the format specifier. default is 'g'.
+ * See .NET numeric formatting strings documentation for more information.
  */
 declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
+/**
+ * Converts a string to an integer. The difference between parseInt and parseInteger
+ * is that parseInteger will return null if the string is empty or null, whereas
+ * parseInt will return NaN and parseInteger will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
 declare function parseInteger(s: string): number;
+/**
+ * Converts a string to a decimal. The difference between parseFloat and parseDecimal
+ * is that parseDecimal will return null if the string is empty or null, whereas
+ * parseFloat will return NaN and parseDecimal will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
 declare function parseDecimal(s: string): number;
+/**
+ * Converts a string to an ID. If the string is a number, it is returned as-is.
+ * If the string is empty, null or whitespace, null is returned.
+ * Otherwise, it is converted to a number if possible. If the string is not a
+ * valid number or longer than 14 digits, the trimmed string is returned as-is.
+ * @param id the string to convert to an ID
+ */
 declare function toId(id: any): any;
+/**
+ * Formats a date using the specified format string and optional culture.
+ * Supports .NET style format strings including custom formats.
+ * See .NET documentation for supported formats.
+ * @param d the date to format. If null, it returns empty string.
+ * @param format the format string to use. If null, it uses the current culture's default format.
+ * 'G' uses the culture's datetime format.
+ * 'g' uses the culture's datetime format with secs removed.
+ * 'd' uses the culture's date format.
+ * 't' uses the culture's time format.
+ * 'u' uses the sortable ISO format with UTC time.
+ * 'U' uses the culture's date format with UTC time.
+ * @param locale the locale to use
+ * @returns the formatted date
+ * @example
+ * // returns "2019-01-01"
+ * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
+ * @example
+ * // returns "2019-01-01 12:00:00"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
+ * @example
+ * // returns "2019-01-01 12:00:00.000"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
+ * @example
+ * // returns "2019-01-01 12:00:00.000 AM"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+ */
 declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+/**
+ * Formats a number containing number of minutes into a string in the format "d.hh:mm".
+ * @param n The number of minutes.
+ */
 declare function formatDayHourAndMin(n: number): string;
+/**
+ * Formats a date as the ISO 8601 UTC date/time format.
+ * @param n The number of minutes.
+ */
 declare function formatISODateTimeUTC(d: Date): string;
+/**
+ * Parses a string in the ISO 8601 UTC date/time format.
+ * @param s The string to parse.
+ */
 declare function parseISODateTime(s: string): Date;
+/**
+ * Parses a time string in the format "hh:mm" into a number containing number of minutes.
+ * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
+ * @param s The string to parse.
+ */
 declare function parseHourAndMin(value: string): number;
+/**
+ * Parses a string in the format "d.hh:mm" into a number containing number of minutes.
+ * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
+ * Returns NULL if the string is empty or whitespace.
+ */
 declare function parseDayHourAndMin(s: string): number;
+/**
+ * Parses a string to a date. If the string is empty or whitespace, returns null.
+ * Returns a NaN Date if the string is not a valid date.
+ * @param s The string to parse.
+ * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
+  */
 declare function parseDate(s: string, dateOrder?: string): Date;
+/**
+ * Splits a date string into an array of strings, each containing a single date part.
+ * It can handle separators "/", ".", "-" and "\".
+ * @param s The string to split.
+ */
 declare function splitDateString(s: string): string[];
 
 /**
@@ -807,8 +905,7 @@ declare function outerHtml(element: JQuery): string;
  */
 declare function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
-declare function autoFullHeight(element: JQuery): void;
-declare function initFullHeightGridPage(gridDiv: JQuery, opt?: {
+declare function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
     noRoute?: boolean;
 }): void;
 declare function layoutFillHeightValue(element: JQuery): number;
@@ -1343,6 +1440,9 @@ declare function parseCriteria(expression: string, params?: any): any[];
  * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
  */
 declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+/**
+ * Enumeration of Criteria operator keys.
+ */
 declare enum CriteriaOperator {
     paren = "()",
     not = "not",
@@ -1379,4 +1479,4 @@ declare namespace Criteria {
     var parse: typeof parseCriteria;
 }
 
-export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, DateFormat, DebouncedFunction, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, GroupByElement, GroupByResult, Grouping, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NotifyMap, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, autoFullHeight, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AlertOptions, ArgumentNullException, Authorization, ColumnSelection, CommonDialogOptions, Config, ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, DateFormat, DebouncedFunction, DeleteRequest, DeleteResponse, DialogButton, Dictionary, EditorAttribute, Enum, ErrorHandling, Exception, GroupByElement, GroupByResult, Grouping, HandleRouteEventArgs, IFrameDialogOptions, ISlickFormatter, InvalidCastException, Invariant, JQBlockUIOptions, LT, LayoutTimer, ListRequest, ListResponse, Locale, Lookup, LookupOptions, MemberType, NotifyMap, NumberFormat, PostToServiceOptions, PostToUrlOptions, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptData, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, ToastContainerOptions, Toastr, ToastrOptions, Type, TypeMember, UndeleteRequest, UndeleteResponse, UserDefinition, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
