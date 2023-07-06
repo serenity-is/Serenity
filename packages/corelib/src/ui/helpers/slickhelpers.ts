@@ -378,7 +378,7 @@ export namespace GridUtils {
     }
 
     export function addQuickSearchInput(toolDiv: JQuery,
-        view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): void {
+        view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
 
         var oldSubmit = view.onSubmit;
         var input: QuickSearchInput;
@@ -420,6 +420,8 @@ export namespace GridUtils {
                 lastDoneEvent = null;
             }
         });
+
+        return input;
     }
 
     export function addQuickSearchInputCustom(container: JQuery,

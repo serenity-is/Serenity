@@ -359,7 +359,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected createQuickSearchInput(): void {
-        GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields(), () => this.persistSettings(null));
+        var input = GridUtils.addQuickSearchInput(this.toolbar.element, this.view, this.getQuickSearchFields(), () => this.persistSettings(null));
+        input?.element?.attr('id', this.idPrefix + 'QuickSearchInput');
     }
 
     public destroy() {
