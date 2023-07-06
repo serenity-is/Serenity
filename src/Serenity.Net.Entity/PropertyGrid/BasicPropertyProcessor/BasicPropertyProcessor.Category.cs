@@ -10,7 +10,11 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             item.Category = GetLocalizableTextValue<CategoryAttribute>(source, attr.Category,
                 () => "Categories." + attr.Category);
         }
-        else if (Items != null && Items.Count > 0)
+        else if (source.GetAttribute<TabAttribute>() is null && Items?.Count > 0)
+        {
             item.Category = Items[^1].Category;
+        }
+        else
+            item.Category = null;
     }
 }
