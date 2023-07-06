@@ -19,22 +19,30 @@ export class SlickPager extends Widget<PagerOptions> {
             throw "SlickPager requires view option to be set!";
 
         this.element.addClass('s-SlickPager slick-pg')
-            .html(
-                '<div class="slick-pg-in">' + 
-                    '<div class="slick-pg-grp">' +
-                        '<div class="slick-pg-first slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
-                        '<div class="slick-pg-prev slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
-                    '</div><div class="slick-pg-sep"></div><div class="slick-pg-grp">' + 
-                        '<span class="slick-pg-control">&nbsp;' + htmlEncode(localText("Controls.Pager.Page")) +
-                        '&nbsp;<input class="slick-pg-current" type="text" size="4" value="1" /> / ' +
-                        '<span class="slick-pg-total"> 1 </span></span>' + 
-                    '</div><div class="slick-pg-sep"></div><div class="slick-pg-grp">' + 
-                        '<div class="slick-pg-next slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
-                        '<div class="slick-pg-last slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
-                    '</div><div class="slick-pg-sep"></div><div class="slick-pg-grp">' + 
-                        '<div class="slick-pg-reload slick-pg-btn"><span class="slick-pg-btn-span"></span></div>' + 
-                    '</div><div class="slick-pg-sep"></div>' + 
-                    '<div class="slick-pg-grp"><span class="slick-pg-stat"></span></div></div>');
+            .html(`<div class="slick-pg-in">
+    <div class="slick-pg-grp slick-pg-grp-firstprev">
+        <div class="slick-pg-first slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
+        <div class="slick-pg-prev slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
+    </div>
+    <div class="slick-pg-grp slick-pg-grp-control">
+        <span class="slick-pg-control">
+            <span class="slick-pg-pagetext">${htmlEncode(localText("Controls.Pager.Page"))}</span>
+            <input id="${this.idPrefix}CurrentPage" class="slick-pg-current" type="text" size="4" value="1" />
+            <span class="slick-pg-pagesep">/</span>
+            <span class="slick-pg-total">1</span>
+        </span>
+    </div>
+    <div class="slick-pg-grp slick-pg-grp-nextlast">
+        <div class="slick-pg-next slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
+        <div class="slick-pg-last slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
+    </div>
+    <div class="slick-pg-grp slick-pg-grp-reload">
+        <div class="slick-pg-reload slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
+    </div>
+    <div class="slick-pg-grp slick-pg-grp-stat">
+        <span class="slick-pg-stat"></span>
+    </div>
+</div>`);
 
         var self = this;
         $('.slick-pg-reload', this.element).click(function () { v.populate() });
@@ -47,11 +55,11 @@ export class SlickPager extends Widget<PagerOptions> {
         if (self.options.showRowsPerPage) {
             var opt: string = "", sel = "";
             for (var nx = 0; nx < o.rowsPerPageOptions.length; nx++) {
-                if (v.rowsPerPage == o.rowsPerPageOptions[nx]) 
+                if (v.rowsPerPage == o.rowsPerPageOptions[nx])
                     sel = 'selected="selected"'; else sel = '';
                 opt += "<option value='" + o.rowsPerPageOptions[nx] + "' " + sel + " >" + o.rowsPerPageOptions[nx] + "&nbsp;&nbsp;</option>";
             };
-            $('.slick-pg-in', this.element).prepend('<div class="slick-pg-grp"><select class="slick-pg-size" name="rp">' + opt + '</select></div><div class="slick-pg-sep"></div>');
+            $('.slick-pg-in', this.element).prepend('<div class="slick-pg-grp"><select class="slick-pg-size" name="rp">' + opt + '</select></div>');
             $('select.slick-pg-size', this.element).change(
                 function (this: HTMLSelectElement) {
                     if (o.onRowsPerPageChange)
@@ -60,14 +68,14 @@ export class SlickPager extends Widget<PagerOptions> {
                         v["newp"] = 1;
                         v.setPagingOptions({
                             page: 1,
-                            rowsPerPage: +this.value 
+                            rowsPerPage: +this.value
                         });
                     }
                 }
             );
         }
 
-        v.onPagingInfoChanged.subscribe(function() {
+        v.onPagingInfoChanged.subscribe(function () {
             self._updatePager();
         });
     }
@@ -91,11 +99,11 @@ export class SlickPager extends Widget<PagerOptions> {
             case 'last': newp = pages; break;
             case 'input':
                 var nv = parseInt($('input.slick-pg-current', this.element).val());
-                if (isNaN(nv)) 
+                if (isNaN(nv))
                     nv = 1;
-                else if (nv < 1) 
+                else if (nv < 1)
                     nv = 1;
-                else if (nv > pages) 
+                else if (nv > pages)
                     nv = pages;
 
                 $('.slick-pg-current', this.element).val(nv);
@@ -114,7 +122,7 @@ export class SlickPager extends Widget<PagerOptions> {
         }
     }
 
-    _updatePager() { 
+    _updatePager() {
 
         var view = this.options.view;
         var info = view.getPagingInfo();
@@ -126,7 +134,7 @@ export class SlickPager extends Widget<PagerOptions> {
         var r1 = (info.page - 1) * info.rowsPerPage + 1;
         var r2 = r1 + info.rowsPerPage - 1;
 
-        if (info.totalCount < r2) 
+        if (info.totalCount < r2)
             r2 = info.totalCount;
 
         var stat: string;
