@@ -1,4 +1,4 @@
-﻿#if !ISSOURCEGENERATOR
+#if !ISSOURCEGENERATOR
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 #endif
@@ -100,7 +100,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             rowType.FullNameOf() != "Serenity.Data.Row`1");
     }
 
-    private static IEnumerable<PropertyDefinition> EnumerateProperties(TypeDefinition rowType)
+    public static IEnumerable<PropertyDefinition> EnumerateProperties(TypeDefinition rowType)
     {
         do
         {
