@@ -1,7 +1,49 @@
-﻿import { isMobileView } from "./layout";
+﻿beforeEach(() => {
+    jest.resetModules();
+    jest.unmock('@optionaldeps/jquery');
+});
+
+function mockUndefinedJQuery() {
+    jest.mock('@optionaldeps/jquery', () => {
+        return {
+            __esModule: true,
+            default: undefined
+        }
+    });
+}
+
+describe('initFullHeightGridPage', () => {
+    it('works without jQuery', async () => {
+        mockUndefinedJQuery();
+        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        var div = document.createElement('div');
+        initFullHeightGridPage(div, { noRoute: true });
+        expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
+        expect(div.classList.contains('responsive-height')).toBe(true);
+    });
+
+    it('works with jQuery and HTML element', async () => {
+        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        var div = document.createElement('div');
+        initFullHeightGridPage(div, { noRoute: true });
+        expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
+        expect(div.classList.contains('responsive-height')).toBe(true);
+    });
+
+    it('works with jQuery and jQuery wrapped element', async () => {
+        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        var div = document.createElement('div');
+        const $ = (await import("@optionaldeps/jquery")).default as any;
+        initFullHeightGridPage($(div), { noRoute: true });
+        expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
+        expect(div.classList.contains('responsive-height')).toBe(true);
+    });
+});
 
 describe('isMobileView', () => {
-    it('should return false if window is undefined', () => {
+
+    it('should return false if window is undefined', async () => {
+        const isMobileView = (await import('./layout')).isMobileView;
         var oldWindow = window;
         window = undefined;
         try {
@@ -12,7 +54,8 @@ describe('isMobileView', () => {
         }
     });
 
-    it('should return based on window.matchMedia result for "width < 768px"', () => {
+    it('should return based on window.matchMedia result for "width < 768px"', async () => {
+        const isMobileView = (await import('./layout')).isMobileView;
         var matchMedia = window.matchMedia;
         try {
             var q: string;
@@ -35,7 +78,9 @@ describe('isMobileView', () => {
         }
     });
 
-    it('should check window.width if window.matchMedia not available', () => {
+    it('should check window.width if window.matchMedia not available', async () => {
+        const isMobileView = (await import('./layout')).isMobileView;
+        
         var matchMedia = window.matchMedia;
         try {
             delete window.matchMedia;
@@ -48,6 +93,5 @@ describe('isMobileView', () => {
             window.matchMedia = matchMedia;
         }
     });
-
-
 });
+

@@ -6,25 +6,25 @@ import $ from "@optionaldeps/jquery";
    
 export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean, setHeight?: boolean }) {
     var el = ($ && gridDiv instanceof $) ? (gridDiv as JQuery).get(0) : gridDiv as HTMLElement
-    document.documentElement?.classList.add('full-height-page');
+    document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
-    let setHeight = opt?.setHeight ?? (!el.classList.contains('s-DataGrid') &&
-        !el.classList.contains('s-Panel'));
+    let setHeight = opt?.setHeight ?? ($ && (!el.classList.contains('s-DataGrid') &&
+        !el.classList.contains('s-Panel')));
 
     let layout = function () {
         setHeight && layoutFillHeight($(el));
         $ ? $(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
     };
 
-    if ($('body').hasClass('has-layout-event')) {
-        $('body').bind('layout', layout);
+    if (document.body.classList.contains('has-layout-event')) {
+        $ ? $(document.body).on('layout', layout) : el.addEventListener('layout', layout);
     }
     else if ((window as any).Metronic?.addResizeHandler) {
         (window as any).Metronic.addResizeHandler(layout);
     }
     else {
-        $(window).resize(layout);
+        $ ? $(window).resize(layout) : window.addEventListener('resize', layout);
     }
 
     layout();
@@ -97,9 +97,7 @@ export function triggerLayoutOnShow(element: JQuery) {
 }
 
 export function centerDialog(el: JQuery) {
-    if (!el.hasClass("ui-dialog"))
-        el = el.closest(".ui-dialog");
-
+    el = el.closest(".ui-dialog");
     (el as any).position?.({ at: 'center center', of: window });
     let pos = el.position();
     if (pos.left < 0)
