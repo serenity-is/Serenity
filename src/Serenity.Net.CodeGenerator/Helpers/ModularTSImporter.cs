@@ -16,7 +16,7 @@ public class ModularTSImporter
 
     protected string ImportFromTypes(string name)
     {
-        return AddExternalImport("../../ServerTypes/" + currentModule, name);
+        return AddExternalImport("@/ServerTypes/" + currentModule, name);
     }
 
     protected string ImportFromQ(string name)
