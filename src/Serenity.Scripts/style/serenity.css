@@ -3040,7 +3040,6 @@ img.ui-datepicker-trigger {
   display: inline-block;
   height: 26px;
   width: 24px;
-  float: left;
   margin-left: 2px;
   border: 1px solid #aaa;
   border-radius: 4px 4px 4px 4px;
@@ -3301,7 +3300,6 @@ a.s-LinkDropDown input {
 }
 .s-QuickSearchBar .quick-search-icon {
   display: inline-block;
-  float: left;
   padding: 0 0 0 8px;
   border-radius: 5px 0 0 5px;
   background: #0090d9;
