@@ -1934,7 +1934,7 @@ s.-Panel .tab-pane {
   min-height: 43px;
   margin-bottom: 0;
 }
-.full-height-page section.content {
+section.content {
   display: flex;
   flex-direction: column;
 }
