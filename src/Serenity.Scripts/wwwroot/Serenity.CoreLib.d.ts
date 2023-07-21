@@ -5171,7 +5171,7 @@ declare namespace Serenity {
         set readOnly(value: boolean);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        protected updateInterface(): void;
+        updateInterface(): void;
         protected getRowDefinition(): IRowDefinition;
         private _localTextDbPrefix;
         protected getLocalTextDbPrefix(): string;
