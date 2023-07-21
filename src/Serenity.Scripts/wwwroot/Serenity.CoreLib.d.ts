@@ -4726,7 +4726,7 @@ declare namespace Serenity {
         getCriteria(): CriteriaWithText;
         loadState(state: any): void;
         saveState(): any;
-        protected argumentNull(): Q.ArgumentNullException;
+        protected argumentNull(): Error;
         validateEditorValue(value: string): string;
         getEditorValue(): string;
         getEditorText(): any;
