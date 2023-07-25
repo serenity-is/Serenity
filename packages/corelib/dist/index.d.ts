@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ArgumentNullException, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
+import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
 export { Formatter } from '@serenity-is/corelib/slick';
@@ -1553,7 +1553,7 @@ declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     getCriteria(): CriteriaWithText;
     loadState(state: any): void;
     saveState(): any;
-    protected argumentNull(): ArgumentNullException;
+    protected argumentNull(): Error;
     validateEditorValue(value: string): string;
     getEditorValue(): string;
     getEditorText(): any;
@@ -2021,7 +2021,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     set readOnly(value: boolean);
     get_readOnly(): boolean;
     set_readOnly(value: boolean): void;
-    protected updateInterface(): void;
+    updateInterface(): void;
     protected getRowDefinition(): IRowDefinition;
     private _localTextDbPrefix;
     protected getLocalTextDbPrefix(): string;

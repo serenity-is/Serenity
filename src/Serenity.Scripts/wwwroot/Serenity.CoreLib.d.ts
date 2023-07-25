@@ -4726,7 +4726,7 @@ declare namespace Serenity {
         getCriteria(): CriteriaWithText;
         loadState(state: any): void;
         saveState(): any;
-        protected argumentNull(): Q.ArgumentNullException;
+        protected argumentNull(): Error;
         validateEditorValue(value: string): string;
         getEditorValue(): string;
         getEditorText(): any;
@@ -5171,7 +5171,7 @@ declare namespace Serenity {
         set readOnly(value: boolean);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        protected updateInterface(): void;
+        updateInterface(): void;
         protected getRowDefinition(): IRowDefinition;
         private _localTextDbPrefix;
         protected getLocalTextDbPrefix(): string;

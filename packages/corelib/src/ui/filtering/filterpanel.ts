@@ -225,7 +225,14 @@ export class FilterPanel extends FilterWidgetBase<any> {
             line.rightParen = row.children('div.l')
                 .children('a.rightparen').hasClass('active');
             filtering.set_operator({ key: op });
-            var criteria = filtering.getCriteria();
+            var criteria;
+            try {
+                criteria = filtering.getCriteria();
+            }
+            catch (ex) {
+                errorText = ex.message ?? ex.toString();
+                break;
+            }
             line.criteria = criteria.criteria;
             line.state = filtering.saveState();
             line.displayText = criteria.displayText;

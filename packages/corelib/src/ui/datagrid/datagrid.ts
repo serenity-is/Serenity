@@ -1043,7 +1043,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
     }
 
-    protected updateInterface() {
+    public updateInterface() {
         this.toolbar && this.toolbar.updateInterface();
     }
 

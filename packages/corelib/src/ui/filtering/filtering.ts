@@ -236,7 +236,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected argumentNull() {
-        return new ArgumentNullException('value', localText('Controls.FilterPanel.ValueRequired'));
+        return new Error(localText('Controls.FilterPanel.ValueRequired'));
     }
 
     validateEditorValue(value: string) {
