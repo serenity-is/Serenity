@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace Serenity.Abstractions;
+namespace Serenity.Services;
 
 /// <summary>
 /// Default implementation for IUserClaimCreator
