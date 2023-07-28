@@ -1,4 +1,4 @@
-﻿
+
 namespace {{ModuleNamespace}} {
     export interface {{FormClassName}} {
         {{~for x in FormFields~}}
@@ -11,7 +11,7 @@ namespace {{ModuleNamespace}} {
     }
 
     [{{for x in FormFields}}{{if !for.first}},{{end}}
-        ['{{x.PropertyName}}', () => Serenity.{{x.TSEditorType}}]{{end}}{{end}}
+        ['{{x.PropertyName}}', () => Serenity.{{x.TSEditorType}}]{{end}}
     ].forEach(x => Object.defineProperty({{FormClassName}}.prototype, <string>x[0], {
         get: function () {
             return this.w(x[0], (x[1] as any)());
