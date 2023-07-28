@@ -1,6 +1,6 @@
-﻿
+
 namespace {{ModuleNamespace}} {
-    export class {{ColumnsClass}} {
+    export class {{ColumnsClassName}} {
         static columnsKey = '{{ColumnsKey}}';
     }
 }
