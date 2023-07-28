@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public class EntityModel
 {
@@ -99,7 +99,7 @@ public class EntityModel
     public string ViewPageModulePath => "@/" + Module + "/" + ClassName + "/" + ClassName + "Page";
     public string ServiceClassName => ClassName + "Service";
     public string ServiceBaseUrl => ModuleSlash + ClassName;
-    public string EntityPluralTextKey => "Db" + DotModule + ClassName + ".EntityPlural";
+    public string EntityPluralTextKey => "Db" + DotModule + "." + ClassName + ".EntityPlural";
 
     public IEnumerable<EntityField> AllFields => Fields.Concat(JoinFields);
     public IEnumerable<EntityField> JoinFields => Joins.SelectMany(x => x.Fields);
