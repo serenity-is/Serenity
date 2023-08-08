@@ -66,8 +66,6 @@ export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, 
             get: (x: Object, y: string) => {
                 var tv = t[y];
                 if (tv == null)
-                    return;
-                if (typeof tv == 'number')
                     return localText(p + y);
                 else {
                     var z = o[y];

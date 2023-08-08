@@ -89,7 +89,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             var jw = new JsonTextWriter(new System.IO.StringWriter(jwBuilder))
 #endif
             {
-                QuoteName = false
+                QuoteName = false,
+                Formatting = Formatting.Indented,
+                Indentation = 4
             };
             jw.WriteStartObject();
             List<string> stack = new();
@@ -166,8 +168,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     }
                     else
                     {
-                        jw.WritePropertyName(part);
-                        jw.WriteValue(1);
                         cw.Indented("export const ");
                         sb.Append(part);
                         sb.AppendLine(": string;");
@@ -191,7 +191,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             else
                 sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
             jw.Flush();
-            sb.Append(jwBuilder);
+            sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
             sb.AppendLine(") as any;");
         });
 
