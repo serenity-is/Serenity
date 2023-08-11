@@ -689,7 +689,7 @@ declare namespace Q {
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
          * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
          *
-         * You should usually add your application root namespace to this list in ScriptInitialization.ts file.
+         * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
          */
         rootNamespaces: string[];
         /**
