@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that this type should generate a form script, 
@@ -39,4 +39,11 @@ public sealed class FormScriptAttribute : Attribute
     /// The key.
     /// </value>
     public string? Key { get; private set; }
+
+    /// <summary>
+    /// If set, modifies the local text prefix that should be used
+    /// instead of the automatically calculated one from Key and
+    /// Namespace
+    /// </summary>
+    public string? LocalTextPrefix { get; set; }
 }

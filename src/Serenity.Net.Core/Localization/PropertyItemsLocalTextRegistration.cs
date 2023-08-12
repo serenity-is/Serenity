@@ -79,8 +79,13 @@ public static class PropertyItemsLocalTextRegistration
             if (columnsAttr is null)
                 return null;
 
+            if (columnsAttr.LocalTextPrefix is not null)
+                return columnsAttr.LocalTextPrefix;
+
             itemsKey = columnsAttr.Key;
         }
+        else if (formAttr.LocalTextPrefix is not null)
+            return formAttr.LocalTextPrefix;
         else
             itemsKey = formAttr.Key;
 
