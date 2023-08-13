@@ -95,3 +95,4 @@ describe('isMobileView', () => {
     });
 });
 
+export {}

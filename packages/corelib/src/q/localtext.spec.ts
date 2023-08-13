@@ -71,3 +71,5 @@ describe('proxyTexts', () => {
         expect(texts.a).toEqual('Abc');
     });
 });
+
+export {}
