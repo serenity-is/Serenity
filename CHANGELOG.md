@@ -1,3 +1,39 @@
+## 6.8.0 (2023-08-14)
+
+Features:
+  - New Serenity.Pro.OpenIdClient Package which is exclusively available to Business/Enterprise customers, this update introduces the Serenity.Pro.OpenIdClient package, enabling seamless external login via Google, Microsoft, GitHub, and more. The implementation includes robust account link and unlink actions. [StartSharp]
+  - [WARNING!] To thwart potential XSS attacks via email links, a critical security measure has been implemented. The `LoginPage.tsx` now incorporates a defensive check to only accept return URLs that begin with a forward slash (`/`). Our gratitude to Tasfaout Abderrahim for bringing this to our attention. Please apply the check in `LoginPage.tsx` that looks like `if (returnUrl && /^\//.test(returnUrl)) {`.
+  - [BREAKING CHANGE!] The `SettingStorage` module has undergone modifications to enhance performance and security. The `getItem` and `setItem` methods may now return Promises, eliminating synchronous XHR calls. Consequently, similar adjustments extend to the `DataGrid`'s `restoreSettings`, `persistSettings`, and `getPersistedSettings` methods. Users with custom code using these methods must ensure compatibility with the Promise return type (e.g., utilize async operations). Furthermore, a new `restoreSettingsFrom` method takes precedence over `restoreSettings` in mixins, derived classes, etc. It's important to note that `restoreSettingsFrom` does not handle null settings parameters. [BREAKING CHANGE]
+  - Added .mpp (MS Project), .vsd, .vsdx (Visio) to default extension whitelist
+  - Set SameSite.Lax for CSRF-TOKEN cookie
+  - Enhanced `initFullHeightGridPage` with flex layout and responsive handling instead of trying to calculate grid height from other divs in page
+  - Adapted pro theme css for new `initFullHeightGridPage` version
+  - Added a setHeight option for cases where initFullHeightGridPage is used with another container type like in split master detail sample
+  - Implemented reCAPTCHA for signup form [StartSharp]
+  - Restored reCAPTCHA functionality with a special property processor. Need to `services.ConfigureSection<RecaptchaSettings>(Configuration);` in Startup.cs, and set Recaptcha:SiteKey and Recaptcha:SecretKey in appsettings.json by generating them from https://www.google.com/recaptcha/admin (use v2 ones, not sure newer ones work). Unless they are set, Recaptcha property will be made invisible in the form. See Signup form in StartSharp for an example.
+  - Enhanced form item handling by clearing category when lacking Category but having Tab attribute
+  - Also get base row type properties with BasedOnRow attribute
+  - Introduced IUserClaimCreator interface and its default implementation DefaultUserClaimCreator. You should register it in Startup.cs and use it instead of the static implementation in UserRetrieveService class. If you have any custom claims you can inherit DefaultUserClaimCreator and override AddClaims method then register your class instead of DefaultUserClaimCreator.
+  Replace UserRetrieveService.CreatePrincipal with IUserClaimCreator dependency whereever it is used.
+  - Applied patch for jquery ui touch events so that grid columns can be dragged in mobile
+  - New HandleControllerExceptionAttribute that can redirect errors to ValidationError page.
+  - Generated a more compact and merge friendly version of Texts.ts file.
+  - Introduced IHasPassword interface that allows to check if user has a password set via IUserDefinition
+  - Added a LocalTextPrefix property to FormScript and ColumnsScript attribute that may be used to override the local text prefix calculated from form key and namespace
+  - Updated jsx-dom to 8.0.7
+  - If reportParams is passed as null, JSON serialize the report instance in HTML report callback url builder
+  - Set Content-Disposition header for preview as well so save name for the generated pdf will not be Render.pdf always
+  - Moved password related page / service codes like Forgot/Reset/Change password to Serenity.Extensions to make them easier to update and reduce amount of code in StartSharp/Serene.
+  - Introduced an IElevationHandler and RequiresElevation attribute so that user will have to enter password again before performing some critical actions.
+  - Added hidden-xs css rule for compatibility with bs4
+
+Bugfixes:
+  - Fix sergen code generation errors for form, columns etc. in non-modular projects
+  - Fix several invalid source links in Demo
+  - Don't auto fill demo username/pass for activation page
+  - Possible issue with Postgress in SqlErrorStore while inserting exceptions
+  - Fix styling for grouping bar when group columns are longer than the width via x-scrolling
+
 ## 6.7.6 (2023-05-24)
 
 Features:
