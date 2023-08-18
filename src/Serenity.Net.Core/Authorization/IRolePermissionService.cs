@@ -6,9 +6,10 @@ namespace Serenity.Net.Core.Authorization;
 public interface IRolePermissionService
 {
     /// <summary>
-    /// Returns permission keys for give role key
+    /// Return if given role has given permission.
     /// </summary>
-    /// <param name="roleKey">Role Key</param>
+    /// <param name="role">Role Key or Name</param>
+    /// <param name="permission">Permission Key</param>
     /// <returns></returns>
-    ISet<string> GetRolePermissions(string roleKey);
+    bool HasPermission(string role, string permission);
 }
