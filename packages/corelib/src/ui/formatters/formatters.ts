@@ -241,7 +241,7 @@ export class NumberFormatter {
         if (dbl == null)
             return '';
 
-        return htmlEncode(value.toString());
+        return htmlEncode(formatNumber(dbl, format));
     }
 
     @Decorators.option()
@@ -286,12 +286,10 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
 
         if (!isEmptyOrNull(this.displayProperty)) {
             column.referencedFields.push(this.displayProperty);
-            return;
         }
 
         if (!isEmptyOrNull(this.urlProperty)) {
             column.referencedFields.push(this.urlProperty);
-            return;
         }
     }
 

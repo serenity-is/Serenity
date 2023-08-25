@@ -5,7 +5,7 @@ jest.mock("@serenity-is/corelib/q", () => ({
 }));
 
 import { EnumKeyAttribute, EnumTypeRegistry } from "../..";
-import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter } from "./formatters";
+import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
 import { addAttribute, registerEnum, tryGetText } from "@serenity-is/corelib/q"
 
 describe("BooleanFormatter", () => {
@@ -136,3 +136,169 @@ describe("EnumFormatter", () => {
         expect(value).toBe("Value1");
     })
 });
+
+describe("FileDownloadFormatter", () => {
+    it("shows empty string if value is null", () => {
+        var formatter = new FileDownloadFormatter();
+        expect(formatter.format({value: null, escape: (s) => s})).toBe("");
+    });
+
+
+    it("replaces all backward slashes to foward", () => {
+        var formatter = new FileDownloadFormatter();
+        expect(formatter.format({value: "file\\with\\backward\\slashes", escape: (s) => s})).toContain("file/with/backward/slashes");
+    });
+
+    it("shows empty string if fileOriginalName is not specified", () => {
+        var formatter = new FileDownloadFormatter();
+        expect(formatter.format({value: "file", escape: (s) => s}).replace(/\s/g, "")).toContain("</i></a>");
+    });
+
+    it("shows empty string if fileOriginalName is specified but not found", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.originalNameProperty = "fileOriginalName";
+        expect(formatter.format({value: "file", item: {}, escape: (s) => s}).replace(/\s/g, "")).toContain("</i></a>");
+    });
+
+    it("shows fileOriginalName if fileOriginalName is specified and found", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.originalNameProperty = "fileOriginalName";
+        expect(formatter.format({value: "file", item: {fileOriginalName: "test"}, escape: (s) => s})).toContain("</i> test</a>");
+    });
+
+    it("uses displayFormat if displayFormat is specified", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.originalNameProperty = "fileOriginalName";
+        formatter.displayFormat = "originalName: {0} dbFile: {1} downloadUrl: {2}"
+        expect(formatter.format({value: "file", item: {fileOriginalName: "test"}, escape: (s) => s}))
+            .toContain("</i> originalName: test dbFile: file downloadUrl: /upload/file</a>");
+    });
+
+    it("uses icon if specified", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.iconClass = "testicon"
+        expect(formatter.format({value: "file", item: {fileOriginalName: "test"}, escape: (s) => s}))
+            .toContain("'testicon'");
+    });
+
+    it("adds fa if icon starts with fa", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.iconClass = "fa-testicon"
+        expect(formatter.format({value: "file", item: {fileOriginalName: "test"}, escape: (s) => s}))
+            .toContain("'fa fa-testicon'");
+    });
+
+    it("uses default icon if not specified", () => {
+        var formatter = new FileDownloadFormatter();
+        expect(formatter.format({value: "file", item: {fileOriginalName: "test"}, escape: (s) => s}))
+            .toContain("'fa fa-download'");
+    });
+
+    it("adds originalNameProperty to referencedFields if specified", () => {
+        var formatter = new FileDownloadFormatter();
+        formatter.originalNameProperty = "fileOriginalName";
+        var column = {};
+        formatter.initializeColumn(column);
+        expect(column).toEqual({referencedFields: ["fileOriginalName"]});
+    })
+});
+
+describe("MinuteFormatter", () => {
+
+    it("shows empty string if value is null", () => {
+        var formatter = new MinuteFormatter();
+        expect(formatter.format({value: null, escape: (s) => s})).toBe("");
+        expect(formatter.format({value: NaN, escape: (s) => s})).toBe("");
+    })
+
+    it("shows correctly formatted minute", () => {
+        var formatter = new MinuteFormatter();
+
+        expect(formatter.format({value: 0, escape: (s) => s})).toBe("00:00");
+        expect(formatter.format({value: 12, escape: (s) => s})).toBe("00:12");
+        expect(formatter.format({value: 72, escape: (s) => s})).toBe("01:12");
+        expect(formatter.format({value: 680, escape: (s) => s})).toBe("11:20");
+        expect(formatter.format({value: 1360, escape: (s) => s})).toBe("22:40");
+    })
+})
+
+describe("NumberFormatter", () => {
+    it("shows empty string if value is null", () => {
+        var formatter = new NumberFormatter();
+        expect(formatter.format({value: null, escape: (s) => s})).toBe("");
+        expect(formatter.format({value: NaN, escape: (s) => s})).toBe("");
+    });
+
+    it("shows formatted number if value type is number", () => {
+        var formatter = new NumberFormatter();
+        expect(formatter.format({value: 123456.789, escape: (s) => s})).toBe("123456.79");
+    });
+
+    it("parses shows formatted number if value type is string", () => {
+        var formatter = new NumberFormatter();
+        expect(formatter.format({value: "123456.789", escape: (s) => s})).toBe("123456.79");
+    });
+
+    it("shows empty string if value type is string and it is not a number", () => {
+        var formatter = new NumberFormatter();
+        expect(formatter.format({value: "this is not a number", escape: (s) => s})).toBe("");
+    });
+
+    it("uses given numberformat", () => {
+        var formatter = new NumberFormatter();
+        formatter.displayFormat = "0.###"
+        expect(formatter.format({value: "123456.789", escape: (s) => s})).toBe("123456.789");
+    });
+})
+
+describe("UrlFormatter", () => {
+    it("shows empty string if value is null or empty", () => {
+        var formatter = new UrlFormatter();
+        expect(formatter.format({value: null, escape: (s) => s})).toBe("");
+        expect(formatter.format({value: "", escape: (s) => s})).toBe("");
+    })
+
+    it("shows empty string if urlProperty value is null or empty", () => {
+        var formatter = new UrlFormatter();
+        formatter.urlProperty = "url";
+        expect(formatter.format({value: null, item: {url: null}, escape: (s) => s})).toBe("");
+        expect(formatter.format({value: null, item: {url: ""}, escape: (s) => s})).toBe("");
+    })
+
+    it("shows link if url is specified", () => {
+        var formatter = new UrlFormatter();
+        expect(formatter.format({value: "test", escape: (s) => s})).toContain("'test'");
+    })
+
+    it("formats url if format is specified", () => {
+        var formatter = new UrlFormatter();
+        formatter.urlFormat = "test/{0}";
+        expect(formatter.format({value: "test", escape: (s) => s})).toContain("'test/test'");
+    })
+
+    it("resolves url if it starts with tilda", () => {
+        var formatter = new UrlFormatter();
+        expect(formatter.format({value: "~/test", escape: (s) => s})).toContain("'/test'");
+    })
+
+    it("uses display format property for showing if specified", () => {
+        var formatter = new UrlFormatter();
+        formatter.displayFormat = "displayFormat {0}"
+        expect(formatter.format({value: "~/test", escape: (s) => s})).toContain("displayFormat ~/test");
+    })
+
+    it("adds target if specified", () => {
+        var formatter = new UrlFormatter();
+        formatter.target = "_blank"
+        expect(formatter.format({value: "~/test", escape: (s) => s})).toContain("target='_blank'");
+    })
+
+    it("adds diplayProperty and UrlProperty to referencedFields if specified", () => {
+        var formatter = new UrlFormatter();
+        formatter.displayProperty = "display";
+        formatter.urlProperty = "url";
+        var column = {};
+        formatter.initializeColumn(column);
+        expect(column).toEqual({referencedFields: ["display", "url"]});
+    });
+})
