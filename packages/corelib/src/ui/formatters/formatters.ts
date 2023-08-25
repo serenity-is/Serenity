@@ -76,7 +76,7 @@ export class DateFormatter implements Formatter {
         else if (typeof value === 'string') {
             date = parseISODateTime(value);
 
-            if (date == null) {
+            if (date == null || isNaN(date.valueOf())) {
                 return htmlEncode(value);
             }
         }
