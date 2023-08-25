@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Serenity;
 
@@ -7,23 +8,47 @@ namespace Serenity;
 /// </summary>
 public class Throttler
 {
-    private readonly IMemoryCache cache;
+    private readonly IMemoryCache? cache;
+    private readonly IDistributedCache? distributedCache;
 
     /// <summary>
     /// Creates a new throttler
     /// </summary>
-    /// <param name="cache">Cache</param>
     /// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
     /// <param name="duration">Check period</param>
     /// <param name="limit">How many times are allowed</param>
-    public Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
+    private Throttler(string key, TimeSpan duration, int limit)
     {
-        this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-
         Key = key;
         Duration = duration;
         Limit = limit;
         CacheKey = "Throttling:" + key + ":" + duration.Ticks.ToInvariant();
+    }
+
+    /// <summary>
+    /// Creates a new throttler
+    /// </summary>
+    /// <param name="cache">Memory cache</param>
+    /// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
+    /// <param name="duration">Check period</param>
+    /// <param name="limit">How many times are allowed</param>
+    public Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
+        : this(key, duration, limit)
+    {
+        this.cache = cache;
+    }
+
+    /// <summary>
+    /// Creates a new throttler
+    /// </summary>
+    /// <param name="distributedCache">Distributed cache</param>
+    /// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
+    /// <param name="duration">Check period</param>
+    /// <param name="limit">How many times are allowed</param>
+    public Throttler(IDistributedCache distributedCache, string key, TimeSpan duration, int limit)
+        : this(key, duration, limit)
+    {
+        this.distributedCache = distributedCache;
     }
 
     /// <summary>
@@ -54,12 +79,15 @@ public class Throttler
     /// <returns>True if under throttle limit, false otherwise</returns>
     public bool Check()
     {
-        var hit = cache.TryGet<HitInfo>(CacheKey);
+        var hit = cache?.TryGet<HitInfo>(CacheKey) ?? distributedCache?.GetAutoJson<HitInfo>(CacheKey);
 
         if (hit == null)
         {
             hit = new HitInfo { Counter = 1 };
-            cache.Add(CacheKey, hit, Duration);
+            if(cache != null)
+                cache.Add(CacheKey, hit, Duration);
+            else
+                distributedCache?.SetAutoJson(CacheKey, hit, Duration);
         }
         else
         {
@@ -75,6 +103,9 @@ public class Throttler
     /// </summary>
     public void Reset()
     {
-        cache.Remove(CacheKey);
+        if (cache != null)
+            cache.Remove(CacheKey);
+        else
+            distributedCache?.Remove(CacheKey);
     }
 }
