@@ -71,6 +71,7 @@ public class Throttler
     private class HitInfo
     {
         public int Counter;
+        public DateTime CreatedAt;
     }
 
     /// <summary>
@@ -83,7 +84,7 @@ public class Throttler
 
         if (hit == null)
         {
-            hit = new HitInfo { Counter = 1 };
+            hit = new HitInfo { Counter = 1, CreatedAt = DateTime.UtcNow };
             if(cache != null)
                 cache.Add(CacheKey, hit, Duration);
             else
@@ -93,6 +94,12 @@ public class Throttler
         {
             if (hit.Counter++ >= Limit)
                 return false;
+
+            if (distributedCache is not null)
+            {
+                var remaining = Duration - (DateTime.UtcNow - hit.CreatedAt);
+                distributedCache.SetAutoJson(CacheKey, hit, remaining);
+            }
         }
 
         return true;
