@@ -239,7 +239,7 @@ export class NumberFormatter {
 
         var dbl = parseDecimal(value.toString());
         if (dbl == null || isNaN(dbl))
-            return value.toString();
+            return value?.toString() ?? '';
 
         return htmlEncode(formatNumber(dbl, format));
     }
