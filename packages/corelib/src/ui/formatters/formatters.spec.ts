@@ -239,9 +239,9 @@ describe("NumberFormatter", () => {
         expect(formatter.format({value: "123456.789", escape: (s) => s})).toBe("123456.79");
     });
 
-    it("shows empty string if value type is string and it is not a number", () => {
+    it("shows given string value if value type is string and it is not a number", () => {
         var formatter = new NumberFormatter();
-        expect(formatter.format({value: "this is not a number", escape: (s) => s})).toBe("");
+        expect(formatter.format({value: "this is not a number", escape: (s) => s})).toBe("this is not a number");
     });
 
     it("uses given numberformat", () => {
