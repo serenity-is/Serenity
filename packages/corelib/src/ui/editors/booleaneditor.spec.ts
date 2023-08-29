@@ -1,7 +1,4 @@
-import { newBodyDiv } from "@serenity-is/corelib/q";
 import { BooleanEditor } from "./booleaneditor";
-import { Widget } from "../widgets/widget";
-
 
 describe("BooleanEditor", () => {
     it("updates value when checkbox is checked", () => {
