@@ -1,4 +1,4 @@
-import { alertDialog, htmlEncode, blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, localText } from "@serenity-is/corelib/q";
+import { alertDialog, htmlEncode, blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, localText, ServiceResponse } from "@serenity-is/corelib/q";
 
 export namespace UploadHelper {
 
@@ -251,7 +251,7 @@ export interface UploadInputOptions {
     fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
 }
 
-export interface UploadResponse {
+export interface UploadResponse extends ServiceResponse {
     TemporaryFile: string;
     Size: number;
     IsImage: boolean;
