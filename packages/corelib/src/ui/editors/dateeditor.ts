@@ -102,10 +102,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             this.element.val('');
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            this.element.val(formatDate(today(), null));
+            this.element.val(formatDate(today(), "yyyy-MM-dd"));
         }
         else {
-            this.element.val(formatDate(value, null));
+            this.element.val(formatDate(value, "yyyy-MM-dd"));
         }
     }
 
