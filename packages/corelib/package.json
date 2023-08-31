@@ -12,7 +12,8 @@
   },
   "devDependencies": {
     "@types/jest": "29.5.1",
-    "tslib": "2.4.1"
+    "tslib": "2.4.1",
+    "flatpickr": "4.6.13"
   },
   "exports": {
     ".": {

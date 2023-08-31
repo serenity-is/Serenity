@@ -76,6 +76,9 @@ importers:
       '@types/jest':
         specifier: 29.5.1
         version: 29.5.1
+      flatpickr:
+        specifier: 4.6.13
+        version: 4.6.13
       tslib:
         specifier: 2.4.1
         version: 2.4.1
