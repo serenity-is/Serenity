@@ -78,7 +78,7 @@ describe("DateEditor_WithDefaultHtmlInput", () => {
 describe("DateEditor_WithFlatPicker", () => {
     beforeEach(() => {
         // @ts-ignore
-        import("../../../node_modules/flatpickr/dist/flatpickr.js");
+        import("../../../../../node_modules/flatpickr/dist/flatpickr.js");
     })
 
     it("uses flatpickr date if it is found", () => {
