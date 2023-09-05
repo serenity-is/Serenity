@@ -4460,7 +4460,7 @@ declare namespace Serenity {
         uploadUrl?: string;
         fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
     }
-    interface UploadResponse {
+    interface UploadResponse extends ServiceResponse {
         TemporaryFile: string;
         Size: number;
         IsImage: boolean;

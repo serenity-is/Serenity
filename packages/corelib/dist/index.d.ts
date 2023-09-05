@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest, ServiceResponse } from '@serenity-is/corelib/q';
+import { PropertyItem, executeOnceWhenVisible, executeEverytimeWhenVisible, DialogButton, PropertyItemsData, Lookup, ColumnSelection, ListRequest, ServiceOptions, ListResponse, ServiceResponse, SaveRequest, HandleRouteEventArgs, DeleteResponse, Exception, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest } from '@serenity-is/corelib/q';
 export { ColumnSelection, Criteria, DeleteRequest, DeleteResponse, ISlickFormatter, ListRequest, ListResponse, PropertyItem, PropertyItemsData, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SummaryType, UndeleteRequest, UndeleteResponse } from '@serenity-is/corelib/q';
 import { PagerOptions, RemoteView, Format, Formatter, RemoteViewOptions } from '@serenity-is/corelib/slick';
 export { Formatter } from '@serenity-is/corelib/slick';
@@ -1287,7 +1287,7 @@ interface UploadInputOptions {
     uploadUrl?: string;
     fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
 }
-interface UploadResponse {
+interface UploadResponse extends ServiceResponse {
     TemporaryFile: string;
     Size: number;
     IsImage: boolean;
