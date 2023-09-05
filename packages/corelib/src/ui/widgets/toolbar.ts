@@ -131,7 +131,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
     protected createButton(container: JQuery, b: ToolButton) {
         var cssClass = b.cssClass ?? '';
 
-        var btn = $('<div class="tool-button"><div class="button-outer">' +
+        var btn = $('<div class="tool-button" tabindex="0"><div class="button-outer">' +
             '<span class="button-inner"></span></div></div>')
             .appendTo(container);
 
