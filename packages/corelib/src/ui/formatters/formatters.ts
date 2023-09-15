@@ -76,7 +76,7 @@ export class DateFormatter implements Formatter {
         else if (typeof value === 'string') {
             date = parseISODateTime(value);
 
-            if (date == null) {
+            if (date == null || isNaN(date.valueOf())) {
                 return htmlEncode(value);
             }
         }
@@ -238,10 +238,10 @@ export class NumberFormatter {
         }
 
         var dbl = parseDecimal(value.toString());
-        if (dbl == null)
-            return '';
+        if (dbl == null || isNaN(dbl))
+            return value?.toString() ?? '';
 
-        return htmlEncode(value.toString());
+        return htmlEncode(formatNumber(dbl, format));
     }
 
     @Decorators.option()
@@ -286,12 +286,10 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
 
         if (!isEmptyOrNull(this.displayProperty)) {
             column.referencedFields.push(this.displayProperty);
-            return;
         }
 
         if (!isEmptyOrNull(this.urlProperty)) {
             column.referencedFields.push(this.urlProperty);
-            return;
         }
     }
 
