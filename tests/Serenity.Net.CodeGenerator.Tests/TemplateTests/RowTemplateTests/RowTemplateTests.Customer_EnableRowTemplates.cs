@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.Tests.CodeGenerator;
 
 public partial class RowTemplateTests
 {
@@ -42,10 +42,10 @@ public partial class RowTemplateTests
     {
         var model = new CustomerEntityModel
         {
-           EnableRowTemplates = true
+            EnableRowTemplates = true
         };
         var actual = RenderTemplate(model);
-        
+
         AssertEqual(Customer_Expected_EnableRowTemplates, actual);
     }
 }

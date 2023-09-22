@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Serenity.CodeGenerator;
 
@@ -35,8 +35,18 @@ public class GeneratorConfig
     public bool? DeclareJoinConstants { get; set; }
 
     /// <summary>
+    /// When true, enables usage of [GenerateFields] attributes on rows,
+    /// causing the fields to be generated automatically by a source generator.
+    /// This should only be used when Serenity.Pro.Coder is enabled in the project.
+    /// </summary>
+    public bool? EnableGenerateFields { get; set; }
+
+    /// <summary>
     /// When true, enables RowTemplate class generation. This should
     /// only be used when Serenity.Pro.Coder is enabled in the project.
+    /// Has no effect when EnableGenerateFields is true.
+    /// EnableGenerateFields should be preffered over this as 
+    /// RowTemplate might cause some issues.
     /// </summary>
     public bool? EnableRowTemplates { get; set; }
 

@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public class EntityModelGenerator : IEntityModelGenerator
 {
@@ -108,6 +108,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             ClassName = className,
             ConnectionKey = inputs.ConnectionKey,
             DeclareJoinConstants = inputs.Config.DeclareJoinConstants ?? false,
+            EnableGenerateFields = inputs.Config.EnableGenerateFields ?? false,
             EnableRowTemplates = inputs.Config.EnableRowTemplates ?? false,
             FileScopedNamespaces = inputs.Config.FileScopedNamespaces ?? false,
             Module = inputs.Module,
