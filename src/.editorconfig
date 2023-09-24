@@ -9,3 +9,6 @@ dotnet_diagnostic.IDE0004.severity = suggestion
 # IDE0049: Simplify Names
 dotnet_diagnostic.IDE0049.severity = suggestion
 
+[*Texts*.cs]
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
