@@ -37,12 +37,6 @@
     <ToCompileCoreLib Include="..\..\packages\corelib\src\**\*.ts;..\..\packages\corelib\src\tsconfig.json;..\..\packages\corelib\build\build.js;..\..\packages\corelib\node_modules\@serenity-is\*\*.d.ts;..\..\packages\corelib\rollup.config.js;..\..\packages\corelib\package.json"></ToCompileCoreLib>
     <NpmPackageFile Include="..\..\packages\corelib\package.json" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.9.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
   <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" 
           Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
     <Exec Command="pnpm run build" WorkingDirectory="..\..\packages\corelib" />
