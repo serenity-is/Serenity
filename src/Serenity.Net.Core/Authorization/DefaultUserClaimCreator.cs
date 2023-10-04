@@ -42,10 +42,8 @@ public class DefaultUserClaimCreator : IUserClaimCreator
         if (username is null)
             throw new ArgumentNullException(nameof(username));
 
-        var user = userRetrieveService.ByUsername(username);
-        if (user == null)
+        var user = userRetrieveService.ByUsername(username) ?? 
             throw new ArgumentOutOfRangeException(nameof(username));
-
         if (authType == null)
             throw new ArgumentNullException(nameof(authType));
 
