@@ -1,3 +1,22 @@
+## 6.8.2 (2023-10-05)
+
+Features:
+  - [BREAKING CHANGE!] Changed namespace of IRolePermissionService from Serenity.Serenity.Net.Core.Authorization to Serenity.Abstractions
+  - Used single line getter/setter style for rows, also for sergen
+  - Switching to tags instead of namespace for determining which migrations to run. So, instead of checking for a particular namespace like "Serenity.Demo.Northwind.Migrations", checking if the migration has "NorthwindDB" tag. For "Default" database, we allow migrations with "DefaultDB" tag, in addition to migrations without any tags to avoid skipping legacy migrations or migrations that user added but forgot to add a tag.
+  - Removed migration skipping feature when database name does not match what was expected, as it seems to have helped no-one, while causing confusion for users that are not aware of it
+  - Updated Microsoft.Data.Sqlite 7.0.11 and Microsoft.Data.SqlClient to 5.1.1
+  - Updated Microsoft.TypeScript.MSBuild to 4.9.5, which is the last version before v5
+  - Made use of C# global usings feature both in Serene and StartSharp. Please note that while generating code, Sergen can't yet parse global usings. So, if you expect generated code to omit such usings you need to set them manually in sergen.json for now.
+  - Switched to file scoped namespaces also in Serene
+  - Defined a new TypeSource class implementing ITypeSource, and used that instead of listing assemblies in Startup.cs [StartSharp]
+  - Moved application specific service implementations into AppServices namespace.
+  - Set RootNamespace instead of AssemblyName in project file, so that newly added files don't include ".Web" suffix.
+  - Backported account password and some other changes to Serene from StartSharp.
+
+Bugfixes:
+  - Fix click event in Card View sample
+
 ## 6.8.1 (2023-09-23)
 
 Features:
