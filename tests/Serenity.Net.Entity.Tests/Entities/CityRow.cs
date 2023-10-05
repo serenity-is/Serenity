@@ -4,39 +4,19 @@
 public class CityRow : Row<CityRow.RowFields>, IIdRow, INameRow
 {
     [NotNull, Identity, IdProperty]
-    public int? CityId
-    {
-        get { return fields.CityId[this]; }
-        set { fields.CityId[this] = value; }
-    }
+    public int? CityId { get => fields.CityId[this]; set => fields.CityId[this] = value; }
 
     [NotNull, NameProperty]
-    public string CityName
-    {
-        get { return fields.CityName[this]; }
-        set { fields.CityName[this] = value; }
-    }
+    public string CityName { get => fields.CityName[this]; set => fields.CityName[this] = value; }
 
     [ForeignKey("Countries", "CountryId"), LeftJoin("jCountry")]
-    public int? CountryId
-    {
-        get { return fields.CountryId[this]; }
-        set { fields.CountryId[this] = value; }
-    }
+    public int? CountryId { get => fields.CountryId[this]; set => fields.CountryId[this] = value; }
 
     [Expression("jCountry.CountryName")]
-    public string CountryName
-    {
-        get { return fields.CountryName[this]; }
-        set { fields.CountryName[this] = value; }
-    }
+    public string CountryName { get => fields.CountryName[this]; set => fields.CountryName[this] = value; }
 
     [Expression("jCity.CityName + ' / ' + jCountry.CountryName")]
-    public string FullName
-    {
-        get { return fields.FullName[this]; }
-        set { fields.FullName[this] = value; }
-    }
+    public string FullName { get => fields.FullName[this]; set => fields.FullName[this] = value; }
 
     public class RowFields : RowFieldsBase
     {

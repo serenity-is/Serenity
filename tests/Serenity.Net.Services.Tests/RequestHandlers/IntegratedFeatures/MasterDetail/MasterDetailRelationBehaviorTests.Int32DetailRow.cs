@@ -5,32 +5,16 @@ public partial class MasterDetailRelationBehaviorTests
     public class Int32DetailRow : Row<Int32DetailRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
-        public int? DetailID
-        {
-            get { return Fields.DetailID[this]; }
-            set { Fields.DetailID[this] = value; }
-        }
+        public int? DetailID { get => fields.DetailID[this]; set => fields.DetailID[this] = value; }
 
         [NotNull]
-        public int? MasterID
-        {
-            get { return Fields.MasterID[this]; }
-            set { Fields.MasterID[this] = value; }
-        }
+        public int? MasterID { get => fields.MasterID[this]; set => fields.MasterID[this] = value; }
 
         [NotNull]
-        public int? ProductID
-        {
-            get { return Fields.ProductID[this]; }
-            set { Fields.ProductID[this] = value; }
-        }
+        public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
 
         [NotNull]
-        public decimal? Quantity
-        {
-            get { return Fields.Quantity[this]; }
-            set { Fields.Quantity[this] = value; }
-        }
+        public decimal? Quantity { get => fields.Quantity[this]; set => fields.Quantity[this] = value; }
         
         public class RowFields : RowFieldsBase
         {
