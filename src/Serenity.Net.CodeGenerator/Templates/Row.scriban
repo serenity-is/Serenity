@@ -41,11 +41,7 @@ public sealed{{if EnableGenerateFields || EnableRowTemplates}} partial{{end}} cl
     {{~for x in AllFields~}}
 
     [{{ATTRREF x.AttributeList}}]
-    public {{TYPEREF x.PropertyType}} {{x.PropertyName}}
-    {
-        get => {{f}}ields.{{x.PropertyName}}[this];
-        set => {{f}}ields.{{x.PropertyName}}[this] = value;
-    }
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get => fields.{{x.PropertyName}}[this]; set => fields.{{x.PropertyName}}[this] = value; }
     {{~end~}}
 {{~if !NET5Plus~}}
     {{~if Identity~}}
