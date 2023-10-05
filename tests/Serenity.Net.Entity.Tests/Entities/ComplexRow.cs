@@ -32,11 +32,7 @@ public class ComplexRow : Row<ComplexRow.RowFields>
     }
 
     [ForeignKey("TheCountryTable", "TheCountryID"), LeftJoin("c")]
-    public int? CountryID
-    {
-        get => fields.CountryID[this];
-        set => fields.CountryID[this] = value;
-    }
+    public int? CountryID { get => fields.CountryID[this]; set => fields.CountryID[this] = value; }
 
     [DisplayName("Country Name"), Expression("c.Name")]
     public string CountryName
