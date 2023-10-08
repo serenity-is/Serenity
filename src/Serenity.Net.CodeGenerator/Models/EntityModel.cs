@@ -26,6 +26,7 @@ public class EntityModel
     public bool EnableGenerateFields { get; set; }
     public bool EnableRowTemplates { get; set; }
     public bool FileScopedNamespaces { get; set; }
+    public bool GenerateListExcel { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 
     public string IdField => Identity;

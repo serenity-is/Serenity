@@ -110,6 +110,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             DeclareJoinConstants = inputs.Config.DeclareJoinConstants ?? false,
             EnableGenerateFields = inputs.Config.EnableGenerateFields ?? false,
             EnableRowTemplates = inputs.Config.EnableRowTemplates ?? false,
+            GenerateListExcel = inputs.Config.GenerateUI,
             FileScopedNamespaces = inputs.Config.FileScopedNamespaces ?? false,
             Module = inputs.Module,
             NET5Plus = inputs.Net5Plus,

@@ -1,4 +1,4 @@
-﻿{{USING "Microsoft.AspNetCore.Mvc" }}
+{{USING "Microsoft.AspNetCore.Mvc" }}
 {{USING "Serenity.Data" }}
 {{USING "Serenity.Reporting" }}
 {{USING "Serenity.Services" }}
@@ -47,6 +47,7 @@ public class {{EndpointClassName}} : ServiceEndpoint
     {
         return handler.List(connection, request);
     }
+{{~if GenerateListExcel~}}
 
     [HttpPost, AuthorizeList(typeof(MyRow))]
     public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
@@ -58,5 +59,6 @@ public class {{EndpointClassName}} : ServiceEndpoint
         return ExcelContentResult.Create(bytes, "{{ClassName}}List_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
+{{~end~}}
 }
 {{~end}}{{~NAMESPACEBLOCK block~}}

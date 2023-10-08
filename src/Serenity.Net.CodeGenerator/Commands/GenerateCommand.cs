@@ -1,4 +1,4 @@
-﻿using Serenity.Data.Schema;
+using Serenity.Data.Schema;
 using System.Data.Common;
 
 namespace Serenity.CodeGenerator;
@@ -338,7 +338,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             while (what.IsEmptyOrNull())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Choose What to Generate (R:Row, S:Repo+Svc, U=UI, C=Custom)");
+                Console.WriteLine("Choose What to Generate (R:Row, S:Services, U=UI, C=Custom)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 what = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
                 userInput = what;

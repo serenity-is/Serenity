@@ -1,4 +1,4 @@
-﻿using Serenity.Data.Schema;
+using Serenity.Data.Schema;
 using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
@@ -70,7 +70,7 @@ public partial class GenerateCommand
             var whatToGenerate = SelectWhatToGenerate();
 
             config.GenerateRow = whatToGenerate.Contains("Row");
-            config.GenerateService = whatToGenerate.Contains("Repository & Service");
+            config.GenerateService = whatToGenerate.Contains("Services");
             config.GenerateUI = whatToGenerate.Contains("User Interface");
             config.GenerateCustom = whatToGenerate.Contains("Custom");
 
@@ -108,7 +108,7 @@ public partial class GenerateCommand
             var whatToGenerate = new List<string>
             {
                 "Row",
-                "Repository & Service",
+                "Services",
                 "User Interface",
                 "Custom"
             };
