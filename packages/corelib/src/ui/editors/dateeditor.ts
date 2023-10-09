@@ -85,8 +85,8 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     }
 
     get_value(): string {
-        var value = this.element.val().trim();
-        if (value != null && value.length === 0) {
+        var value = this.element.val()?.trim();
+        if (!value?.length) {
             return null;
         }
 
@@ -102,10 +102,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             this.element.val('');
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            this.element.val(formatDate(today(), "yyyy-MM-dd"));
+            this.element.val(formatDate(today(), this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
         }
         else {
-            this.element.val(formatDate(value, "yyyy-MM-dd"));
+            this.element.val(formatDate(value, this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
         }
     }
 

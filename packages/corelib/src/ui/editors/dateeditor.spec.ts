@@ -43,7 +43,7 @@ function commonTests() {
     it("sets value when valueAsDate used", () => {
         var editor = new DateEditor($("<input type='text'/>"));
         editor.valueAsDate = new Date(2020, 0, 1);
-        expect(editor.value).toEqual("2020-01-01");
+        expect(editor.get_value()).toEqual("2020-01-01");
     })
 
     it("sets value when valueAsDate used", () => {
@@ -51,16 +51,6 @@ function commonTests() {
         editor.element.val("2020-01-01");
         expect(editor.valueAsDate).toEqual(new Date(2020, 0, 1));
     })
-
-    // it("validates value is not below min", async () => {
-    //     var editor = new DateEditor($("<input type='text'/>"));
-    //     editor.set_minValue("2020-02-01");
-    //     editor.value = "2020-01-01";
-    //     var form = $("<form/>").append(editor.element);
-    //     require("@optionaldeps/jquery.validation");
-    //     await import("@optionaldeps/jquery.validation")
-    //     $.fn.validate();
-    // });
 }
 
 describe("DateEditor_WithDefaultHtmlInput", () => {
