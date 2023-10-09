@@ -1,3 +1,9 @@
+## 6.8.3 (2023-10-09)
+
+Bugfixes:
+  - Don't generate ListExcel method if only Row & Services are selected as Columns type is not available
+  - Date editor persist / restore results in dates in format yyyy-MM-dd
+
 ## 6.8.2 (2023-10-05)
 
 Features:
