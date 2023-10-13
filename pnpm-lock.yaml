@@ -61,8 +61,8 @@ importers:
   packages/corelib:
     dependencies:
       '@serenity-is/sleekgrid':
-        specifier: 1.6.1
-        version: 1.6.1
+        specifier: 1.6.2
+        version: 1.6.2
       '@types/jquery':
         specifier: 2.0.48
         version: 2.0.48
@@ -962,8 +962,8 @@ packages:
       rollup: 2.79.1
     dev: true
 
-  /@serenity-is/sleekgrid@1.6.1:
-    resolution: {integrity: sha512-WKySjC5WIw9gt2/0qhK1gdzUP6Qg7N3zbtvZO4xT3hcdqfW5wH6NJv//PrxsTmmZOc6JP5vsKlJALzGepv4HKw==}
+  /@serenity-is/sleekgrid@1.6.2:
+    resolution: {integrity: sha512-HunyimIIsfLlKJGnoKFEUkZumellr3SW9Tk3gCflHdQbvrYnqXD+FZMUc9vTxKmVI5xFbYMcYXXAH/+DlD+b/g==}
     dev: false
 
   /@sinclair/typebox@0.24.51:
