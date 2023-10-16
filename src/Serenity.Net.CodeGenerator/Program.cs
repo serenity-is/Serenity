@@ -37,7 +37,7 @@ public class Program
             command = args.Length > 2 ? args[1] : null;
         }
 
-        if (command.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(command))
         {
             WriteHelp();
             return ExitCodes.NoCommand;

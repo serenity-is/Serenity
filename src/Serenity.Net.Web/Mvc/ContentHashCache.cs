@@ -104,7 +104,7 @@ public class ContentHashCache : IContentHashCache
     /// <inheritdoc/>
     public string ResolvePath(PathString pathBase, string contentPath)
     {
-        if (contentPath.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(contentPath))
             throw new ArgumentNullException(nameof(contentPath));
 
         if (contentPath[0] != '/' &&
@@ -124,7 +124,7 @@ public class ContentHashCache : IContentHashCache
     /// <inheritdoc/>
     public string ResolveWithHash(PathString pathBase, string contentUrl)
     {
-        if (contentUrl.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(contentUrl))
             throw new ArgumentNullException(nameof(contentUrl));
 
         if (contentUrl[0] == '~')

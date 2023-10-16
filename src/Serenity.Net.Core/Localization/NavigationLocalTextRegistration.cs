@@ -24,7 +24,7 @@ public static class NavigationLocalTextRegistration
             throw new ArgumentNullException(nameof(registry));
 
         foreach (NavigationItemAttribute attr in typeSource.GetAssemblyAttributes<NavigationItemAttribute>())
-            registry.Add(languageID, "Navigation." + (attr.Category.IsEmptyOrNull() ? "" : attr.Category + "/") +
+            registry.Add(languageID, "Navigation." + (string.IsNullOrEmpty(attr.Category) ? "" : attr.Category + "/") +
                 attr.Title, attr.Title);
     }
 }

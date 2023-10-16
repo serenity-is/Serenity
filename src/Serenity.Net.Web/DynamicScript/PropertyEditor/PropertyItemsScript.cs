@@ -40,7 +40,7 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     /// <exception cref="ArgumentNullException"></exception>
     protected static string CheckName(string name)
     {
-        if (name.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(name))
             throw new ArgumentNullException(nameof(name));
 
         return name;

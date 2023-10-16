@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Contains validation related helper methods for service handlers
@@ -37,7 +37,7 @@ public static class DataValidation
     public static void ValidateRequired(this IRow row, Field field, ITextLocalizer localizer)
     {
         var str = field as StringField;
-        if ((str is not null && str[row].IsTrimmedEmpty()) ||
+        if ((str is not null && string.IsNullOrEmpty(str[row])) ||
             (str is null && field.AsObject(row) == null))
         {
             throw RequiredError(field, localizer);

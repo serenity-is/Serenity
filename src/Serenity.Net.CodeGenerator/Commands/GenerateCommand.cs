@@ -80,7 +80,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
         if (!string.IsNullOrEmpty(inputs.Config.CustomTemplates))
             Templates.TemplatePath = fileSystem.Combine(projectDir, inputs.Config.CustomTemplates);
 
-        foreach (var x in inputs.Config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
+        foreach (var x in inputs.Config.Connections.Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
         {
             connectionStringOptions[x.Key] = new ConnectionStringEntry
             {
@@ -210,9 +210,9 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 return new
                 {
                     name = x.Tablename,
-                    module = xct == null || xct.Module.IsEmptyOrNull() ? EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : xct.Module,
-                    permission = xct == null || xct.PermissionKey.IsTrimmedEmpty() ? "Administration:General" : xct.PermissionKey,
-                    identifier = xct == null || xct.Identifier.IsEmptyOrNull() ? EntityModelGenerator.IdentifierForTable(x.Table) : xct.Identifier,
+                    module = xct == null || string.IsNullOrEmpty(xct.Module) ? EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : xct.Module,
+                    permission = xct == null || string.IsNullOrWhiteSpace(xct.PermissionKey) ? "Administration:General" : xct.PermissionKey,
+                    identifier = xct == null || string.IsNullOrEmpty(xct.Identifier) ? EntityModelGenerator.IdentifierForTable(x.Table) : xct.Identifier,
                 };
             })));
 
@@ -262,12 +262,12 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         if (inputs.Module == null)
         {
-            userInput = confTable == null || confTable.Module.IsEmptyOrNull() ?
+            userInput = confTable == null || string.IsNullOrEmpty(confTable.Module) ?
                 EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : confTable.Module;
 
             Console.WriteLine();
 
-            while (inputs.Module.IsTrimmedEmpty())
+            while (string.IsNullOrWhiteSpace(inputs.Module))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Module name for table: ('!' to abort)");
@@ -285,12 +285,12 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         if (inputs.Identifier == null)
         {
-            userInput = confTable == null || confTable.Identifier.IsEmptyOrNull() ?
+            userInput = confTable == null || string.IsNullOrEmpty(confTable.Identifier) ?
                 EntityModelGenerator.IdentifierForTable(tableName.Table) : confTable.Identifier;
 
             Console.WriteLine();
 
-            while (inputs.Identifier.IsTrimmedEmpty())
+            while (string.IsNullOrWhiteSpace(inputs.Identifier))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a class Identifier for table: ('!' to abort)");
@@ -308,12 +308,12 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         if (inputs.PermissionKey == null)
         {
-            userInput = confTable == null || confTable.PermissionKey.IsTrimmedEmpty() ?
+            userInput = confTable == null || string.IsNullOrWhiteSpace(confTable.PermissionKey) ?
                 "Administration:General" : confTable.PermissionKey;
 
             Console.WriteLine();
 
-            while (inputs.PermissionKey.IsTrimmedEmpty())
+            while (string.IsNullOrWhiteSpace(inputs.PermissionKey))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Permission Key for table: ('!' to abort)");
@@ -335,7 +335,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             Console.WriteLine();
 
             userInput = "RSUC";
-            while (what.IsEmptyOrNull())
+            while (string.IsNullOrEmpty(what))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Choose What to Generate (R:Row, S:Services, U=UI, C=Custom)");

@@ -208,7 +208,7 @@ public partial class GenerateCommand
         {
             var projectDir = fileSystem.GetDirectoryName(csproj);
             var connectionStringOptions = new ConnectionStringOptions();
-            foreach (var x in config.Connections.Where(x => !x.ConnectionString.IsEmptyOrNull()))
+            foreach (var x in config.Connections.Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
             {
                 connectionStringOptions[x.Key] = new ConnectionStringEntry
                 {

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -284,7 +284,7 @@ public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, I
                 match.AsObject(localRow, value);
 
                 if (value != null &&
-                    (value is not string || !(value as string).IsTrimmedEmpty()))
+                    (value is not string || !string.IsNullOrWhiteSpace(value as string)))
                 {
                     anyNonEmpty = true;
                 }

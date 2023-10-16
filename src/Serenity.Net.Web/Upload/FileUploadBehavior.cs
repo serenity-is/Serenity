@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 using System.IO;
 
 namespace Serenity.Services;
@@ -240,7 +240,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
 
         if (newFilename == null)
         {
-            if (oldFilename.IsTrimmedEmpty())
+            if (string.IsNullOrWhiteSpace(oldFilename))
                 return;
 
             filename[handler.Row] = null;
@@ -270,7 +270,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
 
     internal static void DeleteOldFile(IUploadStorage storage, FilesToDelete filesToDelete, string oldFilename, bool copyToHistory)
     {
-        if (!oldFilename.IsEmptyOrNull())
+        if (!string.IsNullOrEmpty(oldFilename))
         {
             filesToDelete.RegisterOldFile(oldFilename);
 

@@ -35,7 +35,7 @@ public static class TwoLevelCacheInvalidationExtensions
         if (cache is null)
             throw new ArgumentNullException(nameof(cache));
 
-        if (groupKey.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(groupKey))
             throw new ArgumentNullException(nameof(groupKey));
 
         var updater = cache.Memory.Get("BatchGenerationUpdater:UpdaterInstance:" + groupKey, TimeSpan.Zero,

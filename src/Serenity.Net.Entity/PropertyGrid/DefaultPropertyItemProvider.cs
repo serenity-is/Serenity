@@ -78,9 +78,9 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider
                         type.FullName, property.Name, basedOnRow.GetType().FullName));
                 }
                 else if (
-                    (!source.BasedOnField.PropertyName.IsEmptyOrNull() &&
+                    (!string.IsNullOrEmpty(source.BasedOnField.PropertyName) &&
                      source.BasedOnField.PropertyName != property.Name) ||
-                    (source.BasedOnField.PropertyName.IsEmptyOrNull() &&
+                    (string.IsNullOrEmpty(source.BasedOnField.PropertyName) &&
                      source.BasedOnField.Name != property.Name))
                 {
                     throw new InvalidProgramException(string.Format(

@@ -44,10 +44,10 @@ public class NavigationHelper
         {
             var item = new NavigationItem();
 
-            bool isAuthorizedSection = !attr.Url.IsEmptyOrNull() &&
-                (attr.Permission.IsEmptyOrNull() || permissions.HasPermission(attr.Permission));
+            bool isAuthorizedSection = !string.IsNullOrEmpty(attr.Url) &&
+                (string.IsNullOrEmpty(attr.Permission) || permissions.HasPermission(attr.Permission));
 
-            var path = attr.Category.IsEmptyOrNull() ? "" : (attr.Category + "/");
+            var path = string.IsNullOrEmpty(attr.Category) ? "" : (attr.Category + "/");
             path += attr.Title ?? "";
 
             var children = attrByCategory[path];

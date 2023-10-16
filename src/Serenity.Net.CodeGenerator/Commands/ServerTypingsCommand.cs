@@ -116,7 +116,7 @@ public class ServerTypingsCommand : BaseFileSystemCommand
             }
         }
 
-        if (config.RootNamespace.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(config.RootNamespace))
             config.RootNamespace = config.GetRootNamespaceFor(fileSystem, csproj);
 
         var generator = new ServerTypingsGenerator(fileSystem, assemblyFiles.ToArray())

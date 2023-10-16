@@ -48,7 +48,7 @@ internal static class BundleUtils
 
     public static string ExpandVersionVariable(IFileProvider fileProvider, string scriptUrl)
     {
-        if (scriptUrl.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(scriptUrl))
             return scriptUrl;
 
         var tpl = "{version}";
@@ -168,7 +168,7 @@ internal static class BundleUtils
 
             foreach (var sourceFile in sourceFiles)
             {
-                if (sourceFile.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(sourceFile))
                     continue;
 
                 if (sourceFile.StartsWith(bundlePrefix, StringComparison.OrdinalIgnoreCase))

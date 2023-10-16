@@ -51,7 +51,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
                     if (prefix != null)
                     {
-                        var propertyName = distinct.PropertyName.IsEmptyOrNull() ?
+                        var propertyName = string.IsNullOrEmpty(distinct.PropertyName) ?
                                 (source.BasedOnField is not null ?
                                     (source.BasedOnField.PropertyName ?? source.BasedOnField.Name) :
                                 item.Name) : distinct.PropertyName;

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Validation behavior for rows that have a parent record via <see cref="IParentIdRow"/> interface
@@ -41,7 +41,7 @@ public class ValidateParentBehavior : BaseSaveBehavior
             return;
 
         var parentIdField = parentIdRow.ParentIdField;
-        if (parentIdField.ForeignTable.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(parentIdField.ForeignTable))
             return;
 
         var foreignRowType = rowTypeRegistry.ByConnectionKey(row.GetFields().ConnectionKey)

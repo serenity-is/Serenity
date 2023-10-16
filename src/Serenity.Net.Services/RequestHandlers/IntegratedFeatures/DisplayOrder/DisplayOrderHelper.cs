@@ -217,7 +217,7 @@ public static class DisplayOrderHelper
         if (connection == null)
             throw new ArgumentNullException("connection");
 
-        if (tableName.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(tableName))
             throw new ArgumentNullException("tableName");
 
         if (keyField is null)

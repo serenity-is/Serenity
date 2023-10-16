@@ -151,7 +151,7 @@ public class CssBundleManager : ICssBundleManager
 
                 foreach (var sourceFile in sourceFiles)
                 {
-                    if (sourceFile.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(sourceFile))
                         continue;
 
                     if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
