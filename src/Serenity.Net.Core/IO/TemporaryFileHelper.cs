@@ -1,11 +1,11 @@
-﻿using System.IO;
-
 namespace Serenity.IO;
 
 /// <summary>
 ///   Contains helper functions for temporary files and folders</summary>
 public class TemporaryFileHelper
 {
+    private static readonly TemporaryPhysicalFileSystem physicalFileSystem = new();
+
     /// <summary>
     ///   A signature file that marks a folder as a temporary file to ensure that it actually contains temporary
     ///   files and can be safely cleaned</summary>
@@ -23,14 +23,15 @@ public class TemporaryFileHelper
     ///   Clears a folder based on default conditions</summary>
     /// <param name="directoryToClean">
     ///   Folder to be cleared</param>
+    /// <param name="fileSystem">File system</param>
     /// <remarks>
     ///   If any errors occur during cleanup, this doesn't raise an exception
     ///   and ignored. Other errors might raise an exception. As errors are
     ///   ignored, method can't guarantee that less than specified number of files
     ///   will be in the folder after it ends.</remarks>
-    public static void PurgeDirectoryDefault(string directoryToClean)
+    public static void PurgeDirectoryDefault(string directoryToClean, ITemporaryFileSystem? fileSystem = null)
     {
-        PurgeDirectory(directoryToClean, DefaultAutoExpireTime, DefaultMaxFilesInDirectory, DefaultTemporaryCheckFile);
+        PurgeDirectory(directoryToClean, DefaultAutoExpireTime, DefaultMaxFilesInDirectory, DefaultTemporaryCheckFile, fileSystem);
     }
 
     /// <summary>
@@ -47,24 +48,24 @@ public class TemporaryFileHelper
     /// <param name="checkFileName">
     ///   Safety file to be checked. If it is specified and it doesn't exists, operation
     ///   is aborted.</param>
+    /// <param name="fileSystem">File system</param>
     /// <remarks>
     ///   If any errors occur during cleanup, this doesn't raise an exception
     ///   and ignored. Other errors might raise an exception. As errors are
     ///   ignored, method can't guarantee that less than specified number of files
     ///   will be in the folder after it ends.</remarks>
     public static void PurgeDirectory(string directoryToClean,
-        TimeSpan autoExpireTime, int maxFilesInDirectory, string checkFileName)
+        TimeSpan autoExpireTime, int maxFilesInDirectory, string checkFileName, ITemporaryFileSystem? fileSystem = null)
     {
+        fileSystem ??= physicalFileSystem;
+
         checkFileName ??= string.Empty;
         if (checkFileName.Length > 0)
         {
-            checkFileName = System.IO.Path.GetFileName(checkFileName).Trim();
-            if (!System.IO.File.Exists(System.IO.Path.Combine(directoryToClean, checkFileName)))
+            checkFileName = fileSystem.GetFileName(checkFileName).Trim();
+            if (!fileSystem.FileExists(fileSystem.Combine(directoryToClean, checkFileName)))
                 return;
         }
-
-        // get folder information
-        DirectoryInfo directoryInfo = new(directoryToClean);
 
         // if no time condition, or all files are to be deleted (maxFilesInDirectory = 0) 
         // no need for this part
@@ -74,14 +75,14 @@ public class TemporaryFileHelper
             DateTime autoExpireLimit = DateTime.Now.Subtract(autoExpireTime);
 
             // traverse all files and if older than limit, try to delete
-            foreach (FileInfo fiOld in directoryInfo.GetFiles()
+            foreach (var fiOld in fileSystem.GetTemporaryFileInfos(directoryToClean)
                 .Where(fi => fi.CreationTime < autoExpireLimit))
             {
                 if (!checkFileName.Equals(fiOld.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
-                        fiOld.Delete();
+                        fileSystem.DeleteFile(fiOld.FullName!);
                     }
                     catch
                     {
@@ -94,7 +95,7 @@ public class TemporaryFileHelper
         if (maxFilesInDirectory >= 0)
         {
             // list all files
-            FileInfo[] files = directoryInfo.GetFiles();
+            var files = fileSystem.GetTemporaryFileInfos(directoryToClean);
 
             // if count is above limit
             if (files.Length > maxFilesInDirectory)
@@ -103,7 +104,7 @@ public class TemporaryFileHelper
                 if (maxFilesInDirectory != 0)
                 {
                     Array.Sort(files,
-                        delegate (FileInfo x, FileInfo y)
+                        delegate (TemporaryFileInfo x, TemporaryFileInfo y)
                         { return x.CreationTime < y.CreationTime ? -1 : 1; });
                 }
 
@@ -113,7 +114,7 @@ public class TemporaryFileHelper
                     if (!checkFileName.Equals(files[i].Name, StringComparison.OrdinalIgnoreCase))
                         try
                         {
-                            files[i].Delete();
+                            fileSystem.DeleteFile(files[i].FullName!);
                         }
                         catch
                         {
@@ -127,9 +128,12 @@ public class TemporaryFileHelper
     ///   Tries to delete a file with given path.</summary>
     /// <param name="filePath">
     ///   File to be deleted (can be null).</param>
-    public static void TryDelete(string filePath)
+    /// <param name="fileSystem">File system</param>
+    public static void TryDelete(string filePath, IFileSystem? fileSystem = null)
     {
-        if (File.Exists(filePath))
+        fileSystem ??= physicalFileSystem;
+
+        if (fileSystem.FileExists(filePath))
             try
             {
                 Delete(filePath);
@@ -144,15 +148,18 @@ public class TemporaryFileHelper
     ///   Deletes a file.</summary>
     /// <param name="filePath">
     ///   File to be deleted (can be null).</param>
-    public static void Delete(string filePath)
+    /// <param name="fileSystem"></param>
+    public static void Delete(string filePath, IFileSystem? fileSystem = null)
     {
-        if (File.Exists(filePath))
-            File.Delete(filePath);
+        fileSystem ??= physicalFileSystem;
+
+        if (fileSystem.FileExists(filePath))
+            fileSystem.DeleteFile(filePath);
         filePath += ".delete";
-        if (File.Exists(filePath))
+        if (fileSystem.FileExists(filePath))
             try
             {
-                File.Delete(filePath);
+                fileSystem.DeleteFile(filePath);
             }
             catch
             {
@@ -165,14 +172,15 @@ public class TemporaryFileHelper
     ///   File to be deleted (can be null).</param>
     /// <param name="type">
     ///   Delete type.</param>
-    public static void Delete(string filePath, DeleteType type)
+    /// <param name="fileSystem">File system</param>
+    public static void Delete(string filePath, DeleteType type, ITemporaryFileSystem? fileSystem = null)
     {
         if (type == DeleteType.Delete)
-            Delete(filePath);
+            Delete(filePath, fileSystem);
         else if (type == DeleteType.TryDelete)
-            TryDelete(filePath);
+            TryDelete(filePath, fileSystem);
         else
-            TryDeleteOrMark(filePath);
+            TryDeleteOrMark(filePath, fileSystem);
     }
 
     /// <summary>
@@ -180,17 +188,18 @@ public class TemporaryFileHelper
     ///   creating a ".delete" file.</summary>
     /// <param name="filePath">
     ///   File to be deleted</param>
-    public static void TryDeleteOrMark(string filePath)
+    /// <param name="fileSystem">File system</param>
+    public static void TryDeleteOrMark(string filePath, ITemporaryFileSystem? fileSystem = null)
     {
-        TryDelete(filePath);
-        if (File.Exists(filePath))
+        fileSystem ??= physicalFileSystem;
+        TryDelete(filePath, fileSystem);
+        if (fileSystem.FileExists(filePath))
         {
             try
             {
                 string deleteFile = filePath + ".delete";
-                long fileTime = File.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
-                using var sw = new StreamWriter(File.OpenWrite(deleteFile));
-                sw.Write(fileTime);
+                long fileTime = fileSystem.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
+                fileSystem.WriteAllText(deleteFile, fileTime.ToInvariant());
             }
             catch
             {
@@ -202,95 +211,35 @@ public class TemporaryFileHelper
     ///   Tries to delete all files that is marked for deletion by TryDeleteOrMark in a folder.</summary>
     /// <param name="path">
     ///   Path of marked files to be deleted</param>
-    public static void TryDeleteMarkedFiles(string path)
+    /// <param name="fileSystem">File system</param>
+    public static void TryDeleteMarkedFiles(string path, ITemporaryFileSystem? fileSystem = null)
     {
-        if (Directory.Exists(path))
+        fileSystem ??= physicalFileSystem;
+
+        if (!fileSystem.DirectoryExists(path))
+            return;
+
+        foreach (var name in fileSystem.GetFiles(path, "*.delete"))
         {
-            foreach (var name in Directory.GetFiles(path, "*.delete"))
+            try
             {
-                try
+                string readLine = fileSystem.ReadAllText(name);
+                string actualFile = name[0..^7];
+                if (fileSystem.FileExists(actualFile))
                 {
-                    string readLine;
-                    using (var sr = new StreamReader(File.OpenRead(name)))
-                        readLine = sr.ReadToEnd();
-                    string actualFile = name[0..^7];
-                    if (File.Exists(actualFile))
+                    if (long.TryParse(readLine, out long fileTime))
                     {
-                        if (long.TryParse(readLine, out long fileTime))
-                        {
-                            if (fileTime == File.GetLastWriteTimeUtc(actualFile).ToFileTimeUtc())
-                                TryDelete(actualFile);
-                        }
-                        TryDelete(name);
+                        if (fileTime == fileSystem.GetLastWriteTimeUtc(actualFile).ToFileTimeUtc())
+                            TryDelete(actualFile);
                     }
-                    else
-                        TryDelete(name);
+                    TryDelete(name);
                 }
-                catch
-                {
-                }
+                else
+                    TryDelete(name);
             }
-        }
-    }
-
-    private class TempFile
-    {
-        public string? Filename;
-        public DateTime? Expiry;
-        public bool RemoveFolder;
-    }
-
-    private static readonly List<TempFile> _tempFiles = new();
-
-    /// <summary>
-    /// Clears the temporary files.
-    /// </summary>
-    /// <param name="ignoreExpiry">if set to <c>true</c> ignore expiry dates.</param>
-    public static void ClearTempFiles(bool ignoreExpiry)
-    {
-        lock (_tempFiles)
-        {
-            DateTime utcNow = DateTime.UtcNow;
-            for (var i = _tempFiles.Count - 1; i >= 0; i--)
+            catch
             {
-                var tf = _tempFiles[i];
-                if (ignoreExpiry || (tf.Expiry != null && tf.Expiry <= utcNow))
-                {
-                    TryDelete(tf.Filename!);
-                    if (!File.Exists(tf.Filename))
-                    {
-                        _tempFiles.RemoveAt(i);
-                        if (tf.RemoveFolder)
-                            try
-                            {
-                                Directory.Delete(Path.GetDirectoryName(tf.Filename));
-                            }
-                            catch
-                            {
-                            }
-                    }
-                }
             }
-        }
-    }
-
-    /// <summary>
-    /// Registers the temporary file.
-    /// </summary>
-    /// <param name="filename">The filename.</param>
-    /// <param name="expiry">The expiry.</param>
-    /// <param name="removeFolder">if set to <c>true</c> [remove folder].</param>
-    public static void RegisterTempFile(string filename, DateTime? expiry, bool removeFolder)
-    {
-        TempFile tf = new()
-        {
-            Filename = filename,
-            Expiry = expiry,
-            RemoveFolder = removeFolder
-        };
-        lock (_tempFiles)
-        {
-            _tempFiles.Add(tf);
         }
     }
 
