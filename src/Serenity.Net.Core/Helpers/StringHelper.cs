@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Serenity;
 
@@ -61,6 +62,7 @@ public static partial class StringHelper
 
         if (str.Length == 0)
             return null;
+
         return str;
     }
 
@@ -80,8 +82,9 @@ public static partial class StringHelper
     ///   Trimmed string (result won't be null).</returns>
     public static string TrimToEmpty(this string? str)
     {
-        if (string.IsNullOrEmpty(str))
+        if (string.IsNullOrWhiteSpace(str))
             return string.Empty;
+
         return str.Trim();
     }
 
@@ -101,11 +104,11 @@ public static partial class StringHelper
     ///   If two strings are same trimmed, true</returns>
     public static bool IsTrimmedSame(this string? string1, string? string2)
     {
-        if ((string1 == null || string1.Length == 0) &&
-            (string2 == null || string2.Length == 0))
+        if (string.IsNullOrWhiteSpace(string1) &&
+            string.IsNullOrWhiteSpace(string2))
             return true;
-        else
-            return TrimToNull(string1) == TrimToNull(string2);
+
+        return TrimToEmpty(string1) == TrimToEmpty(string2);
     }
 
     /// <summary>
@@ -176,7 +179,6 @@ public static partial class StringHelper
         QuoteString(str, sb, true);
         return sb.ToString();
     }
-
 
     private const string emptySingleQuote = "''";
     private const string emptyDoubleQuote = "\"\"";
@@ -300,7 +302,7 @@ public static partial class StringHelper
     /// </summary>
     /// <param name="filename">The string.</param>
     /// <param name="replacement">Replacement string for invalid characters</param>
-    /// <param name="removeDiacritics">True to remove diacritics</param>
+    /// <param name="removeDiacritics">True (default) to remove diacritics</param>
     /// <exception cref="ArgumentNullException">s is null</exception>
     public static string SanitizeFilename(string filename,
         string replacement = "_", bool removeDiacritics = true)
@@ -310,7 +312,7 @@ public static partial class StringHelper
 
         if (removeDiacritics)
         {
-            RemoveDiacritics(filename);
+            filename = RemoveDiacritics(filename);
             filename = filename.Replace("ı", "i");
         }
 
@@ -323,12 +325,12 @@ public static partial class StringHelper
     /// A regex to remove invalid file path characters
     /// </summary>
     public static readonly Regex InvalidPathCharsRegex =
-        new($"[{Regex.Escape(new string(Path.GetInvalidPathChars()))}]",
+        new($"[\\*\\?<>{Regex.Escape(new string(Path.GetInvalidPathChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Sanitizes the path by removing diacritics, ı with i and replacing any
-    /// invalid file path characters with underscore.
+    /// Sanitizes the path by removing diacritics (ü with u, ı with i etc.) and 
+    /// replacing any invalid file path characters with underscore.
     /// </summary>
     /// <param name="filename">The string.</param>
     /// <param name="replacement">Replacement string for invalid characters</param>
@@ -342,7 +344,7 @@ public static partial class StringHelper
 
         if (removeDiacritics)
         {
-            RemoveDiacritics(filename);
+            filename = RemoveDiacritics(filename);
             filename = filename.Replace("ı", "i");
         }
 
@@ -354,11 +356,14 @@ public static partial class StringHelper
     /// <summary>
     /// Removes the diacritic characters from string by replacing them with ASCII versions.
     /// </summary>
-    /// <param name="s">The string.</param>
+    /// <param name="str">The string.</param>
     /// <returns>String with diacritics replaced.</returns>
-    public static string RemoveDiacritics(string s)
+    public static string RemoveDiacritics(string str)
     {
-        var normalizedString = s.Normalize(NormalizationForm.FormKD);
+        if (str == null)
+            throw new ArgumentNullException(nameof(str));
+
+        var normalizedString = str.Normalize(NormalizationForm.FormKD);
         var stringBuilder = new StringBuilder();
 
         for (int i = 0; i < normalizedString.Length; i++)
