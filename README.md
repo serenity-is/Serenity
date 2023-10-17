@@ -11,7 +11,7 @@ Serenity is an ASP.NET Core / TypeScript application platform designed to simpli
 
 It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks, and applying best software design practices. 
 
-<img src="https://github.com/serenity-is/Serene/blob/master/build/assets/SereneAnimation.gif" />
+<img src="https://github.com/serenity-is/Serene/blob/master/build/assets/SereneAnimation.webp" />
 
 ## Documentation and Tutorials
 
