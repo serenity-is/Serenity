@@ -293,7 +293,7 @@ public static partial class StringHelper
     /// A regex to remove invalid file name characters
     /// </summary>
     public static readonly Regex InvalidFilenameCharsRegex =
-        new($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
+        new($"[\\*\\?<>{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
