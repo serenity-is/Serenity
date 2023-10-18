@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public enum ExitCodes
 {
@@ -11,5 +11,9 @@ public enum ExitCodes
     NoProjectFiles = 4,
     MultipleProjectFiles = 5,
     CantDeterminePackagesDir = 6,
-    NoConnectionString = 7
+    NoConnectionString = 7,
+    InvalidArguments = 8,
+    InvalidConnectionKey = 9,
+    NoTablesSelected = 10,
+    InvalidTable = 11
 }

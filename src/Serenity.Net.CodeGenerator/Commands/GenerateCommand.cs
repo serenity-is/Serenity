@@ -1,12 +1,16 @@
 using Serenity.Data.Schema;
+using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
 
 public partial class GenerateCommand : BaseFileSystemCommand
 {
-    public GenerateCommand(IGeneratorFileSystem fileSystem) 
+    private readonly IAnsiConsole ansiConsole;
+
+    public GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole) 
         : base(fileSystem)
     {
+        this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
     }
 
     private class AppSettingsFormat
@@ -46,298 +50,161 @@ public partial class GenerateCommand : BaseFileSystemCommand
         return null;
     }
 
-    public void Run(string csproj, string[] args)
+    private void Error(string error)
     {
-        if (!args.Any())
+        ansiConsole.Write(new Markup($"[bold red]{error}[/]"));
+        ansiConsole.WriteLine();
+    }
+
+    private void WriteHeading(string text)
+    {
+        ansiConsole.WriteLine();
+        ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]{text}[/]")
         {
-            var exitCode = new Interactive(fileSystem, Spectre.Console.AnsiConsole.Console).Run(csproj);
-            if (exitCode != ExitCodes.Success &&
-                exitCode != ExitCodes.Help)
-                Environment.Exit((int)exitCode);
+            Justification = Justify.Left
+        });
+    }
 
-            return;
-        }
-
+    public ExitCodes Run(string csproj, string[] args)
+    {
         var projectDir = fileSystem.GetDirectoryName(csproj);
         var config = fileSystem.LoadGeneratorConfig(projectDir);
 
-        var inputs = new EntityModelInputs
+        var connectionStrings = ParseConnectionStrings(fileSystem, csproj, config);
+        if (connectionStrings.Count == 0)
         {
-            ConnectionKey = GetOption(args, "c").TrimToNull(),
-            Module = GetOption(args, "m").TrimToNull(),
-            Identifier = GetOption(args, "i").TrimToNull(),
-            PermissionKey = GetOption(args, "p").TrimToNull(),
-            Config = config
-        };
+            Error("No connections in appsettings files or sergen.json!");
+            return ExitCodes.NoConnectionString;
+        }
 
-        var interactive = inputs.Identifier is null;
+        var argsConnectionKey = GetOption(args, "c").TrimToNull();
+        var argsModule = GetOption(args, "m").TrimToNull();
+        var argsIdentifier = GetOption(args, "i").TrimToNull();
+        var argsPermissionKey = GetOption(args, "p").TrimToNull();
 
-        var table = GetOption(args, "t").TrimToNull();
+        if (!string.IsNullOrEmpty(config.CustomTemplates))
+            Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);
+
+        WriteHeading("Table Code Generation");
+
+        var argsTable = GetOption(args, "t").TrimToNull();
         var what = GetOption(args, "w").TrimToNull();
-        var outFile = GetOption(args, "o").TrimToNull();
 
-        if (!string.IsNullOrEmpty(inputs.Config.CustomTemplates))
-            Templates.TemplatePath = fileSystem.Combine(projectDir, inputs.Config.CustomTemplates);
+        var connectionKey = argsConnectionKey ?? SelectConnection(connectionStrings);
 
-        var connectionStringOptions = ParseConnectionStringOptions(fileSystem, csproj, inputs.Config);
-        if (connectionStringOptions.Count == 0)
+        if (string.IsNullOrEmpty(connectionKey))
         {
-            Console.Error.WriteLine("No connections in appsettings files or sergen.json!");
-            Environment.Exit(1);
+            Error("No connection selected!");
+            return ExitCodes.NoConnectionString;
         }
 
-        var connectionKeys = connectionStringOptions.Keys.OrderBy(x => x).ToArray();
-
-        if (outFile == null && inputs.ConnectionKey == null)
+        if (!connectionStrings.ContainsKey(connectionKey))
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("=== Table Code Generation ===");
-            Console.WriteLine("");
-            Console.ResetColor();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Available Connections:");
-            Console.ResetColor();
-            foreach (var x in connectionKeys)
-                Console.WriteLine(x);
-            Console.ResetColor();
-            Console.WriteLine();
-        }
-        else if (inputs.ConnectionKey == null)
-        {
-            fileSystem.WriteAllText(outFile, System.Text.Json.JsonSerializer.Serialize(connectionStringOptions.Keys.OrderBy(x => x)));
-            Environment.Exit(0);
-        }
-
-        string userInput = null;
-
-        if (outFile == null && inputs.ConnectionKey == null)
-        {
-            userInput = connectionKeys.Length == 1 ? connectionKeys[0] : null;
-            while (inputs.ConnectionKey == null ||
-                !connectionKeys.Contains(inputs.ConnectionKey, StringComparer.OrdinalIgnoreCase))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Enter a Connection: ('!' to abort)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                inputs.ConnectionKey = Hinter.ReadHintedLine(connectionKeys, userInput: userInput);
-                userInput = inputs.ConnectionKey;
-
-                if (inputs.ConnectionKey == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
-            }
-        }
-
-        userInput = inputs.ConnectionKey;
-        if (!connectionStringOptions.ContainsKey(userInput))
-        {
-            Console.Error.WriteLine("Can't find connection with key: " + userInput + "!");
-            Environment.Exit(1);
-        }
-
-        if (outFile == null)
-        {
-            Console.ResetColor();
-            Console.WriteLine();
+            Error($"Can't find connection with key: {connectionKey}!");
+            return ExitCodes.InvalidConnectionKey;
         }
 
         RegisterSqlProviders();
-
-        var sqlConnections = new DefaultSqlConnections(
-            new DefaultConnectionStrings(connectionStringOptions));
+        var sqlConnections = new DefaultSqlConnections(new DefaultConnectionStrings(connectionStrings));
 
         ISchemaProvider schemaProvider;
-        List<TableName> tableNames;
-        using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
+        List<TableName> allTableEntries;
+        using (var connection = sqlConnections.NewByKey(connectionKey))
         {
             schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
-            tableNames = schemaProvider.GetTableNames(connection).ToList();
+            allTableEntries = schemaProvider.GetTableNames(connection).ToList();
         }
 
-        var tables = tableNames.Select(x => x.Tablename).ToList();
-        var confConnection = inputs.Config.Connections.FirstOrDefault(x =>
-            string.Compare(x.Key, inputs.ConnectionKey, StringComparison.OrdinalIgnoreCase) == 0);
+        var allTableNames = allTableEntries.Select(x => x.Tablename).ToList();
+        var confConnection = config.Connections.FirstOrDefault(x =>
+            string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
-        if (outFile == null && table == null)
+        var selectedTableNames = !string.IsNullOrEmpty(argsTable) ? new[] { argsTable } : SelectTables(allTableNames);
+        if (!selectedTableNames.Any())
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Available Tables:");
-            Console.ResetColor();
-
-            foreach (var x in tables)
-                Console.WriteLine(x);
+            Error("No tables selected!");
+            return ExitCodes.NoTablesSelected;
         }
-        else if (table == null)
+
+        string module = null;
+        var permissionKey = argsPermissionKey ?? "Administration:General";
+        var generateData = new Dictionary<string, (string module, string identifier, string permissionKey, TableName table)>();
+
+        foreach (var tableName in selectedTableNames)
         {
-            fileSystem.WriteAllText(outFile, JSON.Stringify(tableNames.Select(x =>
+            var confTable = confConnection?.Tables?.FirstOrDefault(x => string.Compare(x.Tablename,
+                tableName, StringComparison.OrdinalIgnoreCase) == 0);
+
+            var tableEntry = allTableEntries.FirstOrDefault(x => x.Tablename == tableName) ??
+                allTableEntries.FirstOrDefault(x => string.Equals(x.Tablename, tableName, 
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (tableEntry is null)
             {
-                var xct = confConnection?.Tables.FirstOrDefault(z => string.Compare(z.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
-                return new
-                {
-                    name = x.Tablename,
-                    module = xct == null || string.IsNullOrEmpty(xct.Module) ? EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : xct.Module,
-                    permission = xct == null || string.IsNullOrWhiteSpace(xct.PermissionKey) ? "Administration:General" : xct.PermissionKey,
-                    identifier = xct == null || string.IsNullOrEmpty(xct.Identifier) ? EntityModelGenerator.IdentifierForTable(x.Table) : xct.Identifier,
-                };
-            })));
-
-            Environment.Exit(0);
-        }
-
-        userInput = tables.Count == 1 ? tables[0] : null;
-        if (userInput == null && schemaProvider.DefaultSchema != null &&
-            tables.Any(x => x.StartsWith(schemaProvider.DefaultSchema + ".", StringComparison.Ordinal)))
-            userInput = schemaProvider.DefaultSchema + ".";
-
-        if (outFile == null)
-        {
-            Console.WriteLine();
-
-            while (table == null ||
-                !tables.Contains(table, StringComparer.OrdinalIgnoreCase))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Enter a Table: ('!' to abort)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                table = Hinter.ReadHintedLine(tables, userInput: userInput);
-                userInput = table;
-
-                if (table == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
+                Error($"Can't find table with name: {tableName}!");
+                return ExitCodes.InvalidTable;
             }
+
+            if (string.IsNullOrEmpty(module))
+                module = confTable?.Module?.TrimToNull() is null ?
+                    EntityModelGenerator.IdentifierForTable(connectionKey) : confTable.Module;
+
+            module = argsModule ?? SelectModule(tableName, module);
+
+            var defaultIdentifier = confTable?.Identifier?.IsTrimmedEmpty() != false ?
+                EntityModelGenerator.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
+
+            var identifier = (selectedTableNames.Count() == 1 ? 
+                argsIdentifier : null) ?? SelectIdentifier(tableName, defaultIdentifier);
+
+            permissionKey = argsPermissionKey ?? SelectPermissionKey(tableName, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);
+
+            generateData.Add(tableName, (module, identifier, permissionKey, tableEntry));
         }
 
-        userInput = table;
-        var tableName = tableNames.First(x => string.Compare(x.Tablename, 
-            userInput, StringComparison.OrdinalIgnoreCase) == 0);
-        if (tableName == null)
+        if (what != null)
         {
-            Console.Error.WriteLine("Can't find table with name: " + userInput + "!");
-            Environment.Exit(1);
+            config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
+        }
+        else
+        {
+            var whatToGenerate = SelectWhatToGenerate();
+            config.GenerateRow = whatToGenerate.Contains("Row");
+            config.GenerateService = whatToGenerate.Contains("Services");
+            config.GenerateUI = whatToGenerate.Contains("User Interface");
+            config.GenerateCustom = whatToGenerate.Contains("Custom");
         }
 
-        inputs.Schema = tableName.Schema;
-        inputs.Table = tableName.Table;
-
-        var confTable = confConnection?.Tables.FirstOrDefault(x =>
-            string.Compare(x.Tablename, table, StringComparison.OrdinalIgnoreCase) == 0);
-
-        if (inputs.Module == null)
+        foreach (var data in generateData)
         {
-            userInput = confTable == null || string.IsNullOrEmpty(confTable.Module) ?
-                EntityModelGenerator.IdentifierForTable(inputs.ConnectionKey) : confTable.Module;
+            var confTable = confConnection?.Tables.FirstOrDefault(x => string.Compare(x.Tablename, data.Key, 
+                StringComparison.OrdinalIgnoreCase) == 0);
 
-            Console.WriteLine();
-
-            while (string.IsNullOrWhiteSpace(inputs.Module))
+            var inputs = new EntityModelInputs
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Enter a Module name for table: ('!' to abort)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                inputs.Module = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = inputs.Module;
+                Config = config,
+                ConnectionKey = connectionKey,
+                Identifier = data.Value.identifier,
+                Module = data.Value.module,
+                PermissionKey = data.Value.permissionKey,
+                Table = data.Value.table.Table,
+                Schema = data.Value.table.Schema
+            };
 
-                if (inputs.Module == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
-            }
-        }
+            UpdateConfigTable(inputs, data.Value.table.Tablename, confConnection, confTable);
 
-        if (inputs.Identifier == null)
-        {
-            userInput = confTable == null || string.IsNullOrEmpty(confTable.Identifier) ?
-                EntityModelGenerator.IdentifierForTable(tableName.Table) : confTable.Identifier;
-
-            Console.WriteLine();
-
-            while (string.IsNullOrWhiteSpace(inputs.Identifier))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Enter a class Identifier for table: ('!' to abort)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                inputs.Identifier = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = inputs.Identifier;
-
-                if (inputs.Identifier == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
-            }
-        }
-
-        if (inputs.PermissionKey == null)
-        {
-            userInput = confTable == null || string.IsNullOrWhiteSpace(confTable.PermissionKey) ?
-                "Administration:General" : confTable.PermissionKey;
-
-            Console.WriteLine();
-
-            while (string.IsNullOrWhiteSpace(inputs.PermissionKey))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Enter a Permission Key for table: ('!' to abort)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                inputs.PermissionKey = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = inputs.PermissionKey;
-
-                if (inputs.PermissionKey == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
-            }
-        }
-
-
-        if (what == null)
-        {
-            Console.WriteLine();
-
-            userInput = "RSUC";
-            while (string.IsNullOrEmpty(what))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Choose What to Generate (R:Row, S:Services, U=UI, C=Custom)");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                what = Hinter.ReadHintedLine(Array.Empty<string>(), userInput: userInput);
-                userInput = what;
-
-                if (what == "!")
-                {
-                    Console.ResetColor();
-                    return;
-                }
-            }
-        }
-
-        Console.ResetColor();
-        Console.WriteLine();
-
-        inputs.Config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
-        inputs.Config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
-        inputs.Config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
-        inputs.Config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
-
-        UpdateConfigTable(inputs, tableName.Tablename, confConnection, confTable);
-
-        if (inputs.Config.SaveGeneratedTables != false)
-            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), inputs.Config.SaveToJson());
-
-        using (var connection = sqlConnections.NewByKey(inputs.ConnectionKey))
-        {
-            connection.Open();
             var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
-                csproj, fileSystem, sqlConnections, interactive);
+                csproj, fileSystem, sqlConnections, interactive: argsIdentifier is null);
+
             generator.Run();
         }
+
+        if (config.SaveGeneratedTables != false)
+            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
+
+        return ExitCodes.Success;
     }
 }

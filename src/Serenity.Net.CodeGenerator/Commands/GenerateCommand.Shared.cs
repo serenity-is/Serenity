@@ -81,7 +81,7 @@ public partial class GenerateCommand
             MySqlConnector.MySqlConnectorFactory.Instance);
     }
 
-    private static ConnectionStringOptions ParseConnectionStringOptions(IFileSystem fileSystem,
+    private static ConnectionStringOptions ParseConnectionStrings(IFileSystem fileSystem,
         string csproj, GeneratorConfig config)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);

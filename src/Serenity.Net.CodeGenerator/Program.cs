@@ -18,24 +18,36 @@ public class Program
         if (fileSystem is null)
             throw new ArgumentNullException(nameof(fileSystem));
 
-        string command = null;
-        if (args.Length > 0)
-            command = args[0].ToLowerInvariant().TrimToEmpty();
+        string csproj = null;
+        var csprojIdx = Array.FindIndex(args, x => x == "-p");
+        if (csprojIdx >= 0)
+        {
+            if (csprojIdx >= args.Length - 1)
+            {
+                WriteHelp();
+                return ExitCodes.InvalidArguments;
+            }
+            csproj = args[csprojIdx + 1];
+            args = args.Where((x, i) => i != csprojIdx && i != csprojIdx + 1).ToArray();
+        }
 
         string[] prjRefs = null;
         var prjRefsIdx = Array.FindIndex(args, x => x == "--projectrefs");
-        if (prjRefsIdx >= 0 && prjRefsIdx < args.Length - 1)
+        if (prjRefsIdx >= 0)
         {
+            if (prjRefsIdx >= args.Length - 1)
+            {
+                WriteHelp();
+                return ExitCodes.InvalidArguments;
+            }
+
             prjRefs = args[prjRefsIdx + 1].Split(';', StringSplitOptions.RemoveEmptyEntries);
             args = args.Where((x, i) => i != prjRefsIdx && i != prjRefsIdx + 1).ToArray();
         }
 
-        string csproj = null;
-        if (command == "-p" && args.Length >= 2)
-        {
-            csproj = args[1];
-            command = args.Length > 2 ? args[2] : null;
-        }
+        string command = null;
+        if (args.Length > 0)
+            command = args[0].ToLowerInvariant().TrimToEmpty();
 
         if (string.IsNullOrEmpty(command))
         {
@@ -153,7 +165,8 @@ public class Program
 
             if ("generate".StartsWith(command, StringComparison.Ordinal))
             {
-                new GenerateCommand(fileSystem).Run(csproj, args.Skip(1).ToArray());
+                new GenerateCommand(fileSystem, Spectre.Console.AnsiConsole.Console)
+                    .Run(csproj, args.Skip(1).ToArray());
                 return ExitCodes.Success;
             }
         }
