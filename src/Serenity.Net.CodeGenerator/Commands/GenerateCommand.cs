@@ -1,5 +1,4 @@
 using Serenity.Data.Schema;
-using System.Data.Common;
 
 namespace Serenity.CodeGenerator;
 
@@ -49,7 +48,6 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
     public void Run(string csproj, string[] args)
     {
-        var projectDir = fileSystem.GetDirectoryName(csproj);
         if (!args.Any())
         {
             var exitCode = new Interactive(fileSystem, Spectre.Console.AnsiConsole.Console).Run();
@@ -60,13 +58,16 @@ public partial class GenerateCommand : BaseFileSystemCommand
             return;
         }
 
+        var projectDir = fileSystem.GetDirectoryName(csproj);
+        var config = fileSystem.LoadGeneratorConfig(projectDir);
+
         var inputs = new EntityModelInputs
         {
             ConnectionKey = GetOption(args, "c").TrimToNull(),
             Module = GetOption(args, "m").TrimToNull(),
             Identifier = GetOption(args, "i").TrimToNull(),
             PermissionKey = GetOption(args, "p").TrimToNull(),
-            Config = fileSystem.LoadGeneratorConfig(projectDir)
+            Config = config
         };
 
         var interactive = inputs.Identifier is null;
@@ -75,43 +76,10 @@ public partial class GenerateCommand : BaseFileSystemCommand
         var what = GetOption(args, "w").TrimToNull();
         var outFile = GetOption(args, "o").TrimToNull();
 
-        var connectionStringOptions = new ConnectionStringOptions();
-
         if (!string.IsNullOrEmpty(inputs.Config.CustomTemplates))
             Templates.TemplatePath = fileSystem.Combine(projectDir, inputs.Config.CustomTemplates);
 
-        foreach (var x in inputs.Config.Connections.Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
-        {
-            connectionStringOptions[x.Key] = new ConnectionStringEntry
-            {
-                ConnectionString = x.ConnectionString,
-                ProviderName = x.ProviderName,
-                Dialect = x.Dialect
-            };
-        }
-
-        foreach (var name in inputs.Config.GetAppSettingsFiles())
-        {
-            var path = fileSystem.Combine(projectDir, name);
-            if (fileSystem.FileExists(name))
-            {
-                var appSettings = JSON.ParseTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
-                if (appSettings.Data != null)
-                    foreach (var data in appSettings.Data)
-                    {
-                        // not so nice fix for relative paths, e.g. sqlite etc.
-                        if (data.Value.ConnectionString.Contains("../../..", StringComparison.Ordinal))
-                            data.Value.ConnectionString = data.Value
-                                .ConnectionString.Replace("../../..", fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
-                        else if (data.Value.ConnectionString.Contains(@"..\..\..\", StringComparison.Ordinal))
-                            data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\",
-                                fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
-
-                        connectionStringOptions[data.Key] = data.Value;
-                    }
-            }
-        }
-
+        var connectionStringOptions = ParseConnectionStringOptions(fileSystem, csproj, inputs.Config);
         if (connectionStringOptions.Count == 0)
         {
             Console.Error.WriteLine("No connections in appsettings files or sergen.json!");
@@ -371,82 +339,5 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 csproj, fileSystem, sqlConnections, interactive);
             generator.Run();
         }
-    }
-
-    private static void UpdateConfigTable(EntityModelInputs inputs, string tableName,
-        GeneratorConfig.Connection confConnection,
-        GeneratorConfig.Table confTable)
-    {
-        if (confConnection == null)
-        {
-            confConnection = new GeneratorConfig.Connection
-            {
-                Key = inputs.ConnectionKey
-            };
-            inputs.Config.Connections.Add(confConnection);
-        }
-
-        if (confTable == null)
-        {
-            confTable = new GeneratorConfig.Table
-            {
-                Identifier = inputs.Identifier,
-                Module = inputs.Module,
-                PermissionKey = inputs.PermissionKey,
-                Tablename = tableName
-            };
-
-            confConnection.Tables.Add(confTable);
-        }
-        else
-        {
-            confTable.Identifier = inputs.Identifier;
-            confTable.Module = inputs.Module;
-            confTable.PermissionKey = inputs.PermissionKey;
-        }
-    }
-
-    private static EntityCodeGenerator CreateCodeGenerator(
-        EntityModelInputs inputs, IEntityModelGenerator modelGenerator, 
-        string csproj, IGeneratorFileSystem fileSystem,
-        ISqlConnections sqlConnections, bool interactive = true)
-    {
-        using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
-        connection.EnsureOpen();
-
-        var csprojContent = fileSystem.ReadAllText(csproj);
-        inputs.Net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>",
-            RegexOptions.Multiline | RegexOptions.Compiled).IsMatch(csprojContent);
-
-        inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
-            StringComparison.OrdinalIgnoreCase);
-
-        inputs.DataSchema = new EntityDataSchema(connection);
-        var rowModel = modelGenerator.GenerateModel(inputs);
-
-        var codeFileHelper = new CodeFileHelper(fileSystem)
-        {
-            NoUserInteraction = !interactive,
-            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(fileSystem.FileExists),
-            TSCPath = inputs.Config.TSCPath ?? "tsc"
-        };
-
-        return new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, inputs.Config, csproj);
-    }
-
-    private static void RegisterSqlProviders()
-    {
-        DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient",
-            Microsoft.Data.SqlClient.SqlClientFactory.Instance);
-        DbProviderFactories.RegisterFactory("System.Data.SqlClient",
-            Microsoft.Data.SqlClient.SqlClientFactory.Instance);
-        DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite",
-            Microsoft.Data.Sqlite.SqliteFactory.Instance);
-        DbProviderFactories.RegisterFactory("Npgsql",
-            Npgsql.NpgsqlFactory.Instance);
-        DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient",
-            FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
-        DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient",
-            MySqlConnector.MySqlConnectorFactory.Instance);
     }
 }

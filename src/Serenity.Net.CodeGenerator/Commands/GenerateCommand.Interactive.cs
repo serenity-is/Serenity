@@ -10,8 +10,7 @@ public partial class GenerateCommand
         private readonly IGeneratorFileSystem fileSystem;
         private readonly IAnsiConsole ansiConsole;
 
-        public Interactive(IGeneratorFileSystem fileSystem,
-            IAnsiConsole ansiConsole)
+        public Interactive(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
@@ -206,53 +205,21 @@ public partial class GenerateCommand
 
         private (string connectionKey, ISqlConnections sqlConnections) SelectConnectionString(GeneratorConfig config, string csproj)
         {
-            var projectDir = fileSystem.GetDirectoryName(csproj);
-            var connectionStringOptions = new ConnectionStringOptions();
-            foreach (var x in config.Connections.Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
-            {
-                connectionStringOptions[x.Key] = new ConnectionStringEntry
-                {
-                    ConnectionString = x.ConnectionString,
-                    ProviderName = x.ProviderName,
-                    Dialect = x.Dialect
-                };
-            }
+            var options = ParseConnectionStringOptions(fileSystem, csproj, config);
 
-            foreach (var name in config.GetAppSettingsFiles())
-            {
-                var path = fileSystem.Combine(projectDir, name);
-                if (fileSystem.FileExists(name))
-                {
-                    var appSettings = JSON.ParseTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
-                    if (appSettings.Data != null)
-                        foreach (var data in appSettings.Data)
-                        {
-                            // not so nice fix for relative paths, e.g. sqlite etc.
-                            if (data.Value.ConnectionString.Contains("../../..", StringComparison.Ordinal))
-                                data.Value.ConnectionString = data.Value
-                                    .ConnectionString.Replace("../../..", fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
-                            else if (data.Value.ConnectionString.Contains(@"..\..\..\", StringComparison.Ordinal))
-                                data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\",
-                                    fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
-
-                            connectionStringOptions[data.Key] = data.Value;
-                        }
-                }
-            }
-
-            if (connectionStringOptions.Count == 0)
+            if (options.Count == 0)
             {
                 ansiConsole.Write(new Markup($"[bold red]No connections in appsettings files or sergen.json![/]"));
                 ansiConsole.WriteLine();
                 return (null, null);
             }
 
-            var connectionKeys = connectionStringOptions.Keys.OrderBy(x => x).ToArray();
+            var connectionKeys = options.Keys.OrderBy(x => x).ToArray();
 
             RegisterSqlProviders();
 
             var sqlConnections = new DefaultSqlConnections(
-                new DefaultConnectionStrings(connectionStringOptions));
+                new DefaultConnectionStrings(options));
 
             ansiConsole.WriteLine();
             var selections = new SelectionPrompt<string>()
