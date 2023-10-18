@@ -70,8 +70,8 @@ public class EntityModelGenerator : IEntityModelGenerator
                     flags.Add(new("Serenity.Data.Mapping.PrimaryKey"));
                 else if (version)
                 {
-                    flags.Add(new("Serenity.ComponentModel.Insertable", "false"));
-                    flags.Add(new("Serenity.ComponentModel.Updatable", "false"));
+                    flags.Add(new("Serenity.ComponentModel.Insertable", false));
+                    flags.Add(new("Serenity.ComponentModel.Updatable", false));
                 }
                 
                 if (!fieldInfo.IsNullable || version)
@@ -272,7 +272,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (tableField.PropertyName == model.Identity)
             {
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
-                tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""));
+                tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "Db.Shared.RecordId"));
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.AlignRight"));
                 tableField.OmitInForm = true;
             }
@@ -357,13 +357,13 @@ public class EntityModelGenerator : IEntityModelGenerator
                     foreignField.FieldName[foreignPrefixLength..]))?.Trim();
 
                 viewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
-                    "\"" + viewField.Title + "\""));
+                    viewField.Title));
 
                 viewField.Expression = entityJoin.Alias + ".[" + viewField.Name + "]";
 
-                var expr = model.DeclareJoinConstants ?
-                        "$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"" :
-                        ("\"" + viewField.Expression + "\"");
+                object expr = model.DeclareJoinConstants ?
+                    new RawCode("$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"") :
+                    (viewField.Expression);
 
                 viewField.AttributeList.Add(new("Serenity.Data.Mapping.Expression", expr));
 
@@ -377,27 +377,27 @@ public class EntityModelGenerator : IEntityModelGenerator
         {
             var attrs = tableField.AttributeList;
 
-            attrs.Add(new("System.ComponentModel.DisplayName", "\"" + tableField.Title + "\""));
+            attrs.Add(new("System.ComponentModel.DisplayName", tableField.Title));
 
             if (tableField.PropertyName != tableField.Name)
-                attrs.Add(new("Serenity.Data.Mapping.Column", "\"" + tableField.Name + "\""));
+                attrs.Add(new("Serenity.Data.Mapping.Column", tableField.Name));
 
             if ((tableField.Size ?? 0) > 0)
-                attrs.Add(new("Serenity.Data.Mapping.Size", tableField.Size.ToString()));
+                attrs.Add(new("Serenity.Data.Mapping.Size", tableField.Size ?? 0));
 
             if (tableField.Scale > 0)
-                attrs.Add(new("Serenity.Data.Mapping.Scale", tableField.Scale.ToString()));
+                attrs.Add(new("Serenity.Data.Mapping.Scale", tableField.Scale));
 
             if (!tableField.FlagList.IsEmptyOrNull())
                 attrs.AddRange(tableField.FlagList);
 
             if (!string.IsNullOrEmpty(tableField.PKTable))
             {
-                attrs.Add(new("Serenity.Data.Mapping.ForeignKey", "\"" +
-                    (string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]")) + "\", " +
-                    "\"" + tableField.PKColumn + "\""));
-                var alias = model.DeclareJoinConstants ?
-                    tableField.ForeignJoinAlias : ("\"" + tableField.ForeignJoinAlias + "\"");
+                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
+                attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
+
+                object alias = model.DeclareJoinConstants ?
+                    new RawCode(tableField.ForeignJoinAlias) : tableField.ForeignJoinAlias;
                 attrs.Add(new("Serenity.Data.Mapping.LeftJoin", alias));
             }
 
@@ -413,7 +413,7 @@ public class EntityModelGenerator : IEntityModelGenerator
 
             if (tableField.TextualField != null)
                 attrs.Add(new("Serenity.Data.Mapping.TextualField",
-                    "nameof(" + tableField.TextualField + ")"));
+                    new RawCode("nameof(" + tableField.TextualField + ")")));
         }
 
         return model;

@@ -1,3 +1,4 @@
+using Serenity.CodeGeneration;
 using Serenity.Data.Schema;
 using Spectre.Console;
 
@@ -121,18 +122,18 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         if (what != null)
         {
-            config.GenerateRow = what.Contains('R', StringComparison.OrdinalIgnoreCase);
-            config.GenerateService = what.Contains('S', StringComparison.OrdinalIgnoreCase);
-            config.GenerateUI = what.Contains('U', StringComparison.OrdinalIgnoreCase);
-            config.GenerateCustom = what.Contains('C', StringComparison.OrdinalIgnoreCase);
+            config.GenerateRow = what == "*" || what.Contains('R', StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = what == "*" || what.Contains('S', StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = what == "*" || what.Contains('U', StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = what == "*" || what.Contains('C', StringComparison.OrdinalIgnoreCase);
         }
         else
         {
             var whatToGenerate = SelectWhatToGenerate();
-            config.GenerateRow = whatToGenerate.Contains("Row");
-            config.GenerateService = whatToGenerate.Contains("Services");
-            config.GenerateUI = whatToGenerate.Contains("User Interface");
-            config.GenerateCustom = whatToGenerate.Contains("Custom");
+            config.GenerateRow = whatToGenerate.Contains("Row", StringComparer.Ordinal);
+            config.GenerateService = whatToGenerate.Contains("Services", StringComparer.Ordinal);
+            config.GenerateUI = whatToGenerate.Contains("User Interface", StringComparer.Ordinal);
+            config.GenerateCustom = whatToGenerate.Contains("Custom", StringComparer.Ordinal);
         }
 
         foreach (var inputs in inputsList)

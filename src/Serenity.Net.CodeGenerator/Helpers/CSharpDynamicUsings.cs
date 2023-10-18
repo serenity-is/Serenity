@@ -17,7 +17,7 @@ public class CSharpDynamicUsings
 
         scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
         {
-            return cw.ShortTypeName(cw, fullName);
+            return cw.ShortTypeRef(fullName);
         }));
 
         scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
@@ -29,7 +29,7 @@ public class CSharpDynamicUsings
 
             foreach (var fullName in fullNames)
             {
-                result.Add(cw.ShortTypeName(cw, fullName));
+                result.Add(cw.ShortTypeRef(fullName));
             }
 
             return string.Join(", ", result);
@@ -40,14 +40,7 @@ public class CSharpDynamicUsings
             if (models == null)
                 return "";
 
-            HashSet<string> result = new();
-
-            foreach (var model in models)
-            {
-                result.Add(cw.ShortTypeName(cw, model.TypeName) + (string.IsNullOrEmpty(model.Arguments) ? "" : "(" + model.Arguments + ")"));
-            }
-
-            return string.Join(", ", result);
+            return string.Join(", ", models.Select(x => x.ToString(cw)));
         }));
 
         scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
