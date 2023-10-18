@@ -522,4 +522,31 @@ public class CodeWriter
 
         return nsb.ToString().TrimEnd();
     }
+
+    /// <summary>
+    /// List of usings that can be safely used during code generation
+    /// without causing type name clashes
+    /// </summary>
+    public static readonly HashSet<string> SafeSetOfUsings = new()
+    {
+        "Serenity",
+        "Serenity.Abstractions",
+        "Serenity.ComponentModel",
+        "Serenity.Data",
+        "Serenity.Data.Mapping",
+        "Serenity.Extensions",
+        "Serenity.Localization",
+        "Serenity.Reflection",
+        "Serenity.Services",
+        "Serenity.Web",
+        "Microsoft.AspNetCore.Mvc",
+        "System.Globalization",
+        "System.Data",
+        "System",
+        "System.IO",
+        "System.ComponentModel",
+        "System.Collections.Generic"
+    };
+
+
 }

@@ -456,7 +456,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
     }
 
-    private void ScanAnnotationTypeAttributes(TypeDefinition fromType)
+    protected virtual void ScanAnnotationTypeAttributes(TypeDefinition fromType)
     {
         var annotationTypeAttrs = TypingsUtils.GetAttrs(
             fromType.GetAttributes(),

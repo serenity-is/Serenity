@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public class ApplicationMetadata : IApplicationMetadata
 {
-    private class Scanner : ServerTypingsGenerator
+    private class Scanner : TypingsGeneratorBase
     {
         public List<TypeDefinition> RowTypes { get; } = new();
 
@@ -15,6 +15,12 @@ public class ApplicationMetadata : IApplicationMetadata
 
         protected override void GenerateCodeFor(TypeDefinition type)
         {
+        }
+
+        protected override void ScanAnnotationTypeAttributes(TypeDefinition type)
+        {
+            base.ScanAnnotationTypeAttributes(type);
+
             if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
                 TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
             {

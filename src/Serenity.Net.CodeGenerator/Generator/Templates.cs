@@ -1,4 +1,4 @@
-﻿using Scriban;
+using Scriban;
 using Scriban.Runtime;
 
 namespace Serenity.CodeGenerator;
@@ -38,6 +38,7 @@ public static class Templates
         return t;
     }
 
+
     public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model,
         Action<CodeWriter> initWriter = null)
     {
@@ -54,17 +55,10 @@ public static class Templates
                 ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                 null, x => x.Name);
 
+
             var cw = new CodeWriter
             {
-                AllowUsing = ns => ns == "Serenity" ||
-                  ns.StartsWith("Serenity.", StringComparison.Ordinal) ||
-                  ns == "Microsoft.AspNetCore.Mvc" ||
-                  ns == "System.Globalization" ||
-                  ns == "System.Data" ||
-                  ns == "System" ||
-                  ns == "System.IO" ||
-                  ns == "System.ComponentModel" ||
-                  ns == "System.Collections.Generic",
+                AllowUsing = CodeWriter.SafeSetOfUsings.Contains,
                 IsCSharp = true
             };
 
