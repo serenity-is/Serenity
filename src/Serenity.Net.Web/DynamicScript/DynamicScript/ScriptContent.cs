@@ -93,13 +93,28 @@ public class ScriptContent : IScriptContent
 
             if (brotliContent == null)
             {
-                CompressionLevel brotliLevel = compressionLevel switch
+                CompressionLevel brotliLevel;
+                if (Environment.Version.Major >= 7)
                 {
-                    CompressionLevel.Optimal => (CompressionLevel)4,
-                    // level 5-9 almost same compression, and 10+ is much slower
-                    CompressionLevel.SmallestSize => (CompressionLevel)5,
-                    _ => (CompressionLevel)1
-                };
+                    // .NET 7 does not allow custom levels
+                    brotliLevel = compressionLevel switch
+                    {
+                        CompressionLevel.Optimal => CompressionLevel.Optimal,
+                        // CompressionLevel.SmallestSize is too slow with Brotli
+                        CompressionLevel.SmallestSize => CompressionLevel.Optimal, 
+                        _ => CompressionLevel.Fastest
+                    };
+                }
+                else
+                {
+                    brotliLevel = compressionLevel switch
+                    {
+                        CompressionLevel.Optimal => (CompressionLevel)4,
+                        // level 5-9 almost same compression, and 10+ is much slower
+                        CompressionLevel.SmallestSize => (CompressionLevel)5,
+                        _ => (CompressionLevel)1
+                    };
+                }
 
                 using var cs = new MemoryStream(content.Length);
                 using (var br = new BrotliStream(cs, brotliLevel))
