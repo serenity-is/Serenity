@@ -111,8 +111,8 @@ public class ServerTypingsCommand : BaseFileSystemCommand
             endOfLine: config.EndOfLine);
     }
 
-    static string[] DetermineAssemblyFiles(IGeneratorFileSystem fileSystem, string csproj, GeneratorConfig config,
-        Action<string> onError)
+    public static string[] DetermineAssemblyFiles(IGeneratorFileSystem fileSystem, 
+        string csproj, GeneratorConfig config, Action<string> onError)
     {
         string[] assemblyFiles = null;
 

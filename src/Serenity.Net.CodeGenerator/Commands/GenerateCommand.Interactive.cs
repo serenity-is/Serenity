@@ -16,17 +16,13 @@ public partial class GenerateCommand
             this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
         }
 
-        public ExitCodes Run()
+        public ExitCodes Run(string csproj)
         {
             ansiConsole.WriteLine();
             ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]Table Code Generation[/]")
             {
                 Justification = Justify.Left
             });
-
-            var csproj = SelectCsProj();
-            if (csproj is null)
-                return ExitCodes.NoProjectFiles;
 
             var projectDir = fileSystem.GetDirectoryName(csproj);
             var config = fileSystem.LoadGeneratorConfig(projectDir);
@@ -229,35 +225,6 @@ public partial class GenerateCommand
                     .AddChoices(connectionKeys);
 
             return (ansiConsole.Prompt(selections), sqlConnections);
-        }
-
-        private string SelectCsProj()
-        {
-            var csprojFiles = fileSystem.GetFiles(".", "*.csproj");
-            if (csprojFiles.Length == 1)
-                return csprojFiles.First();
-
-            if (csprojFiles.Length == 0)
-            {
-                ansiConsole.Write(new Markup($"[bold red]Can't find a project file in current directory![/]"));
-                ansiConsole.WriteLine();
-                ansiConsole.Write(new Markup($"[bold red]Please run Sergen in a folder that contains the Asp.Net Core project.[/]"));
-                ansiConsole.WriteLine();
-                return null;
-            }
-
-            ansiConsole.WriteLine();
-            ansiConsole.Write(new Spectre.Console.Rule($"[bold orange1]Please select an Asp.Net Core project file[/]")
-            {
-                Justification = Justify.Left
-            });
-            ansiConsole.WriteLine();
-            var selections = new SelectionPrompt<string>()
-                    .PageSize(10)
-                    .MoreChoicesText("[grey](Move up and down to reveal more project files)[/]")
-                    .AddChoices(csprojFiles);
-
-            return ansiConsole.Prompt(selections);
         }
     }
 }
