@@ -13,58 +13,6 @@ public partial class GenerateCommand : BaseFileSystemCommand
         this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
     }
 
-    private class AppSettingsFormat
-    {
-        public ConnectionStringOptions Data { get; }
-
-        public AppSettingsFormat()
-        {
-            Data = new ConnectionStringOptions();
-        }
-
-        public class ConnectionInfo
-        {
-            public string ConnectionString { get; set; }
-            public string ProviderName { get; set; }
-        }
-    }
-
-    private static string GetOption(string[] args, string opt)
-    {
-        var dash = "-" + opt;
-        var val = args.FirstOrDefault(x => x.StartsWith(dash + ":", StringComparison.Ordinal));
-        if (val != null)
-            return val[(dash.Length + 1)..];
-
-        var idx = Array.IndexOf(args, dash);
-        if (idx >= 0 && idx < args.Length - 1)
-        {
-            val = args[idx + 1];
-            if (val.StartsWith("\"", StringComparison.Ordinal) && 
-                val.EndsWith("\"", StringComparison.Ordinal))
-                return val[1..^1];
-            else
-                return val;
-        }
-
-        return null;
-    }
-
-    private void Error(string error)
-    {
-        ansiConsole.Write(new Markup($"[bold red]{error}[/]"));
-        ansiConsole.WriteLine();
-    }
-
-    private void WriteHeading(string text)
-    {
-        ansiConsole.WriteLine();
-        ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]{text}[/]")
-        {
-            Justification = Justify.Left
-        });
-    }
-
     public ExitCodes Run(string csproj, string[] args)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
