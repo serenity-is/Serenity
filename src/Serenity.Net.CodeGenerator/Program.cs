@@ -1,4 +1,4 @@
-﻿using Serenity.CodeGeneration;
+using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
@@ -31,10 +31,10 @@ public class Program
         }
 
         string csproj = null;
-        if (command == "-p" && args.Length > 2)
+        if (command == "-p" && args.Length >= 2)
         {
             csproj = args[1];
-            command = args.Length > 2 ? args[1] : null;
+            command = args.Length > 2 ? args[2] : null;
         }
 
         if (string.IsNullOrEmpty(command))

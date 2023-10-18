@@ -50,7 +50,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
     {
         if (!args.Any())
         {
-            var exitCode = new Interactive(fileSystem, Spectre.Console.AnsiConsole.Console).Run();
+            var exitCode = new Interactive(fileSystem, Spectre.Console.AnsiConsole.Console).Run(csproj);
             if (exitCode != ExitCodes.Success &&
                 exitCode != ExitCodes.Help)
                 Environment.Exit((int)exitCode);
