@@ -74,7 +74,7 @@ public class ApplicationMetadata : IApplicationMetadata
                 NormalizeTablename(objectName2), StringComparison.OrdinalIgnoreCase);
     }
 
-    private Dictionary<string, IRowMetadata> rowByTablename = new();
+    private readonly Dictionary<string, IRowMetadata> rowByTablename = new();
 
     public IRowMetadata GetRowByTablename(string tablename)
     {
