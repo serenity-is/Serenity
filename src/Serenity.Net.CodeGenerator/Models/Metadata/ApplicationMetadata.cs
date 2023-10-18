@@ -131,6 +131,10 @@ public class ApplicationMetadata : IApplicationMetadata
         
         public string FullName => type.FullNameOf();
 
+        public bool HasLookupScriptAttribute => type.GetAttributes()
+            .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&
+                x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel");
+
         public IRowPropertyMetadata GetTableField(string columnName)
         {
             throw new NotImplementedException();

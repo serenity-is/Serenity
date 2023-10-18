@@ -248,6 +248,11 @@ public class CodeWriter
     public string Tab => tab;
 
     /// <summary>
+    /// Gets current indentation string
+    /// </summary>
+    public string Indentation => indent;
+
+    /// <summary>
     /// Returns true if the namespace is in list of usings.
     /// </summary>
     /// <param name="ns"></param>

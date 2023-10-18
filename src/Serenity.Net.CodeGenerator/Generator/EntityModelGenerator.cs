@@ -324,6 +324,8 @@ public class EntityModelGenerator : IEntityModelGenerator
             tableField.ForeignJoinAlias = entityJoin.Alias;
             entityJoin.SourceField = tableField.PropertyName;
 
+            var pkRow = inputs.Application?.GetRowByTablename(tableField.PKTable);
+
             foreach (var foreignField in foreignFields)
             {
                 if (foreignField.FieldName.Equals(foreignKeyInfo.PKColumn, StringComparison.OrdinalIgnoreCase))
@@ -391,14 +393,15 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (!tableField.FlagList.IsEmptyOrNull())
                 attrs.AddRange(tableField.FlagList);
 
+            IRowMetadata pkRow = null;
             if (!string.IsNullOrEmpty(tableField.PKTable))
             {
-                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
-                var pkRow = inputs.Application?.GetRowByTablename(pkTable);
+                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : 
+                    ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
+                pkRow = inputs.Application?.GetRowByTablename(pkTable);
+                
                 if (pkRow != null)
-                {
                     attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
-                }
                 else
                     attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
 
@@ -420,6 +423,12 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (tableField.TextualField != null)
                 attrs.Add(new("Serenity.Data.Mapping.TextualField",
                     new RawCode("nameof(" + tableField.TextualField + ")")));
+
+            if (pkRow != null && pkRow.HasLookupScriptAttribute)
+            {
+                attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName), 
+                    new RawCode("Async = true")));
+            }
         }
 
         return model;

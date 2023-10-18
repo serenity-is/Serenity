@@ -40,7 +40,30 @@ public class CSharpDynamicUsings
             if (models == null)
                 return "";
 
-            return string.Join(", ", models.Select(x => x.ToString(cw)));
+            var sb = new StringBuilder();
+            var lineLength = 0;
+            for (var i = 0; i < models.Count; i++)
+            {
+                var str = models[i].ToString(cw);
+                if (lineLength == 0 || lineLength + str.Length + 3 < 130)
+                {
+                    if (lineLength > 0)
+                        sb.Append(", ");
+                    sb.Append(str);
+                    lineLength += str.Length;
+                }
+                else
+                {
+                    sb.AppendLine("]");
+                    sb.Append(cw.FileScopedNamespaces ? "    " : "        ");
+                    sb.Append('[');
+                    lineLength = str.Length + 1;
+                    sb.Append(str);
+                }
+            }
+
+            return sb.ToString();
+            
         }));
 
         scriptObject.Import("USING", new UsingDelegate((requestedNamespace) =>
