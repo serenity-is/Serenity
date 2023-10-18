@@ -135,9 +135,74 @@ public class ApplicationMetadata : IApplicationMetadata
             .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&
                 x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel");
 
+        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = new();
+
         public IRowPropertyMetadata GetTableField(string columnName)
         {
-            throw new NotImplementedException();
+            columnName = SqlSyntax.Unquote(columnName);
+
+            if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata metadata))
+                return metadata;
+
+            string locatedColumnName = null;
+
+            var props = type.PropertiesOf().Where(x =>
+            {
+                var attrs = x.GetAttributes();
+                var columnAttr = attrs?.FirstOrDefault(z => z.AttributeType?.Name == "ColumnAttribute" &&
+                    z.AttributeType.NamespaceOf() == "Serenity.Data.Mapping");
+
+                if (columnAttr != null)
+                {
+                    if (columnAttr.ConstructorArguments?.FirstOrDefault().Value is string c &&
+                        string.Equals(SqlSyntax.Unquote(c), columnName,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        locatedColumnName = c;
+                        return true;
+                    }
+
+                    return false;
+                }
+                if (attrs.Any(x => x.AttributeType?.Name == "OriginAttribute" &&
+                    x.AttributeType?.NamespaceOf() == "Serenity.Data.Mapping"))
+                    return false;
+
+                if (attrs.Any(x => x.AttributeType != null &&
+                    TypingsUtils.IsSubclassOf(x.AttributeType, "Serenity.Data.Mapping",
+                    "BaseExpressionAttribute")))
+                    return false;
+
+                return string.Equals(x.Name, columnName, 
+                    StringComparison.OrdinalIgnoreCase);
+            });
+
+            if (props.Count() == 1)
+            {
+                tableFieldByColumnName[columnName] = metadata = new RowPropertyMetadata(props.First(), locatedColumnName);
+                return metadata;
+            }
+
+            return null;
+        }
+
+        public class RowPropertyMetadata : IRowPropertyMetadata
+        {
+            private readonly PropertyDefinition property;
+            private readonly string columnName;
+
+            public RowPropertyMetadata(PropertyDefinition property, string columnName)
+            {
+                this.property = property ?? throw new ArgumentNullException(nameof(property));
+                this.columnName = columnName;
+            }
+
+            public string ColumnName => columnName;
+            public string PropertyName => property.Name;
+
+            public bool IsIdProperty => property.GetAttributes()?
+                .FirstOrDefault(z => z.AttributeType?.Name == "IdPropertyAttribute" &&
+                    z.AttributeType.NamespaceOf() == "Serenity.Data") != null;
         }
     }
 }

@@ -399,9 +399,15 @@ public class EntityModelGenerator : IEntityModelGenerator
                 var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : 
                     ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
                 pkRow = inputs.Application?.GetRowByTablename(pkTable);
-                
+
                 if (pkRow != null)
-                    attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
+                {
+                    var pkProperty = pkRow.GetTableField(tableField.PKColumn);
+                    if (pkProperty != null && pkProperty.IsIdProperty)
+                        attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
+                    else
+                        attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName), tableField.PKColumn));
+                }
                 else
                     attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
 
