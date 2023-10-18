@@ -394,7 +394,13 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (!string.IsNullOrEmpty(tableField.PKTable))
             {
                 var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
-                attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
+                var pkRow = inputs.Application?.GetRowByTablename(pkTable);
+                if (pkRow != null)
+                {
+                    attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
+                }
+                else
+                    attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
 
                 object alias = model.DeclareJoinConstants ?
                     new RawCode(tableField.ForeignJoinAlias) : tableField.ForeignJoinAlias;

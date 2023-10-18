@@ -1,7 +1,8 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public interface IEntityModelInputs
 {
+    public IApplicationMetadata Application { get; }
     string ConnectionKey { get; }
     string Identifier { get; }
     GeneratorConfig Config { get; }

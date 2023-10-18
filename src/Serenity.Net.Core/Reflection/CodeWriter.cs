@@ -351,8 +351,13 @@ public class CodeWriter
 
         if (Using(ns))
             return typeName;
-        else
-            return ns + "." + typeName;
+        else if (CurrentNamespace != null)
+        {
+            var idx = CurrentNamespace.IndexOf('.', StringComparison.Ordinal);
+            if (idx >= 0 && ns.StartsWith(CurrentNamespace[..(idx + 1)], StringComparison.Ordinal))
+                ns = ns[(idx + 1)..];
+        }
+        return ns + "." + typeName;
     }
 
     /// <summary>

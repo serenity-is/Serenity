@@ -1,10 +1,10 @@
 namespace Serenity.CodeGenerator;
 
-public class TypeNameRef
+public class TypeOfRef
 {
     public string TypeName { get; }
 
-    public TypeNameRef(string typeName)
+    public TypeOfRef(string typeName)
     {
         TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
     }

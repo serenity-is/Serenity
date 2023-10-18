@@ -113,7 +113,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
                 ConnectionKey = connectionKey,
                 Config = config,
                 Schema = tableEntry.Schema,
-                Table = tableEntry.Tablename,
+                Table = tableEntry.Table,
                 Module = module,
                 Identifier = identifier,
                 PermissionKey = permissionKey
@@ -136,12 +136,25 @@ public partial class GenerateCommand : BaseFileSystemCommand
             config.GenerateCustom = whatToGenerate.Contains("Custom", StringComparer.Ordinal);
         }
 
+        IApplicationMetadata application = null;
+        try
+        {
+            var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(fileSystem, csproj, config, (error) => { });
+            if (assemblyFiles != null && assemblyFiles.Length > 0)
+            {
+                application = new ApplicationMetadata(fileSystem, assemblyFiles);
+            }
+        }
+        catch { }
+
         foreach (var inputs in inputsList)
         {
             UpdateConfigTableFor(inputs, confConnection);
 
+            inputs.Application = application;
+
             var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
-                csproj, fileSystem, sqlConnections, interactive: argsIdentifier is null);
+                csproj, fileSystem, sqlConnections, interactive: true);
 
             generator.Run();
         }
