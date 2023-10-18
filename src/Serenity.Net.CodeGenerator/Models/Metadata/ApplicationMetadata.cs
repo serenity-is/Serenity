@@ -74,8 +74,16 @@ public class ApplicationMetadata : IApplicationMetadata
                 NormalizeTablename(objectName2), StringComparison.OrdinalIgnoreCase);
     }
 
+    private Dictionary<string, IRowMetadata> rowByTablename = new();
+
     public IRowMetadata GetRowByTablename(string tablename)
     {
+        if (tablename is null)
+            throw new ArgumentNullException(nameof(tablename));
+
+        if (rowByTablename.TryGetValue(tablename, out IRowMetadata metadata))
+            return metadata;
+
         foreach (var type in scanner.RowTypes)
         {
             var attr = type.GetAttributes().FirstOrDefault(x =>
@@ -85,7 +93,10 @@ public class ApplicationMetadata : IApplicationMetadata
             if (attr != null)
             {
                 if (IsEqualIgnoreCase(tablename, attr?.ConstructorArguments?.FirstOrDefault().Value as string))
-                    return new RowMetadata(type);
+                {
+                    rowByTablename[tablename] = metadata = new RowMetadata(type);
+                    return metadata;
+                }
 
                 continue;
             }
@@ -95,9 +106,13 @@ public class ApplicationMetadata : IApplicationMetadata
                 name = name[..^3];
 
             if (IsEqualIgnoreCase(tablename, name))
-                return new RowMetadata(type);
+            {
+                rowByTablename[tablename] = metadata = new RowMetadata(type);
+                return metadata;
+            }
         }
 
+        rowByTablename[tablename] = null;
         return null;
     }
 
