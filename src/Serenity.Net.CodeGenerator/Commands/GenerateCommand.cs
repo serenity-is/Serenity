@@ -7,7 +7,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
 {
     private readonly IAnsiConsole ansiConsole;
 
-    public GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole) 
+    public GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole)
         : base(fileSystem)
     {
         this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
@@ -76,7 +76,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
         string module = null;
         var permissionKey = argsPermissionKey ?? "Administration:General";
-        var generateData = new Dictionary<string, (string module, string identifier, string permissionKey, TableName table)>();
+        var inputsList = new List<EntityModelInputs>();
 
         foreach (var tableName in selectedTableNames)
         {
@@ -107,7 +107,16 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
             permissionKey = argsPermissionKey ?? SelectPermissionKey(tableName, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);
 
-            generateData.Add(tableName, (module, identifier, permissionKey, tableEntry));
+            inputsList.Add(new() 
+            {
+                ConnectionKey = connectionKey,
+                Config = config,
+                Schema = tableEntry.Schema,
+                Table = tableEntry.Tablename,
+                Module = module,
+                Identifier = identifier,
+                PermissionKey = permissionKey
+            });
         }
 
         if (what != null)
@@ -126,23 +135,9 @@ public partial class GenerateCommand : BaseFileSystemCommand
             config.GenerateCustom = whatToGenerate.Contains("Custom");
         }
 
-        foreach (var data in generateData)
+        foreach (var inputs in inputsList)
         {
-            var confTable = confConnection?.Tables.FirstOrDefault(x => string.Compare(x.Tablename, data.Key, 
-                StringComparison.OrdinalIgnoreCase) == 0);
-
-            var inputs = new EntityModelInputs
-            {
-                Config = config,
-                ConnectionKey = connectionKey,
-                Identifier = data.Value.identifier,
-                Module = data.Value.module,
-                PermissionKey = data.Value.permissionKey,
-                Table = data.Value.table.Table,
-                Schema = data.Value.table.Schema
-            };
-
-            UpdateConfigTable(inputs, data.Value.table.Tablename, confConnection, confTable);
+            UpdateConfigTableFor(inputs, confConnection);
 
             var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
                 csproj, fileSystem, sqlConnections, interactive: argsIdentifier is null);

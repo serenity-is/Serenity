@@ -5,10 +5,14 @@ namespace Serenity.CodeGenerator;
 
 public partial class GenerateCommand
 {
-    private static void UpdateConfigTable(EntityModelInputs inputs, string tableName,
-        GeneratorConfig.Connection confConnection,
-        GeneratorConfig.Table confTable)
+    private static void UpdateConfigTableFor(EntityModelInputs inputs, 
+        GeneratorConfig.Connection confConnection)
     {
+        var tableName = string.IsNullOrEmpty(inputs.Schema) ? inputs.Table : (inputs.Schema + "." + inputs.Table);
+
+        var confTable = confConnection?.Tables.FirstOrDefault(x => string.Compare(x.Tablename, tableName,
+            StringComparison.OrdinalIgnoreCase) == 0);
+
         if (confConnection == null)
         {
             confConnection = new GeneratorConfig.Connection
@@ -25,7 +29,7 @@ public partial class GenerateCommand
                 Identifier = inputs.Identifier,
                 Module = inputs.Module,
                 PermissionKey = inputs.PermissionKey,
-                Tablename = tableName
+                Tablename = string.IsNullOrEmpty(inputs.Schema) ? inputs.Table : (inputs.Schema + "." + inputs.Table)
             };
 
             confConnection.Tables.Add(confTable);
