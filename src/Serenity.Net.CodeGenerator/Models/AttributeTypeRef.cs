@@ -26,6 +26,8 @@ public class AttributeTypeRef
 
             if (value is TypeOfRef tr)
                 s += tr.ToString(cw);
+            else if (value is NameOfRef nr)
+                s += nr.ToString(cw);
             else if (value is string str)
                 s += StringHelper.ToDoubleQuoted(str);
             else if (value is bool b)

@@ -116,9 +116,35 @@ public class ApplicationMetadata : IApplicationMetadata
         return null;
     }
 
+    private static string GetColumnName(PropertyDefinition x)
+    {
+        var attrs = x.GetAttributes();
+        var columnAttr = attrs?.FirstOrDefault(z => z.AttributeType?.Name == "ColumnAttribute" &&
+            z.AttributeType.NamespaceOf() == "Serenity.Data.Mapping");
+
+        if (columnAttr != null)
+        {
+            if (columnAttr.ConstructorArguments?.FirstOrDefault().Value is string c)
+                return SqlSyntax.Unquote(c);
+        }
+
+        if (attrs.Any(x => x.AttributeType?.Name == "OriginAttribute" &&
+            x.AttributeType?.NamespaceOf() == "Serenity.Data.Mapping"))
+            return null;
+
+        if (attrs.Any(x => x.AttributeType != null &&
+            TypingsUtils.IsSubclassOf(x.AttributeType, "Serenity.Data.Mapping",
+            "BaseExpressionAttribute")))
+            return null;
+
+        return x.Name;
+    }
+
     private class RowMetadata : IRowMetadata
     {
         private readonly TypeDefinition type;
+        private string idProperty;
+        private string nameProperty;
 
         public RowMetadata(TypeDefinition type)
         {
@@ -128,7 +154,7 @@ public class ApplicationMetadata : IApplicationMetadata
         public string Namespace => type.NamespaceOf();
 
         public string ClassName => type.Name;
-        
+
         public string FullName => type.FullNameOf();
 
         public bool HasLookupScriptAttribute => type.GetAttributes()
@@ -139,70 +165,91 @@ public class ApplicationMetadata : IApplicationMetadata
 
         public IRowPropertyMetadata GetTableField(string columnName)
         {
+            if (string.IsNullOrEmpty(columnName))
+                return null;
+
             columnName = SqlSyntax.Unquote(columnName);
 
             if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata metadata))
                 return metadata;
 
-            string locatedColumnName = null;
-
-            var props = type.PropertiesOf().Where(x =>
-            {
-                var attrs = x.GetAttributes();
-                var columnAttr = attrs?.FirstOrDefault(z => z.AttributeType?.Name == "ColumnAttribute" &&
-                    z.AttributeType.NamespaceOf() == "Serenity.Data.Mapping");
-
-                if (columnAttr != null)
-                {
-                    if (columnAttr.ConstructorArguments?.FirstOrDefault().Value is string c &&
-                        string.Equals(SqlSyntax.Unquote(c), columnName,
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        locatedColumnName = c;
-                        return true;
-                    }
-
-                    return false;
-                }
-                if (attrs.Any(x => x.AttributeType?.Name == "OriginAttribute" &&
-                    x.AttributeType?.NamespaceOf() == "Serenity.Data.Mapping"))
-                    return false;
-
-                if (attrs.Any(x => x.AttributeType != null &&
-                    TypingsUtils.IsSubclassOf(x.AttributeType, "Serenity.Data.Mapping",
-                    "BaseExpressionAttribute")))
-                    return false;
-
-                return string.Equals(x.Name, columnName, 
-                    StringComparison.OrdinalIgnoreCase);
-            });
+            var props = type.PropertiesOf().Where(x => string.Equals(GetColumnName(x), columnName,
+                StringComparison.OrdinalIgnoreCase));
 
             if (props.Count() == 1)
             {
-                tableFieldByColumnName[columnName] = metadata = new RowPropertyMetadata(props.First(), locatedColumnName);
+                tableFieldByColumnName[columnName] = metadata = new RowPropertyMetadata(props.First());
                 return metadata;
             }
 
+            tableFieldByColumnName[columnName] = null;
             return null;
+        }
+
+        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = new();
+
+        public IRowPropertyMetadata GetProperty(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            if (propertyByName.TryGetValue(name, out IRowPropertyMetadata metadata))
+                return metadata;
+
+            var prop = type.PropertiesOf().FirstOrDefault(x => x.Name == name);
+            if (prop != null)
+            {
+                propertyByName[prop.Name] = metadata = new RowPropertyMetadata(prop);
+                return metadata;
+            }
+
+            propertyByName[prop.Name] = null;
+            return null;
+        }
+
+        public string IdProperty
+        {
+            get
+            {
+                if (idProperty == null)
+                {
+                    var props = type.PropertiesOf().Where(p => p.GetAttributes(
+                        "Serenity.Data", "IdPropertyAttribute", subAttributes: false).Any());
+
+                    idProperty = props.Count() == 1 ? props.First().Name : string.Empty;
+                }
+
+                return idProperty == string.Empty ? null : idProperty;
+            }
+        }
+
+        public string NameProperty
+        {
+            get
+            {
+                if (nameProperty == null)
+                {
+                    var props = type.PropertiesOf().Where(p => p.GetAttributes(
+                        "Serenity.Data", "NamePropertyAttribute", subAttributes: false).Any());
+
+                    nameProperty = props.Count() == 1 ? props.First().Name : string.Empty;
+                }
+
+                return nameProperty == string.Empty ? null : nameProperty;
+            }
         }
 
         public class RowPropertyMetadata : IRowPropertyMetadata
         {
             private readonly PropertyDefinition property;
-            private readonly string columnName;
 
-            public RowPropertyMetadata(PropertyDefinition property, string columnName)
+            public RowPropertyMetadata(PropertyDefinition property)
             {
                 this.property = property ?? throw new ArgumentNullException(nameof(property));
-                this.columnName = columnName;
             }
 
-            public string ColumnName => columnName;
+            public string ColumnName => GetColumnName(property);
             public string PropertyName => property.Name;
-
-            public bool IsIdProperty => property.GetAttributes()?
-                .FirstOrDefault(z => z.AttributeType?.Name == "IdPropertyAttribute" &&
-                    z.AttributeType.NamespaceOf() == "Serenity.Data") != null;
         }
     }
 }

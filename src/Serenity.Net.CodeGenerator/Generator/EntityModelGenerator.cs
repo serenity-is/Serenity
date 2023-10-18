@@ -325,6 +325,52 @@ public class EntityModelGenerator : IEntityModelGenerator
             entityJoin.SourceField = tableField.PropertyName;
 
             var pkRow = inputs.Application?.GetRowByTablename(tableField.PKTable);
+            var pkNameProperty = pkRow?.NameProperty;
+            string pkNameFieldName = null;
+            if (pkNameProperty != null &&
+                foreignSelection != GeneratorConfig.FieldSelection.None)
+            {
+                var pkNameProp = pkRow.GetProperty(pkNameProperty);
+                if (pkNameProp != null)
+                {
+                    var columnName = pkNameProp.ColumnName;
+                    if (!string.IsNullOrEmpty(columnName) &&
+                        foreignFields.Any(x => x.FieldName == columnName))
+                    {
+                        pkNameFieldName = columnName;
+                    }
+                    else
+                    {
+                        var nameViewField = new EntityField
+                        {
+                            PropertyName = pkNameProp.PropertyName,
+                            Name = pkNameProp.ColumnName,
+                            DataType = "string"
+                        };
+
+                        nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
+                            nameViewField.Name))?.Trim();
+
+                        nameViewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
+                            nameViewField.Title));
+
+                        object joinExpr = model.DeclareJoinConstants ?
+                            new RawCode(entityJoin.Alias) : entityJoin.Alias;
+
+                        nameViewField.AttributeList.Add(new("Serenity.Data.Mapping.Origin",
+                            joinExpr, new NameOfRef(pkRow.FullName, pkNameProp.PropertyName)));
+
+                        var propName = nameViewField.PropertyName;
+                        nameViewField.PropertyName = propName.StartsWith(entityJoin.Name, StringComparison.Ordinal) &&
+                            !usedPropertyNames.Contains(propName) ? propName : (entityJoin.Name + propName);
+
+                        makeUniquePropertyName(nameViewField);
+
+                        tableField.TextualField = nameViewField.PropertyName;
+                        entityJoin.Fields.Add(nameViewField);
+                    }
+                }
+            }
 
             foreach (var foreignField in foreignFields)
             {
@@ -346,7 +392,8 @@ public class EntityModelGenerator : IEntityModelGenerator
 
                 makeUniquePropertyName(viewField);
 
-                if (tableField.TextualField == null && viewField.FieldType == "String")
+                if (tableField.TextualField == null && (viewField.FieldType == "String" || 
+                    (pkNameFieldName != null && foreignField.FieldName == pkNameFieldName)))
                     tableField.TextualField = viewField.PropertyName;
                 else if (foreignSelection == GeneratorConfig.FieldSelection.NameOnly &&
                     !includeForeignFields.Contains(foreignField.FieldName))
@@ -363,11 +410,23 @@ public class EntityModelGenerator : IEntityModelGenerator
 
                 viewField.Expression = entityJoin.Alias + ".[" + viewField.Name + "]";
 
-                object expr = model.DeclareJoinConstants ?
-                    new RawCode("$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"") :
-                    (viewField.Expression);
+                var originProp = pkRow?.GetTableField(foreignField.FieldName);
+                if (originProp != null)
+                {
+                    object joinExpr = model.DeclareJoinConstants ?
+                        new RawCode(entityJoin.Alias) : entityJoin.Alias;
 
-                viewField.AttributeList.Add(new("Serenity.Data.Mapping.Expression", expr));
+                    viewField.AttributeList.Add(new("Serenity.Data.Mapping.Origin",
+                        joinExpr, new NameOfRef(pkRow.FullName, originProp.PropertyName)));
+                }
+                else
+                {
+                    object expr = model.DeclareJoinConstants ?
+                        new RawCode("$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"") :
+                        (viewField.Expression);
+
+                    viewField.AttributeList.Add(new("Serenity.Data.Mapping.Expression", expr));
+                }
 
                 entityJoin.Fields.Add(viewField);
             }
@@ -394,16 +453,19 @@ public class EntityModelGenerator : IEntityModelGenerator
                 attrs.AddRange(tableField.FlagList);
 
             IRowMetadata pkRow = null;
+            IRowPropertyMetadata pkProperty = null;
+            bool pkPropertyIsId = false;
             if (!string.IsNullOrEmpty(tableField.PKTable))
             {
                 var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : 
                     ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
                 pkRow = inputs.Application?.GetRowByTablename(pkTable);
+                pkProperty = pkRow?.GetTableField(tableField.PKColumn);
+                pkPropertyIsId = pkProperty != null && pkRow.IdProperty == pkProperty.PropertyName;
 
                 if (pkRow != null)
                 {
-                    var pkProperty = pkRow.GetTableField(tableField.PKColumn);
-                    if (pkProperty != null && pkProperty.IsIdProperty)
+                    if (pkPropertyIsId)
                         attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
                     else
                         attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName), tableField.PKColumn));
@@ -430,7 +492,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 attrs.Add(new("Serenity.Data.Mapping.TextualField",
                     new RawCode("nameof(" + tableField.TextualField + ")")));
 
-            if (pkRow != null && pkRow.HasLookupScriptAttribute)
+            if (pkRow != null && pkPropertyIsId && pkRow.HasLookupScriptAttribute)
             {
                 attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName), 
                     new RawCode("Async = true")));

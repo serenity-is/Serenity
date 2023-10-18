@@ -2,5 +2,5 @@ namespace Serenity.CodeGenerator;
 
 public interface IRowPropertyMetadata : IPropertyMetadata
 {
-    bool IsIdProperty { get; }
+    string ColumnName { get; }
 }
