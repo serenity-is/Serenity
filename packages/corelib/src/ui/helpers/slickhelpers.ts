@@ -1,6 +1,6 @@
 ﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText } from "@serenity-is/corelib/q";
+import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "@serenity-is/corelib/q";
 import { Format, Formatter, RemoteView } from "@serenity-is/corelib/slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -802,5 +802,26 @@ export namespace SlickTreeHelper {
                 }
             }
         }
+    }
+}
+
+
+export class ColumnsBase<TRow> {
+    constructor(private items: Column<TRow>[]) {
+        return new Proxy(this, {
+            get(target: any, prop) {
+                if (target[prop])
+                    return target[prop];
+
+                var column = tryFirst<Column>(target.items, x => 
+                    x.sourceItem?.name === prop || x.field === prop);
+                if (column)
+                    return column;
+            }
+        }) as any;
+    }
+
+    valueOf(): Column<TRow>[] {
+        return this.items;
     }
 }
