@@ -115,13 +115,24 @@ export namespace ScriptData {
         }
     }
 
-    async function loadScriptAsync(name: string): Promise<any> {
+    let loadScriptPromises: { [key: string]: Promise<any> }  = {}
+
+    function loadScriptAsync(name: string): Promise<any> {
+        let key = name + '?' + (getHash(name) ?? '');
+
+        var promise = loadScriptPromises[key];
+        if (promise)
+            return promise;
+
+        let options = loadOptions(name, true);
         blockUI(null);
-        return await Promise.resolve(
-            $.ajax(loadOptions(name, true))
-                .always(function () {
-                    blockUndo();
-                }));
+        loadScriptPromises[key] = promise = Promise.resolve(
+            $.ajax(options).always(function () {
+                delete loadScriptPromises[key];
+                blockUndo();
+            }));
+
+        return promise;
     }
 
     function loadScriptData(name: string) {
