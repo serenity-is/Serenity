@@ -8,4 +8,5 @@ public interface IRowMetadata : IClassMetadata
     string ListServiceRoute { get; }
     string IdProperty { get; }
     string NameProperty { get; }
+    string Module { get; }
 }

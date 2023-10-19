@@ -7,6 +7,7 @@ public class ApplicationMetadata : IApplicationMetadata
     private class Scanner : TypingsGeneratorBase
     {
         public List<TypeDefinition> RowTypes { get; } = new();
+        public Dictionary<string, string> RowTypeToListRoute = new();
 
         public Scanner(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
             : base(fileSystem, assemblyLocations)
@@ -25,6 +26,36 @@ public class ApplicationMetadata : IApplicationMetadata
                 TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
             {
                 RowTypes.Add(type);
+            }
+            else if (TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceEndpoint"))
+            {
+                var route = type.GetAttributes().FirstOrDefault(x => x.AttributeType?.Name == "RouteAttribute" &&
+                    x.AttributeType?.Namespace == "Microsoft.AspNetCore.Mvc")?.ConstructorArguments?.FirstOrDefault().Value as string;
+                if (!string.IsNullOrEmpty(route) &&
+                    route.EndsWith("/[action]", StringComparison.Ordinal))
+                {
+                    route = route[..^("/[action]".Length)];
+                    if (route.StartsWith("~/", StringComparison.Ordinal))
+                        route = route[2..];
+                    else if (route.StartsWith("/", StringComparison.Ordinal))
+                        route = route[1..];
+
+                    if (!string.IsNullOrEmpty(route))
+                    {
+                        var method = type.MethodsOf().FirstOrDefault(x => x.Name == "List" &&
+                            x.ReturnType?.Name == "ListResponse`1" &&
+                            x.ReturnType.Namespace == "Serenity.Services");
+
+                        if (method != null &&
+                            method.ReturnType is GenericInstanceType git &&
+                            git?.GenericArguments()?.Count > 0)
+                        {
+                            var rowType = git.GenericArguments[0]?.FullNameOf();
+                            if (rowType != null)
+                                RowTypeToListRoute[rowType] = route + "/List";
+                        }
+                    }
+                }
             }
         }
 
@@ -74,14 +105,14 @@ public class ApplicationMetadata : IApplicationMetadata
                 NormalizeTablename(objectName2), StringComparison.OrdinalIgnoreCase);
     }
 
-    private readonly Dictionary<string, IRowMetadata> rowByTablename = new();
+    private readonly Dictionary<string, RowMetadata> rowByTablename = new();
 
     public IRowMetadata GetRowByTablename(string tablename)
     {
         if (tablename is null)
             throw new ArgumentNullException(nameof(tablename));
 
-        if (rowByTablename.TryGetValue(tablename, out IRowMetadata metadata))
+        if (rowByTablename.TryGetValue(tablename, out RowMetadata metadata))
             return metadata;
 
         foreach (var type in scanner.RowTypes)
@@ -90,13 +121,19 @@ public class ApplicationMetadata : IApplicationMetadata
                 x.AttributeType().Name == "TableNameAttribute" &&
                 x.AttributeType().NamespaceOf() == "Serenity.Data.Mapping");
 
+            RowMetadata createRowMetadata()
+            {
+                var metadata = new RowMetadata(type);
+                if (scanner.RowTypeToListRoute.TryGetValue(type.FullNameOf(), out string route))
+                    metadata.ListServiceRoute = route;
+                rowByTablename[tablename] = metadata;
+                return metadata;
+            }
+
             if (attr != null)
             {
                 if (IsEqualIgnoreCase(tablename, attr?.ConstructorArguments?.FirstOrDefault().Value as string))
-                {
-                    rowByTablename[tablename] = metadata = new RowMetadata(type);
-                    return metadata;
-                }
+                    return createRowMetadata();
 
                 continue;
             }
@@ -106,10 +143,7 @@ public class ApplicationMetadata : IApplicationMetadata
                 name = name[..^3];
 
             if (IsEqualIgnoreCase(tablename, name))
-            {
-                rowByTablename[tablename] = metadata = new RowMetadata(type);
-                return metadata;
-            }
+                return createRowMetadata();
         }
 
         rowByTablename[tablename] = null;
@@ -156,6 +190,10 @@ public class ApplicationMetadata : IApplicationMetadata
         public string ClassName => type.Name;
 
         public string FullName => type.FullNameOf();
+
+        public string Module => type.GetAttributes()
+            .FirstOrDefault(x => x.AttributeType?.Name == "ModuleAttribute" &&
+                x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel")?.ConstructorArguments?.FirstOrDefault().Value as string;
 
         public bool HasLookupScriptAttribute => type.GetAttributes()
             .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&
@@ -239,8 +277,6 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        public string ListServiceRoute => null;
-
         public class RowPropertyMetadata : IRowPropertyMetadata
         {
             private readonly PropertyDefinition property;
@@ -253,5 +289,7 @@ public class ApplicationMetadata : IApplicationMetadata
             public string ColumnName => GetColumnName(property);
             public string PropertyName => property.Name;
         }
+
+        public string ListServiceRoute { get; set; }
     }
 }

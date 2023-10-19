@@ -1,3 +1,5 @@
+using System;
+
 namespace Serenity.CodeGenerator;
 
 public class EntityModelGenerator : IEntityModelGenerator
@@ -73,7 +75,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                     flags.Add(new("Serenity.ComponentModel.Insertable", false));
                     flags.Add(new("Serenity.ComponentModel.Updatable", false));
                 }
-                
+
                 if (!fieldInfo.IsNullable || version)
                     flags.Add(new("Serenity.Data.Mapping.NotNull"));
             }
@@ -392,7 +394,7 @@ public class EntityModelGenerator : IEntityModelGenerator
 
                 makeUniquePropertyName(viewField);
 
-                if (tableField.TextualField == null && (viewField.FieldType == "String" || 
+                if (tableField.TextualField == null && (viewField.FieldType == "String" ||
                     (pkNameFieldName != null && foreignField.FieldName == pkNameFieldName)))
                     tableField.TextualField = viewField.PropertyName;
                 else if (foreignSelection == GeneratorConfig.FieldSelection.NameOnly &&
@@ -457,7 +459,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             bool pkPropertyIsId = false;
             if (!string.IsNullOrEmpty(tableField.PKTable))
             {
-                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable : 
+                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable :
                     ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
                 pkRow = inputs.Application?.GetRowByTablename(pkTable);
                 pkProperty = pkRow?.GetTableField(tableField.PKColumn);
@@ -495,16 +497,65 @@ public class EntityModelGenerator : IEntityModelGenerator
             if (pkRow != null && pkPropertyIsId)
             {
                 if (pkRow.HasLookupScriptAttribute)
-                    attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName), 
+                    attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName),
                         new RawCode("Async = true")));
-                // not yet implemented, it is not a trival task
-                // else if (!string.IsNullOrEmpty(pkRow.ListServiceRoute))
                 else
-                    attrs.Add(new("Serenity.ComponentModel.ServiceLookupEditor", new TypeOfRef(pkRow.FullName)));
+                {
+                    var route = pkRow.ListServiceRoute;
+                    if (!string.IsNullOrEmpty(route))
+                    {
+                        var defaultRoute = DefaultListServiceRoute(pkRow.FullName, pkRow.Module);
+                        if (defaultRoute != route)
+                        {
+                            attrs.Add(new("Serenity.ComponentModel.ServiceLookupEditor",
+                                new TypeOfRef(pkRow.FullName)));
+                        }
+                        else
+                        {
+                            if (route.StartsWith("Services/", StringComparison.Ordinal))
+                                route = route[("Services/".Length)..];
+                            else
+                                route = "~/" + route;
+
+                            attrs.Add(new("Serenity.ComponentModel.ServiceLookupEditor",
+                                new TypeOfRef(pkRow.FullName), new RawCode("Service = " + route.ToDoubleQuoted())));
+                        }
+                    }
+                }
             }
         }
 
         return model;
+    }
+
+    private static string DefaultListServiceRoute(string fullName, string module)
+    {
+        var name = fullName;
+        if (name.EndsWith("Row", StringComparison.Ordinal))
+            name = name[0..^("Row".Length)];
+        var idx = name.LastIndexOf('.');
+        if (idx >= 0)
+        {
+            if (module == null)
+            {
+                module = name[0..idx];
+                if (module.EndsWith(".Entities"))
+                    module = module[0..^9];
+                else if (module.EndsWith(".Scripts"))
+                    module = module[0..^8];
+                else if (module.EndsWith(".Lookups"))
+                    module = module[0..^8];
+
+                var idx2 = module.IndexOf(".");
+                if (idx2 >= 0)
+                    module = module[(idx2 + 1)..];
+            }
+            name = name[(idx + 1)..];
+        }
+        else
+            module = "";
+
+        return "Services/" + (string.IsNullOrEmpty(module) ? name : module + "/" + name) + "/List";
     }
 
     private static string PropertyNameFor(string fieldName)
