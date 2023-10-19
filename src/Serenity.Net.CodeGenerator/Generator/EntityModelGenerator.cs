@@ -492,10 +492,15 @@ public class EntityModelGenerator : IEntityModelGenerator
                 attrs.Add(new("Serenity.Data.Mapping.TextualField",
                     new RawCode("nameof(" + tableField.TextualField + ")")));
 
-            if (pkRow != null && pkPropertyIsId && pkRow.HasLookupScriptAttribute)
+            if (pkRow != null && pkPropertyIsId)
             {
-                attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName), 
-                    new RawCode("Async = true")));
+                if (pkRow.HasLookupScriptAttribute)
+                    attrs.Add(new("Serenity.ComponentModel.LookupEditor", new TypeOfRef(pkRow.FullName), 
+                        new RawCode("Async = true")));
+                // not yet implemented, it is not a trival task
+                // else if (!string.IsNullOrEmpty(pkRow.ListServiceRoute))
+                else
+                    attrs.Add(new("Serenity.ComponentModel.ServiceLookupEditor", new TypeOfRef(pkRow.FullName)));
             }
         }
 

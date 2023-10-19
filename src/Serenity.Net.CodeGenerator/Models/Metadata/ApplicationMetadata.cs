@@ -239,6 +239,8 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
+        public string ListServiceRoute => null;
+
         public class RowPropertyMetadata : IRowPropertyMetadata
         {
             private readonly PropertyDefinition property;
