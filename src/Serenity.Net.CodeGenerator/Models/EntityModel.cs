@@ -15,7 +15,7 @@ public class EntityModel
     public string RowBaseClass { get; set; } = "Serenity.Data.Row";
     public List<EntityField> RowBaseFields { get; } = new();
     public string FieldsBaseClass { get; set; } = "Serenity.Data.RowFieldsBase";
-    public bool IsLookup { get; set; }
+    public string ServiceLookupPermission { get; set; }
     public List<EntityField> Fields { get; } = new();
     public List<EntityJoin> Joins { get; } = new();
     public string NameField { get; set; }

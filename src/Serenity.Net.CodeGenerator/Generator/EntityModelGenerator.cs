@@ -1,5 +1,3 @@
-using System;
-
 namespace Serenity.CodeGenerator;
 
 public class EntityModelGenerator : IEntityModelGenerator
@@ -523,6 +521,14 @@ public class EntityModelGenerator : IEntityModelGenerator
                     }
                 }
             }
+        }
+
+        // define service lookup permission only if not multiple primary keys, which are likely M-N
+        if (!string.IsNullOrEmpty(model.NameField) &&
+            !string.IsNullOrEmpty(model.IdField) &&
+            fieldInfos.Count(x => x.IsPrimaryKey == true) <= 1)
+        {
+            model.ServiceLookupPermission = model.Permission;
         }
 
         return model;

@@ -9,6 +9,9 @@
 [DisplayName("{{Title}}"), InstanceName("{{Title}}"){{if EnableGenerateFields}}, GenerateFields{{end}}]
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
+{{~if ServiceLookupPermission~}}
+[ServiceLookupPermission("{{ServiceLookupPermission}}")]
+{{~end~}}
 public sealed{{if EnableGenerateFields || EnableRowTemplates}} partial{{end}} class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
 {   {{~if DeclareJoinConstants && !Joins.empty?~}}
 
