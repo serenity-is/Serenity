@@ -139,11 +139,27 @@ public class EntityModelGenerator : IEntityModelGenerator
                 field.IsIdentity = identities.Contains(field.FieldName);
         }
 
-        var foreignKeyInfos = inputs.DataSchema.GetForeignKeys(inputs.Schema, inputs.Table)
-            .ToLookup(x => x.FKName)
-            .Where(x => x.Count() == 1)
-            .SelectMany(x => x)
-            .ToList();
+        var prefix = DeterminePrefixLength(fieldInfos, x => x.FieldName);
+        model.FieldPrefix = prefix > 0 ? fieldInfos.First().FieldName[..prefix] : "";
+
+        var idFieldInfo = fieldInfos.FirstOrDefault(f => f.IsIdentity == true);
+        idFieldInfo ??= fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true);
+        if (idFieldInfo != null)
+            model.IdField = PropertyNameFor(idFieldInfo.FieldName[prefix..]);
+        else
+        {
+            idFieldInfo = fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true) ??
+                fieldInfos.FirstOrDefault();
+            if (idFieldInfo != null)
+                model.IdField = PropertyNameFor(idFieldInfo.FieldName[prefix..]);
+        }
+
+        var foreignKeyInfos = !inputs.SkipForeignKeys ?
+            inputs.DataSchema.GetForeignKeys(inputs.Schema, inputs.Table)
+                .ToLookup(x => x.FKName)
+                .Where(x => x.Count() == 1)
+                .SelectMany(x => x)
+                .ToList() : new();
 
         foreach (var field in fieldInfos)
         {
@@ -154,21 +170,6 @@ public class EntityModelGenerator : IEntityModelGenerator
                 field.PKTable = fk.PKTable;
                 field.PKColumn = fk.PKColumn;
             }
-        }
-
-        var prefix = DeterminePrefixLength(fieldInfos, x => x.FieldName);
-        model.FieldPrefix = prefix > 0 ? fieldInfos.First().FieldName[..prefix] : "";
-
-        var identity = fieldInfos.FirstOrDefault(f => f.IsIdentity == true);
-        identity ??= fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true);
-        if (identity != null)
-            model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
-        else
-        {
-            identity = fieldInfos.FirstOrDefault(f => f.IsPrimaryKey == true) ??
-                fieldInfos.FirstOrDefault();
-            if (identity != null)
-                model.Identity = PropertyNameFor(identity.FieldName[prefix..]);
         }
 
         string baseRowMatch = null;
@@ -220,14 +221,14 @@ public class EntityModelGenerator : IEntityModelGenerator
 
         var foreignSelection = inputs.Config.ForeignFieldSelection ?? GeneratorConfig.FieldSelection.All;
 
-        if (inputs.Config.RemoveForeignFields is { } removeFK)
+        if (!inputs.SkipForeignKeys && inputs.Config.RemoveForeignFields is { } removeFK)
         {
             removeForeignFields.AddRange(removeFK.Select(
                 x => x.TrimToNull()).Where(x => x != null));
         }
 
         var includeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (inputs.Config.IncludeForeignFields is { } includeFK)
+        if (!inputs.SkipForeignKeys && inputs.Config.IncludeForeignFields is { } includeFK)
         {
             includeForeignFields.AddRange(includeFK.Select(
                 x => x.TrimToNull()).Where(x => x != null));
@@ -269,7 +270,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         {
             var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true);
 
-            if (tableField.PropertyName == model.Identity)
+            if (tableField.PropertyName == model.IdField)
             {
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
                 tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "Db.Shared.RecordId"));
@@ -455,7 +456,7 @@ public class EntityModelGenerator : IEntityModelGenerator
             IRowMetadata pkRow = null;
             IRowPropertyMetadata pkProperty = null;
             bool pkPropertyIsId = false;
-            if (!string.IsNullOrEmpty(tableField.PKTable))
+            if (!inputs.SkipForeignKeys && !string.IsNullOrEmpty(tableField.PKTable))
             {
                 var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable :
                     ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");

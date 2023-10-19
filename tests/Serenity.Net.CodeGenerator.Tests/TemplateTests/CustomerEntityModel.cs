@@ -16,7 +16,7 @@ public class CustomerEntityModel : EntityModel
         Schema = TestSchema;
         Tablename = Customer;
         Title = Customer;
-        Identity = CustomerId;
+        IdField = CustomerId;
         RowBaseClass = "Serenity.Data.Row<CustomerRow.RowFields>";
         NameField = CustomerName;
         FieldPrefix = "";

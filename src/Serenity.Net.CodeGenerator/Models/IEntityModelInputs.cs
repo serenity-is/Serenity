@@ -13,5 +13,7 @@ public interface IEntityModelInputs
     bool SchemaIsDatabase { get; }
     string PermissionKey { get; }
     string Schema { get; }
+    bool SkipForeignKeys { get; }
     string Table { get; }
+    string Tablename => string.IsNullOrEmpty(Schema) ? Table : (Schema + "." + Table);
 }

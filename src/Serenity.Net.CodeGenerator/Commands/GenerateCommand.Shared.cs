@@ -42,10 +42,11 @@ public partial class GenerateCommand
         }
     }
 
-    private static EntityCodeGenerator CreateCodeGenerator(
-        EntityModelInputs inputs, IEntityModelGenerator modelGenerator,
-        string csproj, IGeneratorFileSystem fileSystem,
-        ISqlConnections sqlConnections, bool interactive = true)
+    private static EntityModel CreateEntityModel(EntityModelInputs inputs, 
+        IEntityModelGenerator modelGenerator,
+        string csproj,
+        IGeneratorFileSystem fileSystem,
+        ISqlConnections sqlConnections)
     {
         using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
         connection.EnsureOpen();
@@ -58,7 +59,17 @@ public partial class GenerateCommand
             StringComparison.OrdinalIgnoreCase);
 
         inputs.DataSchema = new EntityDataSchema(connection);
-        var rowModel = modelGenerator.GenerateModel(inputs);
+        return modelGenerator.GenerateModel(inputs);
+    }
+
+    private static EntityCodeGenerator CreateCodeGenerator(EntityModelInputs inputs, 
+        IEntityModelGenerator modelGenerator,
+        string csproj, 
+        IGeneratorFileSystem fileSystem,
+        ISqlConnections sqlConnections, 
+        bool interactive = true)
+    {
+        var entityModel = CreateEntityModel(inputs, modelGenerator, csproj, fileSystem, sqlConnections);
 
         var codeFileHelper = new CodeFileHelper(fileSystem)
         {
@@ -67,7 +78,7 @@ public partial class GenerateCommand
             TSCPath = inputs.Config.TSCPath ?? "tsc"
         };
 
-        return new EntityCodeGenerator(fileSystem, codeFileHelper, rowModel, inputs.Config, csproj);
+        return new EntityCodeGenerator(fileSystem, codeFileHelper, entityModel, inputs.Config, csproj);
     }
 
     private static void RegisterSqlProviders()

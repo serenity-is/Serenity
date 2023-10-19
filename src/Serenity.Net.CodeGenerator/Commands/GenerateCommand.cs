@@ -135,13 +135,30 @@ public partial class GenerateCommand : BaseFileSystemCommand
             config.GenerateCustom = whatToGenerate.Contains("Custom", StringComparer.Ordinal);
         }
 
-        IApplicationMetadata application = null;
+        ApplicationMetadata application = null;
         try
         {
             var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(fileSystem, csproj, config, (error) => { });
             if (assemblyFiles != null && assemblyFiles.Length > 0)
             {
-                application = new ApplicationMetadata(fileSystem, assemblyFiles);
+                application = new ApplicationMetadata(fileSystem, assemblyFiles)
+                {
+                    DefaultSchema = schemaProvider.DefaultSchema
+                };
+
+                foreach (var inputs in inputsList)
+                {
+                    inputs.SkipForeignKeys = true;
+                    try
+                    {
+                        var entityModel = CreateEntityModel(inputs, new EntityModelGenerator(), csproj, fileSystem, sqlConnections);
+                        application.EntityModels.Add(entityModel);
+                    }
+                    finally
+                    {
+                        inputs.SkipForeignKeys = false;
+                    }
+                }
             }
         }
         catch { }

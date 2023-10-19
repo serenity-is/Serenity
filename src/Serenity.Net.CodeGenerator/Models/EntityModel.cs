@@ -11,7 +11,7 @@ public class EntityModel
     public string Schema { get; set; }
     public string Tablename { get; set; }
     public string Title { get; set; }
-    public string Identity { get; set; }
+    public string IdField { get; set; }
     public string RowBaseClass { get; set; } = "Serenity.Data.Row";
     public List<EntityField> RowBaseFields { get; } = new();
     public string FieldsBaseClass { get; set; } = "Serenity.Data.RowFieldsBase";
@@ -29,7 +29,7 @@ public class EntityModel
     public bool GenerateListExcel { get; set; }
     public HashSet<string> GlobalUsings { get; } = new();
 
-    public string IdField => Identity;
+    public string Identity => IdField;
     public Dictionary<string, object> CustomSettings { get; set; }
 
     public IEnumerable<EntityField> FormFields => Fields.Where(f => !f.OmitInForm);
@@ -113,7 +113,7 @@ public class EntityModel
 
     public string SchemaAndTable
     {
-        get { return string.IsNullOrEmpty(Schema)? Tablename : "[" + Schema + "].[" + Tablename + "]"; }
+        get { return string.IsNullOrEmpty(Schema) ? Tablename : "[" + Schema + "].[" + Tablename + "]"; }
     }
 
     public string RowBaseClassAndInterfaces
@@ -141,7 +141,7 @@ public class EntityModel
         {
             var result = new List<string> { RowBaseClass ?? "Serenity.Data.Row" };
 
-            if (!string.IsNullOrEmpty(Identity))
+            if (!string.IsNullOrEmpty(IdField))
                 result.Add("Serenity.Data.IIdRow");
             if (!string.IsNullOrEmpty(NameField))
                 result.Add("Serenity.Data.INameRow");

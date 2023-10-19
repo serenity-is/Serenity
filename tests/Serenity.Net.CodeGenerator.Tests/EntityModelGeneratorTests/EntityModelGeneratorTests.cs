@@ -35,7 +35,7 @@ public partial class EntiyModelGeneratorTests
         Assert.Equal(TestSchema, model.Schema);
         Assert.Equal(Customer, model.Tablename);
         Assert.Equal(Customer, model.Title);
-        Assert.Equal(CustomerId, model.Identity);
+        Assert.Equal(CustomerId, model.IdField);
         Assert.Equal(typeof(Row<>).FullName.Split('`')[0] + $"<{Customer}Row.RowFields>", model.RowBaseClass);
         Assert.Equal(CustomerName, model.NameField);
         Assert.Equal("", model.FieldPrefix);

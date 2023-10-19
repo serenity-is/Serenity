@@ -14,4 +14,5 @@ public class EntityModelInputs : IEntityModelInputs
     public string PermissionKey { get; set; }
     public string Schema { get; set; }
     public string Table { get; set; }
+    public bool SkipForeignKeys { get; set; }
 }
