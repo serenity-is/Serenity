@@ -28,7 +28,7 @@ namespace Serenity.Tests.CodeGenerator {export interface FormWithUnknownEditor {
     }
 
     export class FormWithUnknownEditor extends Serenity.PrefixedContext {
-        static formKey = 'FormWithUnknownEditor';
+        static readonly formKey = 'FormWithUnknownEditor';
         private static init: boolean;
 
         constructor(prefix: string) {
