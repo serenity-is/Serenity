@@ -5163,7 +5163,7 @@ declare namespace Serenity {
         protected getPropertyItems(): Q.PropertyItem[];
         protected getPropertyItemsData(): Q.PropertyItemsData;
         protected getPropertyItemsDataAsync(): Promise<Q.PropertyItemsData>;
-        protected getColumns(): Slick.Column[];
+        protected getColumns(): Slick.Column<TItem>[];
         protected propertyItemsToSlickColumns(propertyItems: Q.PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
         protected populateLock(): void;

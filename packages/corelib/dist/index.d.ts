@@ -2011,7 +2011,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected getPropertyItems(): PropertyItem[];
     protected getPropertyItemsData(): PropertyItemsData;
     protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
-    protected getColumns(): Column[];
+    protected getColumns(): Column<TItem>[];
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[];
     protected getSlickOptions(): GridOptions;
     protected populateLock(): void;

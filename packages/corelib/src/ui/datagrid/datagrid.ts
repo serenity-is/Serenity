@@ -929,7 +929,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return { items: [], additionalItems: [] };
     }
 
-    protected getColumns(): Column[] {
+    protected getColumns(): Column<TItem>[] {
         return this.propertyItemsToSlickColumns(this.getPropertyItems());
     }
 
