@@ -1,20 +1,24 @@
 ﻿/** 
+ * ## Serenity Core Library
  * 
- * This is the main entry point for `@serenity-is/corelib` package.
+ * This is the package containing core TypeScript classes and functions used in Serenity applications. 
  * 
- * The types from this module are available by importing from "@serenity-is/corelib":
+ * It should be installed by default in your projects created from `Serene` or `StartSharp` template:
  * 
- * ```ts
- * import { EntityGrid } from "serenity-is/corelib"
- * 
- * export class MyGrid extends EntityGrid<MyRow, any> {
+ * ```json
+ * {
+ *   "dependencies": {
+ *     // ...
+ *     "@serenity-is/corelib": "6.9.0"
+ *   }
  * }
  * ```
- *   
- * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` namespace.
+ * 
+ * The version number for this package should be equal or as close as possible to Serenity NuGet package versions in your project file.
+ * 
+ * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` abd `Q` namespaces.
  * > e.g. `Serenity.EntityGrid`
  * @packageDocumentation
- * @module corelib
  */
 
 export * from "./q";
