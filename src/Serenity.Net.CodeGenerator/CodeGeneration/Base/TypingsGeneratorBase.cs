@@ -1116,7 +1116,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                             p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
                         return (from, importList);
-                    }).OrderBy(x => x.from, StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
+                    }).OrderBy(x => FromOrderKey(x.from), StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
                         Environment.NewLine + Environment.NewLine);
                 }
             }
@@ -1126,6 +1126,17 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
 
         base.AddFile(filename, module);
+    }
+
+    private string FromOrderKey(string from)
+    {
+        if (from == null) 
+            return null;
+
+        /// local imports ordered last
+        return (from.StartsWith(".", StringComparison.Ordinal) ||
+            from.StartsWith("/", StringComparison.Ordinal)) ?
+            char.MaxValue + from : from;
     }
 
     protected string ImportFromQ(string name)

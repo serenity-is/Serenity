@@ -68,9 +68,20 @@ public class ModularTSImporter
             return "";
 
         return string.Join(Environment.NewLine, moduleImports
-            .OrderBy(x => x.From, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => FromOrderKey(x.From), StringComparer.OrdinalIgnoreCase)
             .GroupBy(x => x.From, StringComparer.Ordinal)
             .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+    }
+
+    private string FromOrderKey(string from)
+    {
+        if (from == null)
+            return null;
+
+        /// local imports ordered last
+        return (from.StartsWith(".", StringComparison.Ordinal) ||
+            from.StartsWith("/", StringComparison.Ordinal)) ?
+            char.MaxValue + from : from;
     }
 
     delegate string ImportDelegate(string module, string import);
