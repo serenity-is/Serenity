@@ -1,4 +1,4 @@
-﻿using Scriban.Runtime;
+using Scriban.Runtime;
 using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
@@ -67,7 +67,10 @@ public class ModularTSImporter
         if (moduleImports.IsEmptyOrNull())
             return "";
 
-        return string.Join(Environment.NewLine, moduleImports.GroupBy(x => x.From).Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+        return string.Join(Environment.NewLine, moduleImports
+            .OrderBy(x => x.From, StringComparer.OrdinalIgnoreCase)
+            .GroupBy(x => x.From, StringComparer.Ordinal)
+            .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
     }
 
     delegate string ImportDelegate(string module, string import);

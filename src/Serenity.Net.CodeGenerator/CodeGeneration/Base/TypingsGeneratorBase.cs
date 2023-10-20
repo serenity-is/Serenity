@@ -1084,7 +1084,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
                 if (moduleImportsLookup.Any())
                 {
-                    sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup.Select(z =>
+                    sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup
+                        .Select(z =>
                     {
                         var from = z.Key.From;
                         if (!z.Key.External)
@@ -1114,8 +1115,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         var importList = string.Join(", ", z.Select(p =>
                             p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                        return $"import {{ {importList} }} from \"{from}\";";
-                    })) + Environment.NewLine + Environment.NewLine);
+                        return (from, importList);
+                    }).OrderBy(x => x.from, StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
+                        Environment.NewLine + Environment.NewLine);
                 }
             }
 
