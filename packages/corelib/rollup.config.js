@@ -237,8 +237,15 @@ export default [
                 footer: `(function (me) {
     if (!me.Q)
         me.Q = me.Serenity;
-    else
-        Object.assign(me.Q, me.Serenity);
+    else if (me.Q !== me.Serenity) {
+        Object.keys(me.Q).forEach(function(key) {
+            if (me.Q[key] != null &&
+                me.Serenity[key] == null) {
+                me.Serenity[key] = me.Q[key];
+            }
+        });
+        me.Q = me.Serenity;
+    }
     me.Slick = me.Slick || {};
     ['Aggregators', 'AggregateFormatting'].forEach(function(x) {
         me.Slick[x] = me.Slick[x] || {};
