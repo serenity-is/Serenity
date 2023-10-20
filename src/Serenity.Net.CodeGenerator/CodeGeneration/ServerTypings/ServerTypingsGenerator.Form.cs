@@ -345,7 +345,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         }
         cw.InBrace(delegate
         {
-            cw.Indented("static formKey = '");
+            cw.Indented("static readonly formKey = '");
             var key = formScriptAttribute.ConstructorArguments() != null &&
                 formScriptAttribute.ConstructorArguments().Count > 0 ? formScriptAttribute.ConstructorArguments[0].Value as string : null;
             key ??= type.FullNameOf();
