@@ -4961,8 +4961,7 @@ declare namespace Serenity {
         function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
         function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
-    class ColumnsBase<TRow> {
-        private items;
+    class ColumnsBase<TRow = any> {
         constructor(items: Slick.Column<TRow>[]);
         valueOf(): Slick.Column<TRow>[];
     }

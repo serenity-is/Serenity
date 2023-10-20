@@ -806,22 +806,27 @@ export namespace SlickTreeHelper {
 }
 
 
-export class ColumnsBase<TRow> {
-    constructor(private items: Column<TRow>[]) {
-        return new Proxy(this, {
-            get(target: any, prop) {
-                if (target[prop])
-                    return target[prop];
-
-                var column = tryFirst<Column>(target.items, x => 
-                    x.sourceItem?.name === prop || x.field === prop);
-                if (column)
-                    return column;
-            }
-        }) as any;
+export class ColumnsBase<TRow = any> {
+    constructor(items: Column<TRow>[]) {
+        (this as any).__items = items;
+        for (var col of items) {
+            let id = col.id;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
+        for (var col of items) {
+            let id = col.sourceItem?.name;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
+        for (var col of items) {
+            let id = col.field;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
     }
 
     valueOf(): Column<TRow>[] {
-        return this.items;
+        return (this as any).__items;
     }
 }

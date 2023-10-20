@@ -1786,8 +1786,7 @@ declare namespace SlickTreeHelper {
     function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
     function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
 }
-declare class ColumnsBase<TRow> {
-    private items;
+declare class ColumnsBase<TRow = any> {
     constructor(items: Column<TRow>[]);
     valueOf(): Column<TRow>[];
 }
