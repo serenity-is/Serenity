@@ -1,2 +1,2 @@
-﻿export { ISlickFormatter } from "@serenity-is/corelib/q";
-export type { Formatter } from "@serenity-is/corelib/slick";
+﻿export { ISlickFormatter } from "../../q";
+export type { Formatter } from "../../slick";

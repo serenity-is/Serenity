@@ -5,8 +5,6 @@ This is the package containing core TypeScript classes and functions used in Ser
 ## Modules
 
 - [@serenity-is/corelib](modules/corelib.md)
-- [@serenity-is/corelib/q](modules/corelib_q.md)
-- [@serenity-is/corelib/slick](modules/corelib_slick.md)
 
 The main entry for the NPM package is `@serenity-is/corelib`. This should be installed by default 
 in your projects created from `Serene` or `StartSharp` template:

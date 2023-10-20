@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { addValidationRule, isEmptyOrNull, localText } from "@serenity-is/corelib/q";
+import { addValidationRule, isEmptyOrNull, localText } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export interface RecaptchaOptions {

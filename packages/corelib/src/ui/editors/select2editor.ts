@@ -1,5 +1,5 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "@serenity-is/corelib/q";
+import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "../../q";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";

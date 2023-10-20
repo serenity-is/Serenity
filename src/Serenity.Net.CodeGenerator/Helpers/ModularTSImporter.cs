@@ -21,7 +21,7 @@ public class ModularTSImporter
 
     protected string ImportFromQ(string name)
     {
-        return AddExternalImport("@serenity-is/corelib/q", name);
+        return AddExternalImport("@serenity-is/corelib", name);
     }
 
     protected string ImportFromCorelib(string name)

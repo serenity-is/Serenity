@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull, isValue, localText, trim } from "@serenity-is/corelib/q";
+import { isEmptyOrNull, isValue, localText, trim } from "../../q";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 

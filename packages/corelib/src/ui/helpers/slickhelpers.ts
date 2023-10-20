@@ -1,7 +1,7 @@
 ﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "@serenity-is/corelib/q";
-import { Format, Formatter, RemoteView } from "@serenity-is/corelib/slick";
+import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "../../q";
+import { Format, Formatter, RemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";

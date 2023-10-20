@@ -29,6 +29,7 @@ var rxDeclareGlobal = /^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 var rxRemoveExports = /^export\s*\{[^\}]*\}\s*\;\s*\r?\n/gm;
 var rxRemoveImports = /^\s*import\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
 var rxReExports = /^\s*export\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
+
 var rxReferenceTypes = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 var rxModuleAugmentation = /^(declare\s+module\s*['"]([A-Za-z\/@\-]+)['"]\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 
@@ -37,8 +38,7 @@ const replaceTypeRef = function(src, name, rep) {
 }
 
 function moduleToGlobalName(fromModule) {
-    return (fromModule == "@serenity-is/sleekgrid" || fromModule.endsWith('./slick') || fromModule == "@serenity-is/corelib/slick") ? 'Slick' : 
-        (fromModule == "@serenity-is/corelib/q" || fromModule == './q' || fromModule.endsWith("../q") || fromModule.indexOf('/q/') >= 0) ? "Q" : null;
+    return fromModule == "@serenity-is/sleekgrid" ? 'Slick' : null;
 }
 
 const convertModularToGlobal = (src, ns, isTS) => {
@@ -192,27 +192,6 @@ var toGlobal = function (ns, outFile, isTS) {
     }
 }
 
-var extendGlobals = function () {
-    return {
-        name: 'extendGlobals',
-        generateBundle(o, b) {
-            for (var fileName of Object.keys(b)) {
-                var code = b[fileName].code || b[fileName].source;
-
-                if (code && fileName.indexOf('.js') >= 0) {
-                    var src = code;
-                    src = src.replace(/^(\s*)exports\.([A-Za-z_]+)\s*=\s*(.+?);/gm, function (match, grp1, grp2, grp3) {
-                        if (grp2.charAt(0) == '_' && grp2.charAt(1) == '_')
-                            return grp1 + "exports." + grp2 + " = exports." + grp2 + " || " + grp3 + ";";
-                        return grp1 + "exports." + grp2 + " = exports." + grp2 + " || {}; extend(exports." + grp2 + ", " + grp3 + ");";
-                    });
-                    b[fileName].code = src;
-                }
-            }
-        }
-    }
-}
-
 async function minifyScript(fileName) {
     var minified = await minify({ [basename(fileName)]: fs.readFileSync(fileName, 'utf8') }, {
         mangle: true,
@@ -243,18 +222,32 @@ const mergeRefTypes = (src) => {
 
 export default [
     {
-        input: "src/corelib.ts",
+        input: "src/index.ts",
         output: [
             {
                 file: './out/Serenity.CoreLib.js',
                 format: "iife",
                 sourcemap: true,
                 sourcemapExcludeSources: false,
-                name: "window",
+                name: "Serenity",
                 extend: true,
                 freeze: false,
                 banner: fs.readFileSync('./node_modules/tslib/tslib.js',
                     'utf8').replace(/^\uFEFF/, '') + '\n',
+                footer: `(function (me) {
+    if (!me.Q)
+        me.Q = me.Serenity;
+    else
+        Object.assign(me.Q, me.Serenity);
+    me.Slick = me.Slick || {};
+    ['Aggregators', 'AggregateFormatting'].forEach(function(x) {
+        me.Slick[x] = me.Slick[x] || {};
+        Object.assign(me.Slick[x], Serenity[x]);
+    });
+    ['RemoteView'].forEach(function(x) {
+        me.Slick[x] = Serenity[x];
+    });
+})(this);`,
                 globals
             }
         ],
@@ -264,32 +257,9 @@ export default [
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
-            }),
-            extendGlobals()
+            })
         ],
         external
-    },
-    {
-        input: "./out/q/index.d.ts",
-        output: [{
-            file: "./out/q/index.bundle.d.ts"
-        }],
-        plugins: [
-            dts(), 
-            toGlobal('Q')
-        ]
-    },
-    {
-        input: "./out/slick/index.d.ts",
-        output: [{ 
-            file: "./out/slick/index.bundle.d.ts",
-            format: "es"
-        }],
-        plugins: [
-            dts(), 
-            toGlobal('Slick')
-        ],
-        external: ['../q', '../../q', '@serenity-is/corelib/q', ...external]
     },
     {
         input: "./out/index.d.ts",
@@ -310,20 +280,34 @@ export default [
                         dtsOutputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
                             'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
                         // inject sleekgrid typings after q
-                        dtsOutputs.splice(2, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
+                        dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
+                        dtsOutputs.push(`
+export import Q = Serenity;
+
+declare namespace Slick {
+    export import AggregateFormatting = Serenity.AggregateFormatting;
+    export import Aggregators = Serenity.Aggregators;
+    export import CancellableViewCallback = Serenity.CancellableViewCallback;
+    export import Formatter = Serenity.Formatter;
+    export import GroupInfo = Serenity.GroupInfo;   
+    export import PagerOptions = Serenity.PagerOptions;
+    export import PagingInfo = Serenity.PagingInfo;
+    export import PagingOptions = Serenity.PagingOptions;
+    export import RemoteView = Serenity.RemoteView;
+    export import RemoteViewAjaxCallback = Serenity.RemoteViewAjaxCallback;
+    export import RemoteViewFilter = Serenity.RemoteViewFilter;
+    export import RemoteViewOptions = Serenity.RemoteViewOptions;
+    export import RemoteViewProcessCallback = Serenity.RemoteViewProcessCallback;
+    export import SummaryOptions = Serenity.SummaryOptions;
+}
+`);
 
                         var src = dtsOutputs.join('\n').replace(/\r/g, '');
                         src = mergeRefTypes(src);
-                    
                         fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
                         await minifyScript('./out/Serenity.CoreLib.js');
                         !fs.existsSync('./dist') && fs.mkdirSync('./dist');
-                        !fs.existsSync('./dist/q') && fs.mkdirSync('./dist/q');
-                        fs.copyFileSync('./out/q/index.bundle.d.ts', './dist/q/index.d.ts');
-                        !fs.existsSync('./dist/slick') && fs.mkdirSync('./dist/slick');
-                        fs.copyFileSync('./out/slick/index.bundle.d.ts', './dist/slick/index.d.ts');
                         fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
-
                         const wwwroot = '../../src/Serenity.Scripts/wwwroot';
                         fs.copyFileSync('./out/Serenity.CoreLib.min.js', `${wwwroot}/Serenity.CoreLib.min.js`);
                         fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', `${wwwroot}/Serenity.CoreLib.min.js.map`);
@@ -334,6 +318,6 @@ export default [
                 }
             }
         ],
-        external: ['./q', '../q', '../../q', './slick', '../../slick', '../slick', '@serenity-is/corelib/q', '@serenity-is/corelib/slick', ...external]
+        external
     }
 ];

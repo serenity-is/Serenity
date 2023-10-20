@@ -641,8 +641,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
-                (tryModule("@serenity-is/corelib/q") ||
                  tryModule("@serenity-is/corelib") ||
+                (tryModule("@serenity-is/corelib/q") ||
                  tryModule("@serenity-is/extensions") ||
                  tryModule("@serenity-is/pro.extensions"))))
         {
@@ -1141,7 +1141,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     protected string ImportFromQ(string name)
     {
-        return AddExternalImport("@serenity-is/corelib/q", name);
+        return AddExternalImport("@serenity-is/corelib", name);
     }
 
     protected string ImportFromCorelib(string name)

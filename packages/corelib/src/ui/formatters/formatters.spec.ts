@@ -1,12 +1,12 @@
 
-jest.mock("@serenity-is/corelib/q", () => ({
-    ...jest.requireActual("@serenity-is/corelib/q"),
+jest.mock("../../q", () => ({
+    ...jest.requireActual("../../q"),
     tryGetText: jest.fn().mockImplementation((key: string) => key)
 }));
 
 import { EnumKeyAttribute, EnumTypeRegistry } from "../..";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
-import { addAttribute, registerEnum, tryGetText } from "@serenity-is/corelib/q"
+import { addAttribute, registerEnum, tryGetText } from "../../q"
 
 describe("BooleanFormatter", () => {
     it("shows empty string if value is null", () => {

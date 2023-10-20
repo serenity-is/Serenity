@@ -62,11 +62,9 @@ var coreLibBase = {
 await esbuild.build({
     ...coreLibBase,
     entryPoints: [
-        'src/q/index.ts',
-        'src/slick/index.ts',
         'src/index.ts'
     ],
     outbase: 'src',
-    external: ['@serenity-is/corelib/q', '@serenity-is/corelib/slick', '@serenity-is/sleekgrid' ],
+    external: ['@serenity-is/sleekgrid'],
     minify: true
 });

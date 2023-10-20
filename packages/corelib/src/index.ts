@@ -17,13 +17,11 @@
  * @module corelib
  */
 
+export * from "./q";
+export * from "./slick";
 export * from "./globals/select2-globals"
 export * from "./globals/jquery-globals"
 export * from "./globals/jquery.validation-globals"
-
-export type { ServiceError, ServiceResponse, ServiceRequest, ServiceOptions, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, DeleteRequest, DeleteResponse, UndeleteRequest, UndeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, RetrieveLocalizationRequest, RetrieveLocalizationResponse, PropertyItem, PropertyItemsData } from "@serenity-is/corelib/q";
-export { ColumnSelection, RetrieveColumnSelection, SummaryType, Criteria } from "@serenity-is/corelib/q";
-
 export * from "./interfaces";
 export * from "./types";
 export * from "./ui/datagrid/irowdefinition";

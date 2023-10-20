@@ -20,7 +20,7 @@
     ],
     "rootDir": "./src",
     "paths": {
-      "@serenity-is/corelib/*": [
+      "@/*": [
         "./src/*"
       ],
       "@optionaldeps/*": [

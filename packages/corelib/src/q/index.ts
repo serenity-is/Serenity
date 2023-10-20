@@ -1,19 +1,17 @@
 /** 
  * 
- * This is the main entry point for `@serenity-is/corelib/q` module. This module mainly contains 
+ * This is the main entry point for `@serenity-is/corelib` quick access functions module. This module mainly contains 
  * helper functions.
  * 
- * The types from this module are available by importing from "@serenity-is/corelib/q":
+ * The types from this module are available by importing from "@serenity-is/corelib":
  * 
  * ```ts
- * import { htmlEncode, notifyInfo } from "serenity-is/corelib/q"
+ * import { htmlEncode, notifyInfo } from "serenity-is/corelib"
  * notifyInfo(htmlEncode("&'<>"));
  * ```
  *   
- * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Q` namespace.
- * > e.g. `Q.htmlEncode("&'<>")`
- * @packageDocumentation
- * @module corelib/q
+ * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Q` namespace
+ * > in addition to `Serenity` namespace for compatibility, e.g. `Q.htmlEncode("&'<>")`
  */
 
 export * from "./arrays";

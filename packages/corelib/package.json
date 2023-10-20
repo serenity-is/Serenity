@@ -18,25 +18,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./q": {
-      "types": "./dist/q/index.d.ts",
-      "import": "./dist/q/index.js"
-    },
-    "./slick": {
-      "types": "./dist/slick/index.d.ts",
-      "import": "./dist/slick/index.js"
     }
   },
   "main": "dist/index.js",
   "import": "dist/index.js",
   "types": "dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "q": [ "dist/q/index.d.ts" ],
-      "slick": [ "dist/slick/index.d.ts" ]
-    }
-  },
   "files": [
     "dist/**/*.css",
     "dist/**/*.d.ts",

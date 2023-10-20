@@ -18,8 +18,6 @@
     "outDir": "../out/test",
     "paths": {
       "@/*": [ "../src/*" ],
-      "@serenity-is/corelib/q": ["../src/q"],
-      "@serenity-is/corelib/slick": ["../src/slick"],
       "@optionaldeps/*": ["./testutil/*-testmodule"]
     },
     "noImplicitAny": false,
