@@ -70,6 +70,8 @@ public class ApplicationMetadata : IApplicationMetadata
     {
         scanner = new Scanner(fileSystem, assemblyLocations);
         scanner.Run();
+        foreach (var asm in scanner.Assemblies)
+            asm.Dispose();
     }
 
     public List<EntityModel> EntityModels { get; } = new List<EntityModel>();
