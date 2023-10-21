@@ -1,4 +1,4 @@
-﻿
+
 export namespace {{ServiceClassName}} {
     export const baseUrl = '{{ServiceBaseUrl}}';
 
@@ -8,7 +8,7 @@ export namespace {{ServiceClassName}} {
     export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
     export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
 
-    export const Methods {
+    export const Methods = {
         Create: "{{ServiceBaseUrl}}/Create",
         Update: "{{ServiceBaseUrl}}/Update",
         Delete: "{{ServiceBaseUrl}}/Delete",
