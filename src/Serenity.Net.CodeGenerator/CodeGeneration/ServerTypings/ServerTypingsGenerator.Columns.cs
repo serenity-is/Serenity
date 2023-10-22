@@ -16,52 +16,51 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         var basedOnRow = GetBasedOnRowAndAnnotations(type, out var basedOnByName, out var rowAnnotations);
 
-        cw.Indented("export interface ");
-        sb.Append(identifier);
-
         var publicProperties = type.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty).ToArray();
 
-        cw.InBrace(delegate
+        if (module)
         {
-            if (publicProperties.Length > 0)
+            cw.Indented("export interface ");
+            sb.Append(identifier);
+
+            cw.InBrace(delegate
             {
-                var column = AddExternalImport("@serenity-is/sleekgrid", "Column");
-                
-                foreach (var item in publicProperties)
+                if (publicProperties.Length > 0)
                 {
-                    cw.Indented(item.Name);
-                    sb.Append(": ");
-                    sb.Append(column);
-                    if (basedOnRow != null)
+                    var column = AddExternalImport("@serenity-is/sleekgrid", "Column");
+
+                    foreach (var item in publicProperties)
                     {
-                        sb.Append('<');
-                        HandleMemberType(basedOnRow, codeNamespace, module);
-                        sb.Append('>');
+                        cw.Indented(item.Name);
+                        sb.Append(": ");
+                        sb.Append(column);
+                        if (basedOnRow != null)
+                        {
+                            sb.Append('<');
+                            HandleMemberType(basedOnRow, codeNamespace, module);
+                            sb.Append('>');
+                        }
+                        sb.AppendLine(";");
                     }
-                    sb.AppendLine(";");
+
                 }
+            });
 
-            }
-        });
+            sb.AppendLine();
+        }
 
-        sb.AppendLine();
         cw.Indented("export class ");
         sb.Append(identifier);
         if (module)
         {
             var columnsBase = ImportFromCorelib("ColumnsBase");
             sb.Append($" extends {columnsBase}");
-        }
-        else
-        {
-            sb.Append($" extends Serenity.ColumnsBase");
-        }
-
-        if (basedOnRow != null)
-        {
-            sb.Append('<');
-            HandleMemberType(basedOnRow, codeNamespace, module);
-            sb.Append('>');
+            if (basedOnRow != null)
+            {
+                sb.Append('<');
+                HandleMemberType(basedOnRow, codeNamespace, module);
+                sb.Append('>');
+            }
         }
 
         cw.InBrace(delegate
