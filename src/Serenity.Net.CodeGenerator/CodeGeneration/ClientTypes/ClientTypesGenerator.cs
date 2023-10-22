@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -105,7 +105,6 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             "Serenity",
             "Serenity.ComponentModel",
             "System",
-            "System.Collections",
             "System.Collections.Generic",
             "System.ComponentModel"
         })
