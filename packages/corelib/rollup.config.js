@@ -289,7 +289,7 @@ export default [
                         // inject sleekgrid typings after q
                         dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
                         dtsOutputs.push(`
-declare const Q = Serenity;
+declare import Q = Serenity;
 
 declare namespace Slick {
     export import AggregateFormatting = Serenity.AggregateFormatting;

@@ -1,3 +1,8 @@
+## 6.9.3 (2023-10-22)
+
+### Bugfixes:
+  - Improve class namespace Q declaration in Serenity.Corelib.d.ts via declare import Q = Serenity;
+
 ## 6.9.2 (2023-10-22)
 
 ### Bugfixes:
