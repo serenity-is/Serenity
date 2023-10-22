@@ -1,3 +1,16 @@
+## 6.9.1 (2023-10-22)
+
+### Features:
+- Sergen now utilizes the `IncludeGlobalUsings` property when specified in `sergen.json` during client type generation.
+- Removed unused `System.Collections` references from generated client type files.
+- Introduced a new `MigrationKeyAttribute` that derives from `MigrationBaseAttribute`, offering a direct option for migrations, eliminating the need for defining a local `MigrationAttribute`.
+- Added the `TargetDBAttribute` and `DefaultDBAttribute`, allowing for simplified usage without the necessity of locally defining a `DefaultDBAttribute` class.
+- Relocated the logic for the `EnsureDatabase` function to the `MigrationUtils` class within Serenity.Extensions, enabling calls from `DataMigrations.cs`.
+- Transferred all feature-specific migrations in StartSharp to their respective projects.
+
+### Bugfixes:
+- Fixed a missing equal sign in the `Service typing Methods` constant.
+
 ## 6.9.0 (2023-10-20)
 
 ### Features:
