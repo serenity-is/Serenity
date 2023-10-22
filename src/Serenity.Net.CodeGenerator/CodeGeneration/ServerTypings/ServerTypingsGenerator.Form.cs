@@ -143,8 +143,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         var type = lookup[key].FirstOrDefault() ??
             lookup[key + suffix].FirstOrDefault() ??
-            lookup["Serenity." + key].FirstOrDefault() ??
-            lookup["Serenity." + key + suffix].FirstOrDefault();
+            lookup["Serenity." + key + suffix].FirstOrDefault() ??
+            lookup["Serenity." + key].FirstOrDefault();
 
         if (type is not null)
             return type;
@@ -301,6 +301,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     foreach (var rootNamespace in RootNamespaces)
                     {
                         string wn = rootNamespace + "." + editorTypeKey;
+
+                        if (rootNamespace == "Serenity" &&
+                            (editorScriptType = (GetScriptType(wn + "Editor") ?? GetScriptType(wn))) != null)
+                            break;
+
                         if ((editorScriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
                             break;
                     }
