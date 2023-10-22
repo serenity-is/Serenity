@@ -1,4 +1,4 @@
-﻿import typescript from '@rollup/plugin-typescript';
+import typescript from '@rollup/plugin-typescript';
 import { minify } from "terser";
 import fs from 'fs';
 import { builtinModules } from "module";
@@ -289,7 +289,7 @@ export default [
                         // inject sleekgrid typings after q
                         dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
                         dtsOutputs.push(`
-export import Q = Serenity;
+declare const Q = Serenity;
 
 declare namespace Slick {
     export import AggregateFormatting = Serenity.AggregateFormatting;

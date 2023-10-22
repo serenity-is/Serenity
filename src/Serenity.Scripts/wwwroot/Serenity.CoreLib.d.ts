@@ -5787,7 +5787,7 @@ declare namespace Slick {
     }
 }
 
-export import Q = Serenity;
+declare const Q = Serenity;
 
 declare namespace Slick {
     export import AggregateFormatting = Serenity.AggregateFormatting;
