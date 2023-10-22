@@ -1,4 +1,4 @@
-﻿using Serenity.CodeGeneration;
+using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
@@ -30,6 +30,10 @@ public class ClientTypesCommand : BaseFileSystemCommand
         {
             FileScopedNamespaces = config.FileScopedNamespaces == true
         };
+
+        if (config.IncludeGlobalUsings != null)
+            generator.GlobalUsings.AddRange(config.IncludeGlobalUsings);
+
         generator.RootNamespaces.Add(config.RootNamespace);
 
         foreach (var type in tsTypes)
