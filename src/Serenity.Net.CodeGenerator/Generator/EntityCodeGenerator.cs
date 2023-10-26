@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public class EntityCodeGenerator
 {
@@ -173,11 +173,11 @@ public class EntityCodeGenerator
 
         if (fileSystem.FileExists(path))
         {
-            var current = fileSystem.ReadAllText(path);
+            var current = fileSystem.ReadAllText(path).Replace("\r", "\n", StringComparison.Ordinal) + "\n";
             
-            if(!current.Contains(text))
+            if (!current.Contains(text))
             {
-                fileSystem.WriteAllText(path, current + text);
+                fileSystem.WriteAllText(path, (current.Trim() + "\n" + text.Trim()).Trim());
             }
         }
         else
