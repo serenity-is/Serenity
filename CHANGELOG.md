@@ -1,3 +1,9 @@
+## 6.9.4 (2023-10-26)
+
+### Bugfixes:
+  - Workaround in HtmlReportCallbackUrlBuilder for ASP.NET chunking cookies when authentication cookie contains too many claims
+  - Missing line break while sergen updates module exports under ServerTypes
+
 ## 6.9.3 (2023-10-22)
 
 ### Bugfixes:
