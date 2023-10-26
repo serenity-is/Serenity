@@ -173,7 +173,7 @@ public class EntityCodeGenerator
 
         if (fileSystem.FileExists(path))
         {
-            var current = fileSystem.ReadAllText(path).Replace("\r", "\n", StringComparison.Ordinal) + "\n";
+            var current = fileSystem.ReadAllText(path).Replace("\r", "", StringComparison.Ordinal) + "\n";
             
             if (!current.Contains(text))
             {
