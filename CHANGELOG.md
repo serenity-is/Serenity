@@ -1,3 +1,13 @@
+## 6.9.5 (2023-10-26)
+
+### Features:
+  - New BasedOnRowPropertyNameAnalyzer and its associated fix that raises an error in development time if a column/form type with `BasedOnRow` and `CheckNames = true` has a property that does match any property name in the row type. It offers to add [IgnoreName] attribute as a fix, or if only the case mismatch, renaming to the correct property name (Serenity.Pro.Coder/StartSharp).
+  - New RowPropertyAccessorsAnalyzer that can generate getters/setters of style `fields.SomeField[this]` at development time if the property is a simple `{ get; set; }`, `{ get; }` or just empty braces `{}`. It can also convert a simple field member like `SomeProperty;` to a field accessor property. The analyzer also raises errors if the accessors use a mismatching field (Serenity.Pro.Coder/StartSharp). See 6.9.5 release notes for more information about these analyzers and code fixes.
+
+### Bugfixes:
+  - Name property determined from existing entity uses "Field" instead of "StringField"
+  - Fix typo in chunking authentication cookie handling
+
 ## 6.9.4 (2023-10-26)
 
 ### Bugfixes:
