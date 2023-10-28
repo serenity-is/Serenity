@@ -346,7 +346,9 @@ public class EntityModelGenerator : IEntityModelGenerator
                         {
                             PropertyName = pkNameProp.PropertyName,
                             Name = pkNameProp.ColumnName,
-                            DataType = "string"
+                            DataType = "string",
+                            FieldType = "String",
+                            TSType = "string"
                         };
 
                         nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
