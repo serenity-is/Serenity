@@ -1,4 +1,4 @@
-## 6.9.5 (2023-10-26)
+## 6.9.5 (2023-10-28)
 
 ### Features:
   - New BasedOnRowPropertyNameAnalyzer and its associated fix that raises an error in development time if a column/form type with `BasedOnRow` and `CheckNames = true` has a property that does match any property name in the row type. It offers to add [IgnoreName] attribute as a fix, or if only the case mismatch, renaming to the correct property name (Serenity.Pro.Coder/StartSharp).
