@@ -1,4 +1,4 @@
-﻿import { executeOnceWhenVisible, executeEverytimeWhenVisible } from "@serenity-is/corelib/q";
+﻿import { executeOnceWhenVisible, executeEverytimeWhenVisible } from "../../q";
 
 export namespace LazyLoadHelper {
     export const executeOnceWhenShown = executeOnceWhenVisible 

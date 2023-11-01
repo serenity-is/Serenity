@@ -1,4 +1,4 @@
-﻿import { ArgumentNullException, Criteria, ListRequest, delegateCombine, delegateRemove, formatDate, isEmptyOrNull, isTrimmedEmpty, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/corelib/q";
+﻿import { ArgumentNullException, Criteria, ListRequest, delegateCombine, delegateRemove, formatDate, isEmptyOrNull, isTrimmedEmpty, localText, notifyWarning, parseDate, toId, tryGetText } from "../../q";
 import { Decorators } from "../../decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";

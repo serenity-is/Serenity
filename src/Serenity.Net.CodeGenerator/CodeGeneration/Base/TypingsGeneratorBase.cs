@@ -456,7 +456,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
     }
 
-    private void ScanAnnotationTypeAttributes(TypeDefinition fromType)
+    protected virtual void ScanAnnotationTypeAttributes(TypeDefinition fromType)
     {
         var annotationTypeAttrs = TypingsUtils.GetAttrs(
             fromType.GetAttributes(),
@@ -641,8 +641,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
             ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
-                (tryModule("@serenity-is/corelib/q") ||
                  tryModule("@serenity-is/corelib") ||
+                (tryModule("@serenity-is/corelib/q") ||
                  tryModule("@serenity-is/extensions") ||
                  tryModule("@serenity-is/pro.extensions"))))
         {
@@ -1084,7 +1084,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
                 if (moduleImportsLookup.Any())
                 {
-                    sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup.Select(z =>
+                    sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup
+                        .Select(z =>
                     {
                         var from = z.Key.From;
                         if (!z.Key.External)
@@ -1114,8 +1115,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         var importList = string.Join(", ", z.Select(p =>
                             p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                        return $"import {{ {importList} }} from \"{from}\";";
-                    })) + Environment.NewLine + Environment.NewLine);
+                        return (from, importList);
+                    }).OrderBy(x => FromOrderKey(x.from), StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
+                        Environment.NewLine + Environment.NewLine);
                 }
             }
 
@@ -1126,9 +1128,20 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         base.AddFile(filename, module);
     }
 
+    private string FromOrderKey(string from)
+    {
+        if (from == null) 
+            return null;
+
+        /// local imports ordered last
+        return (from.StartsWith(".", StringComparison.Ordinal) ||
+            from.StartsWith("/", StringComparison.Ordinal)) ?
+            char.MaxValue + from : from;
+    }
+
     protected string ImportFromQ(string name)
     {
-        return AddExternalImport("@serenity-is/corelib/q", name);
+        return AddExternalImport("@serenity-is/corelib", name);
     }
 
     protected string ImportFromCorelib(string name)

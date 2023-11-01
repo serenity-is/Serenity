@@ -35,5 +35,5 @@ public class TableName
     /// <value>
     /// The table name.
     /// </value>
-    public string Tablename => Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
+    public string Tablename => string.IsNullOrEmpty(Schema) ? Table : Schema + "." + Table;
 }

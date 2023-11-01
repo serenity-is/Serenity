@@ -134,7 +134,7 @@ public class ScriptBundleManager : IScriptBundleManager
 
                 foreach (var sourceFile in sourceFiles)
                 {
-                    if (sourceFile.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(sourceFile))
                         continue;
 
                     if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
@@ -196,7 +196,7 @@ public class ScriptBundleManager : IScriptBundleManager
                     sourceUrl = VirtualPathUtility.ToAbsolute(contextAccessor, sourceUrl);
                     var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
 
-                    if (sourceUrl.IsNullOrEmpty() || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
+                    if (string.IsNullOrEmpty(sourceUrl) || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
                         continue;
 
                     registerInBundle(sourceUrl);

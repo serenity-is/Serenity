@@ -1,4 +1,4 @@
-﻿import { ArgumentNullException, Exception, htmlEncode, isAssignableFrom, isEmptyOrNull, notifyError } from "@serenity-is/corelib/q";
+﻿import { ArgumentNullException, Exception, htmlEncode, isAssignableFrom, isEmptyOrNull, notifyError } from "../q";
 import { IDialog } from "../interfaces";
 import { commonTypeRegistry } from "./commontyperegistry";
 

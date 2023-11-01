@@ -1,4 +1,4 @@
-﻿{{~f = NET5Plus ? "f" : "F"~}}
+{{~f = NET5Plus ? "f" : "F"~}}
 {{USING "Serenity.ComponentModel"}}
 {{USING "Serenity.Data"}}
 {{USING "Serenity.Data.Mapping"}}
@@ -6,17 +6,26 @@
 
 {{NAMESPACE ModuleNamespace}}{{capture block~}}
 [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
-[DisplayName("{{Title}}"), InstanceName("{{Title}}")]
+[DisplayName("{{Title}}"), InstanceName("{{Title}}"){{if EnableGenerateFields}}, GenerateFields{{end}}]
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
-public sealed{{if EnableRowTemplates}} partial{{end}} class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
+{{~if ServiceLookupPermission~}}
+[ServiceLookupPermission("{{ServiceLookupPermission}}")]
+{{~end~}}
+public sealed{{if EnableGenerateFields || EnableRowTemplates}} partial{{end}} class {{RowClassName}} : {{TYPEREFLIST RowBaseClassAndInterfaceList}}
 {   {{~if DeclareJoinConstants && !Joins.empty?~}}
 
     {{~for j in Joins~}}
     const string {{j.Alias}} = nameof({{j.Alias}});
     {{~end~}}
     {{~end~}}
-    {{~if EnableRowTemplates~}}
+    {{~if EnableGenerateFields~}}
+    {{~for x in AllFields~}}
+
+    [{{ATTRREF x.AttributeList}}]
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get => fields.{{x.PropertyName}}[this]; set => fields.{{x.PropertyName}}[this] = value; }
+    {{~end~}}
+    {{~else if EnableRowTemplates~}}
 
     class RowTemplate
     {   {{~for x in AllFields~}}
@@ -35,11 +44,7 @@ public sealed{{if EnableRowTemplates}} partial{{end}} class {{RowClassName}} : {
     {{~for x in AllFields~}}
 
     [{{ATTRREF x.AttributeList}}]
-    public {{TYPEREF x.PropertyType}} {{x.PropertyName}}
-    {
-        get => {{f}}ields.{{x.PropertyName}}[this];
-        set => {{f}}ields.{{x.PropertyName}}[this] = value;
-    }
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get => fields.{{x.PropertyName}}[this]; set => fields.{{x.PropertyName}}[this] = value; }
     {{~end~}}
 {{~if !NET5Plus~}}
     {{~if Identity~}}

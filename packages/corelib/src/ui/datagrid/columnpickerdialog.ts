@@ -1,6 +1,6 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, centerDialog, Culture, htmlEncode, Router, localText, trimToNull } from "@serenity-is/corelib/q";
+import { Authorization, centerDialog, Culture, htmlEncode, Router, localText, trimToNull } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";

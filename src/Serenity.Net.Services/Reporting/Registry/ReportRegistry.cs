@@ -34,7 +34,7 @@ public class ReportRegistry : IReportRegistry
     public static string GetReportKey(Type type)
     {
         var attr = type.GetCustomAttribute<ReportAttribute>(false);
-        if (attr == null || attr.ReportKey.IsNullOrEmpty())
+        if (attr == null || string.IsNullOrEmpty(attr.ReportKey))
             return type.FullName;
 
         return attr.ReportKey;
@@ -127,7 +127,7 @@ public class ReportRegistry : IReportRegistry
         var list = new List<Report>();
 
         foreach (var k in reportsByCategory)
-            if (categoryKey.IsNullOrEmpty() ||
+            if (string.IsNullOrEmpty(categoryKey) ||
                 string.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
                 (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
             {

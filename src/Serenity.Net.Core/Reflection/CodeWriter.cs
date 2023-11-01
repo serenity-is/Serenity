@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace Serenity.Reflection;
 
 /// <summary>
@@ -248,6 +248,11 @@ public class CodeWriter
     public string Tab => tab;
 
     /// <summary>
+    /// Gets current indentation string
+    /// </summary>
+    public string Indentation => indent;
+
+    /// <summary>
     /// Returns true if the namespace is in list of usings.
     /// </summary>
     /// <param name="ns"></param>
@@ -338,21 +343,26 @@ public class CodeWriter
     /// <summary>
     /// Tries to add namespace
     /// </summary>
-    /// <param name="nameSpace"></param>
-    /// <param name="typeName"></param>
+    /// <param name="ns">Namespace</param>
+    /// <param name="typeName">Type name</param>
     /// <returns>if succeeds returns only typeName if fails returns fullName</returns>
-    public string ShortTypeName(string nameSpace, string typeName)
+    public string ShortTypeName(string ns, string typeName)
     {
         if (string.IsNullOrEmpty(typeName))
             return string.Empty;
 
-        if (string.IsNullOrEmpty(nameSpace))
+        if (string.IsNullOrEmpty(ns))
             return typeName;
 
-        if (Using(nameSpace))
+        if (Using(ns))
             return typeName;
-        else
-            return nameSpace + "." + typeName;
+        else if (CurrentNamespace != null)
+        {
+            var idx = CurrentNamespace.IndexOf('.', StringComparison.Ordinal);
+            if (idx >= 0 && ns.StartsWith(CurrentNamespace[..(idx + 1)], StringComparison.Ordinal))
+                ns = ns[(idx + 1)..];
+        }
+        return ns + "." + typeName;
     }
 
     /// <summary>
@@ -433,14 +443,13 @@ public class CodeWriter
     }
 
     /// <summary>
-    /// Converts datatype with a namespace to datatype without namespace if its namespace is in the allowed usings else returns fullname.
-    /// <para>
+    /// Converts datatype with a namespace to datatype without namespace if its namespace 
+    /// is in the allowed usings else returns fullname.
+    /// This can handle nullables, CS keywords and generics to some extent.
     /// Please see <see cref="IsCSharp"/> if you are using this for C#
-    /// </para>
     /// </summary>
-    /// <param name="cw"></param>
-    /// <param name="fullName"></param>
-    public string ShortTypeName(CodeWriter cw, string fullName)
+    /// <param name="fullName">Full name of the class</param>
+    public string ShortTypeRef(string fullName)
     {
         fullName = fullName.Trim();
 
@@ -454,37 +463,37 @@ public class CodeWriter
             nullableText = "?";
         }
 
-        if (IsCSharp)
+        if (!IsCSharp)
+            return ShortTypeName(fullName) + nullableText;
+
+        if (IsCSKeyword(fullName))
+            return fullName + nullableText;
+
+        if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
         {
-            if (IsCSKeyword(fullName))
-                return fullName + nullableText;
-
-            if (fullName.IndexOf('.', StringComparison.OrdinalIgnoreCase) < 0)
+            if (fullName == "Stream")
+                fullName = "System.IO.Stream";
+            else
             {
-                if (fullName == "Stream")
-                    fullName = "System.IO.Stream";
-                else
+                var type = Type.GetType("System." + fullName);
+
+                if (type != null)
                 {
-                    var type = Type.GetType("System." + fullName);
-
-                    if (type != null)
-                    {
-                        fullName = type.FullName;
-                    }
-                    else
-                        return fullName + nullableText;
+                    fullName = type.FullName;
                 }
-            }
-
-            if (fullName.EndsWith(">"))
-            {
-                var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
-                if (idx >= 0)
-                    return cw.ShortTypeName(fullName[..idx]) + '<' + ShortTypeName(cw, fullName[(idx + 1)..^1]) + '>' + nullableText;
+                else
+                    return fullName + nullableText;
             }
         }
 
-        return cw.ShortTypeName(fullName) + nullableText;
+        if (fullName.EndsWith(">"))
+        {
+            var idx = fullName.IndexOf('<', StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
+                return ShortTypeName(fullName[..idx]) + '<' + ShortTypeRef(fullName[(idx + 1)..^1]) + '>' + nullableText;
+        }
+
+        return ShortTypeName(fullName) + nullableText;
     }
 
     /// <summary>
@@ -518,4 +527,31 @@ public class CodeWriter
 
         return nsb.ToString().TrimEnd();
     }
+
+    /// <summary>
+    /// List of usings that can be safely used during code generation
+    /// without causing type name clashes
+    /// </summary>
+    public static readonly HashSet<string> SafeSetOfUsings = new()
+    {
+        "Serenity",
+        "Serenity.Abstractions",
+        "Serenity.ComponentModel",
+        "Serenity.Data",
+        "Serenity.Data.Mapping",
+        "Serenity.Extensions",
+        "Serenity.Localization",
+        "Serenity.Reflection",
+        "Serenity.Services",
+        "Serenity.Web",
+        "Microsoft.AspNetCore.Mvc",
+        "System.Globalization",
+        "System.Data",
+        "System",
+        "System.IO",
+        "System.ComponentModel",
+        "System.Collections.Generic"
+    };
+
+
 }

@@ -1,8 +1,8 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 
 namespace Serenity.Tests.Helpers;
 
-public class Base32Test
+public class Base32Tests
 {
     // from https://github.com/dotnet/aspnetcore/blob/main/src/Identity/test/Identity.Test/Base32Test.cs
 

@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { localText, trimToNull } from "@serenity-is/corelib/q";
+import { localText, trimToNull } from "../../q";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 

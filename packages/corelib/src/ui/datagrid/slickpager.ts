@@ -1,5 +1,5 @@
-﻿import { htmlEncode, extend, localText } from "@serenity-is/corelib/q";
-import { PagerOptions } from "@serenity-is/corelib/slick";
+﻿import { htmlEncode, extend, localText } from "../../q";
+import { PagerOptions } from "../../slick";
 import { Decorators } from "../../decorators";
 import { Widget } from "../widgets/widget";
 

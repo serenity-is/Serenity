@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -9,47 +9,33 @@ namespace Serenity;
 public static partial class StringHelper
 {
     /// <summary>
-    ///   <p>Returns true if <see cref="string"/> is <c>null</c> or empty (zero length)</p></summary>
-    /// <remarks>
-    ///   <p>This function might be useful if an empty string is assumed to be <c>null</c>.</p>
-    ///   <p>This is an extension method, so it can be called directly as <c>str.IsNullOrEmpty()</c>.</p></remarks>
-    /// <param name="str">
-    ///   String.</param>
-    /// <returns>
-    ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
+    /// This function is just an extension method version of string.IsNullOrEmpty and is effectively obsolete.
+    /// <param name="str">String.</param>
+    /// <returns>If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
+    /// </summary>
     public static bool IsEmptyOrNull([NotNullWhen(false)] this string? str)
     {
         return string.IsNullOrEmpty(str);
     }
 
     /// <summary>
-    ///   <p>Returns true if <see cref="string"/> is <c>null</c> or empty (zero length)</p></summary>
-    /// <remarks>
-    ///   <p>This function might be useful if an empty string is assumed to be <c>null</c>.</p>
-    ///   <p>This is an extension method, so it can be called directly as <c>str.IsNullOrEmpty()</c>.</p></remarks>
-    /// <param name="str">
-    ///   String.</param>
-    /// <returns>
-    ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
+    /// This function is just an extension method version of string.IsNullOrEmpty and is effectively obsolete.
+    /// <param name="str">String.</param>
+    /// <returns>If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
+    /// </summary>
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str)
     {
         return string.IsNullOrEmpty(str);
     }
 
     /// <summary>
-    ///   Checks if a string <see cref="string"/> is <c>null</c>, empty or just contains whitespace
-    ///   characters.</summary>
-    /// <remarks>
-    ///   <p><b>Warning:</b> "\n" (line end), "\t" (tab) and some other are also considered as whitespace). 
-    ///   To see a list see <see cref="string.Trim()" /> function.</p>
-    ///   <p>This is an extension method, so it can be called directly as <c>str.IsTrimmedEmpty()</c>.</p></remarks>
-    /// <param name="str">
-    ///   String.</param>
-    /// <returns>
-    ///   If string is null, empty or contains only white space, <c>true</c></returns>
+    /// This function is just an extension method version of string.IsNullOrWhitespace and is effectively obsolete.
+    /// <param name="str">String.</param>
+    /// <returns>If <paramref name="str"/> is <c>null</c>, empty or whitespace, <c>true</c></returns>
+    /// </summary>
     public static bool IsTrimmedEmpty([NotNullWhen(false)] this string? str)
     {
-        return TrimToNull(str) == null;
+        return string.IsNullOrWhiteSpace(str);
     }
 
     /// <summary>
@@ -68,13 +54,14 @@ public static partial class StringHelper
     ///   Trimmed string, result is null if empty.</returns>
     public static string? TrimToNull(this string? str)
     {
-        if (str.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(str))
             return null;
 
         str = str.Trim();
 
         if (str.Length == 0)
             return null;
+
         return str;
     }
 
@@ -94,8 +81,9 @@ public static partial class StringHelper
     ///   Trimmed string (result won't be null).</returns>
     public static string TrimToEmpty(this string? str)
     {
-        if (str.IsNullOrEmpty())
+        if (string.IsNullOrWhiteSpace(str))
             return string.Empty;
+
         return str.Trim();
     }
 
@@ -115,11 +103,11 @@ public static partial class StringHelper
     ///   If two strings are same trimmed, true</returns>
     public static bool IsTrimmedSame(this string? string1, string? string2)
     {
-        if ((string1 == null || string1.Length == 0) &&
-            (string2 == null || string2.Length == 0))
+        if (string.IsNullOrWhiteSpace(string1) &&
+            string.IsNullOrWhiteSpace(string2))
             return true;
-        else
-            return TrimToNull(string1) == TrimToNull(string2);
+
+        return TrimToEmpty(string1) == TrimToEmpty(string2);
     }
 
     /// <summary>
@@ -190,7 +178,6 @@ public static partial class StringHelper
         QuoteString(str, sb, true);
         return sb.ToString();
     }
-
 
     private const string emptySingleQuote = "''";
     private const string emptyDoubleQuote = "\"\"";
@@ -288,7 +275,7 @@ public static partial class StringHelper
     /// <returns>Substring or empty string.</returns>
     public static string SafeSubstring(this string? value, int startIndex, int maxLength)
     {
-        if (value.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(value))
             return string.Empty;
 
         var len = value.Length;
@@ -304,8 +291,8 @@ public static partial class StringHelper
     /// <summary>
     /// A regex to remove invalid file name characters
     /// </summary>
-    public static readonly Regex InvalidFilenameCharsRegex = 
-        new ($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
+    public static readonly Regex InvalidFilenameCharsRegex =
+        new($"[\\*\\?<>{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
@@ -314,9 +301,9 @@ public static partial class StringHelper
     /// </summary>
     /// <param name="filename">The string.</param>
     /// <param name="replacement">Replacement string for invalid characters</param>
-    /// <param name="removeDiacritics">True to remove diacritics</param>
+    /// <param name="removeDiacritics">True (default) to remove diacritics</param>
     /// <exception cref="ArgumentNullException">s is null</exception>
-    public static string SanitizeFilename(string filename, 
+    public static string SanitizeFilename(string filename,
         string replacement = "_", bool removeDiacritics = true)
     {
         if (filename == null)
@@ -324,7 +311,7 @@ public static partial class StringHelper
 
         if (removeDiacritics)
         {
-            RemoveDiacritics(filename);
+            filename = RemoveDiacritics(filename);
             filename = filename.Replace("ı", "i");
         }
 
@@ -337,12 +324,12 @@ public static partial class StringHelper
     /// A regex to remove invalid file path characters
     /// </summary>
     public static readonly Regex InvalidPathCharsRegex =
-        new($"[{Regex.Escape(new string(Path.GetInvalidPathChars()))}]",
+        new($"[\\*\\?<>{Regex.Escape(new string(Path.GetInvalidPathChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Sanitizes the path by removing diacritics, ı with i and replacing any
-    /// invalid file path characters with underscore.
+    /// Sanitizes the path by removing diacritics (ü with u, ı with i etc.) and 
+    /// replacing any invalid file path characters with underscore.
     /// </summary>
     /// <param name="filename">The string.</param>
     /// <param name="replacement">Replacement string for invalid characters</param>
@@ -356,7 +343,7 @@ public static partial class StringHelper
 
         if (removeDiacritics)
         {
-            RemoveDiacritics(filename);
+            filename = RemoveDiacritics(filename);
             filename = filename.Replace("ı", "i");
         }
 
@@ -368,11 +355,14 @@ public static partial class StringHelper
     /// <summary>
     /// Removes the diacritic characters from string by replacing them with ASCII versions.
     /// </summary>
-    /// <param name="s">The string.</param>
+    /// <param name="str">The string.</param>
     /// <returns>String with diacritics replaced.</returns>
-    public static string RemoveDiacritics(string s)
+    public static string RemoveDiacritics(string str)
     {
-        var normalizedString = s.Normalize(NormalizationForm.FormKD);
+        if (str == null)
+            throw new ArgumentNullException(nameof(str));
+
+        var normalizedString = str.Normalize(NormalizationForm.FormKD);
         var stringBuilder = new StringBuilder();
 
         for (int i = 0; i < normalizedString.Length; i++)
@@ -435,13 +425,13 @@ public static partial class StringHelper
     /// </summary>
     public static string Join(string a, string separator, string b)
     {
-        if (a.IsNullOrEmpty() && b.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(a) && string.IsNullOrEmpty(b))
             return "";
 
-        if (a.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(a))
             return b ?? "";
 
-        if (b.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(b))
             return a ?? "";
 
         return a + separator + b;

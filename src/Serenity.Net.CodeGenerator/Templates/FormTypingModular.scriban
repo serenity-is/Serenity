@@ -5,7 +5,7 @@ export interface {{FormClassName}} {
 }
 
 export class {{FormClassName}} extends {{SERENITYIMPORT "PrefixedContext"}} {
-    static formKey = '{{FormKey}}';
+    static readonly formKey = '{{FormKey}}';
     private static init: boolean;
     
     constructor(prefix: string) {

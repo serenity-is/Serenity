@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Default implementation for IFilenameFormatSanitizer
@@ -21,7 +21,7 @@ public class DefaultFilenameFormatSanitizer : IFilenameFormatSanitizer
     /// <param name="value">Value to be sanitized</param>
     public virtual string SanitizePlaceholder(string _, string? value)
     {
-        value = StringHelper.SanitizeFilename((value ?? "").Replace('\\', '/'));
+        value = StringHelper.SanitizeFilename((value ?? "").Replace('\\', '/'), removeDiacritics: true);
         value = value.Replace("..", "_", StringComparison.Ordinal);
         if (string.IsNullOrWhiteSpace(value))
             value = "_";

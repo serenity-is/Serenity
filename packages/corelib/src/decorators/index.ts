@@ -3,7 +3,7 @@ import {
     registerClass as regClass, registerEditor as regEditor, registerInterface as regIntf, registerEnum as regEnum,
     startsWith,
     EditorAttribute
-} from "@serenity-is/corelib/q";
+} from "../q";
 
 function Attr(name: string) {
     return function (target: Function) {

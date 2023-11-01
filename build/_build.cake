@@ -147,13 +147,6 @@ Task("Compile")
     .IsDependentOn("Restore")
     .Does(context => 
 {
-
-    StartProcess("powershell", new ProcessSettings 
-    { 
-        Arguments = @"npx tsc -p ..\..\Serenity.Net.CodeGenerator\Resource\tsconfig.json", 
-        WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
-    });
-
     writeHeader("Building Serenity.Net.sln");
     MSBuild(System.IO.Path.Combine(src, "Serenity.Net.sln"), s => {
         s.SetConfiguration(configuration);

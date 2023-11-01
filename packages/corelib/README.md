@@ -9,11 +9,9 @@ in your projects created from `Serene` or `StartSharp` template:
 {
   "dependencies": {
     // ...
-    "@serenity-is/corelib": "6.7.1"
+    "@serenity-is/corelib": "6.9.0"
   }
 }
 ```
 
 The version number for this package should be equal or as close as possible to Serenity NuGet package versions in your project file.
-
-`@serenity-is/corelib/q` and `@serenity-is/corelib/slick` are not separately installable NPM packages. They are just sub-modules exported via `subpath exports` feature of the Node/NPM.

@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, Culture, format, formatDate, Invariant, isEmptyOrNull, parseDate, parseISODateTime, replaceAll, localText, today } from "@serenity-is/corelib/q";
+import { addValidationRule, Culture, format, formatDate, Invariant, isEmptyOrNull, parseDate, parseISODateTime, replaceAll, localText, today } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="currentColor"></path></svg>';
@@ -85,8 +85,8 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     }
 
     get_value(): string {
-        var value = this.element.val().trim();
-        if (value != null && value.length === 0) {
+        var value = this.element.val()?.trim();
+        if (!value?.length) {
             return null;
         }
 
@@ -102,10 +102,10 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
             this.element.val('');
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            this.element.val(formatDate(today(), "yyyy-MM-dd"));
+            this.element.val(formatDate(today(), this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
         }
         else {
-            this.element.val(formatDate(value, "yyyy-MM-dd"));
+            this.element.val(formatDate(value, this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
         }
     }
 

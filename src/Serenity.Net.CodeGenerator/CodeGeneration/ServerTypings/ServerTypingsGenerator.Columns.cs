@@ -1,4 +1,4 @@
-﻿#if !ISSOURCEGENERATOR
+#if !ISSOURCEGENERATOR
 using Mono.Cecil.Cil;
 #endif
 
@@ -16,12 +16,56 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         var basedOnRow = GetBasedOnRowAndAnnotations(type, out var basedOnByName, out var rowAnnotations);
 
+        var publicProperties = type.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty).ToArray();
+
+        if (module)
+        {
+            cw.Indented("export interface ");
+            sb.Append(identifier);
+
+            cw.InBrace(delegate
+            {
+                if (publicProperties.Length > 0)
+                {
+                    var column = AddExternalImport("@serenity-is/sleekgrid", "Column");
+
+                    foreach (var item in publicProperties)
+                    {
+                        cw.Indented(item.Name);
+                        sb.Append(": ");
+                        sb.Append(column);
+                        if (basedOnRow != null)
+                        {
+                            sb.Append('<');
+                            HandleMemberType(basedOnRow, codeNamespace, module);
+                            sb.Append('>');
+                        }
+                        sb.AppendLine(";");
+                    }
+
+                }
+            });
+
+            sb.AppendLine();
+        }
+
         cw.Indented("export class ");
         sb.Append(identifier);
+        if (module)
+        {
+            var columnsBase = ImportFromCorelib("ColumnsBase");
+            sb.Append($" extends {columnsBase}");
+            if (basedOnRow != null)
+            {
+                sb.Append('<');
+                HandleMemberType(basedOnRow, codeNamespace, module);
+                sb.Append('>');
+            }
+        }
 
         cw.InBrace(delegate
         {
-            cw.Indented("static columnsKey = '");
+            cw.Indented("static readonly columnsKey = '");
             var key = columnsAttribute.ConstructorArguments() != null &&
                 columnsAttribute.ConstructorArguments().Count > 0 ? columnsAttribute.ConstructorArguments()[0].Value as string : null;
             key ??= type.FullNameOf();
@@ -31,9 +75,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             if (module)
             {
-                foreach (var item in type.PropertiesOf())
-                {
+                var fieldsProxy = ImportFromQ("fieldsProxy");
+                cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{type.Name}>();");
 
+                foreach (var item in publicProperties)
+                {
                     if (!TypingsUtils.IsPublicInstanceProperty(item))
                         continue;
 

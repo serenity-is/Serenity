@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Serenity.CodeGenerator;
 
@@ -55,10 +55,10 @@ public class CodeFileHelper : ICodeFileHelper
             return;
         }
 
-        if (!Kdiff3Path.IsEmptyOrNull() &&
+        if (!string.IsNullOrEmpty(Kdiff3Path) &&
             !fileSystem.FileExists(Kdiff3Path))
         {
-            if (Kdiff3Path.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(Kdiff3Path))
                 throw new InvalidOperationException(
                     "Couldn't locate KDiff3 utility which is required to merge changes. " +
                     "Please install it, or if it is not installed to default location, " +
@@ -69,7 +69,7 @@ public class CodeFileHelper : ICodeFileHelper
                 "Please install it, or if it is not installed to default location, " +
                 "set its path in CodeGenerator.config file!", Kdiff3Path));
         }
-        else if (!Kdiff3Path.IsEmptyOrNull())
+        else if (!string.IsNullOrEmpty(Kdiff3Path))
         {
             var generated = fileSystem.ChangeExtension(file, fileSystem.GetExtension(file) + ".gen.bak");
             CheckoutAndWrite(generated, fileSystem.ReadAllBytes(file));
@@ -127,10 +127,10 @@ public class CodeFileHelper : ICodeFileHelper
         if (NoUserInteraction)
             return;
 
-        if (TSCPath.IsNullOrEmpty() ||
+        if (string.IsNullOrEmpty(TSCPath) ||
             !fileSystem.FileExists(TSCPath))
         {
-            if (TSCPath.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(TSCPath))
                 throw new InvalidOperationException(
                     "Couldn't locate TSC.EXE file which is required for TypeScript compilation. " +
                     "Please install it, or if it is not installed to default location, " +

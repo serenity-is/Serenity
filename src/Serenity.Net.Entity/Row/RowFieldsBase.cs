@@ -1,4 +1,4 @@
-﻿using Serenity.Reflection;
+using Serenity.Reflection;
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
@@ -477,12 +477,12 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         field.ForeignField = foreignKey.Field;
                     }
 
-                    if ((leftJoin != null || innerJoin != null) && field.ForeignTable.IsEmptyOrNull())
+                    if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignTable))
                         throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                             "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
                                 fieldInfo.Name, rowType.FullName));
 
-                    if ((leftJoin != null || innerJoin != null) && field.ForeignField.IsEmptyOrNull())
+                    if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignField))
                         throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                             "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
                                 fieldInfo.Name, rowType.FullName));
@@ -747,7 +747,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         foreach (var field in this)
         {
-            if (!field.ForeignTable.IsNullOrEmpty() &&
+            if (!string.IsNullOrEmpty(field.ForeignTable) &&
                 field.TextualField == null)
             {
                 foreach (var join in joins.Values)

@@ -23,7 +23,7 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     /// <exception cref="ValidationError">InvalidCriteriaField</exception>
     protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
-        if (criteria.Expression.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(criteria.Expression))
             return base.VisitCriteria(criteria);
 
         if (!SqlSyntax.IsValidIdentifier(criteria.Expression))

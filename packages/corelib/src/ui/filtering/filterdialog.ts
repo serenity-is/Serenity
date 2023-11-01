@@ -1,5 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
-import { notifyError, localText } from "@serenity-is/corelib/q";
+import { notifyError, localText } from "../../q";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { FilterPanel } from "./filterpanel";
 

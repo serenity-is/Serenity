@@ -1,4 +1,4 @@
-namespace Serenity.Net.Core.Authorization;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Role Permission Service abstraction 

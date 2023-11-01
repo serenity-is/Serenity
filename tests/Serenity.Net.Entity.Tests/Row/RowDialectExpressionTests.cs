@@ -30,11 +30,7 @@ public class RowDialectExpressionTests
         [LeftJoin("q", "w", "x", ServerType.MySql, NegateDialect = true), LeftJoin("q", "z", "y", ServerType.SqlServer, NegateDialect = true)]
         [InnerJoin("e", "w", "x", ServerType.MySql), InnerJoin("e", "z", "y", ServerType.SqlServer)]
         [InnerJoin("w", "w", "x", ServerType.MySql, NegateDialect = true), InnerJoin("w", "z", "y", ServerType.SqlServer, NegateDialect = true)]
-        public int? Test
-        {
-            get => fields.Test[this];
-            set => fields.Test[this] = value;
-        }
+        public int? Test { get => fields.Test[this]; set => fields.Test[this] = value; }
 
         public class RowFields : RowFieldsBase
         {

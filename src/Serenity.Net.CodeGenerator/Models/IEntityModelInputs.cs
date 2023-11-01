@@ -1,7 +1,8 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public interface IEntityModelInputs
 {
+    public IApplicationMetadata Application { get; }
     string ConnectionKey { get; }
     string Identifier { get; }
     GeneratorConfig Config { get; }
@@ -12,5 +13,7 @@ public interface IEntityModelInputs
     bool SchemaIsDatabase { get; }
     string PermissionKey { get; }
     string Schema { get; }
+    bool SkipForeignKeys { get; }
     string Table { get; }
+    string Tablename => string.IsNullOrEmpty(Schema) ? Table : (Schema + "." + Table);
 }

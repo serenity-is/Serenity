@@ -1,4 +1,4 @@
-﻿import { Exception, getAttributes, htmlEncode, isEnum, notifyError } from "@serenity-is/corelib/q";
+﻿import { Exception, getAttributes, htmlEncode, isEnum, notifyError } from "../q";
 import { EnumKeyAttribute } from "../decorators";
 import { commonTypeRegistry } from "./commontyperegistry";
 

@@ -1,4 +1,4 @@
-﻿using Serenity.CodeGenerator;
+using Serenity.CodeGenerator;
 using static Serenity.Tests.CustomerEntityInputs;
 
 namespace Serenity.Tests;
@@ -16,7 +16,7 @@ public class CustomerEntityModel : EntityModel
         Schema = TestSchema;
         Tablename = Customer;
         Title = Customer;
-        Identity = CustomerId;
+        IdField = CustomerId;
         RowBaseClass = "Serenity.Data.Row<CustomerRow.RowFields>";
         NameField = CustomerName;
         FieldPrefix = "";
@@ -38,14 +38,14 @@ public class CustomerEntityModel : EntityModel
             Scale = 0,
             AttributeList =
             {
-                new("System.ComponentModel.DisplayName", "\"Customer Id\""),
+                new("System.ComponentModel.DisplayName", "Customer Id"),
                 new("Serenity.Data.Mapping.Identity"),
                 new("Serenity.Data.Mapping.IdProperty"),
             },
             ColAttributeList =
             {
                 new("Serenity.ComponentModel.EditLink"),
-                new("System.ComponentModel.DisplayName", "\"Db.Shared.RecordId\""),
+                new("System.ComponentModel.DisplayName", "Db.Shared.RecordId"),
                 new("Serenity.ComponentModel.AlignRight")
             }
         });
@@ -64,8 +64,8 @@ public class CustomerEntityModel : EntityModel
             Scale = 0,
             AttributeList =
             {
-                new("System.ComponentModel.DisplayName", "\"Customer Name\""),
-                new("Serenity.Data.Mapping.Size", "50"),
+                new("System.ComponentModel.DisplayName", "Customer Name"),
+                new("Serenity.Data.Mapping.Size", 50),
                 new("Serenity.Data.Mapping.NotNull"),
                 new("Serenity.Data.Mapping.QuickSearch"),
                 new("Serenity.Data.NameProperty"),
@@ -93,10 +93,10 @@ public class CustomerEntityModel : EntityModel
             TextualField = "CityName",
             AttributeList =
             {
-                new("System.ComponentModel.DisplayName", "\"City\""),
-                new("Serenity.Data.Mapping.ForeignKey", "\"[test].[City]\", \"CityId\""),
-                new("Serenity.Data.Mapping.LeftJoin", joinConstants ? "jCity" : "\"jCity\""),
-                new("Serenity.Data.Mapping.TextualField", "nameof(CityName)")
+                new("System.ComponentModel.DisplayName", "City"),
+                new("Serenity.Data.Mapping.ForeignKey", "[test].[City]", "CityId"),
+                new("Serenity.Data.Mapping.LeftJoin", joinConstants ? new RawCode("jCity") : "jCity"),
+                new("Serenity.Data.Mapping.TextualField", new RawCode("nameof(CityName)"))
             },
         });
 
@@ -119,9 +119,9 @@ public class CustomerEntityModel : EntityModel
                     Scale = 0,
                     AttributeList =
                     {
-                        new("System.ComponentModel.DisplayName", "\"City Name\""),
+                        new("System.ComponentModel.DisplayName", "City Name"),
                         new("Serenity.Data.Mapping.Expression", 
-                            joinConstants ? "$\"{jCity}.[CityName]\"" : "\"jCity.[CityName]\"")
+                            joinConstants ? new RawCode("$\"{jCity}.[CityName]\"") : "jCity.[CityName]")
                     },
                     Expression = "jCity.[CityName]"
                 },
@@ -137,9 +137,9 @@ public class CustomerEntityModel : EntityModel
                     Scale = 0,
                     AttributeList =
                     {
-                        new("System.ComponentModel.DisplayName", "\"City Country Id\""),
+                        new("System.ComponentModel.DisplayName", "City Country Id"),
                         new("Serenity.Data.Mapping.Expression", 
-                            joinConstants ? "$\"{jCity}.[CountryId]\"" : "\"jCity.[CountryId]\"")
+                            joinConstants ? new RawCode("$\"{jCity}.[CountryId]\"") : "jCity.[CountryId]")
                     },
                     Expression = "jCity.[CountryId]"
                 }

@@ -455,7 +455,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     [Obsolete("This method was used by the old ORM")]
     public LeftJoin ForeignJoin(int? foreignIndex = null)
     {
-        if (ForeignTable.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(ForeignTable))
             throw new ArgumentNullException("ForeignTable");
 
         string foreignJoin;

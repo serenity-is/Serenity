@@ -28,7 +28,7 @@ public class DatabaseCaretReferences
 
             string databaseName;
 
-            if (!connectionKey.IsEmptyOrNull())
+            if (!string.IsNullOrEmpty(connectionKey))
             {
                 databaseName = GetDatabaseName?.Invoke(connectionKey);
                 if (!string.IsNullOrEmpty(databaseName))

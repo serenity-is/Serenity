@@ -37,7 +37,7 @@ Slick._ = (() => {
     asyncEditorLoadDelay: 100,
     asyncEditorLoading: false,
     asyncPostCleanupDelay: 40,
-    asyncPostRenderDelay: 50,
+    asyncPostRenderDelay: -1,
     autoEdit: true,
     autoHeight: false,
     cellFlashingCssClass: "flashing",
@@ -1048,6 +1048,39 @@ Slick._ = (() => {
           this._layout.getScrollContainerX().scrollLeft = scrollLeft;
         }
       };
+      this.asyncPostProcessRows = () => {
+        var dataLength = this.getDataLength();
+        var cols = this._cols;
+        while (this._postProcessFromRow <= this._postProcessToRow) {
+          var row = this._vScrollDir >= 0 ? this._postProcessFromRow++ : this._postProcessToRow--;
+          var cacheEntry = this._rowsCache[row];
+          if (!cacheEntry || row >= dataLength) {
+            continue;
+          }
+          if (!this._postProcessedRows[row]) {
+            this._postProcessedRows[row] = {};
+          }
+          this.ensureCellNodesInRowsCache(row);
+          for (var x in cacheEntry.cellNodesByColumnIdx) {
+            var columnIdx = parseInt(x, 10);
+            var m = cols[columnIdx];
+            var processedStatus = this._postProcessedRows[row][columnIdx];
+            if (processedStatus !== "R") {
+              if (m.asyncPostRender || m.asyncPostRenderCleanup) {
+                var node = cacheEntry.cellNodesByColumnIdx[columnIdx];
+                if (node) {
+                  m.asyncPostRender && m.asyncPostRender(node, row, this.getDataItem(row), m, processedStatus === "C");
+                }
+              }
+              this._postProcessedRows[row][columnIdx] = "R";
+            }
+          }
+          if (this._options.asyncPostRenderDelay >= 0) {
+            this._hPostRender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
+            return;
+          }
+        }
+      };
       this.handleActiveCellPositionChange = () => {
         if (!this._activeCellNode) {
           return;
@@ -2033,6 +2066,7 @@ Slick._ = (() => {
       }
     }
     setInitialCols(initCols) {
+      var _a, _b;
       initializeColumns(initCols, this._colDefaults);
       var initColById = {};
       var viewCols = [];
@@ -2045,9 +2079,15 @@ Slick._ = (() => {
           viewCols.push(m);
       }
       viewCols = this._layout.reorderViewColumns(viewCols, this._options);
+      this._postRenderActive = (_a = this._options.enableAsyncPostRender) != null ? _a : false;
+      this._postCleanupActive = (_b = this._options.enableAsyncPostRenderCleanup) != null ? _b : false;
       for (i = 0; i < viewCols.length; i++) {
         m = viewCols[i];
         viewColById[m.id] = i;
+        if (m.asyncPostRenderCleanup != null)
+          this._postCleanupActive = true;
+        if (m.asyncPostRender != null)
+          this._postRenderActive = true;
       }
       this._initCols = initCols;
       this._initColById = initColById;
@@ -2453,7 +2493,7 @@ Slick._ = (() => {
         if (i !== this._activeRow && (i < rangeToKeep.top || i > rangeToKeep.bottom) && !this._layout.isFrozenRow(i))
           this.removeRowFromCache(i);
       }
-      this._options.enableAsyncPostRenderCleanup && this.startPostProcessingCleanup();
+      this.startPostProcessingCleanup();
     }
     invalidate() {
       this.updateRowCount();
@@ -2468,21 +2508,22 @@ Slick._ = (() => {
       for (var row in this._rowsCache) {
         this.removeRowFromCache(parseInt(row, 10));
       }
-      this._options.enableAsyncPostRenderCleanup && this.startPostProcessingCleanup();
+      this.startPostProcessingCleanup();
     }
-    queuePostProcessedRowForCleanup(cacheEntry, postProcessedRow, rowIdx) {
+    queuePostProcessedRowForCleanup(cacheEntry, row) {
       var _a, _b;
+      var postProcessedRow = this._postProcessedRows[row];
+      if (!postProcessedRow)
+        return;
       this._postProcessGroupId++;
       for (var x in postProcessedRow) {
-        if (postProcessedRow.hasOwnProperty(x)) {
-          var columnIdx = parseInt(x, 10);
-          this._postProcessCleanupQueue.push({
-            groupId: this._postProcessGroupId,
-            cellNode: cacheEntry.cellNodesByColumnIdx[columnIdx | 0],
-            columnIdx: columnIdx | 0,
-            rowIdx
-          });
-        }
+        var columnIdx = parseInt(x, 10);
+        this._postProcessCleanupQueue.push({
+          groupId: this._postProcessGroupId,
+          cellNode: cacheEntry.cellNodesByColumnIdx[columnIdx | 0],
+          columnIdx: columnIdx | 0,
+          rowIdx: row
+        });
       }
       this._postProcessCleanupQueue.push({
         groupId: this._postProcessGroupId,
@@ -2499,7 +2540,7 @@ Slick._ = (() => {
         columnIdx,
         rowIdx
       });
-      this._jQuery(cellnode).detach();
+      this._jQuery ? this._jQuery(cellnode).remove() : cellnode.remove();
     }
     removeRowFromCache(row) {
       var _a, _b, _c, _d;
@@ -2507,8 +2548,8 @@ Slick._ = (() => {
       if (!cacheEntry) {
         return;
       }
-      if (this._options.enableAsyncPostRenderCleanup && this._postProcessedRows[row]) {
-        this.queuePostProcessedRowForCleanup(cacheEntry, this._postProcessedRows[row], row);
+      if (this._postCleanupActive && this._postProcessedRows[row]) {
+        this.queuePostProcessedRowForCleanup(cacheEntry, row);
       } else {
         (_b = (_a = cacheEntry.rowNodeL) == null ? void 0 : _a.parentElement) == null ? void 0 : _b.removeChild(cacheEntry.rowNodeL);
         (_d = (_c = cacheEntry.rowNodeR) == null ? void 0 : _c.parentElement) == null ? void 0 : _d.removeChild(cacheEntry.rowNodeR);
@@ -2530,7 +2571,7 @@ Slick._ = (() => {
           this.removeRowFromCache(rows[i]);
         }
       }
-      this._options.enableAsyncPostRenderCleanup && this.startPostProcessingCleanup();
+      this.startPostProcessingCleanup();
     }
     invalidateRow(row) {
       this.invalidateRows([row]);
@@ -2561,9 +2602,6 @@ Slick._ = (() => {
       this.ensureCellNodesInRowsCache(row);
       var d = this.getDataItem(row);
       for (var x in cacheEntry.cellNodesByColumnIdx) {
-        if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
-          continue;
-        }
         var cell = parseInt(x, 10);
         if (row === this._activeRow && cell === this._activeCell && this._currentEditor) {
           this._currentEditor.loadValue(d);
@@ -2622,7 +2660,7 @@ Slick._ = (() => {
           this.removeRowFromCache(i);
         }
       }
-      this._options.enableAsyncPostRenderCleanup && this.startPostProcessingCleanup();
+      this.startPostProcessingCleanup();
       vpi.virtualHeight = Math.max(this._options.rowHeight * numberOfRows, tempViewportH - this._scrollDims.height);
       if (this._activeCellNode && this._activeRow > l) {
         this.resetActiveCell();
@@ -2725,21 +2763,18 @@ Slick._ = (() => {
         }
       }
     }
-    cleanUpCells(range, row) {
+    cleanUpCells(rangeToKeep, row) {
       if (this._layout.isFrozenRow(row))
         return;
       var cacheEntry = this._rowsCache[row];
       var cellsToRemove = [], frozenCols = this._layout.getFrozenCols();
       for (var x in cacheEntry.cellNodesByColumnIdx) {
-        if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
-          continue;
-        }
         var i = parseInt(x, 10);
         if (i < frozenCols) {
           continue;
         }
         var colspan = cacheEntry.cellColSpans[i], cols = this._cols;
-        if (this._colLeft[i] > range.rightPx || this._colRight[Math.min(cols.length - 1, i + colspan - 1)] < range.leftPx) {
+        if (this._colLeft[i] > rangeToKeep.rightPx || this._colRight[Math.min(cols.length - 1, i + colspan - 1)] < rangeToKeep.leftPx) {
           if (!(row == this._activeRow && i === this._activeCell)) {
             cellsToRemove.push(i);
           }
@@ -2749,7 +2784,7 @@ Slick._ = (() => {
       this._postProcessGroupId++;
       while ((cellToRemove = cellsToRemove.pop()) != null) {
         node = cacheEntry.cellNodesByColumnIdx[cellToRemove];
-        if (this._options.enableAsyncPostRenderCleanup && this._postProcessedRows[row] && this._postProcessedRows[row][cellToRemove]) {
+        if (this._postCleanupActive && this._postProcessedRows[row] && this._postProcessedRows[row][cellToRemove]) {
           this.queuePostProcessedCellForCleanup(node, cellToRemove, row);
         } else {
           node.parentElement.removeChild(node);
@@ -2871,18 +2906,18 @@ Slick._ = (() => {
       }
     }
     startPostProcessing() {
-      if (!this._options.enableAsyncPostRender) {
+      if (!this._postRenderActive) {
         return;
       }
       clearTimeout(this._hPostRender);
       if (this._options.asyncPostRenderDelay < 0) {
         this.asyncPostProcessRows();
       } else {
-        this._hPostRender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
+        this._hPostRender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
       }
     }
     startPostProcessingCleanup() {
-      if (!this._options.enableAsyncPostRenderCleanup) {
+      if (!this._postCleanupActive) {
         return;
       }
       clearTimeout(this._hPostRenderCleanup);
@@ -2894,9 +2929,10 @@ Slick._ = (() => {
     }
     invalidatePostProcessingResults(row) {
       if (this._options.enableAsyncPostRenderCleanup) {
-        for (var columnIdx in this._postProcessedRows[row]) {
-          if (this._postProcessedRows[row].hasOwnProperty(columnIdx)) {
-            this._postProcessedRows[row][columnIdx] = "C";
+        var postProcessed = this._postProcessedRows[row];
+        if (postProcessed) {
+          for (var columnIdx in postProcessed) {
+            postProcessed[columnIdx] = "C";
           }
         }
       } else {
@@ -2994,42 +3030,6 @@ Slick._ = (() => {
       }
       this.trigger(this.onScroll, { scrollLeft: this._scrollLeft, scrollTop: this._scrollTop });
       return !!(hScrollDist || vScrollDist);
-    }
-    asyncPostProcessRows() {
-      var dataLength = this.getDataLength();
-      var cols = this._cols;
-      while (this._postProcessFromRow <= this._postProcessToRow) {
-        var row = this._vScrollDir >= 0 ? this._postProcessFromRow++ : this._postProcessToRow--;
-        var cacheEntry = this._rowsCache[row];
-        if (!cacheEntry || row >= dataLength) {
-          continue;
-        }
-        if (!this._postProcessedRows[row]) {
-          this._postProcessedRows[row] = {};
-        }
-        this.ensureCellNodesInRowsCache(row);
-        for (var x in cacheEntry.cellNodesByColumnIdx) {
-          if (!cacheEntry.cellNodesByColumnIdx.hasOwnProperty(x)) {
-            continue;
-          }
-          var columnIdx = parseInt(x, 10);
-          var m = cols[columnIdx];
-          var processedStatus = this._postProcessedRows[row][columnIdx];
-          if (processedStatus !== "R") {
-            if (m.asyncPostRender || m.asyncPostRenderCleanup) {
-              var node = cacheEntry.cellNodesByColumnIdx[columnIdx];
-              if (node) {
-                m.asyncPostRender && m.asyncPostRender(node, row, this.getDataItem(row), m, processedStatus === "C");
-              }
-            }
-            this._postProcessedRows[row][columnIdx] = "R";
-          }
-        }
-        if (this._options.asyncPostRenderDelay >= 0) {
-          this._hPostRender = setTimeout(this.asyncPostProcessRows.bind(this), this._options.asyncPostRenderDelay);
-          return;
-        }
-      }
     }
     asyncPostProcessCleanupRows() {
       var _a;

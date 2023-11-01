@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Serenity.CodeGeneration;
 using System.IO;
 
@@ -25,98 +25,13 @@ public class ServerTypingsCommand : BaseFileSystemCommand
         if (!modules && config.ServerTypings?.NamespaceTypings == false)
             return;
 
-        string[] assemblyFiles = null;
-
-        if (config.ServerTypings == null ||
-            config.ServerTypings.Assemblies.IsEmptyOrNull())
+        var assemblyFiles = DetermineAssemblyFiles(fileSystem, csproj, config, error =>
         {
-            var targetFramework = ProjectFileHelper.ExtractTargetFrameworkFrom(fileSystem, csproj);
+            Console.Error.WriteLine(error);
+            Environment.Exit(1);
+        });
 
-            if (string.IsNullOrEmpty(targetFramework))
-            {
-                Console.Error.WriteLine("Couldn't read TargetFramework from " +
-                    "project file for server typings generation!");
-                Environment.Exit(1);
-            }
-
-            string outputName = ProjectFileHelper.ExtractAssemblyNameFrom(fileSystem, csproj)
-                ?? fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
-
-            var outputExtension = ".dll";
-            if (targetFramework.StartsWith("net", StringComparison.OrdinalIgnoreCase) &&
-                !targetFramework.StartsWith("netcoreapp", StringComparison.Ordinal) &&
-                targetFramework.IndexOf('.', StringComparison.Ordinal) < 0)
-                outputExtension = ".exe";
-
-            var outputPath1 = fileSystem.Combine(fileSystem.GetDirectoryName(csproj),
-                PathHelper.ToPath("bin/Debug/" + targetFramework + "/" + outputName + outputExtension));
-            var outputPath2 = fileSystem.Combine(fileSystem.GetDirectoryName(csproj), 
-                PathHelper.ToPath("bin/Release/" + targetFramework + "/" + outputName + outputExtension));
-
-            if (fileSystem.FileExists(outputPath1))
-            {
-                if (fileSystem.FileExists(outputPath2) &&
-                    fileSystem.GetLastWriteTime(outputPath1) < fileSystem.GetLastWriteTime(outputPath2))
-                    assemblyFiles = new[] { outputPath2 };
-                else
-                    assemblyFiles = new[] { outputPath1 };
-            }
-            else if (fileSystem.FileExists(outputPath2))
-                assemblyFiles = new[] { outputPath2 };
-            else
-            {
-                Console.Error.WriteLine(string.Format(CultureInfo.CurrentCulture,
-                    "Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
-                    "Make sure project is built successfully before running Sergen", outputPath1));
-                Environment.Exit(1);
-            }
-        }
-
-        if (assemblyFiles == null)
-        {
-            if (config.ServerTypings == null)
-            {
-                Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
-                Environment.Exit(1);
-            }
-
-            if (config.ServerTypings.Assemblies.IsEmptyOrNull())
-            {
-                Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
-                Environment.Exit(1);
-            }
-
-            assemblyFiles = config.ServerTypings.Assemblies;
-            for (var i = 0; i < assemblyFiles.Length; i++)
-            {
-                var assemblyFile1 = PathHelper.ToUrl(fileSystem.GetFullPath(PathHelper.ToPath(assemblyFiles[i])));
-                var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
-                string assemblyFile2 = assemblyFile1;
-                if (binDebugIdx >= 0)
-                    assemblyFile2 = string.Concat(assemblyFile1[0..binDebugIdx], "/bin/Release/", assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
-
-                assemblyFiles[i] = assemblyFile1;
-
-                if (fileSystem.FileExists(assemblyFile1))
-                {
-                    if (fileSystem.FileExists(assemblyFile2) &&
-                        fileSystem.GetLastWriteTime(assemblyFile1) < fileSystem.GetLastWriteTime(assemblyFile2))
-                        assemblyFiles[i] = assemblyFile2;
-                }
-                else if (fileSystem.FileExists(assemblyFile2))
-                    assemblyFiles[i] = assemblyFile2;
-                else
-                {
-                    Console.Error.WriteLine(string.Format(CultureInfo.CurrentCulture, string.Format(CultureInfo.CurrentCulture, 
-                        "Assembly file '{0}' specified in sergen.json is not found! " +
-                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
-                        "Please check path in sergen.json and try again.", assemblyFile1)));
-                    Environment.Exit(1);
-                }
-            }
-        }
-
-        if (config.RootNamespace.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(config.RootNamespace))
             config.RootNamespace = config.GetRootNamespaceFor(fileSystem, csproj);
 
         var generator = new ServerTypingsGenerator(fileSystem, assemblyFiles.ToArray())
@@ -194,5 +109,102 @@ public class ServerTypingsCommand : BaseFileSystemCommand
                 .Select(x => (x.Filename, x.Text)),
             deleteExtraPattern: new[] { "*.ts" },
             endOfLine: config.EndOfLine);
+    }
+
+    public static string[] DetermineAssemblyFiles(IGeneratorFileSystem fileSystem, 
+        string csproj, GeneratorConfig config, Action<string> onError)
+    {
+        string[] assemblyFiles = null;
+
+        if (config.ServerTypings == null ||
+            config.ServerTypings.Assemblies.IsEmptyOrNull())
+        {
+            var targetFramework = ProjectFileHelper.ExtractTargetFrameworkFrom(fileSystem, csproj);
+
+            if (string.IsNullOrEmpty(targetFramework))
+            {
+                onError("Couldn't read TargetFramework from project file!");
+                return null;
+            }
+
+            string outputName = ProjectFileHelper.ExtractAssemblyNameFrom(fileSystem, csproj)
+                ?? fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
+
+            var outputExtension = ".dll";
+            if (targetFramework.StartsWith("net", StringComparison.OrdinalIgnoreCase) &&
+                !targetFramework.StartsWith("netcoreapp", StringComparison.Ordinal) &&
+                targetFramework.IndexOf('.', StringComparison.Ordinal) < 0)
+                outputExtension = ".exe";
+
+            var outputPath1 = fileSystem.Combine(fileSystem.GetDirectoryName(csproj),
+                PathHelper.ToPath("bin/Debug/" + targetFramework + "/" + outputName + outputExtension));
+            var outputPath2 = fileSystem.Combine(fileSystem.GetDirectoryName(csproj),
+                PathHelper.ToPath("bin/Release/" + targetFramework + "/" + outputName + outputExtension));
+
+            if (fileSystem.FileExists(outputPath1))
+            {
+                if (fileSystem.FileExists(outputPath2) &&
+                    fileSystem.GetLastWriteTime(outputPath1) < fileSystem.GetLastWriteTime(outputPath2))
+                    assemblyFiles = new[] { outputPath2 };
+                else
+                    assemblyFiles = new[] { outputPath1 };
+            }
+            else if (fileSystem.FileExists(outputPath2))
+                assemblyFiles = new[] { outputPath2 };
+            else
+            {
+                onError(string.Format(CultureInfo.CurrentCulture,
+                    "Couldn't find output file at {0}!" + Environment.NewLine +
+                    "Make sure project is built successfully before running Sergen", outputPath1));
+                return null;
+            }
+        }
+
+        if (assemblyFiles == null)
+        {
+            if (config.ServerTypings == null)
+            {
+                onError("ServerTypings is not configured in sergen.json file!");
+                return null;
+            }
+
+            if (config.ServerTypings.Assemblies.IsEmptyOrNull())
+            {
+                Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
+                return null;
+            }
+
+            assemblyFiles = config.ServerTypings.Assemblies;
+            for (var i = 0; i < assemblyFiles.Length; i++)
+            {
+                var assemblyFile1 = PathHelper.ToUrl(fileSystem.GetFullPath(PathHelper.ToPath(assemblyFiles[i])));
+                var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
+                string assemblyFile2 = assemblyFile1;
+                if (binDebugIdx >= 0)
+                    assemblyFile2 = string.Concat(assemblyFile1[0..binDebugIdx], "/bin/Release/", assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
+
+                assemblyFiles[i] = assemblyFile1;
+
+                if (fileSystem.FileExists(assemblyFile1))
+                {
+                    if (fileSystem.FileExists(assemblyFile2) &&
+                        fileSystem.GetLastWriteTime(assemblyFile1) < fileSystem.GetLastWriteTime(assemblyFile2))
+                        assemblyFiles[i] = assemblyFile2;
+                }
+                else if (fileSystem.FileExists(assemblyFile2))
+                    assemblyFiles[i] = assemblyFile2;
+                else
+                {
+                    onError(string.Format(CultureInfo.CurrentCulture, string.Format(CultureInfo.CurrentCulture,
+                        "Assembly file '{0}' specified in sergen.json is not found! " +
+                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
+                        "Please check paths in sergen.json.", assemblyFile1)));
+                    return null;
+                }
+            }
+        }
+
+        return assemblyFiles;
+
     }
 }

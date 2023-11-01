@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.Text.Json.Serialization;
-using System;
+﻿using System.Text.Json.Serialization;
 
 namespace Serenity.CodeGenerator;
 

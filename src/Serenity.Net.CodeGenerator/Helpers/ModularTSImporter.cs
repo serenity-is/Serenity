@@ -1,4 +1,4 @@
-﻿using Scriban.Runtime;
+using Scriban.Runtime;
 using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
@@ -21,7 +21,7 @@ public class ModularTSImporter
 
     protected string ImportFromQ(string name)
     {
-        return AddExternalImport("@serenity-is/corelib/q", name);
+        return AddExternalImport("@serenity-is/corelib", name);
     }
 
     protected string ImportFromCorelib(string name)
@@ -67,7 +67,21 @@ public class ModularTSImporter
         if (moduleImports.IsEmptyOrNull())
             return "";
 
-        return string.Join(Environment.NewLine, moduleImports.GroupBy(x => x.From).Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+        return string.Join(Environment.NewLine, moduleImports
+            .OrderBy(x => FromOrderKey(x.From), StringComparer.OrdinalIgnoreCase)
+            .GroupBy(x => x.From, StringComparer.Ordinal)
+            .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+    }
+
+    private string FromOrderKey(string from)
+    {
+        if (from == null)
+            return null;
+
+        /// local imports ordered last
+        return (from.StartsWith(".", StringComparison.Ordinal) ||
+            from.StartsWith("/", StringComparison.Ordinal)) ?
+            char.MaxValue + from : from;
     }
 
     delegate string ImportDelegate(string module, string import);

@@ -1,29 +1,31 @@
 ﻿/** 
+ * ## Serenity Core Library
  * 
- * This is the main entry point for `@serenity-is/corelib` package.
+ * This is the package containing core TypeScript classes and functions used in Serenity applications. 
  * 
- * The types from this module are available by importing from "@serenity-is/corelib":
+ * It should be installed by default in your projects created from `Serene` or `StartSharp` template:
  * 
- * ```ts
- * import { EntityGrid } from "serenity-is/corelib"
- * 
- * export class MyGrid extends EntityGrid<MyRow, any> {
+ * ```json
+ * {
+ *   "dependencies": {
+ *     // ...
+ *     "@serenity-is/corelib": "6.9.0"
+ *   }
  * }
  * ```
- *   
- * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` namespace.
+ * 
+ * The version number for this package should be equal or as close as possible to Serenity NuGet package versions in your project file.
+ * 
+ * > When using classic namespaces instead of the ESM modules, the types and functions in this module are directly available from the global `Serenity` and `Q` namespaces.
  * > e.g. `Serenity.EntityGrid`
  * @packageDocumentation
- * @module corelib
  */
 
+export * from "./q";
+export * from "./slick";
 export * from "./globals/select2-globals"
 export * from "./globals/jquery-globals"
 export * from "./globals/jquery.validation-globals"
-
-export type { ServiceError, ServiceResponse, ServiceRequest, ServiceOptions, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, DeleteRequest, DeleteResponse, UndeleteRequest, UndeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, RetrieveLocalizationRequest, RetrieveLocalizationResponse, PropertyItem, PropertyItemsData } from "@serenity-is/corelib/q";
-export { ColumnSelection, RetrieveColumnSelection, SummaryType, Criteria } from "@serenity-is/corelib/q";
-
 export * from "./interfaces";
 export * from "./types";
 export * from "./ui/datagrid/irowdefinition";

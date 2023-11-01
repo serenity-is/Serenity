@@ -1,4 +1,4 @@
-﻿global using Serenity.Reflection;
+global using Serenity.Reflection;
 #if ISSOURCEGENERATOR
 global using CustomAttribute = Microsoft.CodeAnalysis.AttributeData;
 global using FieldDefinition = Microsoft.CodeAnalysis.IFieldSymbol;
@@ -266,6 +266,13 @@ public static class TypingsUtils
     public static bool IsGenericInstance(this TypeReference type)
     {
         return type.IsGenericInstance;
+    }
+
+    public static IEnumerable<CustomAttribute> GetAttributes(this PropertyDefinition prop, string ns, string name, bool subAttributes = false)
+    {
+        return prop.CustomAttributes.Where(x => (x.AttributeType?.Namespace == ns &&
+            x.AttributeType.Name == name) ||
+            (subAttributes && TypingsUtils.IsSubclassOf(x.AttributeType, ns, name)));
     }
 
     public static IEnumerable<CustomAttribute> GetAttributes(this FieldDefinition field)

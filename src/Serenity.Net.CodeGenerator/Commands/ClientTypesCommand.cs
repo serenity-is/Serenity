@@ -1,4 +1,4 @@
-﻿using Serenity.CodeGeneration;
+using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
@@ -16,7 +16,7 @@ public class ClientTypesCommand : BaseFileSystemCommand
 
         config.ClientTypes ??= new GeneratorConfig.ClientTypesConfig();
 
-        if (config.RootNamespace.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(config.RootNamespace))
             config.RootNamespace = config.GetRootNamespaceFor(fileSystem, csproj);
 
         var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath(config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
@@ -30,6 +30,10 @@ public class ClientTypesCommand : BaseFileSystemCommand
         {
             FileScopedNamespaces = config.FileScopedNamespaces == true
         };
+
+        if (config.IncludeGlobalUsings != null)
+            generator.GlobalUsings.AddRange(config.IncludeGlobalUsings);
+
         generator.RootNamespaces.Add(config.RootNamespace);
 
         foreach (var type in tsTypes)

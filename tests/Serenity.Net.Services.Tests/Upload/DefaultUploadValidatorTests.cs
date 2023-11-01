@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 
 namespace Serenity.Tests.Web;

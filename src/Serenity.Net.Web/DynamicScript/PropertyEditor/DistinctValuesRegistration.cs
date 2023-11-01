@@ -63,7 +63,7 @@ public class DistinctValuesRegistration
                             "on " + property.Name + " property of " + type.FullName);
                     }
 
-                    attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
+                    attr.PropertyName = string.IsNullOrEmpty(attr.PropertyName) ? property.Name :
                         attr.PropertyName;
                 }
                 else
@@ -86,7 +86,7 @@ public class DistinctValuesRegistration
                     else
                         attr.RowType = type;
 
-                    attr.PropertyName = attr.PropertyName.IsEmptyOrNull() ? property.Name :
+                    attr.PropertyName = string.IsNullOrEmpty(attr.PropertyName) ? property.Name :
                         attr.PropertyName;
                 }
 

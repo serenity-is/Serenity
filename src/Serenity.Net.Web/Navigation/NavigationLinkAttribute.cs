@@ -75,7 +75,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         if (controller == null)
             throw new ArgumentNullException(nameof(controller));
 
-        if (action.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));
 
         var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -157,7 +157,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         if (controller == null)
             throw new ArgumentNullException(nameof(controller));
 
-        if (action.IsEmptyOrNull())
+        if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));
 
         var actionMethod = controller.GetMethod(action, BindingFlags.Public | BindingFlags.Instance) 

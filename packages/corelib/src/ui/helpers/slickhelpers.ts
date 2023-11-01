@@ -1,7 +1,7 @@
 ﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText } from "@serenity-is/corelib/q";
-import { Format, Formatter, RemoteView } from "@serenity-is/corelib/slick";
+import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "../../q";
+import { Format, Formatter, RemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
@@ -802,5 +802,31 @@ export namespace SlickTreeHelper {
                 }
             }
         }
+    }
+}
+
+
+export class ColumnsBase<TRow = any> {
+    constructor(items: Column<TRow>[]) {
+        (this as any).__items = items;
+        for (var col of items) {
+            let id = col.id;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
+        for (var col of items) {
+            let id = col.sourceItem?.name;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
+        for (var col of items) {
+            let id = col.field;
+            if (id && !(this as any)[id])
+                (this as any)[id] = col;
+        }
+    }
+
+    valueOf(): Column<TRow>[] {
+        return (this as any).__items;
     }
 }
