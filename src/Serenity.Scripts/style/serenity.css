@@ -2211,6 +2211,7 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
 .flex-layout .ui-tabs-panel > .s-DataGrid,
 .flex-layout .property-panes,
 .flex-layout .tab-pane,
+.flex-layout .tab-content > .tab-pane.active,
 .flex-layout .s-PropertyGrid {
   display: -moz-box;
   display: -webkit-box;
