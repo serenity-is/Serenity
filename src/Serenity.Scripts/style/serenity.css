@@ -659,17 +659,21 @@ button.ui-button::-moz-focus-inner {
   margin-top: 6px;
 }
 .ui-tabs .ui-tabs-panel {
-  display: block;
   border-width: 0 1px 1px 1px;
   padding: 1em 1.4em;
   background: none;
-}
-.ui-tabs .ui-tabs-panel {
   background: #FFF;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
   border-radius: 0;
 }
+
+.ui-tabs-panel {
+    display: block;
+}
+
+.ui-tabs-panel:not(.ui-tabs-panel-active):not([aria-hidden=false]) {
+  display: none !important;
+}
+
 .ui-tabs .ui-tabs-hide {
   display: none !important;
 }
@@ -2206,7 +2210,7 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
 .flex-layout .ui-tabs-panel,
 .flex-layout .ui-tabs-panel > .s-DataGrid,
 .flex-layout .property-panes,
-.flex-layout .property-panes .tab-pane.active,
+.flex-layout .tab-pane,
 .flex-layout .s-PropertyGrid {
   display: -moz-box;
   display: -webkit-box;
@@ -3172,11 +3176,7 @@ a.s-LinkDropDown input {
   cursor: pointer;
 }
 .s-PropertyGrid .category.collapsed .field {
-  visibility: hidden !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
+  display: none !important;
 }
 .s-PropertyGrid .category-title i.fa {
   float: right;
@@ -3221,14 +3221,6 @@ a.s-LinkDropDown input {
 }
 .property-panes .tab-pane {
   padding: 6px 0;
-}
-.property-panes > .tab-pane:not(.active) {
-  visibility: hidden !important;
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
 }
 .quick-filters-bar {
   border: 1px solid #e7e7e7;

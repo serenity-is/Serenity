@@ -157,7 +157,7 @@ export function getHighlightTarget(el: HTMLElement) {
 export function baseValidateOptions(): JQueryValidation.ValidationOptions {
     return <any>{
         errorClass: 'error',
-        ignore: ':hidden, .no-validate',
+        ignore: '[style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
         ignoreTitle: true,
         normalizer: function (value: any) {
             return $.trim(value);
