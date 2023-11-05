@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.PropertyGrid;
 
@@ -70,11 +70,11 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider
                 if (source.BasedOnField is null)
                 {
                     throw new InvalidProgramException(string.Format(
-                        "{0} has a [BasedOnRow(typeof({2}), CheckNames = true)] attribute but its '{1}' property " +
-                        "doesn't have a matching field with same property / field name in the row.\n\n" +
-                        "Please check if property is named correctly.\n\n" +
-                        "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
-                        "To disable check for this specific property add a [IgnoreName] attribute to the property itself.",
+                        "{0} has a [BasedOnRow(typeof({2}), CheckNames = true)] attribute, but its '{1}' property " +
+                        "doesn't have a matching field with the same property/field name in the row.\n\n" +
+                        "Please check if the property is named correctly.\n\n" +
+                        "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
+                        "To disable checking for this specific property, add an [IgnoreName] attribute to the property itself.",
                         type.FullName, property.Name, basedOnRow.GetType().FullName));
                 }
                 else if (
@@ -84,11 +84,11 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider
                      source.BasedOnField.Name != property.Name))
                 {
                     throw new InvalidProgramException(string.Format(
-                            "{0} has a [BasedOnRow(typeof({3}), CheckNames = true)] attribute but its '{1}' property " +
+                            "{0} has a [BasedOnRow(typeof({3}), CheckNames = true)] attribute, but its '{1}' property " +
                             "doesn't match the property/field name '{2}' in the row.\n\n" +
-                            "Property names must match case sensitively. Please change property name to '{2}'.\n\n" +
-                            "To remove this validation you may set CheckNames to false on [BasedOnRow] attribute.\n\n" +
-                            "To disable check for this specific property add a [IgnoreName] attribute to the property itself.",
+                            "Property names must match case sensitively. Please change the property name to '{2}'.\n\n" +
+                            "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
+                            "To disable check for this specific property, add an [IgnoreName] attribute to the property itself.",
                             type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ??
                                 source.BasedOnField.Name, basedOnRow.GetType().FullName));
                 }
