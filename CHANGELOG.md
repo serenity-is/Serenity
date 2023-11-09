@@ -1,3 +1,16 @@
+## 6.9.6 (2023-11-09)
+
+### Features:
+
+- The default ignore option for jQuery validation has been changed to include elements matching `[style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate`. This change replaces the previous default of `:hidden, .no-validate`. The reason for this update is that the previous default settings required a workaround for validating inputs in hidden tabs. The workaround involved altering the visibility of hidden tabs by setting their display properties to `flex` or `block`, and visibility property to `hidden` to make them considered as `not(:hidden)`. However, this approach occasionally caused issues, especially when dealing with inputs in inactive tabs, as they were not effectively hidden due to the display property manipulation. Simply setting the ignore rule to empty and validating all inputs was not a viable solution, as some fields may intentionally be hidden using methods like `.hide()`, indicating that they should not be subject to validation. This change also necessitated modifications in `serenity.css`, `pro-theme.css`, and `jquery-ui`, so make sure to update your versions of `Serenity.Pro.Theme` and `Serenity.Scripts` accordingly.
+- Enhancements have been made to improve the performance of methods utilized by source generators, such as `EnumerateBaseClasses`, `IsOrSubClassOf`, and `IsAssignableFrom`.
+- An experimental `IDiskUploadFileSystem` implementation has been introduced. This implementation enables the storage of files and directories in a database table named `FileSystem`. Additionally, a `SqlUploadStorage` implementation has been provided, which leverages the aforementioned `IDiskUploadFileSystem` for file uploads. Note that these features are part of the `StartSharp` framework.
+- A new attribute, `HideLabelAttribute`, has been added. It corresponds to the `LabelWidth("0", JustThis = true)` setting.
+
+### Bug Fixes:
+- The `BasedOnRowPropertyNameAnalyzer` has been enhanced to also process properties of the base entity class.
+- A bug where switching to an inactive jQueryUI/Bootstrap tab with validation errors occurred has been resolved.
+
 ## 6.9.5 (2023-10-28)
 
 ### Features:
