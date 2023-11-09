@@ -152,7 +152,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                             if (memberAccess.Expression is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameLeft)
                                 continue;
 
-                            if (idNameLeft.Identifier.Text != "fields")
+                            if (idNameLeft.Identifier.Text != "fields" &&
+                                idNameLeft.Identifier.Text != "Fields")
                                 continue;
 
                             if (memberAccess.Name is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameRight)
