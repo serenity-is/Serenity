@@ -27,7 +27,7 @@
       ]
     },
     {
-      "library": "jquery@3.6.1",
+      "library": "jquery@3.7.1",
       "destination": "wwwroot/jquery",
       "files": [
         "jquery.js",
