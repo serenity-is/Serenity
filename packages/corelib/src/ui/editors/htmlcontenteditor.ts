@@ -187,7 +187,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
         }
     }
 
-    static CKEditorVer = "4.7.1";
+    static CKEditorVer = "4.22.1";
     static CKEditorBasePath: string;
 
     static getCKEditorBasePath(): string {
