@@ -1,5 +1,5 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "../../q";
+import { Authorization, PropertyItem, any, format, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull, tryGetText } from "../../q";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -971,3 +971,28 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     public openDialogAsPanel: boolean;
 }
+
+export function select2LocaleInitialization() {
+    if (typeof $ === "undefined" || !$.fn || !$.fn.select2)
+        return false;
+
+    const txt = (s: string) => localText("Controls.SelectEditor." + s);
+    const fmt = (s: string, ...prm: any[]) => format(localText("Controls.SelectEditor." + s), prm);
+
+    ($.fn.select2 as any).locales['current'] = {
+        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
+        formatNoMatches: () => txt("NoMatches"),
+        formatAjaxError: () => txt("AjaxError"),
+        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
+        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
+        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
+        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
+        formatSearching: () => txt("Searching")
+    };
+    $.extend(($.fn.select2 as any).defaults, ($.fn.select2 as any).locales['current']);
+    return true;
+}
+
+if (!select2LocaleInitialization() &&
+    typeof document !== "undefined")
+    document.addEventListener?.('DOMContentLoaded', select2LocaleInitialization);

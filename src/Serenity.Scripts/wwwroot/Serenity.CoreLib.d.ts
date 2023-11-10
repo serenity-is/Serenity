@@ -4254,6 +4254,7 @@ declare namespace Serenity {
         protected inplaceCreateClick(e: JQueryEventObject): void;
         openDialogAsPanel: boolean;
     }
+    function select2LocaleInitialization(): boolean;
 
     class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt?: SelectEditorOptions);
