@@ -1,21 +1,19 @@
-"Moono" Skin
-====================
+"Moono-lisa" Skin
+=================
 
-This skin has been chosen for the **default skin** of CKEditor 4.x (replaced by "Moono-lisa" skin since CKEditor 4.6.0),
-elected from the CKEditor [skin contest](http://ckeditor.com/blog/new_ckeditor_4_skin) and further shaped by
-the CKEditor team. "Moono" is maintained by the core developers.
+This skin has been made a **default skin** starting from CKEditor 4.6.0 and is maintained by the core developers.
 
-For more information about skins, please check the [CKEditor Skin SDK](http://docs.cksource.com/CKEditor_4.x/Skin_SDK)
+For more information about skins, please check the [CKEditor Skin SDK](https://ckeditor.com/docs/ckeditor4/latest/guide/skin_sdk_intro.html)
 documentation.
 
 Features
 -------------------
-"Moono" is a monochromatic skin, which offers a modern look coupled with gradients and transparency.
+"Moono-lisa" is a monochromatic skin, which offers a modern, flat and minimalistic look which blends very well in modern design.
 It comes with the following features:
 
-- Chameleon feature with brightness,
-- high-contrast compatibility,
-- graphics source provided in SVG.
+- Chameleon feature with brightness.
+- High-contrast compatibility.
+- Graphics source provided in SVG.
 
 Directory Structure
 -------------------
@@ -37,13 +35,12 @@ it's not loaded until the first menu open up,
 
 Other parts:
 - **skin.js**: the only JavaScript part of the skin that registers the skin, its browser specific files and its icons and defines the Chameleon feature,
-- **icons/**: contains all skin defined icons,
 - **images/**: contains a fill general used images,
-- **dev/**: contains SVG source of the skin icons.
+- **dev/**: contains SVG and PNG source of the skin icons.
 
 License
 -------
 
-Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
 
-For licensing, see LICENSE.md or [http://ckeditor.com/license](http://ckeditor.com/license)
+CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
