@@ -31,9 +31,7 @@
       "destination": "wwwroot/jquery",
       "files": [
         "jquery.js",
-        "jquery.min.js",
-        "jquery.slim.js",
-        "jquery.slim.min.js"
+        "jquery.min.js"
       ]
     },
     {
