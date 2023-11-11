@@ -133,9 +133,17 @@ export const build = async (opt) => {
         setInterval(() => {
             process.stdout.write("");
         }, 5000);
-    }
 
-    await esbuild.build(esbuildOptions(opt));
+        delete opt.watch;
+        const context = await esbuild.context(opt);
+        await context.rebuild()        
+        await context.watch();
+        context.dispose();
+    }
+    else {
+        delete opt.watch;
+        await esbuild.build(opt);
+    }
 };
 
 function scanDir(dir, org) {
