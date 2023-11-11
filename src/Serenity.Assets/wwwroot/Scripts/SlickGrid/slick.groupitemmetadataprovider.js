@@ -28,7 +28,7 @@ Slick._ = (() => {
   var { convertCompatFormatter, Group } = Slick;
 
   // src/data/groupitemmetadataprovider.ts
-  var _GroupItemMetadataProvider = class {
+  var _GroupItemMetadataProvider = class _GroupItemMetadataProvider {
     constructor(opt) {
       this.pluginName = "GroupItemMetadataProvider";
       this.handleGridClick = (e, args) => {
@@ -178,8 +178,7 @@ Slick._ = (() => {
       Object.assign(this.options, value);
     }
   };
-  var GroupItemMetadataProvider = _GroupItemMetadataProvider;
-  GroupItemMetadataProvider.defaults = {
+  _GroupItemMetadataProvider.defaults = {
     enableExpandCollapse: true,
     groupCellCssClass: "slick-group-cell",
     groupCssClass: "slick-group",
@@ -194,6 +193,7 @@ Slick._ = (() => {
     toggleExpandedCssClass: "expanded",
     totalsFocusable: false
   };
+  var GroupItemMetadataProvider = _GroupItemMetadataProvider;
   return __toCommonJS(groupitemmetadataprovider_exports);
 })();
 ["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._; Slick.Data = Slick.Data || {}; Slick.Data.GroupItemMetadataProvider = Slick.GroupItemMetadataProvider;

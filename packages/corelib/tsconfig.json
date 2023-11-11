@@ -15,6 +15,7 @@
     "module": "ES2020",
     "moduleResolution": "Node",
     "skipLibCheck": true,
+    "useDefineForClassFields": false,
     "types": [
       "jest"
     ],
