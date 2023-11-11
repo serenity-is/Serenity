@@ -11,8 +11,8 @@
     "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
-    "@types/jest": "29.5.1",
-    "tslib": "2.4.1"
+    "@types/jest": "29.5.8",
+    "tslib": "2.6.2"
   },
   "exports": {
     ".": {
