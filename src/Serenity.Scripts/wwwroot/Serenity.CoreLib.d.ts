@@ -1631,7 +1631,7 @@ declare namespace Slick {
 declare namespace Slick {
     interface Column<TItem = any> {
         referencedFields?: string[];
-        sourceItem?: PropertyItem;
+        sourceItem?: Serenity.PropertyItem;
     }
 }
 
@@ -4996,7 +4996,7 @@ declare namespace Serenity {
         function tryGet(key: string): any;
     }
 
-    type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
+    type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider;
 
     interface SettingStorage {
         getItem(key: string): string | Promise<string>;
@@ -5768,7 +5768,7 @@ interface JQuery {
 declare namespace Slick {
     namespace Data {
         /** @obsolete use the type exported from @serenity-is/sleekgrid */
-        const GroupItemMetadataProvider: GroupItemMetadataProviderType;
+        const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider;
     }
     interface RowMoveManagerOptions {
         cancelEditOnDrag: boolean;
@@ -5788,7 +5788,7 @@ declare namespace Slick {
     }
 }
 
-declare import Q = Serenity;
+import Q = Serenity;
 
 declare namespace Slick {
     export import AggregateFormatting = Serenity.AggregateFormatting;

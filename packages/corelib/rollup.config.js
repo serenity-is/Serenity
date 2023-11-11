@@ -44,6 +44,9 @@ function moduleToGlobalName(fromModule) {
 const convertModularToGlobal = (src, ns, isTS) => {
     src = src.replace(/: Event;/g, ': Slick.Event;');
     src = src.replace(/: Event</g, ': Slick.Event<');
+    src = src.replace('sourceItem?: PropertyItem', 'sourceItem?: Serenity.PropertyItem');
+    src = src.replace('const GroupItemMetadataProvider: GroupItemMetadataProviderType', 'const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider');
+    src = src.replace('type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider', 'type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider');
 
     var refTypes = [];
     src = src.replace(rxReferenceTypes, function (match) {
@@ -289,7 +292,7 @@ export default [
                         // inject sleekgrid typings after q
                         dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
                         dtsOutputs.push(`
-declare import Q = Serenity;
+import Q = Serenity;
 
 declare namespace Slick {
     export import AggregateFormatting = Serenity.AggregateFormatting;
