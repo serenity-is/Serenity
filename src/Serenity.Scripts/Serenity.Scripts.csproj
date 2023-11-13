@@ -13,12 +13,8 @@
 
   <ItemGroup>
     <Using Remove="*" />
-    <None Remove="*\tsconfig.json;style\*.css;" />
+    <None Remove="*\tsconfig.json" />
     <Content Update="*.json;**\tsconfig.json;**\package.json;**\package-lock.json;tslint.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
-    <None Include="style\*.css">
-      <Pack>true</Pack>
-      <PackagePath>content\Content\serenity\</PackagePath>
-    </None>
     <Content Include="..\..\packages\corelib\out\Serenity.CoreLib.js;..\..\packages\corelib\out\Serenity.CoreLib.js.map;..\..\packages\corelib\out\Serenity.CoreLib.min.js">
       <Pack>true</Pack>
       <PackagePath>content\Scripts\serenity\</PackagePath>
@@ -37,8 +33,7 @@
     <ToCompileCoreLib Include="..\..\packages\corelib\src\**\*.ts;..\..\packages\corelib\src\tsconfig.json;..\..\packages\corelib\build\build.js;..\..\packages\corelib\node_modules\@serenity-is\*\*.d.ts;..\..\packages\corelib\rollup.config.js;..\..\packages\corelib\package.json"></ToCompileCoreLib>
     <NpmPackageFile Include="..\..\packages\corelib\package.json" />
   </ItemGroup>
-  <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" 
-          Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
+  <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
     <Exec Command="pnpm run build" WorkingDirectory="..\..\packages\corelib" />
   </Target>
 </Project>
