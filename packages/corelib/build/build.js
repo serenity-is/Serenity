@@ -31,7 +31,8 @@ for (var esmOpt of [
         absWorkingDir: sleekRoot,
         outfile: esmOpt.outfile.replace('./dist/compat/', assetsSlick + '/').replace('/plugins/', '/Plugins/'),
         minify: false,
-        sourcemap: false
+        sourcemap: false,
+        tsconfig: join(sleekRoot, 'tsconfig.json')
     };
 
     esbuild.build(esmOpt).catch(() => process.exit());
