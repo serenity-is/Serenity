@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/tsbuild",
-  "version": "6.9.8",
+  "version": "6.9.10",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity ESBuild functions",
@@ -30,5 +30,6 @@
   ],
   "license": "MIT",
   "repository": "https://github.com/serenity-is/serenity/packages/tsbuild",
-  "type": "module"
+  "type": "module",
+  "types": "dist/index.d.ts"
 }
