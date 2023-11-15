@@ -74,7 +74,7 @@ public class LocalTextTests
     [Fact]
     public void ToString_ReturnsEmpty_If_Key_IsEmpty()
     {
-        LocalText text2 = new LocalText(string.Empty);
+        LocalText text2 = new(string.Empty);
         string actual2 = text2.ToString(localizer: null);
         Assert.Equal(string.Empty, actual2);
     }
