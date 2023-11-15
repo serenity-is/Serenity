@@ -31,7 +31,7 @@ public class DefaultUploadFileResponder : IUploadFileResponder
         var mimeType = KnownMimeTypes.Get(pathInfo);
 
         var stream = uploadStorage.OpenFile(pathInfo);
-        responseHeaders.Add("X-Content-Type-Options", "nosniff");
+        responseHeaders.Append("X-Content-Type-Options", "nosniff");
 
         if (mimeType == "application/pdf" ||
             mimeType == "text/plain" ||
@@ -46,7 +46,7 @@ public class DefaultUploadFileResponder : IUploadFileResponder
             Inline = false
         };
 
-        responseHeaders.Add("Content-Disposition", cd.ToString());
+        responseHeaders.Append("Content-Disposition", cd.ToString());
 
         return new FileStreamResult(stream, "application/octet-stream");
     }

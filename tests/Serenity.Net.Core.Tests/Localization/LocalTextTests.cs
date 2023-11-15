@@ -1,11 +1,11 @@
-﻿namespace Serenity.Tests.Localization;
+namespace Serenity.Tests.Localization;
 
 public class LocalTextTests
 {
     [Fact]
     public void InvariantLanguageID_IsEmptyString()
     {
-        Assert.Equal(string.Empty, LocalText.InvariantLanguageID);
+        Assert.Equal(LocalText.InvariantLanguageID, string.Empty);
     }
 
     [Fact]
