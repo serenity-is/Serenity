@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 #if ISSOURCEGENERATOR
 #else
 using CharSpan = System.ReadOnlySpan<char>;
@@ -247,11 +247,6 @@ public class Scanner
         return textToToken.FirstOrDefault(v => v.Value == t).Key;
     }
 
-    public SyntaxKind StringToToken(string s)
-    {
-        return textToToken[s];
-    }
-
     public static List<int> ComputeLineStarts(string text)
     {
         List<int> result = new();
@@ -284,12 +279,6 @@ public class Scanner
         }
         result.Add(lineStart);
         return result;
-    }
-
-
-    public int GetPositionOfLineAndCharacter(SourceFile sourceFile, int line, int character)
-    {
-        return ComputePositionOfLineAndCharacter(GetLineStarts(sourceFile), line, character);
     }
 
     public static int ComputePositionOfLineAndCharacter(int[] lineStarts, int line, int character)
@@ -537,11 +526,11 @@ public class Scanner
     public static int ScanShebangTrivia(string text, int pos)
     {
         var shebang = _shebangTriviaRegex.Exec(text)[0];
-        pos = pos + shebang.Length;
+        pos += shebang.Length;
         return pos;
     }
 
-    public static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default(U))
+    public static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default)
     {
         int pendingPos = 0;
         int pendingEnd = 0;
@@ -621,7 +610,6 @@ public class Scanner
                                     // If we are not reducing and we have a truthy result, return it.
                                     return accumulator;
                                 }
-                                hasPendingCommentRange = false;
                             }
                             pendingPos = startPos;
                             pendingEnd = pos;
@@ -682,7 +670,7 @@ public class Scanner
     }
 
 
-    public bool IsIdentifierStart(int ch)
+    public static bool IsIdentifierStart(int ch)
     {
         return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' ||
                     ch == '$' || ch == '_' ||
@@ -1080,9 +1068,9 @@ public class Scanner
             var ch = _tokenValue[0];
             if (ch >= 'a' && ch <= 'z')
             {
-                if (textToToken.ContainsKey(_tokenValue))
+                if (textToToken.TryGetValue(_tokenValue, out SyntaxKind value))
                 {
-                    _token = textToToken[_tokenValue];
+                    _token = value;
                     return _token;
                 }
             }

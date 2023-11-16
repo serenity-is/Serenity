@@ -1,8 +1,15 @@
-﻿namespace Serenity.TypeScript.TsParser;
+namespace Serenity.TypeScript.TsParser;
 
 public static class TsExtensions
 {
-    public static string[] Exec(this Regex r, string text) => r.Match(text).Captures.Cast<string>().ToArray();
+    public static string[] Exec(this Regex r, string text)
+    {
+        var result = new List<string>();
+        foreach (Capture x in r.Match(text).Captures)
+            result.Add(x.Value);
+        return result.ToArray();
+    } 
+
     public static bool Test(this Regex r, string text) => r.IsMatch(text);
     public static void Pop<T>(this List<T> list) => list.RemoveAt(0);
     

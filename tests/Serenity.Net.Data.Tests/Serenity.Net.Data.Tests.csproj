@@ -2,6 +2,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.Net.Data\Serenity.Net.Data.csproj" />
     <ProjectReference Include="..\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj" />
-    <PackageReference Include="TSQL.Parser" Version="2.4.0" />
+    <PackageReference Include="TSQL.Parser" Version="2.6.0" />
   </ItemGroup>
 </Project>

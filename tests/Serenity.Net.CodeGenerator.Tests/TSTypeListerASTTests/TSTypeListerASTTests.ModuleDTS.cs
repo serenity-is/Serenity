@@ -30,7 +30,8 @@ export class Type1 extends StringEditor {
 }
 ");
 
-        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: new TSConfig
+        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(), 
+            tsConfig: new TSConfig
         {
             CompilerOptions = new()
             {
@@ -88,7 +89,7 @@ export class Type1 extends StringEditor {
 }
 ");
 
-        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: new TSConfig
+        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(), tsConfig: new TSConfig
         {
             CompilerOptions = new()
             {
