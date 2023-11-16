@@ -1,3 +1,69 @@
+## 8.0.0 (2023-11-16)
+
+### Features:
+- This is a major update that supports .NET 8. Before switching to this version, ensure that your Visual Studio 2022 version is `17.8.0` or later. .NET SDK 8 should be installed through the Visual Studio update or manually if you are not using VS. In your project file, change the target to `net8.0`:
+  - `<TargetFramework>net8.0</TargetFramework>`
+  
+  Next, update the following packages to at least the listed versions below:
+  ```xml
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+  <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+  ```
+
+  Next, update Serenity and Pro packages to version 8.0. This should be enough to transition to .NET 8 as there aren't many breaking changes affecting Serenity-based applications.
+  
+  Note that Serenity 8.0+ will no longer support .NET 6/.NET 7. 
+  
+  We won't release a .NET 8 version of Serene yet, as most users who download it won't have the required Visual Studio 17.8.0 update, causing issues for newcomers. Serene users should apply the changes noted in these release notes to their apps after updating their Visual Studio.
+
+- Updated `Microsoft.TypeScript.MSBuild` to 5.2.2, now the recommended TypeScript version.
+- Updated several NuGet package references to their latest versions, including `Newtonsoft.Json`, `Scriban`, `Mono.Cecil`, `Microsoft.Data.SqlClient`, `Dapper`, `MailKit`, `Nuglify`, `SixLabors.ImageSharp`, etc.
+- [Breaking Change] `serenity.css` is moved to `Serenity.Extensions` as a static asset for easy updates. After updating, delete `wwwroot/Content/serenity/serenity.css` and replace the `serenity.css` reference in your `appsettings.json` with `~/Serenity.Extensions/common-style.css`. Serene users should also replace their `~/Content/site/common-theme.css` reference with `~/Serenity.Extensions/common-theme.css`. These changes will make it easier for Serene users to update their core CSS files.
+- Removed the following legacy scripts and CSS files from the Serenity.Assets package: 
+  - `Content/aristo/aristo.css`
+  - `Content/bootstrap-theme.css` (Bootstrap 3)
+  - `Content/bootstrap.css` (Bootstrap 3)
+  - `Content/ionicons.css`
+  - `Content/page.css`
+  - `Content/simple-line-icons.css`
+  - `Content/slick-default-theme.css`
+  - `Content/slick.columnpicker.css`
+  - `Content/slick.headerbuttons.css`
+  - `Content/slick.headermenu.css`
+  - `Content/slick.pager.css`
+  - `Scripts/bootstrap.js` (Bootstrap 3)
+  - `Scripts/jquery/jquery.slim.js`
+  - `Scripts/jquery.cropzoom.js`
+  - `Scripts/jquery.iframe-transport.js`
+  - `Scripts/jquery.json.js`
+  - `Scripts/jquery.scrollintoview.js`
+  - `Scripts/jquery.slimscroll.js`
+  - `Scripts/jsrender.js`
+  - `Scripts/pace.js`
+  - `Scripts/react*.js`
+  - `Scripts/rsvp.js`
+  - `Scripts/saltarelle/linq.js` 
+  - `Scripts/saltarelle/mscorlib.js`
+
+  These files have not been used by Serene/StartSharp for a long time. If you still have references to any of the above files in your `appsettings.bundles.json`, remove those references or install those files via `libman.json` or similar.
+- Updated jQuery to 3.7.1
+- Removed jQuery 3.5.1 files from Serenity.Assets. If you still have a reference in your `appsettings.bundles.json` like `"~/Serenity.Assets/Scripts/jquery-{version}.js"`, please change it to `"~/Serenity.Assets/jquery/jquery.js"` or install it via libman.
+- Removed the full version of jQuery UI from Serenity.Assets, e.g., `jquery-ui-1.12.1.js`, as it does not have the patches we applied to `jquery-ui.js`, which is our trimmed custom version. If you still have a reference in `appsettings.bundles.json` like `"~/Serenity.Assets/Scripts/jquery-ui-{version}.js"`, replace it with `"~/Serenity.Assets/Scripts/jquery-ui.js"` or install it via libman/npm (though you won't have our patches in that case).
+- Updated CKEditor to 4.22.1, the last open-source version. Switched to moono-lisa skin, which is flatter than moono.
+- Updated Bootstrap to 5.3.2, offering more customization options via CSS variables and supporting a dark theme.  
+- Updated esbuild to 0.19.15, which has some breaking changes related to watch mode. Please update tsbuild to `8.0.0` and apply changes in StartSharp repository's `tsbuild.js` to your project.
+- TSBuild now has a type definition so that you can see what options it provides. Serenity.Pro.Theme rules are updated to comply with this change. Apply changes in `_Layout.cshtml` and `_LayoutHead.cshtml` so that a `data-bs-theme="dark"` attribute is added to the HTML element when the `cosmos-dark` or another similar dark theme is used.
+- Implemented Select2 localization using Q.localText and Q.format functions. Removing the Select2-locales folder from Serenity.Assets, as they were not suitable to use with Serenity localization.
+- StartSharp template now comes with a `.gitignore` file with ignore patterns suitable for general Serenity applications.
+
+### Bugfixes:
+- Allow `Fields.XYZ` while determining the `IsActive` property and others in addition to `fields.XYZ`, but the `Fields` property is only there for compatibility and is effectively obsolete.
+- Background image was not shown in no-layout pages like login in the glassy-light theme.
+- Add the hidden class to wizard dialog panes so that validation doesn't run for inactive steps, unlike usual tab forms.
+- PuppeteerHtmlToPdf fix affecting Base64 data URIs.
+
+
 ## 6.9.6 (2023-11-09)
 
 ### Features:
