@@ -125,7 +125,7 @@ export const esbuildOptions = (opt) => {
 }
 
 export const build = async (opt) => {
-    var opt = esbuildOptions(opt);
+    opt = esbuildOptions(opt);
 
     if (opt.watch) {
         // this somehow resolves the issue that when debugging is stopped
@@ -136,9 +136,7 @@ export const build = async (opt) => {
 
         delete opt.watch;
         const context = await esbuild.context(opt);
-        await context.rebuild()        
         await context.watch();
-        context.dispose();
     }
     else {
         delete opt.watch;
