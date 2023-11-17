@@ -12,8 +12,8 @@ public class JsonRowConverter : JsonConverter
     /// </summary>
     public static Func<IRow, string, bool> ShouldSerializeExtension
     {
-        get => JsonConverters.JsonIRowConverter.ShouldSerializeExtension;
-        set => JsonConverters.JsonIRowConverter.ShouldSerializeExtension = value;
+        get => JsonConverters.RowJsonConverter.ShouldSerializeExtension;
+        set => JsonConverters.RowJsonConverter.ShouldSerializeExtension = value;
     }
 
     /// <summary>
@@ -21,8 +21,8 @@ public class JsonRowConverter : JsonConverter
     /// </summary>
     public static Func<IRow, string, bool> ShouldDeserializeExtension
     {
-        get => JsonConverters.JsonIRowConverter.ShouldDeserializeExtension;
-        set => JsonConverters.JsonIRowConverter.ShouldDeserializeExtension = value;
+        get => JsonConverters.RowJsonConverter.ShouldDeserializeExtension;
+        set => JsonConverters.RowJsonConverter.ShouldDeserializeExtension = value;
     }
 
     /// <summary>

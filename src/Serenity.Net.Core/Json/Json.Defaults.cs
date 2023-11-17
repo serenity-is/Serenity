@@ -63,8 +63,11 @@ public static partial class JSON
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals | JsonNumberHandling.AllowReadingFromString,
                 Converters = {
-                JsonConverters.SafeInt64JsonConverter.Instance
-            }
+                    JsonConverters.SafeInt64JsonConverter.Instance,
+                    JsonConverters.ObjectJsonConverter.Instance,
+                    JsonConverters.NullableJsonConverter.Instance,
+                    new JsonStringEnumConverter()
+                }
             };
         }
     }

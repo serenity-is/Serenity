@@ -10,8 +10,8 @@ namespace Serenity.Data;
 /// <seealso cref="IRow{TFields}" />
 /// <seealso cref="INotifyPropertyChanged" />
 /// <seealso cref="IEditableObject" />
-[JsonConverter(typeof(JsonConverters.JsonIRowConverter))]
 [Newtonsoft.Json.JsonConverter(typeof(JsonRowConverter))]
+[JsonConverter(typeof(JsonConverters.RowJsonConverter))]
 public abstract partial class Row<TFields> : IRow, IRow<TFields>
     where TFields : RowFieldsBase
 {

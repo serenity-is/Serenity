@@ -4,7 +4,7 @@ namespace Serenity.JsonConverters;
 
 /// <summary>
 ///   Serialize/deserialize a row</summary>
-public class JsonIRowConverter : JsonConverter<IRow>
+public class RowJsonConverter : JsonConverter<IRow>
 {
     /// <summary>
     /// Should serialize extension
