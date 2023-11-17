@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)..\build\Package.Build.props')" />
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -42,7 +42,6 @@
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
   <ItemGroup>
-    <Using Include="Newtonsoft.Json" />
     <Using Include="Serenity" />
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
@@ -59,6 +58,7 @@
     <Using Include="System.Reflection" />
     <Using Include="System.Security.Claims" />
     <Using Include="System.Text" />
+    <Using Include="System.Text.Json.Serialization" />
     <Using Include="System.Text.RegularExpressions" />
   </ItemGroup>
 </Project>

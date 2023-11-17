@@ -27,7 +27,7 @@ public class JsonLocalTextRegistrationTests
     public void AddFromNestedDictionary_Handles_SimpleDictionary()
     {
         var registry = new MockLocalTextRegistry();
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{""x"":""5"", ""y.z"": ""a.b.c""}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""5"", ""y.z"": ""a.b.c""}");
         JsonLocalTextRegistration.AddFromNestedDictionary(dict, "pre.", "es", registry);
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("es", "pre.x", "5"), x),
@@ -38,7 +38,7 @@ public class JsonLocalTextRegistrationTests
     public void AddFromNestedDictionary_Handles_HierarchicalDictionary()
     {
         var registry = new MockLocalTextRegistry();
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{x:""x"",y:{z:{u:{l:""l"",m:""m""},t:""t""}}}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""x"",""y"":{""z"":{""u"":{""l"":""l"",""m"":""m""},""t"":""t""}}}");
         JsonLocalTextRegistration.AddFromNestedDictionary(dict, "Db.", "jp", registry);
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("jp", "Db.x", "x"), x),
@@ -51,7 +51,7 @@ public class JsonLocalTextRegistrationTests
     public void AddFromNestedDictionary_Skips_NullValues()
     {
         var registry = new MockLocalTextRegistry();
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{x:""x"",y:null}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""x"",""y"":null}");
         JsonLocalTextRegistration.AddFromNestedDictionary(dict, "Db.", "jp", registry);
         Assert.Collection(registry.AddedList.OrderBy(x => x.key),
             x => Assert.Equal(("jp", "Db.x", "x"), x));
@@ -62,14 +62,14 @@ public class JsonLocalTextRegistrationTests
     {
         Assert.Throws<ArgumentNullException>(() =>
         {
-            JsonLocalTextRegistration.ProcessNestedDictionary<object>(nested: null, "x", new Dictionary<string, string>());
+            JsonLocalTextRegistration.ProcessNestedDictionary<object>(nested: null, "x", []);
         });
     }
 
     [Fact]
     public void JsonLocalTextRegistration_ProcessNestedDictionary_HandlesSimpleDictionary()
     {
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{x:""5"", ""y.z"": ""a.b.c""}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""5"", ""y.z"": ""a.b.c""}");
         var target = new Dictionary<string, string>();
         JsonLocalTextRegistration.ProcessNestedDictionary(dict, "pre.", target);
 
@@ -85,7 +85,7 @@ public class JsonLocalTextRegistrationTests
     [Fact]
     public void JsonLocalTextRegistration_ProcessNestedDictionary_HandlesHierarchicalDictionary()
     {
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{x:""x"",y:{z:{u:{l:""l"",m:""m""},t:""t""}}}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""x"",""y"":{""z"":{""u"":{""l"":""l"",""m"":""m""},""t"":""t""}}}");
         var target = new Dictionary<string, string>();
         JsonLocalTextRegistration.ProcessNestedDictionary(dict, "Db.", target);
 
@@ -107,7 +107,7 @@ public class JsonLocalTextRegistrationTests
     [Fact]
     public void ProcessNestedDictionary_Skips_NullValues()
     {
-        var dict = JSON.Parse<Dictionary<string, object>>(@"{x:""x"",y:null}");
+        var dict = JSON.Deserialize<Dictionary<string, object>>(@"{""x"":""x"",""y"":null}");
         var target = new Dictionary<string, string>();
         JsonLocalTextRegistration.ProcessNestedDictionary(dict, "Db.", target);
 

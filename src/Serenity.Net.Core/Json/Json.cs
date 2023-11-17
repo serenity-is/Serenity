@@ -1,23 +1,22 @@
-﻿using System.IO;
+using System.Text.Json;
 
 namespace Serenity;
 
 /// <summary>
-/// Contains shortcuts to Newtonsoft.Json serialization / deserialization methods, and default
+/// Contains shortcuts to Json serialization / deserialization methods, and default
 /// Serenity settings.
 /// </summary>
-public static class JSON
+public static partial class JSON
 {
     /// <summary>
     /// Deserializes a JSON string to an object
     /// </summary>
     /// <typeparam name="T">Type to deserialize</typeparam>
     /// <param name="input">JSON string</param>
-    /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
     /// <returns>Deserialized object</returns>
-    public static T? Parse<T>(string input, bool includeNulls = false)
+    public static T? Deserialize<T>(string input)
     {
-        return JsonConvert.DeserializeObject<T>(input, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
+        return JsonSerializer.Deserialize<T>(input, JsonDefaults.StrictWriteNulls);
     }
 
     /// <summary>
@@ -25,11 +24,10 @@ public static class JSON
     /// </summary>
     /// <param name="targetType">Type to deserialize</param>
     /// <param name="input">JSON string</param>
-    /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
     /// <returns>Deserialized object</returns>
-    public static object? Parse(string input, Type targetType, bool includeNulls = false)
+    public static object? Deserialize(string input, Type targetType)
     {
-        return JsonConvert.DeserializeObject(input, targetType, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
+        return JsonSerializer.Deserialize(input, targetType, JsonDefaults.StrictWriteNulls);
     }
 
     /// <summary>
@@ -37,11 +35,10 @@ public static class JSON
     /// </summary>
     /// <typeparam name="T">Type to deserialize</typeparam>
     /// <param name="input">JSON string</param>
-    /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
     /// <returns>Deserialized object</returns>
-    public static T? ParseTolerant<T>(string input, bool includeNulls = false)
+    public static T? DeserializeTolerant<T>(string input)
     {
-        return JsonConvert.DeserializeObject<T>(input, includeNulls ? JsonSettings.TolerantIncludeNulls : JsonSettings.Tolerant);
+        return JsonSerializer.Deserialize<T>(input, JsonDefaults.TolerantWriteNulls);
     }
 
     /// <summary>
@@ -49,58 +46,41 @@ public static class JSON
     /// </summary>
     /// <param name="targetType">Type to deserialize</param>
     /// <param name="input">JSON string</param>
-    /// <param name="includeNulls">If true, if a value is null and target property is not nullable, raises error.</param>
     /// <returns>Deserialized object</returns>
-    public static object? ParseTolerant(string input, Type targetType, bool includeNulls = false)
+    public static object? DeserializeTolerant(string input, Type targetType)
     {
-        return JsonConvert.DeserializeObject(input, targetType, includeNulls ? JsonSettings.TolerantIncludeNulls : JsonSettings.Tolerant);
-    }
+        return JsonSerializer.Deserialize(input, targetType, JsonDefaults.TolerantWriteNulls);
+    }   
 
     /// <summary>
     /// Converts object to its JSON representation
     /// </summary>
     /// <param name="value">Value to convert to JSON</param>
-    /// <param name="includeNulls">If true, serializes null values.</param>
+    /// <param name="writeNulls">If true, serializes null values.</param>
     /// <returns>Serialized JSON string</returns>
-    public static string Stringify(object? value, bool includeNulls = false)
+    public static string Serialize(object? value, bool writeNulls = false)
     {
-        return JsonConvert.SerializeObject(value, includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
+        return JsonSerializer.Serialize(value, writeNulls ? JsonDefaults.StrictWriteNulls : JsonDefaults.Strict);
     }
+
+    private static readonly JsonSerializerOptions Indented = new(JsonDefaults.Strict)
+    {
+        WriteIndented = true
+    };
+
+    private static readonly JsonSerializerOptions IndentedWriteNulls = new(JsonDefaults.StrictWriteNulls)
+    {
+        WriteIndented = true
+    };
 
     /// <summary>
     /// Converts object to its JSON representation
     /// </summary>
     /// <param name="value">Value to convert to JSON</param>
-    /// <param name="indentation">Indentation (default 4)</param>
-    /// <param name="includeNulls">If true, serializes null values.</param>
+    /// <param name="writeNulls">If true, serializes null values.</param>
     /// <returns>Serialized JSON string</returns>
-    public static string StringifyIndented(object? value, int indentation = 4, bool includeNulls = false)
+    public static string SerializeIndented(object? value, bool writeNulls = false)
     {
-        using var sw = new StringWriter();
-        using var jw = new JsonTextWriter(sw)
-        {
-            Formatting = Formatting.Indented,
-            IndentChar = ' ',
-            Indentation = indentation
-        };
-
-        var serializer = JsonSerializer.Create(includeNulls ? JsonSettings.StrictIncludeNulls : JsonSettings.Strict);
-        serializer.Serialize(jw, value);
-        return sw.ToString();
-    }
-
-    /// <summary>
-    ///   Converts an object to its JSON representation (extension method for Stringify)</summary>
-    /// <param name="value">
-    ///   Object</param>
-    /// <param name="includeNulls">If true, serializes null values.</param>
-    /// <returns>
-    ///   JSON representation string.</returns>
-    /// <remarks>
-    ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
-    ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
-    public static string ToJson(this object? value, bool includeNulls = false)
-    {
-        return Stringify(value, includeNulls);
+        return JsonSerializer.Serialize(value, writeNulls ? IndentedWriteNulls : Indented);
     }
 }

@@ -27,7 +27,7 @@ public static class DistributedCacheExtensions
         else if (value is byte[] b)
             cache.Set(key, b);
         else
-            cache.SetString(key, JSON.Stringify(value));
+            cache.SetString(key, JSON.Serialize(value));
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public static class DistributedCacheExtensions
         else if (value is byte[] b)
             cache.Set(key, b, options);
         else
-            cache.SetString(key, JSON.Stringify(value), options);
+            cache.SetString(key, JSON.Serialize(value), options);
     }
 
     /// <summary>
@@ -90,6 +90,6 @@ public static class DistributedCacheExtensions
         if (typeof(TValue) == typeof(string))
             return (TValue)(object)s;
 
-        return JSON.Parse<TValue>(s);
+        return JSON.Deserialize<TValue>(s);
     }
 }

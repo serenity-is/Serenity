@@ -1,8 +1,11 @@
-﻿namespace Serenity.Data;
+using Newtonsoft.Json;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
+
+namespace Serenity.Services;
 
 /// <summary>
-///   Serialize/deserialize a row</summary>
-public class JsonSafeInt64Converter : JsonConverter
+///   Serialize/deserialize a IdentifierSet object as string</summary>
+public class JsonStringHashSetConverter : JsonConverter
 {
     /// <summary>
     ///   Writes the JSON representation of the object.</summary>
@@ -14,17 +17,17 @@ public class JsonSafeInt64Converter : JsonConverter
     ///   The calling serializer.</param>
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        if (value == null)
-            writer.WriteNull();
-        else
+        var hashset = (HashSet<string>?)value;
+        if (hashset == null)
         {
-            var intvalue = Convert.ToInt64(value);
-            if (intvalue > 9007199254740992 ||
-                intvalue < -9007199254740992)
-                writer.WriteValue(intvalue.ToString(CultureInfo.InvariantCulture));
-            else
-                writer.WriteValue(intvalue);
+            writer.WriteNull();
+            return;
         }
+
+        writer.WriteStartArray();
+        foreach (var s in hashset)
+            writer.WriteValue(s);
+        writer.WriteEndArray();
     }
 
     /// <summary>
@@ -38,9 +41,28 @@ public class JsonSafeInt64Converter : JsonConverter
     ///   The calling serializer.</param>
     /// <returns>
     ///   The object value.</returns>
-    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        throw new NotImplementedException();
+        if (reader.TokenType == JsonToken.Null)
+            return null;
+
+        var hashset = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (reader.TokenType != JsonToken.StartArray)
+            throw new JsonSerializationException("Unexpected start array when deserializing object.");
+
+        while (true)
+        {
+            reader.Read();
+            if (reader.TokenType == JsonToken.String)
+                hashset.Add((string)reader.Value!);
+            else if (reader.TokenType == JsonToken.EndArray)
+                break;
+            else
+                throw new JsonSerializationException("Unexpected token when deserializing object.");
+        }
+
+        return hashset;
     }
 
     /// <summary>
@@ -51,14 +73,14 @@ public class JsonSafeInt64Converter : JsonConverter
     ///   True if this instance can convert the specified object type; otherwise, false.</returns>
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(long) || objectType == typeof(long?);
+        return objectType == typeof(HashSet<string>);
     }
 
     /// <summary>
     ///   Gets a value indicating whether this <see cref="JsonConverter"/> can read JSON.</summary>
     /// <value>
     ///   True if this <see cref="JsonConverter"/> can write JSON; otherwise, false.</value>
-    public override bool CanRead => false;
+    public override bool CanRead => true;
 
     /// <summary>
     ///   Gets a value indicating whether this <see cref="JsonConverter"/> can write JSON.</summary>

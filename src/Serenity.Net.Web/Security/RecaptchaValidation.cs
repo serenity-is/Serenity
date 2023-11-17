@@ -55,7 +55,7 @@ public static class RecaptchaValidation
     private class RecaptchaResponse
     {
         public bool Success { get; set; }
-        [JsonProperty("error-codes")]
+        [JsonPropertyName("error-codes")]
         public string[] ErrorCodes { get; set; }
     }
 }
