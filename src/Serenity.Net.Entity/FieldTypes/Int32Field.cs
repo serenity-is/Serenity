@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with Int32 value
@@ -150,5 +152,53 @@ public class Int32Field : GenericValueField<int>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        int v;
+
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+            case JsonTokenType.Number:
+                if (reader.TokenType == JsonTokenType.Number)
+                    v = reader.GetInt32();
+                else
+                    v = reader.TokenType == JsonTokenType.True ? 1 : 0;
+                if (EnumType == null)
+                    _setValue(row, v);
+                else
+                    _setValue(row, (int)ConvertEnumFromInt(EnumType, v));
+                break;
+            case JsonTokenType.String:
+                string s = reader.GetString().TrimToNull();
+                if (s == null)
+                    _setValue(row, null);
+                else if (EnumType == null)
+                    _setValue(row, Convert.ToInt32(s, CultureInfo.InvariantCulture));
+                else
+                    _setValue(row, (int)ConvertEnumFromString(EnumType, s));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteNumberValue(value.Value);
     }
 }

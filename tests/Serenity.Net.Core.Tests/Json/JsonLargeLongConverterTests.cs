@@ -9,7 +9,7 @@ public partial class JsonLargeLongConverterTests
     {
         Converters =
         {
-            new JsonLargeLongConverter()
+            new SafeInt64JsonConverter()
         }
     };
 

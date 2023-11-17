@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Web;
 
@@ -84,7 +84,9 @@ public class DistinctValuesScript<TRow> : LookupScript
     public override string GetScript()
     {
         return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
-            ", new Q.Lookup(" + LookupParams.ToJson() + ", " + GetItems().ToJson() + 
+            ", new Q.Lookup(" + 
+            JSON.Serialize(LookupParams, writeNulls: false) + ", " + 
+            JSON.Serialize(GetItems(), writeNulls: false) + 
             ".map(function(x) { return { v: x }; })));";
     }
 

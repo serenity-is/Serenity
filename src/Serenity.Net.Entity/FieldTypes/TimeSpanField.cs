@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a TimeSpan value
@@ -179,4 +181,41 @@ public sealed class TimeSpanField : GenericValueField<TimeSpan>
 
         row.FieldAssignedValue(this);
     }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                var s = reader.GetString().TrimToNull();
+                if (s == null)
+                    _setValue(row, null);
+                else if (reader.TryGetDateTimeOffset(out var dofs))
+                    _setValue(row, dofs.TimeOfDay);
+                else if (reader.TryGetDateTime(out var dt))
+                    _setValue(row, dt.TimeOfDay);
+                else
+                    _setValue(row, TimeSpan.ParseExact(s, "c", CultureInfo.InvariantCulture));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteStringValue(value.Value.ToString("c", CultureInfo.InvariantCulture));
+    }
+
 }

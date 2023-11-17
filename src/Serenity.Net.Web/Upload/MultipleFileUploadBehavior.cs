@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 
 namespace Serenity.Services;
 
@@ -82,7 +82,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
             !json.EndsWith("]", StringComparison.Ordinal)))
             throw new ArgumentOutOfRangeException(key);
 
-        var list = JSON.Parse<UploadedFile[]>(json ?? "[]");
+        var list = JSON.Deserialize<UploadedFile[]>(json ?? "[]");
 
         if (list.Any(x => string.IsNullOrEmpty(x.Filename)) ||
             list.GroupBy(x => x.Filename.Trim()).SelectMany(x => x.Skip(1)).Any())
@@ -205,7 +205,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
             file.Filename = copyResult.Path;
         }
 
-        return JSON.Stringify(newFileList);
+        return JSON.Serialize(newFileList, writeNulls: false);
     }
 
     /// <inheritdoc/>

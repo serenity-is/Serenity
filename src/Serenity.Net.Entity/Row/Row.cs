@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Data;
 
@@ -10,7 +10,8 @@ namespace Serenity.Data;
 /// <seealso cref="IRow{TFields}" />
 /// <seealso cref="INotifyPropertyChanged" />
 /// <seealso cref="IEditableObject" />
-[JsonConverter(typeof(JsonRowConverter))]
+[JsonConverter(typeof(JsonConverters.JsonIRowConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(JsonRowConverter))]
 public abstract partial class Row<TFields> : IRow, IRow<TFields>
     where TFields : RowFieldsBase
 {
@@ -285,10 +286,10 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     private Field FindFieldEnsure(string fieldName)
     {
         var field = FindField(fieldName);
-        if (field is null)
-            throw new ArgumentOutOfRangeException("fieldName", string.Format(
-                "{0} has no field with name '{1}'.", GetType().Name, fieldName));
-        return field;
+        return field is null
+            ? throw new ArgumentOutOfRangeException("fieldName", string.Format(
+                "{0} has no field with name '{1}'.", GetType().Name, fieldName))
+            : field;
     }
 
     /// <summary>

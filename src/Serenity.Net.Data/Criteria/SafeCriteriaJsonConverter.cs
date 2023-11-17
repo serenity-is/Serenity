@@ -4,7 +4,7 @@ namespace Serenity.JsonConverters;
 
 /// <summary>
 ///   Serialize/deserialize a BaseCriteria object and checks for safety of criteria expressions.</summary>
-public class JsonBaseCriteriaSafeConverter : JsonBaseCriteriaConverter
+public class SafeCriteriaJsonConverter : CriteriaJsonConverter
 {
     /// <inheritdoc/>
     public override BaseCriteria Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

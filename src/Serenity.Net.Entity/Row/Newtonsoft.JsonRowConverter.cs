@@ -10,12 +10,20 @@ public class JsonRowConverter : JsonConverter
     /// <summary>
     /// Should serialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldSerializeExtension;
+    public static Func<IRow, string, bool> ShouldSerializeExtension
+    {
+        get => JsonConverters.JsonIRowConverter.ShouldSerializeExtension;
+        set => JsonConverters.JsonIRowConverter.ShouldSerializeExtension = value;
+    }
 
     /// <summary>
     /// Should deserialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldDeserializeExtension;
+    public static Func<IRow, string, bool> ShouldDeserializeExtension
+    {
+        get => JsonConverters.JsonIRowConverter.ShouldDeserializeExtension;
+        set => JsonConverters.JsonIRowConverter.ShouldDeserializeExtension = value;
+    }
 
     /// <summary>
     ///   Writes the JSON representation of the object.</summary>

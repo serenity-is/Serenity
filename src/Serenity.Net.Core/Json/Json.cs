@@ -16,7 +16,7 @@ public static partial class JSON
     /// <returns>Deserialized object</returns>
     public static T? Deserialize<T>(string input)
     {
-        return JsonSerializer.Deserialize<T>(input, JsonDefaults.StrictWriteNulls);
+        return JsonSerializer.Deserialize<T>(input, Defaults.StrictWriteNulls);
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public static partial class JSON
     /// <returns>Deserialized object</returns>
     public static object? Deserialize(string input, Type targetType)
     {
-        return JsonSerializer.Deserialize(input, targetType, JsonDefaults.StrictWriteNulls);
+        return JsonSerializer.Deserialize(input, targetType, Defaults.StrictWriteNulls);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public static partial class JSON
     /// <returns>Deserialized object</returns>
     public static T? DeserializeTolerant<T>(string input)
     {
-        return JsonSerializer.Deserialize<T>(input, JsonDefaults.TolerantWriteNulls);
+        return JsonSerializer.Deserialize<T>(input, Defaults.TolerantWriteNulls);
     }
 
     /// <summary>
@@ -49,8 +49,36 @@ public static partial class JSON
     /// <returns>Deserialized object</returns>
     public static object? DeserializeTolerant(string input, Type targetType)
     {
-        return JsonSerializer.Deserialize(input, targetType, JsonDefaults.TolerantWriteNulls);
-    }   
+        return JsonSerializer.Deserialize(input, targetType, Defaults.TolerantWriteNulls);
+    }
+
+    /// <summary>
+    /// Tries to populate an existing object similar to Newtonsoft.Json.JsonConvert.PopulateObject
+    /// </summary>
+    /// <typeparam name="T">Type of the object</typeparam>
+    /// <param name="target">Target object</param>
+    /// <param name="jsonSource">JSON string</param>
+    /// <param name="options">Serializer options</param>
+    public static void PopulateObject<T>(T target, string jsonSource, JsonSerializerOptions options) 
+        where T : class
+    {
+        var json = JsonDocument.Parse(jsonSource).RootElement;
+        foreach (var property in json.EnumerateObject())
+            OverwriteProperty(target, property, options);
+    }
+
+    static void OverwriteProperty<T>(T target, JsonProperty updatedProperty, JsonSerializerOptions options) where T : class
+    {
+        var propertyInfo = typeof(T).GetProperty(updatedProperty.Name);
+
+        if (propertyInfo == null)
+            return;
+
+        var propertyType = propertyInfo.PropertyType;
+        var parsedValue = updatedProperty.Value.Deserialize(propertyType, options);
+
+        propertyInfo.SetValue(target, parsedValue);
+    }
 
     /// <summary>
     /// Converts object to its JSON representation
@@ -60,15 +88,15 @@ public static partial class JSON
     /// <returns>Serialized JSON string</returns>
     public static string Serialize(object? value, bool writeNulls = false)
     {
-        return JsonSerializer.Serialize(value, writeNulls ? JsonDefaults.StrictWriteNulls : JsonDefaults.Strict);
+        return JsonSerializer.Serialize(value, writeNulls ? Defaults.StrictWriteNulls : Defaults.Strict);
     }
 
-    private static readonly JsonSerializerOptions Indented = new(JsonDefaults.Strict)
+    private static readonly JsonSerializerOptions Indented = new(Defaults.Strict)
     {
         WriteIndented = true
     };
 
-    private static readonly JsonSerializerOptions IndentedWriteNulls = new(JsonDefaults.StrictWriteNulls)
+    private static readonly JsonSerializerOptions IndentedWriteNulls = new(Defaults.StrictWriteNulls)
     {
         WriteIndented = true
     };

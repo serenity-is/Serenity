@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a Variant (e.g. SQL VARIANT) value
@@ -117,12 +119,53 @@ public class VariantField : GenericClassField<object>
             case Newtonsoft.Json.JsonToken.Integer:
             case Newtonsoft.Json.JsonToken.Float:
             case Newtonsoft.Json.JsonToken.Bytes:
-                _setValue(row, (string)reader.Value);
+                _setValue(row, reader.Value);
                 break;
             default:
                 throw JsonUnexpectedToken(reader);
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+                _setValue(row, reader.TokenType == JsonTokenType.Number);
+                break;
+            case JsonTokenType.Number:
+                if (reader.TryGetInt32(out int intValue))
+                    _setValue(row, intValue);
+                else if (reader.TryGetInt64(out long longValue))
+                    _setValue(row, longValue);
+                else
+                    _setValue(row, reader.GetDouble());
+                
+                break;
+            case JsonTokenType.String:
+                _setValue(row, reader.GetString());
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            JsonSerializer.Serialize(writer, value, options);
     }
 }

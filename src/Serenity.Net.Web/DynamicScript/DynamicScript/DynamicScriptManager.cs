@@ -1,4 +1,6 @@
-﻿using CompressionLevel = System.IO.Compression.CompressionLevel;
+using System.IO;
+using System.Text.Json;
+using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 namespace Serenity.Web;
 
@@ -154,7 +156,12 @@ public partial class DynamicScriptManager : IDynamicScriptManager
             {
                 if (script is IGetScriptData scriptData)
                 {
-                    content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
+                    using var ms = new MemoryStream();
+                    using var jsonWriter = new Utf8JsonWriter(ms);
+                    JsonSerializer.Serialize(jsonWriter, scriptData.GetScriptData(),
+                        JSON.Defaults.Strict);
+                    jsonWriter.Flush();
+                    content = ms.ToArray();
                 }
                 else
                 {

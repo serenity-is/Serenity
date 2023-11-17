@@ -4,7 +4,7 @@ namespace Serenity.JsonConverters;
 
 /// <summary>
 ///   Serialize/deserialize a HashSet object as string</summary>
-public class JsonHashSetStringConverter : JsonConverter<HashSet<string>>
+public class HashSetStringJsonConverter : JsonConverter<HashSet<string>>
 {
     /// <inheritdoc/>
     public override HashSet<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

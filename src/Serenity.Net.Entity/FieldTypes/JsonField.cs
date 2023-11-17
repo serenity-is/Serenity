@@ -58,7 +58,7 @@ public class JsonField<TValue> : GenericClassField<TValue>
             _setValue(row, null);
         else
             _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString(index), 
-                SerializerOptions ?? JsonDefaults.Strict));
+                SerializerOptions ?? JSON.Defaults.Strict));
 
         row.FieldAssignedValue(this);
     }
@@ -82,7 +82,7 @@ public class JsonField<TValue> : GenericClassField<TValue>
         if (value == null)
             return null;
 
-        return JsonSerializer.Serialize(value, SerializerOptions ?? JsonDefaults.Strict);
+        return JsonSerializer.Serialize(value, SerializerOptions ?? JSON.Defaults.Strict);
     }
 
     /// <summary>
@@ -108,7 +108,8 @@ public class JsonField<TValue> : GenericClassField<TValue>
                 return 1;
         }
         else
-            return JSON.Serialize(value1).CompareTo(JSON.Serialize(value2));
+            return JSON.Serialize(value1, writeNulls: false)
+                .CompareTo(JSON.Serialize(value2, writeNulls: false));
     }
 
     /// <summary>
@@ -144,7 +145,9 @@ public class JsonField<TValue> : GenericClassField<TValue>
                 if (typeof(TValue) == typeof(string))
                     _setValue(row, serializer.Deserialize<TValue>(reader));
                 else
-                    _setValue(row, serializer.Deserialize<TValue>(reader));
+#pragma warning disable CS0618 // Type or member is obsolete
+                    _setValue(row, JSON.Parse<TValue>((string)reader.Value, includeNulls: serializer.NullValueHandling == Newtonsoft.Json.NullValueHandling.Include));
+#pragma warning restore CS0618 // Type or member is obsolete
                 break;
             default:
                 _setValue(row, serializer.Deserialize<TValue>(reader));
@@ -152,5 +155,36 @@ public class JsonField<TValue> : GenericClassField<TValue>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (typeof(TValue) == typeof(string))
+                    _setValue(row, JsonSerializer.Deserialize<TValue>(ref reader, options));
+                else
+                    _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString(), options));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            JsonSerializer.Serialize(writer, value, options);
     }
 }

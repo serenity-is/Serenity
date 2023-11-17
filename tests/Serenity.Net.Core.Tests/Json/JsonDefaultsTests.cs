@@ -8,19 +8,19 @@ public partial class JsonDefaultsTests
     {
         return defaults switch
         {
-            nameof(JsonDefaults.Strict) => JsonDefaults.Strict,
-            nameof(JsonDefaults.StrictWriteNulls) => JsonDefaults.StrictWriteNulls,
-            nameof(JsonDefaults.Tolerant) => JsonDefaults.Tolerant,
-            nameof(JsonDefaults.TolerantWriteNulls) => JsonDefaults.TolerantWriteNulls,
+            nameof(JSON.Defaults.Strict) => JSON.Defaults.Strict,
+            nameof(JSON.Defaults.StrictWriteNulls) => JSON.Defaults.StrictWriteNulls,
+            nameof(JSON.Defaults.Tolerant) => JSON.Defaults.Tolerant,
+            nameof(JSON.Defaults.TolerantWriteNulls) => JSON.Defaults.TolerantWriteNulls,
             _ => throw new NotSupportedException()
         };
     }
 
     [Theory]
-    [InlineData(nameof(JsonDefaults.Strict))]
-    [InlineData(nameof(JsonDefaults.StrictWriteNulls))]
-    [InlineData(nameof(JsonDefaults.Tolerant))]
-    [InlineData(nameof(JsonDefaults.TolerantWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Strict))]
+    [InlineData(nameof(JSON.Defaults.StrictWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Tolerant))]
+    [InlineData(nameof(JSON.Defaults.TolerantWriteNulls))]
     public void Tolerant_Serializes_SmallLongValues_ToNumber(string defaults)
     {
         var options = GetDefaults(defaults);
@@ -33,10 +33,10 @@ public partial class JsonDefaultsTests
     }
 
     [Theory]
-    [InlineData(nameof(JsonDefaults.Strict))]
-    [InlineData(nameof(JsonDefaults.StrictWriteNulls))]
-    [InlineData(nameof(JsonDefaults.Tolerant))]
-    [InlineData(nameof(JsonDefaults.TolerantWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Strict))]
+    [InlineData(nameof(JSON.Defaults.StrictWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Tolerant))]
+    [InlineData(nameof(JSON.Defaults.TolerantWriteNulls))]
     public void Tolerant_Serializes_LargeLongValues_ToString(string defaults)
     {
         var options = GetDefaults(defaults);
@@ -48,10 +48,10 @@ public partial class JsonDefaultsTests
     }
 
     [Theory]
-    [InlineData(nameof(JsonDefaults.Strict))]
-    [InlineData(nameof(JsonDefaults.StrictWriteNulls))]
-    [InlineData(nameof(JsonDefaults.Tolerant))]
-    [InlineData(nameof(JsonDefaults.TolerantWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Strict))]
+    [InlineData(nameof(JSON.Defaults.StrictWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Tolerant))]
+    [InlineData(nameof(JSON.Defaults.TolerantWriteNulls))]
     public void Tolerant_Deserializes_SmallLongValues_Properly(string defaults)
     {
         var options = GetDefaults(defaults);
@@ -65,10 +65,10 @@ public partial class JsonDefaultsTests
     }
 
     [Theory]
-    [InlineData(nameof(JsonDefaults.Strict))]
-    [InlineData(nameof(JsonDefaults.StrictWriteNulls))]
-    [InlineData(nameof(JsonDefaults.Tolerant))]
-    [InlineData(nameof(JsonDefaults.TolerantWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Strict))]
+    [InlineData(nameof(JSON.Defaults.StrictWriteNulls))]
+    [InlineData(nameof(JSON.Defaults.Tolerant))]
+    [InlineData(nameof(JSON.Defaults.TolerantWriteNulls))]
     public void Tolerant_Deserializes_LargeLongValues_Properly(string defaults)
     {
         var options = GetDefaults(defaults);

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Serenity.Data;
 
@@ -133,4 +134,37 @@ public sealed class GuidField : GenericValueField<Guid>
 
         return Convert.ChangeType(source, typeof(Guid), provider);
     }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                var v = reader.GetString().TrimToNull();
+                if (v == null)
+                    _setValue(row, null);
+                else
+                    _setValue(row, Guid.Parse(v));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteStringValue(value.Value.ToString("D", CultureInfo.InvariantCulture));
+    }
+
 }

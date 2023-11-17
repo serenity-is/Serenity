@@ -5,9 +5,9 @@ namespace Serenity.JsonConverters;
 
 /// <summary>
 ///   Serialize/deserialize a BaseCriteria object</summary>
-public class JsonBaseCriteriaConverter : JsonConverter<BaseCriteria>
+public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
 {
-    static JsonBaseCriteriaConverter()
+    static CriteriaJsonConverter()
     {
         KeyToOperator = new Dictionary<string, CriteriaOperator>(StringComparer.OrdinalIgnoreCase);
         for (var i = 0; i < OperatorToKey.Length; i++)

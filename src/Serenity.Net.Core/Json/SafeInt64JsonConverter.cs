@@ -4,12 +4,12 @@ namespace Serenity.JsonConverters;
 
 /// <summary>
 ///   Serialize/deserialize a long value converting it to string if it is higher than precision double can handle</summary>
-public class JsonLargeLongConverter : JsonConverter<long>
+public class SafeInt64JsonConverter : JsonConverter<long>
 {
     /// <summary>
     /// The default instance
     /// </summary>
-    public static readonly JsonLargeLongConverter Instance = new();
+    public static readonly SafeInt64JsonConverter Instance = new();
 
     /// <inheritdoc/>
     public override long Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

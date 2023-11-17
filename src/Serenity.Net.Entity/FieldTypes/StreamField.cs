@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Data;
 
@@ -164,5 +165,40 @@ public class StreamField : GenericClassField<Stream>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (string.IsNullOrEmpty(reader.GetString()))
+                    _setValue(row, null);
+                else
+                    _setValue(row, new MemoryStream(reader.GetBytesFromBase64()));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null || value.Length == 0)
+            writer.WriteNullValue();
+        else
+        {
+            var ms = new MemoryStream((int)value.Length);
+            CopyStream(value, ms);
+            writer.WriteBase64StringValue(ms.ToArray());
+        }
     }
 }

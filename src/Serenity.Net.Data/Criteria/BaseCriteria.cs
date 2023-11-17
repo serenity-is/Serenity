@@ -8,7 +8,7 @@ namespace Serenity.Data;
 /// </summary>
 /// <seealso cref="ICriteria" />
 [DebuggerDisplay("{ToStringIgnoreParams()}")]
-[JsonConverter(typeof(JsonConverters.JsonBaseCriteriaConverter))]
+[JsonConverter(typeof(JsonConverters.CriteriaJsonConverter))]
 [Newtonsoft.Json.JsonConverter(typeof(JsonCriteriaConverter))]
 public abstract class BaseCriteria : ICriteria
 {

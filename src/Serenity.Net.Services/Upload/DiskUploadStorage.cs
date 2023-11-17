@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 
 namespace Serenity.Web;
 
@@ -91,12 +91,12 @@ public class DiskUploadStorage : IUploadStorage
         var metaFile = filePath + ".meta";
         if (fileSystem.FileExists(metaFile))
         {
-            var json = fileSystem.ReadAllText(metaFile);
+            var json = fileSystem.ReadAllText(metaFile)?.Trim();
             if (!string.IsNullOrEmpty(json) &&
                 json[0] == '{' &&
                 json[^1] == '}')
             {
-                return JSON.Parse<Dictionary<string, string>>(json);
+                return JSON.Deserialize<Dictionary<string, string>>(json);
             }
         }
 
@@ -134,7 +134,7 @@ public class DiskUploadStorage : IUploadStorage
             metadata = existing;
         }
 
-        fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
+        fileSystem.WriteAllText(metaFile, JSON.SerializeIndented(metadata));
     }
 
     /// <inheritdoc/>

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Serenity.Data;
 
@@ -109,7 +110,7 @@ public sealed class DateTimeField : GenericValueField<DateTime>
         set
         {
             if (value != (dateTimeKind == null))
-                dateTimeKind = value ? (DateTimeKind?)null : DateTimeKind.Unspecified;
+                dateTimeKind = value ? null : DateTimeKind.Unspecified;
         }
     }
 
@@ -284,5 +285,46 @@ public sealed class DateTimeField : GenericValueField<DateTime>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (string.IsNullOrWhiteSpace(reader.GetString())) 
+                    _setValue(row, null);
+                else if (reader.TryGetDateTimeOffset(out var dtofs))
+                    _setValue(row, ToDateTimeKind(dtofs));
+                else 
+                    _setValue(row, ToDateTimeKind(reader.GetDateTime()));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+        {
+            var dt = value.Value;
+            if (DateTimeKind == DateTimeKind.Local)
+                dt = dt.ToUniversalTime();
+            writer.WriteStringValue(dt.ToString(
+                (DateTimeKind == DateTimeKind.Unspecified ?
+                    DateHelper.ISODateTimeFormatLocal :
+                    DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+        }
     }
 }

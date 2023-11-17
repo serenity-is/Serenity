@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a String value
@@ -127,4 +129,45 @@ public class StringField : GenericClassField<string>
 
         row.FieldAssignedValue(this);
     }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        string v;
+
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+            case JsonTokenType.Number:
+                if (reader.TokenType == JsonTokenType.Number)
+                    v = Convert.ToString(reader.GetDouble(), CultureInfo.InvariantCulture);
+                else
+                    v = Convert.ToString(reader.TokenType == JsonTokenType.True, CultureInfo.InvariantCulture);
+                _setValue(row, v);
+                break;
+            case JsonTokenType.String:
+                v = reader.GetString();
+                _setValue(row, v);
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteStringValue(value);
+    }
+
 }

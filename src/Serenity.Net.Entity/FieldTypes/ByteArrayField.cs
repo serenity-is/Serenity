@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a byte[] value
@@ -149,5 +151,36 @@ public class ByteArrayField : CustomClassField<byte[]>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (string.IsNullOrEmpty(reader.GetString()))
+                    _setValue(row, null);
+                else
+                    _setValue(row, reader.GetBytesFromBase64());
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteBase64StringValue(value);
     }
 }

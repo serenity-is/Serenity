@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a Decimal value
@@ -108,4 +110,48 @@ public sealed class DecimalField : GenericValueField<decimal>
 
         row.FieldAssignedValue(this);
     }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        decimal v;
+
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+            case JsonTokenType.Number:
+                if (reader.TokenType == JsonTokenType.Number)
+                    v = reader.GetDecimal();
+                else
+                    v = reader.TokenType == JsonTokenType.True ? 1L : 0L;
+                _setValue(row, v);
+                break;
+            case JsonTokenType.String:
+                string s = reader.GetString().TrimToNull();
+                if (s == null)
+                    _setValue(row, null);
+                else
+                    _setValue(row, Convert.ToDecimal(s, CultureInfo.InvariantCulture));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteNumberValue(value.Value);
+    }
+
 }

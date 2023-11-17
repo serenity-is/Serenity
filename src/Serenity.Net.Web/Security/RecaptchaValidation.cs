@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -43,7 +43,7 @@ public static class RecaptchaValidation
         using (var sr = new StreamReader(webResponse.GetResponseStream()))
             responseJson = sr.ReadToEnd();
 
-        var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
+        var response = JSON.DeserializeTolerant<RecaptchaResponse>(responseJson);
         if (response == null ||
             !response.Success)
         {

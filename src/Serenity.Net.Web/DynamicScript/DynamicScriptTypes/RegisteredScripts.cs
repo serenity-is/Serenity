@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Web;
 
@@ -37,18 +38,18 @@ public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptD
 
     private static string ToJsonFast(IDictionary<string, string> dictionary)
     {
-        var sw = new StringWriter();
-        var writer = new JsonTextWriter(sw);
+        using var ms = new MemoryStream();
+        var writer = new Utf8JsonWriter(ms);
         writer.WriteStartObject();
         foreach (var pair in dictionary)
         {
-            writer.WritePropertyName(pair.Key);
             if (pair.Value == null)
-                writer.WriteValue(0);
+                writer.WriteNumber(pair.Key, 0);
             else
-                writer.WriteValue(pair.Value);
+                writer.WriteString(pair.Key, pair.Value);
         }
         writer.WriteEndObject();
-        return sw.ToString();
+        writer.Flush();
+        return Encoding.UTF8.GetString(ms.ToArray());
     }
 }
