@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 #if ISSOURCEGENERATOR
 using Newtonsoft.Json;
 #else
@@ -202,11 +202,7 @@ public static class TSConfigHelper
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
 #else
-            return JsonSerializer.Deserialize<T>(text,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
+            return JSON.DeserializeTolerant<T>(text);
 #endif
         }
         catch

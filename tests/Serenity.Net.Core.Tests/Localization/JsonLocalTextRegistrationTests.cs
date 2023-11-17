@@ -148,7 +148,7 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Handles_SimpleDictionary()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/my.es.json", @"{x:""5"", ""y.z"": ""a.b.c""}");
+        fileSystem.AddFile(@"C:/My/my.es.json", @"{""x"":""5"", ""y.z"": ""a.b.c""}");
         
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
@@ -162,7 +162,7 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Handles_HierarchicalDictionary()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""x"",y:{z:{u:{l:""l"",m:""m""},t:""t""}}}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{""x"":""x"",""y"":{""z"":{""u"":{""l"":""l"",""m"":""m""},""t"":""t""}}}");
 
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
@@ -178,7 +178,7 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Skips_NullValues()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""x"",y:null}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{""x"":""x"",""y"":null}");
 
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
@@ -191,11 +191,11 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Determines_LanguageIDs_Properly()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/jp.json", @"{x:""1""}");
-        fileSystem.AddFile(@"C:/My/en-US.json", @"{x:""2""}");
-        fileSystem.AddFile(@"C:/My/texts.en-GB.json", @"{x:""3""}");
-        fileSystem.AddFile(@"C:/My/texts.en-US.en.json", @"{x:""4""}");
-        fileSystem.AddFile(@"C:/My/my.some.long.prefix.tr-TR.json", @"{x:""5""}");
+        fileSystem.AddFile(@"C:/My/jp.json", @"{""x"":""1""}");
+        fileSystem.AddFile(@"C:/My/en-US.json", @"{""x"":""2""}");
+        fileSystem.AddFile(@"C:/My/texts.en-GB.json", @"{""x"":""3""}");
+        fileSystem.AddFile(@"C:/My/texts.en-US.en.json", @"{""x"":""4""}");
+        fileSystem.AddFile(@"C:/My/my.some.long.prefix.tr-TR.json", @"{""x"":""5""}");
 
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
@@ -212,11 +212,11 @@ public class JsonLocalTextRegistrationTests
     public void AddJsonTexts_Sorts_Files_ByFilename()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(@"C:/My/zz.json", @"{x:""1""}");
-        fileSystem.AddFile(@"C:/My/bb.json", @"{x:""2""}");
-        fileSystem.AddFile(@"C:/My/tt.json", @"{x:""3""}");
-        fileSystem.AddFile(@"C:/My/cc.json", @"{x:""4""}");
-        fileSystem.AddFile(@"C:/My/aa.json", @"{x:""5""}");
+        fileSystem.AddFile(@"C:/My/zz.json", @"{""x"":""1""}");
+        fileSystem.AddFile(@"C:/My/bb.json", @"{""x"":""2""}");
+        fileSystem.AddFile(@"C:/My/tt.json", @"{""x"":""3""}");
+        fileSystem.AddFile(@"C:/My/cc.json", @"{""x"":""4""}");
+        fileSystem.AddFile(@"C:/My/aa.json", @"{""x"":""5""}");
 
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
