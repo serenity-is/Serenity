@@ -18,14 +18,11 @@ public class FormScriptRegistration
     public static void RegisterFormScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {
-        if (scriptManager == null)
-            throw new ArgumentNullException(nameof(scriptManager));
+        ArgumentNullException.ThrowIfNull(scriptManager);
 
-        if (typeSource == null)
-            throw new ArgumentNullException(nameof(typeSource));
+        ArgumentNullException.ThrowIfNull(typeSource);
 
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var scripts = new List<Func<string>>();
 

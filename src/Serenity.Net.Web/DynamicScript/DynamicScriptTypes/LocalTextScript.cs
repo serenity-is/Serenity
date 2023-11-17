@@ -62,11 +62,9 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
         LocalTextPackages packages, string package, string languageId, bool isPending)
     {
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
+        ArgumentNullException.ThrowIfNull(package);
 
-        if (packages == null)
-            throw new ArgumentNullException(nameof(packages));
+        ArgumentNullException.ThrowIfNull(packages);
 
         if (!packages.TryGetValue(package, out string includes))
             includes = null;

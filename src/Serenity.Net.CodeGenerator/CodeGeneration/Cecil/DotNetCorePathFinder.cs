@@ -274,8 +274,7 @@ public class DotNetCorePathFinder
 
     public static string DetectTargetFrameworkId(AssemblyDefinition assembly)
     {
-        if (assembly == null)
-            throw new ArgumentNullException(nameof(assembly));
+        ArgumentNullException.ThrowIfNull(assembly);
 
         const string TargetFrameworkAttributeName = "System.Runtime.Versioning.TargetFrameworkAttribute";
 

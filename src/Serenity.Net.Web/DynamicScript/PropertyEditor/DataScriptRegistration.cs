@@ -18,14 +18,11 @@ public class DataScriptRegistration
     public static void RegisterDataScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IServiceProvider serviceProvider)
     {
-        if (scriptManager == null)
-            throw new ArgumentNullException(nameof(scriptManager));
+        ArgumentNullException.ThrowIfNull(scriptManager);
 
-        if (typeSource == null)
-            throw new ArgumentNullException(nameof(typeSource));
+        ArgumentNullException.ThrowIfNull(typeSource);
 
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         DataScriptAttribute attr;
 

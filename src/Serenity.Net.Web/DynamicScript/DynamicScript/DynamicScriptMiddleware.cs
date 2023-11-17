@@ -145,8 +145,7 @@ public class DynamicScriptMiddleware
     /// <exception cref="ArgumentNullException">Context is null</exception>
     public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
         if (ifModifiedSince != null && ifModifiedSince.Length > 0)

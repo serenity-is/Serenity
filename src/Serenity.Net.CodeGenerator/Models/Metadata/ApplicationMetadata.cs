@@ -79,8 +79,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
     private string ParseSchemaAndName(string objectName, out string schema)
     {
-        if (objectName is null)
-            throw new ArgumentNullException(nameof(objectName));
+        ArgumentNullException.ThrowIfNull(objectName);
 
         schema = DefaultSchema;
         var parts = objectName.Split('.');
@@ -112,8 +111,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
     public IRowMetadata GetRowByTablename(string tablename)
     {
-        if (tablename is null)
-            throw new ArgumentNullException(nameof(tablename));
+        ArgumentNullException.ThrowIfNull(tablename);
 
         if (rowByTablename.TryGetValue(tablename, out IRowMetadata metadata))
             return metadata;

@@ -8,8 +8,7 @@ public class MockFileWatcher : IFileWatcher
 
     public MockFileWatcher(System.IO.Abstractions.IFileSystem fileSystem, string path, string filter)
     {
-        if (filter == null)
-            throw new ArgumentNullException(nameof(filter));
+        ArgumentNullException.ThrowIfNull(filter);
 
         FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         

@@ -45,8 +45,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <inheritdoc/>
     public void Changed(string name)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         scriptLastChange[name] = DateTime.UtcNow;
         scriptChanged?.Invoke(name);
@@ -67,8 +66,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <inheritdoc/>
     public void Register(string name, IDynamicScript script)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
         registeredScripts[name] = script ?? throw new ArgumentNullException(nameof(script));
     }
 
@@ -101,8 +99,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <exception cref="ArgumentNullException">name is null</exception>
     public string PeekScriptHash(string name, IDynamicScript script)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var cacheKey = "DynamicScript:" + name;
         if (script is ICacheSuffix ics)
@@ -141,8 +138,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
 
     private IScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var cacheKey = (json ? "DynamicData:" : "DynamicScript:") + name;
         if (script is ICacheSuffix ics)

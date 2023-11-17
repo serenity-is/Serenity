@@ -184,11 +184,9 @@ public class DefaultReportRenderer : IReportRenderer
     /// <inheritdoc />
     public ReportRenderResult Render(IReport report, ReportRenderOptions options)
     {
-        if (report is null)
-            throw new ArgumentNullException(nameof(report));
+        ArgumentNullException.ThrowIfNull(report);
 
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
 
         if (report is IDataOnlyReport dataOnlyReport)
             return RenderDataOnlyReport(dataOnlyReport, options);

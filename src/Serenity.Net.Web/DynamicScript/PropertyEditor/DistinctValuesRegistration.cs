@@ -20,14 +20,11 @@ public class DistinctValuesRegistration
     public static void RegisterDistinctValueScripts(IDynamicScriptManager scriptManager, 
         ITypeSource typeSource, IServiceProvider serviceProvider)
     {
-        if (scriptManager == null)
-            throw new ArgumentNullException(nameof(scriptManager));
+        ArgumentNullException.ThrowIfNull(scriptManager);
 
-        if (typeSource == null)
-            throw new ArgumentNullException(nameof(typeSource));
+        ArgumentNullException.ThrowIfNull(typeSource);
 
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var list = new List<DistinctValuesEditorAttribute>();
         foreach (var type in typeSource.GetTypes())

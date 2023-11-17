@@ -13,8 +13,7 @@ public class MockUserAccessor : IUserAccessor
 
     public MockUserAccessor(Func<string> getUsername)
     {
-        if (getUsername == null)
-            throw new ArgumentNullException(nameof(getUsername));
+        ArgumentNullException.ThrowIfNull(getUsername);
 
         getUser = () =>
         {

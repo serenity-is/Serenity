@@ -20,8 +20,7 @@ public class TSTypeLister
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.astCache = astCache;
         this.cancellationToken = cancellationToken;
-        if (tsConfigPath is null)
-            throw new ArgumentNullException(nameof(tsConfigPath));
+        ArgumentNullException.ThrowIfNull(tsConfigPath);
 
         this.tsConfigPath = fileSystem.GetFullPath(tsConfigPath);
     }

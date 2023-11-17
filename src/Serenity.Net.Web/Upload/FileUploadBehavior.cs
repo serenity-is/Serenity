@@ -144,8 +144,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         if (replaceFields == null)
             return result;
 
-        if (formatSanitizer is null)
-            throw new ArgumentNullException(nameof(formatSanitizer));
+        ArgumentNullException.ThrowIfNull(formatSanitizer);
 
         var row = handler.Row;
 
@@ -360,8 +359,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         IUploadOptions uploadOptions, IUploadValidator validator, IImageProcessor imageProcessor,
         IUploadStorage storage, ref string temporaryFile)
     {
-        if (storage == null)
-            throw new ArgumentNullException(nameof(storage));
+        ArgumentNullException.ThrowIfNull(storage);
 
         UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 

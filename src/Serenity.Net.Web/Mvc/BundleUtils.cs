@@ -18,11 +18,9 @@ internal static class BundleUtils
 
     public static string GetLatestVersion(IFileProvider fileProvider, string path, string pattern)
     {
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
 
-        if (pattern == null)
-            throw new ArgumentNullException(nameof(pattern));
+        ArgumentNullException.ThrowIfNull(pattern);
 
         var regex = new Regex(pattern);
 

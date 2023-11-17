@@ -82,8 +82,7 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     /// <exception cref="ArgumentOutOfRangeException">One fo the types is not a subclass of the PermissionAttributeBase.</exception>
     protected ServiceAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
     {
-        if (sourceType == null)
-            throw new ArgumentNullException(nameof(sourceType));
+        ArgumentNullException.ThrowIfNull(sourceType);
 
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));

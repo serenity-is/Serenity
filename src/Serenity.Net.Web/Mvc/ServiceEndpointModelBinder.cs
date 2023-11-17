@@ -10,8 +10,7 @@ public class ServiceEndpointModelBinderProvider : IModelBinderProvider
     /// <inheritdoc/>
     public IModelBinder GetBinder(ModelBinderProviderContext context)
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var type = context.Metadata.ModelType;
         if (typeof(IDbConnection).IsAssignableFrom(type) ||

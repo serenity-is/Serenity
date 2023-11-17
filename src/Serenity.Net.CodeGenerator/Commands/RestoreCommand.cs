@@ -18,8 +18,7 @@ public class RestoreCommand : BaseFileSystemCommand
 
     public ExitCodes Run(string csproj, bool verbose = false)
     {
-        if (csproj == null)
-            throw new ArgumentNullException(nameof(csproj));
+        ArgumentNullException.ThrowIfNull(csproj);
 
         if (!fileSystem.FileExists(csproj))
         {

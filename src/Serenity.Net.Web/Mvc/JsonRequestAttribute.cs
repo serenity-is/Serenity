@@ -23,8 +23,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
     /// <inheritdoc/>
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
-        if (filterContext == null)
-            throw new ArgumentNullException(nameof(filterContext));
+        ArgumentNullException.ThrowIfNull(filterContext);
 
         var request = filterContext.HttpContext.Request;
         string method = request.Method ?? "";

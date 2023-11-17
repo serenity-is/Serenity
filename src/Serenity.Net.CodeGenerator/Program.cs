@@ -15,8 +15,7 @@ public class Program
     public static ExitCodes Run(string[] args, IGeneratorFileSystem fileSystem, 
         Func<IBuildProjectSystem> projectSystemFactory)
     {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(fileSystem);
 
         string csproj = null;
         var csprojIdx = Array.FindIndex(args, x => x == "-p");

@@ -36,11 +36,9 @@ public class ModularTSImporter
 
     protected string AddModuleImport(string from, string name, bool external = false)
     {
-        if (name is null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
-        if (from is null)
-            throw new ArgumentNullException(nameof(from));
+        ArgumentNullException.ThrowIfNull(from);
 
         var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
         if (existing != null)

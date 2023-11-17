@@ -84,8 +84,7 @@ public class EntityModelGenerator : IEntityModelGenerator
 
     public EntityModel GenerateModel(IEntityModelInputs inputs)
     {
-        if (inputs is null)
-            throw new ArgumentNullException(nameof(inputs));
+        ArgumentNullException.ThrowIfNull(inputs);
 
         var className = inputs.Identifier ?? IdentifierForTable(inputs.Table);
         bool omitSchema = inputs.SchemaIsDatabase ||

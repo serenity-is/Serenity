@@ -859,8 +859,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     protected static bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
         out string requestParam)
     {
-        if (method == null)
-            throw new ArgumentNullException(nameof(method));
+        ArgumentNullException.ThrowIfNull(method);
 
         responseType = null;
         requestType = null;
@@ -973,8 +972,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     protected static string GetServiceUrlFromRoute(TypeDefinition controller)
     {
-        if (controller == null)
-            throw new ArgumentNullException(nameof(controller));
+        ArgumentNullException.ThrowIfNull(controller);
 
         var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
             TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
@@ -1156,11 +1154,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     protected string AddModuleImport(string from, string name, bool external = false)
     {
-        if (name is null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
-        if (from is null)
-            throw new ArgumentNullException(nameof(from));
+        ArgumentNullException.ThrowIfNull(from);
 
         var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
         if (existing != null)
