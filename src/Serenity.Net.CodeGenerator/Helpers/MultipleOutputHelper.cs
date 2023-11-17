@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public class MultipleOutputHelper
 {
@@ -17,17 +17,17 @@ public class MultipleOutputHelper
 
         var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var file in filesToWrite)
+        foreach (var (path, txt) in filesToWrite)
         {
-            generated.Add(PathHelper.ToUrl(file.Path));
+            generated.Add(PathHelper.ToUrl(path));
 
-            var outFile = fileSystem.Combine(outDir, file.Path);
+            var outFile = fileSystem.Combine(outDir, path);
             bool exists = fileSystem.FileExists(outFile);
             if (exists)
             {
                 var content = fileSystem.ReadAllText(outFile, utf8);
                 if (content.Trim().Replace("\r", "", StringComparison.Ordinal) ==
-                    (file.Text ?? "").Trim().Replace("\r", "", StringComparison.Ordinal))
+                    (txt ?? "").Trim().Replace("\r", "", StringComparison.Ordinal))
                     continue;
             }
             else if (!fileSystem.DirectoryExists(fileSystem.GetDirectoryName(outFile)))
@@ -40,7 +40,7 @@ public class MultipleOutputHelper
             Console.WriteLine(fileSystem.GetFileName(outFile));
 #endif
 
-            string text = file.Text ?? "";
+            string text = txt ?? "";
             if (string.Equals(endOfLine, "lf", StringComparison.OrdinalIgnoreCase))
                 text = text.Replace("\r", "");
             else if (string.Equals(endOfLine, "crlf", StringComparison.OrdinalIgnoreCase))

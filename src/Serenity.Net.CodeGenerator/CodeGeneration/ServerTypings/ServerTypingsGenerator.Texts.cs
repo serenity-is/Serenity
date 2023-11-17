@@ -26,8 +26,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
         {
             var name = nested.Name;
+#pragma warning disable CA1865 // Use char overload
             if (name.EndsWith("_", StringComparison.Ordinal))
                 name = name[0..^1];
+#pragma warning restore CA1865 // Use char overload
 
             AddNestedLocalTexts(nested, prefix + name + ".");
         }

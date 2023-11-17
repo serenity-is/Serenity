@@ -130,8 +130,8 @@ public class GeneratorConfig
     public bool ShouldSerializeMVC() => MVC != null &&
         (!string.IsNullOrEmpty(MVC.OutDir) ||
          MVC.UseRootNamespace != null ||
-         MVC.SearchViewPaths?.Any() == true ||
-         MVC.StripViewPaths?.Any() == true ||
+         MVC.SearchViewPaths?.Length > 0 ||
+         MVC.StripViewPaths?.Length > 0 ||
          MVC.SourceGenerator == false);
 
     /// <summary>
@@ -191,7 +191,7 @@ public class GeneratorConfig
     public List<BaseRowClass> BaseRowClasses { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeBaseRowClasses() =>
-        BaseRowClasses != null && BaseRowClasses.Any();
+        BaseRowClasses != null && BaseRowClasses.Count > 0;
 
     /// <summary>
     /// The set of foreign fields to generate, default is All
@@ -208,7 +208,7 @@ public class GeneratorConfig
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeIncludeForeignFields() =>
-        IncludeForeignFields != null && IncludeForeignFields.Any();
+        IncludeForeignFields != null && IncludeForeignFields.Count > 0;
 
     /// <summary>
     /// A list of foreign fields to omit from generated code.
@@ -221,7 +221,7 @@ public class GeneratorConfig
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
-        RemoveForeignFields != null && RemoveForeignFields.Any();
+        RemoveForeignFields != null && RemoveForeignFields.Count > 0;
 
     /// <summary>
     /// The location of custom templates folder. The files in this folder
@@ -240,7 +240,7 @@ public class GeneratorConfig
     public Dictionary<string, string> CustomGenerate { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomGenerate() =>
-        CustomGenerate != null && CustomGenerate.Any();
+        CustomGenerate != null && CustomGenerate.Count > 0;
 
     /// <summary>
     /// Custom settings to be passed to and used in custom templates
@@ -248,7 +248,7 @@ public class GeneratorConfig
     public Dictionary<string, object> CustomSettings { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomSettings() =>
-        CustomSettings != null && CustomSettings.Any();
+        CustomSettings != null && CustomSettings.Count > 0;
 
     /// <summary>
     /// List of appsettings.json files in order.
@@ -257,7 +257,7 @@ public class GeneratorConfig
     public string[] AppSettingFiles { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeAppSettingFiles() =>
-        AppSettingFiles != null && AppSettingFiles.Any();
+        AppSettingFiles != null && AppSettingFiles.Length > 0;
 
     /// <summary>
     /// Generate row class

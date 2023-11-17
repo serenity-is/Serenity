@@ -164,8 +164,8 @@ public partial class GenerateCommand
         if (idx >= 0 && idx < args.Length - 1)
         {
             val = args[idx + 1];
-            if (val.StartsWith("\"", StringComparison.Ordinal) &&
-                val.EndsWith("\"", StringComparison.Ordinal))
+            if (val.StartsWith('"') &&
+                val.EndsWith('"'))
                 return val[1..^1];
             else
                 return val;
