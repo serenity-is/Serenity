@@ -9,7 +9,8 @@ public class MultipleOutputHelper
         string[] deleteExtraPattern,
         string endOfLine)
     {
-        ArgumentNullException.ThrowIfNull(fileSystem);
+        if (fileSystem is null)
+            throw new ArgumentNullException(nameof(fileSystem));
 
         outDir = fileSystem.GetFullPath(outDir);
         fileSystem.CreateDirectory(outDir);

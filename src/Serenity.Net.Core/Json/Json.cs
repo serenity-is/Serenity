@@ -53,7 +53,7 @@ public static partial class JSON
     }
 
     /// <summary>
-    /// Tries to populate an existing object similar to Newtonsoft.Json.JsonConvert.PopulateObject
+    /// Tries to populate an existing object similar to JsonConvert's PopulateObject
     /// </summary>
     /// <typeparam name="T">Type of the object</typeparam>
     /// <param name="target">Target object</param>

@@ -262,22 +262,34 @@ public class GeneratorConfig
     /// <summary>
     /// Generate row class
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateRow { get; set; }
     /// <summary>
     /// Generate service classes like repository, endpoint, service.ts etc.
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateService { get; set; }
     /// <summary>
     /// Generate UI related classes like Grid/Dialog
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateUI { get; set; }
     /// <summary>
     /// Generate custom code (user defined templates at CustomTemplates path)
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateCustom { get; set; }
 
     /// <summary>
@@ -290,7 +302,9 @@ public class GeneratorConfig
     /// Holds extension data if any
     /// </summary>
     [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
     [JsonExtensionData]
+#endif
     public IDictionary<string, object> ExtensionData { get; set; }
 
     public GeneratorConfig()
@@ -560,7 +574,9 @@ public class GeneratorConfig
         /// Extension data for upgrades
         /// </summary>
         [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
         [JsonExtensionData]
+#endif
         public IDictionary<string, object> ExtensionData { get; set; }
     }
 
@@ -580,7 +596,9 @@ public class GeneratorConfig
         /// Extension data for TSBuild
         /// </summary>
         [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
         [JsonExtensionData]
+#endif
         public IDictionary<string, object> ExtensionData { get; set; }
     }
 }

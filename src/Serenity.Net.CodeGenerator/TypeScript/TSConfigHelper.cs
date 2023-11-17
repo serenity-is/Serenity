@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 #if ISSOURCEGENERATOR
 using Newtonsoft.Json;
 #else
@@ -25,7 +25,8 @@ public static class TSConfigHelper
         IGeneratorFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(config);
+        if (config is null)
+            throw new ArgumentNullException(nameof(config));
 
         if (config.Files != null)
         {
@@ -186,7 +187,8 @@ public static class TSConfigHelper
 
     public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
     {
-        ArgumentNullException.ThrowIfNull(path);
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
 
         try
         {
@@ -202,7 +204,11 @@ public static class TSConfigHelper
                     MissingMemberHandling = MissingMemberHandling.Ignore
                 });
 #else
-            return JSON.DeserializeTolerant<T>(text);
+            return JsonSerializer.Deserialize<T>(text,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
 #endif
         }
         catch
