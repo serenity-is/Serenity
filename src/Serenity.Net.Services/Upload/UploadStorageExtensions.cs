@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
@@ -287,9 +287,7 @@ public static class UploadStorageExtensions
                 w < 0 ||
                 h < 0 ||
                 (w == 0 && h == 0))
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentOutOfRangeException(nameof(thumbSizes));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
             var thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
 
