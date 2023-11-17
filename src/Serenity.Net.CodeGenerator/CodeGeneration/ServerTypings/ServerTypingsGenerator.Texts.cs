@@ -86,11 +86,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             var jw = new Newtonsoft.Json.JsonTextWriter(
                 new System.IO.StringWriter(jwBuilder))
 #else
-            var jw = new JsonTextWriter(new System.IO.StringWriter(jwBuilder))
+            var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
 #endif
             {
                 QuoteName = false,
-                Formatting = Formatting.Indented,
+                Formatting = Newtonsoft.Json.Formatting.Indented,
                 Indentation = 4
             };
             jw.WriteStartObject();

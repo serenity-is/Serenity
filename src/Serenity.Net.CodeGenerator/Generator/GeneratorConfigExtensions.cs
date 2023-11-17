@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Serenity.CodeGenerator;
 
@@ -19,7 +19,9 @@ public static class GeneratorConfigExtensions
         foreach (var c in config.Connections)
             c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
+#pragma warning disable CS0618 // Type or member is obsolete
         return JSON.StringifyIndented(config, 2);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     /// <summary>

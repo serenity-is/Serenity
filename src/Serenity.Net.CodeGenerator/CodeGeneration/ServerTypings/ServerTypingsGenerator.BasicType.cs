@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -35,8 +35,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             var jsonProperty = a != null ? (
                 TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") ??
-                TypingsUtils.FindAttr(a, "System.Text.Json.Serialization", "JsonPropertyNameAttribute") ??
-                ) : null;
+                TypingsUtils.FindAttr(a, "System.Text.Json.Serialization", "JsonPropertyNameAttribute")) : null;
             if (jsonProperty != null &&
                 jsonProperty.HasConstructorArguments())
             {
@@ -64,7 +63,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     continue;
 
                 if (TypingsUtils.FindAttr(field.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null ||
-                TypingsUtils.FindAttr(field.GetAttributes(), "System.Text.Json.Serialization", "JsonIgnoreAttribute") != null ||
+                    TypingsUtils.FindAttr(field.GetAttributes(), "System.Text.Json.Serialization", "JsonIgnoreAttribute") != null)
                     continue;
 
                 handleMember(field.FieldType(), field.Name, field.GetAttributes());
