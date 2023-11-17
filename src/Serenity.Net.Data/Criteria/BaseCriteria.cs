@@ -12,8 +12,8 @@ namespace Serenity.Data;
 [Newtonsoft.Json.JsonConverter(typeof(JsonCriteriaConverter))]
 public abstract class BaseCriteria : ICriteria
 {
-    private static readonly NoParamsChecker noParamsChecker = new NoParamsChecker();
-    private static readonly IgnoreParams ignoreParams = new IgnoreParams();
+    private static readonly NoParamsChecker noParamsChecker = new();
+    private static readonly IgnoreParams ignoreParams = new();
 
     /// <summary>
     /// Gets a value indicating whether this criteria instance is empty.

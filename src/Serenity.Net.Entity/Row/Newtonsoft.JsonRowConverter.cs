@@ -1,4 +1,7 @@
-﻿namespace Serenity.Data;
+using Newtonsoft.Json;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
+
+namespace Serenity.Data;
 
 /// <summary>
 ///   Serialize/deserialize a row</summary>
@@ -40,7 +43,7 @@ public class JsonRowConverter : JsonConverter
                     if (row.IsAssigned(row.Fields[i]))
                     {
                         var f = fields[i];
-                        if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
+                        if (!f.IsNull(row) || serializer.NullValueHandling == Newtonsoft.Json.NullValueHandling.Include)
                         {
                             writer.WritePropertyName(f.PropertyName ?? f.Name);
                             f.ValueToJson(writer, row, serializer);
@@ -52,7 +55,7 @@ public class JsonRowConverter : JsonConverter
         {
             var fields = row.Fields;
             foreach (var f in fields)
-                if (!f.IsNull(row) || serializer.NullValueHandling == NullValueHandling.Include)
+                if (!f.IsNull(row) || serializer.NullValueHandling == Newtonsoft.Json.NullValueHandling.Include)
                 {
                     writer.WritePropertyName(f.PropertyName ?? f.Name);
                     f.ValueToJson(writer, row, serializer);
@@ -87,13 +90,11 @@ public class JsonRowConverter : JsonConverter
     ///   The object value.</returns>
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        if (reader.TokenType == JsonToken.Null)
+        if (reader.TokenType ==Newtonsoft.Json.JsonToken.Null)
             return null;
 
-        var row = (IRow)Activator.CreateInstance(objectType);
-        if (row == null)
+        var row = (IRow)Activator.CreateInstance(objectType) ?? 
             throw new JsonSerializationException(string.Format("No row of type {0} could be created.", objectType.Name));
-
         row.TrackAssignments = true;
 
         if (!reader.Read())
@@ -103,15 +104,14 @@ public class JsonRowConverter : JsonConverter
         {
             switch (reader.TokenType)
             {
-                case JsonToken.PropertyName:
+                case Newtonsoft.Json.JsonToken.PropertyName:
                     string fieldName = (string)reader.Value;
 
                     if (!reader.Read())
                         throw new JsonSerializationException("Unexpected end when deserializing object.");
 
                     var field = row.Fields.FindField(fieldName);
-                    if (field is null)
-                        field = row.Fields.FindFieldByPropertyName(fieldName);
+                    field ??= row.Fields.FindFieldByPropertyName(fieldName);
 
                     bool deserializeAsExtension = field is null &&
                         ShouldDeserializeExtension is not null && ShouldDeserializeExtension(row, fieldName);
@@ -121,7 +121,7 @@ public class JsonRowConverter : JsonConverter
                         serializer.MissingMemberHandling == MissingMemberHandling.Error)
                             throw new JsonSerializationException(string.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
 
-                    while (reader.TokenType == JsonToken.Comment)
+                    while (reader.TokenType ==Newtonsoft.Json.JsonToken.Comment)
                         reader.Read();
 
                     if (field is null)
@@ -136,7 +136,7 @@ public class JsonRowConverter : JsonConverter
 
                     break;
 
-                case JsonToken.EndObject:
+                case Newtonsoft.Json.JsonToken.EndObject:
                     return row;
 
                 default:

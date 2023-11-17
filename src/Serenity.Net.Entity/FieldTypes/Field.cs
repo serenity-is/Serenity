@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -204,10 +206,20 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <returns></returns>
-    /// <exception cref="JsonSerializationException">Unexpected token when deserializing row: " + reader.TokenType</exception>
-    protected Exception JsonUnexpectedToken(JsonReader reader)
+    /// <exception cref="Newtonsoft.Json.JsonSerializationException">Unexpected token when deserializing row: " + reader.TokenType</exception>
+    protected Exception JsonUnexpectedToken(Newtonsoft.Json.JsonReader reader)
     {
-        throw new JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
+        throw new Newtonsoft.Json.JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
+    }
+
+
+    /// <summary>
+    /// Jsons the unexpected token.
+    /// </summary>
+    /// <param name="reader">The reader.</param>
+    protected Exception UnexpectedJsonToken(ref Utf8JsonReader reader)
+    {
+        throw new JsonException("Unexpected token when deserializing row: " + reader.TokenType);
     }
 
     /// <summary>
@@ -523,20 +535,38 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public abstract void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer);
+    public abstract void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer);
     /// <summary>
     /// Deserializes this fields value from JSON
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public abstract void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer);
+    public abstract void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer);
+
+    /// <summary>
+    /// Serializes this fields value to JSON
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="writer">The writer.</param>
+    /// <param name="options">The serializer options.</param>
+    public abstract void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options);
+
+    /// <summary>
+    /// Deserializes this fields value from JSON
+    /// </summary>
+    /// <param name="reader">The reader.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="options">The serializer options.</param>
+    public abstract void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options);
+
     /// <summary>
     /// Copies the specified source.
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="target">The target.</param>
     public abstract void Copy(IRow source, IRow target);
+
     /// <summary>
     /// Gets field value from a data reader.
     /// </summary>
@@ -544,6 +574,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
     public abstract void GetFromReader(IDataReader reader, int index, IRow row);
+
     /// <summary>
     /// Gets the type of the value.
     /// </summary>
@@ -551,6 +582,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// The type of the value.
     /// </value>
     public abstract Type ValueType { get; }
+
     /// <summary>
     /// Converts the value.
     /// </summary>
@@ -558,6 +590,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="provider">The provider.</param>
     /// <returns></returns>
     public abstract object ConvertValue(object source, IFormatProvider provider);
+
     /// <summary>
     /// Compares the field values for two rows for an ascending index sort
     /// </summary>
@@ -565,18 +598,21 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="row2">The row2.</param>
     /// <returns></returns>
     public abstract int IndexCompare(IRow row1, IRow row2);
+
     /// <summary>
     /// Gets the value of this row as an object.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns></returns>
     public abstract object AsObject(IRow row);
+
     /// <summary>
     /// Gets the value of this field in specified row as object.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
     public abstract void AsObject(IRow row, object value);
+
     /// <summary>
     /// Gets if the field value is null.
     /// </summary>
