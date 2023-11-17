@@ -1,5 +1,3 @@
-using Newtonsoft.Json.Linq;
-
 namespace Serenity.CodeGenerator;
 
 /// <summary>
@@ -291,8 +289,9 @@ public class GeneratorConfig
     /// <summary>
     /// Holds extension data if any
     /// </summary>
+    [Newtonsoft.Json.JsonExtensionData]
     [JsonExtensionData]
-    public IDictionary<string, JToken> ExtensionData { get; set; }
+    public IDictionary<string, object> ExtensionData { get; set; }
 
     public GeneratorConfig()
     {
@@ -560,8 +559,9 @@ public class GeneratorConfig
         /// <summary>
         /// Extension data for upgrades
         /// </summary>
+        [Newtonsoft.Json.JsonExtensionData]
         [JsonExtensionData]
-        public IDictionary<string, JToken> ExtensionData { get; set; }
+        public IDictionary<string, object> ExtensionData { get; set; }
     }
 
     public class TSBuildConfig
@@ -579,7 +579,8 @@ public class GeneratorConfig
         /// <summary>
         /// Extension data for TSBuild
         /// </summary>
+        [Newtonsoft.Json.JsonExtensionData]
         [JsonExtensionData]
-        public IDictionary<string, JToken> ExtensionData { get; set; }
+        public IDictionary<string, object> ExtensionData { get; set; }
     }
 }
