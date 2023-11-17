@@ -41,6 +41,8 @@ public static partial class JSON
             TolerantWriteNulls = Populate(new JsonSerializerOptions(), tolerant: true, writeNulls: true);
         }
 
+        private static JsonConverter rowJsonConverter;
+
         /// <summary>
         /// Creates a JsonSerializerSettings object with common values and converters.
         /// </summary>
@@ -57,13 +59,26 @@ public static partial class JSON
             options.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals |
                 JsonNumberHandling.AllowReadingFromString;
             options.PropertyNameCaseInsensitive = true;
+            options.PropertyNamingPolicy = null;
             options.ReadCommentHandling = JsonCommentHandling.Skip;
             
             options.Converters.Add(JsonConverters.SafeInt64JsonConverter.Instance);
             options.Converters.Add(JsonConverters.ObjectJsonConverter.Instance);
             options.Converters.Add(JsonConverters.NullableJsonConverter.Instance);
             options.Converters.Add(new JsonStringEnumConverter());
-            
+
+            if (rowJsonConverter == null)
+            {
+                // Unfortunately System.Text.Json does not read the converter type
+                // from the base type's JsonConverter attribute
+                var rowJsonConverterType = Type.GetType("Serenity.JsonConverters.RowJsonConverter, Serenity.Net.Entity");
+                if (rowJsonConverterType != null)
+                    rowJsonConverter = (JsonConverter)Activator.CreateInstance(rowJsonConverterType);
+            }
+
+            if (rowJsonConverter != null)
+                options.Converters.Add(rowJsonConverter);
+
             if (!writeNulls)
                 options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             if (!tolerant)
