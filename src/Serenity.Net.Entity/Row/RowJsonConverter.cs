@@ -37,8 +37,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                     {
                         var f = fields[i];
                         if (!f.IsNull(row) || 
-                            options.DefaultIgnoreCondition == JsonIgnoreCondition.Never ||
-                            options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull)
+                            options.DefaultIgnoreCondition != JsonIgnoreCondition.WhenWritingNull)
                         {
                             writer.WritePropertyName(f.PropertyName ?? f.Name);
                             f.ValueToJson(writer, row, options);
@@ -51,8 +50,7 @@ public class RowJsonConverter : JsonConverter<IRow>
             var fields = row.Fields;
             foreach (var f in fields)
                 if (!f.IsNull(row) ||
-                    options.DefaultIgnoreCondition == JsonIgnoreCondition.Never ||
-                    options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull)
+                    options.DefaultIgnoreCondition != JsonIgnoreCondition.WhenWritingNull)
                 {
                     writer.WritePropertyName(f.PropertyName ?? f.Name);
                     f.ValueToJson(writer, row, options);
