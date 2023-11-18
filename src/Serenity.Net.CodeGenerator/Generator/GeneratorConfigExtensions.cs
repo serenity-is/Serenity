@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.IO;
 
 namespace Serenity.CodeGenerator;
 
@@ -12,14 +12,24 @@ public static class GeneratorConfigExtensions
     /// </summary>
     public static string SaveToJson(this GeneratorConfig config)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
 
         config.Connections.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
         foreach (var c in config.Connections)
             c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
-        return JSON.StringifyIndented(config, 2);
+        using var sw = new StringWriter();
+        using var jw = new Newtonsoft.Json.JsonTextWriter(sw)
+        {
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+            IndentChar = ' ',
+            Indentation = 2
+        };
+        var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSettings.Strict);
+
+        serializer.Serialize(jw, config);
+        jw.Flush();
+        return sw.ToString();
     }
 
     /// <summary>
@@ -27,8 +37,7 @@ public static class GeneratorConfigExtensions
     /// </summary>
     public static string[] GetAppSettingsFiles(this GeneratorConfig config)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
 
         if (config.AppSettingFiles != null &&
             config.AppSettingFiles.Length != 0)
@@ -50,11 +59,9 @@ public static class GeneratorConfigExtensions
     /// <exception cref="ArgumentNullException">fileSystem is null</exception>
     public static string GetRootNamespaceFor(this GeneratorConfig config, IGeneratorFileSystem fileSystem, string csproj)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
 
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(fileSystem);
 
         if (!string.IsNullOrEmpty(config.RootNamespace))
             return config.RootNamespace;
@@ -84,11 +91,8 @@ public static class GeneratorConfigExtensions
     public static GeneratorConfig LoadGeneratorConfig(this IFileSystem fileSystem,
         string path, string filename = "sergen.json")
     {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
-
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(path);
 
         if (!string.IsNullOrEmpty(filename))
             path = System.IO.Path.Combine(path, filename);

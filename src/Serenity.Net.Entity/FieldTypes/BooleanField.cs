@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with boolean value
@@ -64,7 +66,7 @@ public sealed class BooleanField : GenericValueField<bool>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         writer.WriteValue(_getValue(row));
     }
@@ -76,25 +78,25 @@ public sealed class BooleanField : GenericValueField<bool>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader is null</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.Boolean:
+            case Newtonsoft.Json.JsonToken.Boolean:
                 _setValue(row, (bool)reader.Value);
                 break;
-            case JsonToken.Integer:
-            case JsonToken.Float:
+            case Newtonsoft.Json.JsonToken.Integer:
+            case Newtonsoft.Json.JsonToken.Float:
                 _setValue(row, Convert.ToBoolean(reader.Value, CultureInfo.InvariantCulture));
                 break;
-            case JsonToken.String:
+            case Newtonsoft.Json.JsonToken.String:
                 var s = ((string)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
@@ -106,5 +108,46 @@ public sealed class BooleanField : GenericValueField<bool>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+                _setValue(row, true);
+                break;
+            case JsonTokenType.False:
+                _setValue(row, false);
+                break;
+            case JsonTokenType.Number:
+                _setValue(row, Convert.ToBoolean(reader.GetDouble(), CultureInfo.InvariantCulture));
+                break;
+            case JsonTokenType.String:
+                var s = reader.GetString().TrimToNull();
+                if (s == null)
+                    _setValue(row, null);
+                else
+                    _setValue(row, Convert.ToBoolean(s, CultureInfo.InvariantCulture));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteBooleanValue(value.Value);
     }
 }

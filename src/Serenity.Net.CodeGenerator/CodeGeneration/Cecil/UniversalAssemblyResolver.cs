@@ -292,8 +292,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     string ResolveInternal(AssemblyNameReference name)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var assembly = SearchDirectory(name, directories);
         if (assembly != null)
@@ -411,8 +410,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     public static string ToHexString(IEnumerable<byte> bytes, int estimatedLength)
     {
-        if (bytes == null)
-            throw new ArgumentNullException(nameof(bytes));
+        ArgumentNullException.ThrowIfNull(bytes);
 
         StringBuilder sb = new(estimatedLength * 2);
         foreach (var b in bytes)

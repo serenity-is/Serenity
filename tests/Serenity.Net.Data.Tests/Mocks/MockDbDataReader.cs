@@ -22,8 +22,7 @@ public class MockDbDataReader : DbDataReader
     public MockDbDataReader(IEnumerable<IDictionary<string, object>> items,
         params string[] props)
     {
-        if (items == null)
-            throw new ArgumentNullException(nameof(items));
+        ArgumentNullException.ThrowIfNull(items);
 
         this.props = props;
         values = items.Select(item => props.Select(p =>

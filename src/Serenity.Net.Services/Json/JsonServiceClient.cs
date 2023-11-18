@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -56,9 +56,9 @@ public class JsonServiceClient
     {
         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(UriHelper.Combine(BaseUrl, relativeUrl));
         wr.Method = "POST";
-        var r = JsonConvert.SerializeObject(request, Formatting.None, JsonSettings.Strict);
+        var r = JSON.Stringify(request, writeNulls: true);
         wr.ContentType = "application/json";
-        var rb = System.Text.Encoding.UTF8.GetBytes(r);
+        var rb = Encoding.UTF8.GetBytes(r);
 
         wr.CookieContainer = cookies;
         wr.ContinueTimeout = 10 * 60 * 1000;
@@ -69,7 +69,7 @@ public class JsonServiceClient
         using var rs = response.GetResponseStream();
         using var sr = new StreamReader(rs);
         var rt = sr.ReadToEnd();
-        var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant);
+        var resp = JSON.ParseTolerant<TResponse>(rt);
 
         if (resp is ServiceResponse serviceResponse &&
             serviceResponse.Error != null)

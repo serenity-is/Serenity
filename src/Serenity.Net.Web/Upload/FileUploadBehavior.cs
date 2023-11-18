@@ -144,8 +144,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         if (replaceFields == null)
             return result;
 
-        if (formatSanitizer is null)
-            throw new ArgumentNullException(nameof(formatSanitizer));
+        ArgumentNullException.ThrowIfNull(formatSanitizer);
 
         var row = handler.Row;
 
@@ -236,7 +235,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         }
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
 
         if (newFilename == null)
         {
@@ -294,7 +293,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
     }
 
     private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete filesToDelete)
@@ -360,8 +359,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         IUploadOptions uploadOptions, IUploadValidator validator, IImageProcessor imageProcessor,
         IUploadStorage storage, ref string temporaryFile)
     {
-        if (storage == null)
-            throw new ArgumentNullException(nameof(storage));
+        ArgumentNullException.ThrowIfNull(storage);
 
         UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 

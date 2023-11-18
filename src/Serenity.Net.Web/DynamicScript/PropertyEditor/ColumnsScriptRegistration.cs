@@ -18,11 +18,9 @@ public class ColumnsScriptRegistration
     public static void RegisterColumnsScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {
-        if (scriptManager == null)
-            throw new ArgumentNullException(nameof(scriptManager));
+        ArgumentNullException.ThrowIfNull(scriptManager);
 
-        if (typeSource == null)
-            throw new ArgumentNullException(nameof(typeSource));
+        ArgumentNullException.ThrowIfNull(typeSource);
 
         var scripts = new List<Func<string>>();
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 
 namespace Serenity.Web;
@@ -71,7 +71,8 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     {
         var data = GetScriptData();
         return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
-            scriptName.ToSingleQuoted(), data.ToJson());
+            scriptName.ToSingleQuoted(), 
+            JSON.Stringify(data, writeNulls: false));
     }
 
     /// <inheritdoc/>

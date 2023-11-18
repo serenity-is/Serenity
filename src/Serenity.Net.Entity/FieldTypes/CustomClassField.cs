@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Base class for custom fields with reference type values
@@ -99,7 +101,7 @@ public class CustomClassField<TValue> : GenericClassField<TValue>
     /// <param name="writer">The writer.</param>
     /// <param name="value">The value.</param>
     /// <param name="serializer">The serializer.</param>
-    public virtual void ValueToJson(JsonWriter writer, TValue value, JsonSerializer serializer)
+    public virtual void ValueToJson(Newtonsoft.Json.JsonWriter writer, TValue value, Newtonsoft.Json.JsonSerializer serializer)
     {
         serializer.Serialize(writer, value);
     }
@@ -110,7 +112,7 @@ public class CustomClassField<TValue> : GenericClassField<TValue>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         var value = _getValue(row);
         if (value == null)
@@ -125,7 +127,7 @@ public class CustomClassField<TValue> : GenericClassField<TValue>
     /// <param name="reader">The reader.</param>
     /// <param name="serializer">The serializer.</param>
     /// <returns></returns>
-    protected virtual TValue ValueFromJson(JsonReader reader, JsonSerializer serializer)
+    protected virtual TValue ValueFromJson(Newtonsoft.Json.JsonReader reader, Newtonsoft.Json.JsonSerializer serializer)
     {
         return serializer.Deserialize<TValue>(reader);
     }
@@ -137,15 +139,15 @@ public class CustomClassField<TValue> : GenericClassField<TValue>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
 
@@ -155,6 +157,54 @@ public class CustomClassField<TValue> : GenericClassField<TValue>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <summary>
+    /// Deserializes this fields value from JSON
+    /// </summary>
+    /// <param name="reader">The reader.</param>
+    /// <param name="options">Serializer options</param>
+    protected virtual TValue ValueFromJson(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    {
+        return JsonSerializer.Deserialize<TValue>(ref reader, options);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+
+            default:
+                _setValue(row, ValueFromJson(ref reader, options));
+                break;
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            ValueToJson(writer, value, options);
+    }
+
+    /// <summary>
+    /// Serializes the value to json
+    /// </summary>
+    /// <param name="writer">Writer</param>
+    /// <param name="value">Value</param>
+    /// <param name="options">Serializer options</param>
+    public virtual void ValueToJson(Utf8JsonWriter writer, TValue value, JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, value, options);
     }
 
     /// <summary>

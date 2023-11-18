@@ -29,8 +29,7 @@ public static class TemplateHelper
     public static string RenderViewToString(IServiceProvider serviceProvider, string viewName, object model,
         Action<ViewContext> beforeRender = null)
     {
-        if (serviceProvider is null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var viewEngine = serviceProvider.GetRequiredService<IRazorViewEngine>();
         var actionContextAccessor = serviceProvider.GetService<IActionContextAccessor>();

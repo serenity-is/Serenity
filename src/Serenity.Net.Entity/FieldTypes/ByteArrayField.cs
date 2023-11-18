@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a byte[] value
@@ -109,7 +111,7 @@ public class ByteArrayField : CustomClassField<byte[]>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         var value = _getValue(row);
         if (value == null)
@@ -127,21 +129,21 @@ public class ByteArrayField : CustomClassField<byte[]>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.String:
+            case Newtonsoft.Json.JsonToken.String:
                 _setValue(row, Convert.FromBase64String((string)reader.Value));
                 break;
-            case JsonToken.Bytes:
+            case Newtonsoft.Json.JsonToken.Bytes:
                 _setValue(row, (byte[])reader.Value);
                 break;
             default:
@@ -149,5 +151,36 @@ public class ByteArrayField : CustomClassField<byte[]>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (string.IsNullOrEmpty(reader.GetString()))
+                    _setValue(row, null);
+                else
+                    _setValue(row, reader.GetBytesFromBase64());
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteBase64StringValue(value);
     }
 }

@@ -1,10 +1,4 @@
-﻿using System.Threading;
-#if ISSOURCEGENERATOR
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-#endif
+using System.Threading;
 
 namespace Serenity.CodeGenerator;
 
@@ -25,8 +19,10 @@ public static class TSConfigHelper
         IGeneratorFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
+#pragma warning disable CA1510 // Use ArgumentNullException throw helper
         if (config is null)
             throw new ArgumentNullException(nameof(config));
+#pragma warning restore CA1510 // Use ArgumentNullException throw helper
 
         if (config.Files != null)
         {
@@ -75,8 +71,8 @@ public static class TSConfigHelper
             .Select(x => PathHelper.ToUrl(x))
             .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
             .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
-            .Select(x => (!x.StartsWith("**/", StringComparison.Ordinal) && !x.StartsWith("/")) ? ("/" + x) : x)
+                (x.StartsWith('/') ? x[1..] : x))
+            .Select(x => (!x.StartsWith("**/", StringComparison.Ordinal) && !x.StartsWith('/')) ? ("/" + x) : x)
             .ToArray();
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -85,7 +81,7 @@ public static class TSConfigHelper
             .Select(x => PathHelper.ToUrl(x))
             .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
             .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                (x.StartsWith("/", StringComparison.Ordinal) ? x[1..] : x))
+                (x.StartsWith('/') ? x[1..] : x))
             .ToArray();
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -104,11 +100,11 @@ public static class TSConfigHelper
 
         IEnumerable<string> allTsFiles;
 
-        if (includePatterns.Any() &&
+        if (includePatterns.Length > 0 &&
             includePatterns.All(x =>
-                x.StartsWith("/", StringComparison.Ordinal) &&
+                x.StartsWith('/') &&
                 !x.StartsWith(@"/*", StringComparison.Ordinal) &&
-                x[1..].Split('/')[0].IndexOf("*", StringComparison.Ordinal) < 0))
+                x[1..].Split('/')[0].IndexOf('*') < 0))
         {
             // may optimize by traversing directories at root manually, e.g. skip node_modules etc.
             var scanDirs = includePatterns.Select(x =>
@@ -135,9 +131,9 @@ public static class TSConfigHelper
         allTsFiles = allTsFiles.Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
             !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
 
-        files = files.Concat(allTsFiles.Where(x => includePatterns.Any() &&
+        files = files.Concat(allTsFiles.Where(x => includePatterns.Length > 0 &&
             includeGlob.IsMatch(x[(rootDir.Length + 1)..]) &&
-            (!excludePatterns.Any() || !excludeGlob.IsMatch(x[(rootDir.Length + 1)..]))));
+            (excludePatterns.Length == 0 || !excludeGlob.IsMatch(x[(rootDir.Length + 1)..]))));
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -187,8 +183,10 @@ public static class TSConfigHelper
 
     public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
     {
+#pragma warning disable CA1510 // Use ArgumentNullException throw helper
         if (path is null)
             throw new ArgumentNullException(nameof(path));
+#pragma warning restore CA1510 // Use ArgumentNullException throw helper
 
         try
         {
@@ -198,17 +196,13 @@ public static class TSConfigHelper
             var text = fileSystem.ReadAllText(path);
 
 #if ISSOURCEGENERATOR
-            return JsonConvert.DeserializeObject<T>(text, 
-                new JsonSerializerSettings
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(text, 
+                new Newtonsoft.Json.JsonSerializerSettings
                 {
-                    MissingMemberHandling = MissingMemberHandling.Ignore
+                    MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore
                 });
 #else
-            return JsonSerializer.Deserialize<T>(text,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
+            return JSON.ParseTolerant<T>(text);
 #endif
         }
         catch

@@ -15,8 +15,7 @@ public static class HttpRequestExtensions
     /// <exception cref="ArgumentNullException">Request is null</exception>
     public static Uri GetBaseUri(this HttpRequest request, bool pathBase = true)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var uriBuilder = new UriBuilder(request.Scheme, request.Host.Host, 
             request.Host.Port ?? -1, pathBase ? request.PathBase : "");

@@ -26,7 +26,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
         {
             var name = nested.Name;
-            if (name.EndsWith("_", StringComparison.Ordinal))
+            if (name.EndsWith('_'))
                 name = name[0..^1];
 
             AddNestedLocalTexts(nested, prefix + name + ".");
@@ -82,15 +82,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
             var jwBuilder = new StringBuilder();
-#if ISSOURCEGENERATOR
-            var jw = new Newtonsoft.Json.JsonTextWriter(
-                new System.IO.StringWriter(jwBuilder))
-#else
-            var jw = new JsonTextWriter(new System.IO.StringWriter(jwBuilder))
-#endif
+            var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
             {
                 QuoteName = false,
-                Formatting = Formatting.Indented,
+                Formatting = Newtonsoft.Json.Formatting.Indented,
                 Indentation = 4
             };
             jw.WriteStartObject();

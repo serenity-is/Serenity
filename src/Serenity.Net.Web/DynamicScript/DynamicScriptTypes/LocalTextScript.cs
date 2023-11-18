@@ -1,5 +1,6 @@
 using SerenityIs.Administration;
 using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Web;
 
@@ -61,11 +62,9 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
         LocalTextPackages packages, string package, string languageId, bool isPending)
     {
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
+        ArgumentNullException.ThrowIfNull(package);
 
-        if (packages == null)
-            throw new ArgumentNullException(nameof(packages));
+        ArgumentNullException.ThrowIfNull(packages);
 
         if (!packages.TryGetValue(package, out string includes))
             includes = null;
@@ -88,9 +87,8 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
         var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
-        StringBuilder jwBuilder = new("Q.LT.add(");
-        JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
-            
+        var ms = new MemoryStream();
+        var jw = new Utf8JsonWriter(ms);
         jw.WriteStartObject();
         List<string> stack = new();
         int stackCount = 0;
@@ -155,21 +153,21 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
                     jw.WritePropertyName(part);
                     jw.WriteStartObject();
                     jw.WritePropertyName("");
-                    jw.WriteValue(pair.Value);
+                    jw.WriteStringValue(pair.Value);
                 }
                 else
                 {
                     jw.WritePropertyName(part);
-                    jw.WriteValue(pair.Value);
+                    jw.WriteStringValue(pair.Value);
                 }
             }
         }
         for (int i = 0; i < stackCount; i++)
             jw.WriteEndObject();
         jw.WriteEndObject();
-        jwBuilder.Append(");");
+        jw.Flush();
 
-        return jwBuilder.ToString();
+        return "Q.LT.add(" + Encoding.UTF8.GetString(ms.ToArray()) + ");";
     }
 
     /// <inheritdoc/>

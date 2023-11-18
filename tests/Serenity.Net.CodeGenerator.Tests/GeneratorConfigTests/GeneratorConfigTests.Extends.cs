@@ -1,9 +1,10 @@
-﻿using Serenity.CodeGenerator;
+using Serenity.CodeGenerator;
 
 namespace Serenity.Tests.CodeGenerator;
 
 public partial class GeneratorConfigTests
 {
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
     [Fact]
     public void Extends_WorksProperly_With_Nested_Objects()
     {
@@ -115,5 +116,5 @@ public partial class GeneratorConfigTests
         Assert.NotNull(config.ServerTypings);
         Assert.Null(config.ServerTypings.ModuleTypings);
     }
-
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
 }

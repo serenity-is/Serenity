@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -33,7 +33,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             if (!CanHandleType(memberType.Resolve()))
                 return;
 
-            var jsonProperty = a != null ? TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") : null;
+            var jsonProperty = a != null ? (
+                TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") ??
+                TypingsUtils.FindAttr(a, "System.Text.Json.Serialization", "JsonPropertyNameAttribute")) : null;
             if (jsonProperty != null &&
                 jsonProperty.HasConstructorArguments())
             {
@@ -60,7 +62,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 if (field.IsStatic | !field.IsPublic())
                     continue;
 
-                if (TypingsUtils.FindAttr(field.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                if (TypingsUtils.FindAttr(field.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null ||
+                    TypingsUtils.FindAttr(field.GetAttributes(), "System.Text.Json.Serialization", "JsonIgnoreAttribute") != null)
                     continue;
 
                 handleMember(field.FieldType(), field.Name, field.GetAttributes());
@@ -72,7 +75,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     continue;
 
                 if (property.HasCustomAttributes() &&
-                    TypingsUtils.FindAttr(property.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null)
+                    (TypingsUtils.FindAttr(property.GetAttributes(), "Newtonsoft.Json", "JsonIgnoreAttribute") != null ||
+                     TypingsUtils.FindAttr(property.GetAttributes(), "System.Text.Json.Serialization", "JsonIgnoreAttribute") != null))
                     continue;
 
                 handleMember(property.PropertyType(), property.Name, property.GetAttributes());

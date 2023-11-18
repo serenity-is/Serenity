@@ -47,8 +47,7 @@ public class ProjectFileHelper
     public static IEnumerable<XElement> EnumerateProjectAndDirectoryBuildProps(IGeneratorFileSystem fileSystem,
         string csproj)
     {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(fileSystem);
 
         var xe = XElement.Parse(fileSystem.ReadAllText(csproj));
         yield return xe;

@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Serenity;
 
 /// <summary>
-/// Contains default Serenity JSON serialization settings.
+/// Contains default Serenity JSON serialization settings for Newtonsoft.Json.
 /// </summary>
 public static class JsonSettings
 {

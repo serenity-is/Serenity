@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 
 namespace Serenity.Services;
 
@@ -78,8 +78,8 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
     {
         json = json.TrimToNull();
 
-        if (json != null && (!json.StartsWith("[", StringComparison.Ordinal) ||
-            !json.EndsWith("]", StringComparison.Ordinal)))
+        if (json != null && (!json.StartsWith('[') ||
+            !json.EndsWith(']')))
             throw new ArgumentOutOfRangeException(key);
 
         var list = JSON.Parse<UploadedFile[]>(json ?? "[]");
@@ -139,7 +139,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
                 continue;
 
             FileUploadBehavior.DeleteOldFile(storage, filesToDelete, filename, 
-                copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+                copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
         }
 
         if (newFileList.IsEmptyOrNull())
@@ -167,7 +167,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
 
         foreach (var file in oldFileList)
             FileUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename, 
-                (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+                editorAttr is IUploadFileOptions { CopyToHistory: true });
     }
 
     private string CopyTemporaryFiles(ISaveRequestHandler handler,
@@ -205,7 +205,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
             file.Filename = copyResult.Path;
         }
 
-        return JSON.Stringify(newFileList);
+        return JSON.Stringify(newFileList, writeNulls: false);
     }
 
     /// <inheritdoc/>

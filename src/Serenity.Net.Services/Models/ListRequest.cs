@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// The request model for a List service.
@@ -37,7 +37,8 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// The where criteria for the query. This is passed
     /// as an array of arrays in the JSON.
     /// </summary>
-    [JsonConverter(typeof(JsonSafeCriteriaConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(JsonSafeCriteriaConverter))]
+    [JsonConverter(typeof(JsonConverters.SafeCriteriaJsonConverter))]
     public BaseCriteria Criteria { get; set; }
     
     /// <summary>
@@ -68,13 +69,15 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// e.g. only the table fields, not view fields by default.
     /// </summary>
     public ColumnSelection ColumnSelection { get; set; }
-    
+
     /// <inheritdoc/>
-    [JsonConverter(typeof(JsonStringHashSetConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
+    [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
     public HashSet<string> IncludeColumns { get; set; }
 
     /// <inheritdoc/>
-    [JsonConverter(typeof(JsonStringHashSetConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
+    [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
     public HashSet<string> ExcludeColumns { get; set; }
 
     /// <summary>

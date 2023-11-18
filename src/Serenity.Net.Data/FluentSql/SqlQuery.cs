@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// SQL query string builder
@@ -26,7 +26,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     private int take;
     private StringBuilder where;
     private int intoIndex = -1;
-    private List<object> into = new List<object>();
+    private List<object> into = new();
     private SqlQuery unionQuery;
     private SqlUnionType unionType;
 
@@ -245,8 +245,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        if (orderBy == null)
-            orderBy = new List<string>();
+        orderBy ??= new List<string>();
 
         orderBy.Add(expression);
 
@@ -294,8 +293,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        if (orderBy == null)
-            orderBy = new List<string>();
+        orderBy ??= new List<string>();
 
         string search = (expression ?? "").Trim();
         orderBy.RemoveAll(x => string.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
@@ -631,8 +629,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         get
         {
-            if (aliasWithJoins == null)
-                aliasWithJoins = new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
+            aliasWithJoins ??= new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
 
             return aliasWithJoins;
         }
@@ -642,8 +639,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         get
         {
-            if (aliasExpressions == null)
-                aliasExpressions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            aliasExpressions ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             return aliasExpressions;
         }

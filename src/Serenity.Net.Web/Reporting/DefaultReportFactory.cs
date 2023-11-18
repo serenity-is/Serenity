@@ -51,6 +51,6 @@ public class DefaultReportFactory : IReportFactory
 
         reportOptions = reportOptions.TrimToNull();
         if (reportOptions != null)
-            JsonConvert.PopulateObject(reportOptions, report);
+            JSON.PopulateObject(report, reportOptions, JSON.Defaults.Strict);
     }
 }

@@ -1,10 +1,11 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// A sort column. In JSON this is deserialized from strings
 /// in the format "field" or "field desc"
 /// </summary>
-[JsonConverter(typeof(JsonSortByConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(JsonSortByConverter))]
+[JsonConverter(typeof(JsonConverters.SortByJsonConverter))]
 public class SortBy
 {
     /// <summary>

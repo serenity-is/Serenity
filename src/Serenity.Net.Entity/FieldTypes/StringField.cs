@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a String value
@@ -90,7 +92,7 @@ public class StringField : GenericClassField<string>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         writer.WriteValue(_getValue(row));
     }
@@ -102,23 +104,23 @@ public class StringField : GenericClassField<string>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.String:
+            case Newtonsoft.Json.JsonToken.String:
                 _setValue(row, (string)reader.Value);
                 break;
-            case JsonToken.Integer:
-            case JsonToken.Float:
-            case JsonToken.Boolean:
+            case Newtonsoft.Json.JsonToken.Integer:
+            case Newtonsoft.Json.JsonToken.Float:
+            case Newtonsoft.Json.JsonToken.Boolean:
                 _setValue(row, Convert.ToString(reader.Value, CultureInfo.InvariantCulture));
                 break;
             default:
@@ -127,4 +129,45 @@ public class StringField : GenericClassField<string>
 
         row.FieldAssignedValue(this);
     }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        string v;
+
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+            case JsonTokenType.Number:
+                if (reader.TokenType == JsonTokenType.Number)
+                    v = Convert.ToString(reader.GetDouble(), CultureInfo.InvariantCulture);
+                else
+                    v = Convert.ToString(reader.TokenType == JsonTokenType.True, CultureInfo.InvariantCulture);
+                _setValue(row, v);
+                break;
+            case JsonTokenType.String:
+                v = reader.GetString();
+                _setValue(row, v);
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            writer.WriteStringValue(value);
+    }
+
 }

@@ -72,8 +72,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <exception cref="InvalidOperationException">Route attribute is not found</exception>
     public static string GetUrlFromController(Type controller, string action)
     {
-        if (controller == null)
-            throw new ArgumentNullException(nameof(controller));
+        ArgumentNullException.ThrowIfNull(controller);
 
         if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));
@@ -154,8 +153,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
     public static string GetPermissionFromController(Type controller, string action)
     {
-        if (controller == null)
-            throw new ArgumentNullException(nameof(controller));
+        ArgumentNullException.ThrowIfNull(controller);
 
         if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));

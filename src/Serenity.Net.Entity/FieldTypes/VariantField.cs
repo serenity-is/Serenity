@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a Variant (e.g. SQL VARIANT) value
@@ -90,7 +92,7 @@ public class VariantField : GenericClassField<object>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         writer.WriteValue(_getValue(row));
     }
@@ -102,27 +104,68 @@ public class VariantField : GenericClassField<object>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.String:
-            case JsonToken.Integer:
-            case JsonToken.Float:
-            case JsonToken.Bytes:
-                _setValue(row, (string)reader.Value);
+            case Newtonsoft.Json.JsonToken.String:
+            case Newtonsoft.Json.JsonToken.Integer:
+            case Newtonsoft.Json.JsonToken.Float:
+            case Newtonsoft.Json.JsonToken.Bytes:
+                _setValue(row, reader.Value);
                 break;
             default:
                 throw JsonUnexpectedToken(reader);
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+                _setValue(row, reader.TokenType == JsonTokenType.Number);
+                break;
+            case JsonTokenType.Number:
+                if (reader.TryGetInt32(out int intValue))
+                    _setValue(row, intValue);
+                else if (reader.TryGetInt64(out long longValue))
+                    _setValue(row, longValue);
+                else
+                    _setValue(row, reader.GetDouble());
+                
+                break;
+            case JsonTokenType.String:
+                _setValue(row, reader.GetString());
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            JsonSerializer.Serialize(writer, value, options);
     }
 }

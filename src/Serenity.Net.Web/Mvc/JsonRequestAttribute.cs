@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Services;
 
@@ -22,8 +23,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
     /// <inheritdoc/>
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
-        if (filterContext == null)
-            throw new ArgumentNullException(nameof(filterContext));
+        ArgumentNullException.ThrowIfNull(filterContext);
 
         var request = filterContext.HttpContext.Request;
         string method = request.Method ?? "";
@@ -54,16 +54,24 @@ public class JsonRequestAttribute : ActionFilterAttribute
         {
             if ((request.ContentType ?? string.Empty)
                 .Contains("application/json", StringComparison.OrdinalIgnoreCase))
-            {                   
+            {
                 if (filterContext.HttpContext.Request.Body.CanSeek)
                     filterContext.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
-                using var sr = new StreamReader(filterContext.HttpContext.Request.Body,
-                    System.Text.Encoding.GetEncoding((string)filterContext.HttpContext
-                        .Request.Headers["Content-Encoding"] ?? "utf-8"), true, 4096, true);
-                var js = JsonSerializer.Create(JsonSettings.Strict);
-                using var jr = new JsonTextReader(sr);
-                var obj = js.Deserialize(jr, prm.ParameterType);
+                var encoding = (string)filterContext.HttpContext.Request.Headers.ContentEncoding ?? "utf-8";
+                object obj;
+                if (string.Equals(encoding, "utf-8", StringComparison.OrdinalIgnoreCase))
+                {
+                    obj = JsonSerializer.Deserialize(filterContext.HttpContext.Request.Body, prm.ParameterType,
+                        JSON.Defaults.Strict);
+                }
+                else
+                {
+                    using var sr = new StreamReader(filterContext.HttpContext.Request.Body,
+                        Encoding.GetEncoding(encoding)); 
+                    obj = JsonSerializer.Deserialize(sr.ReadToEnd(), prm.ParameterType, JSON.Defaults.Strict);
+                }
+
                 filterContext.ActionArguments[prm.Name] = obj;
             }
             else 
@@ -71,7 +79,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
                 var req = FromFormOrQuery(request, prm.Name);
                 if (req != null)
                 {
-                    var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
+                    var obj = JsonSerializer.Deserialize(req, prm.ParameterType, JSON.Defaults.Strict);
                     filterContext.ActionArguments[prm.Name] = obj;
                 }
             }
@@ -82,7 +90,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
             var req = FromFormOrQuery(request, prm.Name);
             if (req != null)
             {
-                var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
+                var obj = JsonSerializer.Deserialize(req, prm.ParameterType, JSON.Defaults.Strict);
                 filterContext.ActionArguments[prm.Name] = obj;
             }
         }

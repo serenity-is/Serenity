@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Serenity.Data;
 
@@ -109,7 +110,7 @@ public sealed class DateTimeField : GenericValueField<DateTime>
         set
         {
             if (value != (dateTimeKind == null))
-                dateTimeKind = value ? (DateTimeKind?)null : DateTimeKind.Unspecified;
+                dateTimeKind = value ? null : DateTimeKind.Unspecified;
         }
     }
 
@@ -222,7 +223,7 @@ public sealed class DateTimeField : GenericValueField<DateTime>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         var value = _getValue(row);
         if (value.HasValue)
@@ -246,18 +247,18 @@ public sealed class DateTimeField : GenericValueField<DateTime>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.Date:
+            case Newtonsoft.Json.JsonToken.Date:
                 var obj = reader.Value;
                 DateTime value;
                 if (obj is DateTime dt)
@@ -272,7 +273,7 @@ public sealed class DateTimeField : GenericValueField<DateTime>
 
                 _setValue(row, ToDateTimeKind(value));
                 break;
-            case JsonToken.String:
+            case Newtonsoft.Json.JsonToken.String:
                 var s = ((string)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
@@ -284,5 +285,46 @@ public sealed class DateTimeField : GenericValueField<DateTime>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.String:
+                if (string.IsNullOrWhiteSpace(reader.GetString())) 
+                    _setValue(row, null);
+                else if (reader.TryGetDateTimeOffset(out var dtofs))
+                    _setValue(row, ToDateTimeKind(dtofs));
+                else 
+                    _setValue(row, ToDateTimeKind(reader.GetDateTime()));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+        {
+            var dt = value.Value;
+            if (DateTimeKind == DateTimeKind.Local)
+                dt = dt.ToUniversalTime();
+            writer.WriteStringValue(dt.ToString(
+                (DateTimeKind == DateTimeKind.Unspecified ?
+                    DateHelper.ISODateTimeFormatLocal :
+                    DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+        }
     }
 }

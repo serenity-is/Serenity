@@ -18,8 +18,7 @@ public static class UploadServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Collection is null</exception>
     public static void AddUploadStorage(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.AddOptions();
         collection.TryAddSingleton<IFilenameFormatSanitizer, DefaultFilenameFormatSanitizer>();
@@ -41,11 +40,9 @@ public static class UploadServiceCollectionExtensions
     public static void AddUploadStorage(this IServiceCollection collection,
         Action<UploadSettings> setupAction)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
-        if (setupAction == null)
-            throw new ArgumentNullException(nameof(setupAction));
+        ArgumentNullException.ThrowIfNull(setupAction);
 
         collection.AddUploadStorage();
         collection.Configure(setupAction);

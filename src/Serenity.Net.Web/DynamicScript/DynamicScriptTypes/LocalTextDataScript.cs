@@ -63,8 +63,7 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
         string includes, string languageId, bool isPending, string packageId = null)
     {
-        if (registry == null)
-            throw new ArgumentNullException(nameof(registry));
+        ArgumentNullException.ThrowIfNull(registry);
 
         var result = new Dictionary<string, string>();
 
