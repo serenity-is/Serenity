@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -9,5 +9,5 @@ public class SaveResponse : ServiceResponse
     /// <summary>
     /// The entity ID of the created / updated entity.
     /// </summary>
-    public object EntityId;
+    public object EntityId { get; set; }
 }
