@@ -136,7 +136,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         return hash;
     }
 
-    private IScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
+    private ScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
     {
         ArgumentNullException.ThrowIfNull(name);
 
