@@ -41,7 +41,7 @@ public static partial class JSON
             TolerantWriteNulls = Populate(new JsonSerializerOptions(), tolerant: true, writeNulls: true);
         }
 
-        private static JsonConverter rowJsonConverter;
+        private static JsonConverter? rowJsonConverter;
 
         /// <summary>
         /// Creates a JsonSerializerSettings object with common values and converters.
