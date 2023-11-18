@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.IO;
 
 namespace Serenity.CodeGenerator;
 
@@ -18,9 +18,18 @@ public static class GeneratorConfigExtensions
         foreach (var c in config.Connections)
             c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        return JSON.StringifyIndented(config, 2);
-#pragma warning restore CS0618 // Type or member is obsolete
+        using var sw = new StringWriter();
+        using var jw = new Newtonsoft.Json.JsonTextWriter(sw)
+        {
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+            IndentChar = ' ',
+            Indentation = 2
+        };
+        var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSettings.Strict);
+
+        serializer.Serialize(jw, config);
+        jw.Flush();
+        return sw.ToString();
     }
 
     /// <summary>

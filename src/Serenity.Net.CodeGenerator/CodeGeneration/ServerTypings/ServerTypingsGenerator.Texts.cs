@@ -84,12 +84,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
             var jwBuilder = new StringBuilder();
-#if ISSOURCEGENERATOR
-            var jw = new Newtonsoft.Json.JsonTextWriter(
-                new System.IO.StringWriter(jwBuilder))
-#else
             var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
-#endif
             {
                 QuoteName = false,
                 Formatting = Newtonsoft.Json.Formatting.Indented,
