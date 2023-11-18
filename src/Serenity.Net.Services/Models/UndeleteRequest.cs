@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -9,5 +9,5 @@ public class UndeleteRequest : ServiceRequest
     /// <summary>
     /// The entity ID to undelete
     /// </summary>
-    public object EntityId;
+    public object EntityId { get; set; }
 }
