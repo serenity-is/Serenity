@@ -40,8 +40,8 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
 
         return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
             ("Lookup." + LookupKey).ToSingleQuoted(), 
-                JSON.Serialize(LookupParams, writeNulls: false), 
-                JSON.Serialize(items, writeNulls: false));
+                JSON.Stringify(LookupParams, writeNulls: false), 
+                JSON.Stringify(items, writeNulls: false));
     }
 
     /// <summary>

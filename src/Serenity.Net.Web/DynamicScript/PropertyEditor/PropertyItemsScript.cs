@@ -72,7 +72,7 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
         var data = GetScriptData();
         return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
             scriptName.ToSingleQuoted(), 
-            JSON.Serialize(data, writeNulls: false));
+            JSON.Stringify(data, writeNulls: false));
     }
 
     /// <inheritdoc/>

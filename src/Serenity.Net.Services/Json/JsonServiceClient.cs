@@ -56,7 +56,7 @@ public class JsonServiceClient
     {
         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(UriHelper.Combine(BaseUrl, relativeUrl));
         wr.Method = "POST";
-        var r = JSON.Serialize(request, writeNulls: true);
+        var r = JSON.Stringify(request, writeNulls: true);
         wr.ContentType = "application/json";
         var rb = Encoding.UTF8.GetBytes(r);
 
@@ -69,7 +69,7 @@ public class JsonServiceClient
         using var rs = response.GetResponseStream();
         using var sr = new StreamReader(rs);
         var rt = sr.ReadToEnd();
-        var resp = JSON.DeserializeTolerant<TResponse>(rt);
+        var resp = JSON.ParseTolerant<TResponse>(rt);
 
         if (resp is ServiceResponse serviceResponse &&
             serviceResponse.Error != null)

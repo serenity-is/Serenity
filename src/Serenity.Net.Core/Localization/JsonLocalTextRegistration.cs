@@ -89,7 +89,7 @@ public static class JsonLocalTextRegistration
             if (langID is null)
                 continue;
 
-            var texts = JSON.Deserialize<Dictionary<string, object>>(
+            var texts = JSON.Parse<Dictionary<string, object>>(
                 fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? new();
 
             AddFromNestedDictionary(texts, "", langID, registry);

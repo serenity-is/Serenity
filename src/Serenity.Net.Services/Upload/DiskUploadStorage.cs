@@ -96,7 +96,7 @@ public class DiskUploadStorage : IUploadStorage
                 json[0] == '{' &&
                 json[^1] == '}')
             {
-                return JSON.Deserialize<Dictionary<string, string>>(json);
+                return JSON.Parse<Dictionary<string, string>>(json);
             }
         }
 
@@ -134,7 +134,7 @@ public class DiskUploadStorage : IUploadStorage
             metadata = existing;
         }
 
-        fileSystem.WriteAllText(metaFile, JSON.SerializeIndented(metadata));
+        fileSystem.WriteAllText(metaFile, JSON.StringifyIndented(metadata));
     }
 
     /// <inheritdoc/>

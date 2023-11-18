@@ -85,8 +85,8 @@ public class DistinctValuesScript<TRow> : LookupScript
     {
         return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
             ", new Q.Lookup(" + 
-            JSON.Serialize(LookupParams, writeNulls: false) + ", " + 
-            JSON.Serialize(GetItems(), writeNulls: false) + 
+            JSON.Stringify(LookupParams, writeNulls: false) + ", " + 
+            JSON.Stringify(GetItems(), writeNulls: false) + 
             ".map(function(x) { return { v: x }; })));";
     }
 

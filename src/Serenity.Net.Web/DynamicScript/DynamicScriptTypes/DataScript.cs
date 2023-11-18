@@ -48,6 +48,6 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     {
         var data = getData();
         return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), 
-            JSON.Serialize(data, writeNulls: false));
+            JSON.Stringify(data, writeNulls: false));
     }
 }

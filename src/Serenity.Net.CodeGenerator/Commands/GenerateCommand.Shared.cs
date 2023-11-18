@@ -117,7 +117,7 @@ public partial class GenerateCommand
             var path = fileSystem.Combine(projectDir, name);
             if (fileSystem.FileExists(name))
             {
-                var appSettings = JSON.DeserializeTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
+                var appSettings = JSON.ParseTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
                 if (appSettings.Data != null)
                     foreach (var data in appSettings.Data)
                     {

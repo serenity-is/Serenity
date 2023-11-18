@@ -202,7 +202,7 @@ public static class TSConfigHelper
                     MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore
                 });
 #else
-            return JSON.DeserializeTolerant<T>(text);
+            return JSON.ParseTolerant<T>(text);
 #endif
         }
         catch

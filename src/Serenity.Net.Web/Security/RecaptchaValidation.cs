@@ -43,7 +43,7 @@ public static class RecaptchaValidation
         using (var sr = new StreamReader(webResponse.GetResponseStream()))
             responseJson = sr.ReadToEnd();
 
-        var response = JSON.DeserializeTolerant<RecaptchaResponse>(responseJson);
+        var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
         if (response == null ||
             !response.Success)
         {

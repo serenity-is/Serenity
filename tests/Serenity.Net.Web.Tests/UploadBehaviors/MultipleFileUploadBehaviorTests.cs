@@ -549,7 +549,7 @@ public partial class MultipleFileUploadBehaviorTests
         uow.Commit();
 
         var newFile = mockFileSystem.AllFiles.Select(x => mockFileSystem.Path.GetFileName(x)).ToList();
-        var rowFileName = JSON.Deserialize<UploadedFile[]>(row.StringFieldImageUploadEditor)
+        var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor)
             .Select(x => mockFileSystem.Path.GetFileName(x.Filename));
 
         if (!isUpdate)

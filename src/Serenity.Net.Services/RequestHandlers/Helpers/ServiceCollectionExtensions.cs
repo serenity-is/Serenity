@@ -315,7 +315,7 @@ public static class ServiceCollectionExtensions
             string json = sr.ReadToEnd().TrimToNull();
             if (json is null)
                 continue;
-            var texts = JSON.Deserialize<Dictionary<string, object>>(json);
+            var texts = JSON.Parse<Dictionary<string, object>>(json);
 
             JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
         }
