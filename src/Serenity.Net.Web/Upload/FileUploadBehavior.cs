@@ -235,7 +235,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         }
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
 
         if (newFilename == null)
         {
@@ -293,7 +293,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
     }
 
     private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete filesToDelete)
