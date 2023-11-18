@@ -14,21 +14,23 @@ public static class JSON
     /// </summary>
     /// <typeparam name="T">Type to deserialize</typeparam>
     /// <param name="input">JSON string</param>
+    /// <param name="options">Serializer options. Defaults to StrictWriteNulls.</param>
     /// <returns>Deserialized object</returns>
-    public static T? Parse<T>(string input)
+    public static T? Parse<T>(string input, JsonSerializerOptions? options = null)
     {
-        return JsonSerializer.Deserialize<T>(input, Defaults.StrictWriteNulls);
+        return JsonSerializer.Deserialize<T>(input, options ?? Defaults.StrictWriteNulls);
     }
 
     /// <summary>
     /// Deserializes a JSON string to an object
     /// </summary>
     /// <param name="targetType">Type to deserialize</param>
+    /// <param name="options">Serializer options. Defaults to StrictWriteNulls.</param>
     /// <param name="input">JSON string</param>
     /// <returns>Deserialized object</returns>
-    public static object? Parse(string input, Type targetType)
+    public static object? Parse(string input, Type targetType, JsonSerializerOptions? options = null)
     {
-        return JsonSerializer.Deserialize(input, targetType, Defaults.StrictWriteNulls);
+        return JsonSerializer.Deserialize(input, targetType, options ?? Defaults.StrictWriteNulls);
     }
 
     /// <summary>
@@ -90,6 +92,20 @@ public static class JSON
     public static string Stringify(object? value, bool writeNulls = false)
     {
         return JsonSerializer.Serialize(value, writeNulls ? Defaults.StrictWriteNulls : Defaults.Strict);
+    }
+
+    /// <summary>
+    /// Converts object to its JSON representation
+    /// </summary>
+    /// <param name="value">Value to convert to JSON</param>
+    /// <param name="options">Serializer options.</param>
+    /// <returns>Serialized JSON string</returns>
+    public static string Stringify(object? value, JsonSerializerOptions options)
+    {
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
+        return JsonSerializer.Serialize(value, options);
     }
 
     private static readonly JsonSerializerOptions Indented = new(Defaults.Strict)
