@@ -56,6 +56,7 @@ public static class RecaptchaValidation
     {
         public bool Success { get; set; }
         [JsonPropertyName("error-codes")]
+        [Newtonsoft.Json.JsonProperty("error-codes")]
         public string[] ErrorCodes { get; set; }
     }
 }
