@@ -8,13 +8,13 @@ public class MockTypeSource : ITypeSource
     public MockTypeSource(params Type[] types)
     {
         this.types = types ?? throw new ArgumentNullException(nameof(types));
-        attributes = Array.Empty<Attribute>();
+        attributes = [];
     }
 
     public MockTypeSource(params Attribute[] attributes)
     {
         this.attributes = attributes ?? throw new ArgumentNullException(nameof(attributes));
-        types = Array.Empty<Type>();
+        types = [];
     }
 
     public IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType)

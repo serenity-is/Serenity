@@ -93,7 +93,7 @@ public class ReportRegistry : IReportRegistry
 
             if (!reportsByCategoryNew.TryGetValue(category, out List<Report> reports))
             {
-                reports = new List<Report>();
+                reports = [];
                 reportsByCategoryNew[category] = reports;
             }
 
@@ -226,27 +226,21 @@ public class ReportRegistry : IReportRegistry
     /// <summary>
     /// Model for a report category
     /// </summary>
-    public class Category
+    /// <remarks>
+    /// Creates an instance of the class
+    /// </remarks>
+    /// <param name="key">Category key</param>
+    /// <param name="title">Category title</param>
+    public class Category(string key, string title)
     {
         /// <summary>
         /// Key for the category
         /// </summary>
-        public string Key { get; private set; }
+        public string Key { get; private set; } = key;
 
         /// <summary>
         /// Category title
         /// </summary>
-        public string Title { get; private set; }
-
-        /// <summary>
-        /// Creates an instance of the class
-        /// </summary>
-        /// <param name="key">Category key</param>
-        /// <param name="title">Category title</param>
-        public Category(string key, string title)
-        {
-            Key = key;
-            Title = title;
-        }
+        public string Title { get; private set; } = title;
     }
 }

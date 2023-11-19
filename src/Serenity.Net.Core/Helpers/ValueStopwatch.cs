@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 // https://github.com/dotnet/aspnetcore/blob/main/src/Shared/ValueStopwatch/ValueStopwatch.cs
 
@@ -7,7 +7,7 @@ namespace Serenity;
 /// <summary>
 /// A value stopwatch
 /// </summary>
-public struct ValueStopwatch
+public readonly struct ValueStopwatch
 {
     private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
     private static readonly double TimestampToMilliseconds = 1000 / (double)Stopwatch.Frequency;
@@ -17,7 +17,7 @@ public struct ValueStopwatch
     /// <summary>
     /// Returns if stopwatch is active
     /// </summary>
-    public bool IsActive => startTimestamp != 0;
+    public readonly bool IsActive => startTimestamp != 0;
 
     private ValueStopwatch(long startTimestamp)
     {
@@ -32,7 +32,7 @@ public struct ValueStopwatch
     /// <summary>
     /// Gets elapsed milliseconds
     /// </summary>
-    public double ElapsedMilliseconds
+    public readonly double ElapsedMilliseconds
     {
         get
         {
@@ -45,7 +45,7 @@ public struct ValueStopwatch
     /// <summary>
     /// Gets elapsed time
     /// </summary>
-    public TimeSpan ElapsedTime
+    public readonly TimeSpan ElapsedTime
     {
         get
         {

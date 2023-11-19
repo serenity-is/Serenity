@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Serenity.Tests.CodeGenerator;
 
@@ -12,7 +12,8 @@ public partial class RowTemplateTests
             FileScopedNamespaces = true
         };
         var actual = RenderTemplate(model);
-        
+
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
         var expected = Regex.Replace(Customer_Expected_Defaults,
             @"^namespace TestNamespace\.TestModule",
             "namespace TestNamespace.TestModule;\n",
@@ -20,6 +21,7 @@ public partial class RowTemplateTests
 
         expected = Regex.Replace(expected,
             @"^([{}]\r?\n?|    )", "", RegexOptions.Multiline).TrimEnd();
+#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
         AssertEqual(expected, actual);
         Assert.Contains("namespace TestNamespace.TestModule;", actual);

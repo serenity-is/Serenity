@@ -98,7 +98,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     private static void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
         ExternalType type, bool isOptions)
     {
-        List<ExternalMember> members = new();
+        List<ExternalMember> members = [];
 
         if (type.Fields != null)
             members.AddRange(type.Fields);

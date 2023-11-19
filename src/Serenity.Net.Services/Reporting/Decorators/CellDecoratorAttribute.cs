@@ -4,19 +4,15 @@
 /// Attribute used to set the <see cref="ICellDecorator"/> type
 /// for a property.
 /// </summary>
-public class CellDecoratorAttribute : Attribute
+/// <remarks>
+/// Creates an instance of the class.
+/// </remarks>
+/// <param name="decorator">Decorator type</param>
+public class CellDecoratorAttribute(Type decorator) : Attribute
 {
-    /// <summary>
-    /// Creates an instance of the class.
-    /// </summary>
-    /// <param name="decorator">Decorator type</param>
-    public CellDecoratorAttribute(Type decorator)
-    {
-        DecoratorType = decorator;
-    }
 
     /// <summary>
     /// Gets the decorator type.
     /// </summary>
-    public Type DecoratorType { get; set; }
+    public Type DecoratorType { get; set; } = decorator;
 }

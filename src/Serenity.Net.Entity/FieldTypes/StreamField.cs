@@ -6,23 +6,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with a Stream value
 /// </summary>
-public class StreamField : GenericClassField<Stream>
+/// <remarks>
+/// Initializes a new instance of the <see cref="StreamField"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public class StreamField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, Stream> getValue = null, Action<IRow, Stream> setValue = null) : GenericClassField<Stream>(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StreamField"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public StreamField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, Stream> getValue = null, Action<IRow, Stream> setValue = null)
-        : base(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

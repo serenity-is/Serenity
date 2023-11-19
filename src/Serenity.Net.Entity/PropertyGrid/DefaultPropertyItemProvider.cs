@@ -6,27 +6,21 @@ namespace Serenity.PropertyGrid;
 /// Default property item provider
 /// </summary>
 /// <seealso cref="IPropertyItemProvider" />
-public partial class DefaultPropertyItemProvider : IPropertyItemProvider
+/// <remarks>
+/// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
+/// </remarks>
+/// <param name="provider">The provider.</param>
+/// <param name="typeSource">The type source.</param>
+/// <exception cref="ArgumentNullException">
+/// provider or typeSource is null
+/// </exception>
+public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource) : IPropertyItemProvider
 {
-    private readonly IServiceProvider provider;
-    private readonly IEnumerable<ObjectFactory> processorFactories;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
-    /// </summary>
-    /// <param name="provider">The provider.</param>
-    /// <param name="typeSource">The type source.</param>
-    /// <exception cref="ArgumentNullException">
-    /// provider or typeSource is null
-    /// </exception>
-    public DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource)
-    {
-        this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        processorFactories = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+    private readonly IServiceProvider provider = provider ?? throw new ArgumentNullException(nameof(provider));
+    private readonly IEnumerable<ObjectFactory> processorFactories = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithInterface(typeof(IPropertyProcessor))
             .Where(x => !x.IsAbstract && !x.IsInterface)
             .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
-    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -44,7 +38,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider
         var list = new List<PropertyItem>();
 
         var basedOnRow = GetBasedOnRow(type, out bool checkNames);
-        var processors = processorFactories.Select(x => (IPropertyProcessor)x(provider, Array.Empty<object>()))
+        var processors = processorFactories.Select(x => (IPropertyProcessor)x(provider, []))
             .OrderBy(x => x.Priority).ToList();
 
         foreach (var processor in processors)
@@ -94,7 +88,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider
                 }
             }
 
-            PropertyItem pi = new PropertyItem
+            PropertyItem pi = new()
             {
                 Name = property.Name
             };

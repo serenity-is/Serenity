@@ -26,13 +26,13 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         });
     }
 
-    static readonly string[] FormatterAttributeNames = new[]
-    {
+    static readonly string[] FormatterAttributeNames =
+    [
         "Serenity.Decorators.registerFormatter",
         "@serenity-is/corelib:Decorators.registerFormatter",
         "Decorators.registerFormatter",
         "registerFormatter"
-    };
+    ];
 
     private bool IsFormatterType(ExternalType type)
     {

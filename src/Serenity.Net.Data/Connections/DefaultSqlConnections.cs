@@ -6,27 +6,20 @@ namespace Serenity.Data;
 /// <summary>
 /// Default connection factory
 /// </summary>
-public class DefaultSqlConnections : ISqlConnections
+/// <remarks>
+/// Creates a new instance
+/// </remarks>
+/// <param name="connectionStrings">Named connection strings</param>
+/// <param name="profiler">Profiler if any</param>
+/// <param name="loggerFactory">Optional logger factory (to be used by static SqlHelper methods)</param>
+public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null) : ISqlConnections
 {
     /// <summary>Connection strings</summary>
-    protected readonly IConnectionStrings connectionStrings;
+    protected readonly IConnectionStrings connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
     /// <summary>Profiler</summary>
-    protected readonly IConnectionProfiler profiler;
+    protected readonly IConnectionProfiler profiler = profiler;
     /// <summary>Logger factory</summary>
-    protected readonly ILoggerFactory loggerFactory;
-
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="connectionStrings">Named connection strings</param>
-    /// <param name="profiler">Profiler if any</param>
-    /// <param name="loggerFactory">Optional logger factory (to be used by static SqlHelper methods)</param>
-    public DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null)
-    {
-        this.connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
-        this.profiler = profiler;
-        this.loggerFactory = loggerFactory;
-    }
+    protected readonly ILoggerFactory loggerFactory = loggerFactory;
 
     /// <summary>
     /// Lists all known connections strings
@@ -100,11 +93,7 @@ public class DefaultSqlConnections : ISqlConnections
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
     public virtual IDbConnection NewByKey(string connectionKey)
     {
-        var info = connectionStrings.TryGetConnectionString(connectionKey);
-
-        if (info == null)
-            throw new InvalidOperationException(string.Format("No connection string with key {0} in configuration file!", connectionKey));
-
+        var info = connectionStrings.TryGetConnectionString(connectionKey) ?? throw new InvalidOperationException(string.Format("No connection string with key {0} in configuration file!", connectionKey));
         return New(info.ConnectionString, info.ProviderName, info.Dialect);
     }
 

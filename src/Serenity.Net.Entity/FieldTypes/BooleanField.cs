@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with boolean value
 /// </summary>
-public sealed class BooleanField : GenericValueField<bool>
+/// <remarks>
+/// Initializes a new instance of the <see cref="BooleanField"/> class.
+/// </remarks>
+/// <param name="collection">The field collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value callback.</param>
+/// <param name="setValue">The set value callback.</param>
+public sealed class BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null) : GenericValueField<bool>(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BooleanField"/> class.
-    /// </summary>
-    /// <param name="collection">The field collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value callback.</param>
-    /// <param name="setValue">The set value callback.</param>
-    public BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null)
-        : base(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

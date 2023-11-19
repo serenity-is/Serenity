@@ -1,12 +1,7 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-public class MockDiskUploadFileSystem : MockFileSystem, IDiskUploadFileSystem
+public class MockDiskUploadFileSystem(string currentDirectory = "") : MockFileSystem(currentDirectory), IDiskUploadFileSystem
 {
-    public MockDiskUploadFileSystem(string currentDirectory = "")
-        : base(currentDirectory)
-    {
-    }
-    
     public void TryDeleteMarkedFiles(string folderPath)
     {
         if (!Directory.Exists(folderPath))

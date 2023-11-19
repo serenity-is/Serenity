@@ -34,15 +34,10 @@ public partial class RadioButtonEditorAttribute : CustomEditorAttribute
             return;
         }
 
-        var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(false);
-        if (lk == null)
-        {
-            throw new ArgumentException(string.Format(
+        var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentException(string.Format(
                 "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                 "be used with a RadioButtonEditor!",
                 enumOrLookupType.FullName), "lookupType");
-        }
-
         LookupKey = lk.Key ?? LookupScriptAttribute.AutoLookupKeyFor(enumOrLookupType);
     }
 

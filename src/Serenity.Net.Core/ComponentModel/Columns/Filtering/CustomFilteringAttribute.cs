@@ -6,18 +6,13 @@ namespace Serenity.ComponentModel;
 /// Base class which other custom filtering types derive from.
 /// </summary>
 /// <seealso cref="FilteringTypeAttribute" />
-public abstract class CustomFilteringAttribute : FilteringTypeAttribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="CustomFilteringAttribute"/> class.
+/// </remarks>
+/// <param name="filteringType">Type of the filtering.</param>
+public abstract class CustomFilteringAttribute(string filteringType) : FilteringTypeAttribute(filteringType)
 {
     private Dictionary<string, object?>? options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomFilteringAttribute"/> class.
-    /// </summary>
-    /// <param name="filteringType">Type of the filtering.</param>
-    public CustomFilteringAttribute(string filteringType)
-        : base(filteringType)
-    {
-    }
 
     /// <summary>
     /// Sets the parameters.

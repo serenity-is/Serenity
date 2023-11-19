@@ -6,17 +6,13 @@
 /// </summary>
 /// <typeparam name="TRow">The entity type</typeparam>
 /// <typeparam name="TListRequest">List request type</typeparam>
-public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>,
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="context">Request context</param>
+public class ListRequestHandler<TRow, TListRequest>(IRequestContext context) : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>(context),
     IListHandler<TRow, TListRequest>
     where TRow : class, IRow, new()
     where TListRequest : ListRequest
 {
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="context">Request context</param>
-    public ListRequestHandler(IRequestContext context)
-        : base(context)
-    {
-    }
 }

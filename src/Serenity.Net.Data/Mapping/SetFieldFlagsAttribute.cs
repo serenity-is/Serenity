@@ -3,18 +3,13 @@
 /// <summary>
 /// Used to turn on (include) or turn off (exclude) field flags.
 /// </summary>
-public class SetFieldFlagsAttribute : Attribute
+/// <remarks>
+/// Turn on or off field flags.
+/// </remarks>
+/// <param name="add">Set of flags to turn on (include)</param>
+/// <param name="remove">Set of flags to turn off (exclude)</param>
+public class SetFieldFlagsAttribute(FieldFlags add, FieldFlags remove = FieldFlags.None) : Attribute
 {
-    /// <summary>
-    /// Turn on or off field flags.
-    /// </summary>
-    /// <param name="add">Set of flags to turn on (include)</param>
-    /// <param name="remove">Set of flags to turn off (exclude)</param>
-    public SetFieldFlagsAttribute(FieldFlags add, FieldFlags remove = FieldFlags.None)
-    {
-        Add = add;
-        Remove = remove;
-    }
 
     /// <summary>
     /// Gets the include flags.
@@ -22,7 +17,7 @@ public class SetFieldFlagsAttribute : Attribute
     /// <value>
     /// The include flags.
     /// </value>
-    public FieldFlags Add { get; private set; }
+    public FieldFlags Add { get; private set; } = add;
 
     /// <summary>
     /// Gets the exclude flags.
@@ -30,5 +25,5 @@ public class SetFieldFlagsAttribute : Attribute
     /// <value>
     /// The exclude flags.
     /// </value>
-    public FieldFlags Remove { get; private set; }
+    public FieldFlags Remove { get; private set; } = remove;
 }

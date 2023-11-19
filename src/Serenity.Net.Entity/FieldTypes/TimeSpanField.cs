@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with a TimeSpan value
 /// </summary>
-public sealed class TimeSpanField : GenericValueField<TimeSpan>
+/// <remarks>
+/// Initializes a new instance of the <see cref="TimeSpanField"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public sealed class TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, TimeSpan?> getValue = null, Action<IRow, TimeSpan?> setValue = null) : GenericValueField<TimeSpan>(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TimeSpanField"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, TimeSpan?> getValue = null, Action<IRow, TimeSpan?> setValue = null)
-        : base(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

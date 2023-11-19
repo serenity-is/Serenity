@@ -19,10 +19,12 @@ public static class TSConfigHelper
         IGeneratorFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
-#pragma warning disable CA1510 // Use ArgumentNullException throw helper
+#if ISSOURCEGENERATOR
         if (config is null)
             throw new ArgumentNullException(nameof(config));
-#pragma warning restore CA1510 // Use ArgumentNullException throw helper
+#else
+        ArgumentNullException.ThrowIfNull(config);
+#endif
 
         if (config.Files != null)
         {
@@ -38,14 +40,14 @@ public static class TSConfigHelper
             if (config.Exclude == null || config.Exclude.Length == 0)
                 return null;
 
-            include = new string[] { "**/*" };
+            include = ["**/*"];
         }
 
         var typeRoots = config.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
-            new string[] { "./node_modules/@types" } : config.CompilerOptions.TypeRoots;
+            ["./node_modules/@types"] : config.CompilerOptions.TypeRoots;
 
         var types = new HashSet<string>(config.CompilerOptions?.Types ??
-            Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            [], StringComparer.OrdinalIgnoreCase);
 
         IEnumerable<string> files = typeRoots.Select(typeRoot =>
         {
@@ -77,7 +79,7 @@ public static class TSConfigHelper
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var excludePatterns = (config.Exclude ?? Array.Empty<string>())
+        var excludePatterns = (config.Exclude ?? [])
             .Select(x => PathHelper.ToUrl(x))
             .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
             .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
@@ -183,10 +185,15 @@ public static class TSConfigHelper
 
     public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
     {
-#pragma warning disable CA1510 // Use ArgumentNullException throw helper
+#if ISSOURCEGENERATOR
+        if (fileSystem == null)
+            throw new ArgumentNullException(nameof(fileSystem));
         if (path is null)
             throw new ArgumentNullException(nameof(path));
-#pragma warning restore CA1510 // Use ArgumentNullException throw helper
+#else
+        ArgumentNullException.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(path);
+#endif
 
         try
         {

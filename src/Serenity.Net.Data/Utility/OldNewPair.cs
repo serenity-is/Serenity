@@ -4,21 +4,15 @@
 /// A pair of old new values
 /// </summary>
 /// <typeparam name="TItem">The type of the item.</typeparam>
-public struct OldNewPair<TItem>
+/// <remarks>
+/// Initializes a new instance of the <see cref="OldNewPair{TItem}"/> struct.
+/// </remarks>
+/// <param name="o">The o.</param>
+/// <param name="n">The n.</param>
+public readonly struct OldNewPair<TItem>(TItem o, TItem n)
 {
-    private readonly TItem _old;
-    private readonly TItem _new;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OldNewPair{TItem}"/> struct.
-    /// </summary>
-    /// <param name="o">The o.</param>
-    /// <param name="n">The n.</param>
-    public OldNewPair(TItem o, TItem n)
-    {
-        _old = o;
-        _new = n;
-    }
+    private readonly TItem _old = o;
+    private readonly TItem _new = n;
 
     /// <summary>
     /// Gets the old.
@@ -26,7 +20,7 @@ public struct OldNewPair<TItem>
     /// <value>
     /// The old.
     /// </value>
-    public TItem Old => _old;
+    public readonly TItem Old => _old;
 
     /// <summary>
     /// Gets the new.
@@ -34,5 +28,5 @@ public struct OldNewPair<TItem>
     /// <value>
     /// The new.
     /// </value>
-    public TItem New => _new;
+    public readonly TItem New => _new;
 }

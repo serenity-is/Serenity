@@ -94,7 +94,7 @@ public static partial class Sql
         if (statements == null || statements.Length == 0)
             throw new ArgumentNullException("fields");
 
-        StringBuilder sb = new StringBuilder("COALESCE(");
+        StringBuilder sb = new("COALESCE(");
         sb.Append(statements[0]);
         for (int i = 1; i < statements.Length; i++)
         {
@@ -117,7 +117,7 @@ public static partial class Sql
         if (values == null || values.Length == 0)
             throw new ArgumentNullException("values");
 
-        StringBuilder sb = new StringBuilder("COALESCE(");
+        StringBuilder sb = new("COALESCE(");
 
         for (var i = 0; i < values.Length; i++)
         {
@@ -349,7 +349,7 @@ public static partial class Sql
     /// <exception cref="ArgumentOutOfRangeException">whenThenPairs is empty or contains odd number of elements</exception>
     public static string Case(string condition, string[] whenThenPairs, string elseStatement)
     {
-        StringBuilder sb = new StringBuilder("CASE ");
+        StringBuilder sb = new("CASE ");
         sb.Append(condition);
 
         if (whenThenPairs.Length == 0 ||
@@ -389,8 +389,8 @@ public static partial class Sql
         /// </summary>
         public CaseBuilder()
         {
-            when = new List<ICriteria>();
-            then = new List<object>();
+            when = [];
+            then = [];
         }
 
         /// <summary>
@@ -458,7 +458,7 @@ public static partial class Sql
         /// </exception>
         public string ToString(IQueryWithParams query)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.Append("CASE ");
 
             if (when.Count == 0)

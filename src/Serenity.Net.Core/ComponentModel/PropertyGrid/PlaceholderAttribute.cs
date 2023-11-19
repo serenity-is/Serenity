@@ -5,16 +5,12 @@
 /// when its value is empty. Only editors using basic inputs and Select2 editor
 /// supports this.
 /// </summary>
-public class PlaceholderAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class PlaceholderAttribute(string? value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public PlaceholderAttribute(string? value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value.
@@ -22,5 +18,5 @@ public class PlaceholderAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public string? Value { get; private set; }
+    public string? Value { get; private set; } = value;
 }

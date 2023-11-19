@@ -3,20 +3,14 @@
 /// <summary>
 /// DatePart expression attribute
 /// </summary>
-public class DatePartAttribute : BaseExpressionAttribute
+/// <remarks>
+/// Creates a new instance
+/// </remarks>
+/// <param name="expression">An expression that returns a date value</param>
+/// <param name="part">Datepart like "year", "month" etc.</param>
+/// <exception cref="ArgumentNullException">One of expressions is null</exception>
+public class DatePartAttribute(DateParts part, object expression) : BaseExpressionAttribute
 {
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="expression">An expression that returns a date value</param>
-    /// <param name="part">Datepart like "year", "month" etc.</param>
-    /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public DatePartAttribute(DateParts part, object expression)
-    {
-        Part = part;
-        Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-    }
-
     private static string ToSqliteSpecifier(DateParts datePart)
     {
         return datePart switch
@@ -55,10 +49,10 @@ public class DatePartAttribute : BaseExpressionAttribute
     /// <summary>
     /// Date part
     /// </summary>
-    public DateParts Part { get; }
+    public DateParts Part { get; } = part;
 
     /// <summary>
     /// Date expression
     /// </summary>
-    public object Expression { get; }
+    public object Expression { get; } = expression ?? throw new ArgumentNullException(nameof(expression));
 }

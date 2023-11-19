@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with a DateTimeOffset value
 /// </summary>
-public sealed class DateTimeOffsetField : GenericValueField<DateTimeOffset>
+/// <remarks>
+/// Initializes a new instance of the <see cref="DateTimeOffsetField"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public sealed class DateTimeOffsetField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, DateTimeOffset?> getValue = null, Action<IRow, DateTimeOffset?> setValue = null) : GenericValueField<DateTimeOffset>(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DateTimeOffsetField"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public DateTimeOffsetField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, DateTimeOffset?> getValue = null, Action<IRow, DateTimeOffset?> setValue = null)
-        : base(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

@@ -6,17 +6,12 @@ namespace Serenity.Web;
 /// <summary>
 /// Property processor to pass recaptcha site key to client side
 /// </summary>
-public class RecaptchaPropertyProcessor : PropertyProcessor
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+public class RecaptchaPropertyProcessor(IOptions<RecaptchaSettings> options = null) : PropertyProcessor
 {
-    private readonly IOptions<RecaptchaSettings> options;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    public RecaptchaPropertyProcessor(IOptions<RecaptchaSettings> options = null)
-    {
-        this.options = options;
-    }
+    private readonly IOptions<RecaptchaSettings> options = options;
 
     /// <inheritdoc/>
     public override void Process(IPropertySource source, PropertyItem item)
@@ -37,7 +32,7 @@ public class RecaptchaPropertyProcessor : PropertyProcessor
             }
             else
             {
-                item.EditorParams ??= new();
+                item.EditorParams ??= [];
                 item.EditorParams["siteKey"] = siteKey;
             }
         }

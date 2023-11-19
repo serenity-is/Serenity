@@ -6,16 +6,12 @@
 /// for display / filtering.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class TextualFieldAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="TextualFieldAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class TextualFieldAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TextualFieldAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public TextualFieldAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value.
@@ -23,5 +19,5 @@ public class TextualFieldAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

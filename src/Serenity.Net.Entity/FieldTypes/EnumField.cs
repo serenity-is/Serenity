@@ -50,7 +50,7 @@ public class EnumField<TEnum> : Int32Field
         }
         set
         {
-            int? v = value == null ? (int?)null : Convert.ToInt32(value);
+            int? v = value == null ? null : Convert.ToInt32(value);
             _setValue(row, v);
             row.FieldAssignedValue(this);
         }

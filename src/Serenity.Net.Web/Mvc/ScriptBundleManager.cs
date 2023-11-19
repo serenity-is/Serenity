@@ -78,10 +78,10 @@ public class ScriptBundleManager : IScriptBundleManager
         {
             isEnabled = false;
             var settings = options.Value;
-            var bundles = settings.Bundles ?? new Dictionary<string, string[]>();
+            var bundles = settings.Bundles ?? [];
 
             bundles = bundles.Keys.ToDictionary(k => k,
-                k => (bundles[k] ?? Array.Empty<string>())
+                k => (bundles[k] ?? [])
                     .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
                     .Where(u => !string.IsNullOrEmpty(u))
                     .ToArray());
@@ -126,7 +126,7 @@ public class ScriptBundleManager : IScriptBundleManager
                     if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string> bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        bundleKeysBySourceUrl[sourceFile] = new HashSet<string>();
+                        bundleKeysBySourceUrl[sourceFile] = [];
                     }
 
                     bundleKeys.Add(bundleKey);

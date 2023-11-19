@@ -6,26 +6,19 @@ namespace Serenity.Reporting;
 /// <summary>
 /// Implementation for IWKHtmlToPdfConverter
 /// </summary>
-public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="options">Options</param>
+/// <param name="webHostEnvironment">Host environment</param>
+/// <param name="fileSystem">File system</param>
+public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
+    IWebHostEnvironment webHostEnvironment = null, IFileSystem fileSystem = null) : IWKHtmlToPdfConverter
 {
-    private readonly IOptions<WKHtmlToPdfSettings> options;
-    private readonly IWebHostEnvironment webHostEnvironment;
-    private readonly IFileSystem fileSystem;
+    private readonly IOptions<WKHtmlToPdfSettings> options = options;
+    private readonly IWebHostEnvironment webHostEnvironment = webHostEnvironment;
+    private readonly IFileSystem fileSystem = fileSystem ?? new PhysicalFileSystem();
     private string executablePath;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="options">Options</param>
-    /// <param name="webHostEnvironment">Host environment</param>
-    /// <param name="fileSystem">File system</param>
-    public WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
-        IWebHostEnvironment webHostEnvironment = null, IFileSystem fileSystem = null)
-    {
-        this.options = options;
-        this.webHostEnvironment = webHostEnvironment;
-        this.fileSystem = fileSystem ?? new PhysicalFileSystem();
-    }
 
     /// <summary>
     /// Gets wkhtmltopdf executable path
@@ -48,8 +41,8 @@ public class WKHtmlToPdfConverter : IWKHtmlToPdfConverter
 
         string[] wkhtmlFileNames =
             Environment.OSVersion.Platform == PlatformID.Win32NT ?
-                new[] { "wkhtmltopdf.exe", "wkhtmltopdf.cmd", "wkhtmltopdf.bat" } :
-                new[] { "wkhtmltopdf", "wkhtmltopdf.sh" };
+                ["wkhtmltopdf.exe", "wkhtmltopdf.cmd", "wkhtmltopdf.bat"] :
+                ["wkhtmltopdf", "wkhtmltopdf.sh"];
 
         IEnumerable<string> paths = new[] { assemblyPath };
         string contentRootPath = webHostEnvironment?.ContentRootPath;

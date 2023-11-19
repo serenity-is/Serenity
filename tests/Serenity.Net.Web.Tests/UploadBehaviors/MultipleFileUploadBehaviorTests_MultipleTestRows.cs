@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Web;
+namespace Serenity.Tests.Web;
 
 public partial class MultipleFileUploadBehaviorTests
 {
@@ -21,14 +21,9 @@ public partial class MultipleFileUploadBehaviorTests
         }
     }
 
-    class MultipleCustomEditorImageUploadEditorAttribute : BaseUploadEditorAttribute
+    class MultipleCustomEditorImageUploadEditorAttribute(string editorType) : BaseUploadEditorAttribute(editorType)
     {
         public override bool IsMultiple => true;
-
-        public MultipleCustomEditorImageUploadEditorAttribute(string editorType)
-            : base(editorType)
-        {
-        }
     }
 
     public class MultipleTestIIdRow : Row<MultipleTestIIdRow.RowFields>, IIdRow

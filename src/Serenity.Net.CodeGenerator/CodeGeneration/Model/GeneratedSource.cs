@@ -1,15 +1,8 @@
 ﻿namespace Serenity.CodeGeneration;
 
-public class GeneratedSource
+public class GeneratedSource(string filename, string text, bool module = false)
 {
-    public GeneratedSource(string filename, string text, bool module = false)
-    {
-        Filename = filename;
-        Text = text;
-        Module = module;
-    }
-
-    public string Filename { get; private set; }
-    public string Text { get; private set; }
-    public bool Module { get; private set; }
+    public string Filename { get; private set; } = filename;
+    public string Text { get; private set; } = text;
+    public bool Module { get; private set; } = module;
 }

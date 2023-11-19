@@ -186,7 +186,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     }
 
     private static readonly string[] OperatorToKey =
-    {
+    [
         "()", // Paren
         "not", // Not
         "is null", // IsNull
@@ -205,7 +205,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
         "not in", // NOT IN
         "like", // LIKE
         "not like" // NOT LIKE
-    };
+    ];
 
     private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;
 }

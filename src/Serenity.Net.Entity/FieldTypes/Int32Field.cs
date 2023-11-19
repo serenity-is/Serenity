@@ -5,21 +5,17 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with Int32 value
 /// </summary>
-public class Int32Field : GenericValueField<int>
+/// <remarks>Initializes a new instance of the <see cref="Int32Field" /> class.</remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public class Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null) : GenericValueField<int>(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>Initializes a new instance of the <see cref="Int32Field" /> class.</summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
-        : base(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

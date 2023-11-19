@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with Int16 value
 /// </summary>
-public sealed class Int16Field : GenericValueField<short>
+/// <remarks>
+/// Initializes a new instance of the <see cref="Int16Field"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public sealed class Int16Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, short?> getValue = null, Action<IRow, short?> setValue = null) : GenericValueField<short>(collection, FieldType.Int16, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Int16Field"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public Int16Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, short?> getValue = null, Action<IRow, short?> setValue = null)
-        : base(collection, FieldType.Int16, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

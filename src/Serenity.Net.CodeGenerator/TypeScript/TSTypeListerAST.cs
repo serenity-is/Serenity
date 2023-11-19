@@ -1,4 +1,4 @@
-﻿#if ISSOURCEGENERATOR
+#if ISSOURCEGENERATOR
 using System.Collections.Concurrent;
 #else
 using Serenity.CodeGeneration;
@@ -11,8 +11,8 @@ namespace Serenity.CodeGenerator;
 
 public class TSTypeListerAST
 {
-    private readonly List<string> fileNames = new();
-    private readonly HashSet<string> exportedTypeNames = new();
+    private readonly List<string> fileNames = [];
+    private readonly HashSet<string> exportedTypeNames = [];
     private readonly IGeneratorFileSystem fileSystem;
     private readonly ConcurrentDictionary<string, SourceFile> astCache;
     private readonly TSModuleResolver moduleResolver;
@@ -328,7 +328,7 @@ public class TSTypeListerAST
             }
         }
 
-        return result.Any() ? result : null;
+        return result.Count != 0 ? result : null;
     }
 
     List<string> GetBaseInterfaces(InterfaceDeclaration node)
@@ -391,7 +391,7 @@ public class TSTypeListerAST
 
             if (ce.Arguments != null &&
                 ce.Arguments.Count > 0)
-                result.Arguments ??= new();
+                result.Arguments ??= [];
 
             foreach (var arg in ce.Arguments)
             {
@@ -470,7 +470,7 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = (member as MethodDeclaration);
                 if (md.Type != null)
@@ -489,7 +489,7 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new(),
+                    Arguments = [],
                     IsConstructor = true
                 };
                 var md = member as ConstructorDeclaration;
@@ -550,7 +550,7 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = member as MethodSignature;
                 if (md.Type != null)
@@ -578,7 +578,7 @@ public class TSTypeListerAST
         return result;
     }
 
-    ExternalType EnumToExternalType(EnumDeclaration enumDec)
+    static ExternalType EnumToExternalType(EnumDeclaration enumDec)
     {
         var result = new ExternalType
         {
@@ -673,7 +673,7 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = member as MethodDeclaration;
                 if (md.Type != null)
@@ -751,13 +751,13 @@ public class TSTypeListerAST
                 if (string.IsNullOrEmpty(identifier))
                     continue;
 
-                var resolvedSub = ResolveModule(identifier, sourceFile.FileName, false);
-                if (resolvedSub.fullPath is null ||
-                    visited.Contains(resolvedSub.fullPath))
+                var (moduleName, fullPath) = ResolveModule(identifier, sourceFile.FileName, false);
+                if (fullPath is null ||
+                    visited.Contains(fullPath))
                     continue;
 
-                visited.Add(resolvedSub.fullPath);
-                var subFile = ParseFile(resolvedSub.fullPath, sourceFileInfo?.ModuleName, true);
+                visited.Add(fullPath);
+                var subFile = ParseFile(fullPath, sourceFileInfo?.ModuleName, true);
                 if (subFile is null)
                     continue;
 
@@ -769,12 +769,12 @@ public class TSTypeListerAST
                     type.Namespace = null;
 
                     if (sourceFileInfo?.ModuleName != null &&
-                        !sourceFileInfo.ModuleName.StartsWith("/") &&
-                        !sourceFileInfo.ModuleName.StartsWith("."))
+                        !sourceFileInfo.ModuleName.StartsWith('/') &&
+                        !sourceFileInfo.ModuleName.StartsWith('.'))
                     {
                         if (type.BaseType != null &&
                             type.BaseType.Contains(':') &&
-                            type.BaseType.StartsWith("."))
+                            type.BaseType.StartsWith('.'))
                             type.BaseType = sourceFileInfo.ModuleName + ":" + type.BaseType.Split(':').Last();
 
                         if (type.Attributes != null)
@@ -782,8 +782,8 @@ public class TSTypeListerAST
                             foreach (var attr in type.Attributes)
                             {
                                 if (attr.Type != null &&
-                                    attr.Type.Contains(":", StringComparison.Ordinal) &&
-                                    attr.Type.StartsWith(".", StringComparison.Ordinal))
+                                    attr.Type.Contains(':', StringComparison.Ordinal) &&
+                                    attr.Type.StartsWith('.'))
                                     attr.Type = sourceFileInfo.ModuleName + ":" + attr.Type.Split(':').Last();
                             }
                         }
@@ -945,7 +945,7 @@ public class TSTypeListerAST
             {
                 var sourceFileInfo = sourceFileInfos.GetOrAdd(sourceFile, static (s) => new SourceFileInfo());
                 sourceFileInfo.ModuleName = moduleName;
-                sourceFileInfo.ResolvedModules ??= new();
+                sourceFileInfo.ResolvedModules ??= [];
 
                 foreach (var node in sourceFile.Statements)
                 {
@@ -967,8 +967,7 @@ public class TSTypeListerAST
                             sourceFileInfo.ResolvedModules[sl.Text] = new ResolvedModuleFull
                             {
                                 ResolvedFileName = resolved.fullPath,
-                                IsExternalLibraryImport = !resolved.moduleName.StartsWith("/",
-                                    StringComparison.Ordinal)
+                                IsExternalLibraryImport = !resolved.moduleName.StartsWith('/')
                             };
                         }
                     }
@@ -1024,16 +1023,19 @@ public class TSTypeListerAST
             .Select(x => ResolveModule(x, referencedFrom: null, enqueue: true))
             .ToArray();
 
-        SourceFile[] sourceFiles = Array.Empty<SourceFile>();
+        SourceFile[] sourceFiles = [];
         while (!processFileQueue.IsEmpty)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var currentQueue = processFileQueue.ToArray();
             while (!processFileQueue.IsEmpty)
                 processFileQueue.TryDequeue(out _);
-            sourceFiles = sourceFiles.Concat(currentQueue.AsParallel()
-                .Select(x => ParseFile(x.fullPath, x.moduleName, extractExportsOnly: false)))
-                .ToArray();
+            sourceFiles =
+            [
+                .. sourceFiles,
+                .. currentQueue.AsParallel()
+                    .Select(x => ParseFile(x.fullPath, x.moduleName, extractExportsOnly: false)),
+            ];
         }
 
         exportedTypeNames.Clear();
@@ -1055,7 +1057,7 @@ public class TSTypeListerAST
         foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var result = ExtractTypes(sourceFile, new HashSet<string>());
+            var result = ExtractTypes(sourceFile, []);
             foreach (var r in result)
             {
                 r.SourceFile = sourceFile.FileName;

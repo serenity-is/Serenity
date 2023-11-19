@@ -679,10 +679,10 @@ public class PropertyItem
     /// </summary>
     public PropertyItem()
     {
-        EditorParams = new Dictionary<string, object>();
-        FormatterParams = new Dictionary<string, object>();
-        FilteringParams = new Dictionary<string, object>();
-        QuickFilterParams = new Dictionary<string, object>();
-        ExtensionData = new();
+        EditorParams = [];
+        FormatterParams = [];
+        FilteringParams = [];
+        QuickFilterParams = [];
+        ExtensionData = [];
     }
 }

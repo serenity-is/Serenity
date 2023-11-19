@@ -2,13 +2,8 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class ClientTypesCommand : BaseFileSystemCommand
+public class ClientTypesCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand(fileSystem)
 {
-    public ClientTypesCommand(IGeneratorFileSystem fileSystem) 
-        : base(fileSystem)
-    {
-    }
-
     public void Run(string csproj, List<ExternalType> tsTypes)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);

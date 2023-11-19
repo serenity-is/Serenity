@@ -5,17 +5,13 @@ namespace Serenity.Data.Mapping;
 /// Specifies SQL expression this property corresponds to.
 /// You may use brackets ([]) to escape identifiers. Brackets will be converted to database specific quotes.
 /// </summary>
+/// <remarks>
+/// Specifies SQL expression this property corresponds to.
+/// </remarks>
+/// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-public class ExpressionAttribute : BaseExpressionAttribute
+public class ExpressionAttribute(string value) : BaseExpressionAttribute
 {
-    /// <summary>
-    /// Specifies SQL expression this property corresponds to.
-    /// </summary>
-    /// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
-    public ExpressionAttribute(string value)
-    {
-        Value = value ?? throw new ArgumentNullException(nameof(value));
-    }
 
     /// <summary>
     /// Specifies SQL expression and dialects this property corresponds to.
@@ -37,7 +33,7 @@ public class ExpressionAttribute : BaseExpressionAttribute
     /// <summary>
     /// Gets the expression
     /// </summary>
-    public string Value { get; }
+    public string Value { get; } = value ?? throw new ArgumentNullException(nameof(value));
 
     /// <summary>
     /// Gets or sets the dialect.

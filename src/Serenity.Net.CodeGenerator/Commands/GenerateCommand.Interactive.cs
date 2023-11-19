@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public partial class GenerateCommand
 {
-    private IEnumerable<string> SelectWhatToGenerate()
+    private List<string> SelectWhatToGenerate()
     {
         var whatToGenerate = new List<string>
         {
@@ -83,7 +83,7 @@ public partial class GenerateCommand
                 .DefaultValue(defaultModule));
     }
 
-    private IEnumerable<string> SelectTables(IEnumerable<string> tables)
+    private List<string> SelectTables(IEnumerable<string> tables)
     {
         return ansiConsole.Prompt(
             new MultiSelectionPrompt<string>()

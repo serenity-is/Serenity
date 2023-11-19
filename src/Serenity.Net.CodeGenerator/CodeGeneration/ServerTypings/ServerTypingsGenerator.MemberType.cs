@@ -173,8 +173,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             if (!string.IsNullOrEmpty(type.Module))
             {
                 return AddModuleImport(type.Module, type.Name, external:
-                    !type.Module.StartsWith("/", StringComparison.Ordinal) &&
-                    !type.Module.StartsWith(".", StringComparison.Ordinal));
+                    !type.Module.StartsWith('/') &&
+                    !type.Module.StartsWith('.'));
             }
             else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
             {

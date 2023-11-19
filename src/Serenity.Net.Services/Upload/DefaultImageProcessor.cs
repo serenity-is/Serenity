@@ -65,7 +65,7 @@ public class DefaultImageProcessor : IImageProcessor
 
         IImageEncoder encoder = mimeType switch
         {
-            "image/jpeg" => new JpegEncoder() { Quality = ((encoderParams?.Quality ?? 0) == 0) ? (int?)null : encoderParams.Quality },
+            "image/jpeg" => new JpegEncoder() { Quality = ((encoderParams?.Quality ?? 0) == 0) ? null : encoderParams.Quality },
             "image/png" => new PngEncoder(),
             "image/gif" => new GifEncoder(),
             "image/webp" => new WebpEncoder(),

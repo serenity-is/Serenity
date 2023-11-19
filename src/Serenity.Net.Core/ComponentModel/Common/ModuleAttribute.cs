@@ -5,16 +5,12 @@
 /// under ~/Modules folder entity resides in.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class ModuleAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="ModuleAttribute"/> class.
+/// </remarks>
+/// <param name="module">The module.</param>
+public class ModuleAttribute(string module) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ModuleAttribute"/> class.
-    /// </summary>
-    /// <param name="module">The module.</param>
-    public ModuleAttribute(string module)
-    {
-        Value = module;
-    }
 
     /// <summary>
     /// Gets the module.
@@ -22,5 +18,5 @@ public class ModuleAttribute : Attribute
     /// <value>
     /// The module.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = module;
 }

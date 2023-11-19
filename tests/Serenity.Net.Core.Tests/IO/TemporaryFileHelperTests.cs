@@ -35,8 +35,8 @@ public class TemporaryFileHelperTests
         var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
         System.IO.File.Delete(tempPath);
         System.IO.Directory.CreateDirectory(tempPath);
-        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, ".temporary"), Array.Empty<byte>());
-        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, "deleteme"), Array.Empty<byte>());
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, ".temporary"), []);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, "deleteme"), []);
         System.IO.File.SetCreationTime(System.IO.Path.Combine(tempPath, "deleteme"), DateTime.Now.AddDays(-99999));
         Assert.Equal(2L, System.IO.Directory.GetFiles(tempPath).Length);
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.Zero, maxFilesInDirectory: 0, ".temporary", fileSystem: null);
@@ -50,8 +50,8 @@ public class TemporaryFileHelperTests
         var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
         System.IO.File.Delete(tempPath);
         System.IO.Directory.CreateDirectory(tempPath);
-        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, ".temporary"), Array.Empty<byte>());
-        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, "deleteme"), Array.Empty<byte>());
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, ".temporary"), []);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(tempPath, "deleteme"), []);
         Assert.Equal(2L, System.IO.Directory.GetFiles(tempPath).Length);
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.Zero, maxFilesInDirectory: 0, ".temporary", fileSystem: null);
         Assert.Collection(System.IO.Directory.GetFiles(tempPath), 

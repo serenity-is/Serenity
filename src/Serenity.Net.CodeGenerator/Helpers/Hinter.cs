@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 /// <summary>
 /// Original code from https://github.com/fjunqueira/hinter
@@ -27,7 +27,7 @@ public class Hinter
 
             if (input.Key == ConsoleKey.Backspace)
             {
-                userInput = userInput.Any() ? userInput.Remove(userInput.Length - 1, 1) : string.Empty;
+                userInput = userInput.Length != 0 ? userInput.Remove(userInput.Length - 1, 1) : string.Empty;
                 lastSuggestion = null;
                 lastUserInput = null;
             }
@@ -36,12 +36,12 @@ public class Hinter
                 lastUserInput ??= userInput;
                 var suggestions = hintSource
                     .Where(item => item.Length >= lastUserInput.Length &&
-                        string.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
+                        string.Compare(item[..lastUserInput.Length], lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
                     .Distinct()
                     .OrderBy(x => x)
                     .ToList();
 
-                if (suggestions.Any())
+                if (suggestions.Count != 0)
                 {
                     var idx = lastSuggestion == null ? -1 : suggestions.IndexOf(lastSuggestion);
 

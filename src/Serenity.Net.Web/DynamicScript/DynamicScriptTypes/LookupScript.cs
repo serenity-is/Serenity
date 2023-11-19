@@ -21,7 +21,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// </summary>
     protected LookupScript()
     {
-        lookupParams = new Dictionary<string, object>();
+        lookupParams = [];
     }
 
     /// <inheritdoc/>

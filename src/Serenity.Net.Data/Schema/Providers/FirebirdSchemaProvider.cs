@@ -57,7 +57,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         {
             var fi = new FieldInfo
             {
-                FieldName = ((string)src.FIELD_NAME).TrimToNull()
+                FieldName = src.FIELD_NAME.TrimToNull()
             };
             var fieldType = src.FIELD_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_TYPE, CultureInfo.InvariantCulture);
             var fieldSubType = src.FIELD_SUB_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_SUB_TYPE, CultureInfo.InvariantCulture);

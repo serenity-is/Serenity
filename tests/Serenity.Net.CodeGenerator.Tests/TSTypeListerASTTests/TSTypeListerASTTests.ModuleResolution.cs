@@ -79,7 +79,7 @@ export class B1 {
                 BaseUrl = ".",
                 Paths = new()
                 {
-                    ["my/*"] = new[] { "./zzz/*" }
+                    ["my/*"] = [ "./zzz/*" ]
                 }
             }
         });
@@ -115,7 +115,7 @@ export class B1 {
                 BaseUrl = ".",
                 Paths = new()
                 {
-                    ["my/*"] = new[] { "./nnn", "./zzz/*" }
+                    ["my/*"] = [ "./nnn", "./zzz/*" ]
                 }
             }
         });

@@ -11,7 +11,7 @@ public class EntityField
     public bool OmitInForm { get; set; }
     public string Name { get; set; }
     public string Title { get; set; }
-    public List<AttributeTypeRef> FlagList { get; } = new();
+    public List<AttributeTypeRef> FlagList { get; } = [];
     public string Flags { get => FlagList == null ? null : string.Join(", ", FlagList.Select(x => x.ToString(new CodeWriter { IsCSharp = true }))); }
     public string PKSchema { get; set; }
     public string PKTable { get; set; }
@@ -21,9 +21,9 @@ public class EntityField
     public int? Size { get; set; }
     public int Scale { get; set; }
     public string TextualField { get; set; }
-    public List<AttributeTypeRef> AttributeList { get; } = new();
+    public List<AttributeTypeRef> AttributeList { get; } = [];
     public string Attributes => string.Join(", ", AttributeList.Select(x => x.ToString(new CodeWriter { IsCSharp = true })));
-    public List<AttributeTypeRef> ColAttributeList { get; } = new();
+    public List<AttributeTypeRef> ColAttributeList { get; } = [];
     public string ColAttributes => string.Join(", ", ColAttributeList.Select(x => x.ToString(new CodeWriter { IsCSharp = true })));
     public string Expression { get; set; }
 

@@ -5,9 +5,10 @@ public static class TsExtensions
     public static string[] Exec(this Regex r, string text)
     {
         var result = new List<string>();
-        foreach (Capture x in r.Match(text).Captures)
-            result.Add(x.Value);
-        return result.ToArray();
+        foreach (var x in r.Match(text).Captures)
+            if (x is Capture c)
+                result.Add(c.Value);
+        return [.. result];
     } 
 
     public static bool Test(this Regex r, string text) => r.IsMatch(text);

@@ -5,16 +5,12 @@
 /// the request type, and <see cref="SaveResponse"/> as the response type.
 /// </summary>
 /// <typeparam name="TRow">The entity type</typeparam>
-public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>,
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="context">Request context</param>
+public class SaveRequestHandler<TRow>(IRequestContext context) : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>(context),
     ISaveHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="context">Request context</param>
-    public SaveRequestHandler(IRequestContext context)
-        : base(context)
-    {
-    }
 }

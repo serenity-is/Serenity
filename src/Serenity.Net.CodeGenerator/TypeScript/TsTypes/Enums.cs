@@ -1,4 +1,4 @@
-﻿namespace Serenity.TypeScript.TsTypes;
+namespace Serenity.TypeScript.TsTypes;
 
 [Flags]
 public enum NodeFlags
@@ -328,7 +328,6 @@ public enum SymbolFlags
         (Value | Type) & ~(RegularEnum | ValueModule), // regular enums merge only with regular enums and modules
     ConstEnumExcludes = (Value | Type) & ~ConstEnum, // const enums merge only with const enums
     ValueModuleExcludes = Value & ~(Function | Class | RegularEnum | ValueModule),
-    NamespaceModuleExcludes = 0,
     MethodExcludes = Value & ~Method,
     GetAccessorExcludes = Value & ~SetAccessor,
     SetAccessorExcludes = Value & ~GetAccessor,
@@ -703,10 +702,6 @@ public enum TransformFlags
                           ContainsCapturedLexicalThis | ContainsBlockScopedBinding | ContainsYield |
                           ContainsHoistedDeclarationOrCompletion | ContainsBindingPattern | ContainsObjectRest,
 
-    MethodOrAccessorExcludes = NodeExcludes | ContainsDefaultValueAssignments | ContainsLexicalThis |
-                               ContainsCapturedLexicalThis | ContainsBlockScopedBinding | ContainsYield |
-                               ContainsHoistedDeclarationOrCompletion | ContainsBindingPattern | ContainsObjectRest,
-
     ClassExcludes = NodeExcludes | ContainsDecorators | ContainsPropertyInitializer | ContainsLexicalThis |
                     ContainsCapturedLexicalThis | ContainsComputedPropertyName |
                     ContainsParameterPropertyAssignments | ContainsLexicalThisInComputedPropertyName,
@@ -721,7 +716,6 @@ public enum TransformFlags
     VariableDeclarationListExcludes = NodeExcludes | ContainsBindingPattern | ContainsObjectRest,
     ParameterExcludes = NodeExcludes,
     CatchClauseExcludes = NodeExcludes | ContainsObjectRest,
-    BindingPatternExcludes = NodeExcludes | ContainsRest,
 
     // Masks
     // - Additional bitmasks

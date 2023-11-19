@@ -22,9 +22,8 @@ internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
     }
 }
 
-internal class DeleteHandlerProxy<TRow>
-    : DeleteHandlerProxy<TRow, DeleteRequest, DeleteResponse>, IDeleteHandler<TRow>
+internal class DeleteHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : DeleteHandlerProxy<TRow, DeleteRequest, DeleteResponse>(factory), IDeleteHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public DeleteHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

@@ -1,20 +1,13 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using GlobFilter = Serenity.IO.GlobFilter;
 
 namespace Serenity.CodeGenerator;
 
-public class RestoreCommand : BaseFileSystemCommand
+public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem projectSystem,
+    IEnumerable<string> projectReferences = null) : BaseFileSystemCommand(fileSystem)
 {
-    protected IBuildProjectSystem ProjectSystem { get; }
-    public IEnumerable<string> ProjectReferences { get; }
-
-    public RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem projectSystem,
-        IEnumerable<string> projectReferences = null)
-        : base(fileSystem)
-    {
-        ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
-        ProjectReferences = projectReferences;
-    }
+    protected IBuildProjectSystem ProjectSystem { get; } = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
+    public IEnumerable<string> ProjectReferences { get; } = projectReferences;
 
     public ExitCodes Run(string csproj, bool verbose = false)
     {
@@ -197,7 +190,7 @@ public class RestoreCommand : BaseFileSystemCommand
             var ver = dep.Version.Trim();
             if (ver.EndsWith("-*", StringComparison.Ordinal))
                 ver = ver[0..^2];
-            else if (ver.StartsWith("[", StringComparison.Ordinal) && ver.EndsWith("]", StringComparison.Ordinal))
+            else if (ver.StartsWith('[') && ver.EndsWith(']'))
             {
                 ver = ver[1..^1].Trim();
             }
@@ -353,8 +346,7 @@ public class RestoreCommand : BaseFileSystemCommand
         "Serenity.Net.Web"
     };
 
-    private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, 
-        int depth = 0)
+    private List<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
     {
         var allReferences = new List<string>();
         try

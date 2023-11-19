@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Concat expression attribute
@@ -18,8 +18,8 @@ public class CaseAttribute : BaseExpressionAttribute
         if (restOrElse == null)
             throw new ArgumentNullException(nameof(restOrElse));
 
-        When = new[] { when1 ?? throw new ArgumentNullException(nameof(when1)) };
-        Then = new[] { then1 ?? throw new ArgumentNullException(nameof(then1)) };
+        When = [when1 ?? throw new ArgumentNullException(nameof(when1))];
+        Then = [then1 ?? throw new ArgumentNullException(nameof(then1))];
 
         var modulo = restOrElse.Length % 2;
         if (modulo == 1)
@@ -27,11 +27,19 @@ public class CaseAttribute : BaseExpressionAttribute
 
         if (restOrElse.Length > 1)
         {
-            When = When.Concat(restOrElse.SkipLast(modulo).Where((x, i) => i % 2 == 0)
-                .Select(x => x ?? throw new ArgumentNullException(nameof(restOrElse)))).ToArray();
+            When =
+            [
+                .. When,
+                .. restOrElse.SkipLast(modulo).Where((x, i) => i % 2 == 0)
+                    .Select(x => x ?? throw new ArgumentNullException(nameof(restOrElse))),
+            ];
 
-            Then = Then.Concat(restOrElse.Where((x, i) => i % 2 == 1)
-                .Select(x => x ?? throw new ArgumentNullException(nameof(restOrElse)))).ToArray();
+            Then =
+            [
+                .. Then,
+                .. restOrElse.Where((x, i) => i % 2 == 1)
+                    .Select(x => x ?? throw new ArgumentNullException(nameof(restOrElse))),
+            ];
         }
     }
 
@@ -41,7 +49,7 @@ public class CaseAttribute : BaseExpressionAttribute
         var whenElse = string.Join(" ", When.Select((x, i) =>
             $"WHEN {ToString(x, dialect)} THEN {ToString(Then[i], dialect)}"));
 
-        return "(CASE " + (Switch != null ? (ToString(Switch, dialect) + " ") : "") + 
+        return "(CASE " + (Switch != null ? (ToString(Switch, dialect) + " ") : "") +
             whenElse + (Else != null ? (" ELSE " + ToString(Else, dialect)) : "") + " END)";
     }
 

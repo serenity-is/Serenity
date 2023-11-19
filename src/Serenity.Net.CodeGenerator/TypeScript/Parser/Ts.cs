@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.TypeScript.TsParser;
 
@@ -16,7 +16,7 @@ public class Ts
     {
         if (nodes != null)
             return cbNodes(nodes);
-        return default(T);
+        return default;
     }
 
 
@@ -44,16 +44,16 @@ public class Ts
     {
         if (node == null)
             return null;
-        Func<object, IEnumerable<INode>, INode> visitNodes = (o1, o2) =>
+        INode visitNodes(object o1, IEnumerable<INode> o2)
         {
             var list = o2?.Cast<INode>().ToList();
             if (list != null)
                 if (cbNodeArray == null)
                     return VisitEachNode(cbNode, list);
                 else
-                    return cbNodeArray(list.ToArray());
+                    return cbNodeArray([.. list]);
             return null;
-        };
+        }
         var cbNodes = cbNodeArray;
         switch (node.Kind)
         {
@@ -764,7 +764,7 @@ public class Ts
     }
 
 
-    public bool IsExternalModule(SourceFile file)
+    public static bool IsExternalModule(SourceFile file)
     {
         return file.ExternalModuleIndicator != null;
     }

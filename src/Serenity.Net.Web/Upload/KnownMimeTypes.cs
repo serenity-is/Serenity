@@ -8,7 +8,7 @@ namespace Serenity.Web;
 /// </summary>
 public static class KnownMimeTypes
 {
-    private static readonly IContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
+    private static readonly FileExtensionContentTypeProvider contentTypeProvider = new();
 
     /// <summary>
     ///   (extension -> mime type) pairs for known mime types.</summary>

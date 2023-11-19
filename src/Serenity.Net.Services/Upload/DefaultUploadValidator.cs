@@ -8,30 +8,22 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation for <see cref="IUploadValidator"/>
 /// </summary>
-public class DefaultUploadValidator : IUploadValidator
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="imageProcessor">Image processor</param>
+/// <param name="localizer">Text localizer</param>
+/// <param name="uploadSettings">Upload settings</param>
+/// <param name="logger">Exception logger</param>
+/// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
+public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer,
+    ILogger<DefaultUploadValidator> logger = null,
+    IOptions<UploadSettings> uploadSettings = null) : IUploadValidator
 {
-    private readonly IImageProcessor imageProcessor;
-    private readonly ITextLocalizer localizer;
-    private readonly IOptions<UploadSettings> uploadSettings;
-    private readonly ILogger<DefaultUploadValidator> logger;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="imageProcessor">Image processor</param>
-    /// <param name="localizer">Text localizer</param>
-    /// <param name="uploadSettings">Upload settings</param>
-    /// <param name="logger">Exception logger</param>
-    /// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
-    public DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer, 
-        ILogger<DefaultUploadValidator> logger = null,
-        IOptions<UploadSettings> uploadSettings = null)
-    {
-        this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
-        this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
-        this.uploadSettings = uploadSettings ?? new UploadSettings();
-        this.logger = logger;
-    }
+    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+    private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+    private readonly IOptions<UploadSettings> uploadSettings = uploadSettings ?? new UploadSettings();
+    private readonly ILogger<DefaultUploadValidator> logger = logger;
 
     /// <inheritdoc/>
     public void ValidateFile(IUploadFileConstraints constraints, 
@@ -111,7 +103,7 @@ public class DefaultUploadValidator : IUploadValidator
         isImageExtension = true;
     }
 
-    private static readonly char[] extSep = new char[] { ',', ';' };
+    private static readonly char[] extSep = [',', ';'];
 
     private bool IsExtensionIn(string extensionList, string extension)
     {

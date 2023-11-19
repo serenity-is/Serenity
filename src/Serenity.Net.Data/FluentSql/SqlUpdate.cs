@@ -20,7 +20,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
             throw new ArgumentNullException("tableName");
 
         _tableName = tableName;
-        _nameValuePairs = new List<string>();
+        _nameValuePairs = [];
         _where = new StringBuilder();
     }
 
@@ -247,12 +247,12 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   A new clone.</returns>
     public SqlUpdate Clone()
     {
-        SqlUpdate clone = new SqlUpdate(_tableName);
+        SqlUpdate clone = new(_tableName);
         clone._nameValuePairs.AddRange(_nameValuePairs);
         clone._where.Append(_where.ToString());
         if (_params != null)
         {
-            clone._params = new Dictionary();
+            clone._params = [];
             foreach (var pair in _params)
                 clone._params.Add(pair.Key, pair.Value);
         }
@@ -291,7 +291,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (nameValuePairs.Count % 2 != 0)
             throw new ArgumentOutOfRangeException("nameValuePairs");
 
-        StringBuilder sb = new StringBuilder("UPDATE ", 64 + where.Length +
+        StringBuilder sb = new("UPDATE ", 64 + where.Length +
             nameValuePairs.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName));
         sb.Append(" SET ");

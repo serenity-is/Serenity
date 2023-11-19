@@ -5,9 +5,14 @@ namespace Serenity.Services;
 /// <summary>
 /// Behavior for handling localizable rows / properties
 /// </summary>
-public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="handlerFactory">Default handler factory</param>
+/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
 {
-    private readonly IDefaultHandlerFactory handlerFactory;
+    private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
     private LocalizationRowAttribute attr;
     private int rowPrefixLength;
     private Func<IIdRow> rowFactory;
@@ -20,16 +25,6 @@ public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, I
     private ILocalizationRow localRowInstance;
     private BaseCriteria foreignKeyCriteria;
     private Func<IDictionary> dictionaryFactory;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="handlerFactory">Default handler factory</param>
-    /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
-    public LocalizationBehavior(IDefaultHandlerFactory handlerFactory)
-    {
-        this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-    }
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -108,7 +103,7 @@ public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, I
             return null;
 
         var name = field.Name[rowPrefixLength..];
-        name = localRowInstance.IdField.Name.Substring(0, localRowPrefixLength) + name;
+        name = localRowInstance.IdField.Name[..localRowPrefixLength] + name;
         var match = localRowInstance.FindField(name);
         if (match is null && field.PropertyName != null)
             match = localRowInstance.FindFieldByPropertyName(field.PropertyName);
@@ -275,11 +270,8 @@ public class LocalizationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, I
                 if (!row.IsAssigned(field))
                     continue;
 
-                var match = GetLocalizationMatch(field);
-                if (match is null)
-                    throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
+                var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
                         field.PropertyName ?? field.Name));
-
                 var value = field.AsObject(row);
                 match.AsObject(localRow, value);
 

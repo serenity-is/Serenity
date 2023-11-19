@@ -22,9 +22,8 @@ internal class CreateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
     }
 }
 
-internal class CreateHandlerProxy<TRow>
-    : CreateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>, ICreateHandler<TRow>
+internal class CreateHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : CreateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>(factory), ICreateHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public CreateHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

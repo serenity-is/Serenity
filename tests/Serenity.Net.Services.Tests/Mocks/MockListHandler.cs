@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
 public class MockListHandler<TRow> : IListRequestProcessor, IRequestType<ListRequest>
     where TRow: IRow, new()
@@ -20,7 +20,7 @@ public class MockListHandler<TRow> : IListRequestProcessor, IRequestType<ListReq
 
     public ListResponse<TRow> Response { get; set; } = new ListResponse<TRow>()
     {
-        Entities = new List<TRow>()
+        Entities = []
     };
 
     public IDictionary<string, object> StateBag { get; set; } = new Dictionary<string, object>();

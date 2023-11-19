@@ -278,9 +278,9 @@ public static class UploadStorageExtensions
 
         var baseFile = Path.ChangeExtension(temporaryFile, null);
 
-        foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new[] { ',' }))
+        foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split([',']))
         {
-            var dims = sizeStr.ToUpperInvariant().Split(new[] { 'X' });
+            var dims = sizeStr.ToUpperInvariant().Split(['X']);
             if (dims.Length != 2 ||
                 !int.TryParse(dims[0], out int w) ||
                 !int.TryParse(dims[1], out int h) ||

@@ -20,14 +20,9 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
         Arguments = new[] { this };
     }
 
-    private class PageAuthorizeFilter : IResourceFilter
+    private class PageAuthorizeFilter(PageAuthorizeAttribute attr) : IResourceFilter
     {
-        readonly PageAuthorizeAttribute attr;
-
-        public PageAuthorizeFilter(PageAuthorizeAttribute attr)
-        {
-            this.attr = attr;
-        }
+        readonly PageAuthorizeAttribute attr = attr;
 
         public void OnResourceExecuted(ResourceExecutedContext context)
         {

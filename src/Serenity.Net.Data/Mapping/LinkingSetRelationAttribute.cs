@@ -4,22 +4,15 @@
 /// Specifies a linking set relation (1-N relation of ID values, like a check list.)
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Declares a linking set relation
+/// </remarks>
+/// <param name="rowType">Linking row type</param>
+/// <param name="thisKey">Name of the field in linking row that corresponds to ID in this table</param>
+/// <param name="itemKey">Name of the field in linking row that will hold item values in list</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class LinkingSetRelationAttribute : Attribute
+public sealed class LinkingSetRelationAttribute(Type rowType, string thisKey, string itemKey) : Attribute
 {
-    /// <summary>
-    /// Declares a linking set relation
-    /// </summary>
-    /// <param name="rowType">Linking row type</param>
-    /// <param name="thisKey">Name of the field in linking row that corresponds to ID in this table</param>
-    /// <param name="itemKey">Name of the field in linking row that will hold item values in list</param>
-    public LinkingSetRelationAttribute(Type rowType, string thisKey, string itemKey)
-    {
-        RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
-        ThisKey = thisKey ?? throw new ArgumentNullException(nameof(thisKey));
-        ItemKey = itemKey ?? throw new ArgumentNullException(nameof(itemKey));
-        HandleEqualityFilter = true;
-    }
 
     /// <summary>
     /// Gets the type of the row.
@@ -27,7 +20,7 @@ public sealed class LinkingSetRelationAttribute : Attribute
     /// <value>
     /// The type of the row.
     /// </value>
-    public Type RowType { get; private set; }
+    public Type RowType { get; private set; } = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
     /// <summary>
     /// Gets the this key, e.g. name of field in linking set table that this tables ID field corresponds to.
@@ -35,7 +28,7 @@ public sealed class LinkingSetRelationAttribute : Attribute
     /// <value>
     /// The this key.
     /// </value>
-    public string ThisKey { get; private set; }
+    public string ThisKey { get; private set; } = thisKey ?? throw new ArgumentNullException(nameof(thisKey));
 
     /// <summary>
     /// Gets the item key, e.g. name of the field in linking set table that contains ID's of selected items.
@@ -43,7 +36,7 @@ public sealed class LinkingSetRelationAttribute : Attribute
     /// <value>
     /// The item key.
     /// </value>
-    public string ItemKey { get; private set; }
+    public string ItemKey { get; private set; } = itemKey ?? throw new ArgumentNullException(nameof(itemKey));
 
     /// <summary>
     /// Gets or sets the filter field.
@@ -75,7 +68,7 @@ public sealed class LinkingSetRelationAttribute : Attribute
     /// <value>
     ///   <c>true</c> if should handle equality filter; otherwise, <c>false</c>.
     /// </value>
-    public bool HandleEqualityFilter { get; set; }
+    public bool HandleEqualityFilter { get; set; } = true;
 
     /// <summary>
     /// Forces deletion of linking row records even if master record uses soft delete.

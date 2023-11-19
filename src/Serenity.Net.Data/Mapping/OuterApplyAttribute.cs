@@ -5,19 +5,14 @@
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <seealso cref="ISqlJoin" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="OuterApplyAttribute"/> class.
+/// </remarks>
+/// <param name="alias">The alias.</param>
+/// <param name="innerQuery">The inner query.</param>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-public class OuterApplyAttribute : Attribute, ISqlJoin
+public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, ISqlJoin
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OuterApplyAttribute"/> class.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <param name="innerQuery">The inner query.</param>
-    public OuterApplyAttribute(string alias, string innerQuery)
-    {
-        Alias = alias;
-        InnerQuery = innerQuery;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OuterApplyAttribute"/> class.
@@ -37,7 +32,7 @@ public class OuterApplyAttribute : Attribute, ISqlJoin
     /// <value>
     /// The alias.
     /// </value>
-    public string Alias { get; private set; }
+    public string Alias { get; private set; } = alias;
 
     /// <summary>
     /// Gets the inner query.
@@ -45,7 +40,7 @@ public class OuterApplyAttribute : Attribute, ISqlJoin
     /// <value>
     /// The inner query.
     /// </value>
-    public string InnerQuery { get; private set; }
+    public string InnerQuery { get; private set; } = innerQuery;
 
     /// <summary>
     /// Gets the property prefix.

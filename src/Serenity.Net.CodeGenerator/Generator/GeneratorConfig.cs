@@ -309,10 +309,10 @@ public class GeneratorConfig
 
     public GeneratorConfig()
     {
-        Connections = new List<Connection>();
-        BaseRowClasses = new List<BaseRowClass>();
-        CustomSettings = new Dictionary<string, object>();
-        CustomGenerate = new Dictionary<string, string>();
+        Connections = [];
+        BaseRowClasses = [];
+        CustomSettings = [];
+        CustomGenerate = [];
         GenerateRow = true;
         GenerateService = true;
         GenerateUI = true;
@@ -350,7 +350,7 @@ public class GeneratorConfig
         /// </summary>
         public Connection()
         {
-            Tables = new List<Table>();
+            Tables = [];
         }
 
         /// <summary>

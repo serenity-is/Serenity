@@ -6,15 +6,11 @@
 /// or <see cref="ReadPermissionAttribute"/> from the target type, which is usually
 /// a Row class.
 /// </summary>
-public class AuthorizeUpdateAttribute : ServiceAuthorizeAttribute
+/// <remarks>
+/// Creates a new instance of the attribute
+/// </remarks>
+/// <param name="sourceType">Source type</param>
+public class AuthorizeUpdateAttribute(Type sourceType) : ServiceAuthorizeAttribute(sourceType, typeof(UpdatePermissionAttribute),
+          typeof(ModifyPermissionAttribute), typeof(ReadPermissionAttribute))
 {
-    /// <summary>
-    /// Creates a new instance of the attribute
-    /// </summary>
-    /// <param name="sourceType">Source type</param>
-    public AuthorizeUpdateAttribute(Type sourceType)
-        : base(sourceType, typeof(UpdatePermissionAttribute),
-              typeof(ModifyPermissionAttribute), typeof(ReadPermissionAttribute))
-    {
-    }
 }

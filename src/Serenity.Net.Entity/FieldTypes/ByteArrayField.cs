@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with a byte[] value
 /// </summary>
-public class ByteArrayField : CustomClassField<byte[]>
+/// <remarks>
+/// Initializes a new instance of the <see cref="ByteArrayField"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public class ByteArrayField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, byte[]> getValue = null, Action<IRow, byte[]> setValue = null) : CustomClassField<byte[]>(collection, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ByteArrayField"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public ByteArrayField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, byte[]> getValue = null, Action<IRow, byte[]> setValue = null)
-        : base(collection, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

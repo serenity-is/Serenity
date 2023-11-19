@@ -4,15 +4,9 @@ using System.IO;
 
 namespace Serenity.CodeGenerator;
 
-public class ServerTypingsCommand : BaseFileSystemCommand
+public class ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool modules) : BaseFileSystemCommand(fileSystem)
 {
-    private readonly bool modules;
-
-    public ServerTypingsCommand(IGeneratorFileSystem fileSystem, bool modules) 
-        : base(fileSystem)
-    {
-        this.modules = modules;
-    }
+    private readonly bool modules = modules;
 
     public void Run(string csproj, List<ExternalType> tsTypes)
     {
@@ -71,7 +65,7 @@ public class ServerTypingsCommand : BaseFileSystemCommand
         {
             var modulesDir = fileSystem.Combine(projectDir, "Modules");
             if (!fileSystem.DirectoryExists(modulesDir) ||
-                !fileSystem.GetFiles(modulesDir, "*.*").Any())
+                fileSystem.GetFiles(modulesDir, "*.*").Length == 0)
             {
                 var rootNsDir = fileSystem.Combine(projectDir, Path.GetFileName(csproj));
                 if (fileSystem.DirectoryExists(rootNsDir))
@@ -107,7 +101,7 @@ public class ServerTypingsCommand : BaseFileSystemCommand
             fileSystem.Combine(projectDir, PathHelper.ToPath(outDir)),
             generatedSources.Where(x => x.Module == modules)
                 .Select(x => (x.Filename, x.Text)),
-            deleteExtraPattern: new[] { "*.ts" },
+            deleteExtraPattern: ["*.ts"],
             endOfLine: config.EndOfLine);
     }
 
@@ -145,12 +139,12 @@ public class ServerTypingsCommand : BaseFileSystemCommand
             {
                 if (fileSystem.FileExists(outputPath2) &&
                     fileSystem.GetLastWriteTime(outputPath1) < fileSystem.GetLastWriteTime(outputPath2))
-                    assemblyFiles = new[] { outputPath2 };
+                    assemblyFiles = [outputPath2];
                 else
-                    assemblyFiles = new[] { outputPath1 };
+                    assemblyFiles = [outputPath1];
             }
             else if (fileSystem.FileExists(outputPath2))
-                assemblyFiles = new[] { outputPath2 };
+                assemblyFiles = [outputPath2];
             else
             {
                 onError(string.Format(CultureInfo.CurrentCulture,

@@ -6,7 +6,17 @@ namespace Serenity.Services;
 /// Behavior class that handles <see cref="MultipleFileUploadEditorAttribute"/> and
 /// <see cref="MultipleImageUploadEditorAttribute"/>.
 /// </summary>
-public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="uploadValidator">Upload validator</param>
+/// <param name="imageProcessor">Image processor</param>
+/// <param name="storage">Upload storage</param>
+/// <param name="formatSanitizer">Filename format sanitizer</param>
+/// <exception cref="ArgumentNullException">One of the arguments is null</exception>
+public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
+    IUploadStorage storage,
+    IFilenameFormatSanitizer formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field Target { get; set; }
@@ -15,28 +25,10 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
     private string fileNameFormat;
     private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
     private Dictionary<string, Field> replaceFields;
-    private readonly IFilenameFormatSanitizer formatSanitizer;
-    private readonly IUploadValidator uploadValidator;
-    private readonly IImageProcessor imageProcessor;
-    private readonly IUploadStorage storage;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="uploadValidator">Upload validator</param>
-    /// <param name="imageProcessor">Image processor</param>
-    /// <param name="storage">Upload storage</param>
-    /// <param name="formatSanitizer">Filename format sanitizer</param>
-    /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
-    public MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-        IUploadStorage storage,
-        IFilenameFormatSanitizer formatSanitizer = null)
-    {
-        this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-        this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
-        this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        this.formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
-    }
+    private readonly IFilenameFormatSanitizer formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
+    private readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
+    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+    private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -225,7 +217,7 @@ public class MultipleFileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehav
             return;
 
         var filesToDelete = handler.StateBag[GetType().FullName + "_" + Target.Name + "_FilesToDelete"] as FilesToDelete;
-        var copyResult = CopyTemporaryFiles(handler, Array.Empty<UploadedFile>(), newFileList, filesToDelete);
+        var copyResult = CopyTemporaryFiles(handler, [], newFileList, filesToDelete);
         var idField = handler.Row.IdField;
 
         new SqlUpdate(handler.Row.Table)

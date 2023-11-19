@@ -4,17 +4,13 @@
 /// Sets the enumeration key of an enum
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="EnumKeyAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
 [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
-public class EnumKeyAttribute : Attribute
+public class EnumKeyAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EnumKeyAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public EnumKeyAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the enum key.
@@ -22,5 +18,5 @@ public class EnumKeyAttribute : Attribute
     /// <value>
     /// The enum key.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

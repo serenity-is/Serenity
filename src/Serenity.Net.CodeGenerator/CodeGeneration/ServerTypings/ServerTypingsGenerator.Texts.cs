@@ -89,7 +89,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 Indentation = 4
             };
             jw.WriteStartObject();
-            List<string> stack = new();
+            List<string> stack = [];
             int stackCount = 0;
             for (int i = 0; i < list.Count; i++)
             {

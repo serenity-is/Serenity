@@ -53,8 +53,7 @@ public static class UploadPathHelper
         int tries = 0;
         while (exists(path) && ++tries < 10000)
         {
-            if (baseFileName == null)
-                baseFileName = Path.ChangeExtension(path, null);
+            baseFileName ??= Path.ChangeExtension(path, null);
 
             path = baseFileName + " (" + tries + ")" + (extension ?? "");
         }

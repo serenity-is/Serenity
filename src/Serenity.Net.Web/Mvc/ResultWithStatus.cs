@@ -7,7 +7,12 @@ namespace Serenity.Services;
 /// An action result type containing a object with status code
 /// </summary>
 /// <typeparam name="TResponse">Response data type</typeparam>
-public class ResultWithStatus<TResponse> : StatusCodeResult
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="data">Data object</param>
+/// <param name="statusCode">Status code</param>
+public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : StatusCodeResult(statusCode)
 {
     /// <summary>
     /// Content encoding
@@ -22,24 +27,12 @@ public class ResultWithStatus<TResponse> : StatusCodeResult
     /// <summary>
     /// JSON serializer settings
     /// </summary>
-    public JsonSerializerOptions SerializerOptions { get; set; }
+    public JsonSerializerOptions SerializerOptions { get; set; } = JSON.Defaults.Strict;
 
     /// <summary>
     /// The data
     /// </summary>
-    public TResponse Data { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="data">Data object</param>
-    /// <param name="statusCode">Status code</param>
-    public ResultWithStatus(int statusCode, TResponse data)
-        : base(statusCode)
-    {
-        Data = data;
-        SerializerOptions = JSON.Defaults.Strict;
-    }
+    public TResponse Data { get; set; } = data;
 
     /// <inheritdoc/>
     public override void ExecuteResult(ActionContext context)

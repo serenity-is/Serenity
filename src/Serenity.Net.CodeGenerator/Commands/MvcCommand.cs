@@ -1,12 +1,7 @@
 ﻿namespace Serenity.CodeGenerator;
 
-public class MvcCommand : BaseFileSystemCommand
+public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand(fileSystem)
 {
-    public MvcCommand(IGeneratorFileSystem fileSystem) 
-        : base(fileSystem)
-    {
-    }
-
     public void Run(string csproj)
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
@@ -21,21 +16,21 @@ public class MvcCommand : BaseFileSystemCommand
         Console.ResetColor();
         Console.WriteLine(outDir);
 
-        string[] stripViewPaths = config.MVC.StripViewPaths ?? new string[] {
+        string[] stripViewPaths = config.MVC.StripViewPaths ?? [
             "Modules/",
             "Views/",
             fileSystem.GetFileNameWithoutExtension(csproj) + "/",
             "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
-        };
+        ];
 
         var rootDir = projectDir + System.IO.Path.DirectorySeparatorChar;
         var searchViewPaths = (config.MVC.SearchViewPaths ??
-            new string[] {
+            [
                 "Modules/",
                 "Views/",
                 fileSystem.GetFileNameWithoutExtension(csproj) + "/",
                 "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
-            })
+            ])
             .Select(x => fileSystem.Combine(rootDir, PathHelper.ToPath(x)));
 
         IEnumerable<string> files = new List<string>();
@@ -94,7 +89,7 @@ public class MvcCommand : BaseFileSystemCommand
                         continue;
 
                     processed.Add(name);
-                    var parts = name.Split(new char[] { '/' });
+                    var parts = name.Split(['/']);
 
                     if (parts.Length == 0)
                         continue;

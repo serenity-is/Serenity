@@ -411,16 +411,16 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                                     fieldInfo.Name, rowType.Name));
                         }
 
-                        object[] prm = new object[7];
-                        prm[0] = this; // owner
-                        prm[1] = column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name);
-                        prm[2] = display != null ? new LocalText(display.DisplayName) : null;
-                        prm[3] = size != null ? size.Value : 0;
-
-                        prm[4] = (FieldFlags.Default ^ removeFlags) | addFlags;
-                        prm[5] = null;
-                        prm[6] = null;
-
+                        object[] prm =
+                        [
+                            this, // owner
+                            column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
+                            display != null ? new LocalText(display.DisplayName) : null,
+                            size != null ? size.Value : 0,
+                            (FieldFlags.Default ^ removeFlags) | addFlags,
+                            null,
+                            null,
+                        ];
                         if (rowFields.TryGetValue("_" + property.Name, out FieldInfo storage) ||
                             rowFields.TryGetValue("m_" + property.Name, out storage) ||
                             rowFields.TryGetValue(property.Name, out storage))
@@ -674,7 +674,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             byAttribute.TryGetValue(attrType, out Field[] fieldList))
             return fieldList;
 
-        List<Field> newList = new();
+        List<Field> newList = [];
 
         foreach (var field in this)
         {
@@ -688,7 +688,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             }
         }
 
-        fieldList = newList.ToArray();
+        fieldList = [.. newList];
 
         if (byAttribute == null)
         {
@@ -711,9 +711,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
     private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)
     {
-        Type[] arguments = new Type[1];
-        arguments[0] = typeof(IRow);
-
+        Type[] arguments = [typeof(IRow)];
         var getter = new DynamicMethod(string.Concat("_Get", fieldInfo.Name, "_"),
             fieldInfo.FieldType, arguments, fieldInfo.DeclaringType);
 
@@ -727,10 +725,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
     private static Delegate CreateFieldSetMethod(FieldInfo fieldInfo)
     {
-        Type[] arguments = new Type[2];
-        arguments[0] = typeof(IRow);
-        arguments[1] = fieldInfo.FieldType;
-
+        Type[] arguments = [typeof(IRow), fieldInfo.FieldType];
         var getter = new DynamicMethod(string.Concat("_Set", fieldInfo.Name, "_"),
             null, arguments, fieldInfo.DeclaringType);
 
@@ -1189,16 +1184,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         aliasDot = newAlias + ".";
     }
 
-    private class ReplacedJoin : Join
+    private class ReplacedJoin(IDictionary<string, Join> joins,
+        string toTable, string alias, ICriteria onCriteria, string keyword) : Join(joins, toTable, alias, onCriteria)
     {
-        private readonly string keyword;
-
-        public ReplacedJoin(IDictionary<string, Join> joins,
-            string toTable, string alias, ICriteria onCriteria, string keyword)
-            : base(joins, toTable, alias, onCriteria)
-        {
-            this.keyword = keyword;
-        }
+        private readonly string keyword = keyword;
 
         public override string GetKeyword()
         {

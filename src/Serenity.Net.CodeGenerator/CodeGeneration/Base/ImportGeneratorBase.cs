@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public abstract class ImportGeneratorBase : CodeGeneratorBase
 {
@@ -6,15 +6,13 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
     public ImportGeneratorBase()
     {
-        RootNamespaces = new HashSet<string>
-        {
-            "Serenity"
-        };
-
-        tsTypes = new Dictionary<string, ExternalType>();
+        RootNamespaces = [ "Serenity" ];
+        tsTypes = [];
     }
 
     public HashSet<string> RootNamespaces { get; private set; }
+
+    private static readonly char[] genericSep = ['€'];
 
     public void AddTSType(ExternalType type)
     {
@@ -35,10 +33,10 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
     protected static string[] SplitGenericArguments(ref string typeName)
     {
         if (!typeName.Contains('<'))
-            return Array.Empty<string>();
+            return [];
 
-        var pos = typeName.IndexOf("<", StringComparison.Ordinal);
-        var last = typeName.LastIndexOf(">", StringComparison.Ordinal);
+        var pos = typeName.IndexOf('<');
+        var last = typeName.LastIndexOf('>');
         if (pos >= 0 && last > pos)
         {
             char[] c = typeName.Substring(pos + 1, last - pos - 1).ToCharArray();
@@ -55,10 +53,10 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
                     c[i] = '€';
             }
 
-            return new string(c).Split(new char[] { '€' });
+            return new string(c).Split(genericSep);
         }
         else
-            return Array.Empty<string>();
+            return [];
     }
 
     protected string RemoveRootNamespace(string ns, string name)

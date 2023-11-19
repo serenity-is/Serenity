@@ -13,6 +13,7 @@ public class EntityCodeGenerator
     private readonly string typingClass;
     private readonly bool modularTS;
     private readonly string modulesPath;
+    private static readonly char[] slashNSeparator = ['\n'];
 
     public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
     {
@@ -120,13 +121,13 @@ public class EntityCodeGenerator
 
                 var templateKey = pair.Key;
                 if (templateKey.Contains("..", StringComparison.Ordinal) ||
-                    templateKey.StartsWith("\\", StringComparison.Ordinal) ||
+                    templateKey.StartsWith('\\') ||
                     templateKey.StartsWith("//", StringComparison.Ordinal))
                     throw new ArgumentOutOfRangeException("templateFile");
 
                 var outputFile = pair.Value;
                 if (outputFile.Contains("..", StringComparison.Ordinal) || 
-                    outputFile.StartsWith("\\", StringComparison.Ordinal) ||
+                    outputFile.StartsWith('\\') ||
                     outputFile.StartsWith("//", StringComparison.Ordinal))
                     throw new ArgumentOutOfRangeException("outputFile");
 
@@ -270,7 +271,7 @@ public class EntityCodeGenerator
         else
         {
             var lines = fileSystem.ReadAllText(file).Replace("\r", "").Split('\n').ToList();
-            var toInsert = code.Replace("\r", "", StringComparison.Ordinal).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var toInsert = code.Replace("\r", "", StringComparison.Ordinal).Split(slashNSeparator, StringSplitOptions.RemoveEmptyEntries);
             var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using ", StringComparison.Ordinal));
             if (usingIndex < 0)
                 usingIndex = 0;

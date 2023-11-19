@@ -131,7 +131,7 @@ public static class ServiceCollectionExtensions
                 if (interfacesToAdd.TryGetValue(intf, out var list))
                     list.Add(type);
                 else
-                    interfacesToAdd[intf] = new List<Type> { type };
+                    interfacesToAdd[intf] = [type];
             }
         }
 

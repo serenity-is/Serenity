@@ -3,16 +3,11 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class ModularTSImporter
+public class ModularTSImporter(string currentModule)
 {
-    private readonly List<ModuleImport> moduleImports = new();
-    private readonly HashSet<string> moduleImportAliases = new();
-    private readonly string currentModule;
-
-    public ModularTSImporter(string currentModule)
-    {
-        this.currentModule = currentModule;
-    }
+    private readonly List<ModuleImport> moduleImports = [];
+    private readonly HashSet<string> moduleImportAliases = [];
+    private readonly string currentModule = currentModule;
 
     protected string ImportFromTypes(string name)
     {
@@ -71,14 +66,14 @@ public class ModularTSImporter
             .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
     }
 
-    private string FromOrderKey(string from)
+    private static string FromOrderKey(string from)
     {
         if (from == null)
             return null;
 
         /// local imports ordered last
-        return (from.StartsWith(".", StringComparison.Ordinal) ||
-            from.StartsWith("/", StringComparison.Ordinal)) ?
+        return (from.StartsWith('.') ||
+            from.StartsWith('/')) ?
             char.MaxValue + from : from;
     }
 

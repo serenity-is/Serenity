@@ -23,12 +23,12 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         });
     }
 
-    private static readonly string[] nameRowInterface = new[] { "Serenity.Data.INameRow" };
-    private static readonly string[] idRowInterface = new[] { "Serenity.Data.IIdRow" };
-    private static readonly string[] isActiveDeletedRowInterfaces = new[] {
+    private static readonly string[] nameRowInterface = ["Serenity.Data.INameRow"];
+    private static readonly string[] idRowInterface = ["Serenity.Data.IIdRow"];
+    private static readonly string[] isActiveDeletedRowInterfaces = [
         "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow"
-    };
-    private static readonly string[] isDeletedRowInterfaces = new[] { "Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow" };
+    ];
+    private static readonly string[] isDeletedRowInterfaces = ["Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow"];
 
     private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
     {

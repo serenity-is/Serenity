@@ -10,13 +10,13 @@ namespace Serenity.Tests.CodeGenerator
             {
                 Name = "Widget",
                 Namespace = "Serenity",
-                GenericParameters = new()
-                {
+                GenericParameters =
+                [
                     new()
                     {
                         Name = "TOptions",
                     }
-                }
+                ]
             });
             var result = generator.Run();
             var code = Assert.Single(result).Text;

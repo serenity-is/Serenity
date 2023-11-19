@@ -4,24 +4,20 @@
 /// Field with a RowList value
 /// </summary>
 /// <typeparam name="TForeign">The type of the foreign.</typeparam>
+/// <remarks>
+/// Initializes a new instance of the <see cref="RowListField{TForeign}"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
 [NotMapped]
-public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign : class, IRow
+public class RowListField<TForeign>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, List<TForeign>> getValue = null, Action<IRow, List<TForeign>> setValue = null) : CustomClassField<List<TForeign>>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RowListField{TForeign}"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-        Func<IRow, List<TForeign>> getValue = null, Action<IRow, List<TForeign>> setValue = null)
-        : base(collection, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Compares the values.

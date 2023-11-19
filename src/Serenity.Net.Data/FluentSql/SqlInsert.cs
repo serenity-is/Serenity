@@ -16,7 +16,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentNullException("tableName");
 
         this.tableName = tableName;
-        nameValuePairs = new List<string>();
+        nameValuePairs = [];
         cachedQuery = null;
     }
 
@@ -128,7 +128,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <returns>Clone.</returns>
     public SqlInsert Clone()
     {
-        SqlInsert clone = new SqlInsert(tableName);
+        SqlInsert clone = new(tableName);
         clone.nameValuePairs.AddRange(nameValuePairs);
         CloneParams(clone);
         clone.cachedQuery = cachedQuery;
@@ -180,7 +180,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (nameValuePairs.Count % 2 != 0)
             throw new ArgumentOutOfRangeException("nameValuePairs");
 
-        StringBuilder sb = new StringBuilder("INSERT INTO ", 64 + nameValuePairs.Count * 16);
+        StringBuilder sb = new("INSERT INTO ", 64 + nameValuePairs.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName));
         sb.Append(" (");
         for (int i = 0; i < nameValuePairs.Count; i += 2)

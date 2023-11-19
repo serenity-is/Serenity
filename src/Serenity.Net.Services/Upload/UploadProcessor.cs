@@ -5,22 +5,18 @@ namespace Serenity.Web;
 /// <summary>
 /// Obsolete class for upload processing
 /// </summary>
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="storage">Upload storage</param>
+/// <param name="_">Exception logger, not used.</param>
+/// <exception cref="ArgumentNullException">Storage is null</exception>
 [Obsolete("Please inject and use IUploadProcessor interface")]
-public class UploadProcessor : ProcessedUploadInfo
+#pragma warning disable CS9113 // Parameter is unread.
+public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) : ProcessedUploadInfo
+#pragma warning restore CS9113 // Parameter is unread.
 {
-    private readonly IUploadStorage storage;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="storage">Upload storage</param>
-    /// <param name="_">Exception logger, not used.</param>
-    /// <exception cref="ArgumentNullException">Storage is null</exception>
-    public UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null)
-    {
-        ThumbBackColor = null;
-        this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
-    }
+    private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
 
     /// <summary>
     /// Thumb width
@@ -35,7 +31,7 @@ public class UploadProcessor : ProcessedUploadInfo
     /// <summary>
     /// Thumb back color
     /// </summary>
-    public string ThumbBackColor { get; set; }
+    public string ThumbBackColor { get; set; } = null;
 
     /// <summary>
     /// Thumb scale mode

@@ -81,7 +81,7 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
         var data = new PropertyItemsData
         {
             Items = propertyProvider.GetPropertyItemsFor(type).ToList(),
-            AdditionalItems = new()
+            AdditionalItems = []
         };
 
         if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))

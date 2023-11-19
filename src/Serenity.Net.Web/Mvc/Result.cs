@@ -8,7 +8,11 @@ namespace Serenity.Services;
 /// An action result type containing a object
 /// </summary>
 /// <typeparam name="TResponse">Response data type</typeparam>
-public class Result<TResponse> : ActionResult
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="data">Data object</param>
+public class Result<TResponse>(TResponse data) : ActionResult
 {
     /// <summary>
     /// Content encoding
@@ -23,22 +27,12 @@ public class Result<TResponse> : ActionResult
     /// <summary>
     /// JSON serializer settings
     /// </summary>
-    public JsonSerializerOptions SerializerOptions { get; set; }
+    public JsonSerializerOptions SerializerOptions { get; set; } = JSON.Defaults.Strict;
 
     /// <summary>
     /// The data
     /// </summary>
-    public TResponse Data { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="data">Data object</param>
-    public Result(TResponse data)
-    {
-        Data = data;
-        SerializerOptions = JSON.Defaults.Strict;
-    }
+    public TResponse Data { get; set; } = data;
 
     /// <inheritdoc/>
     public override void ExecuteResult(ActionContext context)

@@ -22,17 +22,15 @@ internal class ListHandlerProxy<TRow, TListRequest, TListResponse>
     }
 }
 
-internal class ListHandlerProxy<TRow, TListRequest>
-    : ListHandlerProxy<TRow, TListRequest, ListResponse<TRow>>, IListHandler<TRow, TListRequest>
+internal class ListHandlerProxy<TRow, TListRequest>(IDefaultHandlerFactory factory)
+    : ListHandlerProxy<TRow, TListRequest, ListResponse<TRow>>(factory), IListHandler<TRow, TListRequest>
     where TRow : class, IRow, IIdRow, new()
     where TListRequest : ListRequest
 {
-    public ListHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }
 
-internal class ListHandlerProxy<TRow>
-    : ListHandlerProxy<TRow, ListRequest, ListResponse<TRow>>, IListHandler<TRow>
+internal class ListHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : ListHandlerProxy<TRow, ListRequest, ListResponse<TRow>>(factory), IListHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public ListHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

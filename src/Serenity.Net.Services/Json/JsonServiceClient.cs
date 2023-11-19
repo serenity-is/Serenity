@@ -7,7 +7,11 @@ namespace Serenity.Services;
 /// <summary>
 /// A JSON service client implementation
 /// </summary>
-public class JsonServiceClient
+/// <remarks>
+/// Creates an instance of JsonServiceClient for the passed baseUrl
+/// </remarks>
+/// <param name="baseUrl">The base url</param>
+public class JsonServiceClient(string baseUrl)
 {
     /// <summary>
     /// Cookie container
@@ -15,19 +19,9 @@ public class JsonServiceClient
     protected CookieContainer cookies = new();
 
     /// <summary>
-    /// Creates an instance of JsonServiceClient for the passed baseUrl
-    /// </summary>
-    /// <param name="baseUrl">The base url</param>
-    public JsonServiceClient(string baseUrl)
-    {
-        BaseUrl = baseUrl;
-        cookies = new CookieContainer();
-    }
-
-    /// <summary>
     /// Base url for the client
     /// </summary>
-    protected string BaseUrl { get; set; }
+    protected string BaseUrl { get; set; } = baseUrl;
 
     /// <summary>
     /// Post to JSON service

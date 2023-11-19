@@ -1,24 +1,14 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-public class MockRequestContext : IRequestContext
+public class MockRequestContext(IBehaviorProvider behaviors = null,
+    ITwoLevelCache cache = null,
+    ITextLocalizer localizer = null,
+    IPermissionService permissions = null,
+    ClaimsPrincipal user = null) : IRequestContext
 {
-    public IBehaviorProvider Behaviors { get; }
-    public ITwoLevelCache Cache { get; }
-    public ITextLocalizer Localizer { get; }
-    public IPermissionService Permissions { get; }
-    public ClaimsPrincipal User { get; }
-    
-    
-    public MockRequestContext(IBehaviorProvider behaviors = null,
-        ITwoLevelCache cache = null,
-        ITextLocalizer localizer = null,
-        IPermissionService permissions = null,
-        ClaimsPrincipal user = null)
-    {
-        Behaviors = behaviors;
-        Cache = cache;
-        Localizer = localizer;
-        Permissions = permissions;
-        User = user;
-    }
+    public IBehaviorProvider Behaviors { get; } = behaviors;
+    public ITwoLevelCache Cache { get; } = cache;
+    public ITextLocalizer Localizer { get; } = localizer;
+    public IPermissionService Permissions { get; } = permissions;
+    public ClaimsPrincipal User { get; } = user;
 }

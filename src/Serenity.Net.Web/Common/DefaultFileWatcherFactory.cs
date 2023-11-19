@@ -12,7 +12,7 @@ public class DefaultFileWatcherFactory : IFileWatcherFactory
     /// </summary>
     public DefaultFileWatcherFactory()
     {
-        watchers = new List<IFileWatcher>();
+        watchers = [];
     }
 
     /// <inheritdoc/>

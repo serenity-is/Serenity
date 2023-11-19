@@ -5,23 +5,17 @@ namespace Serenity.Web;
 /// <summary>
 /// Adds impersonation support to any IUserContext implementation
 /// </summary>
-public class ImpersonatingUserAccessor : IUserAccessor, IImpersonator
+/// <remarks>
+/// Initializes a new instance of the <see cref="ImpersonatingUserAccessor"/> class
+/// that wraps passed authorization service and adds impersonation support.
+/// </remarks>
+/// <param name="userContext">The user accessor service to wrap with impersonation support.</param>
+/// <param name="itemsAccessor">Request items accessor</param>
+public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextItemsAccessor itemsAccessor) : IUserAccessor, IImpersonator
 {
-    private readonly IUserAccessor userContext;
-    private readonly IHttpContextItemsAccessor requestContext;
+    private readonly IUserAccessor userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
+    private readonly IHttpContextItemsAccessor requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
     private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImpersonatingUserAccessor"/> class
-    /// that wraps passed authorization service and adds impersonation support.
-    /// </summary>
-    /// <param name="userContext">The user accessor service to wrap with impersonation support.</param>
-    /// <param name="itemsAccessor">Request items accessor</param>
-    public ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextItemsAccessor itemsAccessor)
-    {
-        this.userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-        requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
-    }
 
     private Stack<ClaimsPrincipal>? GetImpersonationStack(bool createIfNull)
     {

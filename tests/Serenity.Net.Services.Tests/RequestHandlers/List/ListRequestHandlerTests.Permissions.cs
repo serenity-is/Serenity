@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Services;
+namespace Serenity.Tests.Services;
 
 public partial class ListRequestHandlerTests
 {
@@ -56,7 +56,7 @@ public partial class ListRequestHandlerTests
             TestRow.Fields.Select(x => x.Name).Where(x => x != TestRow.Fields.ExtraSpecialField.Name)
         ), new()
         {
-            IncludeColumns = new() {TestRow.Fields.ExtraSpecialField.Name}
+            IncludeColumns = [TestRow.Fields.ExtraSpecialField.Name]
         });
     }
     
@@ -70,7 +70,7 @@ public partial class ListRequestHandlerTests
             TestRow.Fields.Where(x => x.IsLookup).Select(x => x.Name)
         ), new()
         {
-            IncludeColumns = new() {TestRow.Fields.NormalField.Name}
+            IncludeColumns = [TestRow.Fields.NormalField.Name]
         });
     }
 
@@ -83,7 +83,7 @@ public partial class ListRequestHandlerTests
         Assert.Throws<ValidationError>(() => handler.List(new NullDbConnection(), new()));
     }
 
-    private static IDbConnection NewMockDbConnectionTestSelectedFields(IEnumerable<string> containsFields)
+    private static MockDbConnection NewMockDbConnectionTestSelectedFields(IEnumerable<string> containsFields)
     {
         var db = new MockDbConnection();
         db.OnExecuteReader(command =>

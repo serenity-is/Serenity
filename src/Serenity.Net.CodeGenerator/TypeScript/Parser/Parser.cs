@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Core;
 using static Serenity.TypeScript.TsParser.Scanner;
 using static Serenity.TypeScript.TsParser.Ts;
@@ -62,7 +62,7 @@ public class Parser
         // Prime the scanner.
         NextToken();
         var entityName = ParseEntityName(/*allowReservedWords*/ true);
-        var isInvalid = Token() == SyntaxKind.EndOfFileToken && !ParseDiagnostics.Any();
+        var isInvalid = Token() == SyntaxKind.EndOfFileToken && ParseDiagnostics.Count == 0;
 
         ClearState();
 
@@ -70,7 +70,7 @@ public class Parser
     }
 
 
-    public LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
+    public static LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
     {
 
         // .tsx and .jsx files are treated as jsx language variant.
@@ -95,7 +95,7 @@ public class Parser
         SyntaxCursor = _syntaxCursor;
 
 
-        ParseDiagnostics = new List<Diagnostic>(); // [];
+        ParseDiagnostics = []; // [];
 
         ParsingContext = 0;
 
@@ -165,7 +165,7 @@ public class Parser
             return node;
 
         var comments = GetJsDocCommentRanges(node, SourceFile.Text);
-        if (comments.Any())
+        if (comments.Count != 0)
         {
             foreach (var comment in comments)
             {
@@ -175,7 +175,7 @@ public class Parser
 
                     continue;
                 }
-                node.JsDoc ??= new List<JsDoc>();
+                node.JsDoc ??= [];
 
                 node.JsDoc.Add(jsDoc);
             }
@@ -233,7 +233,7 @@ public class Parser
             End = SourceText.Length,
             Text = SourceText,
 
-            BindDiagnostics = new List<Diagnostic>(),
+            BindDiagnostics = [],
 
             FileName = Optimized ? fileName : NormalizePath(fileName),
 
@@ -713,7 +713,7 @@ public class Parser
 
     public NodeArray<T> CreateList<T>(T[] elements = null, int? pos = null) /*where T : Node*/
     {
-        var array = elements == null ? new NodeArray<T>() : new NodeArray<T>(elements); // (List<T>)(elements || []);
+        var array = elements == null ? [] : new NodeArray<T>(elements); // (List<T>)(elements || []);
         if (!(pos >= 0))
         {
 
@@ -1262,11 +1262,11 @@ public class Parser
 
         return result;
     }
-    public T ParseListElement<T>(ParsingContext _, Func<T> parseElement) where T : INode
+    public static T ParseListElement<T>(ParsingContext _, Func<T> parseElement) where T : INode
     {
         return parseElement();
     }
-    public T ParseListElement2<T>(ParsingContext _, Func<T> parseElement) where T : INode
+    public static T ParseListElement2<T>(ParsingContext _, Func<T> parseElement) where T : INode
     {
         return parseElement();
     }
@@ -1282,7 +1282,7 @@ public class Parser
         return node;
     }
 
-    public bool CanReuseNode(Node node, ParsingContext parsingContext)
+    public static bool CanReuseNode(Node node, ParsingContext parsingContext)
     {
         switch (parsingContext)
         {
@@ -1329,7 +1329,7 @@ public class Parser
     }
 
 
-    public bool IsReusableClassMember(Node node)
+    public static bool IsReusableClassMember(Node node)
     {
         if (node != null)
         {
@@ -1358,7 +1358,7 @@ public class Parser
     }
 
 
-    public bool IsReusableSwitchClause(Node node)
+    public static bool IsReusableSwitchClause(Node node)
     {
         if (node != null)
         {
@@ -1376,7 +1376,7 @@ public class Parser
     }
 
 
-    public bool IsReusableStatement(Node node)
+    public static bool IsReusableStatement(Node node)
     {
         if (node != null)
         {
@@ -1421,14 +1421,14 @@ public class Parser
     }
 
 
-    public bool IsReusableEnumMember(Node node)
+    public static bool IsReusableEnumMember(Node node)
     {
 
         return node.Kind == SyntaxKind.EnumMember;
     }
 
 
-    public bool IsReusableTypeMember(Node node)
+    public static bool IsReusableTypeMember(Node node)
     {
         if (node != null)
         {
@@ -1449,7 +1449,7 @@ public class Parser
     }
 
 
-    public bool IsReusableVariableDeclaration(Node node)
+    public static bool IsReusableVariableDeclaration(Node node)
     {
         if (node.Kind != SyntaxKind.VariableDeclaration)
         {
@@ -1462,7 +1462,7 @@ public class Parser
     }
 
 
-    public bool IsReusableParameter(Node node)
+    public static bool IsReusableParameter(Node node)
     {
         if (node.Kind != SyntaxKind.Parameter)
         {
@@ -1492,7 +1492,7 @@ public class Parser
     }
 
 
-    public DiagnosticMessage ParsingContextErrors(ParsingContext context)
+    public static DiagnosticMessage ParsingContextErrors(ParsingContext context)
     {
         return context switch
         {
@@ -3457,12 +3457,11 @@ public class Parser
     {
         var leftOperand = ParseUnaryExpressionOrHigher();
 
-        if (leftOperand == null) throw new NullReferenceException();
-        return ParseBinaryExpressionRest(precedence, leftOperand);
+        return leftOperand == null ? throw new NullReferenceException() : ParseBinaryExpressionRest(precedence, leftOperand);
     }
 
 
-    public bool IsInOrOfKeyword(SyntaxKind t)
+    public static bool IsInOrOfKeyword(SyntaxKind t)
     {
 
         return t == SyntaxKind.InKeyword || t == SyntaxKind.OfKeyword;
@@ -3859,7 +3858,7 @@ public class Parser
     }
 
 
-    public bool TagNamesAreEquivalent(IJsxTagNameExpression lhs, IJsxTagNameExpression rhs)
+    public static bool TagNamesAreEquivalent(IJsxTagNameExpression lhs, IJsxTagNameExpression rhs)
     {
         if (lhs.Kind != rhs.Kind)
         {
@@ -4815,7 +4814,7 @@ public class Parser
         else
         {
 
-            node.Statements = new NodeArray<IStatement>(); //.Cast<Node>().ToList(); createMissingList
+            node.Statements = []; //.Cast<Node>().ToList(); createMissingList
         }
 
         return FinishNode(node);
@@ -4840,7 +4839,7 @@ public class Parser
         Block block = null;
         if (Optimized && Token() == SyntaxKind.OpenBraceToken)
         {
-            var node = new Block() { Pos = Scanner.StartPos, Statements = new NodeArray<IStatement>() };
+            var node = new Block() { Pos = Scanner.StartPos, Statements = [] };
 
             SyntaxKind token;
             int openBraces = 1;
@@ -5954,7 +5953,7 @@ public class Parser
     }
 
 
-    public bool IsClassMemberModifier(SyntaxKind idToken)
+    public static bool IsClassMemberModifier(SyntaxKind idToken)
     {
         return idToken switch
         {
@@ -6217,7 +6216,7 @@ public class Parser
         else
         {
 
-            node.Members = new NodeArray<IClassElement>(); // createMissingList<ClassElement>();
+            node.Members = []; // createMissingList<ClassElement>();
         }
 
 
@@ -6260,7 +6259,7 @@ public class Parser
         else
         {
 
-            node.Members = new NodeArray<IClassElement>(); // createMissingList<ClassElement>();
+            node.Members = []; // createMissingList<ClassElement>();
         }
 
 
@@ -6501,7 +6500,7 @@ public class Parser
         else
         {
 
-            node.Statements = new NodeArray<IStatement>(); // createMissingList<Statement>();
+            node.Statements = []; // createMissingList<Statement>();
         }
 
         return FinishNode(node);
@@ -7000,7 +6999,7 @@ public class Parser
         return FinishNode(node);
     }
 
-    public void SetExternalModuleIndicator(SourceFile sourceFile)
+    public static void SetExternalModuleIndicator(SourceFile sourceFile)
     {
 
         sourceFile.ExternalModuleIndicator = sourceFile.Statements./*ForEach*/FirstOrDefault(node =>

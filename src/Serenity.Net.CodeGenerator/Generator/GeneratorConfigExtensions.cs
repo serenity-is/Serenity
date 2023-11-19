@@ -43,11 +43,11 @@ public static class GeneratorConfigExtensions
             config.AppSettingFiles.Length != 0)
             return config.AppSettingFiles;
 
-        return new string[]
-        {
+        return
+        [
             "appsettings.json",
             "appsettings.machine.json"
-        };
+        ];
     }
 
     /// <summary>
@@ -116,8 +116,8 @@ public static class GeneratorConfigExtensions
                 getDefault: GeneratorDefaults.TryParse);
         }
 
-        config.Connections ??= new();
-        config.RemoveForeignFields ??= new List<string>();
+        config.Connections ??= [];
+        config.RemoveForeignFields ??= [];
         return config;
     }
 }

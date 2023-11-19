@@ -2,7 +2,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)..\build\Package.Build.props')" />
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

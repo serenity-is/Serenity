@@ -5,43 +5,33 @@ namespace Serenity;
 /// <summary>
 /// Provides throttling checks for operations. E.g. allow 10 login attempts per minute.
 /// </summary>
-public class Throttler
+/// <remarks>
+/// Creates a new throttler
+/// </remarks>
+/// <param name="cache">Cache</param>
+/// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
+/// <param name="duration">Check period</param>
+/// <param name="limit">How many times are allowed</param>
+public class Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
 {
-    private readonly IMemoryCache cache;
-
-    /// <summary>
-    /// Creates a new throttler
-    /// </summary>
-    /// <param name="cache">Cache</param>
-    /// <param name="key">Cache key for throttler. Include the resource name, e.g. username, you are throttling</param>
-    /// <param name="duration">Check period</param>
-    /// <param name="limit">How many times are allowed</param>
-    public Throttler(IMemoryCache cache, string key, TimeSpan duration, int limit)
-    {
-        this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-
-        Key = key;
-        Duration = duration;
-        Limit = limit;
-        CacheKey = "Throttling:" + key + ":" + duration.Ticks.ToInvariant();
-    }
+    private readonly IMemoryCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
     /// <summary>
     /// Cache key
     /// </summary>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = key;
     /// <summary>
     /// Duration
     /// </summary>
-    public TimeSpan Duration { get; private set; }
+    public TimeSpan Duration { get; private set; } = duration;
     /// <summary>
     /// Limit
     /// </summary>
-    public int Limit { get; private set; }
+    public int Limit { get; private set; } = limit;
     /// <summary>
     /// Full cache key
     /// </summary>
-    public string CacheKey { get; private set; }
+    public string CacheKey { get; private set; } = "Throttling:" + key + ":" + duration.Ticks.ToInvariant();
 
     private class HitInfo
     {

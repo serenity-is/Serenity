@@ -21,12 +21,12 @@ public abstract class CodeGeneratorBase
         set => cw.FileScopedNamespaces = value;
     }
 
-    public readonly HashSet<string> GlobalUsings = new();
+    public readonly HashSet<string> GlobalUsings = [];
 
     protected virtual void Reset()
     {
         sb.Clear();
-        generatedCode = new();
+        generatedCode = [];
     }
 
     protected virtual void AddFile(string filename, bool module = false)

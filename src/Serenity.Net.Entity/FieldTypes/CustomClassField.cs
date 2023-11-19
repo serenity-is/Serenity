@@ -7,24 +7,20 @@ namespace Serenity.Data;
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="GenericClassField{TValue}" />
-public class CustomClassField<TValue> : GenericClassField<TValue>
+/// <remarks>
+/// Initializes a new instance of the <see cref="CustomClassField{TValue}"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public class CustomClassField<TValue>(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    Func<IRow, TValue> getValue, Action<IRow, TValue> setValue) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
     where TValue : class
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomClassField{TValue}"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public CustomClassField(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
-        : base(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Gets field value from a data reader.

@@ -4,24 +4,20 @@
 /// Field with a list value
 /// </summary>
 /// <typeparam name="TItem">The type of the item.</typeparam>
+/// <remarks>
+/// Initializes a new instance of the <see cref="ListField{TItem}"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
 [NotMapped]
-public class ListField<TItem> : CustomClassField<List<TItem>>
+public class ListField<TItem>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, List<TItem>> getValue = null, Action<IRow, List<TItem>> setValue = null) : CustomClassField<List<TItem>>(collection, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ListField{TItem}"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public ListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-        Func<IRow, List<TItem>> getValue = null, Action<IRow, List<TItem>> setValue = null)
-        : base(collection, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Compares the values.

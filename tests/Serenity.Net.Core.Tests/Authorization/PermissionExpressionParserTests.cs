@@ -1,10 +1,10 @@
-﻿namespace Serenity.Tests.Authorization;
+namespace Serenity.Tests.Authorization;
 
 public class PermissionExpressionParserTests
 {
     private bool HasPermission(string permission)
     {
-        return permission != null && permission.Contains("1", StringComparison.CurrentCulture);
+        return permission != null && permission.Contains('1', StringComparison.CurrentCulture);
     }
 
     [Theory]

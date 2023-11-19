@@ -3,18 +3,13 @@ namespace Serenity.Abstractions;
 /// <summary>
 /// Default implementation for a type source
 /// </summary>
-public class DefaultTypeSource : ITypeSource, IGetAssemblies
+/// <remarks>
+/// Creates a new instance
+/// </remarks>
+/// <param name="assemblies">List of assemblies</param>
+public class DefaultTypeSource(IEnumerable<Assembly> assemblies) : ITypeSource, IGetAssemblies
 {
-    private readonly IEnumerable<Assembly> assemblies;
-
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="assemblies">List of assemblies</param>
-    public DefaultTypeSource(IEnumerable<Assembly> assemblies)
-    {
-        this.assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
-    }
+    private readonly IEnumerable<Assembly> assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
 
     /// <summary>
     /// Gets all attributes for assemblies with given type

@@ -4,17 +4,13 @@
 /// An base class that can be used for repositories (obsolete, <see cref="BaseRequestHandler"/>)
 /// that accept a <see cref="IRequestContext"/> instance.
 /// </summary>
-public class BaseRepository
+/// <remarks>
+/// Creates an instance of the class.
+/// </remarks>
+/// <param name="context">Request context</param>
+/// <exception cref="ArgumentNullException">Context is null</exception>
+public class BaseRepository(IRequestContext context)
 {
-    /// <summary>
-    /// Creates an instance of the class.
-    /// </summary>
-    /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException">Context is null</exception>
-    public BaseRepository(IRequestContext context)
-    {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
-    }
 
     /// <summary>
     /// Gets cache from the request context
@@ -24,7 +20,7 @@ public class BaseRepository
     /// <summary>
     /// Gets the request context
     /// </summary>
-    protected IRequestContext Context { get; }
+    protected IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets text localizer from the request context

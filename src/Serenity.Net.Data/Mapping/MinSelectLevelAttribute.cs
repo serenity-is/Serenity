@@ -4,16 +4,12 @@
 /// Determines minimum selection level for this field.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class MinSelectLevelAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="MinSelectLevelAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class MinSelectLevelAttribute(SelectLevel value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MinSelectLevelAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public MinSelectLevelAttribute(SelectLevel value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value.
@@ -21,5 +17,5 @@ public class MinSelectLevelAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public SelectLevel Value { get; private set; }
+    public SelectLevel Value { get; private set; } = value;
 }

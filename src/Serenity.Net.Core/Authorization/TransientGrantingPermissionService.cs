@@ -11,22 +11,16 @@ namespace Serenity.Web;
 /// registrar.RegisterInstance&lt;IPermissionService&gt;(new TransientGrantingPermissionService(new MyPermissionService()))
 /// </code>
 /// </remarks> 
-public class TransientGrantingPermissionService : IPermissionService, ITransientGrantor
+/// <remarks>
+/// Creates a new TransientGrantingPermissionService wrapping passed service
+/// </remarks>
+/// <param name="permissionService">Permission service to wrap with transient granting ability</param>
+/// <param name="requestContext">Request context</param>
+public class TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor? requestContext = null) : IPermissionService, ITransientGrantor
 {
-    private readonly IPermissionService permissionService;
-    private readonly IHttpContextItemsAccessor requestContext;
+    private readonly IPermissionService permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
+    private readonly IHttpContextItemsAccessor requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
     private readonly ThreadLocal<Stack<HashSet<string>?>> grantingStack = new();
-
-    /// <summary>
-    /// Creates a new TransientGrantingPermissionService wrapping passed service
-    /// </summary>
-    /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
-    /// <param name="requestContext">Request context</param>
-    public TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor? requestContext = null)
-    {
-        this.permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
-        this.requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
-    }
 
     private Stack<HashSet<string>?>? GetGrantingStack(bool createIfNull)
     {

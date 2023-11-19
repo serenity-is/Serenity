@@ -3,21 +3,15 @@
 /// <summary>
 /// DateDiff expression attribute
 /// </summary>
-public class DateDiffAttribute : BaseExpressionAttribute
+/// <remarks>
+/// Creates a new instance
+/// </remarks>
+/// <param name="part">Datepart like "year", "month" etc.</param>
+/// <param name="start">An expression that returns a date value</param>
+/// <param name="end">An expression that returns a date value</param>
+/// <exception cref="ArgumentNullException">One of expressions is null</exception>
+public class DateDiffAttribute(DateParts part, object start, object end) : BaseExpressionAttribute
 {
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="part">Datepart like "year", "month" etc.</param>
-    /// <param name="start">An expression that returns a date value</param>
-    /// <param name="end">An expression that returns a date value</param>
-    /// <exception cref="ArgumentNullException">One of expressions is null</exception>
-    public DateDiffAttribute(DateParts part, object start, object end)
-    {
-        Part = part;
-        Start = start ?? throw new ArgumentNullException(nameof(start));
-        End = end ?? throw new ArgumentNullException(nameof(end));
-    }
 
     /// <inheritdoc/>
     public override string Translate(ISqlDialect dialect)
@@ -86,15 +80,15 @@ public class DateDiffAttribute : BaseExpressionAttribute
     /// <summary>
     /// Date part
     /// </summary>
-    public DateParts Part { get; }
+    public DateParts Part { get; } = part;
 
     /// <summary>
     /// Date expression 1
     /// </summary>
-    public object Start { get; }
+    public object Start { get; } = start ?? throw new ArgumentNullException(nameof(start));
 
     /// <summary>
     /// Date expression 1
     /// </summary>
-    public object End { get; }
+    public object End { get; } = end ?? throw new ArgumentNullException(nameof(end));
 }

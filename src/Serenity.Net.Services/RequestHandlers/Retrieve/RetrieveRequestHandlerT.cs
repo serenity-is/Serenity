@@ -5,16 +5,12 @@
 /// the request type, and <see cref="RetrieveResponse{T}"/> as the response type.
 /// </summary>
 /// <typeparam name="TRow">The entity type</typeparam>
-public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>,
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="context">The request context</param>
+public class RetrieveRequestHandler<TRow>(IRequestContext context) : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>(context),
     IRetrieveHandler<TRow>
     where TRow : class, IRow, new()
 {
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="context">The request context</param>
-    public RetrieveRequestHandler(IRequestContext context)
-        : base(context)
-    {
-    }
 }

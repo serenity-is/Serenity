@@ -531,7 +531,7 @@ public static class TypingsUtils
             return (type.FullName, type.Scope.Name);
     }
 
-    private static readonly Dictionary<(string, string), List<TypeReference>> BaseClassCache = new();
+    private static readonly Dictionary<(string, string), List<TypeReference>> BaseClassCache = [];
 #endif
 
 
@@ -583,7 +583,7 @@ public static class TypingsUtils
         IEnumerable<string> assemblyLocations)
     {
         if (assemblyLocations == null || !assemblyLocations.Any())
-            return System.Array.Empty<Mono.Cecil.AssemblyDefinition>();
+            return [];
 
         assemblyLocations = assemblyLocations.Select(x =>
         {
@@ -615,7 +615,7 @@ public static class TypingsUtils
             .LoadMainModule(assemblyLocations.First(), inMemory: true);
 
         if (assemblyLocations.Count() == 1)
-            return new[] { module.Assembly };
+            return [module.Assembly];
 
         var resolver = module.AssemblyResolver as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 
@@ -632,7 +632,7 @@ public static class TypingsUtils
                     MetadataResolver = module.MetadataResolver
                 }));
 
-        return assemblyDefinitions.ToArray();
+        return [.. assemblyDefinitions];
     }
 #endif
 
@@ -734,7 +734,7 @@ public static class TypingsUtils
         Queue<TypeDefinition> queue = new();
         queue.Enqueue(type);
 
-        while (queue.Any())
+        while (queue.Count != 0)
         {
             var current = queue.Dequeue();
 

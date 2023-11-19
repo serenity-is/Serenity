@@ -1,9 +1,12 @@
-﻿namespace Serenity.Tests;
+using Serenity.Localization;
+
+namespace Serenity.Tests;
 
 public class MockLocalTextRegistry : ILocalTextRegistry
 {
-    private ILocalTextRegistry localTextRegistry = new Serenity.Localization.LocalTextRegistry();
-    public List<(string languageID, string key, string text)> AddedList { get; } = new();
+    private readonly LocalTextRegistry localTextRegistry = new();
+
+    public List<(string languageID, string key, string text)> AddedList { get; } = [];
 
     public void Add(string languageID, string key, string text)
     {

@@ -3,18 +3,13 @@
 /// <summary>
 /// Adds key fallback to any ILocalTextSource implementation
 /// </summary>
-public class FallbackLocalTextSource : ILocalTextRegistry
+/// <remarks>
+/// Initializes a new instance of the <see cref="FallbackLocalTextSource"/> class.
+/// </remarks>
+/// <param name="source">The local text source.</param>
+public class FallbackLocalTextSource(ILocalTextRegistry source) : ILocalTextRegistry
 {
-    private readonly ILocalTextRegistry source;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FallbackLocalTextSource"/> class.
-    /// </summary>
-    /// <param name="source">The local text source.</param>
-    public FallbackLocalTextSource(ILocalTextRegistry source)
-    {
-        this.source = source ?? throw new ArgumentNullException(nameof(source));
-    }
+    private readonly ILocalTextRegistry source = source ?? throw new ArgumentNullException(nameof(source));
 
     /// <summary>
     /// Returns localized representation which corresponds to the local text key or the fallback if none 
@@ -32,7 +27,7 @@ public class FallbackLocalTextSource : ILocalTextRegistry
             return text;
 
         // Get text without key's suffixes
-        string[] suffixes = { ".EntitySingular", ".EntityPlural" };
+        string[] suffixes = [".EntitySingular", ".EntityPlural"];
         foreach (var suffix in suffixes)
             if (key.EndsWith(suffix))
             {

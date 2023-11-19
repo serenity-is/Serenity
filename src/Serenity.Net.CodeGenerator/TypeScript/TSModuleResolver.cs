@@ -1,19 +1,27 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
-public class TSModuleResolver
+public partial class TSModuleResolver
 {
     private readonly IGeneratorFileSystem fileSystem;
     private readonly string tsBasePath;
     private readonly Dictionary<string, string[]> paths;
 
-    private readonly string[] extensions = new string[]
-    {
+    private readonly string[] extensions =
+    [
             ".ts",
             ".tsx",
             ".d.ts"
-    };
+    ];
 
-    private static readonly Regex removeMultiSlash = new(@"\/+");
+#if ISSOURCEGENERATOR
+    private static readonly Regex removeMultiSlash = new(@"\/+", RegexOptions.Compiled);
+#else
+    [GeneratedRegex(@"\/+", RegexOptions.Compiled)]
+    private static partial Regex removeMultiSlashRegexGen();
+
+    private static readonly Regex removeMultiSlash = removeMultiSlashRegexGen();
+#endif
+    private static readonly char[] slashSeparator = ['/'];
 
     public TSModuleResolver(IGeneratorFileSystem fileSystem, string tsConfigDir, TSConfig tsConfig)
     {
@@ -25,7 +33,7 @@ public class TSModuleResolver
 
         tsBasePath = PathHelper.ToPath(tsBasePath);
 
-        paths = tsConfig?.CompilerOptions?.Paths ?? new Dictionary<string, string[]>();
+        paths = tsConfig?.CompilerOptions?.Paths ?? [];
     }
 
     private class PackageJson
@@ -39,13 +47,13 @@ public class TSModuleResolver
     static string RemoveTrailing(string path)
     {
         while (path != null && path.Length > 1 &&
-            path.EndsWith("\\", StringComparison.Ordinal) ||
-            path.EndsWith("/", StringComparison.Ordinal))
+            path.EndsWith('\\') ||
+            path.EndsWith('/'))
                 path = path[..^1];
         return path;
     }
 
-    string TryGetNodePackageName(string path)
+    static string TryGetNodePackageName(string path)
     {
         path = RemoveTrailing(PathHelper.ToUrl(path));
         var lastNodeIdx = path.LastIndexOf("/node_modules/", StringComparison.Ordinal);
@@ -53,12 +61,12 @@ public class TSModuleResolver
             return null;
 
         var remaining = RemoveTrailing(path[(lastNodeIdx + "/node_modules/".Length) ..]);
-        while (remaining.StartsWith("/", StringComparison.Ordinal))
+        while (remaining.StartsWith('/'))
             remaining = remaining[1..];
         if (remaining.Length > 0)
         {
-            var parts = remaining.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if (remaining.StartsWith("@"))
+            var parts = remaining.Split(slashSeparator, StringSplitOptions.RemoveEmptyEntries);
+            if (remaining.StartsWith('@'))
                 return string.Join("/", parts.Take(2));
 
             return parts.FirstOrDefault();
@@ -83,12 +91,12 @@ public class TSModuleResolver
             if (!fileSystem.FileExists(resolvedPath))
                 return null;
         }
-        else if (fileNameOrModule.StartsWith(".", StringComparison.Ordinal) ||
-            fileNameOrModule.StartsWith("/", StringComparison.Ordinal))
+        else if (fileNameOrModule.StartsWith('.') ||
+            fileNameOrModule.StartsWith('/'))
         {
             string relative = removeMultiSlash.Replace(PathHelper.ToUrl(fileNameOrModule), "/");
 
-            var searchBase = fileNameOrModule.StartsWith("/", StringComparison.Ordinal) ?
+            var searchBase = fileNameOrModule.StartsWith('/') ?
                 tsBasePath : fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom));
 
             if (fileNameOrModule.StartsWith("./", StringComparison.Ordinal))
@@ -96,14 +104,14 @@ public class TSModuleResolver
             else if (!fileNameOrModule.StartsWith("../", StringComparison.Ordinal))
                 relative = relative[1..];
 
-            var withoutSlash = relative.EndsWith("/", StringComparison.Ordinal) ? 
+            var withoutSlash = relative.EndsWith('/') ? 
                 relative[..^1] : relative;
 
             if (!string.IsNullOrEmpty(withoutSlash))
                 searchBase = fileSystem.Combine(searchBase, withoutSlash);
 
             if (fileNameOrModule == "." || 
-                fileNameOrModule.EndsWith("/", StringComparison.Ordinal))
+                fileNameOrModule.EndsWith('/'))
                 resolvedPath = extensions
                     .Select(ext => fileSystem.Combine(searchBase, "index" + ext))
                     .FirstOrDefault(fileSystem.FileExists);
@@ -193,7 +201,7 @@ public class TSModuleResolver
                 {
                     if (pattern == fileNameOrModule ||
                         pattern == "*" ||
-                        (pattern.EndsWith("*") &&
+                        (pattern.EndsWith('*') &&
                             fileNameOrModule.StartsWith(pattern[..^1])))
                     {
                         if (paths[pattern] is string[] mappings)
@@ -210,7 +218,7 @@ public class TSModuleResolver
                                 if (toCombine.StartsWith("./"))
                                     toCombine = toCombine[2..];
 
-                                if (toCombine.StartsWith("/", StringComparison.Ordinal))
+                                if (toCombine.StartsWith('/'))
                                     continue; // not supported?
 
                                 toCombine = toCombine.Replace("*", replaceWith);

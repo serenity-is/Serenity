@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -7,7 +7,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     public bool ModuleTypings { get; set; } = false;
     public bool NamespaceTypings { get; set; } = true;
 
-    public readonly HashSet<string> LocalTextFilters = new();
+    public readonly HashSet<string> LocalTextFilters = [];
 
 #if ISSOURCEGENERATOR
     public ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 

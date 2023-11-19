@@ -3,20 +3,15 @@
 /// <summary>
 /// Default implentation for the <see cref="IDefaultHandlerFactory"/>
 /// </summary>
-public class DefaultHandlerRegistry : IDefaultHandlerRegistry
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="typeSource">Type source containing possible 
+/// handler classes.</param>
+/// <exception cref="ArgumentNullException">typeSource is null</exception>
+public class DefaultHandlerRegistry(ITypeSource typeSource) : IDefaultHandlerRegistry
 {
-    private readonly ITypeSource typeSource;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="typeSource">Type source containing possible 
-    /// handler classes.</param>
-    /// <exception cref="ArgumentNullException">typeSource is null</exception>
-    public DefaultHandlerRegistry(ITypeSource typeSource)
-    {
-        this.typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
-    }
+    private readonly ITypeSource typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
 
     /// <inheritdoc/>
     public virtual IEnumerable<Type> GetTypes()

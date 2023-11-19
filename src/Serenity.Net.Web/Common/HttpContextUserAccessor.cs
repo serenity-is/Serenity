@@ -5,18 +5,13 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation of <see cref="IUserAccessor"/> for HTTP context
 /// </summary>
-public class HttpContextUserAccessor : IUserAccessor
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="httpContextAccessor">HTTP context accessor</param>
+public class HttpContextUserAccessor(IHttpContextAccessor httpContextAccessor = null) : IUserAccessor
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="httpContextAccessor">HTTP context accessor</param>
-    public HttpContextUserAccessor(IHttpContextAccessor httpContextAccessor = null)
-    {
-        this.httpContextAccessor = httpContextAccessor;
-    }
+    private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc/>
     public ClaimsPrincipal User => httpContextAccessor?.HttpContext?.User;

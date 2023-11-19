@@ -22,10 +22,7 @@ public static class ConnectionExtensions
     /// <exception cref="ArgumentOutOfRangeException">Type has no ConnectionKey attribute!</exception>
     public static IDbConnection NewFor<TClass>(this ISqlConnections factory)
     {
-        var attr = typeof(TClass).GetCustomAttribute<ConnectionKeyAttribute>();
-        if (attr == null)
-            throw new ArgumentOutOfRangeException("Type has no ConnectionKey attribute!", typeof(TClass).FullName);
-
+        var attr = typeof(TClass).GetCustomAttribute<ConnectionKeyAttribute>() ?? throw new ArgumentOutOfRangeException("Type has no ConnectionKey attribute!", typeof(TClass).FullName);
         return factory.NewByKey(attr.Value);
     }
 

@@ -4,22 +4,15 @@
 /// A validation context for rows
 /// </summary>
 /// <seealso cref="IValidationContext" />
-public class RowValidationContext : IValidationContext
+/// <remarks>
+/// Initializes a new instance of the <see cref="RowValidationContext"/> class.
+/// </remarks>
+/// <param name="connection">The connection.</param>
+/// <param name="row">The row.</param>
+/// <param name="localizer">The localizer.</param>
+public class RowValidationContext(IDbConnection connection, IRow row, ITextLocalizer localizer) : IValidationContext
 {
-    private readonly IRow row;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RowValidationContext"/> class.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="row">The row.</param>
-    /// <param name="localizer">The localizer.</param>
-    public RowValidationContext(IDbConnection connection, IRow row, ITextLocalizer localizer)
-    {
-        this.row = row;
-        Connection = connection;
-        Localizer = localizer;
-    }
+    private readonly IRow row = row;
 
     /// <summary>
     /// Gets the field value.
@@ -41,7 +34,7 @@ public class RowValidationContext : IValidationContext
     /// <value>
     /// The connection.
     /// </value>
-    public IDbConnection Connection { get; private set; }
+    public IDbConnection Connection { get; private set; } = connection;
     /// <summary>
     /// Gets the value.
     /// </summary>
@@ -52,5 +45,5 @@ public class RowValidationContext : IValidationContext
     /// <summary>
     /// Localizer
     /// </summary>
-    public ITextLocalizer Localizer { get; private set; }
+    public ITextLocalizer Localizer { get; private set; } = localizer;
 }

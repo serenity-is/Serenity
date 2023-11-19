@@ -1,22 +1,17 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Behavior that handles <see cref="UniqueConstraintAttribute"/>
 /// </summary>
-public class UniqueConstraintSaveBehavior : BaseSaveBehavior, IImplicitBehavior
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="localizer">Text localizer</param>
+public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavior, IImplicitBehavior
 {
     private UniqueConstraintAttribute[] attrList;
     private IEnumerable<Field>[] attrFields;
-    private readonly ITextLocalizer localizer;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="localizer">Text localizer</param>
-    public UniqueConstraintSaveBehavior(ITextLocalizer localizer)
-    {
-        this.localizer = localizer;
-    }
+    private readonly ITextLocalizer localizer = localizer;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -37,23 +32,18 @@ public class UniqueConstraintSaveBehavior : BaseSaveBehavior, IImplicitBehavior
         if (attrList == null)
             return;
 
-        if (attrFields == null)
-        {
-            attrFields = attrList.Select(attr =>
+        attrFields ??= attrList.Select(attr =>
             {
                 return attr.Fields.Select(x =>
                 {
                     var field = handler.Row.FindFieldByPropertyName(x) ?? handler.Row.FindField(x);
-                    if (ReferenceEquals(null, field))
-                    {
-                        throw new InvalidOperationException(string.Format(
+                    return field is null
+                        ? throw new InvalidOperationException(string.Format(
                             "Can't find field '{0}' of unique constraint in row type '{1}'",
-                                x, handler.Row.GetType().FullName));
-                    }
-                    return field;
+                                x, handler.Row.GetType().FullName))
+                        : field;
                 });
             }).ToArray();
-        }
 
         for (var i = 0; i < attrList.Length; i++)
         {

@@ -10,7 +10,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Contains Serenity related helper methods that can be used in Razor CSHTML files
 /// </summary>
-public static class HtmlScriptExtensions
+public static partial class HtmlScriptExtensions
 {
     /// <summary>
     /// Renders a CSS stylesheet link element. If bundling is enabled, it may contain
@@ -199,7 +199,11 @@ public static class HtmlScriptExtensions
     }
 
     const string IncludedScriptsAndCssKey = "HtmlScriptExtensions:IncludedScriptsAndCss";
-    static readonly Regex EndingWithVersionRegex = new(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled);
+
+    static readonly Regex EndingWithVersionRegex = EndingWithVersionRegexGen();
+
+    [GeneratedRegex(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled)]
+    private static partial Regex EndingWithVersionRegexGen();
 
     private static bool IsAlreadyIncluded(IDictionary<object, object> contextItems, string url)
     {

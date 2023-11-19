@@ -3,21 +3,15 @@
 /// <summary>
 /// A decorator used to export enum name instead of the enum integer value.
 /// </summary>
-public class EnumDecorator : BaseCellDecorator
+/// <remarks>
+/// Creates an instance of the class.
+/// </remarks>
+/// <param name="enumType">Enum type</param>
+/// <param name="localizer">Text localizer</param>
+public class EnumDecorator(Type enumType, ITextLocalizer localizer) : BaseCellDecorator
 {
-    private readonly Type enumType;
-    private readonly ITextLocalizer localizer;
-
-    /// <summary>
-    /// Creates an instance of the class.
-    /// </summary>
-    /// <param name="enumType">Enum type</param>
-    /// <param name="localizer">Text localizer</param>
-    public EnumDecorator(Type enumType, ITextLocalizer localizer)
-    {
-        this.enumType = enumType;
-        this.localizer = localizer;
-    }
+    private readonly Type enumType = enumType;
+    private readonly ITextLocalizer localizer = localizer;
 
     /// <inheritdoc/>
     public override void Decorate()

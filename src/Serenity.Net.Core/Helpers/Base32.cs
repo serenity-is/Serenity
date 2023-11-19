@@ -17,13 +17,13 @@ public sealed class Base32
     const byte XX = 255;
 
     // lookup table used to decode() characters in Base32 strings
-    static readonly byte[] base32Lookup = {
+    static readonly byte[] base32Lookup = [
         26, 27, 28, 29, 30, 31, XX, XX, XX, XX, XX, XX, XX, XX, //   23456789:;<=>?
 			XX, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, // @ABCDEFGHIJKLMNO
 			15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, XX, XX, XX, XX, XX, // PQRSTUVWXYZ[\]^_
 			XX, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, // `abcdefghijklmno
 			15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 // pqrstuvwxyz
-		};
+		];
 
     static readonly int base32LookupLength = base32Lookup.Length;
 

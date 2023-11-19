@@ -32,15 +32,10 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
         if (lookupType == null)
             throw new ArgumentNullException("lookupType");
 
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
-        if (attr == null)
-        {
-            throw new ArgumentException(string.Format(
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentException(string.Format(
                 "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                 "be used with a CheckLookupEditor!",
                 lookupType.FullName), "lookupType");
-        }
-
         SetOption("lookupKey", attr.Key ??
             LookupScriptAttribute.AutoLookupKeyFor(lookupType));
     }

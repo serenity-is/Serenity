@@ -43,7 +43,7 @@ public class NavigationItem
     /// <summary>
     /// List of children
     /// </summary>
-    public List<NavigationItem> Children { get; private set; } = new();
+    public List<NavigationItem> Children { get; private set; } = [];
 
     /// <summary>
     /// True if this is a navigation section

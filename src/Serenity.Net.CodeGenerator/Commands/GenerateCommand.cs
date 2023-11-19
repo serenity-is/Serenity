@@ -3,15 +3,9 @@ using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
 
-public partial class GenerateCommand : BaseFileSystemCommand
+public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole) : BaseFileSystemCommand(fileSystem)
 {
-    private readonly IAnsiConsole ansiConsole;
-
-    public GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole)
-        : base(fileSystem)
-    {
-        this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
-    }
+    private readonly IAnsiConsole ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
 
     public ExitCodes Run(string csproj, string[] args)
     {
@@ -67,8 +61,8 @@ public partial class GenerateCommand : BaseFileSystemCommand
         var confConnection = config.Connections.FirstOrDefault(x =>
             string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
-        var selectedTableNames = !string.IsNullOrEmpty(argsTable) ? new[] { argsTable } : SelectTables(allTableNames);
-        if (!selectedTableNames.Any())
+        List<string> selectedTableNames = !string.IsNullOrEmpty(argsTable) ? [argsTable] : SelectTables(allTableNames);
+        if (selectedTableNames.Count == 0)
         {
             Error("No tables selected!");
             return ExitCodes.NoTablesSelected;
@@ -102,7 +96,7 @@ public partial class GenerateCommand : BaseFileSystemCommand
             var defaultIdentifier = confTable?.Identifier?.IsTrimmedEmpty() != false ?
                 EntityModelGenerator.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
 
-            var identifier = (selectedTableNames.Count() == 1 ? 
+            var identifier = (selectedTableNames.Count == 1 ? 
                 argsIdentifier : null) ?? SelectIdentifier(tableName, defaultIdentifier);
 
             permissionKey = argsPermissionKey ?? SelectPermissionKey(tableName, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);

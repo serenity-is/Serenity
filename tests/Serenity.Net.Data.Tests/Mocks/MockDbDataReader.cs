@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Data.Common;
 using System.Threading.Tasks;
 using TSQL.Statements;
@@ -15,8 +15,8 @@ public class MockDbDataReader : DbDataReader
 
     public MockDbDataReader()
     {
-        values = Array.Empty<object[]>();
-        props = Array.Empty<string>();
+        values = [];
+        props = [];
     }
 
     public MockDbDataReader(IEnumerable<IDictionary<string, object>> items,
@@ -35,7 +35,7 @@ public class MockDbDataReader : DbDataReader
 
     public MockDbDataReader(string commandText, params object[] anonymousItems)
     {
-        if (anonymousItems == null || !anonymousItems.Any())
+        if (anonymousItems == null || anonymousItems.Length == 0)
             throw new ArgumentNullException(nameof(anonymousItems));
 
         var sample = anonymousItems.First();
@@ -222,7 +222,7 @@ public class MockDbDataReader : DbDataReader
             return result;
 
         var statements = TSQL.TSQLStatementReader.ParseStatements(commandText);
-        if (!statements.Any())
+        if (statements.Count == 0)
             return result;
 
         if (statements[0] is not TSQLSelectStatement statement ||

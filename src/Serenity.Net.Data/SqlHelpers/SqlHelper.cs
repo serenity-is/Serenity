@@ -328,10 +328,7 @@ public static class SqlHelper
         var dialect = connection.GetDialect();
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
-            string identityColumn = query.IdentityColumn();
-            if (identityColumn == null)
-                throw new ArgumentNullException("query.IdentityColumn");
-
+            string identityColumn = query.IdentityColumn() ?? throw new ArgumentNullException("query.IdentityColumn");
             queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
 
             if (dialect.UseReturningIntoVar)

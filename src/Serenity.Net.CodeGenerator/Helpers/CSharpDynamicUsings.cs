@@ -25,7 +25,7 @@ public class CSharpDynamicUsings
             if (fullNames == null)
                 return "";
 
-            HashSet<string> result = new();
+            HashSet<string> result = [];
 
             foreach (var fullName in fullNames)
             {

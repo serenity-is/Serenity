@@ -5,16 +5,12 @@
 /// the request type, and <see cref="UndeleteResponse"/> as the response type.
 /// </summary>
 /// <typeparam name="TRow">The entity type</typeparam>
-public class UndeleteRequestHandler<TRow> : UndeleteRequestHandler<TRow, UndeleteRequest, UndeleteResponse>,
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="context">The request context</param>
+public class UndeleteRequestHandler<TRow>(IRequestContext context) : UndeleteRequestHandler<TRow, UndeleteRequest, UndeleteResponse>(context),
     IUndeleteHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="context">The request context</param>
-    public UndeleteRequestHandler(IRequestContext context)
-        : base(context)
-    {
-    }
 }

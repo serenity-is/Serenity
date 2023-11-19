@@ -158,7 +158,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 .ToLookup(x => x.FKName)
                 .Where(x => x.Count() == 1)
                 .SelectMany(x => x)
-                .ToList() : new();
+                .ToList() : [];
 
         foreach (var field in fieldInfos)
         {
@@ -173,7 +173,7 @@ public class EntityModelGenerator : IEntityModelGenerator
 
         string baseRowMatch = null;
         HashSet<string> baseRowFieldset = null;
-        List<string> baseRowFieldList = new();
+        List<string> baseRowFieldList = [];
         if (inputs?.Config?.BaseRowClasses is { } baseRowClasses)
         {
             foreach (var k in inputs.Config.BaseRowClasses)
@@ -182,7 +182,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 var f = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var fl = new List<string>();
                 bool skip = false;
-                foreach (var s in k.Fields ?? new List<string>())
+                foreach (var s in k.Fields ?? [])
                 {
                     string n = s.TrimToNull();
                     if (n == null || !fieldInfos.Any(z => z.FieldName[prefix..] == n))
@@ -554,7 +554,7 @@ public class EntityModelGenerator : IEntityModelGenerator
                 else if (module.EndsWith(".Lookups"))
                     module = module[0..^8];
 
-                var idx2 = module.IndexOf(".");
+                var idx2 = module.IndexOf('.');
                 if (idx2 >= 0)
                     module = module[(idx2 + 1)..];
             }

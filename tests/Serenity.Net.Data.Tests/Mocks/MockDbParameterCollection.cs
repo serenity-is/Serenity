@@ -5,7 +5,7 @@ namespace Serenity.Tests;
 
 public class MockDbParameterCollection : DbParameterCollection
 {
-    private readonly List<IDbDataParameter> parameters = new();
+    private readonly List<IDbDataParameter> parameters = [];
 
     public override int Count => parameters.Count;
 

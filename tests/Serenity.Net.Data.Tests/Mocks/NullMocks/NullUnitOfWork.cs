@@ -1,13 +1,8 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-public class NullUnitOfWork : IUnitOfWork
+public class NullUnitOfWork(IDbConnection connection = null) : IUnitOfWork
 {
-    private readonly IDbConnection connection;
-
-    public NullUnitOfWork(IDbConnection connection = null)
-    {
-        this.connection = connection ?? new NullDbConnection();
-    }
+    private readonly IDbConnection connection = connection ?? new NullDbConnection();
 
     public IDbConnection Connection => connection;
 

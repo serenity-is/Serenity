@@ -4,16 +4,12 @@
 /// Determines database alias, used for unit test database contexts.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class DatabaseAliasAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="DatabaseAliasAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class DatabaseAliasAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DatabaseAliasAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public DatabaseAliasAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value.
@@ -21,5 +17,5 @@ public class DatabaseAliasAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

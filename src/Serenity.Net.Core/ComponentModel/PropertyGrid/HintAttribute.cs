@@ -5,16 +5,12 @@
 /// Hint is shown when field label is hovered. 
 /// This has no effect on columns.
 /// </summary>
-public class HintAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="HintAttribute"/> class.
+/// </remarks>
+/// <param name="hint">The hint.</param>
+public class HintAttribute(string? hint) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="HintAttribute"/> class.
-    /// </summary>
-    /// <param name="hint">The hint.</param>
-    public HintAttribute(string? hint)
-    {
-        Hint = hint;
-    }
 
     /// <summary>
     /// Gets the hint.
@@ -22,5 +18,5 @@ public class HintAttribute : Attribute
     /// <value>
     /// The hint.
     /// </value>
-    public string? Hint { get; private set; }
+    public string? Hint { get; private set; } = hint;
 }

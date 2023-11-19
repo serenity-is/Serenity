@@ -4,15 +4,10 @@ namespace Serenity.CodeGenerator;
 
 public class ApplicationMetadata : IApplicationMetadata
 {
-    private class Scanner : TypingsGeneratorBase
+    private class Scanner(IGeneratorFileSystem fileSystem, params string[] assemblyLocations) : TypingsGeneratorBase(fileSystem, assemblyLocations)
     {
-        public List<TypeDefinition> RowTypes { get; } = new();
-        public Dictionary<string, string> RowTypeToListRoute = new();
-
-        public Scanner(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
-            : base(fileSystem, assemblyLocations)
-        {
-        }
+        public List<TypeDefinition> RowTypes { get; } = [];
+        public Dictionary<string, string> RowTypeToListRoute = [];
 
         protected override void GenerateCodeFor(TypeDefinition type)
         {
@@ -37,7 +32,7 @@ public class ApplicationMetadata : IApplicationMetadata
                     route = route[..^("/[action]".Length)];
                     if (route.StartsWith("~/", StringComparison.Ordinal))
                         route = route[2..];
-                    else if (route.StartsWith("/", StringComparison.Ordinal))
+                    else if (route.StartsWith('/'))
                         route = route[1..];
 
                     if (!string.IsNullOrEmpty(route))
@@ -74,7 +69,7 @@ public class ApplicationMetadata : IApplicationMetadata
             asm.Dispose();
     }
 
-    public List<EntityModel> EntityModels { get; } = new List<EntityModel>();
+    public List<EntityModel> EntityModels { get; } = [];
     public string DefaultSchema { get; set; }
 
     private string ParseSchemaAndName(string objectName, out string schema)
@@ -107,7 +102,7 @@ public class ApplicationMetadata : IApplicationMetadata
                 NormalizeTablename(objectName2), StringComparison.OrdinalIgnoreCase);
     }
 
-    private readonly Dictionary<string, IRowMetadata> rowByTablename = new();
+    private readonly Dictionary<string, IRowMetadata> rowByTablename = [];
 
     public IRowMetadata GetRowByTablename(string tablename)
     {
@@ -181,16 +176,11 @@ public class ApplicationMetadata : IApplicationMetadata
         return x.Name;
     }
 
-    private class RowMetadata : IRowMetadata
+    private class RowMetadata(TypeDefinition type) : IRowMetadata
     {
-        private readonly TypeDefinition type;
+        private readonly TypeDefinition type = type ?? throw new ArgumentNullException(nameof(type));
         private string idProperty;
         private string nameProperty;
-
-        public RowMetadata(TypeDefinition type)
-        {
-            this.type = type ?? throw new ArgumentNullException(nameof(type));
-        }
 
         public string Namespace => type.NamespaceOf();
 
@@ -206,7 +196,7 @@ public class ApplicationMetadata : IApplicationMetadata
             .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&
                 x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel");
 
-        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = new();
+        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = [];
 
         public IRowPropertyMetadata GetTableField(string columnName)
         {
@@ -227,7 +217,7 @@ public class ApplicationMetadata : IApplicationMetadata
             return tableFieldByColumnName[columnName] = null;
         }
 
-        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = new();
+        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = [];
 
         public IRowPropertyMetadata GetProperty(string name)
         {
@@ -276,14 +266,9 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        public class PropertyMetadata : IRowPropertyMetadata
+        public class PropertyMetadata(PropertyDefinition property) : IRowPropertyMetadata
         {
-            private readonly PropertyDefinition property;
-
-            public PropertyMetadata(PropertyDefinition property)
-            {
-                this.property = property ?? throw new ArgumentNullException(nameof(property));
-            }
+            private readonly PropertyDefinition property = property ?? throw new ArgumentNullException(nameof(property));
 
             public string ColumnName => GetColumnName(property);
             public string PropertyName => property.Name;
@@ -292,14 +277,9 @@ public class ApplicationMetadata : IApplicationMetadata
         public string ListServiceRoute { get; set; }
     }
 
-    private class EntityModelRowMetadata : IRowMetadata
+    private class EntityModelRowMetadata(EntityModel model) : IRowMetadata
     {
-        private readonly EntityModel model;
-
-        public EntityModelRowMetadata(EntityModel model)
-        {
-            this.model = model ?? throw new ArgumentNullException(nameof(model));
-        }
+        private readonly EntityModel model = model ?? throw new ArgumentNullException(nameof(model));
 
         public bool HasLookupScriptAttribute => false;
 
@@ -315,7 +295,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
         public string ClassName => model.RowClassName;
 
-        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = new();
+        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = [];
 
         public IRowPropertyMetadata GetProperty(string name)
         {
@@ -332,7 +312,7 @@ public class ApplicationMetadata : IApplicationMetadata
             return propertyByName[name] = null;
         }
 
-        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = new();
+        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = [];
 
         public IRowPropertyMetadata GetTableField(string columnName)
         {
@@ -353,14 +333,9 @@ public class ApplicationMetadata : IApplicationMetadata
             return tableFieldByColumnName[columnName] = null;
         }
 
-        public class FieldMetadata : IRowPropertyMetadata
+        public class FieldMetadata(EntityField field) : IRowPropertyMetadata
         {
-            private readonly EntityField field;
-
-            public FieldMetadata(EntityField field)
-            {
-                this.field = field ?? throw new ArgumentNullException(nameof(field));
-            }
+            private readonly EntityField field = field ?? throw new ArgumentNullException(nameof(field));
 
             public string ColumnName => field.Name;
             public string PropertyName => field.PropertyName;

@@ -27,7 +27,7 @@ public static class UploadFormatting
         {
             s = g.ToString("N");
             identity = s;
-            groupKey = s.Substring(0, 2);
+            groupKey = s[..2];
         }
         else
         {
@@ -81,7 +81,7 @@ public static class UploadFormatting
         var sizeParts = byteSize.ToString(Invariants.NumberFormat).Split('.');
         string value;
         if (sizeParts.Length > 1)
-            value = sizeParts[0] + "." + sizeParts[1].Substring(0, 2);
+            value = sizeParts[0] + "." + sizeParts[1][..2];
         else
             value = sizeParts[0];
 

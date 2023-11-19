@@ -5,23 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Field with a Decimal value
 /// </summary>
-public sealed class DecimalField : GenericValueField<decimal>
+/// <remarks>
+/// Initializes a new instance of the <see cref="DecimalField"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public sealed class DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, decimal?> getValue = null, Action<IRow, decimal?> setValue = null) : GenericValueField<decimal>(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DecimalField"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, decimal?> getValue = null, Action<IRow, decimal?> setValue = null)
-        : base(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

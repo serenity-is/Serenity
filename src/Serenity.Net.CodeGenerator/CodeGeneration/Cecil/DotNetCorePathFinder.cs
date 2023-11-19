@@ -1,4 +1,4 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
@@ -23,30 +23,30 @@ public class DotNetCorePathFinder
             Version = parts[1];
             Type = type;
             Path = path;
-            RuntimeComponents = runtimeComponents ?? Array.Empty<string>();
+            RuntimeComponents = runtimeComponents ?? [];
         }
     }
 
-    static readonly string[] LookupPaths = new string[] {
+    static readonly string[] LookupPaths = [
          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages"),
          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet", "sdk", "NuGetFallbackFolder"),
          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "dotnet", "sdk", "NuGetFallbackFolder")
-    };
+    ];
 
-    static readonly string[] RuntimePacks = new[] {
+    static readonly string[] RuntimePacks = [
         "Microsoft.NETCore.App",
         "Microsoft.WindowsDesktop.App",
         "Microsoft.AspNetCore.App",
         "Microsoft.AspNetCore.All"
-    };
+    ];
 
     readonly Dictionary<string, DotNetCorePackageInfo> packages;
-    readonly ISet<string> packageBasePaths = new HashSet<string>(StringComparer.Ordinal);
+    readonly HashSet<string> packageBasePaths = new(StringComparer.Ordinal);
     readonly string assemblyName;
     readonly string basePath;
     readonly Version version;
     readonly string dotnetBasePath = FindDotNetExeDirectory();
-    readonly List<string> searchPaths = new();
+    readonly List<string> searchPaths = [];
     ILookup<string, string> packageLocationByName;
 
     public DotNetCorePathFinder(string parentAssemblyFileName, string targetFrameworkId, UniversalAssemblyResolver.TargetFrameworkIdentifier targetFramework, 

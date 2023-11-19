@@ -6,24 +6,20 @@ namespace Serenity.Data;
 /// Field with JSON value
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-public class JsonField<TValue> : GenericClassField<TValue>
+/// <remarks>
+/// Initializes a new instance of the <see cref="JsonField{TValue}"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public class JsonField<TValue>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
     where TValue : class
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="JsonField{TValue}"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public JsonField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
-        : base(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.

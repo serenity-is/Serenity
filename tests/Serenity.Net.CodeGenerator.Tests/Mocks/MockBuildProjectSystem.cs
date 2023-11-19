@@ -1,15 +1,10 @@
-﻿using Serenity.CodeGenerator;
+using Serenity.CodeGenerator;
 
 namespace Serenity.Tests;
 
-public class MockBuildProjectSystem : IBuildProjectSystem
+public class MockBuildProjectSystem(IGeneratorFileSystem fileSystem) : IBuildProjectSystem
 {
-    private readonly IGeneratorFileSystem fileSystem;
-
-    public MockBuildProjectSystem(IGeneratorFileSystem fileSystem)
-    {
-        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-    }
+    private readonly IGeneratorFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
     public IBuildProject LoadProject(string path)
     {

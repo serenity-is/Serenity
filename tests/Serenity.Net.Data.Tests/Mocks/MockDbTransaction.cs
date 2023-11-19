@@ -1,13 +1,8 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-internal class MockDbTransaction : IDbTransaction
+internal class MockDbTransaction(IDbConnection dbConnection) : IDbTransaction
 {
-    private readonly IDbConnection dbConnection;
-
-    public MockDbTransaction(IDbConnection dbConnection)
-    {
-        this.dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
-    }
+    private readonly IDbConnection dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
 
     public IDbConnection Connection => dbConnection;
 

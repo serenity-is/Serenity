@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data;
@@ -74,8 +74,7 @@ public class QueryWithParams : IQueryWithParams
             return;
         }
 
-        if (parameters == null)
-            parameters = new Dictionary();
+        parameters ??= [];
 
         parameters.Add(name, value);
     }
@@ -93,8 +92,7 @@ public class QueryWithParams : IQueryWithParams
             return;
         }
 
-        if (parameters == null)
-            parameters = new Dictionary();
+        parameters ??= [];
 
         parameters[name] = value;
     }

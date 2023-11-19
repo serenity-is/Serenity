@@ -4,16 +4,12 @@
 /// Determines non-plural name for an entity.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class InstanceNameAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="InstanceNameAttribute"/> class.
+/// </remarks>
+/// <param name="instanceName">Name of the instance.</param>
+public class InstanceNameAttribute(string instanceName) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="InstanceNameAttribute"/> class.
-    /// </summary>
-    /// <param name="instanceName">Name of the instance.</param>
-    public InstanceNameAttribute(string instanceName)
-    {
-        InstanceName = instanceName;
-    }
 
     /// <summary>
     /// Gets the name of the instance.
@@ -21,5 +17,5 @@ public class InstanceNameAttribute : Attribute
     /// <value>
     /// The name of the instance.
     /// </value>
-    public string InstanceName { get; private set; }
+    public string InstanceName { get; private set; } = instanceName;
 }

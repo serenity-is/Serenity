@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that property should use lookup editor type of filtering
@@ -30,10 +30,7 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     public LookupFilteringAttribute(Type lookupType)
         : base(Key)
     {
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
-        if (attr == null)
-            throw new ArgumentOutOfRangeException("lookupType");
-
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentOutOfRangeException("lookupType");
         SetOption("lookupKey", attr.Key ??
             LookupScriptAttribute.AutoLookupKeyFor(lookupType));
     }

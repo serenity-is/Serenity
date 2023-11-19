@@ -4,16 +4,12 @@
 /// Sets editor type of the target property.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class EditorTypeAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="EditorTypeAttribute"/> class.
+/// </remarks>
+/// <param name="type">The type.</param>
+public class EditorTypeAttribute(string type) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EditorTypeAttribute"/> class.
-    /// </summary>
-    /// <param name="type">The type.</param>
-    public EditorTypeAttribute(string type)
-    {
-        EditorType = type;
-    }
 
     /// <summary>
     /// Transfers the current editor parameters to specified editorParams dictionary.
@@ -29,5 +25,5 @@ public class EditorTypeAttribute : Attribute
     /// <value>
     /// The type of the editor.
     /// </value>
-    public string EditorType { get; private set; }
+    public string EditorType { get; private set; } = type;
 }

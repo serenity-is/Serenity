@@ -2,10 +2,10 @@ using System.Diagnostics;
 
 namespace Serenity.CodeGenerator;
 
-public class CodeFileHelper : ICodeFileHelper
+public class CodeFileHelper(IGeneratorFileSystem fileSystem) : ICodeFileHelper
 {
-    private static readonly Encoding utf8 = new UTF8Encoding(true);
-    private readonly IGeneratorFileSystem fileSystem;
+    private static readonly UTF8Encoding utf8 = new(true);
+    private readonly IGeneratorFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
     public string Kdiff3Path { get; set; }
     public string TSCPath { get; set; }
@@ -15,12 +15,7 @@ public class CodeFileHelper : ICodeFileHelper
 
     public static byte[] ToUTF8BOM(string s)
     {
-        return Encoding.UTF8.GetPreamble().Concat(utf8.GetBytes(s)).ToArray();
-    }
-
-    public CodeFileHelper(IGeneratorFileSystem fileSystem)
-    {
-        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        return [.. Encoding.UTF8.GetPreamble(), .. utf8.GetBytes(s)];
     }
 
     public void CheckoutAndWrite(string file, string contents)

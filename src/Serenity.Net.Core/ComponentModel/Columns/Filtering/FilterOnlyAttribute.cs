@@ -5,16 +5,12 @@
 /// in column selection dialog, but only used for advanced filtering.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class FilterOnlyAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="FilterOnlyAttribute"/> class.
+/// </remarks>
+/// <param name="value">if set to <c>true</c> (default) indicates this field is filter only.</param>
+public class FilterOnlyAttribute(bool value = true) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilterOnlyAttribute"/> class.
-    /// </summary>
-    /// <param name="value">if set to <c>true</c> (default) indicates this field is filter only.</param>
-    public FilterOnlyAttribute(bool value = true)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets a value indicating whether this <see cref="FilterOnlyAttribute"/> is enabled.
@@ -22,5 +18,5 @@ public class FilterOnlyAttribute : Attribute
     /// <value>
     ///   <c>true</c> if enabled; otherwise, <c>false</c>.
     /// </value>
-    public bool Value { get; private set; }
+    public bool Value { get; private set; } = value;
 }

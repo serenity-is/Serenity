@@ -102,7 +102,7 @@ public static class DisplayOrderHelper
 
         // a list that will contain an element for each record, and hold old and new display 
         // order values of records
-        List<OrderRecord> orderRecords = new List<OrderRecord>();
+        List<OrderRecord> orderRecords = [];
 
         // link to the order entry for record whose display order value is asked to be changed
         OrderRecord changing = null;
@@ -133,7 +133,7 @@ public static class DisplayOrderHelper
                 // each records actual display order value is one more than previous one
                 order++;
                 // create an entry to hold current and new display order value of the record
-                OrderRecord r = new OrderRecord
+                OrderRecord r = new()
                 {
                     // record ID
                     recordID = reader.GetValue(0),
@@ -227,7 +227,7 @@ public static class DisplayOrderHelper
             throw new ArgumentNullException("orderField");
 
         // StringBuilder that will contain query(s)
-        StringBuilder queries = new StringBuilder();
+        StringBuilder queries = new();
 
         if (connection.GetDialect().NeedsExecuteBlockStatement)
         {
@@ -280,7 +280,7 @@ public static class DisplayOrderHelper
         else
         {
             // StringBuilder that will contain IN(...) part of the latest query
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             // scan all display order changing records
             int start = 0;

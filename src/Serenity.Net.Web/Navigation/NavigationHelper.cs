@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Navigation;
 
@@ -242,7 +242,7 @@ public class NavigationHelper
                 group.Order = minOrder;
         }
 
-        if (!newCategory.Any())
+        if (newCategory.Count == 0)
             return byCategory;
 
         var usedGroupPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

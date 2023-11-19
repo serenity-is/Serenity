@@ -20,7 +20,7 @@ public static class EnumMapper
         public EnumTypeItem()
         {
             stringToValue = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            valueToString = new Dictionary<int, string>();
+            valueToString = [];
         }
     }
 

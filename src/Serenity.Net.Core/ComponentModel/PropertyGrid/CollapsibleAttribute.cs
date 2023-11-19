@@ -5,16 +5,12 @@
 /// Commonly used with form categories to make them collapsible.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class CollapsibleAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="CollapsibleAttribute"/> class.
+/// </remarks>
+/// <param name="value">if set to <c>true</c> target is collapsible.</param>
+public class CollapsibleAttribute(bool value = true) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CollapsibleAttribute"/> class.
-    /// </summary>
-    /// <param name="value">if set to <c>true</c> target is collapsible.</param>
-    public CollapsibleAttribute(bool value = true)
-    {
-        Value = value;
-    }
 
 
     /// <summary>
@@ -23,7 +19,7 @@ public class CollapsibleAttribute : Attribute
     /// <value>
     ///   <c>true</c> if value; otherwise, <c>false</c>.
     /// </value>
-    public bool Value { get; private set; }
+    public bool Value { get; private set; } = value;
 
 
     /// <summary>

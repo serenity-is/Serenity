@@ -34,7 +34,7 @@ public class Node : TextRange, INode
 
     public void MakeChildren(string sourceStr)
     {
-        Children = new List<Node>();
+        Children = [];
         Ts.ForEachChild(this, node =>
         {
             if (node == null)

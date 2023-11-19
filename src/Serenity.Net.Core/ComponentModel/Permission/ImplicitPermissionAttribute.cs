@@ -6,17 +6,13 @@
 /// Currently only implemented in premium app.
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="ImplicitPermissionAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-public class ImplicitPermissionAttribute : Attribute
+public class ImplicitPermissionAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImplicitPermissionAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public ImplicitPermissionAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value.
@@ -24,5 +20,5 @@ public class ImplicitPermissionAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

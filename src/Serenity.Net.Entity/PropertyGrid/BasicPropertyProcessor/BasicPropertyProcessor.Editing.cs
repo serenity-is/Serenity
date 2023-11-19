@@ -87,7 +87,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 !item.EditorParams.ContainsKey("minValue") &&
                 !item.EditorParams.ContainsKey("maxValue"))
             {
-                string minVal = new string('0', source.BasedOnField.Size - source.BasedOnField.Scale);
+                string minVal = new('0', source.BasedOnField.Size - source.BasedOnField.Scale);
                 if (source.BasedOnField.Scale > 0)
                     minVal += "." + new string('0', source.BasedOnField.Scale);
                 string maxVal = minVal.Replace('0', '9');
@@ -110,7 +110,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             {
                 item.EditorParams["maxValue"] = source.BasedOnField is Int16Field ? short.MaxValue
                     : source.BasedOnField is Int32Field ? int.MaxValue :
-                    source.BasedOnField is Int64Field ? long.MaxValue : (object)null;
+                    source.BasedOnField is Int64Field ? long.MaxValue : null;
 
                 if ((item.EditorParams.ContainsKey("allowNegatives") &&
                      Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||

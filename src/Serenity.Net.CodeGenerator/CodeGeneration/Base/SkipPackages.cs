@@ -2,8 +2,8 @@
 
 public static class SkipPackages
 {
-    private static readonly string[] NotReferencingSerenity = new[]
-    {
+    private static readonly string[] NotReferencingSerenity =
+    [
         "AspNetCore",
         "Azure",
         "AutoMapper",
@@ -27,7 +27,7 @@ public static class SkipPackages
         "System.",
         "X.PagedList",
         "Yaml"
-    };
+    ];
 
     public static bool ForRestore(string packageId)
     {

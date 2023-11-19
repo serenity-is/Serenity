@@ -1,15 +1,9 @@
 namespace Serenity.CodeGenerator;
 
-public class AttributeTypeRef
+public class AttributeTypeRef(string typeName, params object[] arguments)
 {
-    public string TypeName { get; }
-    public object[] Arguments { get; }
-
-    public AttributeTypeRef(string typeName, params object[] arguments)
-    {
-        TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
-        Arguments = arguments;
-    }
+    public string TypeName { get; } = typeName ?? throw new ArgumentNullException(nameof(typeName));
+    public object[] Arguments { get; } = arguments;
 
     public string ToString(CodeWriter cw)
     {

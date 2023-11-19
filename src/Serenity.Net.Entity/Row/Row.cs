@@ -339,7 +339,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         }
         else
         {
-            dictionaryData ??= new Hashtable();
+            dictionaryData ??= [];
             dictionaryData[key] = value;
         }
     }

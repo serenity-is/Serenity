@@ -4,16 +4,12 @@
 /// Sets local text prefix for the row.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class LocalTextPrefixAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="LocalTextPrefixAttribute"/> class.
+/// </remarks>
+/// <param name="value">The prefix.</param>
+public class LocalTextPrefixAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LocalTextPrefixAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The prefix.</param>
-    public LocalTextPrefixAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the local text prefix.
@@ -21,5 +17,5 @@ public class LocalTextPrefixAttribute : Attribute
     /// <value>
     /// The local text prefix.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

@@ -3,22 +3,18 @@
 /// <summary>
 /// Maps a row to its localization row
 /// </summary>
-public class LocalizationRowAttribute : Attribute
+/// <remarks>
+/// Creates a new instance of the attribute
+/// </remarks>
+/// <param name="localizationRow">Localization row type</param>
+/// <exception cref="ArgumentNullException">localizationRow is null</exception>
+public class LocalizationRowAttribute(Type localizationRow) : Attribute
 {
-    /// <summary>
-    /// Creates a new instance of the attribute
-    /// </summary>
-    /// <param name="localizationRow">Localization row type</param>
-    /// <exception cref="ArgumentNullException">localizationRow is null</exception>
-    public LocalizationRowAttribute(Type localizationRow)
-    {
-        LocalizationRow = localizationRow ?? throw new ArgumentNullException(nameof(localizationRow));
-    }
 
     /// <summary>
     /// Localization row type
     /// </summary>
-    public Type LocalizationRow { get; private set; }
+    public Type LocalizationRow { get; private set; } = localizationRow ?? throw new ArgumentNullException(nameof(localizationRow));
 
     /// <summary>
     /// ID field corresponding to this tables ID field.

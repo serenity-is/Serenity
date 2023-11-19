@@ -1,17 +1,10 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-public class MockFileWatcherFactory : IFileWatcherFactory
+public class MockFileWatcherFactory(System.IO.Abstractions.IFileSystem fileSystem) : IFileWatcherFactory
 {
-    private readonly List<IFileWatcher> watchers;
+    private readonly List<IFileWatcher> watchers = [];
 
-    public System.IO.Abstractions.IFileSystem FileSystem { get; }
-
-    public MockFileWatcherFactory(System.IO.Abstractions.IFileSystem fileSystem)
-    {
-        FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-
-        watchers = new List<IFileWatcher>();
-    }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
     public void KeepAlive(IFileWatcher fileWatcher)
     {

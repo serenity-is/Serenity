@@ -3,7 +3,12 @@
 /// <summary>
 /// Behavior that handles <see cref="UpdatableExtensionAttribute"/>
 /// </summary>
-public class UpdatableExtensionBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="handlerFactory">Default handler factory</param>
+/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior
 {
     private class RelationInfo
     {
@@ -18,18 +23,7 @@ public class UpdatableExtensionBehavior : BaseSaveDeleteBehavior, IImplicitBehav
         public object PresenceValue;
     }
 
-    private readonly IDefaultHandlerFactory handlerFactory;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="handlerFactory">Default handler factory</param>
-    /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
-    public UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory)
-    {
-        this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-    }
-
+    private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
     private List<RelationInfo> infoList;
 
     /// <inheritdoc/>
@@ -165,7 +159,7 @@ public class UpdatableExtensionBehavior : BaseSaveDeleteBehavior, IImplicitBehav
                 return JoinAliasLocator.ReplaceAliases(x, mapAlias);
             }
 
-            info.Mappings = new List<Tuple<Field, Field>>();
+            info.Mappings = [];
             foreach (var field in extFields)
             {
                 if (ReferenceEquals(info.OtherKeyField, field))

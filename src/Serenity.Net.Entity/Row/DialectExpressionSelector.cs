@@ -3,22 +3,15 @@
 /// <summary>
 /// Selects field expressions based on dialect
 /// </summary>
-public class DialectExpressionSelector
+/// <remarks>
+/// Initializes a new instance of the <see cref="DialectExpressionSelector"/> class.
+/// </remarks>
+/// <param name="dialect">The dialect.</param>
+/// <exception cref="ArgumentNullException">dialect</exception>
+public class DialectExpressionSelector(ISqlDialect dialect)
 {
-    private readonly string dialectServerType;
-    private readonly string dialectTypeName;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DialectExpressionSelector"/> class.
-    /// </summary>
-    /// <param name="dialect">The dialect.</param>
-    /// <exception cref="ArgumentNullException">dialect</exception>
-    public DialectExpressionSelector(ISqlDialect dialect)
-    {
-        Dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
-        dialectServerType = dialect.ServerType;
-        dialectTypeName = dialect.GetType().Name;
-    }
+    private readonly string dialectServerType = dialect.ServerType;
+    private readonly string dialectTypeName = dialect.GetType().Name;
 
     private bool IsMatch(string dialect)
     {
@@ -98,10 +91,10 @@ public class DialectExpressionSelector
             duplicate.Key.TrimToNull() ?? "<null>"));
     }
 
-    private static readonly char[] comma = new char[] { ',' };
+    private static readonly char[] comma = [','];
 
     /// <summary>
     /// Gets the dialect used for this expression selector
     /// </summary>
-    public ISqlDialect Dialect { get; }
+    public ISqlDialect Dialect { get; } = dialect ?? throw new ArgumentNullException(nameof(dialect));
 }

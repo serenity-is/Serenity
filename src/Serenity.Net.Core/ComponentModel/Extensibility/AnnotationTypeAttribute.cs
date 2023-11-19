@@ -5,30 +5,25 @@
 /// e.g. it contains attributes for the other type and its properties. This is mainly used to
 /// separate dependencies between rows and UI related properties like editor types etc.
 /// </summary>
+/// <remarks>
+/// Creates an instance of AnnotationType attribute
+/// </remarks>
+/// <param name="type">The type to match. It can be a type, an interface 
+/// or an attribute type that type other type should have.</param>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-public class AnnotationTypeAttribute : Attribute
+public class AnnotationTypeAttribute(Type type) : Attribute
 {
-    /// <summary>
-    /// Creates an instance of AnnotationType attribute
-    /// </summary>
-    /// <param name="type">The type to match. It can be a type, an interface 
-    /// or an attribute type that type other type should have.</param>
-    public AnnotationTypeAttribute(Type type)
-    {
-        AnnotatedType = type ?? throw new ArgumentNullException("type");
-        Inherited = true;
-    }
 
     /// <summary>
     /// Other type, interface or type of attribute that other type should have
     /// </summary>
-    public Type AnnotatedType { get; private set; }
+    public Type AnnotatedType { get; private set; } = type ?? throw new ArgumentNullException("type");
 
     /// <summary>
     /// Should type exactly match, or can it be a subclass of the type.
     /// Default is true, ignored for attribute types.
     /// </summary>
-    public bool Inherited { get; set; }
+    public bool Inherited { get; set; } = true;
 
     /// <summary>
     /// If specified this annotation only applies to types in the namespaces 

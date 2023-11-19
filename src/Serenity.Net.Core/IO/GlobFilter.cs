@@ -18,10 +18,10 @@ public class GlobFilter
     private readonly bool isActive;
     private readonly List<Func<string, bool>> matchers;
 
-    private readonly char[] DotAsteriskSlashBackQue = new char[] { '.', '*', '/', '\\', '?' };
-    private readonly char[] AsteriskSlashBackQue = new char[] { '*', '/', '\\', '?' };
-    private readonly char[] AsteriskQue = new char[] { '*', '?' };
-    private readonly char[] FolderSeps = new char[] { '\\', '/' };
+    private readonly char[] DotAsteriskSlashBackQue = ['.', '*', '/', '\\', '?'];
+    private readonly char[] AsteriskSlashBackQue = ['*', '/', '\\', '?'];
+    private readonly char[] AsteriskQue = ['*', '?'];
+    private readonly char[] FolderSeps = ['\\', '/'];
 
     /// <summary>
     /// Creates a new GlobFilter, containing both include and exclude patterns.
@@ -48,7 +48,7 @@ public class GlobFilter
     /// <param name="globs">List of patterns</param>
     public GlobFilter(IEnumerable<string> globs)
     {
-        matchers = new List<Func<string, bool>>();
+        matchers = [];
 
         if (globs == null)
             return;
@@ -79,7 +79,7 @@ public class GlobFilter
             if (starDotIndex == 0 &&
                 s.IndexOfAny(DotAsteriskSlashBackQue, 2) < 0)
             {
-                extensions ??= new HashSet<string>();
+                extensions ??= [];
 
                 extensions.Add(s[1..]);
                 continue;
@@ -89,7 +89,7 @@ public class GlobFilter
             if (starDotIndex == 0 &&
                 s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
             {
-                endsWith ??= new List<string>();
+                endsWith ??= [];
 
                 endsWith.Add(s[1..]);
                 continue;
@@ -102,7 +102,7 @@ public class GlobFilter
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0 &&
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 1) < 0)
             {
-                startsWithAndEndsWith ??= new();
+                startsWithAndEndsWith ??= [];
                 startsWithAndEndsWith.Add(new(s[1..starDotIndex], false, s[(starDotIndex + 1)..]));
                 continue;
             }
@@ -112,7 +112,7 @@ public class GlobFilter
                 s[0] == '/' &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
-                startsWithAndEndsWith ??= new();
+                startsWithAndEndsWith ??= [];
                 startsWithAndEndsWith.Add(new(null, false, s[(starDotIndex + 1)..]));
                 continue;
             }
@@ -122,9 +122,9 @@ public class GlobFilter
                 s[0] != '/' &&
                 s.IndexOfAny(AsteriskQue, 1) < 0)
             {
-                contains ??= new List<string>();
+                contains ??= [];
 
-                startsWith ??= new List<string>();
+                startsWith ??= [];
 
                 contains.Add('/'.ToString() + s);
                 startsWith.Add(s);
@@ -137,7 +137,7 @@ public class GlobFilter
                 s[0] == '/' &&
                 s.IndexOfAny(AsteriskQue) < 0)
             {
-                startsWith ??= new List<string>();
+                startsWith ??= [];
 
                 startsWith.Add(s[1..]);
                 continue;
@@ -152,7 +152,7 @@ public class GlobFilter
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 5) < 0 &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
-                startsWithAndEndsWith ??= new();
+                startsWithAndEndsWith ??= [];
 
                 if (s[0] == '/')
                 {
@@ -160,7 +160,7 @@ public class GlobFilter
                 }
                 else
                 {
-                    containsAndEndsWith ??= new();
+                    containsAndEndsWith ??= [];
                     startsWithAndEndsWith.Add(new(s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
                     containsAndEndsWith.Add(new('/'.ToString() + s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
                 }
@@ -180,7 +180,7 @@ public class GlobFilter
                 {
                     exactMatch.Add(s[..]);
 
-                    endsWith ??= new List<string>();
+                    endsWith ??= [];
 
                     endsWith.Add('/' + s[..]);
                 }
@@ -190,7 +190,7 @@ public class GlobFilter
 
             if (s[0] == '*' && s.IndexOfAny(AsteriskSlashBackQue, 1) < 0)
             {
-                endsWith ??= new List<string>();
+                endsWith ??= [];
 
                 endsWith.Add(s[1..]);
                 continue;
@@ -201,7 +201,7 @@ public class GlobFilter
                 s[1] == '*' &&
                 s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
             {
-                startsWithAndEndsWith ??= new();
+                startsWithAndEndsWith ??= [];
                 startsWithAndEndsWith.Add(new(null, false, s[2..]));
                 continue;
             }

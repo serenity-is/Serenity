@@ -241,7 +241,7 @@ public partial class EntiyModelGeneratorTests
         var inputs = new CustomerEntityInputs();
         inputs.Config.ForeignFieldSelection = GeneratorConfig.FieldSelection.None;
         inputs.Config.IncludeForeignFields = null;
-        inputs.Config.RemoveForeignFields = new() { CountryId };
+        inputs.Config.RemoveForeignFields = [CountryId];
 
         var model = generator.GenerateModel(inputs);
 
@@ -258,7 +258,7 @@ public partial class EntiyModelGeneratorTests
 
         var inputs = new CustomerEntityInputs();
         inputs.Config.ForeignFieldSelection = GeneratorConfig.FieldSelection.None;
-        inputs.Config.IncludeForeignFields = new() { CountryId };
+        inputs.Config.IncludeForeignFields = [CountryId];
         inputs.Config.RemoveForeignFields = null;
 
         var model = generator.GenerateModel(inputs);

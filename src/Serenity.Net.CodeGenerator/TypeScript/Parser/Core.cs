@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.TypeScript.TsParser;
 
@@ -14,7 +14,7 @@ public static class Core
         }
         var low = offset ?? 0;
         var high = array.Length - 1;
-        comparer = comparer ?? ((v1, v2) => (v1 < v2 ? -1 : (v1 > v2 ? 1 : 0)));
+        comparer ??= ((v1, v2) => (v1 < v2 ? -1 : (v1 > v2 ? 1 : 0)));
         while (low <= high)
         {
             var middle = low + ((high - low) >> 1);
@@ -73,7 +73,7 @@ public static class Core
         var rootLength = GetRootLength(path);
         var root = path[..rootLength];
         var normalized = GetNormalizedParts(path, rootLength);
-        if (normalized.Any())
+        if (normalized.Count != 0)
         {
             var joinedParts = root + string.Join(DirectorySeparator.ToString(), normalized);//.join(directorySeparator);
             return PathEndsWithDirectorySeparator(path) ? joinedParts + DirectorySeparator : joinedParts;
@@ -96,12 +96,12 @@ public static class Core
             {
                 return 1;
             }
-            var p1 = path.IndexOf("/", 2, StringComparison.Ordinal);
+            var p1 = path.IndexOf('/', 2);
             if (p1 < 0)
             {
                 return 2;
             }
-            var p2 = path.IndexOf("/", p1 + 1, StringComparison.Ordinal);
+            var p2 = path.IndexOf('/', p1 + 1);
             if (p2 < 0)
             {
                 return p1 + 1;
@@ -127,12 +127,14 @@ public static class Core
         }
         return 0;
     }
-    public static char DirectorySeparator = '/';
-    public static int DirectorySeparatorCharCode = '/';
+    
+    private static readonly char DirectorySeparator = '/';
+    private static readonly int DirectorySeparatorCharCode = '/';
+
     public static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
     {
         var parts = normalizedSlashedPath[rootLength..].Split(DirectorySeparator);
-        List<string> normalized = new List<string>();
+        List<string> normalized = [];
         foreach (var part in parts)
         {
             if (part != ".")
@@ -156,9 +158,9 @@ public static class Core
     }
     public static T LastOrUndefined<T>(List<T> array)
     {
-        return array != null && array.Any()
+        return array != null && array.Count != 0
                     ? array.Last()
-                    : default(T);
+                    : default;
     }
     public static bool PathEndsWithDirectorySeparator(string path)
     {
@@ -198,7 +200,7 @@ public static class Core
     }
     public static string GetLocaleSpecificMessage(DiagnosticMessage message)
     {
-        return "localizedDiagnosticMessages";// && localizedDiagnosticMessages[message.key] || message.message;
+        return message.Message;
     }
 
 }

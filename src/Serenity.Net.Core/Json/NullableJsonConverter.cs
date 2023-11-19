@@ -22,7 +22,7 @@ public class NullableJsonConverter : JsonConverterFactory
                 new Type[] { Nullable.GetUnderlyingType(type) }),
             BindingFlags.Instance | BindingFlags.Public,
             binder: null,
-            args: Array.Empty<object>(),
+            args: [],
             culture: null);
 
     class NullableValueConverter<T> : JsonConverter<T?> where T : struct

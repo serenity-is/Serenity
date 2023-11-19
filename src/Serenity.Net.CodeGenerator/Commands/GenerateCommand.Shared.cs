@@ -52,8 +52,7 @@ public partial class GenerateCommand
         connection.EnsureOpen();
 
         var csprojContent = fileSystem.ReadAllText(csproj);
-        inputs.Net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>",
-            RegexOptions.Multiline | RegexOptions.Compiled).IsMatch(csprojContent);
+        inputs.Net5Plus = !targetFrameworkNetCoreRegexGen().IsMatch(csprojContent);
 
         inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
             StringComparison.OrdinalIgnoreCase);
@@ -143,7 +142,7 @@ public partial class GenerateCommand
 
         public AppSettingsFormat()
         {
-            Data = new ConnectionStringOptions();
+            Data = [];
         }
 
         public class ConnectionInfo
@@ -188,4 +187,7 @@ public partial class GenerateCommand
             Justification = Justify.Left
         });
     }
+
+    [GeneratedRegex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
+    private static partial Regex targetFrameworkNetCoreRegexGen();
 }

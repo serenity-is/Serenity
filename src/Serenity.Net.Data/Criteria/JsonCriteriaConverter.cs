@@ -222,7 +222,7 @@ public class JsonCriteriaConverter : JsonConverter
     public override bool CanWrite => true;
 
     private static readonly string[] OperatorToKey =
-    {
+    [
         "()", // Paren
         "not", // Not
         "is null", // IsNull
@@ -241,7 +241,7 @@ public class JsonCriteriaConverter : JsonConverter
         "not in", // NOT IN
         "like", // LIKE
         "not like" // NOT LIKE
-    };
+    ];
 
     private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;
 }

@@ -16,10 +16,7 @@ public static class ConnectionStringsExtensions
         if (connectionStrings == null)
             throw new ArgumentNullException(nameof(connectionStrings));
 
-        var connectionString = connectionStrings.TryGetConnectionString(connectionKey);
-        if (connectionString == null)
-            throw new ArgumentOutOfRangeException(nameof(connectionKey));
-
+        var connectionString = connectionStrings.TryGetConnectionString(connectionKey) ?? throw new ArgumentOutOfRangeException(nameof(connectionKey));
         return connectionString;
     }
 }

@@ -141,8 +141,8 @@ public class Program
                 {
                     ensureTSTypes();
                     new ClientTypesCommand(fileSystem).Run(csproj,
-                        (tsTypesNamespaces ?? new List<ExternalType>())
-                        .Concat(tsTypesModules ?? new List<ExternalType>()).ToList());
+                        [.. (tsTypesNamespaces ?? [])
+, .. tsTypesModules ?? []]);
                 }
 
                 if (transformAll ||

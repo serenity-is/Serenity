@@ -6,7 +6,11 @@ namespace Serenity;
 /// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 
 /// from String.
 /// </summary>
-public class LocalText : ILocalText
+/// <remarks>
+/// Creates a new LocalText instance that contains the specified local text key
+/// </remarks>
+/// <param name="key">Local text key</param>
+public class LocalText(string? key) : ILocalText
 {
     /// <summary>
     /// Invariant language ID is an empty string
@@ -24,18 +28,9 @@ public class LocalText : ILocalText
     }
 
     /// <summary>
-    /// Creates a new LocalText instance that contains the specified local text key
-    /// </summary>
-    /// <param name="key">Local text key</param>
-    public LocalText(string? key)
-    {
-        Key = key ?? string.Empty;
-    }
-
-    /// <summary>
     /// Gets the local text key
     /// </summary>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = key ?? string.Empty;
 
     /// <summary>
     /// Implicit conversion from String that creates a new instance of LocalText with the specified key.

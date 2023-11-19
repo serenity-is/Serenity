@@ -52,7 +52,7 @@ public abstract partial class Field : IFieldWithJoinInfo
         minSelectLevel = SelectLevel.Auto;
         naturalOrder = 0;
         this.caption = caption;
-        customAttributes = Array.Empty<object>();
+        customAttributes = [];
         fields?.Add(this);
     }
 
@@ -194,7 +194,7 @@ public abstract partial class Field : IFieldWithJoinInfo
         {
             if (customAttributes != value)
             {
-                customAttributes = value ?? Array.Empty<object>();
+                customAttributes = value ?? [];
                 if (fields != null)
                     fields.byAttribute = null;
             }

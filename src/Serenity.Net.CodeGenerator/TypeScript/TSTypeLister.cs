@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 using System.Collections.Concurrent;
 using System.Threading;
 #if !ISSOURCEGENERATOR
@@ -20,8 +20,12 @@ public class TSTypeLister
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         this.astCache = astCache;
         this.cancellationToken = cancellationToken;
+#if ISSOURCEGENERATOR
         if (tsConfigPath is null)
             throw new ArgumentNullException(nameof(tsConfigPath));
+#else
+        ArgumentNullException.ThrowIfNull(tsConfigPath);
+#endif
 
         this.tsConfigPath = fileSystem.GetFullPath(tsConfigPath);
     }

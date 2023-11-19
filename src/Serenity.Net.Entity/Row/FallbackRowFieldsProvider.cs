@@ -10,7 +10,7 @@ public class FallbackRowFieldsProvider : IRowFieldsProvider
     /// <summary>
     /// The instance
     /// </summary>
-    public static FallbackRowFieldsProvider Instance = new FallbackRowFieldsProvider();
+    public static FallbackRowFieldsProvider Instance = new();
     private readonly ConcurrentDictionary<Type, RowFieldsBase> byType;
     private readonly ConcurrentDictionary<(Type type, string alias),
         RowFieldsBase> byTypeAndAlias;

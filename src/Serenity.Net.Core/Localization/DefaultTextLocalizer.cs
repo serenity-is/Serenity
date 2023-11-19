@@ -3,18 +3,13 @@
 /// <summary>
 /// Implementation of text localizer for current ui culture name and text registry
 /// </summary>
-public class DefaultTextLocalizer : ITextLocalizer
+/// <remarks>
+/// Creates a new default text localizer instance
+/// </remarks>
+/// <param name="registry"></param>
+public class DefaultTextLocalizer(ILocalTextRegistry registry) : ITextLocalizer
 {
-    private readonly ILocalTextRegistry registry;
-
-    /// <summary>
-    /// Creates a new default text localizer instance
-    /// </summary>
-    /// <param name="registry"></param>
-    public DefaultTextLocalizer(ILocalTextRegistry registry)
-    {
-        this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
-    }
+    private readonly ILocalTextRegistry registry = registry ?? throw new ArgumentNullException(nameof(registry));
 
     /// <summary>
     /// Gets translation for a key based on the context language
