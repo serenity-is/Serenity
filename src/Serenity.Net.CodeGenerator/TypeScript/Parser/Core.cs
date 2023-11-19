@@ -200,7 +200,7 @@ public static class Core
     }
     public static string GetLocaleSpecificMessage(DiagnosticMessage message)
     {
-        return message.Message;
+        return message?.Key ?? message?.Message ?? "localizedDiagnosticMessages";
     }
 
 }
