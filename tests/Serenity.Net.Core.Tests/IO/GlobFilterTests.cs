@@ -4,8 +4,8 @@ namespace Serenity.Tests.IO;
 
 public class GlobFilterTests
 {
-    static readonly string[] filters = new string[]
-    {
+    static readonly string[] filters =
+    [
         ".git/",
         "/web.config",
         "/Web.Debug.config",
@@ -29,7 +29,7 @@ public class GlobFilterTests
         "*-vsdoc.js",
         "/*-dat.js",
         "Modules/**/*",
-    };
+    ];
 
     [Theory]
     [InlineData(@".git/", true)]

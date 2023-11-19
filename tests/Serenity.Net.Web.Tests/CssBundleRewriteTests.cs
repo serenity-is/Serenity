@@ -54,10 +54,7 @@ public class CssBundleRewriteTests
         container.AddCssBundling(options =>
         {
             options.Enabled = true;
-            options.Bundles[bundleName] = new string[]
-            {
-                cssUrl
-            };
+            options.Bundles[bundleName] = [ cssUrl ];
         });
         var services = container.BuildServiceProvider();
         var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
