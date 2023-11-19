@@ -1,21 +1,13 @@
 namespace Serenity.CodeGeneration;
 
+#if ISSOURCEGENERATOR
+public partial class ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation,
+    System.Threading.CancellationToken cancellationToken)
+    : TypingsGeneratorBase(compilation, cancellationToken)
+{
+#else
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    public bool LocalTexts { get; set; }
-    public bool ModuleReExports { get; set; } = true;
-    public bool ModuleTypings { get; set; } = false;
-    public bool NamespaceTypings { get; set; } = true;
-
-    public readonly HashSet<string> LocalTextFilters = [];
-
-#if ISSOURCEGENERATOR
-    public ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 
-        System.Threading.CancellationToken cancellationToken)
-        : base(compilation, cancellationToken)
-    {
-    }
-#else
     public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
         : base(fileSystem, assemblies)
     {
@@ -26,6 +18,13 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
     }
 #endif
+
+    public bool LocalTexts { get; set; }
+    public bool ModuleReExports { get; set; } = true;
+    public bool ModuleTypings { get; set; } = false;
+    public bool NamespaceTypings { get; set; } = true;
+
+    public readonly HashSet<string> LocalTextFilters = [];
 
     protected override void GenerateAll()
     {
