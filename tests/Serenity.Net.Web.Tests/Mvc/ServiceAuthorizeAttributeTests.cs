@@ -4,7 +4,7 @@ public class ServiceAuthorizeAttributeTests
 {
     private const string NotLoggedInErrorCode = "NotLoggedIn";
     private const string AccessDeniedErrorCode = "AccessDenied";
-    private static readonly string[] testPermissionArray = [ "Test:Permission" ];
+    private static readonly string[] testPermissionArray = ["Test:Permission"];
 
     [Fact]
     public void Passes_If_Permission_Is_Null_And_Context_Is_Logged_In()
@@ -27,10 +27,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_OrPermission_Is_Not_Null_And_Context_Has_That_Permission()
     {
-        var sutResult = TestResourceFilters(
-            [
-                new OrPermissionSetAttribute("Test:DoesntHave", "Test:Permission")
-            ],
+        var sutResult = TestResourceFilters([new OrPermissionSetAttribute("Test:DoesntHave", "Test:Permission")],
             permissions: testPermissionArray);
 
         Assert.Null(sutResult);
@@ -90,10 +87,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_If_Permission_Is_Null_And_User_Is_Not_Logged_In_And_Have_No_Permissions()
     {
-        var sutResult = TestResourceFilters(
-            [
-                new ServiceAuthorizeAttribute((string)null),
-            ],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
             isLoggedIn: false);
 
         Assert.Equal(NotLoggedInErrorCode, sutResult.Error.Code);
@@ -102,10 +96,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_Permission_Is_Null_And_User_Is_Logged_In_And_Have_No_Permissions()
     {
-        var sutResult = TestResourceFilters(
-            [
-                new ServiceAuthorizeAttribute((string)null),
-            ],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
             isLoggedIn: true);
 
         Assert.Null(sutResult);
@@ -114,10 +105,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_With_AccessDenied_If_User_Is_Logged_In()
     {
-        var sutResult = TestResourceFilters(
-            [
-                new ServiceAuthorizeAttribute("Test:Permission")
-            ],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute("Test:Permission")],
             isLoggedIn: true);
 
         Assert.Equal(AccessDeniedErrorCode, sutResult.Error.Code);
@@ -126,10 +114,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_With_NotLoggedIn_If_User_Is_Not_Logged_In()
     {
-        var sutResult = TestResourceFilters(
-            [
-                new ServiceAuthorizeAttribute("Test:Permission")
-            ],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute("Test:Permission")],
             isLoggedIn: false);
 
         Assert.Equal(NotLoggedInErrorCode, sutResult.Error.Code);
@@ -265,7 +250,7 @@ public class ServiceAuthorizeAttributeTests
         }
     }
 
-    private class CallConstructorWithTypeAndParamsTypeAttribute(Type sourceType, params Type[] attributeTypes) 
+    private class CallConstructorWithTypeAndParamsTypeAttribute(Type sourceType, params Type[] attributeTypes)
         : ServiceAuthorizeAttribute(sourceType, attributeTypes)
     {
     }
