@@ -19,12 +19,7 @@ public static class TSConfigHelper
         IGeneratorFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
-#if ISSOURCEGENERATOR
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
-#else
-        ArgumentNullException.ThrowIfNull(config);
-#endif
+        ArgumentExceptionHelper.ThrowIfNull(config);
 
         if (config.Files != null)
         {
@@ -185,15 +180,8 @@ public static class TSConfigHelper
 
     public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
     {
-#if ISSOURCEGENERATOR
-        if (fileSystem == null)
-            throw new ArgumentNullException(nameof(fileSystem));
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
-#else
-        ArgumentNullException.ThrowIfNull(fileSystem);
-        ArgumentNullException.ThrowIfNull(path);
-#endif
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem);
+        ArgumentExceptionHelper.ThrowIfNull(path);
 
         try
         {
