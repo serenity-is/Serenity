@@ -28,7 +28,7 @@
     ],
     "noEmitHelpers": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "jsx-dom"
+    "jsxImportSource": "jsx-dom/min"
   },
   "include": [
     "../src/globals/jquery-globals.ts",
