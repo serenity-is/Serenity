@@ -4,7 +4,7 @@
 {{USING "MyRow = " + RowFullName}}
 
 {{NAMESPACE ModuleNamespace}}{{capture block~}}
-public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> {}
+public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> { }
 
 public class {{ClassName}}SaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}SaveHandler
 {

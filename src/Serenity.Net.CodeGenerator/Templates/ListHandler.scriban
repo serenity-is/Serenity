@@ -4,7 +4,7 @@
 {{USING "MyRow = " + RowFullName}}
 
 {{NAMESPACE ModuleNamespace}}{{capture block~}}
-public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> {}
+public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> { }
 
 public class {{ClassName}}ListHandler : ListRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}ListHandler
 {
