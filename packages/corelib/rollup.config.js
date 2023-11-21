@@ -39,7 +39,8 @@ const replaceTypeRef = function(src, name, rep) {
 }
 
 function moduleToGlobalName(fromModule) {
-    return fromModule == "@serenity-is/sleekgrid" ? 'Slick' : null;
+    return fromModule == "@serenity-is/sleekgrid" ? 'Slick' :
+        (fromModule == "@serenity-is/base" ? 'Serenity' : null);
 }
 
 const convertModularToGlobal = (src, ns, isTS) => {
@@ -48,6 +49,7 @@ const convertModularToGlobal = (src, ns, isTS) => {
     src = src.replace('sourceItem?: PropertyItem', 'sourceItem?: Serenity.PropertyItem');
     src = src.replace('const GroupItemMetadataProvider: GroupItemMetadataProviderType', 'const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider');
     src = src.replace('type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider', 'type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider');
+    src = src.replace(/^\s*export\s+\*\s+from\s*['"]@serenity-is\/base['"]\s*\;\s*\r?$/gm, '');
 
     var refTypes = [];
     src = src.replace(rxReferenceTypes, function (match) {
@@ -110,8 +112,9 @@ const convertModularToGlobal = (src, ns, isTS) => {
         }
     }
 
-    if (ns == 'Slick')
+    if (ns == 'Slick') {
         src = replaceTypeRef(src, 'Event', 'Slick.Event');
+    }
 
     if (ns == 'Serenity') {
         src = src.replace(': typeof executeOnceWhenVisible', ': typeof Q.executeOnceWhenVisible');
@@ -176,8 +179,6 @@ var toGlobal = function (ns, outFile, isTS) {
                     var src = b[fileName].code;
                     src = convertModularToGlobal(src, ns, isTS);
                     if (outFile) {
-                        if (outFile.indexOf('Slick') >= 0)
-                            src = src.replace(/SlickEvent/g, )
                         fs.writeFileSync(outFile, src);
                     }
                     else {
@@ -298,6 +299,8 @@ export default [
                             'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
                         // inject sleekgrid typings after q
                         dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
+                        dtsOutputs.splice(2, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/base/dist/index.d.ts").toString(), 'Serenity'));
+                        
                         dtsOutputs.push(`
 import Q = Serenity;
 
