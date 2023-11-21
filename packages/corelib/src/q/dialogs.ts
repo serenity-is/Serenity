@@ -1,10 +1,10 @@
 ﻿import { Config } from "./config";
 import { extend } from "./system";
-import { htmlEncode, toggleClass } from "./html";
 import { startsWith } from "./strings";
 import { tryGetText } from "./localtext";
 import $ from "@optionaldeps/jquery";
 import bootstrap from "@optionaldeps/bootstrap";
+import { htmlEncode, toggleClass } from "@serenity-is/base";
 
 /**
  * Options for a message dialog button

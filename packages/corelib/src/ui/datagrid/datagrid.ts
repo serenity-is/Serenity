@@ -1,8 +1,8 @@
-﻿import { Criteria, ListResponse, type PropertyItem, type PropertyItemsData, debounce, getInstanceType, getTypeFullName, isInstanceOfType } from "@serenity-is/base";
+﻿import { Criteria, ListResponse, type PropertyItem, type PropertyItemsData, debounce, getInstanceType, getTypeFullName, isInstanceOfType, htmlEncode } from "@serenity-is/base";
 import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, GroupItemMetadataProvider, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, LayoutTimer, ScriptData, deepClone, endsWith, extend, getAttributes, getColumnsData, getColumnsDataAsync, htmlEncode, indexOf, isEmptyOrNull, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
+import { Authorization, LayoutTimer, ScriptData, deepClone, endsWith, extend, getAttributes, getColumnsData, getColumnsDataAsync, indexOf, isEmptyOrNull, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";

@@ -1,7 +1,7 @@
-﻿import { Culture, type PropertyItem, SaveRequest } from "@serenity-is/base";
+﻿import { Culture, type PropertyItem, SaveRequest, htmlEncode } from "@serenity-is/base";
 import { Column, FormatterContext, Grid } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, htmlEncode, isEmptyOrNull, localText, replaceAll, safeCast, serviceCall, startsWith, tryGetText } from "../../q";
+import { Authorization, clearKeys, isEmptyOrNull, localText, replaceAll, safeCast, serviceCall, startsWith, tryGetText } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";

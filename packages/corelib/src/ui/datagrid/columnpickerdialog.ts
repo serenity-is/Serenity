@@ -1,11 +1,11 @@
-﻿import { Column } from "@serenity-is/sleekgrid";
+﻿import { Culture, htmlEncode } from "@serenity-is/base";
+import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, centerDialog, htmlEncode, Router, localText, trimToNull } from "../../q";
+import { Authorization, Router, centerDialog, localText, trimToNull } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
 import { IDataGrid } from "./idatagrid";
-import { Culture } from "@serenity-is/base";
 
 @Decorators.registerClass('Serenity.ColumnPickerDialog')
 @Decorators.resizable()

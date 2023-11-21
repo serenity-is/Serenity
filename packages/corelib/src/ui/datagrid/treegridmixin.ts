@@ -1,6 +1,6 @@
-﻿import { ListResponse } from "@serenity-is/base";
+﻿import { ListResponse, htmlEncode } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { htmlEncode, toGrouping, tryFirst } from "../../q";
+import { toGrouping, tryFirst } from "../../q";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { DataGrid } from "./datagrid";
 

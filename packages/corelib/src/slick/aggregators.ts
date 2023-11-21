@@ -1,6 +1,6 @@
 ﻿import { escape, Column, GroupTotals, NonDataRow, convertCompatFormatter } from "@serenity-is/sleekgrid";
-import { htmlEncode, tryGetText } from "../q";
-import { formatNumber } from "@serenity-is/base";
+import { tryGetText } from "../q";
+import { formatNumber, htmlEncode } from "@serenity-is/base";
 
 export {}
 

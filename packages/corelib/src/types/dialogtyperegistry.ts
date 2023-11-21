@@ -1,7 +1,7 @@
-﻿import { ArgumentNullException, Exception, htmlEncode, isEmptyOrNull, notifyError } from "../q";
+﻿import { ArgumentNullException, Exception, isEmptyOrNull, notifyError } from "../q";
 import { IDialog } from "../interfaces";
 import { commonTypeRegistry } from "./commontyperegistry";
-import { isAssignableFrom } from "@serenity-is/base";
+import { htmlEncode, isAssignableFrom } from "@serenity-is/base";
 
 export namespace DialogTypeRegistry {
 

@@ -1,8 +1,8 @@
-﻿import { deepClone, extend, htmlEncode, notifyError, localText } from "../q";
+﻿import { deepClone, extend, notifyError, localText } from "../q";
 import { EventEmitter, EventData, Grid, gridDefaults, Group, GroupItemMetadataProvider, GroupTotals } from "@serenity-is/sleekgrid";
 import { AggregateFormatting } from "./aggregators";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
-import { ListRequest, ListResponse, ServiceResponse } from "@serenity-is/base";
+import { ListRequest, ListResponse, ServiceResponse, htmlEncode } from "@serenity-is/base";
 
 export interface RemoteViewOptions {
     autoLoad?: boolean;

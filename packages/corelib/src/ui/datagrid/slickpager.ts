@@ -1,7 +1,8 @@
-﻿import { htmlEncode, extend, localText } from "../../q";
+﻿import { extend, localText } from "../../q";
 import { PagerOptions } from "../../slick";
 import { Decorators } from "../../decorators";
 import { Widget } from "../widgets/widget";
+import { htmlEncode } from "@serenity-is/base";
 
 @Decorators.registerClass("Serenity.SlickPager")
 export class SlickPager extends Widget<PagerOptions> {

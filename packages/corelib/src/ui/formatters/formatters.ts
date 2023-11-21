@@ -1,7 +1,7 @@
-﻿import { Culture, Enum, formatDate, formatNumber, getTypeFullName, parseDecimal, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Culture, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, parseDecimal, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { getAttributes, htmlEncode, isEmptyOrNull, ISlickFormatter, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
+import { ISlickFormatter, getAttributes, isEmptyOrNull, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 

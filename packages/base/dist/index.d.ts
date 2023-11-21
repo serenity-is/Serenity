@@ -356,6 +356,19 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
+/**
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+ * @param s String (or number etc.) to be HTML encoded
+ */
+declare function htmlEncode(s: any): string;
+/**
+ * Toggles the class on the element handling spaces like addClass does.
+ * @param el the element
+ * @param cls the class to toggle
+ * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ */
+declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+
 declare enum SummaryType {
     Disabled = -1,
     None = 0,
@@ -550,4 +563,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type Type, type UndeleteRequest, type UndeleteResponse, compareStringFactory, debounce, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, initFormType, isAssignableFrom, isEnum, isInstanceOfType, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, registerClass, registerEnum, registerInterface, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, trunc };
+export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type Type, type UndeleteRequest, type UndeleteResponse, compareStringFactory, debounce, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, registerClass, registerEnum, registerInterface, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc };
