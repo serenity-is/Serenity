@@ -1685,6 +1685,149 @@ declare namespace Slick {
 
 declare namespace Serenity {
     /**
+     * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+     */
+    class CriteriaBuilder extends Array {
+        /**
+         * Creates a between criteria.
+         * @param fromInclusive from value
+         * @param toInclusive to value
+         */
+        bw(fromInclusive: any, toInclusive: any): Array<any>;
+        /**
+         * Creates a contains criteria
+         * @param value contains value
+         */
+        contains(value: string): Array<any>;
+        /**
+         * Creates a endsWith criteria
+         * @param value endsWith value
+         */
+        endsWith(value: string): Array<any>;
+        /**
+         * Creates an equal (=) criteria
+         * @param value equal value
+         */
+        eq(value: any): Array<any>;
+        /**
+         * Creates a greater than criteria
+         * @param value greater than value
+         */
+        gt(value: any): Array<any>;
+        /**
+         * Creates a greater than or equal criteria
+         * @param value greater than or equal value
+         */
+        ge(value: any): Array<any>;
+        /**
+         * Creates a in criteria
+         * @param values in values
+         */
+        in(values: any[]): Array<any>;
+        /**
+         * Creates a IS NULL criteria
+         */
+        isNull(): Array<any>;
+        /**
+         * Creates a IS NOT NULL criteria
+         */
+        isNotNull(): Array<any>;
+        /**
+         * Creates a less than or equal to criteria
+         * @param value less than or equal to value
+         */
+        le(value: any): Array<any>;
+        /**
+         * Creates a less than criteria
+         * @param value less than value
+         */
+        lt(value: any): Array<any>;
+        /**
+         * Creates a not equal criteria
+         * @param value not equal value
+         */
+        ne(value: any): Array<any>;
+        /**
+         * Creates a LIKE criteria
+         * @param value like value
+         */
+        like(value: any): Array<any>;
+        /**
+         * Creates a STARTS WITH criteria
+         * @param value startsWith value
+         */
+        startsWith(value: string): Array<any>;
+        /**
+         * Creates a NOT IN criteria
+         * @param values array of NOT IN values
+         */
+        notIn(values: any[]): Array<any>;
+        /**
+         * Creates a NOT LIKE criteria
+         * @param value not like value
+         */
+        notLike(value: any): Array<any>;
+    }
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
+     * @param expression The criteria expression.
+     * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+     * @example
+     * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
+    function parseCriteria(expression: string, params?: any): any[];
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The expression may contain parameter placeholders like `A >= ${p1}`
+     * where p1 is a variable in the scope.
+     * @param strings The string fragments.
+     * @param values The tagged template arguments.
+     * @example
+     * var a = 5, b = 4;
+     * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
+    function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+    /**
+     * Enumeration of Criteria operator keys.
+     */
+    enum CriteriaOperator {
+        paren = "()",
+        not = "not",
+        isNull = "is null",
+        isNotNull = "is not null",
+        exists = "exists",
+        and = "and",
+        or = "or",
+        xor = "xor",
+        eq = "=",
+        ne = "!=",
+        gt = ">",
+        ge = ">=",
+        lt = "<",
+        le = "<=",
+        in = "in",
+        notIn = "not in",
+        like = "like",
+        notLike = "not like"
+    }
+    /**
+     * Creates a new criteria builder containg the passed field name.
+     * @param field The field name.
+     */
+    function Criteria(field: string): CriteriaBuilder;
+    namespace Criteria {
+        var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var Operator: typeof CriteriaOperator;
+        var isEmpty: (c: any[]) => boolean;
+        var join: (c1: any[], op: string, c2: any[]) => any[];
+        var not: (c: any[]) => (string | any[])[];
+        var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var paren: (c: any[]) => any[];
+        var parse: typeof parseCriteria;
+    }
+
+    /**
      * Interface for number formatting, similar to .NET's NumberFormatInfo
      */
     interface NumberFormat {
@@ -3042,149 +3185,6 @@ declare namespace Serenity {
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-
-    /**
-     * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
-     */
-    class CriteriaBuilder extends Array {
-        /**
-         * Creates a between criteria.
-         * @param fromInclusive from value
-         * @param toInclusive to value
-         */
-        bw(fromInclusive: any, toInclusive: any): Array<any>;
-        /**
-         * Creates a contains criteria
-         * @param value contains value
-         */
-        contains(value: string): Array<any>;
-        /**
-         * Creates a endsWith criteria
-         * @param value endsWith value
-         */
-        endsWith(value: string): Array<any>;
-        /**
-         * Creates an equal (=) criteria
-         * @param value equal value
-         */
-        eq(value: any): Array<any>;
-        /**
-         * Creates a greater than criteria
-         * @param value greater than value
-         */
-        gt(value: any): Array<any>;
-        /**
-         * Creates a greater than or equal criteria
-         * @param value greater than or equal value
-         */
-        ge(value: any): Array<any>;
-        /**
-         * Creates a in criteria
-         * @param values in values
-         */
-        in(values: any[]): Array<any>;
-        /**
-         * Creates a IS NULL criteria
-         */
-        isNull(): Array<any>;
-        /**
-         * Creates a IS NOT NULL criteria
-         */
-        isNotNull(): Array<any>;
-        /**
-         * Creates a less than or equal to criteria
-         * @param value less than or equal to value
-         */
-        le(value: any): Array<any>;
-        /**
-         * Creates a less than criteria
-         * @param value less than value
-         */
-        lt(value: any): Array<any>;
-        /**
-         * Creates a not equal criteria
-         * @param value not equal value
-         */
-        ne(value: any): Array<any>;
-        /**
-         * Creates a LIKE criteria
-         * @param value like value
-         */
-        like(value: any): Array<any>;
-        /**
-         * Creates a STARTS WITH criteria
-         * @param value startsWith value
-         */
-        startsWith(value: string): Array<any>;
-        /**
-         * Creates a NOT IN criteria
-         * @param values array of NOT IN values
-         */
-        notIn(values: any[]): Array<any>;
-        /**
-         * Creates a NOT LIKE criteria
-         * @param value not like value
-         */
-        notLike(value: any): Array<any>;
-    }
-    /**
-     * Parses a criteria expression to Serenity Criteria array format.
-     * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
-     * @param expression The criteria expression.
-     * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
-     * @example
-     * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
-     */
-    function parseCriteria(expression: string, params?: any): any[];
-    /**
-     * Parses a criteria expression to Serenity Criteria array format.
-     * The expression may contain parameter placeholders like `A >= ${p1}`
-     * where p1 is a variable in the scope.
-     * @param strings The string fragments.
-     * @param values The tagged template arguments.
-     * @example
-     * var a = 5, b = 4;
-     * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
-     */
-    function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
-    /**
-     * Enumeration of Criteria operator keys.
-     */
-    enum CriteriaOperator {
-        paren = "()",
-        not = "not",
-        isNull = "is null",
-        isNotNull = "is not null",
-        exists = "exists",
-        and = "and",
-        or = "or",
-        xor = "xor",
-        eq = "=",
-        ne = "!=",
-        gt = ">",
-        ge = ">=",
-        lt = "<",
-        le = "<=",
-        in = "in",
-        notIn = "not in",
-        like = "like",
-        notLike = "not like"
-    }
-    /**
-     * Creates a new criteria builder containg the passed field name.
-     * @param field The field name.
-     */
-    function Criteria(field: string): CriteriaBuilder;
-    namespace Criteria {
-        var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-        var Operator: typeof CriteriaOperator;
-        var isEmpty: (c: any[]) => boolean;
-        var join: (c1: any[], op: string, c2: any[]) => any[];
-        var not: (c: any[]) => (string | any[])[];
-        var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-        var paren: (c: any[]) => any[];
-        var parse: typeof parseCriteria;
-    }
 
     namespace Aggregators {
         function Avg(field: string): void;

@@ -20,5 +20,6 @@
  * @packageDocumentation
  */
 
+export * from "./criteria";
 export * from "./formatting";
 export * from "./servicetypes";

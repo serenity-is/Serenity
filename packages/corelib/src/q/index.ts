@@ -23,4 +23,3 @@ export * from "./toastr2";
 export * from "./userdefinition";
 export * from "./validateoptions";
 export * from "./validation";
-export * from "./criteria";
