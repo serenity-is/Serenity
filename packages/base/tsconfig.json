@@ -3,7 +3,7 @@
   "compilerOptions": {
     "experimentalDecorators": false,
     "declaration": true,
-    "declarationDir": "./dist",
+    "declarationDir": "./out",
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "inlineSources": true,
@@ -21,10 +21,11 @@
     ],
     "rootDir": "./src",
     "outDir": "./out",
-    "target": "ES6",
+    "target": "ES2017",
     "lib": [
       "ES5",
       "ES2015",
+      "ES2017",
       "DOM"
     ],
     "noEmitHelpers": false,

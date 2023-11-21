@@ -20,4 +20,5 @@
  * @packageDocumentation
  */
 
+export * from "./formatting";
 export * from "./servicetypes";

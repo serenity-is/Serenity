@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-import { ServiceError, ServiceResponse, ListRequest, ListResponse, ColumnSelection, SaveRequest, DeleteResponse, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest } from '@serenity-is/base';
+import { ServiceError, stringFormat, stringFormatLocale, ServiceResponse, ListRequest, ListResponse, ColumnSelection, SaveRequest, DeleteResponse, RetrieveResponse, RetrieveRequest, SaveResponse, UndeleteResponse, ServiceRequest } from '@serenity-is/base';
 export * from '@serenity-is/base';
 import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, IPlugin, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
 
@@ -546,78 +546,6 @@ declare namespace ErrorHandling {
 }
 
 /**
- * Interface for number formatting, similar to .NET's NumberFormatInfo
- */
-interface NumberFormat {
-    /** Decimal separator */
-    decimalSeparator: string;
-    /** Group separator */
-    groupSeparator?: string;
-    /** Number of digits after decimal separator */
-    decimalDigits?: number;
-    /** Positive sign */
-    positiveSign?: string;
-    /** Negative sign */
-    negativeSign?: string;
-    /** Zero symbol */
-    nanSymbol?: string;
-    /** Percentage symbol */
-    percentSymbol?: string;
-    /** Currency symbol */
-    currencySymbol?: string;
-}
-/** Interface for date formatting, similar to .NET's DateFormatInfo */
-interface DateFormat {
-    /** Date separator */
-    dateSeparator?: string;
-    /** Default date format string */
-    dateFormat?: string;
-    /** Date order, like dmy, or ymd */
-    dateOrder?: string;
-    /** Default date time format string */
-    dateTimeFormat?: string;
-    /** AM designator */
-    amDesignator?: string;
-    /** PM designator */
-    pmDesignator?: string;
-    /** Time separator */
-    timeSeparator?: string;
-    /** First day of week, 0 = Sunday, 1 = Monday */
-    firstDayOfWeek?: number;
-    /** Array of day names */
-    dayNames?: string[];
-    /** Array of short day names */
-    shortDayNames?: string[];
-    /** Array of two letter day names */
-    minimizedDayNames?: string[];
-    /** Array of month names */
-    monthNames?: string[];
-    /** Array of short month names */
-    shortMonthNames?: string[];
-}
-/** Interface for a locale, similar to .NET's CultureInfo */
-interface Locale extends NumberFormat, DateFormat {
-    /** Locale string comparison function, similar to .NET's StringComparer */
-    stringCompare?: (a: string, b: string) => number;
-    /** Locale string to upper case function */
-    toUpper?: (a: string) => string;
-}
-/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
-declare let Invariant: Locale;
-/**
- * Factory for a function that compares two strings, based on a character order
- * passed in the `order` argument.
- */
-declare function compareStringFactory(order: string): ((a: string, b: string) => number);
-/**
- * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
- * settings passed from a `<script>` element in the page with id `ScriptCulture`
- * containing a JSON object if available. This element is generally created in
- * the _LayoutHead.cshtml file for Serenity applications, so that the culture
- * settings determined server, can be passed to the client.
- */
-declare let Culture: Locale;
-/**
  * A string to lowercase function that handles special Turkish
  * characters like 'ı'. Left in for compatibility reasons.
  */
@@ -632,102 +560,20 @@ declare function turkishLocaleToUpper(a: string): string;
  */
 declare let turkishLocaleCompare: (a: string, b: string) => number;
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using current `Culture` locale settings.
+ * @obsolete
+ * Use stringFormat
  */
-declare function format(format: string, ...prm: any[]): string;
+declare let format: typeof stringFormat;
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using the locale passed as the first argument.
+ * @obsolete
+ * Use stringFormatLocale
  */
-declare function localeFormat(l: Locale, format: string, ...prm: any[]): string;
-/**
- * Rounds a number to specified digits or an integer number if digits are not specified.
- * @param n the number to round
- * @param d the number of digits to round to. default is zero.
- * @param rounding whether to use banker's rounding
- * @returns the rounded number
- */
-declare let round: (n: number, d?: number, rounding?: boolean) => number;
-/**
- * Truncates a number to an integer number.
- */
-declare let trunc: (n: number) => number;
-/**
- * Formats a number using the current `Culture` locale (or the passed locale) settings.
- * It supports format specifiers similar to .NET numeric formatting strings.
- * @param num the number to format
- * @param format the format specifier. default is 'g'.
- * See .NET numeric formatting strings documentation for more information.
- */
-declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
-/**
- * Converts a string to an integer. The difference between parseInt and parseInteger
- * is that parseInteger will return null if the string is empty or null, whereas
- * parseInt will return NaN and parseInteger will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseInteger(s: string): number;
-/**
- * Converts a string to a decimal. The difference between parseFloat and parseDecimal
- * is that parseDecimal will return null if the string is empty or null, whereas
- * parseFloat will return NaN and parseDecimal will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseDecimal(s: string): number;
-/**
- * Converts a string to an ID. If the string is a number, it is returned as-is.
- * If the string is empty, null or whitespace, null is returned.
- * Otherwise, it is converted to a number if possible. If the string is not a
- * valid number or longer than 14 digits, the trimmed string is returned as-is.
- * @param id the string to convert to an ID
- */
-declare function toId(id: any): any;
-/**
- * Formats a date using the specified format string and optional culture.
- * Supports .NET style format strings including custom formats.
- * See .NET documentation for supported formats.
- * @param d the date to format. If null, it returns empty string.
- * @param format the format string to use. If null, it uses the current culture's default format.
- * 'G' uses the culture's datetime format.
- * 'g' uses the culture's datetime format with secs removed.
- * 'd' uses the culture's date format.
- * 't' uses the culture's time format.
- * 'u' uses the sortable ISO format with UTC time.
- * 'U' uses the culture's date format with UTC time.
- * @param locale the locale to use
- * @returns the formatted date
- * @example
- * // returns "2019-01-01"
- * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
- * @example
- * // returns "2019-01-01 12:00:00"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
- * @example
- * // returns "2019-01-01 12:00:00.000"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
- * @example
- * // returns "2019-01-01 12:00:00.000 AM"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
- */
-declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+declare let localeFormat: typeof stringFormatLocale;
 /**
  * Formats a number containing number of minutes into a string in the format "d.hh:mm".
  * @param n The number of minutes.
  */
 declare function formatDayHourAndMin(n: number): string;
-/**
- * Formats a date as the ISO 8601 UTC date/time format.
- * @param n The number of minutes.
- */
-declare function formatISODateTimeUTC(d: Date): string;
-/**
- * Parses a string in the ISO 8601 UTC date/time format.
- * @param s The string to parse.
- */
-declare function parseISODateTime(s: string): Date;
 /**
  * Parses a time string in the format "hh:mm" into a number containing number of minutes.
  * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
@@ -740,19 +586,6 @@ declare function parseHourAndMin(value: string): number;
  * Returns NULL if the string is empty or whitespace.
  */
 declare function parseDayHourAndMin(s: string): number;
-/**
- * Parses a string to a date. If the string is empty or whitespace, returns null.
- * Returns a NaN Date if the string is not a valid date.
- * @param s The string to parse.
- * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
-  */
-declare function parseDate(s: string, dateOrder?: string): Date;
-/**
- * Splits a date string into an array of strings, each containing a single date part.
- * It can handle separators "/", ".", "-" and "\".
- * @param s The string to split.
- */
-declare function splitDateString(s: string): string[];
 
 /**
  * Adds an empty option to the select.
@@ -4079,4 +3912,4 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AlertOptions, type AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JQBlockUIOptions, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, Router, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, type WidgetClass, type WidgetComponentProps, type WidgetDialogClass, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AggregateFormatting, Aggregators, type AlertOptions, type AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, type DataChangeInfo, DataGrid, DateEditor, DateFiltering, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, IsActivePropertyAttribute, ItemNameAttribute, type JQBlockUIOptions, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, LocalTextPrefixAttribute, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, Router, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, type WidgetClass, type WidgetComponentProps, type WidgetDialogClass, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDayHourAndMin, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDayHourAndMin, parseHourAndMin, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, startsWith, success, successDialog, text, toGrouping, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

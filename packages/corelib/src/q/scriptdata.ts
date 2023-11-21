@@ -3,10 +3,10 @@ import { startsWith, trimToNull } from "./strings";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { notifyError } from "./notify";
-import { format } from "./formatting";
 import { PropertyItem, PropertyItemsData } from "./propertyitem";
 import { getStateStore } from "./system";
 import { Lookup } from "./lookup";
+import { stringFormat } from "@serenity-is/base";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;
@@ -152,7 +152,7 @@ export namespace ScriptData {
                 ' [LookupScript("' + name.substring(7) + '")] attribute in server side code on top of a row / custom lookup and ' +
                 ' its key is exactly the same.';
         } else {
-            message = format("Can't load script data: {0}!", name);
+            message = stringFormat("Can't load script data: {0}!", name);
         }
 
         notifyError(message);
