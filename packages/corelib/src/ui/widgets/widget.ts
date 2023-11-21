@@ -2,7 +2,8 @@
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, format, getAttributes, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../q";
+import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, getAttributes, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, replaceAll, startsWith } from "../../q";
+import { stringFormat } from "@serenity-is/base";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -73,7 +74,7 @@ export class Widget<TOptions = any> {
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
 
         if (element.data(this.widgetName)) {
-            throw new Exception(format("The element already has widget '{0}'!", this.widgetName));
+            throw new Exception(stringFormat("The element already has widget '{0}'!", this.widgetName));
         }
 
         element.on('remove.' + this.widgetName, e => {
@@ -222,13 +223,13 @@ if (typeof $ !== "undefined" && $.fn) {
             throw new ArgumentNullException('element');
         }
         if (this.length === 0) {
-            throw new Exception(format("Searching for widget of type '{0}' on a non-existent element! ({1})",
+            throw new Exception(stringFormat("Searching for widget of type '{0}' on a non-existent element! ({1})",
                 getTypeFullName(type), this.selector));
         }
 
         var w = (this as any).tryGetWidget(type);
         if (w == null) {
-            var message = format("Element has no widget of type '{0}'! If you have recently changed " +
+            var message = stringFormat("Element has no widget of type '{0}'! If you have recently changed " +
                 "editor type of a property in a form class, or changed data type in row (which also changes " +
                 "editor type) your script side Form definition might be out of date. Make sure your project " +
                 "builds successfully and transform T4 templates", getTypeFullName(type));

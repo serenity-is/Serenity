@@ -1,7 +1,7 @@
-﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, stringFormat } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirmDialog, endsWith, Exception, extend, format, getAttributes, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, localText, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
+import { any, Authorization, confirmDialog, endsWith, Exception, extend, getAttributes, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, localText, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -113,13 +113,13 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected getEntityTitle(): string {
         if (!this.isEditMode()) {
-            return format(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
+            return stringFormat(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
         }
         else {
             var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
                 localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
             var title = this.getEntityNameFieldValue() ?? '';
-            return format(titleFormat,
+            return stringFormat(titleFormat,
                 this.getEntitySingular(), (isEmptyOrNull(title) ? '' : (' (' + title + ')')));
         }
     }

@@ -1,5 +1,5 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, PropertyItem, any, format, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull, tryGetText } from "../../q";
+import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull, tryGetText } from "../../q";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -8,6 +8,7 @@ import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
+import { stringFormat } from "@serenity-is/base";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;
@@ -977,7 +978,7 @@ export function select2LocaleInitialization() {
         return false;
 
     const txt = (s: string) => localText("Controls.SelectEditor." + s);
-    const fmt = (s: string, ...prm: any[]) => format(localText("Controls.SelectEditor." + s), prm);
+    const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
 
     ($.fn.select2 as any).locales['current'] = {
         formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),

@@ -1,9 +1,9 @@
-﻿import { Enum, format,  getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
-import { Formatter } from "../../slick";
+﻿import { Culture, formatDate, formatNumber, parseDecimal, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
+import { Enum, getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
+import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { Culture, parseISODateTime, formatDate, formatNumber, parseDecimal } from "@serenity-is/base";
 
 export interface IInitializeColumn {
     initializeColumn(column: Column): void;
@@ -156,7 +156,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
             safeCast(ctx.item[this.originalNameProperty], String) : null);
 
         originalName = (originalName ?? '');
-        var text = format((this.displayFormat ?? '{0}'),
+        var text = stringFormat((this.displayFormat ?? '{0}'),
             originalName, dbFile, downloadUrl);
 
         var iconClass = this.iconClass ?? "fa fa-download";
@@ -216,7 +216,7 @@ export class MinuteFormatter implements Formatter {
         else
             minuteStr = minute.toString();
 
-        return format('{0}:{1}', hourStr, minuteStr);
+        return stringFormat('{0}:{1}', hourStr, minuteStr);
     }
 }
 
@@ -261,7 +261,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
             return '';
 
         if (!isEmptyOrNull(this.urlFormat))
-            url = format(this.urlFormat, url);
+            url = stringFormat(this.urlFormat, url);
 
         if (url != null && startsWith(url, '~/'))
             url = resolveUrl(url);
@@ -271,7 +271,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
             (ctx.value ?? '').toString());
 
         if (!isEmptyOrNull(this.displayFormat))
-            display = format(this.displayFormat, display);
+            display = stringFormat(this.displayFormat, display);
 
         var s = "<a href='" + htmlEncode(url) + "'";
         if (!isEmptyOrNull(this.target))
