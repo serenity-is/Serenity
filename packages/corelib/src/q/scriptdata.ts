@@ -1,7 +1,6 @@
-﻿import { type PropertyItem, type PropertyItemsData, getStateStore, stringFormat } from "@serenity-is/base";
+﻿import { type PropertyItem, type PropertyItemsData, getStateStore, stringFormat, type Lookup } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
-import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { resolveUrl } from "./services";
 import { startsWith, trimToNull } from "./strings";

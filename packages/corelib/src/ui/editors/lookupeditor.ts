@@ -1,6 +1,6 @@
-﻿import { getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import { getInstanceType, getTypeFullName, type Lookup } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { endsWith, getLookup, getLookupAsync, Lookup, reloadLookup, ScriptData } from "../../q";
+import { endsWith, getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {

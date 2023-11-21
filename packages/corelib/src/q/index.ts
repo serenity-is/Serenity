@@ -9,7 +9,6 @@ export * from "./html";
 export * from "./layout";
 export * from "./layouttimer";
 export * from "./localtext";
-export * from "./lookup";
 export * from "./notify";
 export * from "./router";
 export * from "./scriptdata";

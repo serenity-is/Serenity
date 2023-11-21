@@ -369,6 +369,35 @@ declare function htmlEncode(s: any): string;
  */
 declare function toggleClass(el: Element, cls: string, add?: boolean): void;
 
+interface LookupOptions<TItem> {
+    idField?: string;
+    parentIdField?: string;
+    textField?: string;
+    textFormatter?(item: TItem): string;
+}
+interface Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    textFormatter: (item: TItem) => string;
+}
+declare class Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    textFormatter: (item: TItem) => string;
+    constructor(options: LookupOptions<TItem>, items?: TItem[]);
+    update?(value: TItem[]): void;
+}
+
 declare enum SummaryType {
     Disabled = -1,
     None = 0,
@@ -563,4 +592,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type Type, type UndeleteRequest, type UndeleteResponse, compareStringFactory, debounce, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, registerClass, registerEnum, registerInterface, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc };
+export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type Type, type UndeleteRequest, type UndeleteResponse, compareStringFactory, debounce, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, registerClass, registerEnum, registerInterface, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc };
