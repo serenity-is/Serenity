@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { ListRequest, ListResponse, RetrieveResponse } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { isEmptyOrNull, isValue, ListRequest, ListResponse, RetrieveResponse, safeCast, serviceCall, ServiceOptions, localText, trimToNull } from "../../q";
+import { isEmptyOrNull, isValue, safeCast, serviceCall, ServiceOptions, localText, trimToNull } from "../../q";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { Widget } from "../widgets/widget";
 import { WX } from "../widgets/wx";

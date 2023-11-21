@@ -1,5 +1,6 @@
+import { ListResponse, ServiceResponse } from "@serenity-is/base";
+import {  type ServiceOptions } from "../../q/servicetypes";
 import { ServiceLookupEditor } from "./servicelookupeditor";
-import { type ListResponse, type ServiceOptions, type ServiceResponse } from "../../q/servicetypes";
 
 let oldWindowAlert: any;
 beforeAll(() => {

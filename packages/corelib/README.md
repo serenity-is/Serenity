@@ -1,4 +1,4 @@
-# Serenity Core Library
+# Serenity Core Library (Classic UI)
 
 This is the package containing core TypeScript classes and functions used in Serenity applications.
 

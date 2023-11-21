@@ -1,6 +1,6 @@
 ﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "../../q";
+import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, serviceCall, startsWith, localText, tryGetText, tryFirst } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -8,6 +8,7 @@ import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { Toolbar, ToolButton } from "../widgets/toolbar";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
+import { SaveRequest } from "@serenity-is/base";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;

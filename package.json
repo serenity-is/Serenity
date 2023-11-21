@@ -1,6 +1,7 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "15.2.3",
     "@rollup/plugin-typescript": "11.1.5",
     "@swc/core": "1.3.96",
     "@swc/jest": "0.2.29",

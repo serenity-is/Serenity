@@ -1,19 +1,13 @@
 {
-  "name": "@serenity-is/corelib",
-  "version": "8.0.0",
+  "name": "@serenity-is/base",
+  "version": "1.0.0",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
-  "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
+  "description": "Serenity Base library with types and functions shared between corelib, ui, and others",
   "dependencies": {
-    "@serenity-is/base": "workspace:*",
-    "@serenity-is/sleekgrid": "1.6.3",
-    "@types/jquery": "2.0.48",
-    "@types/jqueryui": "1.12.6",
-    "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
-    "@types/jest": "29.5.8",
-    "tslib": "2.6.2"
+    "@types/jest": "29.5.8"
   },
   "exports": {
     ".": {
@@ -42,11 +36,11 @@
     "framework"
   ],
   "license": "MIT",
-  "repository": "https://github.com/serenity-is/serenity/packages/corelib",
+  "repository": "https://github.com/serenity-is/serenity/packages/base",
   "scripts": {
-    "build": "rollup -c && node build/build",
+    "build": "node build/build",
     "test": "pnpm build && pnpm jest --coverage",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src"
+    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/base --json ./out/typedoc.json src"
   },
   "type": "module"
 }

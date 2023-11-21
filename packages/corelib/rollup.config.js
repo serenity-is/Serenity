@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { minify } from "terser";
 import fs from 'fs';
 import { builtinModules } from "module";
@@ -12,7 +13,7 @@ const external = [
     ...(pkg.dependencies == null ? [] : Object.keys(pkg.dependencies)),
     ...(pkg.devDependencies == null ? [] : Object.keys(pkg.devDependencies)),
     ...(pkg.peerDependencies == null ? [] : Object.keys(pkg.peerDependencies))
-]
+].filter(x => x != "@serenity-is/base");
 
 var globals = {
     'flatpickr': 'flatpickr',
@@ -262,12 +263,15 @@ export default [
             }
         ],
         plugins: [
+            nodeResolve({
+                resolveOnly: ['@serenity-is/base']
+            }),            
             typescript({
                 tsconfig: 'tsconfig.json',
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
-            })
+            }),
         ],
         external
     },
@@ -278,6 +282,9 @@ export default [
             format: "es"
         }],
         plugins: [
+            nodeResolve({
+                resolveOnly: ['@serenity-is/base']
+            }),            
             dts(),
             toGlobal('Serenity'),
             {
