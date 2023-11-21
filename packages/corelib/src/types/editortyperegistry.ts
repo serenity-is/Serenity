@@ -1,4 +1,5 @@
-﻿import { ArgumentNullException, EditorAttribute, Exception, getAttributes, htmlEncode, isAssignableFrom, isEmptyOrNull, notifyError } from "../q";
+﻿import { isAssignableFrom } from "@serenity-is/base";
+import { ArgumentNullException, EditorAttribute, Exception, getAttributes, htmlEncode, isEmptyOrNull, notifyError } from "../q";
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 

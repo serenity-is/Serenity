@@ -1,8 +1,8 @@
-﻿import { Culture, ListResponse } from "@serenity-is/base";
+﻿import { Culture, ListResponse, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { Lookup, PropertyItem, ScriptData, getLookup, htmlEncode, isEmptyOrNull, trimToNull, tryGetText } from "../../q";
+import { Lookup, ScriptData, getLookup, htmlEncode, isEmptyOrNull, trimToNull, tryGetText } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";

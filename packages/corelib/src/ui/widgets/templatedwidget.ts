@@ -1,6 +1,6 @@
-﻿import { stringFormat } from "@serenity-is/base";
+﻿import { getBaseType, getInstanceType, getTypeFullName, getTypeShortName, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { Config, canLoadScriptData, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeShortName, localText, replaceAll, startsWith } from "../../q";
+import { Config, canLoadScriptData, getTemplate, localText, replaceAll, startsWith } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")

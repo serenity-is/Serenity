@@ -1,5 +1,5 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull, tryGetText } from "../../q";
+import { Authorization, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "../../q";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -8,7 +8,7 @@ import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
-import { stringFormat } from "@serenity-is/base";
+import { PropertyItem, stringFormat } from "@serenity-is/base";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;

@@ -141,6 +141,43 @@ declare namespace Criteria {
     var parse: typeof parseCriteria;
 }
 
+interface DebouncedFunction<T extends (...args: any[]) => any> {
+    /**
+     * Call the original function, but applying the debounce rules.
+     *
+     * If the debounced function can be run immediately, this calls it and returns its return
+     * value.
+     *
+     * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+     * function was not invoked yet.
+     */
+    (...args: Parameters<T>): ReturnType<T> | undefined;
+    /**
+     * Throw away any pending invocation of the debounced function.
+     */
+    clear(): void;
+    /**
+     * If there is a pending invocation of the debounced function, invoke it immediately and return
+     * its return value.
+     *
+     * Otherwise, return the value from the last invocation, or undefined if the debounced function
+     * was never invoked.
+     */
+    flush(): ReturnType<T> | undefined;
+}
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function also has a property 'clear' that can be used
+ * to clear the timer to prevent previously scheduled executions, and flush method
+ * to invoke scheduled executions now if any.
+ * @param wait The function will be called after it stops being called for
+ * N milliseconds.
+ * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
+ *
+ * @source underscore.js
+ */
+declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+
 /**
  * Interface for number formatting, similar to .NET's NumberFormatInfo
  */
@@ -319,6 +356,76 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
+declare enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+interface PropertyItem {
+    name?: string;
+    title?: string;
+    hint?: string;
+    placeholder?: string;
+    editorType?: string;
+    editorParams?: any;
+    category?: string;
+    collapsible?: boolean;
+    collapsed?: boolean;
+    tab?: string;
+    cssClass?: string;
+    headerCssClass?: string;
+    formCssClass?: string;
+    maxLength?: number;
+    required?: boolean;
+    insertable?: boolean;
+    insertPermission?: string;
+    hideOnInsert?: boolean;
+    updatable?: boolean;
+    updatePermission?: string;
+    hideOnUpdate?: boolean;
+    readOnly?: boolean;
+    readPermission?: string;
+    oneWay?: boolean;
+    defaultValue?: any;
+    localizable?: boolean;
+    visible?: boolean;
+    allowHide?: boolean;
+    formatterType?: string;
+    formatterParams?: any;
+    displayFormat?: string;
+    alignment?: string;
+    width?: number;
+    widthSet?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
+    labelWidth?: string;
+    resizable?: boolean;
+    sortable?: boolean;
+    sortOrder?: number;
+    groupOrder?: number;
+    summaryType?: SummaryType;
+    editLink?: boolean;
+    editLinkItemType?: string;
+    editLinkIdField?: string;
+    editLinkCssClass?: string;
+    filteringType?: string;
+    filteringParams?: any;
+    filteringIdField?: string;
+    notFilterable?: boolean;
+    filterOnly?: boolean;
+    quickFilter?: boolean;
+    quickFilterParams?: any;
+    quickFilterSeparator?: boolean;
+    quickFilterCssClass?: string;
+}
+interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
+
 interface ServiceError {
     Code?: string;
     Arguments?: string;
@@ -413,4 +520,34 @@ interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
     };
 }
 
-export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DeleteRequest, type DeleteResponse, Invariant, type ListRequest, type ListResponse, type Locale, type NumberFormat, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, type UndeleteRequest, type UndeleteResponse, compareStringFactory, formatDate, formatISODateTimeUTC, formatNumber, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, round, splitDateString, stringFormat, stringFormatLocale, toId, trunc };
+declare function getGlobalThis(): any;
+declare function getStateStore(key?: string): any;
+declare function getTypeStore(): any;
+interface TypeMetadata {
+    enumFlags?: boolean;
+    attr?: any[];
+}
+type Type = Function | Object;
+declare function ensureMetadata(target: Type): TypeMetadata;
+declare function getNested(from: any, name: string): any;
+declare function getType(name: string, target?: any): Type;
+declare function getTypeNameProp(type: Type): string;
+declare function setTypeNameProp(type: Type, value: string): void;
+declare function getTypeFullName(type: Type): string;
+declare function getTypeShortName(type: Type): string;
+declare function getInstanceType(instance: any): any;
+declare function isAssignableFrom(target: any, type: Type): boolean;
+declare function isInstanceOfType(instance: any, type: Type): boolean;
+declare function getBaseType(type: any): any;
+declare function registerClass(type: any, name: string, intf?: any[]): void;
+declare function registerEnum(type: any, name: string, enumKey?: string): void;
+declare function registerInterface(type: any, name: string, intf?: any[]): void;
+declare namespace Enum {
+    let toString: (enumType: any, value: number) => string;
+    let getValues: (enumType: any) => any[];
+}
+declare let isEnum: (type: any) => boolean;
+declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+
+export { ColumnSelection, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type Type, type UndeleteRequest, type UndeleteResponse, compareStringFactory, debounce, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, initFormType, isAssignableFrom, isEnum, isInstanceOfType, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, registerClass, registerEnum, registerInterface, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, trunc };

@@ -1,4 +1,4 @@
-﻿import { getStateStore } from "./system";
+﻿import { getStateStore } from "@serenity-is/base";
 import { isEmptyOrNull, startsWith } from "./strings";
 
 export function localText(key: string): string {

@@ -1827,6 +1827,43 @@ declare namespace Serenity {
         var parse: typeof parseCriteria;
     }
 
+    interface DebouncedFunction<T extends (...args: any[]) => any> {
+        /**
+         * Call the original function, but applying the debounce rules.
+         *
+         * If the debounced function can be run immediately, this calls it and returns its return
+         * value.
+         *
+         * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+         * function was not invoked yet.
+         */
+        (...args: Parameters<T>): ReturnType<T> | undefined;
+        /**
+         * Throw away any pending invocation of the debounced function.
+         */
+        clear(): void;
+        /**
+         * If there is a pending invocation of the debounced function, invoke it immediately and return
+         * its return value.
+         *
+         * Otherwise, return the value from the last invocation, or undefined if the debounced function
+         * was never invoked.
+         */
+        flush(): ReturnType<T> | undefined;
+    }
+    /**
+     * Returns a function, that, as long as it continues to be invoked, will not
+     * be triggered. The function also has a property 'clear' that can be used
+     * to clear the timer to prevent previously scheduled executions, and flush method
+     * to invoke scheduled executions now if any.
+     * @param wait The function will be called after it stops being called for
+     * N milliseconds.
+     * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
+     *
+     * @source underscore.js
+     */
+    function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+
     /**
      * Interface for number formatting, similar to .NET's NumberFormatInfo
      */
@@ -2005,6 +2042,76 @@ declare namespace Serenity {
      */
     function splitDateString(s: string): string[];
 
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    interface PropertyItemsData {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+    }
+
     interface ServiceError {
         Code?: string;
         Arguments?: string;
@@ -2098,6 +2205,36 @@ declare namespace Serenity {
             [key: string]: TEntity;
         };
     }
+
+    function getGlobalThis(): any;
+    function getStateStore(key?: string): any;
+    function getTypeStore(): any;
+    interface TypeMetadata {
+        enumFlags?: boolean;
+        attr?: any[];
+    }
+    type Type = Function | Object;
+    function ensureMetadata(target: Type): TypeMetadata;
+    function getNested(from: any, name: string): any;
+    function getType(name: string, target?: any): Type;
+    function getTypeNameProp(type: Type): string;
+    function setTypeNameProp(type: Type, value: string): void;
+    function getTypeFullName(type: Type): string;
+    function getTypeShortName(type: Type): string;
+    function getInstanceType(instance: any): any;
+    function isAssignableFrom(target: any, type: Type): boolean;
+    function isInstanceOfType(instance: any, type: Type): boolean;
+    function getBaseType(type: any): any;
+    function registerClass(type: any, name: string, intf?: any[]): void;
+    function registerEnum(type: any, name: string, enumKey?: string): void;
+    function registerInterface(type: any, name: string, intf?: any[]): void;
+    namespace Enum {
+        let toString: (enumType: any, value: number) => string;
+        let getValues: (enumType: any) => any[];
+    }
+    let isEnum: (type: any) => boolean;
+    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+    function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 }
 
 
@@ -2406,43 +2543,6 @@ declare namespace Serenity {
          */
         notLoggedInHandler: Function;
     };
-
-    interface DebouncedFunction<T extends (...args: any[]) => any> {
-        /**
-         * Call the original function, but applying the debounce rules.
-         *
-         * If the debounced function can be run immediately, this calls it and returns its return
-         * value.
-         *
-         * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
-         * function was not invoked yet.
-         */
-        (...args: Parameters<T>): ReturnType<T> | undefined;
-        /**
-         * Throw away any pending invocation of the debounced function.
-         */
-        clear(): void;
-        /**
-         * If there is a pending invocation of the debounced function, invoke it immediately and return
-         * its return value.
-         *
-         * Otherwise, return the value from the last invocation, or undefined if the debounced function
-         * was never invoked.
-         */
-        flush(): ReturnType<T> | undefined;
-    }
-    /**
-     * Returns a function, that, as long as it continues to be invoked, will not
-     * be triggered. The function also has a property 'clear' that can be used
-     * to clear the timer to prevent previously scheduled executions, and flush method
-     * to invoke scheduled executions now if any.
-     * @param wait The function will be called after it stops being called for
-     * N milliseconds.
-     * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
-     *
-     * @source underscore.js
-     */
-    function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
     /**
      * Options for a message dialog button
@@ -2885,76 +2985,6 @@ declare namespace Serenity {
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
     function positionToastContainer(create: boolean, options?: ToastrOptions): void;
 
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface PropertyItemsData {
-        items: PropertyItem[];
-        additionalItems: PropertyItem[];
-    }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-
     interface HandleRouteEventArgs {
         handled: boolean;
         route: string;
@@ -3114,7 +3144,6 @@ declare namespace Serenity {
     let today: () => Date;
     function extend<T = any>(a: T, b: T): T;
     function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
-    type Type = Function | Object;
     interface TypeMember {
         name: string;
         type: MemberType;
@@ -3122,19 +3151,6 @@ declare namespace Serenity {
         getter?: string;
         setter?: string;
     }
-    function getNested(from: any, name: string): any;
-    function getGlobalThis(): any;
-    function getType(name: string, target?: any): Type;
-    function getTypeNameProp(type: Type): string;
-    function setTypeNameProp(type: Type, value: string): void;
-    function getTypeFullName(type: Type): string;
-    function getTypeShortName(type: Type): string;
-    function getInstanceType(instance: any): any;
-    function isAssignableFrom(target: any, type: Type): boolean;
-    function isInstanceOfType(instance: any, type: Type): boolean;
-    function safeCast(instance: any, type: Type): any;
-    function cast(instance: any, type: Type): any;
-    function getBaseType(type: any): any;
     function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
     enum MemberType {
         field = 4,
@@ -3144,27 +3160,16 @@ declare namespace Serenity {
     function addTypeMember(type: any, member: TypeMember): TypeMember;
     function getTypes(from?: any): any[];
     function clearKeys(d: any): void;
-    function delegateCombine(delegate1: any, delegate2: any): any;
-    function getStateStore(key?: string): any;
-    namespace Enum {
-        let toString: (enumType: any, value: number) => string;
-        let getValues: (enumType: any) => any[];
-    }
-    let delegateRemove: (delegate1: any, delegate2: any) => any;
-    let isEnum: (type: any) => boolean;
-    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
-    function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
     function keyOf<T>(prop: keyof T): keyof T;
-    function registerClass(type: any, name: string, intf?: any[]): void;
     function registerEditor(type: any, name: string, intf?: any[]): void;
-    function registerEnum(type: any, name: string, enumKey?: string): void;
-    function registerInterface(type: any, name: string, intf?: any[]): void;
     function addAttribute(type: any, attr: any): void;
     class ISlickFormatter {
     }
     class EditorAttribute {
     }
+    function cast(instance: any, type: Type): any;
+    function safeCast(instance: any, type: Type): any;
     function initializeTypes(root: any, pre: string, limit: number): void;
     class Exception extends Error {
         constructor(message: string);
@@ -4719,6 +4724,9 @@ declare namespace Serenity {
         get_activeCriteria(): any[];
         get_displayText(): string;
     }
+    function delegateCombine(delegate1: any, delegate2: any): any;
+    function delegateRemove(delegate1: any, delegate2: any): any;
+    function delegateContains(targets: any[], object: any, method: any): boolean;
 
     interface IFiltering {
         createEditor(): void;

@@ -1,6 +1,6 @@
-﻿import { parseDecimal } from "@serenity-is/base";
+﻿import { PropertyItem, isInstanceOfType, parseDecimal } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
-import { cast, isInstanceOfType, isTrimmedEmpty, PropertyItem, safeCast, localText, tryGetText } from "../../q";
+import { cast, isTrimmedEmpty, safeCast, localText, tryGetText } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export namespace EditorUtils {

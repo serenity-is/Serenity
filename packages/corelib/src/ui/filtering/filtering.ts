@@ -1,6 +1,6 @@
-﻿import { Criteria, formatDate, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Criteria, type PropertyItem, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { ArgumentNullException, Config, Exception, PropertyItem, deepClone, endsWith, extend, getInstanceType, getTypeFullName, getTypes, isAssignableFrom, isEmptyOrNull, localText, startsWith, tryGetText } from "../../q";
+import { ArgumentNullException, Config, Exception, deepClone, endsWith, extend, getTypes, isEmptyOrNull, localText, startsWith, tryGetText } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";

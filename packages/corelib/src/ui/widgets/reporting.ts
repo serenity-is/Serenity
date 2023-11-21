@@ -1,6 +1,6 @@
-﻿import { ServiceRequest, ServiceResponse } from "@serenity-is/base";
+﻿import { PropertyItem, ServiceRequest, ServiceResponse } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { PropertyItem, postToService, serviceCall, trimToNull } from "../../q";
+import { postToService, serviceCall, trimToNull } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { PropertyGrid } from "./propertygrid";

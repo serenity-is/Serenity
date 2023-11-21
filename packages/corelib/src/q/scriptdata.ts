@@ -1,12 +1,10 @@
-﻿import { resolveUrl } from "./services";
-import { startsWith, trimToNull } from "./strings";
+﻿import { type PropertyItem, type PropertyItemsData, getStateStore, stringFormat } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
-import { notifyError } from "./notify";
-import { PropertyItem, PropertyItemsData } from "./propertyitem";
-import { getStateStore } from "./system";
 import { Lookup } from "./lookup";
-import { stringFormat } from "@serenity-is/base";
+import { notifyError } from "./notify";
+import { resolveUrl } from "./services";
+import { startsWith, trimToNull } from "./strings";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;

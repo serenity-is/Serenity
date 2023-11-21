@@ -1,4 +1,5 @@
-﻿import { Config, endsWith, getType, getTypeNameProp, getTypes } from "../q";
+﻿import { getType, getTypeNameProp } from "@serenity-is/base";
+import { Config, endsWith, getTypes } from "../q";
 
 export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (type: any) => string, suffix: string) {
 

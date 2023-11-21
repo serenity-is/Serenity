@@ -1,7 +1,8 @@
-﻿import { Config } from "./config";
+﻿import { getGlobalThis, getNested } from "@serenity-is/base";
+import { Config } from "./config";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
-import { getNested, getGlobalThis, initializeTypes } from "./system";
+import { initializeTypes } from "./system";
 import $ from "@optionaldeps/jquery";
    
 export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean, setHeight?: boolean }) {

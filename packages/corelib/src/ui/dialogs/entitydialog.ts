@@ -1,7 +1,7 @@
-﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, stringFormat } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, type PropertyItem, type PropertyItemsData, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirmDialog, endsWith, Exception, extend, getAttributes, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, localText, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
+import { any, Authorization, confirmDialog, endsWith, Exception, extend, getAttributes, getFormData, getFormDataAsync, isEmptyOrNull, localText, LT, notifySuccess, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -740,7 +740,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         }
     }
 
-    protected getPropertyItems() {
+    protected getPropertyItems(): PropertyItem[] {
         return this.propertyItemsData?.items || [];
     }
 

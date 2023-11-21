@@ -1,7 +1,7 @@
-﻿import { stringFormat } from "@serenity-is/base";
+﻿import { getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
 import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, endsWith, getInstanceType, getTypeFullName, HandleRouteEventArgs, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "../../q";
+import { Authorization, endsWith, HandleRouteEventArgs, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "../../q";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
