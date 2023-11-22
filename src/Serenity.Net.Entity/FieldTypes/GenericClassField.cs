@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace Serenity.Data;
+﻿namespace Serenity.Data;
 
 /// <summary>
 /// Base class for fields with reference type values
@@ -64,7 +62,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// <returns></returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
-        if (source is JValue jValue)
+        if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
 
         if (source == null)

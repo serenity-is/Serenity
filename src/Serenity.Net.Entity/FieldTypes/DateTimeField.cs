@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using System.Text.Json;
 
 namespace Serenity.Data;
@@ -45,7 +44,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
     /// <returns></returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
-        if (source is JValue jValue)
+        if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
 
         if (source == null)

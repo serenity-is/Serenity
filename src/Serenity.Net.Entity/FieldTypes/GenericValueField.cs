@@ -1,5 +1,3 @@
-﻿using Newtonsoft.Json.Linq;
-
 namespace Serenity.Data;
 
 /// <summary>
@@ -39,7 +37,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// <returns></returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
-        if (source is JValue jValue)
+        if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
 
         if (source == null)

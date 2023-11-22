@@ -545,6 +545,4 @@ public class CodeWriter(StringBuilder sb, int tabSize)
         "System.ComponentModel",
         "System.Collections.Generic"
     ];
-
-
 }
