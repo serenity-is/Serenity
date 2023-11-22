@@ -1,3 +1,8 @@
+## 8.0.2 (2023-11-22)
+
+### Bugfixes:
+  - Sergen not able to read connection strings from appsettings.json due to handling difference by System.Text.Json
+
 ## 8.0.1 (2023-11-22)
 
 ### Features:
