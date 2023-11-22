@@ -4172,7 +4172,7 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
  * {
  *   "dependencies": {
  *     // ...
- *     "@serenity-is/corelib": "6.9.0"
+ *     "@serenity-is/corelib": "latest"
  *   }
  * }
  * ```

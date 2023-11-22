@@ -11,7 +11,7 @@
  * {
  *   "dependencies": {
  *     // ...
- *     "@serenity-is/corelib": "6.9.0"
+ *     "@serenity-is/corelib": "latest"
  *   }
  * }
  * ```

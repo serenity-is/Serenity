@@ -9,7 +9,7 @@ in your projects created from `Serene` or `StartSharp` template:
 {
   "dependencies": {
     // ...
-    "@serenity-is/corelib": "6.9.0"
+    "@serenity-is/corelib": "latest"
   }
 }
 ```
