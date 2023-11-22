@@ -3,7 +3,8 @@ import { Config } from "./config"
 import { ErrorHandling } from "./errorhandling";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { blockUI, blockUndo } from "./blockui";
-import { ListRequest, ServiceOptions, ServiceResponse } from "./servicetypes";
+import { ServiceOptions } from "./servicetypes";
+import { ListRequest, ServiceResponse } from "@serenity-is/base";
 
 export function getCookie(name: string) {
     if (($ as any).cookie)

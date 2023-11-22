@@ -1,15 +1,13 @@
 ﻿beforeEach(() => {
     jest.resetModules();
-    jest.unmock('./system');
+    jest.unmock('@serenity-is/base');
 });
 
 const mockLocalTextStore = (localTexts: Record<string, any>) => {
-    jest.mock('./system', () => ({
+    jest.mock('@serenity-is/base', () => ({
         getStateStore: jest.fn(() => localTexts)
     }));
 }
-
-
 
 describe('proxyTexts', () => {
     it('proxies simple object', async () => {

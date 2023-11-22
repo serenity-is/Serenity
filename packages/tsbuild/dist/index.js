@@ -18,6 +18,7 @@ export function checkIfTrigger() {
 }
 
 export const importAsGlobalsMapping = {
+    "@serenity-is/base": "Serenity",
     "@serenity-is/corelib": "Serenity",
     "@serenity-is/corelib/q": "Q",
     "@serenity-is/corelib/slick": "Slick",

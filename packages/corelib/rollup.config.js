@@ -1,18 +1,11 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
-import { minify } from "terser";
 import fs from 'fs';
-import { builtinModules } from "module";
-import dts from "rollup-plugin-dts";
 import { basename, resolve } from "path";
+import { dts } from "rollup-plugin-dts";
+import { minify } from "terser";
 
-var pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-
-const external = [
-    ...builtinModules,
-    ...(pkg.dependencies == null ? [] : Object.keys(pkg.dependencies)),
-    ...(pkg.devDependencies == null ? [] : Object.keys(pkg.devDependencies)),
-    ...(pkg.peerDependencies == null ? [] : Object.keys(pkg.peerDependencies))
-]
+var externalPackages = ["@serenity-is/sleekgrid"];
 
 var globals = {
     'flatpickr': 'flatpickr',
@@ -29,27 +22,23 @@ var rxDeclareGlobal = /^(declare\s+global.*\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 var rxRemoveExports = /^export\s*\{[^\}]*\}\s*\;\s*\r?\n/gm;
 var rxRemoveImports = /^\s*import\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
 var rxReExports = /^\s*export\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s*\;\s*\r?\n/gm;
-
-var rxReferenceTypes = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 var rxModuleAugmentation = /^(declare\s+module\s*['"]([A-Za-z\/@\-]+)['"]\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
+var referenceTypeCommentsRegex = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 
 const replaceTypeRef = function(src, name, rep) {
     return src.replace(new RegExp('([<>:,]\\s*)' + name.replace('$', '\\$') + '([^A-Za-z0-9_\\$])', 'g'), (m, p1, p2) => p1 + rep + p2);
 }
 
 function moduleToGlobalName(fromModule) {
-    return fromModule == "@serenity-is/sleekgrid" ? 'Slick' : null;
+    return fromModule == "@serenity-is/sleekgrid" ? 'Slick' :
+        (fromModule == "@serenity-is/base" ? 'Serenity' : null);
 }
 
 const convertModularToGlobal = (src, ns, isTS) => {
-    src = src.replace(/: Event;/g, ': Slick.Event;');
-    src = src.replace(/: Event</g, ': Slick.Event<');
     src = src.replace('sourceItem?: PropertyItem', 'sourceItem?: Serenity.PropertyItem');
-    src = src.replace('const GroupItemMetadataProvider: GroupItemMetadataProviderType', 'const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider');
-    src = src.replace('type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider', 'type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider');
 
     var refTypes = [];
-    src = src.replace(rxReferenceTypes, function (match) {
+    src = src.replace(referenceTypeCommentsRegex, function (match) {
         refTypes.push(match);
         return '';
     });
@@ -109,9 +98,6 @@ const convertModularToGlobal = (src, ns, isTS) => {
         }
     }
 
-    if (ns == 'Slick')
-        src = replaceTypeRef(src, 'Event', 'Slick.Event');
-
     if (ns == 'Serenity') {
         src = src.replace(': typeof executeOnceWhenVisible', ': typeof Q.executeOnceWhenVisible');
         src = src.replace(': typeof executeEverytimeWhenVisible', ': typeof Q.executeEverytimeWhenVisible');
@@ -160,9 +146,9 @@ const convertModularToGlobal = (src, ns, isTS) => {
             }).join('\n') + '\n}'
     }
 
-    src = src.replace(/^\r?\n\r?\n/gm, '\n');
-    src = src.replace(/^\r?\n\r?\n/gm, '\n');
-    src = refTypes.join('') + '\n' + moduleAugmentations.join('') + src + '\n' + globals.join('\n');    
+    for (var i = 0; i < 2; i++)
+        src = src.replace(/^\r?\n\r?\n/gm, '\n');
+    src = refTypes.join('') + '\n' + moduleAugmentations.join('') + src + '\n' + globals.join('\n');
     return src;
 }
 
@@ -175,8 +161,6 @@ var toGlobal = function (ns, outFile, isTS) {
                     var src = b[fileName].code;
                     src = convertModularToGlobal(src, ns, isTS);
                     if (outFile) {
-                        if (outFile.indexOf('Slick') >= 0)
-                            src = src.replace(/SlickEvent/g, )
                         fs.writeFileSync(outFile, src);
                     }
                     else {
@@ -212,9 +196,9 @@ async function minifyScript(fileName) {
     fs.writeFileSync(fileName.replace(/\.js$/, '.min.js.map'), minified.map);
 }
 
-const mergeRefTypes = (src) => {
+const mergeReferenceTypeComments = (src) => {
     var refTypes = [];
-    src = src.replace(rxReferenceTypes, function (match, offset, str) {
+    src = src.replace(referenceTypeCommentsRegex, function (match, offset, str) {
         refTypes.push(match);
         return '';
     });
@@ -222,6 +206,10 @@ const mergeRefTypes = (src) => {
     src = refTypes.join('') + '\n' + src
     return src;
 }
+
+const nodeResolvePlugin = () => nodeResolve({
+    resolveOnly: ['@serenity-is/base']
+});    
 
 export default [
     {
@@ -262,14 +250,15 @@ export default [
             }
         ],
         plugins: [
+            nodeResolvePlugin(),        
             typescript({
                 tsconfig: 'tsconfig.json',
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
-            })
+            }),
         ],
-        external
+        external: externalPackages
     },
     {
         input: "./out/index.d.ts",
@@ -278,7 +267,10 @@ export default [
             format: "es"
         }],
         plugins: [
-            dts(),
+            nodeResolvePlugin(),
+            dts({
+                respectExternal: true
+            }),
             toGlobal('Serenity'),
             {
                 name: 'writeFinal',
@@ -295,6 +287,10 @@ export default [
 import Q = Serenity;
 
 declare namespace Slick {
+    namespace Data {
+        /** @obsolete use the type exported from @serenity-is/sleekgrid */
+        export import GroupItemMetadataProvider = Slick.GroupItemMetadataProvider;
+    }
     export import AggregateFormatting = Serenity.AggregateFormatting;
     export import Aggregators = Serenity.Aggregators;
     export import CancellableViewCallback = Serenity.CancellableViewCallback;
@@ -313,7 +309,7 @@ declare namespace Slick {
 `);
 
                         var src = dtsOutputs.join('\n').replace(/\r/g, '');
-                        src = mergeRefTypes(src);
+                        src = mergeReferenceTypeComments(src);
                         fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
                         await minifyScript('./out/Serenity.CoreLib.js');
                         !fs.existsSync('./dist') && fs.mkdirSync('./dist');
@@ -328,6 +324,6 @@ declare namespace Slick {
                 }
             }
         ],
-        external
+        external: externalPackages
     }
 ];

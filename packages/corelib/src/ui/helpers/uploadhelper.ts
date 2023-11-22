@@ -1,4 +1,5 @@
-import { alertDialog, htmlEncode, blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, localText, ServiceResponse } from "../../q";
+import { ServiceResponse, htmlEncode, round, stringFormat } from "@serenity-is/base";
+import { alertDialog, blockUI, blockUndo, endsWith, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, startsWith, localText } from "../../q";
 
 export namespace UploadHelper {
 
@@ -104,12 +105,12 @@ export namespace UploadHelper {
             return false;
         }
         if (opt.minSize > 0 && file.Size < opt.minSize) {
-            alertDialog(format(localText('Controls.ImageUpload.UploadFileTooSmall'),
+            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooSmall'),
                 fileSizeDisplay(opt.minSize)));
             return false;
         }
         if (opt.maxSize > 0 && file.Size > opt.maxSize) {
-            alertDialog(format(localText('Controls.ImageUpload.UploadFileTooBig'),
+            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooBig'),
                 fileSizeDisplay(opt.maxSize)));
             return false;
         }
@@ -117,19 +118,19 @@ export namespace UploadHelper {
             return true;
         }
         if (opt.minWidth > 0 && file.Width < opt.minWidth) {
-            alertDialog(format(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
             return false;
         }
         if (opt.maxWidth > 0 && file.Width > opt.maxWidth) {
-            alertDialog(format(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
             return false;
         }
         if (opt.minHeight > 0 && file.Height < opt.minHeight) {
-            alertDialog(format(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
             return false;
         }
         if (opt.maxHeight > 0 && file.Height > opt.maxHeight) {
-            alertDialog(format(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
             return false;
         }
         return true;

@@ -1,4 +1,4 @@
-﻿import { ArgumentNullException, Criteria, ListRequest, delegateCombine, delegateRemove, formatDate, isEmptyOrNull, isTrimmedEmpty, localText, notifyWarning, parseDate, toId, tryGetText } from "../../q";
+﻿import { ArgumentNullException, isEmptyOrNull, localText, notifyWarning, tryGetText } from "../../q";
 import { Decorators } from "../../decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
@@ -6,6 +6,8 @@ import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { Widget } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
+import { Criteria, ListRequest, formatDate, parseDate, toId } from "@serenity-is/base";
+import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 
 export interface QuickFilterBarOptions {
     filters: QuickFilter<Widget<any>, any>[];

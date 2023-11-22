@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { formatNumber, parseInteger } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
-import { extend, formatNumber, isTrimmedEmpty, parseInteger, trimToNull } from "../../q";
+import { extend, isTrimmedEmpty, trimToNull } from "../../q";
 import { Widget } from "../widgets/widget";
 import { DecimalEditor } from "./decimaleditor";
 

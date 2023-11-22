@@ -1,5 +1,6 @@
-﻿import { Decorators, ElementAttribute, OptionsTypeAttribute } from "../../decorators";
-import { any, Authorization, Culture, extend, getAttributes, getTypeShortName, isBS3, isBS5Plus, isEmptyOrNull, PropertyItem, startsWith, localText, trimToEmpty, trimToNull, tryGetText } from "../../q";
+﻿import { Culture, type PropertyItem, getTypeShortName } from "@serenity-is/base";
+import { Decorators, OptionsTypeAttribute } from "../../decorators";
+import { any, Authorization, extend, getAttributes, isBS3, isBS5Plus, isEmptyOrNull, startsWith, localText, trimToEmpty, trimToNull, tryGetText } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";

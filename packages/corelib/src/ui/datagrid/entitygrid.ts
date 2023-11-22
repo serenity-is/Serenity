@@ -1,6 +1,7 @@
-﻿import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
+﻿import { getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
+import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, endsWith, format, getInstanceType, getTypeFullName, HandleRouteEventArgs, isEmptyOrNull, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "../../q";
+import { Authorization, endsWith, HandleRouteEventArgs, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "../../q";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -151,7 +152,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     }
 
     protected getAddButtonCaption(): string {
-        return format(localText('Controls.EntityGrid.NewButton'), this.getItemName());
+        return stringFormat(localText('Controls.EntityGrid.NewButton'), this.getItemName());
     }
 
     protected getButtons(): ToolButton[] {
@@ -204,7 +205,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             }
 
             throw new Error(
-                format("{0} doesn't implement IEditDialog!",
+                stringFormat("{0} doesn't implement IEditDialog!",
                     getTypeFullName(getInstanceType(dlg))));
         });
     }
@@ -225,7 +226,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             }
 
             throw new Error(
-                format("{0} doesn't implement IEditDialog!",
+                stringFormat("{0} doesn't implement IEditDialog!",
                     getTypeFullName(getInstanceType(dlg))));
         });
     }

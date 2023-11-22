@@ -1,4 +1,5 @@
-﻿import { ArgumentNullException, Exception, htmlEncode, isAssignableFrom, isEmptyOrNull, ISlickFormatter, notifyError } from "../q";
+﻿import { htmlEncode, isAssignableFrom } from "@serenity-is/base";
+import { ArgumentNullException, Exception, isEmptyOrNull, ISlickFormatter, notifyError } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace FormatterTypeRegistry {

@@ -1,4 +1,4 @@
-import { Lookup } from "../../q/lookup";
+import { Lookup } from "@serenity-is/base";
 import { ScriptData } from "../../q/scriptdata";
 import { LookupEditor } from "./lookupeditor";
 

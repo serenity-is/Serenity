@@ -3,6 +3,600 @@
 import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, IPlugin, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
 
 /**
+ * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+ */
+declare class CriteriaBuilder extends Array {
+    /**
+     * Creates a between criteria.
+     * @param fromInclusive from value
+     * @param toInclusive to value
+     */
+    bw(fromInclusive: any, toInclusive: any): Array<any>;
+    /**
+     * Creates a contains criteria
+     * @param value contains value
+     */
+    contains(value: string): Array<any>;
+    /**
+     * Creates a endsWith criteria
+     * @param value endsWith value
+     */
+    endsWith(value: string): Array<any>;
+    /**
+     * Creates an equal (=) criteria
+     * @param value equal value
+     */
+    eq(value: any): Array<any>;
+    /**
+     * Creates a greater than criteria
+     * @param value greater than value
+     */
+    gt(value: any): Array<any>;
+    /**
+     * Creates a greater than or equal criteria
+     * @param value greater than or equal value
+     */
+    ge(value: any): Array<any>;
+    /**
+     * Creates a in criteria
+     * @param values in values
+     */
+    in(values: any[]): Array<any>;
+    /**
+     * Creates a IS NULL criteria
+     */
+    isNull(): Array<any>;
+    /**
+     * Creates a IS NOT NULL criteria
+     */
+    isNotNull(): Array<any>;
+    /**
+     * Creates a less than or equal to criteria
+     * @param value less than or equal to value
+     */
+    le(value: any): Array<any>;
+    /**
+     * Creates a less than criteria
+     * @param value less than value
+     */
+    lt(value: any): Array<any>;
+    /**
+     * Creates a not equal criteria
+     * @param value not equal value
+     */
+    ne(value: any): Array<any>;
+    /**
+     * Creates a LIKE criteria
+     * @param value like value
+     */
+    like(value: any): Array<any>;
+    /**
+     * Creates a STARTS WITH criteria
+     * @param value startsWith value
+     */
+    startsWith(value: string): Array<any>;
+    /**
+     * Creates a NOT IN criteria
+     * @param values array of NOT IN values
+     */
+    notIn(values: any[]): Array<any>;
+    /**
+     * Creates a NOT LIKE criteria
+     * @param value not like value
+     */
+    notLike(value: any): Array<any>;
+}
+/**
+ * Parses a criteria expression to Serenity Criteria array format.
+ * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
+ * @param expression The criteria expression.
+ * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+ * @example
+ * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ */
+declare function parseCriteria(expression: string, params?: any): any[];
+/**
+ * Parses a criteria expression to Serenity Criteria array format.
+ * The expression may contain parameter placeholders like `A >= ${p1}`
+ * where p1 is a variable in the scope.
+ * @param strings The string fragments.
+ * @param values The tagged template arguments.
+ * @example
+ * var a = 5, b = 4;
+ * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ */
+declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+/**
+ * Enumeration of Criteria operator keys.
+ */
+declare enum CriteriaOperator {
+    paren = "()",
+    not = "not",
+    isNull = "is null",
+    isNotNull = "is not null",
+    exists = "exists",
+    and = "and",
+    or = "or",
+    xor = "xor",
+    eq = "=",
+    ne = "!=",
+    gt = ">",
+    ge = ">=",
+    lt = "<",
+    le = "<=",
+    in = "in",
+    notIn = "not in",
+    like = "like",
+    notLike = "not like"
+}
+/**
+ * Creates a new criteria builder containg the passed field name.
+ * @param field The field name.
+ */
+declare function Criteria(field: string): CriteriaBuilder;
+declare namespace Criteria {
+    var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var Operator: typeof CriteriaOperator;
+    var isEmpty: (c: any[]) => boolean;
+    var join: (c1: any[], op: string, c2: any[]) => any[];
+    var not: (c: any[]) => (string | any[])[];
+    var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var paren: (c: any[]) => any[];
+    var parse: typeof parseCriteria;
+}
+
+interface DebouncedFunction<T extends (...args: any[]) => any> {
+    /**
+     * Call the original function, but applying the debounce rules.
+     *
+     * If the debounced function can be run immediately, this calls it and returns its return
+     * value.
+     *
+     * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+     * function was not invoked yet.
+     */
+    (...args: Parameters<T>): ReturnType<T> | undefined;
+    /**
+     * Throw away any pending invocation of the debounced function.
+     */
+    clear(): void;
+    /**
+     * If there is a pending invocation of the debounced function, invoke it immediately and return
+     * its return value.
+     *
+     * Otherwise, return the value from the last invocation, or undefined if the debounced function
+     * was never invoked.
+     */
+    flush(): ReturnType<T> | undefined;
+}
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function also has a property 'clear' that can be used
+ * to clear the timer to prevent previously scheduled executions, and flush method
+ * to invoke scheduled executions now if any.
+ * @param wait The function will be called after it stops being called for
+ * N milliseconds.
+ * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
+ *
+ * @source underscore.js
+ */
+declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+
+/**
+ * Interface for number formatting, similar to .NET's NumberFormatInfo
+ */
+interface NumberFormat {
+    /** Decimal separator */
+    decimalSeparator: string;
+    /** Group separator */
+    groupSeparator?: string;
+    /** Number of digits after decimal separator */
+    decimalDigits?: number;
+    /** Positive sign */
+    positiveSign?: string;
+    /** Negative sign */
+    negativeSign?: string;
+    /** Zero symbol */
+    nanSymbol?: string;
+    /** Percentage symbol */
+    percentSymbol?: string;
+    /** Currency symbol */
+    currencySymbol?: string;
+}
+/** Interface for date formatting, similar to .NET's DateFormatInfo */
+interface DateFormat {
+    /** Date separator */
+    dateSeparator?: string;
+    /** Default date format string */
+    dateFormat?: string;
+    /** Date order, like dmy, or ymd */
+    dateOrder?: string;
+    /** Default date time format string */
+    dateTimeFormat?: string;
+    /** AM designator */
+    amDesignator?: string;
+    /** PM designator */
+    pmDesignator?: string;
+    /** Time separator */
+    timeSeparator?: string;
+    /** First day of week, 0 = Sunday, 1 = Monday */
+    firstDayOfWeek?: number;
+    /** Array of day names */
+    dayNames?: string[];
+    /** Array of short day names */
+    shortDayNames?: string[];
+    /** Array of two letter day names */
+    minimizedDayNames?: string[];
+    /** Array of month names */
+    monthNames?: string[];
+    /** Array of short month names */
+    shortMonthNames?: string[];
+}
+/** Interface for a locale, similar to .NET's CultureInfo */
+interface Locale extends NumberFormat, DateFormat {
+    /** Locale string comparison function, similar to .NET's StringComparer */
+    stringCompare?: (a: string, b: string) => number;
+    /** Locale string to upper case function */
+    toUpper?: (a: string) => string;
+}
+/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
+declare let Invariant: Locale;
+/**
+ * Factory for a function that compares two strings, based on a character order
+ * passed in the `order` argument.
+ */
+declare function compareStringFactory(order: string): ((a: string, b: string) => number);
+/**
+ * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
+ * settings passed from a `<script>` element in the page with id `ScriptCulture`
+ * containing a JSON object if available. This element is generally created in
+ * the _LayoutHead.cshtml file for Serenity applications, so that the culture
+ * settings determined server, can be passed to the client.
+ */
+declare let Culture: Locale;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using current `Culture` locale settings.
+ */
+declare function stringFormat(format: string, ...prm: any[]): string;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using the locale passed as the first argument.
+ */
+declare function stringFormatLocale(l: Locale, format: string, ...prm: any[]): string;
+/**
+ * Rounds a number to specified digits or an integer number if digits are not specified.
+ * @param n the number to round
+ * @param d the number of digits to round to. default is zero.
+ * @param rounding whether to use banker's rounding
+ * @returns the rounded number
+ */
+declare let round: (n: number, d?: number, rounding?: boolean) => number;
+/**
+ * Truncates a number to an integer number.
+ */
+declare let trunc: (n: number) => number;
+/**
+ * Formats a number using the current `Culture` locale (or the passed locale) settings.
+ * It supports format specifiers similar to .NET numeric formatting strings.
+ * @param num the number to format
+ * @param format the format specifier. default is 'g'.
+ * See .NET numeric formatting strings documentation for more information.
+ */
+declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
+/**
+ * Converts a string to an integer. The difference between parseInt and parseInteger
+ * is that parseInteger will return null if the string is empty or null, whereas
+ * parseInt will return NaN and parseInteger will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
+declare function parseInteger(s: string): number;
+/**
+ * Converts a string to a decimal. The difference between parseFloat and parseDecimal
+ * is that parseDecimal will return null if the string is empty or null, whereas
+ * parseFloat will return NaN and parseDecimal will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
+declare function parseDecimal(s: string): number;
+/**
+ * Converts a string to an ID. If the string is a number, it is returned as-is.
+ * If the string is empty, null or whitespace, null is returned.
+ * Otherwise, it is converted to a number if possible. If the string is not a
+ * valid number or longer than 14 digits, the trimmed string is returned as-is.
+ * @param id the string to convert to an ID
+ */
+declare function toId(id: any): any;
+/**
+ * Formats a date using the specified format string and optional culture.
+ * Supports .NET style format strings including custom formats.
+ * See .NET documentation for supported formats.
+ * @param d the date to format. If null, it returns empty string.
+ * @param format the format string to use. If null, it uses the current culture's default format.
+ * 'G' uses the culture's datetime format.
+ * 'g' uses the culture's datetime format with secs removed.
+ * 'd' uses the culture's date format.
+ * 't' uses the culture's time format.
+ * 'u' uses the sortable ISO format with UTC time.
+ * 'U' uses the culture's date format with UTC time.
+ * @param locale the locale to use
+ * @returns the formatted date
+ * @example
+ * // returns "2019-01-01"
+ * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
+ * @example
+ * // returns "2019-01-01 12:00:00"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
+ * @example
+ * // returns "2019-01-01 12:00:00.000"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
+ * @example
+ * // returns "2019-01-01 12:00:00.000 AM"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+ */
+declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+/**
+ * Formats a date as the ISO 8601 UTC date/time format.
+ * @param n The number of minutes.
+ */
+declare function formatISODateTimeUTC(d: Date): string;
+/**
+ * Parses a string in the ISO 8601 UTC date/time format.
+ * @param s The string to parse.
+ */
+declare function parseISODateTime(s: string): Date;
+/**
+ * Parses a string to a date. If the string is empty or whitespace, returns null.
+ * Returns a NaN Date if the string is not a valid date.
+ * @param s The string to parse.
+ * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
+  */
+declare function parseDate(s: string, dateOrder?: string): Date;
+/**
+ * Splits a date string into an array of strings, each containing a single date part.
+ * It can handle separators "/", ".", "-" and "\".
+ * @param s The string to split.
+ */
+declare function splitDateString(s: string): string[];
+
+/**
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+ * @param s String (or number etc.) to be HTML encoded
+ */
+declare function htmlEncode(s: any): string;
+/**
+ * Toggles the class on the element handling spaces like addClass does.
+ * @param el the element
+ * @param cls the class to toggle
+ * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ */
+declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+interface LookupOptions<TItem> {
+    idField?: string;
+    parentIdField?: string;
+    textField?: string;
+    textFormatter?(item: TItem): string;
+}
+interface Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    textFormatter: (item: TItem) => string;
+}
+declare class Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    textFormatter: (item: TItem) => string;
+    constructor(options: LookupOptions<TItem>, items?: TItem[]);
+    update?(value: TItem[]): void;
+}
+
+declare enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+interface PropertyItem {
+    name?: string;
+    title?: string;
+    hint?: string;
+    placeholder?: string;
+    editorType?: string;
+    editorParams?: any;
+    category?: string;
+    collapsible?: boolean;
+    collapsed?: boolean;
+    tab?: string;
+    cssClass?: string;
+    headerCssClass?: string;
+    formCssClass?: string;
+    maxLength?: number;
+    required?: boolean;
+    insertable?: boolean;
+    insertPermission?: string;
+    hideOnInsert?: boolean;
+    updatable?: boolean;
+    updatePermission?: string;
+    hideOnUpdate?: boolean;
+    readOnly?: boolean;
+    readPermission?: string;
+    oneWay?: boolean;
+    defaultValue?: any;
+    localizable?: boolean;
+    visible?: boolean;
+    allowHide?: boolean;
+    formatterType?: string;
+    formatterParams?: any;
+    displayFormat?: string;
+    alignment?: string;
+    width?: number;
+    widthSet?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
+    labelWidth?: string;
+    resizable?: boolean;
+    sortable?: boolean;
+    sortOrder?: number;
+    groupOrder?: number;
+    summaryType?: SummaryType;
+    editLink?: boolean;
+    editLinkItemType?: string;
+    editLinkIdField?: string;
+    editLinkCssClass?: string;
+    filteringType?: string;
+    filteringParams?: any;
+    filteringIdField?: string;
+    notFilterable?: boolean;
+    filterOnly?: boolean;
+    quickFilter?: boolean;
+    quickFilterParams?: any;
+    quickFilterSeparator?: boolean;
+    quickFilterCssClass?: string;
+}
+interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
+
+interface ServiceError {
+    Code?: string;
+    Arguments?: string;
+    Message?: string;
+    Details?: string;
+    ErrorId?: string;
+}
+interface ServiceResponse {
+    Error?: ServiceError;
+}
+interface ServiceRequest {
+}
+interface SaveRequest<TEntity> extends ServiceRequest {
+    EntityId?: any;
+    Entity?: TEntity;
+    Localizations?: any;
+}
+interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+    Attachments?: any[];
+}
+interface SaveResponse extends ServiceResponse {
+    EntityId?: any;
+}
+interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+    Localizations?: {
+        [key: string]: TEntity;
+    };
+}
+interface DeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface DeleteResponse extends ServiceResponse {
+}
+interface UndeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface UndeleteResponse extends ServiceResponse {
+}
+declare enum ColumnSelection {
+    List = 0,
+    KeyOnly = 1,
+    Details = 2,
+    None = 3,
+    IdOnly = 4,
+    Lookup = 5
+}
+declare enum RetrieveColumnSelection {
+    details = 0,
+    keyOnly = 1,
+    list = 2,
+    none = 3,
+    idOnly = 4,
+    lookup = 5
+}
+interface ListRequest extends ServiceRequest {
+    Skip?: number;
+    Take?: number;
+    Sort?: string[];
+    ContainsText?: string;
+    ContainsField?: string;
+    Criteria?: any[];
+    EqualityFilter?: any;
+    IncludeDeleted?: boolean;
+    ExcludeTotalCount?: boolean;
+    ColumnSelection?: ColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+    ExportColumns?: string[];
+    DistinctFields?: string[];
+}
+interface ListResponse<TEntity> extends ServiceResponse {
+    Entities?: TEntity[];
+    Values?: any[];
+    TotalCount?: number;
+    Skip?: number;
+    Take?: number;
+}
+interface RetrieveRequest extends ServiceRequest {
+    EntityId?: any;
+    ColumnSelection?: RetrieveColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+}
+interface RetrieveResponse<TEntity> extends ServiceResponse {
+    Entity?: TEntity;
+}
+interface RetrieveLocalizationRequest extends RetrieveRequest {
+}
+interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+    Entities?: {
+        [key: string]: TEntity;
+    };
+}
+
+declare function getGlobalThis(): any;
+declare function getStateStore(key?: string): any;
+declare function getTypeStore(): any;
+interface TypeMetadata {
+    enumFlags?: boolean;
+    attr?: any[];
+}
+type Type = Function | Object;
+declare function ensureMetadata(target: Type): TypeMetadata;
+declare function getNested(from: any, name: string): any;
+declare function getType(name: string, target?: any): Type;
+declare function getTypeNameProp(type: Type): string;
+declare function setTypeNameProp(type: Type, value: string): void;
+declare function getTypeFullName(type: Type): string;
+declare function getTypeShortName(type: Type): string;
+declare function getInstanceType(instance: any): any;
+declare function isAssignableFrom(target: any, type: Type): boolean;
+declare function isInstanceOfType(instance: any, type: Type): boolean;
+declare function getBaseType(type: any): any;
+declare function registerClass(type: any, name: string, intf?: any[]): void;
+declare function registerEnum(type: any, name: string, enumKey?: string): void;
+declare function registerInterface(type: any, name: string, intf?: any[]): void;
+declare namespace Enum {
+    let toString: (enumType: any, value: number) => string;
+    let getValues: (enumType: any) => any[];
+}
+declare let isEnum: (type: any) => boolean;
+declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+
+/**
  * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
  * @param array Array to test.
  * @param predicate Predicate to test elements.
@@ -300,43 +894,6 @@ declare var Config: {
     notLoggedInHandler: Function;
 };
 
-interface DebouncedFunction<T extends (...args: any[]) => any> {
-    /**
-     * Call the original function, but applying the debounce rules.
-     *
-     * If the debounced function can be run immediately, this calls it and returns its return
-     * value.
-     *
-     * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
-     * function was not invoked yet.
-     */
-    (...args: Parameters<T>): ReturnType<T> | undefined;
-    /**
-     * Throw away any pending invocation of the debounced function.
-     */
-    clear(): void;
-    /**
-     * If there is a pending invocation of the debounced function, invoke it immediately and return
-     * its return value.
-     *
-     * Otherwise, return the value from the last invocation, or undefined if the debounced function
-     * was never invoked.
-     */
-    flush(): ReturnType<T> | undefined;
-}
-/**
- * Returns a function, that, as long as it continues to be invoked, will not
- * be triggered. The function also has a property 'clear' that can be used
- * to clear the timer to prevent previously scheduled executions, and flush method
- * to invoke scheduled executions now if any.
- * @param wait The function will be called after it stops being called for
- * N milliseconds.
- * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
- *
- * @source underscore.js
- */
-declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
-
 /**
  * Options for a message dialog button
  */
@@ -518,108 +1075,6 @@ declare function closePanel(element: JQuery | HTMLElement, e?: Event): void;
  */
 declare function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
 
-interface ServiceError {
-    Code?: string;
-    Arguments?: string;
-    Message?: string;
-    Details?: string;
-    ErrorId?: string;
-}
-interface ServiceResponse {
-    Error?: ServiceError;
-}
-interface ServiceRequest {
-}
-interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-    request?: any;
-    service?: string;
-    blockUI?: boolean;
-    onError?(response: TResponse): void;
-    onSuccess?(response: TResponse): void;
-    onCleanup?(): void;
-}
-interface SaveRequest<TEntity> extends ServiceRequest {
-    EntityId?: any;
-    Entity?: TEntity;
-    Localizations?: any;
-}
-interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-    Attachments?: any[];
-}
-interface SaveResponse extends ServiceResponse {
-    EntityId?: any;
-}
-interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-    Localizations?: {
-        [key: string]: TEntity;
-    };
-}
-interface DeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface DeleteResponse extends ServiceResponse {
-}
-interface UndeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface UndeleteResponse extends ServiceResponse {
-}
-declare enum ColumnSelection {
-    List = 0,
-    KeyOnly = 1,
-    Details = 2,
-    None = 3,
-    IdOnly = 4,
-    Lookup = 5
-}
-declare enum RetrieveColumnSelection {
-    details = 0,
-    keyOnly = 1,
-    list = 2,
-    none = 3,
-    idOnly = 4,
-    lookup = 5
-}
-interface ListRequest extends ServiceRequest {
-    Skip?: number;
-    Take?: number;
-    Sort?: string[];
-    ContainsText?: string;
-    ContainsField?: string;
-    Criteria?: any[];
-    EqualityFilter?: any;
-    IncludeDeleted?: boolean;
-    ExcludeTotalCount?: boolean;
-    ColumnSelection?: ColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-    ExportColumns?: string[];
-    DistinctFields?: string[];
-}
-interface ListResponse<TEntity> extends ServiceResponse {
-    Entities?: TEntity[];
-    Values?: any[];
-    TotalCount?: number;
-    Skip?: number;
-    Take?: number;
-}
-interface RetrieveRequest extends ServiceRequest {
-    EntityId?: any;
-    ColumnSelection?: RetrieveColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-}
-interface RetrieveResponse<TEntity> extends ServiceResponse {
-    Entity?: TEntity;
-}
-interface RetrieveLocalizationRequest extends RetrieveRequest {
-}
-interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-    Entities?: {
-        [key: string]: TEntity;
-    };
-}
-
 declare namespace ErrorHandling {
     /**
      * Shows a service error as an alert dialog. If the error
@@ -646,78 +1101,6 @@ declare namespace ErrorHandling {
 }
 
 /**
- * Interface for number formatting, similar to .NET's NumberFormatInfo
- */
-interface NumberFormat {
-    /** Decimal separator */
-    decimalSeparator: string;
-    /** Group separator */
-    groupSeparator?: string;
-    /** Number of digits after decimal separator */
-    decimalDigits?: number;
-    /** Positive sign */
-    positiveSign?: string;
-    /** Negative sign */
-    negativeSign?: string;
-    /** Zero symbol */
-    nanSymbol?: string;
-    /** Percentage symbol */
-    percentSymbol?: string;
-    /** Currency symbol */
-    currencySymbol?: string;
-}
-/** Interface for date formatting, similar to .NET's DateFormatInfo */
-interface DateFormat {
-    /** Date separator */
-    dateSeparator?: string;
-    /** Default date format string */
-    dateFormat?: string;
-    /** Date order, like dmy, or ymd */
-    dateOrder?: string;
-    /** Default date time format string */
-    dateTimeFormat?: string;
-    /** AM designator */
-    amDesignator?: string;
-    /** PM designator */
-    pmDesignator?: string;
-    /** Time separator */
-    timeSeparator?: string;
-    /** First day of week, 0 = Sunday, 1 = Monday */
-    firstDayOfWeek?: number;
-    /** Array of day names */
-    dayNames?: string[];
-    /** Array of short day names */
-    shortDayNames?: string[];
-    /** Array of two letter day names */
-    minimizedDayNames?: string[];
-    /** Array of month names */
-    monthNames?: string[];
-    /** Array of short month names */
-    shortMonthNames?: string[];
-}
-/** Interface for a locale, similar to .NET's CultureInfo */
-interface Locale extends NumberFormat, DateFormat {
-    /** Locale string comparison function, similar to .NET's StringComparer */
-    stringCompare?: (a: string, b: string) => number;
-    /** Locale string to upper case function */
-    toUpper?: (a: string) => string;
-}
-/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
-declare let Invariant: Locale;
-/**
- * Factory for a function that compares two strings, based on a character order
- * passed in the `order` argument.
- */
-declare function compareStringFactory(order: string): ((a: string, b: string) => number);
-/**
- * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
- * settings passed from a `<script>` element in the page with id `ScriptCulture`
- * containing a JSON object if available. This element is generally created in
- * the _LayoutHead.cshtml file for Serenity applications, so that the culture
- * settings determined server, can be passed to the client.
- */
-declare let Culture: Locale;
-/**
  * A string to lowercase function that handles special Turkish
  * characters like 'ı'. Left in for compatibility reasons.
  */
@@ -732,102 +1115,20 @@ declare function turkishLocaleToUpper(a: string): string;
  */
 declare let turkishLocaleCompare: (a: string, b: string) => number;
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using current `Culture` locale settings.
+ * @obsolete
+ * Use stringFormat
  */
-declare function format(format: string, ...prm: any[]): string;
+declare let format: typeof stringFormat;
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using the locale passed as the first argument.
+ * @obsolete
+ * Use stringFormatLocale
  */
-declare function localeFormat(l: Locale, format: string, ...prm: any[]): string;
-/**
- * Rounds a number to specified digits or an integer number if digits are not specified.
- * @param n the number to round
- * @param d the number of digits to round to. default is zero.
- * @param rounding whether to use banker's rounding
- * @returns the rounded number
- */
-declare let round: (n: number, d?: number, rounding?: boolean) => number;
-/**
- * Truncates a number to an integer number.
- */
-declare let trunc: (n: number) => number;
-/**
- * Formats a number using the current `Culture` locale (or the passed locale) settings.
- * It supports format specifiers similar to .NET numeric formatting strings.
- * @param num the number to format
- * @param format the format specifier. default is 'g'.
- * See .NET numeric formatting strings documentation for more information.
- */
-declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
-/**
- * Converts a string to an integer. The difference between parseInt and parseInteger
- * is that parseInteger will return null if the string is empty or null, whereas
- * parseInt will return NaN and parseInteger will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseInteger(s: string): number;
-/**
- * Converts a string to a decimal. The difference between parseFloat and parseDecimal
- * is that parseDecimal will return null if the string is empty or null, whereas
- * parseFloat will return NaN and parseDecimal will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseDecimal(s: string): number;
-/**
- * Converts a string to an ID. If the string is a number, it is returned as-is.
- * If the string is empty, null or whitespace, null is returned.
- * Otherwise, it is converted to a number if possible. If the string is not a
- * valid number or longer than 14 digits, the trimmed string is returned as-is.
- * @param id the string to convert to an ID
- */
-declare function toId(id: any): any;
-/**
- * Formats a date using the specified format string and optional culture.
- * Supports .NET style format strings including custom formats.
- * See .NET documentation for supported formats.
- * @param d the date to format. If null, it returns empty string.
- * @param format the format string to use. If null, it uses the current culture's default format.
- * 'G' uses the culture's datetime format.
- * 'g' uses the culture's datetime format with secs removed.
- * 'd' uses the culture's date format.
- * 't' uses the culture's time format.
- * 'u' uses the sortable ISO format with UTC time.
- * 'U' uses the culture's date format with UTC time.
- * @param locale the locale to use
- * @returns the formatted date
- * @example
- * // returns "2019-01-01"
- * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
- * @example
- * // returns "2019-01-01 12:00:00"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
- * @example
- * // returns "2019-01-01 12:00:00.000"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
- * @example
- * // returns "2019-01-01 12:00:00.000 AM"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
- */
-declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+declare let localeFormat: typeof stringFormatLocale;
 /**
  * Formats a number containing number of minutes into a string in the format "d.hh:mm".
  * @param n The number of minutes.
  */
 declare function formatDayHourAndMin(n: number): string;
-/**
- * Formats a date as the ISO 8601 UTC date/time format.
- * @param n The number of minutes.
- */
-declare function formatISODateTimeUTC(d: Date): string;
-/**
- * Parses a string in the ISO 8601 UTC date/time format.
- * @param s The string to parse.
- */
-declare function parseISODateTime(s: string): Date;
 /**
  * Parses a time string in the format "hh:mm" into a number containing number of minutes.
  * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
@@ -840,19 +1141,6 @@ declare function parseHourAndMin(value: string): number;
  * Returns NULL if the string is empty or whitespace.
  */
 declare function parseDayHourAndMin(s: string): number;
-/**
- * Parses a string to a date. If the string is empty or whitespace, returns null.
- * Returns a NaN Date if the string is not a valid date.
- * @param s The string to parse.
- * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
-  */
-declare function parseDate(s: string, dateOrder?: string): Date;
-/**
- * Splits a date string into an array of strings, each containing a single date part.
- * It can handle separators "/", ".", "-" and "\".
- * @param s The string to split.
- */
-declare function splitDateString(s: string): string[];
 
 /**
  * Adds an empty option to the select.
@@ -886,11 +1174,6 @@ declare function findElementWithRelativeId(element: JQuery, relativeId: string, 
  */
 declare function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
 /**
- * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
- * @param s String (or number etc.) to be HTML encoded
- */
-declare function htmlEncode(s: any): string;
-/**
  * Creates a new DIV and appends it to the body.
  * @returns the new DIV element.
  */
@@ -899,13 +1182,6 @@ declare function newBodyDiv(): JQuery;
  * Returns the outer HTML of the element.
  */
 declare function outerHtml(element: JQuery): string;
-/**
- * Toggles the class on the element handling spaces like jQuery addClass does.
- * @param el the element
- * @param cls the class to toggle
- * @param remove if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
- */
-declare function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
 declare function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
     noRoute?: boolean;
@@ -946,35 +1222,6 @@ declare class LT {
     toString(): string;
     static initializeTextClass: (type: any, prefix: string) => void;
     static getDefault: (key: string, defaultText: string) => string;
-}
-
-interface LookupOptions<TItem> {
-    idField?: string;
-    parentIdField?: string;
-    textField?: string;
-    textFormatter?(item: TItem): string;
-}
-interface Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-    textFormatter: (item: TItem) => string;
-}
-declare class Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-    textFormatter: (item: TItem) => string;
-    constructor(options: LookupOptions<TItem>, items?: TItem[]);
-    update?(value: TItem[]): void;
 }
 
 type ToastContainerOptions = {
@@ -1047,76 +1294,6 @@ declare function notifyInfo(message: string, title?: string, options?: ToastrOpt
 declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
 declare function positionToastContainer(create: boolean, options?: ToastrOptions): void;
 
-interface PropertyItem {
-    name?: string;
-    title?: string;
-    hint?: string;
-    placeholder?: string;
-    editorType?: string;
-    editorParams?: any;
-    category?: string;
-    collapsible?: boolean;
-    collapsed?: boolean;
-    tab?: string;
-    cssClass?: string;
-    headerCssClass?: string;
-    formCssClass?: string;
-    maxLength?: number;
-    required?: boolean;
-    insertable?: boolean;
-    insertPermission?: string;
-    hideOnInsert?: boolean;
-    updatable?: boolean;
-    updatePermission?: string;
-    hideOnUpdate?: boolean;
-    readOnly?: boolean;
-    readPermission?: string;
-    oneWay?: boolean;
-    defaultValue?: any;
-    localizable?: boolean;
-    visible?: boolean;
-    allowHide?: boolean;
-    formatterType?: string;
-    formatterParams?: any;
-    displayFormat?: string;
-    alignment?: string;
-    width?: number;
-    widthSet?: boolean;
-    minWidth?: number;
-    maxWidth?: number;
-    labelWidth?: string;
-    resizable?: boolean;
-    sortable?: boolean;
-    sortOrder?: number;
-    groupOrder?: number;
-    summaryType?: SummaryType;
-    editLink?: boolean;
-    editLinkItemType?: string;
-    editLinkIdField?: string;
-    editLinkCssClass?: string;
-    filteringType?: string;
-    filteringParams?: any;
-    filteringIdField?: string;
-    notFilterable?: boolean;
-    filterOnly?: boolean;
-    quickFilter?: boolean;
-    quickFilterParams?: any;
-    quickFilterSeparator?: boolean;
-    quickFilterCssClass?: string;
-}
-interface PropertyItemsData {
-    items: PropertyItem[];
-    additionalItems: PropertyItem[];
-}
-declare enum SummaryType {
-    Disabled = -1,
-    None = 0,
-    Sum = 1,
-    Avg = 2,
-    Min = 3,
-    Max = 4
-}
-
 interface HandleRouteEventArgs {
     handled: boolean;
     route: string;
@@ -1161,6 +1338,15 @@ declare function getFormDataAsync(key: string): Promise<PropertyItemsData>;
 declare function getTemplate(key: string): string;
 declare function getTemplateAsync(key: string): Promise<string>;
 declare function canLoadScriptData(name: string): boolean;
+
+interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+    request?: any;
+    service?: string;
+    blockUI?: boolean;
+    onError?(response: TResponse): void;
+    onSuccess?(response: TResponse): void;
+    onCleanup?(): void;
+}
 
 declare function getCookie(name: string): any;
 declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
@@ -1267,7 +1453,6 @@ declare function isValue(a: any): boolean;
 declare let today: () => Date;
 declare function extend<T = any>(a: T, b: T): T;
 declare function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
-type Type = Function | Object;
 interface TypeMember {
     name: string;
     type: MemberType;
@@ -1275,19 +1460,6 @@ interface TypeMember {
     getter?: string;
     setter?: string;
 }
-declare function getNested(from: any, name: string): any;
-declare function getGlobalThis(): any;
-declare function getType(name: string, target?: any): Type;
-declare function getTypeNameProp(type: Type): string;
-declare function setTypeNameProp(type: Type, value: string): void;
-declare function getTypeFullName(type: Type): string;
-declare function getTypeShortName(type: Type): string;
-declare function getInstanceType(instance: any): any;
-declare function isAssignableFrom(target: any, type: Type): boolean;
-declare function isInstanceOfType(instance: any, type: Type): boolean;
-declare function safeCast(instance: any, type: Type): any;
-declare function cast(instance: any, type: Type): any;
-declare function getBaseType(type: any): any;
 declare function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
 declare enum MemberType {
     field = 4,
@@ -1297,27 +1469,16 @@ declare function getMembers(type: any, memberTypes: MemberType): TypeMember[];
 declare function addTypeMember(type: any, member: TypeMember): TypeMember;
 declare function getTypes(from?: any): any[];
 declare function clearKeys(d: any): void;
-declare function delegateCombine(delegate1: any, delegate2: any): any;
-declare function getStateStore(key?: string): any;
-declare namespace Enum {
-    let toString: (enumType: any, value: number) => string;
-    let getValues: (enumType: any) => any[];
-}
-declare let delegateRemove: (delegate1: any, delegate2: any) => any;
-declare let isEnum: (type: any) => boolean;
-declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function prop(type: any, name: string, getter?: string, setter?: string): void;
-declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function keyOf<T>(prop: keyof T): keyof T;
-declare function registerClass(type: any, name: string, intf?: any[]): void;
 declare function registerEditor(type: any, name: string, intf?: any[]): void;
-declare function registerEnum(type: any, name: string, enumKey?: string): void;
-declare function registerInterface(type: any, name: string, intf?: any[]): void;
 declare function addAttribute(type: any, attr: any): void;
 declare class ISlickFormatter {
 }
 declare class EditorAttribute {
 }
+declare function cast(instance: any, type: Type): any;
+declare function safeCast(instance: any, type: Type): any;
 declare function initializeTypes(root: any, pre: string, limit: number): void;
 declare class Exception extends Error {
     constructor(message: string);
@@ -1338,149 +1499,6 @@ declare function baseValidateOptions(): JQueryValidation.ValidationOptions;
 declare function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 declare function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
 declare function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-
-/**
- * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
- */
-declare class CriteriaBuilder extends Array {
-    /**
-     * Creates a between criteria.
-     * @param fromInclusive from value
-     * @param toInclusive to value
-     */
-    bw(fromInclusive: any, toInclusive: any): Array<any>;
-    /**
-     * Creates a contains criteria
-     * @param value contains value
-     */
-    contains(value: string): Array<any>;
-    /**
-     * Creates a endsWith criteria
-     * @param value endsWith value
-     */
-    endsWith(value: string): Array<any>;
-    /**
-     * Creates an equal (=) criteria
-     * @param value equal value
-     */
-    eq(value: any): Array<any>;
-    /**
-     * Creates a greater than criteria
-     * @param value greater than value
-     */
-    gt(value: any): Array<any>;
-    /**
-     * Creates a greater than or equal criteria
-     * @param value greater than or equal value
-     */
-    ge(value: any): Array<any>;
-    /**
-     * Creates a in criteria
-     * @param values in values
-     */
-    in(values: any[]): Array<any>;
-    /**
-     * Creates a IS NULL criteria
-     */
-    isNull(): Array<any>;
-    /**
-     * Creates a IS NOT NULL criteria
-     */
-    isNotNull(): Array<any>;
-    /**
-     * Creates a less than or equal to criteria
-     * @param value less than or equal to value
-     */
-    le(value: any): Array<any>;
-    /**
-     * Creates a less than criteria
-     * @param value less than value
-     */
-    lt(value: any): Array<any>;
-    /**
-     * Creates a not equal criteria
-     * @param value not equal value
-     */
-    ne(value: any): Array<any>;
-    /**
-     * Creates a LIKE criteria
-     * @param value like value
-     */
-    like(value: any): Array<any>;
-    /**
-     * Creates a STARTS WITH criteria
-     * @param value startsWith value
-     */
-    startsWith(value: string): Array<any>;
-    /**
-     * Creates a NOT IN criteria
-     * @param values array of NOT IN values
-     */
-    notIn(values: any[]): Array<any>;
-    /**
-     * Creates a NOT LIKE criteria
-     * @param value not like value
-     */
-    notLike(value: any): Array<any>;
-}
-/**
- * Parses a criteria expression to Serenity Criteria array format.
- * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
- * @param expression The criteria expression.
- * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
- * @example
- * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
- */
-declare function parseCriteria(expression: string, params?: any): any[];
-/**
- * Parses a criteria expression to Serenity Criteria array format.
- * The expression may contain parameter placeholders like `A >= ${p1}`
- * where p1 is a variable in the scope.
- * @param strings The string fragments.
- * @param values The tagged template arguments.
- * @example
- * var a = 5, b = 4;
- * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
- */
-declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
-/**
- * Enumeration of Criteria operator keys.
- */
-declare enum CriteriaOperator {
-    paren = "()",
-    not = "not",
-    isNull = "is null",
-    isNotNull = "is not null",
-    exists = "exists",
-    and = "and",
-    or = "or",
-    xor = "xor",
-    eq = "=",
-    ne = "!=",
-    gt = ">",
-    ge = ">=",
-    lt = "<",
-    le = "<=",
-    in = "in",
-    notIn = "not in",
-    like = "like",
-    notLike = "not like"
-}
-/**
- * Creates a new criteria builder containg the passed field name.
- * @param field The field name.
- */
-declare function Criteria(field: string): CriteriaBuilder;
-declare namespace Criteria {
-    var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-    var Operator: typeof CriteriaOperator;
-    var isEmpty: (c: any[]) => boolean;
-    var join: (c1: any[], op: string, c2: any[]) => any[];
-    var not: (c: any[]) => (string | any[])[];
-    var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-    var paren: (c: any[]) => any[];
-    var parse: typeof parseCriteria;
-}
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -3142,6 +3160,9 @@ declare class FilterStore {
     get_activeCriteria(): any[];
     get_displayText(): string;
 }
+declare function delegateCombine(delegate1: any, delegate2: any): any;
+declare function delegateRemove(delegate1: any, delegate2: any): any;
+declare function delegateContains(targets: any[], object: any, method: any): boolean;
 
 interface IFiltering {
     createEditor(): void;
@@ -3489,13 +3510,8 @@ declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
 }
 
-type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
 declare global {
     namespace Slick {
-        namespace Data {
-            /** @obsolete use the type exported from @serenity-is/sleekgrid */
-            const GroupItemMetadataProvider: GroupItemMetadataProviderType;
-        }
         interface RowMoveManagerOptions {
             cancelEditOnDrag: boolean;
         }
@@ -4170,4 +4186,4 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AlertOptions, type AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JQBlockUIOptions, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, type WidgetClass, type WidgetComponentProps, type WidgetDialogClass, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AggregateFormatting, Aggregators, type AlertOptions, type AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JQBlockUIOptions, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, type WidgetClass, type WidgetComponentProps, type WidgetDialogClass, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, ensureMetadata, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

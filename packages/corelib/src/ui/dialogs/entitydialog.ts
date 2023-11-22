@@ -1,6 +1,7 @@
-﻿import { any, Authorization, confirmDialog, DeleteRequest, DeleteResponse, endsWith, Exception, extend, format, getAttributes, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, localText, LT, notifySuccess, PropertyItem, PropertyItemsData, replaceAll, RetrieveRequest, RetrieveResponse, safeCast, SaveRequest, SaveResponse, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, UndeleteRequest, UndeleteResponse, validatorAbortHandler } from "../../q";
+﻿import { DeleteRequest, DeleteResponse, type PropertyItem, type PropertyItemsData, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
+import { any, Authorization, confirmDialog, endsWith, Exception, extend, getAttributes, getFormData, getFormDataAsync, isEmptyOrNull, localText, LT, notifySuccess, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -112,13 +113,13 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected getEntityTitle(): string {
         if (!this.isEditMode()) {
-            return format(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
+            return stringFormat(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
         }
         else {
             var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
                 localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
             var title = this.getEntityNameFieldValue() ?? '';
-            return format(titleFormat,
+            return stringFormat(titleFormat,
                 this.getEntitySingular(), (isEmptyOrNull(title) ? '' : (' (' + title + ')')));
         }
     }
@@ -739,7 +740,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         }
     }
 
-    protected getPropertyItems() {
+    protected getPropertyItems(): PropertyItem[] {
         return this.propertyItemsData?.items || [];
     }
 

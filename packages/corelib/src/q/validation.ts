@@ -1,11 +1,10 @@
-﻿import { extend } from "./system";
+﻿import validator from "@optionaldeps/jquery.validation";
+import { htmlEncode, parseDate, parseDecimal, parseInteger } from "@serenity-is/base";
 import { Config } from "./config";
-import { Exception } from "./system";
-import { tryGetText } from "./localtext";
-import { parseDate, parseHourAndMin, parseDayHourAndMin, parseDecimal, parseInteger } from "./formatting";
 import { isBS3 } from "./dialogs";
-import { htmlEncode } from "./html";
-import validator from "@optionaldeps/jquery.validation";
+import { parseDayHourAndMin, parseHourAndMin } from "./formatting";
+import { tryGetText } from "./localtext";
+import { Exception, extend } from "./system";
 
 if (validator && validator.methods && validator.addMethod) {
 

@@ -1,4 +1,4 @@
-import { Culture } from "../../q";
+import { Culture } from "@serenity-is/base";
 import { DecimalEditor } from "./decimaleditor";
 
 describe("DecimalEditor", () => {

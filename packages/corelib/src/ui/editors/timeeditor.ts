@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { toId } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
-import { addOption, toId } from "../../q";
+import { addOption } from "../../q";
 import { Widget } from "../widgets/widget";
 import { EditorUtils } from "./editorutils";
 

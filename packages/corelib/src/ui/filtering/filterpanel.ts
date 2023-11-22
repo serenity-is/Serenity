@@ -1,5 +1,6 @@
-﻿import { Decorators } from "../../decorators";
-import { cast, isEmptyOrNull, PropertyItem, localText, tryGetText } from "../../q";
+﻿import { PropertyItem } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { cast, isEmptyOrNull, localText, tryGetText } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";

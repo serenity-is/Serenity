@@ -1,5 +1,6 @@
-﻿import { Decorators } from "../../decorators";
-import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeShortName, replaceAll, startsWith, localText } from "../../q";
+﻿import { getBaseType, getInstanceType, getTypeFullName, getTypeShortName, stringFormat } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { Config, canLoadScriptData, getTemplate, localText, replaceAll, startsWith } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
@@ -99,7 +100,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         template = getTemplate(templateName);
 
         if (template == null) {
-            throw new Error(format(
+            throw new Error(stringFormat(
                 "Can't locate template for widget '{0}' with name '{1}'!",
                 getTypeFullName(getInstanceType(this)), templateName));
         }

@@ -656,7 +656,7 @@ declare namespace Slick {
     	private _handlers;
     	/***
     	 * Adds an event handler to be called when the event is fired.
-    	 * <p>Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+    	 * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
     	 * object the event was fired with.<p>
     	 * @method subscribe
     	 * @param fn {Function} Event handler.
@@ -678,7 +678,7 @@ declare namespace Slick {
     	 * @param scope {Object}
     	 *      Optional.
     	 *      The scope ("this") within which the handler will be executed.
-    	 *      If not specified, the scope will be set to the <code>Slick.Event</code> instance.
+    	 *      If not specified, the scope will be set to the <code>Event</code> instance.
     	 */
     	notify(args?: any, e?: TEventData, scope?: object): any;
     	clear(): void;
@@ -1692,6 +1692,600 @@ declare namespace Slick {
 
 declare namespace Serenity {
     /**
+     * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+     */
+    class CriteriaBuilder extends Array {
+        /**
+         * Creates a between criteria.
+         * @param fromInclusive from value
+         * @param toInclusive to value
+         */
+        bw(fromInclusive: any, toInclusive: any): Array<any>;
+        /**
+         * Creates a contains criteria
+         * @param value contains value
+         */
+        contains(value: string): Array<any>;
+        /**
+         * Creates a endsWith criteria
+         * @param value endsWith value
+         */
+        endsWith(value: string): Array<any>;
+        /**
+         * Creates an equal (=) criteria
+         * @param value equal value
+         */
+        eq(value: any): Array<any>;
+        /**
+         * Creates a greater than criteria
+         * @param value greater than value
+         */
+        gt(value: any): Array<any>;
+        /**
+         * Creates a greater than or equal criteria
+         * @param value greater than or equal value
+         */
+        ge(value: any): Array<any>;
+        /**
+         * Creates a in criteria
+         * @param values in values
+         */
+        in(values: any[]): Array<any>;
+        /**
+         * Creates a IS NULL criteria
+         */
+        isNull(): Array<any>;
+        /**
+         * Creates a IS NOT NULL criteria
+         */
+        isNotNull(): Array<any>;
+        /**
+         * Creates a less than or equal to criteria
+         * @param value less than or equal to value
+         */
+        le(value: any): Array<any>;
+        /**
+         * Creates a less than criteria
+         * @param value less than value
+         */
+        lt(value: any): Array<any>;
+        /**
+         * Creates a not equal criteria
+         * @param value not equal value
+         */
+        ne(value: any): Array<any>;
+        /**
+         * Creates a LIKE criteria
+         * @param value like value
+         */
+        like(value: any): Array<any>;
+        /**
+         * Creates a STARTS WITH criteria
+         * @param value startsWith value
+         */
+        startsWith(value: string): Array<any>;
+        /**
+         * Creates a NOT IN criteria
+         * @param values array of NOT IN values
+         */
+        notIn(values: any[]): Array<any>;
+        /**
+         * Creates a NOT LIKE criteria
+         * @param value not like value
+         */
+        notLike(value: any): Array<any>;
+    }
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
+     * @param expression The criteria expression.
+     * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+     * @example
+     * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
+    function parseCriteria(expression: string, params?: any): any[];
+    /**
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The expression may contain parameter placeholders like `A >= ${p1}`
+     * where p1 is a variable in the scope.
+     * @param strings The string fragments.
+     * @param values The tagged template arguments.
+     * @example
+     * var a = 5, b = 4;
+     * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+     */
+    function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+    /**
+     * Enumeration of Criteria operator keys.
+     */
+    enum CriteriaOperator {
+        paren = "()",
+        not = "not",
+        isNull = "is null",
+        isNotNull = "is not null",
+        exists = "exists",
+        and = "and",
+        or = "or",
+        xor = "xor",
+        eq = "=",
+        ne = "!=",
+        gt = ">",
+        ge = ">=",
+        lt = "<",
+        le = "<=",
+        in = "in",
+        notIn = "not in",
+        like = "like",
+        notLike = "not like"
+    }
+    /**
+     * Creates a new criteria builder containg the passed field name.
+     * @param field The field name.
+     */
+    function Criteria(field: string): CriteriaBuilder;
+    namespace Criteria {
+        var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var Operator: typeof CriteriaOperator;
+        var isEmpty: (c: any[]) => boolean;
+        var join: (c1: any[], op: string, c2: any[]) => any[];
+        var not: (c: any[]) => (string | any[])[];
+        var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+        var paren: (c: any[]) => any[];
+        var parse: typeof parseCriteria;
+    }
+
+    interface DebouncedFunction<T extends (...args: any[]) => any> {
+        /**
+         * Call the original function, but applying the debounce rules.
+         *
+         * If the debounced function can be run immediately, this calls it and returns its return
+         * value.
+         *
+         * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+         * function was not invoked yet.
+         */
+        (...args: Parameters<T>): ReturnType<T> | undefined;
+        /**
+         * Throw away any pending invocation of the debounced function.
+         */
+        clear(): void;
+        /**
+         * If there is a pending invocation of the debounced function, invoke it immediately and return
+         * its return value.
+         *
+         * Otherwise, return the value from the last invocation, or undefined if the debounced function
+         * was never invoked.
+         */
+        flush(): ReturnType<T> | undefined;
+    }
+    /**
+     * Returns a function, that, as long as it continues to be invoked, will not
+     * be triggered. The function also has a property 'clear' that can be used
+     * to clear the timer to prevent previously scheduled executions, and flush method
+     * to invoke scheduled executions now if any.
+     * @param wait The function will be called after it stops being called for
+     * N milliseconds.
+     * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
+     *
+     * @source underscore.js
+     */
+    function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+
+    /**
+     * Interface for number formatting, similar to .NET's NumberFormatInfo
+     */
+    interface NumberFormat {
+        /** Decimal separator */
+        decimalSeparator: string;
+        /** Group separator */
+        groupSeparator?: string;
+        /** Number of digits after decimal separator */
+        decimalDigits?: number;
+        /** Positive sign */
+        positiveSign?: string;
+        /** Negative sign */
+        negativeSign?: string;
+        /** Zero symbol */
+        nanSymbol?: string;
+        /** Percentage symbol */
+        percentSymbol?: string;
+        /** Currency symbol */
+        currencySymbol?: string;
+    }
+    /** Interface for date formatting, similar to .NET's DateFormatInfo */
+    interface DateFormat {
+        /** Date separator */
+        dateSeparator?: string;
+        /** Default date format string */
+        dateFormat?: string;
+        /** Date order, like dmy, or ymd */
+        dateOrder?: string;
+        /** Default date time format string */
+        dateTimeFormat?: string;
+        /** AM designator */
+        amDesignator?: string;
+        /** PM designator */
+        pmDesignator?: string;
+        /** Time separator */
+        timeSeparator?: string;
+        /** First day of week, 0 = Sunday, 1 = Monday */
+        firstDayOfWeek?: number;
+        /** Array of day names */
+        dayNames?: string[];
+        /** Array of short day names */
+        shortDayNames?: string[];
+        /** Array of two letter day names */
+        minimizedDayNames?: string[];
+        /** Array of month names */
+        monthNames?: string[];
+        /** Array of short month names */
+        shortMonthNames?: string[];
+    }
+    /** Interface for a locale, similar to .NET's CultureInfo */
+    interface Locale extends NumberFormat, DateFormat {
+        /** Locale string comparison function, similar to .NET's StringComparer */
+        stringCompare?: (a: string, b: string) => number;
+        /** Locale string to upper case function */
+        toUpper?: (a: string) => string;
+    }
+    /** Invariant locale (e.g. CultureInfo.InvariantCulture) */
+    let Invariant: Locale;
+    /**
+     * Factory for a function that compares two strings, based on a character order
+     * passed in the `order` argument.
+     */
+    function compareStringFactory(order: string): ((a: string, b: string) => number);
+    /**
+     * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
+     * settings passed from a `<script>` element in the page with id `ScriptCulture`
+     * containing a JSON object if available. This element is generally created in
+     * the _LayoutHead.cshtml file for Serenity applications, so that the culture
+     * settings determined server, can be passed to the client.
+     */
+    let Culture: Locale;
+    /**
+     * Formats a string with parameters similar to .NET's String.Format function
+     * using current `Culture` locale settings.
+     */
+    function stringFormat(format: string, ...prm: any[]): string;
+    /**
+     * Formats a string with parameters similar to .NET's String.Format function
+     * using the locale passed as the first argument.
+     */
+    function stringFormatLocale(l: Locale, format: string, ...prm: any[]): string;
+    /**
+     * Rounds a number to specified digits or an integer number if digits are not specified.
+     * @param n the number to round
+     * @param d the number of digits to round to. default is zero.
+     * @param rounding whether to use banker's rounding
+     * @returns the rounded number
+     */
+    let round: (n: number, d?: number, rounding?: boolean) => number;
+    /**
+     * Truncates a number to an integer number.
+     */
+    let trunc: (n: number) => number;
+    /**
+     * Formats a number using the current `Culture` locale (or the passed locale) settings.
+     * It supports format specifiers similar to .NET numeric formatting strings.
+     * @param num the number to format
+     * @param format the format specifier. default is 'g'.
+     * See .NET numeric formatting strings documentation for more information.
+     */
+    function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
+    /**
+     * Converts a string to an integer. The difference between parseInt and parseInteger
+     * is that parseInteger will return null if the string is empty or null, whereas
+     * parseInt will return NaN and parseInteger will use the current culture's group
+     * and decimal separators.
+     * @param s the string to parse
+     */
+    function parseInteger(s: string): number;
+    /**
+     * Converts a string to a decimal. The difference between parseFloat and parseDecimal
+     * is that parseDecimal will return null if the string is empty or null, whereas
+     * parseFloat will return NaN and parseDecimal will use the current culture's group
+     * and decimal separators.
+     * @param s the string to parse
+     */
+    function parseDecimal(s: string): number;
+    /**
+     * Converts a string to an ID. If the string is a number, it is returned as-is.
+     * If the string is empty, null or whitespace, null is returned.
+     * Otherwise, it is converted to a number if possible. If the string is not a
+     * valid number or longer than 14 digits, the trimmed string is returned as-is.
+     * @param id the string to convert to an ID
+     */
+    function toId(id: any): any;
+    /**
+     * Formats a date using the specified format string and optional culture.
+     * Supports .NET style format strings including custom formats.
+     * See .NET documentation for supported formats.
+     * @param d the date to format. If null, it returns empty string.
+     * @param format the format string to use. If null, it uses the current culture's default format.
+     * 'G' uses the culture's datetime format.
+     * 'g' uses the culture's datetime format with secs removed.
+     * 'd' uses the culture's date format.
+     * 't' uses the culture's time format.
+     * 'u' uses the sortable ISO format with UTC time.
+     * 'U' uses the culture's date format with UTC time.
+     * @param locale the locale to use
+     * @returns the formatted date
+     * @example
+     * // returns "2019-01-01"
+     * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
+     * @example
+     * // returns "2019-01-01 12:00:00"
+     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
+     * @example
+     * // returns "2019-01-01 12:00:00.000"
+     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
+     * @example
+     * // returns "2019-01-01 12:00:00.000 AM"
+     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+     */
+    function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+    /**
+     * Formats a date as the ISO 8601 UTC date/time format.
+     * @param n The number of minutes.
+     */
+    function formatISODateTimeUTC(d: Date): string;
+    /**
+     * Parses a string in the ISO 8601 UTC date/time format.
+     * @param s The string to parse.
+     */
+    function parseISODateTime(s: string): Date;
+    /**
+     * Parses a string to a date. If the string is empty or whitespace, returns null.
+     * Returns a NaN Date if the string is not a valid date.
+     * @param s The string to parse.
+     * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
+      */
+    function parseDate(s: string, dateOrder?: string): Date;
+    /**
+     * Splits a date string into an array of strings, each containing a single date part.
+     * It can handle separators "/", ".", "-" and "\".
+     * @param s The string to split.
+     */
+    function splitDateString(s: string): string[];
+
+    /**
+     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+     * @param s String (or number etc.) to be HTML encoded
+     */
+    function htmlEncode(s: any): string;
+    /**
+     * Toggles the class on the element handling spaces like addClass does.
+     * @param el the element
+     * @param cls the class to toggle
+     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+     */
+    function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+    interface LookupOptions<TItem> {
+        idField?: string;
+        parentIdField?: string;
+        textField?: string;
+        textFormatter?(item: TItem): string;
+    }
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+    }
+    class Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+        constructor(options: LookupOptions<TItem>, items?: TItem[]);
+        update?(value: TItem[]): void;
+    }
+
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    interface PropertyItemsData {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+    }
+
+    interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
+        Details?: string;
+        ErrorId?: string;
+    }
+    interface ServiceResponse {
+        Error?: ServiceError;
+    }
+    interface ServiceRequest {
+    }
+    interface SaveRequest<TEntity> extends ServiceRequest {
+        EntityId?: any;
+        Entity?: TEntity;
+        Localizations?: any;
+    }
+    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+        Attachments?: any[];
+    }
+    interface SaveResponse extends ServiceResponse {
+        EntityId?: any;
+    }
+    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+        Localizations?: {
+            [key: string]: TEntity;
+        };
+    }
+    interface DeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface DeleteResponse extends ServiceResponse {
+    }
+    interface UndeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+    interface UndeleteResponse extends ServiceResponse {
+    }
+    enum ColumnSelection {
+        List = 0,
+        KeyOnly = 1,
+        Details = 2,
+        None = 3,
+        IdOnly = 4,
+        Lookup = 5
+    }
+    enum RetrieveColumnSelection {
+        details = 0,
+        keyOnly = 1,
+        list = 2,
+        none = 3,
+        idOnly = 4,
+        lookup = 5
+    }
+    interface ListRequest extends ServiceRequest {
+        Skip?: number;
+        Take?: number;
+        Sort?: string[];
+        ContainsText?: string;
+        ContainsField?: string;
+        Criteria?: any[];
+        EqualityFilter?: any;
+        IncludeDeleted?: boolean;
+        ExcludeTotalCount?: boolean;
+        ColumnSelection?: ColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+        ExportColumns?: string[];
+        DistinctFields?: string[];
+    }
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        Values?: any[];
+        TotalCount?: number;
+        Skip?: number;
+        Take?: number;
+    }
+    interface RetrieveRequest extends ServiceRequest {
+        EntityId?: any;
+        ColumnSelection?: RetrieveColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
+    }
+    interface RetrieveResponse<TEntity> extends ServiceResponse {
+        Entity?: TEntity;
+    }
+    interface RetrieveLocalizationRequest extends RetrieveRequest {
+    }
+    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+        Entities?: {
+            [key: string]: TEntity;
+        };
+    }
+
+    function getGlobalThis(): any;
+    function getStateStore(key?: string): any;
+    function getTypeStore(): any;
+    interface TypeMetadata {
+        enumFlags?: boolean;
+        attr?: any[];
+    }
+    type Type = Function | Object;
+    function ensureMetadata(target: Type): TypeMetadata;
+    function getNested(from: any, name: string): any;
+    function getType(name: string, target?: any): Type;
+    function getTypeNameProp(type: Type): string;
+    function setTypeNameProp(type: Type, value: string): void;
+    function getTypeFullName(type: Type): string;
+    function getTypeShortName(type: Type): string;
+    function getInstanceType(instance: any): any;
+    function isAssignableFrom(target: any, type: Type): boolean;
+    function isInstanceOfType(instance: any, type: Type): boolean;
+    function getBaseType(type: any): any;
+    function registerClass(type: any, name: string, intf?: any[]): void;
+    function registerEnum(type: any, name: string, enumKey?: string): void;
+    function registerInterface(type: any, name: string, intf?: any[]): void;
+    namespace Enum {
+        let toString: (enumType: any, value: number) => string;
+        let getValues: (enumType: any) => any[];
+    }
+    let isEnum: (type: any) => boolean;
+    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+    function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+
+    /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
      * @param array Array to test.
      * @param predicate Predicate to test elements.
@@ -1989,43 +2583,6 @@ declare namespace Serenity {
         notLoggedInHandler: Function;
     };
 
-    interface DebouncedFunction<T extends (...args: any[]) => any> {
-        /**
-         * Call the original function, but applying the debounce rules.
-         *
-         * If the debounced function can be run immediately, this calls it and returns its return
-         * value.
-         *
-         * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
-         * function was not invoked yet.
-         */
-        (...args: Parameters<T>): ReturnType<T> | undefined;
-        /**
-         * Throw away any pending invocation of the debounced function.
-         */
-        clear(): void;
-        /**
-         * If there is a pending invocation of the debounced function, invoke it immediately and return
-         * its return value.
-         *
-         * Otherwise, return the value from the last invocation, or undefined if the debounced function
-         * was never invoked.
-         */
-        flush(): ReturnType<T> | undefined;
-    }
-    /**
-     * Returns a function, that, as long as it continues to be invoked, will not
-     * be triggered. The function also has a property 'clear' that can be used
-     * to clear the timer to prevent previously scheduled executions, and flush method
-     * to invoke scheduled executions now if any.
-     * @param wait The function will be called after it stops being called for
-     * N milliseconds.
-     * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
-     *
-     * @source underscore.js
-     */
-    function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
-
     /**
      * Options for a message dialog button
      */
@@ -2207,108 +2764,6 @@ declare namespace Serenity {
      */
     function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
 
-    interface ServiceError {
-        Code?: string;
-        Arguments?: string;
-        Message?: string;
-        Details?: string;
-        ErrorId?: string;
-    }
-    interface ServiceResponse {
-        Error?: ServiceError;
-    }
-    interface ServiceRequest {
-    }
-    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    interface SaveRequest<TEntity> extends ServiceRequest {
-        EntityId?: any;
-        Entity?: TEntity;
-        Localizations?: any;
-    }
-    interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-        Attachments?: any[];
-    }
-    interface SaveResponse extends ServiceResponse {
-        EntityId?: any;
-    }
-    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-        Localizations?: {
-            [key: string]: TEntity;
-        };
-    }
-    interface DeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface DeleteResponse extends ServiceResponse {
-    }
-    interface UndeleteRequest extends ServiceRequest {
-        EntityId?: any;
-    }
-    interface UndeleteResponse extends ServiceResponse {
-    }
-    enum ColumnSelection {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2,
-        None = 3,
-        IdOnly = 4,
-        Lookup = 5
-    }
-    enum RetrieveColumnSelection {
-        details = 0,
-        keyOnly = 1,
-        list = 2,
-        none = 3,
-        idOnly = 4,
-        lookup = 5
-    }
-    interface ListRequest extends ServiceRequest {
-        Skip?: number;
-        Take?: number;
-        Sort?: string[];
-        ContainsText?: string;
-        ContainsField?: string;
-        Criteria?: any[];
-        EqualityFilter?: any;
-        IncludeDeleted?: boolean;
-        ExcludeTotalCount?: boolean;
-        ColumnSelection?: ColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-        ExportColumns?: string[];
-        DistinctFields?: string[];
-    }
-    interface ListResponse<TEntity> extends ServiceResponse {
-        Entities?: TEntity[];
-        Values?: any[];
-        TotalCount?: number;
-        Skip?: number;
-        Take?: number;
-    }
-    interface RetrieveRequest extends ServiceRequest {
-        EntityId?: any;
-        ColumnSelection?: RetrieveColumnSelection;
-        IncludeColumns?: string[];
-        ExcludeColumns?: string[];
-    }
-    interface RetrieveResponse<TEntity> extends ServiceResponse {
-        Entity?: TEntity;
-    }
-    interface RetrieveLocalizationRequest extends RetrieveRequest {
-    }
-    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-        Entities?: {
-            [key: string]: TEntity;
-        };
-    }
-
     namespace ErrorHandling {
         /**
          * Shows a service error as an alert dialog. If the error
@@ -2335,78 +2790,6 @@ declare namespace Serenity {
     }
 
     /**
-     * Interface for number formatting, similar to .NET's NumberFormatInfo
-     */
-    interface NumberFormat {
-        /** Decimal separator */
-        decimalSeparator: string;
-        /** Group separator */
-        groupSeparator?: string;
-        /** Number of digits after decimal separator */
-        decimalDigits?: number;
-        /** Positive sign */
-        positiveSign?: string;
-        /** Negative sign */
-        negativeSign?: string;
-        /** Zero symbol */
-        nanSymbol?: string;
-        /** Percentage symbol */
-        percentSymbol?: string;
-        /** Currency symbol */
-        currencySymbol?: string;
-    }
-    /** Interface for date formatting, similar to .NET's DateFormatInfo */
-    interface DateFormat {
-        /** Date separator */
-        dateSeparator?: string;
-        /** Default date format string */
-        dateFormat?: string;
-        /** Date order, like dmy, or ymd */
-        dateOrder?: string;
-        /** Default date time format string */
-        dateTimeFormat?: string;
-        /** AM designator */
-        amDesignator?: string;
-        /** PM designator */
-        pmDesignator?: string;
-        /** Time separator */
-        timeSeparator?: string;
-        /** First day of week, 0 = Sunday, 1 = Monday */
-        firstDayOfWeek?: number;
-        /** Array of day names */
-        dayNames?: string[];
-        /** Array of short day names */
-        shortDayNames?: string[];
-        /** Array of two letter day names */
-        minimizedDayNames?: string[];
-        /** Array of month names */
-        monthNames?: string[];
-        /** Array of short month names */
-        shortMonthNames?: string[];
-    }
-    /** Interface for a locale, similar to .NET's CultureInfo */
-    interface Locale extends NumberFormat, DateFormat {
-        /** Locale string comparison function, similar to .NET's StringComparer */
-        stringCompare?: (a: string, b: string) => number;
-        /** Locale string to upper case function */
-        toUpper?: (a: string) => string;
-    }
-    /** Invariant locale (e.g. CultureInfo.InvariantCulture) */
-    let Invariant: Locale;
-    /**
-     * Factory for a function that compares two strings, based on a character order
-     * passed in the `order` argument.
-     */
-    function compareStringFactory(order: string): ((a: string, b: string) => number);
-    /**
-     * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
-     * settings passed from a `<script>` element in the page with id `ScriptCulture`
-     * containing a JSON object if available. This element is generally created in
-     * the _LayoutHead.cshtml file for Serenity applications, so that the culture
-     * settings determined server, can be passed to the client.
-     */
-    let Culture: Locale;
-    /**
      * A string to lowercase function that handles special Turkish
      * characters like 'ı'. Left in for compatibility reasons.
      */
@@ -2421,102 +2804,20 @@ declare namespace Serenity {
      */
     let turkishLocaleCompare: (a: string, b: string) => number;
     /**
-     * Formats a string with parameters similar to .NET's String.Format function
-     * using current `Culture` locale settings.
+     * @obsolete
+     * Use stringFormat
      */
-    function format(format: string, ...prm: any[]): string;
+    let format: typeof stringFormat;
     /**
-     * Formats a string with parameters similar to .NET's String.Format function
-     * using the locale passed as the first argument.
+     * @obsolete
+     * Use stringFormatLocale
      */
-    function localeFormat(l: Locale, format: string, ...prm: any[]): string;
-    /**
-     * Rounds a number to specified digits or an integer number if digits are not specified.
-     * @param n the number to round
-     * @param d the number of digits to round to. default is zero.
-     * @param rounding whether to use banker's rounding
-     * @returns the rounded number
-     */
-    let round: (n: number, d?: number, rounding?: boolean) => number;
-    /**
-     * Truncates a number to an integer number.
-     */
-    let trunc: (n: number) => number;
-    /**
-     * Formats a number using the current `Culture` locale (or the passed locale) settings.
-     * It supports format specifiers similar to .NET numeric formatting strings.
-     * @param num the number to format
-     * @param format the format specifier. default is 'g'.
-     * See .NET numeric formatting strings documentation for more information.
-     */
-    function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
-    /**
-     * Converts a string to an integer. The difference between parseInt and parseInteger
-     * is that parseInteger will return null if the string is empty or null, whereas
-     * parseInt will return NaN and parseInteger will use the current culture's group
-     * and decimal separators.
-     * @param s the string to parse
-     */
-    function parseInteger(s: string): number;
-    /**
-     * Converts a string to a decimal. The difference between parseFloat and parseDecimal
-     * is that parseDecimal will return null if the string is empty or null, whereas
-     * parseFloat will return NaN and parseDecimal will use the current culture's group
-     * and decimal separators.
-     * @param s the string to parse
-     */
-    function parseDecimal(s: string): number;
-    /**
-     * Converts a string to an ID. If the string is a number, it is returned as-is.
-     * If the string is empty, null or whitespace, null is returned.
-     * Otherwise, it is converted to a number if possible. If the string is not a
-     * valid number or longer than 14 digits, the trimmed string is returned as-is.
-     * @param id the string to convert to an ID
-     */
-    function toId(id: any): any;
-    /**
-     * Formats a date using the specified format string and optional culture.
-     * Supports .NET style format strings including custom formats.
-     * See .NET documentation for supported formats.
-     * @param d the date to format. If null, it returns empty string.
-     * @param format the format string to use. If null, it uses the current culture's default format.
-     * 'G' uses the culture's datetime format.
-     * 'g' uses the culture's datetime format with secs removed.
-     * 'd' uses the culture's date format.
-     * 't' uses the culture's time format.
-     * 'u' uses the sortable ISO format with UTC time.
-     * 'U' uses the culture's date format with UTC time.
-     * @param locale the locale to use
-     * @returns the formatted date
-     * @example
-     * // returns "2019-01-01"
-     * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
-     * @example
-     * // returns "2019-01-01 12:00:00"
-     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
-     * @example
-     * // returns "2019-01-01 12:00:00.000"
-     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
-     * @example
-     * // returns "2019-01-01 12:00:00.000 AM"
-     * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
-     */
-    function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+    let localeFormat: typeof stringFormatLocale;
     /**
      * Formats a number containing number of minutes into a string in the format "d.hh:mm".
      * @param n The number of minutes.
      */
     function formatDayHourAndMin(n: number): string;
-    /**
-     * Formats a date as the ISO 8601 UTC date/time format.
-     * @param n The number of minutes.
-     */
-    function formatISODateTimeUTC(d: Date): string;
-    /**
-     * Parses a string in the ISO 8601 UTC date/time format.
-     * @param s The string to parse.
-     */
-    function parseISODateTime(s: string): Date;
     /**
      * Parses a time string in the format "hh:mm" into a number containing number of minutes.
      * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
@@ -2529,19 +2830,6 @@ declare namespace Serenity {
      * Returns NULL if the string is empty or whitespace.
      */
     function parseDayHourAndMin(s: string): number;
-    /**
-     * Parses a string to a date. If the string is empty or whitespace, returns null.
-     * Returns a NaN Date if the string is not a valid date.
-     * @param s The string to parse.
-     * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
-      */
-    function parseDate(s: string, dateOrder?: string): Date;
-    /**
-     * Splits a date string into an array of strings, each containing a single date part.
-     * It can handle separators "/", ".", "-" and "\".
-     * @param s The string to split.
-     */
-    function splitDateString(s: string): string[];
 
     /**
      * Adds an empty option to the select.
@@ -2575,11 +2863,6 @@ declare namespace Serenity {
      */
     function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
     /**
-     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
-     * @param s String (or number etc.) to be HTML encoded
-     */
-    function htmlEncode(s: any): string;
-    /**
      * Creates a new DIV and appends it to the body.
      * @returns the new DIV element.
      */
@@ -2588,13 +2871,6 @@ declare namespace Serenity {
      * Returns the outer HTML of the element.
      */
     function outerHtml(element: JQuery): string;
-    /**
-     * Toggles the class on the element handling spaces like jQuery addClass does.
-     * @param el the element
-     * @param cls the class to toggle
-     * @param remove if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
-     */
-    function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
     function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
         noRoute?: boolean;
@@ -2635,35 +2911,6 @@ declare namespace Serenity {
         toString(): string;
         static initializeTextClass: (type: any, prefix: string) => void;
         static getDefault: (key: string, defaultText: string) => string;
-    }
-
-    interface LookupOptions<TItem> {
-        idField?: string;
-        parentIdField?: string;
-        textField?: string;
-        textFormatter?(item: TItem): string;
-    }
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-    }
-    class Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-        constructor(options: LookupOptions<TItem>, items?: TItem[]);
-        update?(value: TItem[]): void;
     }
 
     type ToastContainerOptions = {
@@ -2736,76 +2983,6 @@ declare namespace Serenity {
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
     function positionToastContainer(create: boolean, options?: ToastrOptions): void;
 
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface PropertyItemsData {
-        items: PropertyItem[];
-        additionalItems: PropertyItem[];
-    }
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-
     interface HandleRouteEventArgs {
         handled: boolean;
         route: string;
@@ -2850,6 +3027,15 @@ declare namespace Serenity {
     function getTemplate(key: string): string;
     function getTemplateAsync(key: string): Promise<string>;
     function canLoadScriptData(name: string): boolean;
+
+    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
 
     function getCookie(name: string): any;
     function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
@@ -2956,7 +3142,6 @@ declare namespace Serenity {
     let today: () => Date;
     function extend<T = any>(a: T, b: T): T;
     function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
-    type Type = Function | Object;
     interface TypeMember {
         name: string;
         type: MemberType;
@@ -2964,19 +3149,6 @@ declare namespace Serenity {
         getter?: string;
         setter?: string;
     }
-    function getNested(from: any, name: string): any;
-    function getGlobalThis(): any;
-    function getType(name: string, target?: any): Type;
-    function getTypeNameProp(type: Type): string;
-    function setTypeNameProp(type: Type, value: string): void;
-    function getTypeFullName(type: Type): string;
-    function getTypeShortName(type: Type): string;
-    function getInstanceType(instance: any): any;
-    function isAssignableFrom(target: any, type: Type): boolean;
-    function isInstanceOfType(instance: any, type: Type): boolean;
-    function safeCast(instance: any, type: Type): any;
-    function cast(instance: any, type: Type): any;
-    function getBaseType(type: any): any;
     function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
     enum MemberType {
         field = 4,
@@ -2986,27 +3158,16 @@ declare namespace Serenity {
     function addTypeMember(type: any, member: TypeMember): TypeMember;
     function getTypes(from?: any): any[];
     function clearKeys(d: any): void;
-    function delegateCombine(delegate1: any, delegate2: any): any;
-    function getStateStore(key?: string): any;
-    namespace Enum {
-        let toString: (enumType: any, value: number) => string;
-        let getValues: (enumType: any) => any[];
-    }
-    let delegateRemove: (delegate1: any, delegate2: any) => any;
-    let isEnum: (type: any) => boolean;
-    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
-    function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
     function keyOf<T>(prop: keyof T): keyof T;
-    function registerClass(type: any, name: string, intf?: any[]): void;
     function registerEditor(type: any, name: string, intf?: any[]): void;
-    function registerEnum(type: any, name: string, enumKey?: string): void;
-    function registerInterface(type: any, name: string, intf?: any[]): void;
     function addAttribute(type: any, attr: any): void;
     class ISlickFormatter {
     }
     class EditorAttribute {
     }
+    function cast(instance: any, type: Type): any;
+    function safeCast(instance: any, type: Type): any;
     function initializeTypes(root: any, pre: string, limit: number): void;
     class Exception extends Error {
         constructor(message: string);
@@ -3027,149 +3188,6 @@ declare namespace Serenity {
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
     function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
     function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-
-    /**
-     * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
-     */
-    class CriteriaBuilder extends Array {
-        /**
-         * Creates a between criteria.
-         * @param fromInclusive from value
-         * @param toInclusive to value
-         */
-        bw(fromInclusive: any, toInclusive: any): Array<any>;
-        /**
-         * Creates a contains criteria
-         * @param value contains value
-         */
-        contains(value: string): Array<any>;
-        /**
-         * Creates a endsWith criteria
-         * @param value endsWith value
-         */
-        endsWith(value: string): Array<any>;
-        /**
-         * Creates an equal (=) criteria
-         * @param value equal value
-         */
-        eq(value: any): Array<any>;
-        /**
-         * Creates a greater than criteria
-         * @param value greater than value
-         */
-        gt(value: any): Array<any>;
-        /**
-         * Creates a greater than or equal criteria
-         * @param value greater than or equal value
-         */
-        ge(value: any): Array<any>;
-        /**
-         * Creates a in criteria
-         * @param values in values
-         */
-        in(values: any[]): Array<any>;
-        /**
-         * Creates a IS NULL criteria
-         */
-        isNull(): Array<any>;
-        /**
-         * Creates a IS NOT NULL criteria
-         */
-        isNotNull(): Array<any>;
-        /**
-         * Creates a less than or equal to criteria
-         * @param value less than or equal to value
-         */
-        le(value: any): Array<any>;
-        /**
-         * Creates a less than criteria
-         * @param value less than value
-         */
-        lt(value: any): Array<any>;
-        /**
-         * Creates a not equal criteria
-         * @param value not equal value
-         */
-        ne(value: any): Array<any>;
-        /**
-         * Creates a LIKE criteria
-         * @param value like value
-         */
-        like(value: any): Array<any>;
-        /**
-         * Creates a STARTS WITH criteria
-         * @param value startsWith value
-         */
-        startsWith(value: string): Array<any>;
-        /**
-         * Creates a NOT IN criteria
-         * @param values array of NOT IN values
-         */
-        notIn(values: any[]): Array<any>;
-        /**
-         * Creates a NOT LIKE criteria
-         * @param value not like value
-         */
-        notLike(value: any): Array<any>;
-    }
-    /**
-     * Parses a criteria expression to Serenity Criteria array format.
-     * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
-     * @param expression The criteria expression.
-     * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
-     * @example
-     * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
-     */
-    function parseCriteria(expression: string, params?: any): any[];
-    /**
-     * Parses a criteria expression to Serenity Criteria array format.
-     * The expression may contain parameter placeholders like `A >= ${p1}`
-     * where p1 is a variable in the scope.
-     * @param strings The string fragments.
-     * @param values The tagged template arguments.
-     * @example
-     * var a = 5, b = 4;
-     * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
-     */
-    function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
-    /**
-     * Enumeration of Criteria operator keys.
-     */
-    enum CriteriaOperator {
-        paren = "()",
-        not = "not",
-        isNull = "is null",
-        isNotNull = "is not null",
-        exists = "exists",
-        and = "and",
-        or = "or",
-        xor = "xor",
-        eq = "=",
-        ne = "!=",
-        gt = ">",
-        ge = ">=",
-        lt = "<",
-        le = "<=",
-        in = "in",
-        notIn = "not in",
-        like = "like",
-        notLike = "not like"
-    }
-    /**
-     * Creates a new criteria builder containg the passed field name.
-     * @param field The field name.
-     */
-    function Criteria(field: string): CriteriaBuilder;
-    namespace Criteria {
-        var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-        var Operator: typeof CriteriaOperator;
-        var isEmpty: (c: any[]) => boolean;
-        var join: (c1: any[], op: string, c2: any[]) => any[];
-        var not: (c: any[]) => (string | any[])[];
-        var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-        var paren: (c: any[]) => any[];
-        var parse: typeof parseCriteria;
-    }
 
     namespace Aggregators {
         function Avg(field: string): void;
@@ -4704,6 +4722,9 @@ declare namespace Serenity {
         get_activeCriteria(): any[];
         get_displayText(): string;
     }
+    function delegateCombine(delegate1: any, delegate2: any): any;
+    function delegateRemove(delegate1: any, delegate2: any): any;
+    function delegateContains(targets: any[], object: any, method: any): boolean;
 
     interface IFiltering {
         createEditor(): void;
@@ -5050,8 +5071,6 @@ declare namespace Serenity {
         function reset(): void;
         function tryGet(key: string): any;
     }
-
-    type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider;
 
     interface SettingStorage {
         getItem(key: string): string | Promise<string>;
@@ -5821,10 +5840,6 @@ interface JQuery {
     flexY(flexY: number): JQuery;
 }
 declare namespace Slick {
-    namespace Data {
-        /** @obsolete use the type exported from @serenity-is/sleekgrid */
-        const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider;
-    }
     interface RowMoveManagerOptions {
         cancelEditOnDrag: boolean;
     }
@@ -5846,6 +5861,10 @@ declare namespace Slick {
 import Q = Serenity;
 
 declare namespace Slick {
+    namespace Data {
+        /** @obsolete use the type exported from @serenity-is/sleekgrid */
+        export import GroupItemMetadataProvider = Slick.GroupItemMetadataProvider;
+    }
     export import AggregateFormatting = Serenity.AggregateFormatting;
     export import Aggregators = Serenity.Aggregators;
     export import CancellableViewCallback = Serenity.CancellableViewCallback;

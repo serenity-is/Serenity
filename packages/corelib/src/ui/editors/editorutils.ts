@@ -1,5 +1,6 @@
-﻿import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
-import { cast, isInstanceOfType, isTrimmedEmpty, parseDecimal, PropertyItem, safeCast, localText, tryGetText } from "../../q";
+﻿import { PropertyItem, isInstanceOfType, parseDecimal } from "@serenity-is/base";
+import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
+import { cast, isTrimmedEmpty, safeCast, localText, tryGetText } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export namespace EditorUtils {

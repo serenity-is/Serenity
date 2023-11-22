@@ -1,5 +1,5 @@
 import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { PropertyItemsData } from "../../q/propertyitem";
+import { PropertyItemsData } from "@serenity-is/base";
 import { addAttribute } from "../../q/system";
 import { EntityDialog } from "./entitydialog";
 

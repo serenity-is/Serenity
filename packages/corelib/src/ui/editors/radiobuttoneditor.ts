@@ -1,6 +1,7 @@
-﻿import { Decorators, EnumKeyAttribute } from "../../decorators";
+﻿import { Enum } from "@serenity-is/base";
+import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Enum, getAttributes, getLookup, isEmptyOrNull, tryGetText } from "../../q";
+import { getAttributes, getLookup, isEmptyOrNull, tryGetText } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { Widget } from "../widgets/widget";
 

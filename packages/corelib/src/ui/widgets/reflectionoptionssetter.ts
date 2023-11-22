@@ -1,5 +1,6 @@
-﻿import { DisplayNameAttribute, OptionAttribute } from "../../decorators";
-import { getInstanceType, getMembers, isInstanceOfType, MemberType } from "../../q";
+﻿import { getInstanceType, isInstanceOfType } from "@serenity-is/base";
+import { DisplayNameAttribute, OptionAttribute } from "../../decorators";
+import { getMembers, MemberType } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
 
 export namespace ReflectionOptionsSetter {

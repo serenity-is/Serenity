@@ -4,9 +4,11 @@ jest.mock("../../q", () => ({
     tryGetText: jest.fn().mockImplementation((key: string) => key)
 }));
 
-import { EnumKeyAttribute, EnumTypeRegistry } from "../..";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
-import { addAttribute, registerEnum, tryGetText } from "../../q"
+import { addAttribute, tryGetText } from "../../q"
+import { EnumKeyAttribute } from "@/decorators";
+import { registerEnum } from "@serenity-is/base";
+import { EnumTypeRegistry } from "@/types/enumtyperegistry";
 
 describe("BooleanFormatter", () => {
     it("shows empty string if value is null", () => {

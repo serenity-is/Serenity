@@ -1,4 +1,4 @@
-﻿import { htmlEncode } from "./html";
+﻿import { htmlEncode } from "@serenity-is/base";
 import { localText } from "./localtext";
 import { extend } from "./system";
 import initialInstance, { ToastrOptions } from "./toastr2";

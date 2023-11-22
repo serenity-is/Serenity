@@ -1,9 +1,5 @@
-import {
-    addAttribute, addTypeMember, MemberType, ISlickFormatter,
-    registerClass as regClass, registerEditor as regEditor, registerInterface as regIntf, registerEnum as regEnum,
-    startsWith,
-    EditorAttribute
-} from "../q";
+import { addAttribute, addTypeMember, MemberType, ISlickFormatter, startsWith, registerEditor as regEditor, EditorAttribute } from "../q";
+import { registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum } from "@serenity-is/base";
 
 function Attr(name: string) {
     return function (target: Function) {

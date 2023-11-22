@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { Culture, Invariant, formatDate, formatISODateTimeUTC, parseDate, parseISODateTime, round, stringFormat, trunc } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addOption, addValidationRule, Culture, format, formatDate, formatISODateTimeUTC, Invariant, isEmptyOrNull, parseDate, parseISODateTime, round, localText, today, trunc, tryGetText } from "../../q";
+import { addOption, addValidationRule, isEmptyOrNull, localText, today, tryGetText } from "../../q";
 import { Widget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
@@ -85,11 +86,11 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                 }
 
                 if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(value, this.get_minValue()) < 0) {
-                    return format(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
+                    return stringFormat(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
                 }
     
                 if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
-                    return format(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
+                    return stringFormat(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
                 }
 
                 return null;

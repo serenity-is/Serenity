@@ -5,6 +5,7 @@ export default {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@serenity-is/corelib$': '<rootDir>/src',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid',
+    '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base',
     '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
     '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',
   },

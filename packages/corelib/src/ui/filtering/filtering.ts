@@ -1,5 +1,6 @@
-﻿import { Decorators } from "../../decorators";
-import { ArgumentNullException, Config, Criteria, deepClone, endsWith, Exception, extend, format, formatDate, getInstanceType, getTypeFullName, getTypeShortName, getTypes, isAssignableFrom, isEmptyOrNull, parseISODateTime, PropertyItem, startsWith, localText, tryGetText } from "../../q";
+﻿import { Criteria, type PropertyItem, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, parseISODateTime, stringFormat } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { ArgumentNullException, Config, Exception, deepClone, endsWith, extend, getTypes, isEmptyOrNull, localText, startsWith, tryGetText } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";
@@ -124,7 +125,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             }
         }
 
-        throw new Exception(format("Filtering '{0}' has no editor for '{1}' operator",
+        throw new Exception(stringFormat("Filtering '{0}' has no editor for '{1}' operator",
             getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
@@ -138,13 +139,13 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
     protected displayText(op: FilterOperator, values?: any[]) {
         if (!values || values.length === 0) {
-            return format(this.operatorFormat(op), this.getTitle(this.field));
+            return stringFormat(this.operatorFormat(op), this.getTitle(this.field));
         }
         else if (values.length === 1) {
-            return format(this.operatorFormat(op), this.getTitle(this.field), values[0]);
+            return stringFormat(this.operatorFormat(op), this.getTitle(this.field), values[0]);
         }
         else {
-            return format(this.operatorFormat(op), this.getTitle(this.field), values[0], values[1]);
+            return stringFormat(this.operatorFormat(op), this.getTitle(this.field), values[0], values[1]);
         }
     }
 
@@ -209,7 +210,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             }
         }
 
-        throw new Exception(format("Filtering '{0}' has no handler for '{1}' operator",
+        throw new Exception(stringFormat("Filtering '{0}' has no handler for '{1}' operator",
             getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
@@ -249,7 +250,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     getEditorValue() {
         var input = this.get_container().find(':input').not('.select2-focusser').first();
         if (input.length !== 1) {
-            throw new Exception(format("Couldn't find input in filter container for {0}",
+            throw new Exception(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
         }
 
@@ -745,7 +746,7 @@ export namespace FilteringTypeRegistry {
         initialize();
         var formatterType = knownTypes[key.toLowerCase()];
         if (formatterType == null)
-            throw new Exception(format(
+            throw new Exception(stringFormat(
                 "Can't find {0} filter handler type!", key));
 
         return formatterType;

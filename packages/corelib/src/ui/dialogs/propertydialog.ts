@@ -1,5 +1,6 @@
-﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getForm, getFormData, getFormDataAsync, getInstanceType, getTypeFullName, isEmptyOrNull, PropertyItem, PropertyItemsData, ScriptData, localText } from "../../q";
+﻿import { PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
+import { Decorators, FormKeyAttribute } from "../../decorators";
+import { DialogButton, endsWith, getAttributes, getFormData, getFormDataAsync, isEmptyOrNull, ScriptData, localText } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -134,7 +135,7 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         };
     }
 
-    protected getPropertyItems() {
+    protected getPropertyItems(): PropertyItem[] {
         return this.propertyItemsData?.items || [];
     }
 

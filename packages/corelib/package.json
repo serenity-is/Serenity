@@ -11,6 +11,7 @@
     "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
+    "@serenity-is/base": "workspace:*",
     "@types/jest": "29.5.8",
     "tslib": "2.6.2"
   },

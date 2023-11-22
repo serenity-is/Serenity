@@ -1,5 +1,16 @@
 ﻿import { registerEnum } from "./system";
 
+export enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+
+registerEnum(SummaryType, 'Serenity.SummaryType');
+
 export interface PropertyItem {
     name?: string;
     title?: string;
@@ -62,14 +73,3 @@ export interface PropertyItemsData {
     items: PropertyItem[];
     additionalItems: PropertyItem[];
 }
-   
-export enum SummaryType {
-    Disabled = -1,
-    None = 0,
-    Sum = 1,
-    Avg = 2,
-    Min = 3,
-    Max = 4
-}
-
-registerEnum(SummaryType, 'Serenity.SummaryType');

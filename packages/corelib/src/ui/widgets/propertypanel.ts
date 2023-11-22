@@ -1,5 +1,6 @@
-﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, PropertyItem } from "../../q";
+﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
+import { Decorators, FormKeyAttribute } from "../../decorators";
+import { endsWith, getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
 
