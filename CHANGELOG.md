@@ -1,3 +1,15 @@
+## 8.0.1 (2023-11-22)
+
+### Features:
+- We are migrating from `Newtonsoft.Json` to `System.Text.Json`, as it is the recommended and more performant library in .NET. To make the switch, please remove the `.AddNewtonsoftJson` statement from `Startup.cs`, add the line `services.Configure<JsonOptions>(options => JSON.Defaults.Populate(options.JsonSerializerOptions));`, and optionally remove `Microsoft.AspNetCore.Mvc.NewtonsoftJson` from the project file. The transition should go smoothly as we've addressed many compatibility issues between the two JSON libraries. You only need to add `System.Text.Json` specific attributes, such as `JsonPropertyName`, to properties/classes that already have `Newtonsoft.Json` specific attributes. For more information, refer to https://github.com/serenity-is/Serenity/issues/7021.
+- Serenity and feature package sources have been updated to leverage C# 12 features like primary constructors and collection initializers.
+- The StartSharp dashboard page has been rewritten using jsx-dom. All HTML markup in the `DashboardIndex.cshtml` file has been converted into functional components. This serves as a useful sample for jsx-dom and will simplify the creation/customization of your own dashboards.
+- Our sample pages now utilize the `jsx-dom/min` runtime, as full SVG support in jsx-dom is typically unnecessary. We will soon change the default jsx runtime in `tsconfig.json` for new StartSharp/Serene projects to `jsx-dom/min` and remove the explicit pragma statement from our sample pages. This change won't affect your existing projects. However, be aware that our samples will assume this jsx runtime by default. So, if you copy-paste our samples into your application but have a different jsx runtime configured in your `tsconfig.json`, such as preact, remember to add `/** jsxImportSource jsx-dom/min */` to those `.tsx` files. Alternatively, you can change your `jsxImportSource` in `tsconfig.json` to `jsx-dom/min`.
+- We are currently developing a new `@serenity-is/base` NPM package that will include core functions and classes from `@serenity-is/corelib`, mostly from the old `Q` namespace. This new base library will be shared between `@serenity-is/corelib` and a new UI library that we plan to develop. The upcoming UI library, likely named `@serenity-is/ui`, is in the planning phase and will probably be based on `jsx-dom`, with no dependencies on `jQuery` or `jQuery UI`. Presently, `@serenity-is/base` is packed into `@serenity-is/corelib`, so no changes are required in this release.
+
+### Bugfixes:
+- Addressed an issue with esbuild watch not functioning in the latest versions of tsbuild. Please update `tsbuild` to version 8.0.1 or later in your `package.json` file.
+
 ## 8.0.0 (2023-11-16)
 
 ### Features:
