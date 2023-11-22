@@ -105,14 +105,7 @@ public static class GeneratorConfigExtensions
             config = ExtendsJsonReader.Read<GeneratorConfig>(
                 fileSystem, path,
                 extendsProp: nameof(GeneratorConfig.Extends),
-                options: new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters =
-                    {
-                        new JsonStringEnumConverter()
-                    }
-                },
+                options: JSON.Defaults.Tolerant,
                 getDefault: GeneratorDefaults.TryParse);
         }
 
