@@ -57,6 +57,10 @@ jobs:
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
 
+    - name: base package tests
+      run: pnpm test
+      working-directory: "packages/base"
+
     - name: corelib tests
       run: pnpm test
       working-directory: "packages/corelib"
