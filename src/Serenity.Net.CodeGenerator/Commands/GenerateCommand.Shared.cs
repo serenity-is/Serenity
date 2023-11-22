@@ -138,7 +138,7 @@ public partial class GenerateCommand
 
     private class AppSettingsFormat
     {
-        public ConnectionStringOptions Data { get; }
+        public ConnectionStringOptions Data { get; set; }
 
         public AppSettingsFormat()
         {

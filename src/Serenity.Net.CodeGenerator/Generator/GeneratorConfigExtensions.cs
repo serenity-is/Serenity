@@ -95,7 +95,7 @@ public static class GeneratorConfigExtensions
         ArgumentNullException.ThrowIfNull(path);
 
         if (!string.IsNullOrEmpty(filename))
-            path = System.IO.Path.Combine(path, filename);
+            path = fileSystem.Combine(path, filename);
 
         GeneratorConfig config;
         if (!fileSystem.FileExists(path))
