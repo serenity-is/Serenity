@@ -173,13 +173,13 @@ Task("Test")
         
         StartProcess("powershell", new ProcessSettings 
         { 
-            Arguments = "npx jest", 
+            Arguments = "pnpm jest", 
             WorkingDirectory = System.IO.Path.Combine(root, "packages", "base") 
         });
         
         StartProcess("powershell", new ProcessSettings 
         { 
-            Arguments = "npx jest", 
+            Arguments = "pnpm jest", 
             WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
         });
 
