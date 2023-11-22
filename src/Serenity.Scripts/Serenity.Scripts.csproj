@@ -30,10 +30,12 @@
     <EmbeddedResource Remove="node_modules\**" />
     <TypeScriptCompile Remove="**\node_modules\**;*\out\**;*\dist\**;test\**;wwwroot\Serenity.CoreLib.d.ts" />
     <None Include="wwwroot\Serenity.CoreLib.d.ts" />
-    <ToCompileCoreLib Include="..\..\packages\corelib\src\**\*.ts;..\..\packages\corelib\src\tsconfig.json;..\..\packages\corelib\build\build.js;..\..\packages\corelib\node_modules\@serenity-is\*\*.d.ts;..\..\packages\corelib\rollup.config.js;..\..\packages\corelib\package.json"></ToCompileCoreLib>
+    <ToCompileCoreLib Include="..\..\packages\*\src\**\*.ts;..\..\packages\*\tsconfig.json;..\..\packages\*\build\build.js;..\..\packages\*\rollup.config.js;..\..\packages\*\package.json" />
+    <NpmPackageFile Include="..\..\packages\base\package.json" />
     <NpmPackageFile Include="..\..\packages\corelib\package.json" />
   </ItemGroup>
-  <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
-    <Exec Command="pnpm run build" WorkingDirectory="..\..\packages\corelib" />
+  <Target Name="CompileCoreLib" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(ToCompileCoreLib)" DependsOnTargets="NpmInstall" 
+          Outputs="wwwroot\Serenity.CoreLib.js;wwwroot\Serenity.CoreLib.min.js;wwwroot\Serenity.CoreLib.min.js.map;wwwroot\Serenity.CoreLib.js.map;wwwroot\Serenity.CoreLib.d.ts;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.grid.js;..\Serenity.Assets\wwwroot\Scripts\SlickGrid\slick.core.js">
+    <Exec Command="pnpm -r build" WorkingDirectory="..\..\packages" />
   </Target>
 </Project>
