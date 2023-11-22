@@ -174,6 +174,12 @@ Task("Test")
         StartProcess("powershell", new ProcessSettings 
         { 
             Arguments = "npx jest", 
+            WorkingDirectory = System.IO.Path.Combine(root, "packages", "base") 
+        });
+        
+        StartProcess("powershell", new ProcessSettings 
+        { 
+            Arguments = "npx jest", 
             WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
         });
 
