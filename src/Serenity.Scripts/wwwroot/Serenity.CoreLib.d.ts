@@ -2042,6 +2042,48 @@ declare namespace Serenity {
      */
     function splitDateString(s: string): string[];
 
+    /**
+     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+     * @param s String (or number etc.) to be HTML encoded
+     */
+    function htmlEncode(s: any): string;
+    /**
+     * Toggles the class on the element handling spaces like addClass does.
+     * @param el the element
+     * @param cls the class to toggle
+     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+     */
+    function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+    interface LookupOptions<TItem> {
+        idField?: string;
+        parentIdField?: string;
+        textField?: string;
+        textFormatter?(item: TItem): string;
+    }
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+    }
+    class Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+        constructor(options: LookupOptions<TItem>, items?: TItem[]);
+        update?(value: TItem[]): void;
+    }
+
     enum SummaryType {
         Disabled = -1,
         None = 0,
@@ -2824,11 +2866,6 @@ declare namespace Serenity {
      */
     function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
     /**
-     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
-     * @param s String (or number etc.) to be HTML encoded
-     */
-    function htmlEncode(s: any): string;
-    /**
      * Creates a new DIV and appends it to the body.
      * @returns the new DIV element.
      */
@@ -2837,13 +2874,6 @@ declare namespace Serenity {
      * Returns the outer HTML of the element.
      */
     function outerHtml(element: JQuery): string;
-    /**
-     * Toggles the class on the element handling spaces like jQuery addClass does.
-     * @param el the element
-     * @param cls the class to toggle
-     * @param remove if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
-     */
-    function toggleClass(el: Element, cls: string, remove?: boolean): void;
 
     function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
         noRoute?: boolean;
@@ -2884,35 +2914,6 @@ declare namespace Serenity {
         toString(): string;
         static initializeTextClass: (type: any, prefix: string) => void;
         static getDefault: (key: string, defaultText: string) => string;
-    }
-
-    interface LookupOptions<TItem> {
-        idField?: string;
-        parentIdField?: string;
-        textField?: string;
-        textFormatter?(item: TItem): string;
-    }
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-    }
-    class Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-        constructor(options: LookupOptions<TItem>, items?: TItem[]);
-        update?(value: TItem[]): void;
     }
 
     type ToastContainerOptions = {
