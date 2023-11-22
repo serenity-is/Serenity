@@ -656,7 +656,7 @@ declare namespace Slick {
     	private _handlers;
     	/***
     	 * Adds an event handler to be called when the event is fired.
-    	 * <p>Slick.Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
+    	 * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
     	 * object the event was fired with.<p>
     	 * @method subscribe
     	 * @param fn {Function} Event handler.
@@ -678,7 +678,7 @@ declare namespace Slick {
     	 * @param scope {Object}
     	 *      Optional.
     	 *      The scope ("this") within which the handler will be executed.
-    	 *      If not specified, the scope will be set to the <code>Slick.Event</code> instance.
+    	 *      If not specified, the scope will be set to the <code>Event</code> instance.
     	 */
     	notify(args?: any, e?: TEventData, scope?: object): any;
     	clear(): void;
