@@ -1683,6 +1683,13 @@ declare namespace Slick {
 }
 
 
+declare namespace Slick {
+    interface Column<TItem = any> {
+        referencedFields?: string[];
+        sourceItem?: Serenity.PropertyItem;
+    }
+}
+
 declare namespace Serenity {
     /**
      * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
@@ -2277,17 +2284,7 @@ declare namespace Serenity {
     let isEnum: (type: any) => boolean;
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
-}
 
-
-declare namespace Slick {
-    interface Column<TItem = any> {
-        referencedFields?: string[];
-        sourceItem?: Serenity.PropertyItem;
-    }
-}
-
-declare namespace Serenity {
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
      * @param array Array to test.
@@ -5075,8 +5072,6 @@ declare namespace Serenity {
         function tryGet(key: string): any;
     }
 
-    type GroupItemMetadataProviderType = typeof Slick.GroupItemMetadataProvider;
-
     interface SettingStorage {
         getItem(key: string): string | Promise<string>;
         setItem(key: string, value: string): void | Promise<void>;
@@ -5845,10 +5840,6 @@ interface JQuery {
     flexY(flexY: number): JQuery;
 }
 declare namespace Slick {
-    namespace Data {
-        /** @obsolete use the type exported from @serenity-is/sleekgrid */
-        const GroupItemMetadataProvider: Slick.GroupItemMetadataProvider;
-    }
     interface RowMoveManagerOptions {
         cancelEditOnDrag: boolean;
     }
@@ -5870,6 +5861,10 @@ declare namespace Slick {
 import Q = Serenity;
 
 declare namespace Slick {
+    namespace Data {
+        /** @obsolete use the type exported from @serenity-is/sleekgrid */
+        export import GroupItemMetadataProvider = Slick.GroupItemMetadataProvider;
+    }
     export import AggregateFormatting = Serenity.AggregateFormatting;
     export import Aggregators = Serenity.Aggregators;
     export import CancellableViewCallback = Serenity.CancellableViewCallback;

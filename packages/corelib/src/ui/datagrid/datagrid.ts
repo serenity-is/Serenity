@@ -1,5 +1,5 @@
-﻿import { Criteria, ListResponse, type PropertyItem, type PropertyItemsData, debounce, getInstanceType, getTypeFullName, isInstanceOfType, htmlEncode } from "@serenity-is/base";
-import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, GroupItemMetadataProvider, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
+﻿import { Criteria, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, LayoutTimer, ScriptData, deepClone, endsWith, extend, getAttributes, getColumnsData, getColumnsDataAsync, indexOf, isEmptyOrNull, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
@@ -24,15 +24,8 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
-
 declare global {
     namespace Slick {
-        namespace Data {
-            /** @obsolete use the type exported from @serenity-is/sleekgrid */
-            export const GroupItemMetadataProvider: GroupItemMetadataProviderType;
-        }
-   
         interface RowMoveManagerOptions {
             cancelEditOnDrag: boolean;
         }

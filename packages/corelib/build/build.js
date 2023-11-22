@@ -66,6 +66,6 @@ await esbuild.build({
         'src/index.ts'
     ],
     outbase: 'src',
-    external: ['@serenity-is/sleekgrid', '@serenity-is/base'],
+    external: ['@serenity-is/sleekgrid'],
     minify: true
 });
