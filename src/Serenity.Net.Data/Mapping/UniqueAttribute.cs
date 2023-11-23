@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Defines a unique constraint on the field
@@ -39,6 +39,14 @@ public class UniqueAttribute : SetFieldFlagsAttribute
     ///   <c>true</c> if should ignore deleted; otherwise, <c>false</c>.
     /// </value>
     public bool IgnoreDeleted { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to ignore null values.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if should ignore value; otherwise, <c>false</c>.
+    /// </value>
+    public bool IgnoreNulls { get; set; }
 
     /// <summary>
     /// Gets or sets the error message.

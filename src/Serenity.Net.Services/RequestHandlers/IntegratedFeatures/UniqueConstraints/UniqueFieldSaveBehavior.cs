@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields
@@ -36,6 +36,10 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     /// <inheritdoc/>
     public override void OnBeforeSave(ISaveRequestHandler handler)
     {
+        if (attr?.IgnoreNulls == true &&
+            Target.IsNull(handler.Row))
+            return;
+
         ValidateUniqueConstraint(handler, new Field[] { Target }, localizer,
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
