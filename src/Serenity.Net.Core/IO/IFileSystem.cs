@@ -1,5 +1,9 @@
 #nullable enable
+#if ISSOURCEGENERATOR
+namespace Serenity.CodeGeneration;
+#else
 namespace Serenity;
+#endif
 
 /// <summary>
 /// Base file system for abstracting physical disk access
