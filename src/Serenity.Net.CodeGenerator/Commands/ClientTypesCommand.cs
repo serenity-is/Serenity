@@ -12,7 +12,7 @@ public class ClientTypesCommand(ProjectFileInfo project) : BaseGeneratorCommand(
         config.ClientTypes ??= new GeneratorConfig.ClientTypesConfig();
 
         if (string.IsNullOrEmpty(config.RootNamespace))
-            config.RootNamespace = config.GetRootNamespaceFor(new ProjectFileInfo(FileSystem, ProjectFile));
+            config.RootNamespace = config.GetRootNamespaceFor(Project);
 
         var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
 

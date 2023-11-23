@@ -4,7 +4,7 @@ public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project
 {
     public void Run()
     {
-        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(ProjectFile));
         var config = FileSystem.LoadGeneratorConfig(projectDir);
 
         config.MVC ??= new();
@@ -68,7 +68,7 @@ public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project
         var ns = (config.MVC.UseRootNamespace == true ||
             (config.MVC.UseRootNamespace == null &&
              FileSystem.ReadAllText(ProjectFile).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture))) ?
-             config.GetRootNamespaceFor(new ProjectFileInfo(FileSystem, ProjectFile)) + ".MVC" : "MVC";
+             config.GetRootNamespaceFor(Project) + ".MVC" : "MVC";
 
         cw.InNamespace(ns, () =>
         {

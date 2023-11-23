@@ -121,7 +121,6 @@ public class ServerTypingsCommand(IProjectFileInfo project, bool modules) : Base
             string outputDir = projectFileInfo.GetOutDir();
             string assemblyName = projectFileInfo.GetAssemblyName() ?? 
                 fileSystem.ChangeExtension(fileSystem.GetFileName(projectFile), null);
-            string targetFramework = projectFileInfo.GetTargetFramework();
 
             void couldNotFindError(string expectedPath)
             {
@@ -157,6 +156,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, bool modules) : Base
                 return [outputPath];
             }
 
+            string targetFramework = projectFileInfo.GetTargetFramework();
             if (string.IsNullOrEmpty(targetFramework))
             {
                 onError("Couldn't read TargetFramework from project file!");

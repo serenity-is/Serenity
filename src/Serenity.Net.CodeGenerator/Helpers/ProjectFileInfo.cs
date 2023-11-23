@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator;
 
-public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProjectFileInfo
+public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Dictionary<string, string> props) : IProjectFileInfo
 {
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly string projectFile = projectFile ?? throw new ArgumentNullException(nameof(projectFile));
@@ -17,16 +17,25 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProj
     public string ProjectFile => projectFile;
 
     private static readonly char[] complexValueChars = [';', '$', '@'];
+    private static readonly char[] propertySeps = [',', ';'];
 
     public string GetAssemblyName()
     {
         if (assemblyName is null)
         {
-            projectProperties ??= GetProjectProperties();
-            if (!string.IsNullOrEmpty(projectProperties.AssemblyName))
-                return assemblyName = projectProperties.AssemblyName;
+            if (props != null &&
+                props.TryGetValue("AssemblyName", out string s))
+            {
+                assemblyName = s ?? "";
+            }
+            else
+            {
+                projectProperties ??= GetProjectProperties();
+                if (!string.IsNullOrEmpty(projectProperties.AssemblyName))
+                    return assemblyName = projectProperties.AssemblyName;
 
-            assemblyName ??= ExtractPropertyFrom(projectFile, g => g.Elements("AssemblyName").LastOrDefault());
+                assemblyName ??= ExtractPropertyFrom(projectFile, g => g.Elements("AssemblyName").LastOrDefault());
+            }
         }
 
         return string.IsNullOrEmpty(assemblyName) ? null : assemblyName;
@@ -36,30 +45,47 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProj
     {
         if (outDir is null)
         {
-            projectProperties ??= GetProjectProperties();
-            if (!string.IsNullOrEmpty(projectProperties.OutDir))
-                return outDir = projectProperties.OutDir;
+            if (props != null &&
+                (props.TryGetValue("OutDir", out string s) ||
+                 props.TryGetValue("OutputPath", out s)))
+            {
+                outDir = s ?? "";
+            }
+            else
+            {
+                projectProperties ??= GetProjectProperties();
+                if (!string.IsNullOrEmpty(projectProperties.OutDir))
+                    return outDir = projectProperties.OutDir;
 
-            outDir ??= ExtractPropertyFrom(projectFile, groups => groups.Elements("OutDir").LastOrDefault() ??
-                groups.Elements("OutputPath").LastOrDefault());
+                outDir ??= ExtractPropertyFrom(projectFile, groups => groups.Elements("OutDir").LastOrDefault() ??
+                    groups.Elements("OutputPath").LastOrDefault());
+            }
 
             if (!string.IsNullOrEmpty(outDir))
                 outDir = fileSystem.Combine(fileSystem.GetDirectoryName(projectFile), outDir);
         }
 
-        return string.IsNullOrEmpty(rootNamespace) ? null : rootNamespace;
+        return string.IsNullOrEmpty(outDir) ? null : outDir;
     }
 
     public string GetRootNamespace()
     {
         if (rootNamespace is null)
         {
-            projectProperties ??= GetProjectProperties();
-            if (!string.IsNullOrEmpty(projectProperties.RootNamespace))
-                return rootNamespace = projectProperties.RootNamespace;
+            if (props != null &&
+                props.TryGetValue("RootNamespace", out string s))
+            {
+                rootNamespace = s ?? "";
+            }
+            else
+            {
+                projectProperties ??= GetProjectProperties();
+                if (!string.IsNullOrEmpty(projectProperties.RootNamespace))
+                    return rootNamespace = projectProperties.RootNamespace;
 
-            rootNamespace ??= ExtractPropertyFrom(projectFile, propertyGroups =>
-                propertyGroups.Elements("RootNamespace").LastOrDefault());
+                rootNamespace ??= ExtractPropertyFrom(projectFile, propertyGroups =>
+                    propertyGroups.Elements("RootNamespace").LastOrDefault());
+            }
         }
 
         return string.IsNullOrEmpty(rootNamespace) ? null : rootNamespace;
@@ -69,13 +95,21 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProj
     {
         if (targetFramework is null)
         {
-            projectProperties ??= GetProjectProperties();
-            if (!string.IsNullOrEmpty(projectProperties.TargetFramework))
-                return targetFramework = projectProperties.TargetFramework;
+            if (props != null &&
+                props.TryGetValue("TargetFramework", out string s))
+            {
+                targetFramework = s ?? "";
+            }
+            else
+            {
+                projectProperties ??= GetProjectProperties();
+                if (!string.IsNullOrEmpty(projectProperties.TargetFramework))
+                    return targetFramework = projectProperties.TargetFramework;
 
-            targetFramework ??= ExtractPropertyFrom(projectFile, groups =>
-                groups.Elements("TargetFramework").LastOrDefault() ??
-                groups.Descendants("TargetFrameworks").LastOrDefault()) ?? "";
+                targetFramework ??= ExtractPropertyFrom(projectFile, groups =>
+                    groups.Elements("TargetFramework").LastOrDefault() ??
+                    groups.Descendants("TargetFrameworks").LastOrDefault()) ?? "";
+            }
         }
 
         return string.IsNullOrEmpty(targetFramework) ? null : targetFramework;
@@ -145,7 +179,10 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProj
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"msbuild \"{projectFile}\" -getProperty:AssemblyName -getProperty:OutDir -getProperty:RootNamespace -getProperty:TargetFramework",
+                Arguments = $"msbuild \"{projectFile}\" " +
+                    (props.TryGetValue("Configuration", out string configuration) &&
+                     !string.IsNullOrEmpty(configuration) ? $"-property:Configuration={configuration} " : "") +
+                    $"-getProperty:AssemblyName -getProperty:OutDir -getProperty:RootNamespace -getProperty:TargetFramework",
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             }
@@ -171,5 +208,34 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile) : IProj
             return JSON.ParseTolerant<ProjectPropertiesJson>(output)?.Properties ?? new();
 
         return new();
+    }
+
+    public static IEnumerable<string> FilterPropertyParams(IEnumerable<string> args,
+        out Dictionary<string, string> props)
+    {
+        var result = props = [];
+        return args.Where((x, i) =>
+        {
+            if (x.StartsWith("-prop:", StringComparison.Ordinal))
+            {
+                foreach (var assignment in x[6..].Split(propertySeps, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var eq = assignment.IndexOf('=');
+                    if (eq <= 0)
+                    {
+                        result[x] = null;
+                        continue;
+                    }
+
+                    var propName = assignment[0..eq];
+                    var propValue = assignment[(eq + 1)..];
+                    result[propName] = propValue;
+                }
+
+                return false;
+            }
+
+            return true;
+        });
     }
 }

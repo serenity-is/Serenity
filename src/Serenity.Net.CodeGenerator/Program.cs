@@ -17,7 +17,7 @@ public class Program
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
 
-        string csproj = null;
+        string projectFile = null;
         var csprojIdx = Array.FindIndex(args, x => x == "-p");
         if (csprojIdx >= 0)
         {
@@ -26,7 +26,7 @@ public class Program
                 WriteHelp();
                 return ExitCodes.InvalidArguments;
             }
-            csproj = args[csprojIdx + 1];
+            projectFile = args[csprojIdx + 1];
             args = args.Where((x, i) => i != csprojIdx && i != csprojIdx + 1).ToArray();
         }
 
@@ -42,6 +42,15 @@ public class Program
 
             prjRefs = args[prjRefsIdx + 1].Split(';', StringSplitOptions.RemoveEmptyEntries);
             args = args.Where((x, i) => i != prjRefsIdx && i != prjRefsIdx + 1).ToArray();
+        }
+
+        args = ProjectFileInfo.FilterPropertyParams(args, out var props).ToArray();
+        var errorProp = props.FirstOrDefault(x => x.Value == null);
+        if (errorProp.Key != null)
+        {
+            Console.Error.WriteLine($"Property values should be passed " +
+                $"in format '-prop:Name=Value'. Argument '{errorProp.Value}' is invalid!");
+            return ExitCodes.InvalidArguments;
         }
 
         string command = null;
@@ -61,7 +70,7 @@ public class Program
             return ExitCodes.Help;
         }
 
-        if (csproj == null)
+        if (projectFile == null)
         {
             var csprojs = fileSystem.GetFiles(".", "*.csproj");
             if (csprojs.Length == 0)
@@ -78,15 +87,14 @@ public class Program
                 return ExitCodes.MultipleProjectFiles;
             }
 
-            csproj = csprojs[0];
+            projectFile = csprojs[0];
         }
 
-        if (!fileSystem.FileExists(csproj))
+        if (!fileSystem.FileExists(projectFile))
             return ExitCodes.ProjectNotFound;
 
-        var projectDir = fileSystem.GetFullPath(fileSystem.GetDirectoryName(csproj));
-        var project = new ProjectFileInfo(fileSystem, csproj);
-
+        var projectDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(projectFile));
+        var project = new ProjectFileInfo(fileSystem, projectFile, props);
         try
         {
             if ("restore".StartsWith(command, StringComparison.Ordinal))
@@ -177,18 +185,32 @@ public class Program
 
     private static void WriteHelp()
     {
-        Console.WriteLine("Serenity Code Generator " +
-            Assembly.GetEntryAssembly().GetName().Version);
-        Console.WriteLine();
-        Console.WriteLine("Usage: sergen [command]");
-        Console.WriteLine();
-        Console.WriteLine("Commands:");
-        Console.WriteLine("    g[enerate]        Launches table code generator");
-        Console.WriteLine("    r[estore]         Restores content, e.g. scripts, fonts and css from .nupkg");
-        Console.WriteLine();
-        Console.WriteLine("    c[lienttypes]     Imports editor, formatter types from TypeScript to CS");
-        Console.WriteLine("    m[vc]             Generates intellisense helpers for view locations");
-        Console.WriteLine("    s[ervertypings]   Imports row, form, service types from CS to TypeScript");
-        Console.WriteLine("    t[ransform]       Runs clienttypes, mvc and servertypings commands at once");
+        Console.WriteLine($"""""
+            Serenity Code Generator {Assembly.GetEntryAssembly().GetName().Version}
+            Usage: sergen [switches] [command]
+
+            Commands:
+              g[enerate]        Launches the table code generator.
+              c[lienttypes]     Imports editor and formatter types from TypeScript to C#.
+              m[vc]             Generates IntelliSense helpers for view locations.
+              s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
+              t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
+              r[estore]         [Obsolete] Restores content (e.g., scripts, CSS) from .nupkg.
+
+            Switches:
+              -p <ProjectFile>  Specifies the project file. Useful when multiple projects exist 
+                                in the current directory.
+              -prop:<n>=<v>     Provides hints to sergen for project-level properties, 
+                                where <n> is the property name and <v> is its value.
+                                Use a semicolon to separate multiple properties or specify each 
+                                property separately. This is helpful for improving performance
+                                as Sergen won't have to parse the project, and also for addressing 
+                                cases where sergen might not determine a property correctly.
+
+            Examples:
+              -prop:Configuration=Release
+              -prop:"OutDir=..\bin\Debug\;AssemblyName=MyAssembly"
+            
+            """"");
     }
 }
