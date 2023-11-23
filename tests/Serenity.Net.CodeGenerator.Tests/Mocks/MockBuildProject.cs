@@ -7,7 +7,7 @@ public class MockBuildProject : IBuildProject
 {
     private readonly XElement project;
 
-    public MockBuildProject(IGeneratorFileSystem fileSystem, string path)
+    public MockBuildProject(IFileSystem fileSystem, string path)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
 

@@ -12,7 +12,7 @@ public class Program
             Environment.Exit((int)exitCode);
     }
 
-    public static ExitCodes Run(string[] args, IGeneratorFileSystem fileSystem, 
+    public static ExitCodes Run(string[] args, IFileSystem fileSystem,
         Func<IBuildProjectSystem> projectSystemFactory)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
@@ -85,14 +85,12 @@ public class Program
             return ExitCodes.ProjectNotFound;
 
         var projectDir = fileSystem.GetFullPath(fileSystem.GetDirectoryName(csproj));
+        var project = new ProjectFileInfo(fileSystem, csproj);
 
         try
         {
             if ("restore".StartsWith(command, StringComparison.Ordinal))
-            {
-                return new RestoreCommand(fileSystem, 
-                    projectSystemFactory(), prjRefs).Run(csproj);
-            }
+                return new RestoreCommand(project, projectSystemFactory(), prjRefs).Run();
 
             if ("transform".StartsWith(command, StringComparison.Ordinal) ||
                 "servertypings".StartsWith(command, StringComparison.Ordinal) ||
@@ -133,16 +131,14 @@ public class Program
                 if (transformAll ||
                     "mvct".StartsWith(command, StringComparison.Ordinal))
                 {
-                    new MvcCommand(fileSystem).Run(csproj);
+                    new MvcCommand(project).Run();
                 }
 
                 if (transformAll ||
                     "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
                 {
                     ensureTSTypes();
-                    new ClientTypesCommand(fileSystem).Run(csproj,
-                        [.. (tsTypesNamespaces ?? [])
-, .. tsTypesModules ?? []]);
+                    new ClientTypesCommand(project).Run([.. (tsTypesNamespaces ?? []), .. tsTypesModules ?? []]);
                 }
 
                 if (transformAll ||
@@ -151,12 +147,12 @@ public class Program
                     ensureTSTypes();
 
                     if (tsTypesNamespaces is not null)
-                        new ServerTypingsCommand(fileSystem, modules: false)
-                            .Run(csproj, tsTypesNamespaces);
+                        new ServerTypingsCommand(project, modules: false)
+                            .Run(tsTypesNamespaces);
 
                     if (tsTypesModules is not null)
-                        new ServerTypingsCommand(fileSystem, modules: true)
-                            .Run(csproj, tsTypesModules);
+                        new ServerTypingsCommand(project, modules: true)
+                            .Run(tsTypesModules);
                 }
 
                 return ExitCodes.Success;
@@ -164,8 +160,8 @@ public class Program
 
             if ("generate".StartsWith(command, StringComparison.Ordinal))
             {
-                new GenerateCommand(fileSystem, Spectre.Console.AnsiConsole.Console)
-                    .Run(csproj, args.Skip(1).ToArray());
+                new GenerateCommand(project, Spectre.Console.AnsiConsole.Console)
+                    .Run(args.Skip(1).ToArray());
                 return ExitCodes.Success;
             }
         }

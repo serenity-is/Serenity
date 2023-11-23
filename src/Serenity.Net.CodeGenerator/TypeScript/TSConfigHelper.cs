@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public static class TSConfigHelper
 {
     public static IEnumerable<string> ListFiles(
-        IGeneratorFileSystem fileSystem, string configPath, out TSConfig tsConfig,
+        IFileSystem fileSystem, string configPath, out TSConfig tsConfig,
         CancellationToken cancellationToken = default)
     {
         tsConfig = Read(fileSystem, configPath);
@@ -16,7 +16,7 @@ public static class TSConfigHelper
     }
 
     public static IEnumerable<string> ListFiles(TSConfig config,
-        IGeneratorFileSystem fileSystem, string rootDir,
+        IFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
         ArgumentExceptionHelper.ThrowIfNull(config);
@@ -137,7 +137,7 @@ public static class TSConfigHelper
         return files.Distinct().ToArray();
     }
 
-    public static TSConfig Read(IGeneratorFileSystem fileSystem, string path)
+    public static TSConfig Read(IFileSystem fileSystem, string path)
     {
         var config = TryParseJsonFile<TSConfig>(fileSystem, path);
         var extends = config?.Extends;
@@ -178,7 +178,7 @@ public static class TSConfigHelper
         return config;
     }
 
-    public static T TryParseJsonFile<T>(IGeneratorFileSystem fileSystem, string path) where T: class
+    public static T TryParseJsonFile<T>(IFileSystem fileSystem, string path) where T: class
     {
         ArgumentExceptionHelper.ThrowIfNull(fileSystem);
         ArgumentExceptionHelper.ThrowIfNull(path);
@@ -206,7 +206,7 @@ public static class TSConfigHelper
         }
     }
 
-    public static void LocateTSConfigFiles(IGeneratorFileSystem fileSystem,
+    public static void LocateTSConfigFiles(IFileSystem fileSystem,
         string projectDir, out string modulesPath, out string namespacesPath)
     {
         namespacesPath = null;

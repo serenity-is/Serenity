@@ -2,7 +2,7 @@
 
 public class PackageHelper
 {
-    public static string DeterminePackagesPath(IGeneratorFileSystem fileSystem)
+    public static string DeterminePackagesPath(IFileSystem fileSystem)
     {
         string userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
         if (string.IsNullOrEmpty(userHomeDirectory))

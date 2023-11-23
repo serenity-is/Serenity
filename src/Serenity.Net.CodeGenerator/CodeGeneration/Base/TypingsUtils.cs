@@ -579,7 +579,7 @@ public static class TypingsUtils
     }
 
 #if !ISSOURCEGENERATOR
-    public static Mono.Cecil.AssemblyDefinition[] ToDefinitions(IGeneratorFileSystem fileSystem,
+    public static Mono.Cecil.AssemblyDefinition[] ToDefinitions(IFileSystem fileSystem,
         IEnumerable<string> assemblyLocations)
     {
         if (assemblyLocations == null || !assemblyLocations.Any())

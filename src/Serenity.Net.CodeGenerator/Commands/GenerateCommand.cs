@@ -3,16 +3,16 @@ using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
 
-public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole) : BaseFileSystemCommand(fileSystem)
+public partial class GenerateCommand(IProjectFileInfo project, IAnsiConsole ansiConsole) : BaseGeneratorCommand(project)
 {
     private readonly IAnsiConsole ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
 
-    public ExitCodes Run(string csproj, string[] args)
+    public ExitCodes Run(string[] args)
     {
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
+        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var config = FileSystem.LoadGeneratorConfig(projectDir);
 
-        var connectionStrings = ParseConnectionStrings(fileSystem, csproj, config);
+        var connectionStrings = ParseConnectionStrings(FileSystem, ProjectFile, config);
         if (connectionStrings.Count == 0)
         {
             Error("No connections in appsettings files or sergen.json!");
@@ -25,7 +25,7 @@ public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConso
         var argsPermissionKey = GetOption(args, "p").TrimToNull();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
-            Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);
+            Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
 
         WriteHeading("Table Code Generation");
 
@@ -132,10 +132,10 @@ public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConso
         ApplicationMetadata application = null;
         try
         {
-            var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(fileSystem, csproj, config, (error) => { });
+            var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(Project, config, (error) => { });
             if (assemblyFiles != null && assemblyFiles.Length > 0)
             {
-                application = new ApplicationMetadata(fileSystem, assemblyFiles)
+                application = new ApplicationMetadata(FileSystem, assemblyFiles)
                 {
                     DefaultSchema = schemaProvider.DefaultSchema
                 };
@@ -145,7 +145,7 @@ public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConso
                     inputs.SkipForeignKeys = true;
                     try
                     {
-                        var entityModel = CreateEntityModel(inputs, new EntityModelGenerator(), csproj, fileSystem, sqlConnections);
+                        var entityModel = CreateEntityModel(inputs, new EntityModelGenerator(), sqlConnections);
                         application.EntityModels.Add(entityModel);
                     }
                     finally
@@ -164,13 +164,13 @@ public partial class GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConso
             inputs.Application = application;
 
             var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
-                csproj, fileSystem, sqlConnections, interactive: true);
+                sqlConnections, interactive: true);
 
             generator.Run();
         }
 
         if (config.SaveGeneratedTables != false)
-            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
+            FileSystem.WriteAllText(FileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
         return ExitCodes.Success;
     }

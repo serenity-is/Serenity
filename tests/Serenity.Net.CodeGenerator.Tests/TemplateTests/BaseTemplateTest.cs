@@ -8,7 +8,7 @@ public abstract class BaseTemplateTest
 
     protected string RenderTemplate(EntityModel model)
     {
-        return Templates.Render(new MockGeneratorFileSystem(), TemplateName, model);
+        return Templates.Render(new MockFileSystem(), TemplateName, model);
     }
 
     protected void AssertEqual(string expected, string actual)

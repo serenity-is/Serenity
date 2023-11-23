@@ -7,7 +7,6 @@ namespace Serenity.Tests;
 public class MockFileSystem(string currentDirectory = "") : 
     System.IO.Abstractions.TestingHelpers.MockFileSystem(null, currentDirectory), IFileSystem
 {
-
     /// <inheritdoc/>
     public void CreateDirectory(string path)
     {
@@ -113,5 +112,10 @@ public class MockFileSystem(string currentDirectory = "") :
         }
 
         File.WriteAllText(path, content);
+    }
+
+    public DateTime GetLastWriteTimeUtc(string path)
+    {
+        return File.GetLastWriteTimeUtc(path);
     }
 }

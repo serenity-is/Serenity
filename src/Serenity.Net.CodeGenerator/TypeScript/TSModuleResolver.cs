@@ -2,7 +2,7 @@ namespace Serenity.CodeGenerator;
 
 public partial class TSModuleResolver
 {
-    private readonly IGeneratorFileSystem fileSystem;
+    private readonly IFileSystem fileSystem;
     private readonly string tsBasePath;
     private readonly Dictionary<string, string[]> paths;
 
@@ -23,7 +23,7 @@ public partial class TSModuleResolver
 #endif
     private static readonly char[] slashSeparator = ['/'];
 
-    public TSModuleResolver(IGeneratorFileSystem fileSystem, string tsConfigDir, TSConfig tsConfig)
+    public TSModuleResolver(IFileSystem fileSystem, string tsConfigDir, TSConfig tsConfig)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 

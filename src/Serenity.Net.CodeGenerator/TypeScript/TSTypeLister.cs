@@ -9,12 +9,12 @@ namespace Serenity.CodeGenerator;
 
 public class TSTypeLister
 {
-    private readonly IGeneratorFileSystem fileSystem;
+    private readonly IFileSystem fileSystem;
     private readonly CancellationToken cancellationToken;
     private readonly string tsConfigPath;
     private readonly ConcurrentDictionary<string, SourceFile> astCache;
 
-    public TSTypeLister(IGeneratorFileSystem fileSystem, string tsConfigPath, ConcurrentDictionary<string, SourceFile> astCache = null,
+    public TSTypeLister(IFileSystem fileSystem, string tsConfigPath, ConcurrentDictionary<string, SourceFile> astCache = null,
         CancellationToken cancellationToken = default)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));

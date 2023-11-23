@@ -17,10 +17,4 @@ public class TemporaryPhysicalFileSystem : PhysicalFileSystem, ITemporaryFileSys
             CreationTime = x.CreationTime
         }).ToArray();
     }
-
-    /// <inheritdoc/>
-    public DateTime GetLastWriteTimeUtc(string path)
-    {
-        return System.IO.File.GetLastWriteTimeUtc(path);
-    }
 }

@@ -13,7 +13,7 @@ public partial class ServerTypingsGeneratorTests
 
     private static ServerTypingsGenerator CreateGenerator(params Type[] types)
     {
-        var generator = new ServerTypingsGenerator(new MockGeneratorFileSystem(),
+        var generator = new ServerTypingsGenerator(new MockFileSystem(),
             typeof(ServerTypingsGeneratorTests).Assembly.Location);
         generator.RootNamespaces.Add("ServerTypingsTest");
         generator.TypeFilter = type =>
@@ -26,7 +26,7 @@ public partial class ServerTypingsGeneratorTests
 
     private static ServerTypingsGenerator CreateGeneratorModules(params Type[] types)
     {
-        var generator = new ServerTypingsGenerator(new MockGeneratorFileSystem(),
+        var generator = new ServerTypingsGenerator(new MockFileSystem(),
             typeof(ServerTypingsGeneratorTests).Assembly.Location);
         generator.RootNamespaces.Add("ServerTypingsTest");
         generator.TypeFilter = type =>

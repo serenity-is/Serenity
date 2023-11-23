@@ -3,25 +3,23 @@ using GlobFilter = Serenity.IO.GlobFilter;
 
 namespace Serenity.CodeGenerator;
 
-public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem projectSystem,
-    IEnumerable<string> projectReferences = null) : BaseFileSystemCommand(fileSystem)
+public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projectSystem,
+    IEnumerable<string> projectReferences = null) : BaseGeneratorCommand(project)
 {
     protected IBuildProjectSystem ProjectSystem { get; } = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
     public IEnumerable<string> ProjectReferences { get; } = projectReferences;
 
-    public ExitCodes Run(string csproj, bool verbose = false)
+    public ExitCodes Run(bool verbose = false)
     {
-        ArgumentNullException.ThrowIfNull(csproj);
-
-        if (!fileSystem.FileExists(csproj))
+        if (!FileSystem.FileExists(ProjectFile))
         {
             if (verbose)
-                Console.Error.WriteLine($"Project file {csproj} is not found!");
+                Console.Error.WriteLine($"Project file {ProjectFile} is not found!");
             return ExitCodes.ProjectNotFound;
         }
 
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
+        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var config = FileSystem.LoadGeneratorConfig(projectDir);
 
         if (config?.Restore?.Exclude?.Any(x => x == "**/*") == true)
             return ExitCodes.Success;
@@ -49,7 +47,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
         if (config.Restore?.Exclude.IsEmptyOrNull() == false)
             exclude = new GlobFilter(config.Restore.Exclude);
 
-        var targetRoot = fileSystem.GetDirectoryName(csproj);
+        var targetRoot = FileSystem.GetDirectoryName(ProjectFile);
         var restoredFromProjectReference = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         void restoreFile(string file, string relative)
@@ -67,27 +65,27 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
             if (restoredFromProjectReference.Contains(relative))
                 return;
 
-            var target = fileSystem.Combine(targetRoot, relative);
-            if (fileSystem.FileExists(target))
+            var target = FileSystem.Combine(targetRoot, relative);
+            if (FileSystem.FileExists(target))
             {
-                if (!fileSystem.ReadAllBytes(target)
-                    .SequenceEqual(fileSystem.ReadAllBytes(file)))
+                if (!FileSystem.ReadAllBytes(target)
+                    .SequenceEqual(FileSystem.ReadAllBytes(file)))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Restoring: " + relative);
                     Console.ResetColor();
-                    fileSystem.Copy(file, target, overwrite: true);
+                    FileSystem.Copy(file, target, overwrite: true);
                 }
             }
             else
             {
-                if (!fileSystem.DirectoryExists(target))
-                    fileSystem.CreateDirectory(fileSystem.GetDirectoryName(target));
+                if (!FileSystem.DirectoryExists(target))
+                    FileSystem.CreateDirectory(FileSystem.GetDirectoryName(target));
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Restoring: " + relative);
                 Console.ResetColor();
-                fileSystem.Copy(file, target, overwrite: false);
+                FileSystem.Copy(file, target, overwrite: false);
             }
         }
 
@@ -95,8 +93,8 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
         try
         {
             var projectRefs = ProjectReferences?.Where(x => 
-                !IgnoreProjectRefs.Contains(fileSystem.GetFileNameWithoutExtension(x))) ?? 
-                    EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                !IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(x))) ?? 
+                    EnumerateProjectReferences(ProjectFile, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
             foreach (var reference in projectRefs)
             {
@@ -125,13 +123,13 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                     .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
                         StringComparison.OrdinalIgnoreCase) == true))
                 {
-                    var sourceFile = PathHelper.ToPath(fileSystem.Combine(fileSystem.GetDirectoryName(reference),
+                    var sourceFile = PathHelper.ToPath(FileSystem.Combine(FileSystem.GetDirectoryName(reference),
                         item.EvaluatedInclude));
 
                     if (verbose)
                         Console.WriteLine("Checking source file: " + sourceFile);
 
-                    if (!fileSystem.FileExists(sourceFile))
+                    if (!FileSystem.FileExists(sourceFile))
                     {
                         if (verbose)
                             Console.WriteLine("Source file does NOT exist: " + sourceFile);
@@ -168,7 +166,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
             Console.Error.WriteLine(ex.Message);
         }
 
-        var packagesDir = PackageHelper.DeterminePackagesPath(fileSystem);
+        var packagesDir = PackageHelper.DeterminePackagesPath(FileSystem);
         if (packagesDir == null)
         {
             Console.Error.WriteLine("Can't determine NuGet packages directory!");
@@ -176,7 +174,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
         }
 
         var queue = new Queue<(string ID, string Version)>();
-        foreach (var x in EnumeratePackageReferences(csproj))
+        foreach (var x in EnumeratePackageReferences(ProjectFile))
         {
             if (!skipPackage(x.Id) && !string.IsNullOrEmpty(x.Version))
                 queue.Enqueue(x);
@@ -195,24 +193,24 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                 ver = ver[1..^1].Trim();
             }
 
-            var packageFolder = fileSystem.Combine(fileSystem.Combine(packagesDir, id), ver);
-            if (!fileSystem.DirectoryExists(packageFolder))
+            var packageFolder = FileSystem.Combine(FileSystem.Combine(packagesDir, id), ver);
+            if (!FileSystem.DirectoryExists(packageFolder))
             {
-                packageFolder = fileSystem.Combine(fileSystem.Combine(packagesDir, id.ToLowerInvariant()), ver);
-                if (!fileSystem.DirectoryExists(packageFolder))
+                packageFolder = FileSystem.Combine(FileSystem.Combine(packagesDir, id.ToLowerInvariant()), ver);
+                if (!FileSystem.DirectoryExists(packageFolder))
                 {
-                    var myPackagesDir = fileSystem.Combine(packagesDir, "..", "my-packages");
-                    packageFolder = fileSystem.Combine(myPackagesDir, id, ver);
-                    if (!fileSystem.DirectoryExists(packageFolder))
-                        packageFolder = fileSystem.Combine(myPackagesDir, id.ToLowerInvariant(), ver);
+                    var myPackagesDir = FileSystem.Combine(packagesDir, "..", "my-packages");
+                    packageFolder = FileSystem.Combine(myPackagesDir, id, ver);
+                    if (!FileSystem.DirectoryExists(packageFolder))
+                        packageFolder = FileSystem.Combine(myPackagesDir, id.ToLowerInvariant(), ver);
                 }
             }
 
-            var nuspecFile = fileSystem.Combine(packageFolder, id + ".nuspec");
-            if (!fileSystem.FileExists(nuspecFile))
+            var nuspecFile = FileSystem.Combine(packageFolder, id + ".nuspec");
+            if (!FileSystem.FileExists(nuspecFile))
             {
-                nuspecFile = fileSystem.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
-                if (!fileSystem.FileExists(nuspecFile))
+                nuspecFile = FileSystem.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
+                if (!FileSystem.FileExists(nuspecFile))
                 {
                     if (verbose)
                         Console.WriteLine("Can't find nuspec file: " + nuspecFile);
@@ -224,15 +222,15 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
             Console.WriteLine("Processing: " + id);
             Console.ResetColor();
 
-            var contentRoot = fileSystem.Combine(packageFolder, "content");
-            if (!fileSystem.DirectoryExists(contentRoot))
-                contentRoot = fileSystem.Combine(packageFolder, "Content");
+            var contentRoot = FileSystem.Combine(packageFolder, "content");
+            if (!FileSystem.DirectoryExists(contentRoot))
+                contentRoot = FileSystem.Combine(packageFolder, "Content");
 
-            if (fileSystem.DirectoryExists(contentRoot))
+            if (FileSystem.DirectoryExists(contentRoot))
             {
-                foreach (var file in fileSystem.GetFiles(contentRoot, "*.*", recursive: true))
+                foreach (var file in FileSystem.GetFiles(contentRoot, "*.*", recursive: true))
                 {
-                    var extension = fileSystem.GetExtension(file);
+                    var extension = FileSystem.GetExtension(file);
                     if (string.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
                         continue;
 
@@ -246,9 +244,9 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                         if (config?.Restore.Typings != false)
                         {
                             relative = "typings/" + relative["Scripts/typings/".Length..];
-                            var tsconfig = fileSystem.Combine(projectDir, "tsconfig.json");
-                            if (!fileSystem.FileExists(tsconfig) ||
-                                !fileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
+                            var tsconfig = FileSystem.Combine(projectDir, "tsconfig.json");
+                            if (!FileSystem.FileExists(tsconfig) ||
+                                !FileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
                                 continue; // old typings only needed for users who didn't fix their tsconfig.json
                         }
                     }
@@ -271,13 +269,13 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                 Console.WriteLine("Can't find package content directory: " + nuspecFile);
             }
 
-            var typingsRoot = fileSystem.Combine(packageFolder, "typings");
-            if (!fileSystem.DirectoryExists(typingsRoot))
-                typingsRoot = fileSystem.Combine(packageFolder, "Typings");
+            var typingsRoot = FileSystem.Combine(packageFolder, "typings");
+            if (!FileSystem.DirectoryExists(typingsRoot))
+                typingsRoot = FileSystem.Combine(packageFolder, "Typings");
 
-            if (fileSystem.DirectoryExists(typingsRoot))
+            if (FileSystem.DirectoryExists(typingsRoot))
             {
-                foreach (var file in fileSystem.GetFiles(typingsRoot, "*.ts", recursive: true))
+                foreach (var file in FileSystem.GetFiles(typingsRoot, "*.ts", recursive: true))
                 {
                     if (verbose)
                     { 
@@ -289,7 +287,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                 }
             }
 
-            var nuspecContent = fileSystem.ReadAllText(nuspecFile);
+            var nuspecContent = FileSystem.ReadAllText(nuspecFile);
             var nuspec = XElement.Parse(nuspecContent);
             var meta = nuspec.Elements().Where(x => x.Name?.LocalName == "metadata").FirstOrDefault();
             if (meta == null)
@@ -351,7 +349,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
         var allReferences = new List<string>();
         try
         {
-            csproj = fileSystem.GetFullPath(csproj);
+            csproj = FileSystem.GetFullPath(csproj);
             var project = ProjectSystem.LoadProject(csproj);
             visited?.Add(csproj);
 
@@ -363,14 +361,14 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
                     if (string.IsNullOrEmpty(item.EvaluatedInclude))
                         continue;
 
-                    var path = fileSystem.Combine(fileSystem.GetDirectoryName(csproj), item.EvaluatedInclude);
-                    if (!fileSystem.FileExists(path) || visited?.Contains(path) == true)
+                    var path = FileSystem.Combine(FileSystem.GetDirectoryName(csproj), item.EvaluatedInclude);
+                    if (!FileSystem.FileExists(path) || visited?.Contains(path) == true)
                         continue;
 
-                    if (IgnoreProjectRefs.Contains(fileSystem.GetFileNameWithoutExtension(path)))
+                    if (IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(path)))
                         continue;
 
-                    path = fileSystem.GetFullPath(path);
+                    path = FileSystem.GetFullPath(path);
                     allReferences.Add(path);
                     if (visited?.Contains(path) == true)
                         continue;
@@ -394,7 +392,7 @@ public class RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem
         IBuildProject project;
         try
         {
-            csproj = fileSystem.GetFullPath(csproj);
+            csproj = FileSystem.GetFullPath(csproj);
             project = ProjectSystem.LoadProject(csproj);
         }
         catch

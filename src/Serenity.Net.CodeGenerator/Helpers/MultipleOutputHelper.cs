@@ -4,7 +4,7 @@ public class MultipleOutputHelper
 {
     private static readonly Encoding utf8 = new UTF8Encoding(true);
 
-    public static void WriteFiles(IGeneratorFileSystem fileSystem,
+    public static void WriteFiles(IFileSystem fileSystem,
         string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
         string[] deleteExtraPattern,
         string endOfLine)

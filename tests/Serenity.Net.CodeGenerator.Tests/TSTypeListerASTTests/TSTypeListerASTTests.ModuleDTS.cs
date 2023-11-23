@@ -7,7 +7,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void ModuleDTS_Extracts_StringEditor_Without_Decorators()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
 declare class Widget<TOptions = any> {
 }
@@ -64,7 +64,7 @@ export class Type1 extends StringEditor {
     [Fact]
     public void ModuleDTS_Extracts_StringEditor_Without_Decorators_But_Static_TypeName()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
 declare class Widget<TOptions = any> {
 }

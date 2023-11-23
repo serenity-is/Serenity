@@ -8,12 +8,12 @@ public partial class ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation c
 #else
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
+    public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
         : base(fileSystem, assemblies)
     {
     }
 
-    public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+    public ServerTypingsGenerator(IFileSystem fileSystem, params string[] assemblyLocations)
         : base(fileSystem, assemblyLocations)
     {
     }

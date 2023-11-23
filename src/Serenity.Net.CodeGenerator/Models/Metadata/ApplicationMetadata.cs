@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public class ApplicationMetadata : IApplicationMetadata
 {
-    private class Scanner(IGeneratorFileSystem fileSystem, params string[] assemblyLocations) : TypingsGeneratorBase(fileSystem, assemblyLocations)
+    private class Scanner(IFileSystem fileSystem, params string[] assemblyLocations) : TypingsGeneratorBase(fileSystem, assemblyLocations)
     {
         public List<TypeDefinition> RowTypes { get; } = [];
         public Dictionary<string, string> RowTypeToListRoute = [];
@@ -61,7 +61,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
     private readonly Scanner scanner;
 
-    public ApplicationMetadata(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+    public ApplicationMetadata(IFileSystem fileSystem, params string[] assemblyLocations)
     {
         scanner = new Scanner(fileSystem, assemblyLocations);
         scanner.Run();

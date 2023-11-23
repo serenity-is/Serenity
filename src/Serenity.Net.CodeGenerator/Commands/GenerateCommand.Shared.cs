@@ -42,16 +42,14 @@ public partial class GenerateCommand
         }
     }
 
-    private static EntityModel CreateEntityModel(EntityModelInputs inputs, 
+    private EntityModel CreateEntityModel(EntityModelInputs inputs, 
         IEntityModelGenerator modelGenerator,
-        string csproj,
-        IGeneratorFileSystem fileSystem,
         ISqlConnections sqlConnections)
     {
         using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
         connection.EnsureOpen();
 
-        var csprojContent = fileSystem.ReadAllText(csproj);
+        var csprojContent = FileSystem.ReadAllText(Project.ProjectFile);
         inputs.Net5Plus = !targetFrameworkNetCoreRegexGen().IsMatch(csprojContent);
 
         inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
@@ -61,23 +59,21 @@ public partial class GenerateCommand
         return modelGenerator.GenerateModel(inputs);
     }
 
-    private static EntityCodeGenerator CreateCodeGenerator(EntityModelInputs inputs, 
+    private EntityCodeGenerator CreateCodeGenerator(EntityModelInputs inputs, 
         IEntityModelGenerator modelGenerator,
-        string csproj, 
-        IGeneratorFileSystem fileSystem,
         ISqlConnections sqlConnections, 
         bool interactive = true)
     {
-        var entityModel = CreateEntityModel(inputs, modelGenerator, csproj, fileSystem, sqlConnections);
+        var entityModel = CreateEntityModel(inputs, modelGenerator, sqlConnections);
 
-        var codeFileHelper = new CodeFileHelper(fileSystem)
+        var codeFileHelper = new CodeFileHelper(Project.FileSystem)
         {
             NoUserInteraction = !interactive,
-            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(fileSystem.FileExists),
+            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(Project.FileSystem.FileExists),
             TSCPath = inputs.Config.TSCPath ?? "tsc"
         };
 
-        return new EntityCodeGenerator(fileSystem, codeFileHelper, entityModel, inputs.Config, csproj);
+        return new EntityCodeGenerator(Project, codeFileHelper, entityModel, inputs.Config);
     }
 
     private static void RegisterSqlProviders()

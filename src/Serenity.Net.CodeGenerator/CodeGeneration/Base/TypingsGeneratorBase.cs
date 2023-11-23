@@ -85,12 +85,12 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
     }
 #else
-    protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
+    protected TypingsGeneratorBase(IFileSystem fileSystem, params Assembly[] assemblies)
         : this(TypingsUtils.ToDefinitions(fileSystem, assemblies?.Select(x => x.Location)))
     {
     }
 
-    protected TypingsGeneratorBase(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
+    protected TypingsGeneratorBase(IFileSystem fileSystem, params string[] assemblyLocations)
         : this(TypingsUtils.ToDefinitions(fileSystem, assemblyLocations))
     {
     }

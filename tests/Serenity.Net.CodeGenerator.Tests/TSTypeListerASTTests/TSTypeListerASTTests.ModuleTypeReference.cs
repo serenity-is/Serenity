@@ -7,7 +7,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void Resolves_Imported_Type_From_Serenity_Module()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         string myDialog = root + "Modules/Test/MyDialog.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(myDialog));

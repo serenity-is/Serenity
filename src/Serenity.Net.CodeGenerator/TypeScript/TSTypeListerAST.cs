@@ -13,12 +13,12 @@ public class TSTypeListerAST
 {
     private readonly List<string> fileNames = [];
     private readonly HashSet<string> exportedTypeNames = [];
-    private readonly IGeneratorFileSystem fileSystem;
+    private readonly IFileSystem fileSystem;
     private readonly ConcurrentDictionary<string, SourceFile> astCache;
     private readonly TSModuleResolver moduleResolver;
     private readonly CancellationToken cancellationToken;
 
-    public TSTypeListerAST(IGeneratorFileSystem fileSystem, string tsConfigDir,
+    public TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
         TSConfig tsConfig, ConcurrentDictionary<string, SourceFile> astCache = null, 
         CancellationToken cancellationToken = default)
     {

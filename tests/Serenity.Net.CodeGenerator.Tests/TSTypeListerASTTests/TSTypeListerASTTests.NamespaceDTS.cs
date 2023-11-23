@@ -7,7 +7,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void NamespaceDTS_Extracts_StringEditor_Without_Decorators()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("Serenity.CoreLib.d.ts", @"
 declare namespace Serenity {
     class Widget<TOptions = any> {

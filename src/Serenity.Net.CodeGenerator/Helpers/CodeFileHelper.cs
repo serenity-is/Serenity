@@ -2,10 +2,10 @@ using System.Diagnostics;
 
 namespace Serenity.CodeGenerator;
 
-public class CodeFileHelper(IGeneratorFileSystem fileSystem) : ICodeFileHelper
+public class CodeFileHelper(IFileSystem fileSystem) : ICodeFileHelper
 {
     private static readonly UTF8Encoding utf8 = new(true);
-    private readonly IGeneratorFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
     public string Kdiff3Path { get; set; }
     public string TSCPath { get; set; }

@@ -1,15 +1,15 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
-public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand(fileSystem)
+public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project)
 {
-    public void Run(string csproj)
+    public void Run()
     {
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
+        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var config = FileSystem.LoadGeneratorConfig(projectDir);
 
         config.MVC ??= new();
 
-        var outDir = fileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
+        var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.Write("Transforming MVC at: ");
@@ -19,8 +19,8 @@ public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand
         string[] stripViewPaths = config.MVC.StripViewPaths ?? [
             "Modules/",
             "Views/",
-            fileSystem.GetFileNameWithoutExtension(csproj) + "/",
-            "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
+            FileSystem.GetFileNameWithoutExtension(ProjectFile) + "/",
+            "Areas/" + FileSystem.GetFileNameWithoutExtension(ProjectFile) + "/"
         ];
 
         var rootDir = projectDir + System.IO.Path.DirectorySeparatorChar;
@@ -28,22 +28,22 @@ public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand
             [
                 "Modules/",
                 "Views/",
-                fileSystem.GetFileNameWithoutExtension(csproj) + "/",
-                "Areas/" + fileSystem.GetFileNameWithoutExtension(csproj) + "/"
+                FileSystem.GetFileNameWithoutExtension(ProjectFile) + "/",
+                "Areas/" + FileSystem.GetFileNameWithoutExtension(ProjectFile) + "/"
             ])
-            .Select(x => fileSystem.Combine(rootDir, PathHelper.ToPath(x)));
+            .Select(x => FileSystem.Combine(rootDir, PathHelper.ToPath(x)));
 
         IEnumerable<string> files = new List<string>();
         foreach (var path in searchViewPaths)
         {
-            if (fileSystem.DirectoryExists(path))
-                files = files.Concat(fileSystem.GetFiles(path, "*.cshtml", recursive: true));
+            if (FileSystem.DirectoryExists(path))
+                files = files.Concat(FileSystem.GetFiles(path, "*.cshtml", recursive: true));
         }
 
         string getName(string s)
         {
             var path = s[rootDir.Length..];
-            var name = fileSystem.ChangeExtension(path, null).Replace('\\', '/');
+            var name = FileSystem.ChangeExtension(path, null).Replace('\\', '/');
             foreach (var strip in stripViewPaths)
             {
                 if (name.StartsWith(strip, StringComparison.OrdinalIgnoreCase))
@@ -67,8 +67,8 @@ public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand
         cw.AppendLine("");
         var ns = (config.MVC.UseRootNamespace == true ||
             (config.MVC.UseRootNamespace == null &&
-             fileSystem.ReadAllText(csproj).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture))) ?
-             config.GetRootNamespaceFor(fileSystem, csproj) + ".MVC" : "MVC";
+             FileSystem.ReadAllText(ProjectFile).Contains("Sdk=\"Microsoft.NET.Sdk.Razor\"", StringComparison.CurrentCulture))) ?
+             config.GetRootNamespaceFor(new ProjectFileInfo(FileSystem, ProjectFile)) + ".MVC" : "MVC";
 
         cw.InNamespace(ns, () =>
         {
@@ -141,7 +141,7 @@ public class MvcCommand(IGeneratorFileSystem fileSystem) : BaseFileSystemCommand
 
         });
 
-        MultipleOutputHelper.WriteFiles(fileSystem, outDir, new[]
+        MultipleOutputHelper.WriteFiles(FileSystem, outDir, new[]
         {
             ("MVC.cs", cw.ToString())
         }, deleteExtraPattern: null, endOfLine: config.EndOfLine);

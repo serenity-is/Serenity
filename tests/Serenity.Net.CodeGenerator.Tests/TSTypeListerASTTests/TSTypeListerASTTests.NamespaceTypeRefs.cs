@@ -7,7 +7,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void Resolves_Type_Refs_In_Same_Namespace_Same_File()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("a.d.ts", @"
 declare namespace jsPDF {
     interface AutoTableOptions {
@@ -40,7 +40,7 @@ declare namespace jsPDF {
     [Fact]
     public void Resolve_Same_Namespace_In_One_File_Multiple()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("a.d.ts", @"
 declare namespace Serenity.Extensions {
     interface ExcelImportRequest extends Serenity.ServiceRequest {
@@ -66,7 +66,7 @@ declare namespace Serenity.Extensions {
     [Fact]
     public void BodySkipTest()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("a.ts", @"namespace A {
 
     @Serenity.Decorators.registerEditor()

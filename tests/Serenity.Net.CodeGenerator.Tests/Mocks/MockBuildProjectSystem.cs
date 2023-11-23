@@ -2,9 +2,9 @@ using Serenity.CodeGenerator;
 
 namespace Serenity.Tests;
 
-public class MockBuildProjectSystem(IGeneratorFileSystem fileSystem) : IBuildProjectSystem
+public class MockBuildProjectSystem(IFileSystem fileSystem) : IBuildProjectSystem
 {
-    private readonly IGeneratorFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
     public IBuildProject LoadProject(string path)
     {

@@ -3,7 +3,7 @@ namespace Serenity.CodeGenerator;
 public class EntityCodeGenerator
 {
     private readonly GeneratorConfig config;
-    private readonly IGeneratorFileSystem fileSystem;
+    private readonly IFileSystem fileSystem;
     private readonly ICodeFileHelper codeFileHelper;
     private readonly EntityModel model;
     private readonly string rootDir;
@@ -15,13 +15,14 @@ public class EntityCodeGenerator
     private readonly string modulesPath;
     private static readonly char[] slashNSeparator = ['\n'];
 
-    public EntityCodeGenerator(IGeneratorFileSystem fileSystem, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config, string csproj)
+    public EntityCodeGenerator(IProjectFileInfo project, ICodeFileHelper codeFileHelper, EntityModel model, GeneratorConfig config)
     {
-        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(project);
+        fileSystem = project.FileSystem;
         this.codeFileHelper = codeFileHelper ?? throw new ArgumentNullException(nameof(codeFileHelper));
         this.model = model;
 
-        rootDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(csproj));
+        rootDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(project.ProjectFile));
         this.config = config;
         this.model.CustomSettings = config.CustomSettings;
 

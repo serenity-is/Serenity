@@ -57,23 +57,16 @@ public static class GeneratorConfigExtensions
     /// <param name="csproj">CSProj file</param>
     /// <returns>Root namespace for given project</returns>
     /// <exception cref="ArgumentNullException">fileSystem is null</exception>
-    public static string GetRootNamespaceFor(this GeneratorConfig config, IGeneratorFileSystem fileSystem, string csproj)
+    public static string GetRootNamespaceFor(this GeneratorConfig config, IProjectFileInfo projectInfo)
     {
         ArgumentNullException.ThrowIfNull(config);
-
-        ArgumentNullException.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(projectInfo);
 
         if (!string.IsNullOrEmpty(config.RootNamespace))
             return config.RootNamespace;
 
-        string rootNamespace = null;
-
-        if (fileSystem.FileExists(csproj)) {
-             rootNamespace = ProjectFileHelper.ExtractPropertyFrom(fileSystem, csproj,
-                xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
-        }
-
-        rootNamespace ??= fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
+        string rootNamespace = projectInfo.GetRootNamespace();
+        rootNamespace ??= projectInfo.FileSystem.GetFileNameWithoutExtension(projectInfo.ProjectFile);
 
         if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
             rootNamespace = rootNamespace[0..^4];
