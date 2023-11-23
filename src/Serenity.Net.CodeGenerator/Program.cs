@@ -91,7 +91,10 @@ public class Program
         }
 
         if (!fileSystem.FileExists(projectFile))
+        {
+            Console.Error.WriteLine($"Can't find a project file at: {projectFile}");
             return ExitCodes.ProjectNotFound;
+        }
 
         var projectDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(projectFile));
         var project = new ProjectFileInfo(fileSystem, projectFile, props);
