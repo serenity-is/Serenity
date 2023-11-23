@@ -15,11 +15,14 @@
     <PackageTags>Serenity</PackageTags>
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
     <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
-  </PropertyGroup>
-  <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)..\build\artifacts</ArtifactsPath>
+    <ArtifactsPath Condition="Exists('$(MSBuildThisFileDirectory)..\..\build')">$(MSBuildThisFileDirectory)..\..\build\artifacts</ArtifactsPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />

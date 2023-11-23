@@ -1,6 +1,7 @@
 **/bin/Debug/*
 **/bin/Release/*
 .swc/
+artifacts/
 obj/
 *.bak
 *.orig
