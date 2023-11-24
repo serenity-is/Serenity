@@ -1,5 +1,5 @@
 import { loadNSCorelib } from "../testutil";
-import type { Criteria } from "@/q/criteria";
+import type { Criteria } from "@serenity-is/base";
 
 beforeEach(() => {
     jest.resetModules();

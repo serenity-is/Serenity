@@ -7,27 +7,29 @@
     "inlineSources": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "newLine": "lf",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "module": "ES2020",
-    "moduleResolution": "Node",
-    "skipLibCheck": true,
-    "useDefineForClassFields": false,
-    "types": [
-      "jest"
-    ],
-    "rootDir": "./src",
-    "outDir": "./out",    
-    "target": "ES2017",
+    "jsx": "react-jsx",
+    "jsxImportSource": "jsx-dom/min",
+    "importHelpers": false,
     "lib": [
       "ES5",
       "ES2015",
       "ES2017",
       "DOM"
     ],
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "newLine": "lf",
     "noEmitHelpers": false,
-    "importHelpers": false
+    "noImplicitAny": true,
+    "outDir": "./out",    
+    "rootDir": "./src",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "useDefineForClassFields": false,
+    "target": "ES2017",
+    "types": [
+      "jest"
+    ]
   },
   "include": [
     "src"

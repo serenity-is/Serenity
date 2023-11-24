@@ -1,24 +1,8 @@
 ﻿{
-  "compileOnSave": false,
+  "extends": "./node_modules/@serenity-is/base/tsconfig.base.json",
   "compilerOptions": {
     "experimentalDecorators": true,
-    "declaration": true,
     "declarationDir": "./out",
-    "emitDeclarationOnly": true,
-    "esModuleInterop": true,
-    "inlineSources": true,
-    "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
-    "newLine": "lf",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "module": "ES2020",
-    "moduleResolution": "Node",
-    "skipLibCheck": true,
-    "useDefineForClassFields": false,
-    "types": [
-      "jest"
-    ],
     "rootDir": "./src",
     "paths": {
       "@/*": [
@@ -29,17 +13,7 @@
       ]
     },
     "outDir": "./out",
-    "target": "ES5",
-    "lib": [
-      "ES5",
-      "ES2015",
-      "ES2017",
-      "DOM"
-    ],
-    "noEmitHelpers": false,
-    "importHelpers": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "jsx-dom/min"
+    "target": "ES5"
   },
   "include": [
     "src"

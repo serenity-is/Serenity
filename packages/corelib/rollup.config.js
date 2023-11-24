@@ -253,6 +253,7 @@ export default [
             nodeResolvePlugin(),        
             typescript({
                 tsconfig: 'tsconfig.json',
+                resolveJsonModule: true,
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],

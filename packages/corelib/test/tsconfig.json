@@ -1,17 +1,11 @@
 ﻿{
   "extends": "../tsconfig.json",
-  "compileOnSave": false,
   "compilerOptions": {
     "noEmit": true,
     "emitDeclarationOnly": false,
-    "sourceMap": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "skipLibCheck": true,
     "types": [
       "jquery",
       "jquery.validation",
-      "jqueryui",
       "jest"
     ],
     "rootDir": "../",
@@ -20,15 +14,7 @@
       "@/*": [ "../src/*" ],
       "@optionaldeps/*": ["./testutil/*-testmodule"]
     },
-    "noImplicitAny": false,
-    "lib": [
-      "ES5",
-      "ES2015",
-      "DOM"
-    ],
-    "noEmitHelpers": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "jsx-dom/min"
+    "noImplicitAny": false
   },
   "include": [
     "../src/globals/jquery-globals.ts",
