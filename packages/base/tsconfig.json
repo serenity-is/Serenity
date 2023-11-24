@@ -1,35 +1,10 @@
 ﻿{
-  "compileOnSave": false,
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "experimentalDecorators": false,
-    "declaration": true,
     "declarationDir": "./out",
-    "emitDeclarationOnly": true,
-    "esModuleInterop": true,
-    "inlineSources": true,
-    "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
-    "newLine": "lf",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "module": "ES2020",
-    "moduleResolution": "Node",
-    "skipLibCheck": true,
-    "useDefineForClassFields": false,
-    "types": [
-      "jest"
-    ],
     "rootDir": "./src",
     "outDir": "./out",
-    "target": "ES2017",
-    "lib": [
-      "ES5",
-      "ES2015",
-      "ES2017",
-      "DOM"
-    ],
-    "noEmitHelpers": false,
-    "importHelpers": false
   },
   "include": [
     "src"
