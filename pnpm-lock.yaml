@@ -75,9 +75,6 @@ importers:
       '@types/jquery.validation':
         specifier: 1.16.7
         version: 1.16.7
-      '@types/jqueryui':
-        specifier: 1.12.6
-        version: 1.12.6
     devDependencies:
       '@serenity-is/base':
         specifier: workspace:*
@@ -1313,12 +1310,6 @@ packages:
 
   /@types/jquery@2.0.48:
     resolution: {integrity: sha512-nNLzUrVjaRV/Ds1eHZLYTd7IZxs38cwwLSaqMJj8OTXY8xNUbxSK69bi9cMLvQ7dm/IBeQ1wHwQ0S1uYa0rd2w==}
-    dev: false
-
-  /@types/jqueryui@1.12.6:
-    resolution: {integrity: sha512-lF4aIWtQ3Xbd6J+9WXz/day1pyf39ZMO/KUrigFAuMQ6FFVw2xZBIRCUwA7/CEnab1Bb7b4ko304Lxrp2xw8hQ==}
-    dependencies:
-      '@types/jquery': 2.0.48
     dev: false
 
   /@types/jsdom@20.0.1:
