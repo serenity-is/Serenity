@@ -65,6 +65,6 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// <returns>List of all registered connections</returns>
     public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
-        return options.Value.Keys.Select(x => TryGetConnectionString(x));
+        return options.Value.Keys.Select(TryGetConnectionString);
     }
 }

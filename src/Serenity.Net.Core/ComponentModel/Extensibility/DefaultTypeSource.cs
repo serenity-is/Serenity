@@ -37,7 +37,7 @@ public class DefaultTypeSource(IEnumerable<Assembly> assemblies) : ITypeSource, 
     public IEnumerable<Type> GetTypesWithInterface(Type interfaceType)
     {
         return assemblies.SelectMany(asm => asm.GetTypes())
-            .Where(type => interfaceType.IsAssignableFrom(type));
+            .Where(interfaceType.IsAssignableFrom);
     }
 
     /// <summary>

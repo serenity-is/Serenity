@@ -111,8 +111,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         do
         {
-            foreach (var property in rowType.PropertiesOf().Where(x =>
-                TypingsUtils.IsPublicInstanceProperty(x)))
+            foreach (var property in rowType.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty))
                 yield return property;
         }
         while ((rowType = (rowType.BaseType?.Resolve())) != null &&

@@ -72,7 +72,7 @@ public class DotNetCorePathFinder
         if (File.Exists(depsJsonFileName))
             packages = LoadPackageInfos(depsJsonFileName, targetFrameworkId).ToDictionary(i => i.Name);
 
-        var lookupPaths = LookupPaths.Where(x => Directory.Exists(x)).ToList();
+        var lookupPaths = LookupPaths.Where(Directory.Exists).ToList();
         if (Directory.Exists("/usr/share/dotnet/sdk/NuGetFallbackFolder"))
             lookupPaths.Add("/usr/share/dotnet/sdk/NuGetFallbackFolder");
 
@@ -152,7 +152,7 @@ public class DotNetCorePathFinder
             packageLocationByName = packageBasePaths.Concat(searchPaths).Concat(runtimeDirs).SelectMany(x =>
                 Directory.GetFiles(x, "*.dll")
                     .Concat(Directory.GetFiles(x, "*.exe")))
-                .ToLookup(x => Path.GetFileNameWithoutExtension(x), StringComparer.OrdinalIgnoreCase);
+                .ToLookup(Path.GetFileNameWithoutExtension, StringComparer.OrdinalIgnoreCase);
 
             return packageLocationByName;
         }

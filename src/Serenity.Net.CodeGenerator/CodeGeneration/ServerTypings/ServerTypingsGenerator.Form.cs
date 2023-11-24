@@ -180,7 +180,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         basedOnByName = null;
         if (basedOnRowAttr != null)
         {
-            basedOnByName = EnumerateProperties(basedOnRow).Where(x => TypingsUtils.IsPublicInstanceProperty(x))
+            basedOnByName = EnumerateProperties(basedOnRow).Where(TypingsUtils.IsPublicInstanceProperty)
                 .ToLookup(x => x.Name);
         }
 

@@ -56,10 +56,10 @@ public class JsonServiceClient(string baseUrl)
 
         wr.CookieContainer = cookies;
         wr.ContinueTimeout = 10 * 60 * 1000;
-        using (var requestStream = Task.Run(() => wr.GetRequestStreamAsync()).Result)
+        using (var requestStream = Task.Run(wr.GetRequestStreamAsync).Result)
             requestStream.Write(rb, 0, rb.Length);
 
-        using var response = Task.Run(() => wr.GetResponseAsync()).Result;
+        using var response = Task.Run(wr.GetResponseAsync).Result;
         using var rs = response.GetResponseStream();
         using var sr = new StreamReader(rs);
         var rt = sr.ReadToEnd();

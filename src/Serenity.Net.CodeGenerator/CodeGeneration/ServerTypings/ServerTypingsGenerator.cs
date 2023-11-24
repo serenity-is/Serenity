@@ -94,7 +94,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             EnqueueTypeMembers(type);
 
             if (isServiceRequest)
-                add((t, m) => GenerateBasicType(t, m));
+                add(GenerateBasicType);
 
             return;
         }

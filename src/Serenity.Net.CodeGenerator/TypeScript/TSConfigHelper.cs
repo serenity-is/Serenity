@@ -51,8 +51,8 @@ public static class TSConfigHelper
                 s = s[2..];
             return fileSystem.Combine(rootDir, PathHelper.ToPath(s));
         })
-        .Where(typeRoot => fileSystem.DirectoryExists(typeRoot))
-        .Select(typeRoot => fileSystem.GetFullPath(typeRoot))
+        .Where(fileSystem.DirectoryExists)
+        .Select(fileSystem.GetFullPath)
         .SelectMany(typeRoot =>
             fileSystem.GetDirectories(typeRoot)
                 .Where(typing => (config.CompilerOptions?.Types == null) || types.Contains(fileSystem.GetDirectoryName(typing)))
@@ -65,7 +65,7 @@ public static class TSConfigHelper
         cancellationToken.ThrowIfCancellationRequested();
 
         var includePatterns = config.Include
-            .Select(x => PathHelper.ToUrl(x))
+            .Select(PathHelper.ToUrl)
             .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
             .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                 (x.StartsWith('/') ? x[1..] : x))
@@ -75,7 +75,7 @@ public static class TSConfigHelper
         cancellationToken.ThrowIfCancellationRequested();
 
         var excludePatterns = (config.Exclude ?? [])
-            .Select(x => PathHelper.ToUrl(x))
+            .Select(PathHelper.ToUrl)
             .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
             .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
                 (x.StartsWith('/') ? x[1..] : x))
@@ -83,12 +83,12 @@ public static class TSConfigHelper
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        files = files.Concat(config.Include.Select(x => PathHelper.ToUrl(x))
+        files = files.Concat(config.Include.Select(PathHelper.ToUrl)
             .Where(x => x.StartsWith("../", StringComparison.Ordinal) &&
             !x.Contains('*', StringComparison.Ordinal))
             .Select(x => fileSystem.Combine(rootDir, x))
-            .Select(x => PathHelper.ToPath(x))
-            .Where(x => fileSystem.FileExists(x)));
+            .Select(PathHelper.ToPath)
+            .Where(fileSystem.FileExists));
 
         cancellationToken.ThrowIfCancellationRequested();
 

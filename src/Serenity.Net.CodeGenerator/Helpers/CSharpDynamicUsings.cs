@@ -15,10 +15,7 @@ public class CSharpDynamicUsings
     {
         var scriptObject = new ScriptObject();
 
-        scriptObject.Import("TYPEREF", new TypeDelegate((fullName) =>
-        {
-            return cw.ShortTypeRef(fullName);
-        }));
+        scriptObject.Import("TYPEREF", new TypeDelegate(cw.ShortTypeRef));
 
         scriptObject.Import("TYPEREFLIST", new TypeListDelegate((fullNames) =>
         {

@@ -20,7 +20,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var requestHandler = typeof(IRequestHandler<>).MakeGenericType(args.rowType);
 
         var handlers = registry.GetTypes(args.handlerInterface)
-            .Where(type => requestHandler.IsAssignableFrom(type))
+            .Where(requestHandler.IsAssignableFrom)
             .ToArray();
 
         if (handlers.Length == 1)

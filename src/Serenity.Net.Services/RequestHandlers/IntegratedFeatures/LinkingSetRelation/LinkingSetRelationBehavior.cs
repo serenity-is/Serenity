@@ -247,7 +247,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             enumerator = enumerator.Skip(1000);
 
             listRequest.Criteria = thisKeyCriteria.In(
-                part.Select(x => idField.AsObject(x))) & filterCriteria;
+                part.Select(idField.AsObject)) & filterCriteria;
 
             IListResponse response = listHandler.Process(
                 handler.Connection, listRequest);

@@ -56,7 +56,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             return name;
         }
 
-        files = files.OrderBy(x => getName(x));
+        files = files.OrderBy(getName);
 
         var cw = new CodeWriter()
         {

@@ -108,7 +108,7 @@ public class TSTypeListerAST
             if (args.Count == 1)
                 return text + "<" + GetText(args[0]) + ">";
             else
-                return text + "<" + string.Join(",", args.Select(x => GetText(x)) + ">");
+                return text + "<" + string.Join(",", args.Select(GetText) + ">");
         }
 
         return text;

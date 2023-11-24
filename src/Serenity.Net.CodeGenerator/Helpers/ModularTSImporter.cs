@@ -101,20 +101,11 @@ public class ModularTSImporter(string currentModule)
             }
         }));
 
-        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromCorelib(import);
-        }));
+        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
 
-        scriptObject.Import("QIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromQ(import);
-        }));
+        scriptObject.Import("QIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromQ));
 
-        scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromTypes(import);
-        }));
+        scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromTypes));
 
         scriptObject.Import("GETEDITORVARIABLEINDEX", new EditorVariableIndexDelegate((editor, editors) =>
         {

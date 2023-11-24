@@ -23,6 +23,6 @@ public class DefaultHandlerRegistry(ITypeSource typeSource) : IDefaultHandlerReg
     /// <inheritdoc/>
     public IEnumerable<Type> GetTypes(Type handlerType)
     {
-        return GetTypes().Where(type => handlerType.IsAssignableFrom(type));
+        return GetTypes().Where(handlerType.IsAssignableFrom);
     }
 }

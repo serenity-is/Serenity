@@ -34,6 +34,6 @@ public class MockTypeSource : ITypeSource
 
     public IEnumerable<Type> GetTypesWithInterface(Type interfaceType)
     {
-        return types.Where(type => interfaceType.IsAssignableFrom(type));
+        return types.Where(interfaceType.IsAssignableFrom);
     }
 }
