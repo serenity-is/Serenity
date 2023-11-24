@@ -2,10 +2,11 @@ using System.Diagnostics;
 
 namespace Serenity.CodeGenerator;
 
-public class CodeFileHelper(IFileSystem fileSystem) : ICodeFileHelper
+public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) : ICodeFileHelper
 {
     private static readonly UTF8Encoding utf8 = new(true);
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly IGeneratorConsole console = console ?? throw new ArgumentNullException(nameof(console));
 
     public string Kdiff3Path { get; set; }
     public string TSCPath { get; set; }
@@ -80,11 +81,10 @@ public class CodeFileHelper(IFileSystem fileSystem) : ICodeFileHelper
                 answer = "n";
             else
             {
-
                 while (true)
                 {
-                    Console.Write("Overwrite " + fileSystem.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
-                    answer = Console.ReadLine();
+                    console.Write("Overwrite " + fileSystem.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
+                    answer = console.ReadLine();
 
                     if (answer != null)
                     {

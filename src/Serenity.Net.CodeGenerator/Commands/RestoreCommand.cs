@@ -3,18 +3,22 @@ using GlobFilter = Serenity.IO.GlobFilter;
 
 namespace Serenity.CodeGenerator;
 
-public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projectSystem,
-    IEnumerable<string> projectReferences = null) : BaseGeneratorCommand(project)
+public class RestoreCommand(IProjectFileInfo project, IGeneratorConsole console)
+    : BaseGeneratorCommand(project, console)
 {
-    protected IBuildProjectSystem ProjectSystem { get; } = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
-    public IEnumerable<string> ProjectReferences { get; } = projectReferences;
+    public IEnumerable<string> ProjectReferences { get; set; }
+    public IBuildProjectSystem BuildSystem { get; set; }
 
-    public ExitCodes Run(bool verbose = false)
+    public bool Verbose { get; set; }
+
+    public override ExitCodes Run()
     {
+        ArgumentNullException.ThrowIfNull(BuildSystem);
+
         if (!FileSystem.FileExists(ProjectFile))
         {
-            if (verbose)
-                Console.Error.WriteLine($"Project file {ProjectFile} is not found!");
+            if (Verbose)
+                Console.Error($"Project file {ProjectFile} is not found!");
             return ExitCodes.ProjectNotFound;
         }
 
@@ -71,9 +75,7 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
                 if (!FileSystem.ReadAllBytes(target)
                     .SequenceEqual(FileSystem.ReadAllBytes(file)))
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Restoring: " + relative);
-                    Console.ResetColor();
+                    Console.WriteLine("Restoring: " + relative, ConsoleColor.Green);
                     FileSystem.Copy(file, target, overwrite: true);
                 }
             }
@@ -82,94 +84,92 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
                 if (!FileSystem.DirectoryExists(target))
                     FileSystem.CreateDirectory(FileSystem.GetDirectoryName(target));
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Restoring: " + relative);
-                Console.ResetColor();
+                Console.WriteLine("Restoring: " + relative, ConsoleColor.Green);
                 FileSystem.Copy(file, target, overwrite: false);
             }
         }
 
         if (config?.Restore?.Typings != false)
-        try
-        {
-            var projectRefs = ProjectReferences?.Where(x => 
-                !IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(x))) ?? 
-                    EnumerateProjectReferences(ProjectFile, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-
-            foreach (var reference in projectRefs)
+            try
             {
-                if (verbose)
-                    Console.WriteLine("Project Reference: " + reference);
+                var projectRefs = ProjectReferences?.Where(x =>
+                    !IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(x))) ??
+                        EnumerateProjectReferences(ProjectFile, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
-                IBuildProject project;
-                try
+                foreach (var reference in projectRefs)
                 {
-                    project = ProjectSystem.LoadProject(reference);
-                }
-                catch
-                {
-                    if (verbose)
-                        Console.WriteLine("Could not Load Project Reference!: " + reference);
+                    if (Verbose)
+                        Console.WriteLine("Project Reference: " + reference);
 
-                    continue;
-                }
-
-                foreach (var item in project.AllEvaluatedItems
-                    .Where(x =>
-                        string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
-                    .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
-                        StringComparison.OrdinalIgnoreCase) == true))
-                {
-                    var sourceFile = PathHelper.ToPath(FileSystem.Combine(FileSystem.GetDirectoryName(reference),
-                        item.EvaluatedInclude));
-
-                    if (verbose)
-                        Console.WriteLine("Checking source file: " + sourceFile);
-
-                    if (!FileSystem.FileExists(sourceFile))
+                    IBuildProject project;
+                    try
                     {
-                        if (verbose)
-                            Console.WriteLine("Source file does NOT exist: " + sourceFile);
+                        project = BuildSystem.LoadProject(reference);
+                    }
+                    catch
+                    {
+                        if (Verbose)
+                            Console.WriteLine("Could not Load Project Reference!: " + reference);
+
                         continue;
                     }
 
-                    if (verbose)
-                        Console.WriteLine("Source file exists: " + sourceFile);
-
-                    if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
-                        item.GetMetadataValue("Pack") != "true")
-                        continue;
-
-                    var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
-                    if (!string.IsNullOrEmpty(packagePath))
+                    foreach (var item in project.AllEvaluatedItems
+                        .Where(x =>
+                            string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
+                        .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts",
+                            StringComparison.OrdinalIgnoreCase) == true))
                     {
-                        foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                        var sourceFile = PathHelper.ToPath(FileSystem.Combine(FileSystem.GetDirectoryName(reference),
+                            item.EvaluatedInclude));
+
+                        if (Verbose)
+                            Console.WriteLine("Checking source file: " + sourceFile);
+
+                        if (!FileSystem.FileExists(sourceFile))
                         {
-                            if (verbose)
-                                Console.WriteLine("Checking project package path " + path);
+                            if (Verbose)
+                                Console.WriteLine("Source file does NOT exist: " + sourceFile);
+                            continue;
+                        }
 
-                            if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
-                                continue;
+                        if (Verbose)
+                            Console.WriteLine("Source file exists: " + sourceFile);
 
-                            restoreFile(sourceFile, path);
-                            restoredFromProjectReference.Add(path);
+                        if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
+                            item.GetMetadataValue("Pack") != "true")
+                            continue;
+
+                        var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
+                        if (!string.IsNullOrEmpty(packagePath))
+                        {
+                            foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                if (Verbose)
+                                    Console.WriteLine("Checking project package path " + path);
+
+                                if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
+                                    continue;
+
+                                restoreFile(sourceFile, path);
+                                restoredFromProjectReference.Add(path);
+                            }
                         }
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex.Message);
-        }
+            catch (Exception ex)
+            {
+                Console.Error(ex.Message);
+            }
 
-        var packagesDir = PackageHelper.DeterminePackagesPath(FileSystem);
+        var packagesDir = PackageHelper.DeterminePackagesPath(FileSystem, Console);
         if (packagesDir == null)
         {
-            Console.Error.WriteLine("Can't determine NuGet packages directory!");
+            Console.Error("Can't determine NuGet packages directory!");
             return ExitCodes.CantDeterminePackagesDir;
         }
 
@@ -212,15 +212,13 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
                 nuspecFile = FileSystem.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
                 if (!FileSystem.FileExists(nuspecFile))
                 {
-                    if (verbose)
+                    if (Verbose)
                         Console.WriteLine("Can't find nuspec file: " + nuspecFile);
                     continue;
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Processing: " + id);
-            Console.ResetColor();
+            Console.WriteLine("Processing: " + id, ConsoleColor.Cyan);
 
             var contentRoot = FileSystem.Combine(packageFolder, "content");
             if (!FileSystem.DirectoryExists(contentRoot))
@@ -259,12 +257,12 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
                     if (!relative.StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
                         relative = "wwwroot/" + relative;
 
-                    if (verbose)
+                    if (Verbose)
                         Console.WriteLine("Found a file to restore: " + relative);
                     restoreFile(file, relative);
                 }
             }
-            else if (verbose)
+            else if (Verbose)
             {
                 Console.WriteLine("Can't find package content directory: " + nuspecFile);
             }
@@ -277,11 +275,11 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
             {
                 foreach (var file in FileSystem.GetFiles(typingsRoot, "*.ts", recursive: true))
                 {
-                    if (verbose)
-                    { 
+                    if (Verbose)
+                    {
                         Console.WriteLine(typingsRoot);
                         Console.WriteLine(file);
-                    }   
+                    }
                     var relative = "typings/" + file[(typingsRoot.Length + 1)..];
                     restoreFile(file, relative);
                 }
@@ -350,7 +348,7 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
         try
         {
             csproj = FileSystem.GetFullPath(csproj);
-            var project = ProjectSystem.LoadProject(csproj);
+            var project = BuildSystem.LoadProject(csproj);
             visited?.Add(csproj);
 
             foreach (var item in project.AllEvaluatedItems)
@@ -393,7 +391,7 @@ public class RestoreCommand(IProjectFileInfo project, IBuildProjectSystem projec
         try
         {
             csproj = FileSystem.GetFullPath(csproj);
-            project = ProjectSystem.LoadProject(csproj);
+            project = BuildSystem.LoadProject(csproj);
         }
         catch
         {

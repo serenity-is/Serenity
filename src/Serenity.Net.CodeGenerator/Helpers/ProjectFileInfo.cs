@@ -3,7 +3,9 @@ using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator;
 
-public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Dictionary<string, string> props) : IProjectFileInfo
+public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, 
+    Func<string, string> getPropertyArgument = null,
+    Action<string> onError = null) : IProjectFileInfo
 {
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly string projectFile = projectFile ?? throw new ArgumentNullException(nameof(projectFile));
@@ -19,22 +21,25 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
     private static readonly char[] complexValueChars = [';', '$', '@'];
     private static readonly char[] propertySeps = [',', ';'];
 
+    /// <summary>
+    /// Callback for tests to validate MSBuild execution arguments
+    /// </summary>
+    public Func<ProcessStartInfo, string> ExecuteMSBuild { get; set; }
+
     public string GetAssemblyName()
     {
         if (assemblyName is null)
         {
-            if (props != null &&
-                props.TryGetValue("AssemblyName", out string s))
-            {
-                assemblyName = s ?? "";
-            }
+            if (getPropertyArgument?.Invoke("AssemblyName") is string s)
+                assemblyName = s;
             else
             {
                 projectProperties ??= GetProjectProperties();
                 if (!string.IsNullOrEmpty(projectProperties.AssemblyName))
                     return assemblyName = projectProperties.AssemblyName;
 
-                assemblyName ??= ExtractPropertyFrom(projectFile, g => g.Elements("AssemblyName").LastOrDefault());
+                assemblyName ??= ExtractPropertyFrom(projectFile, g => 
+                    g.Elements("AssemblyName").LastOrDefault());
             }
         }
 
@@ -45,20 +50,18 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
     {
         if (outDir is null)
         {
-            if (props != null &&
-                (props.TryGetValue("OutDir", out string s) ||
-                 props.TryGetValue("OutputPath", out s)))
-            {
-                outDir = s ?? "";
-            }
+            if ((getPropertyArgument?.Invoke("OutDir") ??
+                 getPropertyArgument?.Invoke("OutputPath")) is string s)
+                outDir = s;
             else
             {
                 projectProperties ??= GetProjectProperties();
                 if (!string.IsNullOrEmpty(projectProperties.OutDir))
                     return outDir = projectProperties.OutDir;
 
-                outDir ??= ExtractPropertyFrom(projectFile, groups => groups.Elements("OutDir").LastOrDefault() ??
-                    groups.Elements("OutputPath").LastOrDefault());
+                outDir ??= ExtractPropertyFrom(projectFile, g => 
+                    g.Elements("OutDir").LastOrDefault() ??
+                    g.Elements("OutputPath").LastOrDefault());
             }
 
             if (!string.IsNullOrEmpty(outDir))
@@ -72,11 +75,8 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
     {
         if (rootNamespace is null)
         {
-            if (props != null &&
-                props.TryGetValue("RootNamespace", out string s))
-            {
-                rootNamespace = s ?? "";
-            }
+            if (getPropertyArgument?.Invoke("RootNamespace") is string s)
+                rootNamespace = s;
             else
             {
                 projectProperties ??= GetProjectProperties();
@@ -95,11 +95,8 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
     {
         if (targetFramework is null)
         {
-            if (props != null &&
-                props.TryGetValue("TargetFramework", out string s))
-            {
-                targetFramework = s ?? "";
-            }
+            if (getPropertyArgument?.Invoke("TargetFramework") is string s)
+                targetFramework = s;
             else
             {
                 projectProperties ??= GetProjectProperties();
@@ -170,42 +167,54 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
     private ProjectProperties GetProjectProperties()
     {
         // can't run dotnet in tests in an abstract file system
-        if (fileSystem is not PhysicalFileSystem ||
+        // unless RunMSBuild callback is provided
+        if ((ExecuteMSBuild is null && fileSystem is not PhysicalFileSystem) ||
             !fileSystem.FileExists(projectFile))
             return new();
 
-        var process = new Process()
+        var configArg = getPropertyArgument?.Invoke("Configuration") is string configuration &&
+            !string.IsNullOrEmpty(configuration) ? $"-property:Configuration={configuration} " : "";
+
+        var startInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"msbuild \"{projectFile}\" " +
-                    (props.TryGetValue("Configuration", out string configuration) &&
-                     !string.IsNullOrEmpty(configuration) ? $"-property:Configuration={configuration} " : "") +
-                    $"-getProperty:AssemblyName -getProperty:OutDir -getProperty:RootNamespace -getProperty:TargetFramework",
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            }
+            FileName = "dotnet",
+            Arguments = $"msbuild \"{projectFile}\" {configArg}" +
+                "-getProperty:AssemblyName " +
+                "-getProperty:OutDir " +
+                "-getProperty:RootNamespace " +
+                "-getProperty:TargetFramework",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
         };
 
-        string output;
         try
         {
-            process.Start();
-            output = process.StandardOutput.ReadToEnd();
-            if (!process.WaitForExit(10000))
-                output = null;
+            string output;
+            if (ExecuteMSBuild != null)
+            {
+                output = ExecuteMSBuild(startInfo);
+            }
+            else
+            {
+                var process = new Process() { StartInfo = startInfo };
+                process.Start();
+                output = process.StandardOutput.ReadToEnd();
+                if (!process.WaitForExit(10000))
+                    output = null;
+            }
+
+            output = (output ?? "").Trim();
+
+            if (output.StartsWith('{') &&
+                output.EndsWith('}'))
+                return JSON.ParseTolerant<ProjectPropertiesJson>(output)?.Properties ?? new();
+
+            onError?.Invoke($"Unexpected output from MSBuild for project properties: {output}");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return new();
+            onError?.Invoke($"Error while executing MSBuild to get project properties: {ex.Message}");
         }
-
-        output = (output ?? "").Trim();
-
-        if (output.StartsWith('{') &&
-            output.EndsWith('}'))
-            return JSON.ParseTolerant<ProjectPropertiesJson>(output)?.Properties ?? new();
 
         return new();
     }
@@ -237,5 +246,113 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile, Diction
 
             return true;
         });
+    }
+
+    public string[] GetAssemblyList(string[] configured)
+    {
+        ArgumentNullException.ThrowIfNull(onError);
+
+        string projectFile = ProjectFile;
+
+        if (configured == null || configured.Length == 0)
+        {
+            string outputDir = GetOutDir();
+            string assemblyName = GetAssemblyName() ??
+                FileSystem.ChangeExtension(fileSystem.GetFileName(projectFile), null);
+
+            void couldNotFindError(string expectedPath)
+            {
+                onError(string.Format(CultureInfo.CurrentCulture,
+                    "Couldn't find output file at {0}!" + Environment.NewLine +
+                    "Make sure project is built successfully before running Sergen", expectedPath));
+            }
+
+            bool testCandidate(string path, out string outputPath)
+            {
+                outputPath = path + ".dll";
+                if (fileSystem.FileExists(outputPath))
+                    return true;
+
+                if (fileSystem.FileExists(path + ".exe"))
+                {
+                    outputPath = path + ".exe";
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(outputDir) &&
+                !string.IsNullOrEmpty(assemblyName))
+            {
+                if (!testCandidate(fileSystem.Combine(outputDir, assemblyName), out string outputPath))
+                {
+                    couldNotFindError(outputPath);
+                    return null;
+                }
+
+                return [outputPath];
+            }
+
+            string targetFramework = GetTargetFramework();
+            if (string.IsNullOrEmpty(targetFramework))
+            {
+                onError("Couldn't read TargetFramework from project file!");
+                return null;
+            }
+
+            var debugExists = testCandidate(fileSystem.Combine(fileSystem.GetDirectoryName(ProjectFile),
+                PathHelper.ToPath("bin/Debug/" + targetFramework + "/" + assemblyName)), out var debugPath);
+            var releaseExists = testCandidate(fileSystem.Combine(fileSystem.GetDirectoryName(ProjectFile),
+                PathHelper.ToPath("bin/Release/" + targetFramework + "/" + assemblyName)), out var releasePath);
+
+            if (releaseExists &&
+                (!debugExists || fileSystem.GetLastWriteTimeUtc(debugPath) < fileSystem.GetLastWriteTimeUtc(releasePath)))
+                return [releasePath];
+
+            if (debugExists)
+                return [debugPath];
+
+            couldNotFindError(debugPath);
+            return null;
+        }
+
+        if (configured == null || configured.Length == 0)
+        {
+            onError("ServerTypings has no assemblies configured in sergen.json file!");
+            return null;
+        }
+
+        var assemblyFiles = configured.ToArray();
+        for (var i = 0; i < assemblyFiles.Length; i++)
+        {
+            var assemblyFile1 = PathHelper.ToUrl(fileSystem.GetFullPath(PathHelper.ToPath(assemblyFiles[i])));
+            var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
+            string assemblyFile2 = assemblyFile1;
+            if (binDebugIdx >= 0)
+                assemblyFile2 = string.Concat(assemblyFile1[0..binDebugIdx], "/bin/Release/",
+                    assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
+
+            assemblyFiles[i] = assemblyFile1;
+
+            if (fileSystem.FileExists(assemblyFile1))
+            {
+                if (fileSystem.FileExists(assemblyFile2) &&
+                    fileSystem.GetLastWriteTimeUtc(assemblyFile1) < fileSystem.GetLastWriteTimeUtc(assemblyFile2))
+                    assemblyFiles[i] = assemblyFile2;
+            }
+            else if (fileSystem.FileExists(assemblyFile2))
+                assemblyFiles[i] = assemblyFile2;
+            else
+            {
+                onError(string.Format(CultureInfo.CurrentCulture, string.Format(CultureInfo.CurrentCulture,
+                    "Assembly file '{0}' specified in sergen.json is not found! " +
+                    "This might happen when project is not successfully built or file name doesn't match the output DLL." +
+                    "Please check paths in sergen.json.", assemblyFile1)));
+                return null;
+            }
+        }
+
+        return assemblyFiles;
     }
 }

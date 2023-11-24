@@ -4,28 +4,41 @@ namespace Serenity.Tests.CodeGenerator;
 
 public class RestoreCommandTests
 {
+    private readonly MockFileSystem fileSystem = new();
+    private readonly MockGeneratorConsole console = new();
+    private const string testProject = "Test.csproj";
+    private ProjectFileInfo ProjectFactory(string s = testProject, Func<string, string> prop = null)
+        => new(fileSystem, s, prop, console.Error);
+
     [Fact]
     public void Throws_ArgumentNull_When_FileSystem_IsNull()
     {
-        var fileSystem = new MockFileSystem();
-        var projectSystem = new MockBuildProjectSystem(fileSystem);
-        Assert.Throws<ArgumentNullException>(() => new RestoreCommand(null, projectSystem));
+        Assert.Throws<ArgumentNullException>(() =>
+            new RestoreCommand(null, new MockGeneratorConsole())
+            {
+                BuildSystem = new MockBuildProjectSystem(fileSystem)
+            });
     }
 
     [Fact]
-    public void Throws_ArgumentNull_When_ProjectSystem_IsNull()
+    public void Throws_ArgumentNull_When_BuildSystem_IsNull()
     {
-        var project = new ProjectFileInfo(new MockFileSystem(), "test.csproj", []);
-        var projectSystem = new MockBuildProjectSystem(project.FileSystem);
-        Assert.Throws<ArgumentNullException>(() => new RestoreCommand(project, null));
+        var project = ProjectFactory();
+        Assert.Throws<ArgumentNullException>(() =>
+            new RestoreCommand(project, new MockGeneratorConsole())
+            {
+                BuildSystem = null
+            }.Run());
     }
 
     [Fact]
     public void Returns_ProjectNotFound_ExitCode_When_CsProj_Not_Found()
     {
-        var project = new ProjectFileInfo(new MockFileSystem(), "nonexisting.csproj", []);
-        var projectSystem = new MockBuildProjectSystem(project.FileSystem);
-        var command = new RestoreCommand(project, projectSystem);
+        var project = ProjectFactory("nonexisting.csproj");
+        var command = new RestoreCommand(project, console)
+        {
+            BuildSystem = new MockBuildProjectSystem(project.FileSystem)
+        };
         var exitCode = command.Run();
         Assert.Equal(ExitCodes.ProjectNotFound, exitCode);
     }
@@ -33,11 +46,12 @@ public class RestoreCommandTests
     [Fact]
     public void Returns_Cant_Determine_Packages_Dir_When_Nuget_Packages_Dir_Not_Found()
     {
-        var fileSystem = new MockFileSystem();
-        fileSystem.WriteAllText("Test.csproj", "A");
-        var project = new ProjectFileInfo(fileSystem, "Test.csproj", []);
-        var projectSystem = new MockBuildProjectSystem(fileSystem);
-        var command = new RestoreCommand(project, projectSystem);
+        fileSystem.WriteAllText(testProject, "A");
+        var project = ProjectFactory();
+        var command = new RestoreCommand(project, console)
+        {
+            BuildSystem = new MockBuildProjectSystem(fileSystem)
+        };
         var exitCode = command.Run();
         Assert.Equal(ExitCodes.CantDeterminePackagesDir, exitCode);
     }

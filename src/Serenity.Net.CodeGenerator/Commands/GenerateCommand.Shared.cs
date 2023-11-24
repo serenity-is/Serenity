@@ -1,4 +1,3 @@
-using Spectre.Console;
 using System.Data.Common;
 
 namespace Serenity.CodeGenerator;
@@ -66,7 +65,7 @@ public partial class GenerateCommand
     {
         var entityModel = CreateEntityModel(inputs, modelGenerator, sqlConnections);
 
-        var codeFileHelper = new CodeFileHelper(Project.FileSystem)
+        var codeFileHelper = new CodeFileHelper(Project.FileSystem, Console)
         {
             NoUserInteraction = !interactive,
             Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(Project.FileSystem.FileExists),
@@ -171,18 +170,10 @@ public partial class GenerateCommand
 
     private void Error(string error)
     {
-        ansiConsole.Write(new Markup($"[bold red]{error}[/]"));
-        ansiConsole.WriteLine();
+        Console.Error(error);
+        Console.WriteLine();
     }
 
-    private void WriteHeading(string text)
-    {
-        ansiConsole.WriteLine();
-        ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]{text}[/]")
-        {
-            Justification = Justify.Left
-        });
-    }
 
     [GeneratedRegex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
     private static partial Regex targetFrameworkNetCoreRegexGen();

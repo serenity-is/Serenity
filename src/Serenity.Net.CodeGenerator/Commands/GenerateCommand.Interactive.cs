@@ -26,13 +26,12 @@ public partial class GenerateCommand
         foreach (var x in whatToGenerate)
             prompt.Select(x);
 
-        return ansiConsole.Prompt(prompt);
+        return Console.Prompt(prompt);
     }
 
     private string SelectPermissionKey(string table, string defaultPermissionKey)
     {
-        ansiConsole.WriteLine();
-        return ansiConsole.Prompt(
+        return Console.Prompt(
             new TextPrompt<string>($"Enter a Permission Key for table [springgreen3_1]{table}[/]")
                 .DefaultValue(defaultPermissionKey)
                 .Validate(module =>
@@ -49,8 +48,8 @@ public partial class GenerateCommand
 
     private string SelectIdentifier(string table, string defaultIdentifier)
     {
-        ansiConsole.WriteLine();
-        return ansiConsole.Prompt(
+        Console.WriteLine();
+        return Console.Prompt(
             new TextPrompt<string>($"Enter a class Identifier for table [springgreen3_1]{table}[/]")
                 .Validate(module =>
                 {
@@ -67,8 +66,8 @@ public partial class GenerateCommand
 
     private string SelectModule(string table, string defaultModule)
     {
-        ansiConsole.WriteLine();
-        return ansiConsole.Prompt(
+        Console.WriteLine();
+        return Console.Prompt(
             new TextPrompt<string>($"Enter a Module name for table [springgreen3_1]{table}[/]")
                 .Validate(module =>
                 {
@@ -85,7 +84,7 @@ public partial class GenerateCommand
 
     private List<string> SelectTables(IEnumerable<string> tables)
     {
-        return ansiConsole.Prompt(
+        return Console.Prompt(
             new MultiSelectionPrompt<string>()
                 .Title("[steelblue1]Select tables for code generation (single/multiple)[/]")
                 .PageSize(10)
@@ -101,13 +100,13 @@ public partial class GenerateCommand
         var connectionKeys = options.Keys.OrderBy(x => x).ToArray();
 
         RegisterSqlProviders();
-        ansiConsole.WriteLine();
+        Console.WriteLine();
         var selections = new SelectionPrompt<string>()
                 .Title("[steelblue1]Available Connections[/]")
                 .PageSize(10)
                 .MoreChoicesText("[grey](Move up and down to reveal more connections)[/]")
                 .AddChoices(connectionKeys);
 
-        return ansiConsole.Prompt(selections);
+        return Console.Prompt(selections);
     }
 }

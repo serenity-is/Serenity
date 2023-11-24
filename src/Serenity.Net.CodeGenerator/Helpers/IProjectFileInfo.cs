@@ -5,6 +5,7 @@ namespace Serenity.CodeGenerator
         string ProjectFile { get; }
         IFileSystem FileSystem { get; }
 
+        string[] GetAssemblyList(string[] configured);
         string GetAssemblyName();
         string GetOutDir();
         string GetRootNamespace();

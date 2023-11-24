@@ -2,9 +2,12 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class ClientTypesCommand(ProjectFileInfo project) : BaseGeneratorCommand(project)
+public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole console) 
+    : BaseGeneratorCommand(project, console)
 {
-    public void Run(List<ExternalType> tsTypes)
+    public List<ExternalType> TsTypes { get; set; }
+
+    public override ExitCodes Run()
     {
         var projectDir = FileSystem.GetDirectoryName(ProjectFile);
         var config = FileSystem.LoadGeneratorConfig(projectDir);
@@ -16,9 +19,7 @@ public class ClientTypesCommand(ProjectFileInfo project) : BaseGeneratorCommand(
 
         var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
 
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.Write("Transforming ClientTypes at: ");
-        Console.ResetColor();
+        Console.Write("Transforming ClientTypes at: ", ConsoleColor.Cyan);
         Console.WriteLine(outDir);
 
         var generator = new ClientTypesGenerator()
@@ -31,13 +32,15 @@ public class ClientTypesCommand(ProjectFileInfo project) : BaseGeneratorCommand(
 
         generator.RootNamespaces.Add(config.RootNamespace);
 
-        foreach (var type in tsTypes)
+        foreach (var type in TsTypes)
             generator.AddTSType(type);
 
         var generatedSources = generator.Run();
-        MultipleOutputHelper.WriteFiles(FileSystem, outDir, 
+        MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
             generatedSources.Select(x => (x.Filename, x.Text)), 
             deleteExtraPattern: null,
             endOfLine: config.EndOfLine);
+
+        return ExitCodes.Success;
     }
 }

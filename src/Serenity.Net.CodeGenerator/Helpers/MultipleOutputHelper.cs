@@ -5,6 +5,9 @@ public class MultipleOutputHelper
     private static readonly Encoding utf8 = new UTF8Encoding(true);
 
     public static void WriteFiles(IFileSystem fileSystem,
+#if !ISSOURCEGENERATOR
+        IGeneratorConsole console,
+#endif
         string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
         string[] deleteExtraPattern,
         string endOfLine)
@@ -33,10 +36,9 @@ public class MultipleOutputHelper
                 fileSystem.CreateDirectory(fileSystem.GetDirectoryName(outFile));
 
 #if !ISSOURCEGENERATOR
-            Console.ForegroundColor = exists ? ConsoleColor.Magenta : ConsoleColor.Green;
-            Console.Write(exists ? "Overwriting: " : "New File: ");
-            Console.ResetColor();
-            Console.WriteLine(fileSystem.GetFileName(outFile));
+            console.Write(exists ? "Overwriting: " : "New File: ", 
+                exists ? ConsoleColor.Magenta : ConsoleColor.Green);
+            console.WriteLine(fileSystem.GetFileName(outFile));
 #endif
 
             string text = txt ?? "";
@@ -61,10 +63,8 @@ public class MultipleOutputHelper
                 !generated.Contains(PathHelper.ToUrl(file)[outRoot.Length..]))
             {
 #if !ISSOURCEGENERATOR
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("Deleting: ");
-                Console.ResetColor();
-                Console.WriteLine(fileSystem.GetFileName(file));
+                console.Write("Deleting: ", ConsoleColor.Yellow);
+                console.WriteLine(fileSystem.GetFileName(file));
 #endif
                 fileSystem.DeleteFile(file);
             }

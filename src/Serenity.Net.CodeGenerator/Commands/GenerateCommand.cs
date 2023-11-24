@@ -1,14 +1,16 @@
 using Serenity.Data.Schema;
-using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
 
-public partial class GenerateCommand(IProjectFileInfo project, IAnsiConsole ansiConsole) : BaseGeneratorCommand(project)
+public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole console)
+    : BaseGeneratorCommand(project, console)
 {
-    private readonly IAnsiConsole ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
+    public string[] Arguments { get; set; }
 
-    public ExitCodes Run(string[] args)
+    public override ExitCodes Run()
     {
+        ArgumentNullException.ThrowIfNull(Arguments);
+
         var projectDir = FileSystem.GetDirectoryName(ProjectFile);
         var config = FileSystem.LoadGeneratorConfig(projectDir);
 
@@ -19,18 +21,19 @@ public partial class GenerateCommand(IProjectFileInfo project, IAnsiConsole ansi
             return ExitCodes.NoConnectionString;
         }
 
-        var argsConnectionKey = GetOption(args, "c").TrimToNull();
-        var argsModule = GetOption(args, "m").TrimToNull();
-        var argsIdentifier = GetOption(args, "i").TrimToNull();
-        var argsPermissionKey = GetOption(args, "p").TrimToNull();
+        var argsConnectionKey = GetOption(Arguments, "c").TrimToNull();
+        var argsModule = GetOption(Arguments, "m").TrimToNull();
+        var argsIdentifier = GetOption(Arguments, "i").TrimToNull();
+        var argsPermissionKey = GetOption(Arguments, "p").TrimToNull();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
             Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
 
-        WriteHeading("Table Code Generation");
+        Console.WriteLine("Table Code Generation", ConsoleColor.DarkGreen);
+        Console.WriteLine();
 
-        var argsTable = GetOption(args, "t").TrimToNull();
-        var what = GetOption(args, "w").TrimToNull();
+        var argsTable = GetOption(Arguments, "t").TrimToNull();
+        var what = GetOption(Arguments, "w").TrimToNull();
 
         var connectionKey = argsConnectionKey ?? SelectConnection(connectionStrings);
 
@@ -132,7 +135,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IAnsiConsole ansi
         ApplicationMetadata application = null;
         try
         {
-            var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(Project, config, (error) => { });
+            var assemblyFiles = Project.GetAssemblyList(config.ServerTypings?.Assemblies);
             if (assemblyFiles != null && assemblyFiles.Length > 0)
             {
                 application = new ApplicationMetadata(FileSystem, assemblyFiles)

@@ -1,8 +1,9 @@
 namespace Serenity.CodeGenerator;
 
-public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project)
+public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console) 
+    : BaseGeneratorCommand(project, console)
 {
-    public void Run()
+    public override ExitCodes Run()
     {
         var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(ProjectFile));
         var config = FileSystem.LoadGeneratorConfig(projectDir);
@@ -11,9 +12,7 @@ public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project
 
         var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.Write("Transforming MVC at: ");
-        Console.ResetColor();
+        Console.Write("Transforming MVC at: ", ConsoleColor.Cyan);
         Console.WriteLine(outDir);
 
         string[] stripViewPaths = config.MVC.StripViewPaths ?? [
@@ -141,10 +140,12 @@ public class MvcCommand(IProjectFileInfo project) : BaseGeneratorCommand(project
 
         });
 
-        MultipleOutputHelper.WriteFiles(FileSystem, outDir, new[]
+        MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir, new[]
         {
             ("MVC.cs", cw.ToString())
         }, deleteExtraPattern: null, endOfLine: config.EndOfLine);
+
+        return ExitCodes.Success;
     }
 
     private static StringBuilder TrimEnd(StringBuilder sb)
