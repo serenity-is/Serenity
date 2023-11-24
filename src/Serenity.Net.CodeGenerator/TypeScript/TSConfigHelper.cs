@@ -137,18 +137,49 @@ public static class TSConfigHelper
         return files.Distinct().ToArray();
     }
 
+    private static bool IsRelativeOrRooted(IFileSystem fileSystem, string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        if (path.StartsWith('.') ||
+            path.StartsWith('/') ||
+            path.StartsWith('\\') ||
+            fileSystem.IsPathRooted(path))
+            return true;
+
+        return false;
+    }
+
     public static TSConfig Read(IFileSystem fileSystem, string path)
     {
         var config = TryParseJsonFile<TSConfig>(fileSystem, path);
-        var extends = config?.Extends;
+        var extends = PathHelper.ToPath(config?.Extends ?? "");
         var loop = 0;
         string basePath = path;
         while (!string.IsNullOrEmpty(extends) && loop++ < 10)
         {
-            basePath = fileSystem.Combine(fileSystem.GetDirectoryName(basePath), extends);
+            var baseDir = fileSystem.GetDirectoryName(basePath);
+            basePath = fileSystem.Combine(baseDir, extends);
             var baseConfig = TryParseJsonFile<TSConfig>(fileSystem, basePath);
+
+            if (baseConfig is null &&
+                !IsRelativeOrRooted(fileSystem, extends) &&
+                !fileSystem.FileExists(basePath))
+            {
+                do
+                {
+                    basePath = fileSystem.Combine(baseDir, "node_modules", extends);
+                    baseConfig = TryParseJsonFile<TSConfig>(fileSystem, basePath);
+                }
+                while (baseConfig is null &&
+                    !fileSystem.FileExists(basePath) &&
+                    !string.IsNullOrEmpty(baseDir = fileSystem.GetDirectoryName(baseDir)));
+            }
+
             if (baseConfig is null)
                 break;
+
             config.Exclude ??= baseConfig.Exclude;
             config.Files ??= baseConfig.Files;
             config.Include ??= baseConfig.Include;
@@ -166,7 +197,7 @@ public static class TSConfigHelper
                     baseConfig.CompilerOptions.TypeRoots is not null)
                 {
                     // typeroots are relative to the base config files
-                    var relativePath = fileSystem.GetRelativePath(fileSystem.GetDirectoryName(path), fileSystem.GetDirectoryName(basePath));
+                    var relativePath = fileSystem.GetRelativePath(fileSystem.GetDirectoryName(path), baseDir);
                     relativePath = PathHelper.ToUrl(relativePath);
                     config.CompilerOptions.TypeRoots = baseConfig.CompilerOptions.TypeRoots.Select(x => relativePath + "/" + x).ToArray();
                 }
