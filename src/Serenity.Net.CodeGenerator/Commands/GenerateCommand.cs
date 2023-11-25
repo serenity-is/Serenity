@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
-    public string[] Arguments { get; set; }
+    public List<string> Arguments { get; set; }
 
     public override ExitCodes Run()
     {
@@ -21,19 +21,22 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             return ExitCodes.NoConnectionString;
         }
 
-        var argsConnectionKey = GetOption(Arguments, "c").TrimToNull();
-        var argsModule = GetOption(Arguments, "m").TrimToNull();
-        var argsIdentifier = GetOption(Arguments, "i").TrimToNull();
-        var argsPermissionKey = GetOption(Arguments, "p").TrimToNull();
+        var argsConnectionKey = ArgumentParser.GetSingleValue(Arguments, 
+            ["cnk", "connkey", "connectionkey", "connection-key"]).TrimToNull();
+        var argsModule = ArgumentParser.GetSingleValue(Arguments, ["mod", "module"]).TrimToNull();
+        var argsIdentifier = ArgumentParser.GetSingleValue(Arguments, ["cls", "idn", "identifier"]).TrimToNull();
+        var argsPermissionKey = ArgumentParser.GetSingleValue(Arguments,
+            ["pms", "permission", "permissionkey", "permission-key"]).TrimToNull();
+        var argsTable = ArgumentParser.GetSingleValue(Arguments, ["tbl", "table"]).TrimToNull();
+        var argsWhat = ArgumentParser.GetSingleValue(Arguments, ["wtg", "what", "whattogenerate"]).TrimToNull();
+
+        ArgumentParser.EnsureEmpty(Arguments);
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
             Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
 
         Console.WriteLine("Table Code Generation", ConsoleColor.DarkGreen);
         Console.WriteLine();
-
-        var argsTable = GetOption(Arguments, "t").TrimToNull();
-        var what = GetOption(Arguments, "w").TrimToNull();
 
         var connectionKey = argsConnectionKey ?? SelectConnection(connectionStrings);
 
@@ -116,12 +119,12 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             });
         }
 
-        if (what != null)
+        if (argsWhat != null)
         {
-            config.GenerateRow = what == "*" || what.Contains('R', StringComparison.OrdinalIgnoreCase);
-            config.GenerateService = what == "*" || what.Contains('S', StringComparison.OrdinalIgnoreCase);
-            config.GenerateUI = what == "*" || what.Contains('U', StringComparison.OrdinalIgnoreCase);
-            config.GenerateCustom = what == "*" || what.Contains('C', StringComparison.OrdinalIgnoreCase);
+            config.GenerateRow = argsWhat == "*" || argsWhat.Contains('R', StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = argsWhat == "*" || argsWhat.Contains('S', StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = argsWhat == "*" || argsWhat.Contains('U', StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = argsWhat == "*" || argsWhat.Contains('C', StringComparison.OrdinalIgnoreCase);
         }
         else
         {

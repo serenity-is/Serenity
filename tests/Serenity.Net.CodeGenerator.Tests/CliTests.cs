@@ -16,4 +16,5 @@ public partial class CliTests
         Assert.Throws<ArgumentNullException>(() =>
             new Cli(fileSystem, null));
     }
+
 }

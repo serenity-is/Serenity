@@ -11,49 +11,30 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
     public Func<string, Func<string, string>, IProjectFileInfo> ProjectFactory { get; set; }
     public Func<BaseGeneratorCommand, ExitCodes> RunCommandCallback { get; set; }
 
-    public ExitCodes Run(params string[] arguments)
+    public ExitCodes Run(params string[] args)
     {
-        ArgumentNullException.ThrowIfNull(arguments);
+        ArgumentNullException.ThrowIfNull(args);
 
-        string projectFile = null;
-        var csprojIdx = Array.FindIndex(arguments, x => x == "-p" || x == "--p" || x == "/p");
-        if (csprojIdx >= 0)
+        var arguments = args.ToList();
+        if (ArgumentParser.HasHelpSwitch(arguments))
         {
-            if (csprojIdx >= arguments.Length - 1)
-            {
-                WriteHelp(Console);
-                return ExitCodes.InvalidArguments;
-            }
-            projectFile = arguments[csprojIdx + 1];
-            arguments = arguments.Where((x, i) => i != csprojIdx && i != csprojIdx + 1).ToArray();
+            WriteHelp(Console);
+            return ExitCodes.Help;
         }
 
-        string[] prjRefs = null;
-        var prjRefsIdx = Array.FindIndex(arguments, x => x == "--projectrefs");
-        if (prjRefsIdx >= 0)
-        {
-            if (prjRefsIdx >= arguments.Length - 1)
-            {
-                WriteHelp(Console);
-                return ExitCodes.InvalidArguments;
-            }
-
-            prjRefs = arguments[prjRefsIdx + 1].Split(';', StringSplitOptions.RemoveEmptyEntries);
-            arguments = arguments.Where((x, i) => i != prjRefsIdx && i != prjRefsIdx + 1).ToArray();
-        }
-
-        arguments = ProjectFileInfo.FilterPropertyParams(arguments, out var props).ToArray();
-        var errorProp = props.FirstOrDefault(x => x.Value == null);
-        if (errorProp.Key != null)
-        {
-            Console.Error($"Property values should be passed " +
-                $"in format '-prop:Name=Value'. Argument '{errorProp.Value}' is invalid!");
-            return ExitCodes.InvalidArguments;
-        }
+        var projectFile = ArgumentParser.GetSingleValue(arguments, ["p", "project"]);
+        var projectRefs = ArgumentParser.GetMultipleValues(arguments, ["projectrefs", "project-refs"]);
+        var propertyArgs = ArgumentParser.GetDictionary(arguments, ["prop", "props", "property"],
+            separators: [',', ';']);
 
         string command = null;
-        if (arguments.Length > 0)
-            command = arguments[0].ToLowerInvariant().TrimToEmpty();
+        var commandIndex = arguments.FindIndex(x => !string.IsNullOrWhiteSpace(x) &&
+            !ArgumentParser.IsSwitch(x));
+        if (commandIndex >= 0)
+        {
+            command = arguments[commandIndex].TrimToNull()?.ToLowerInvariant();
+            arguments.RemoveAt(commandIndex);
+        }
 
         if (string.IsNullOrEmpty(command))
         {
@@ -61,27 +42,20 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             return ExitCodes.NoCommand;
         }
 
-        if (command == "-?" ||
-            command == "--help")
-        {
-            WriteHelp(Console);
-            return ExitCodes.Help;
-        }
-
         if (projectFile == null)
         {
             var csprojs = FileSystem.GetFiles(".", "*.csproj");
             if (csprojs.Length == 0)
             {
-                Console.Error("Can't find a project file in current directory!");
-                Console.Error("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Console.Error("Can't find a project file in current directory!\n" + 
+                    "Please run Sergen in a folder that contains the Asp.Net Core project.");
                 return ExitCodes.NoProjectFiles;
             }
 
             if (csprojs.Length > 1)
             {
-                Console.Error("Multiple project files found in current directory!");
-                Console.Error("Please run Sergen in a folder that contains only one Asp.Net Core project.");
+                Console.Error("Multiple project files found in current directory!\n" + 
+                    "Please run Sergen in a folder that contains only one Asp.Net Core project.");
                 return ExitCodes.MultipleProjectFiles;
             }
 
@@ -95,7 +69,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
         }
 
         var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(projectFile));
-        string getPropertyArgument(string name) => props.TryGetValue(name, out var value) ? value : null;
+        string getPropertyArgument(string name) => propertyArgs.TryGetValue(name, out var value) ? value : null;
 
         var project = ProjectFactory?.Invoke(projectFile, getPropertyArgument)
             ?? new ProjectFileInfo(fileSystem, projectFile, getPropertyArgument, Console.Error);
@@ -109,7 +83,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
                 return RunCommand(new RestoreCommand(project, Console)
                 {
                     BuildSystem = BuildSystemFactory(),
-                    ProjectReferences = prjRefs
+                    ProjectReferences = projectRefs
                 });
             }
 
@@ -118,6 +92,8 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
                 "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                 "mvct".StartsWith(command, StringComparison.Ordinal))
             {
+                ArgumentParser.EnsureEmpty(arguments);
+
                 List<ExternalType> tsTypesNamespaces = null;
                 List<ExternalType> tsTypesModules = null;
 
@@ -192,7 +168,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             {
                 return RunCommand(new GenerateCommand(project, Console)
                 {
-                    Arguments = arguments.Skip(1).ToArray()
+                    Arguments = arguments
                 });
             }
         }
@@ -211,19 +187,20 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
         return RunCommandCallback?.Invoke(command) ?? command.Run();
     }
 
-    private static void WriteHelp(IGeneratorConsole console)
+    public static void WriteHelp(IGeneratorConsole console)
     {
         console.ShowHelp($"""""
             Serenity Code Generator {Assembly.GetEntryAssembly().GetName().Version}
             Usage: sergen [switches] [command]
 
             Commands:
-              g[enerate]        Launches the table code generator.
               c[lienttypes]     Imports editor and formatter types from TypeScript to C#.
+              g[enerate]        Launches the table code generator.
               m[vc]             Generates IntelliSense helpers for view locations.
+              mvct              Executes client types and mvc commands simulatenously.
+              r[estore]         [Obsolete] Restores content (e.g., scripts, CSS) from .nupkg.
               s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
               t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
-              r[estore]         [Obsolete] Restores content (e.g., scripts, CSS) from .nupkg.
 
             Switches:
               -p <ProjectFile>  Specifies the project file. Useful when multiple projects exist 
@@ -235,9 +212,9 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
                                 as Sergen won't have to parse the project, and also for addressing 
                                 cases where sergen might not determine a property correctly.
 
-            Examples:
-              -prop:Configuration=Release
-              -prop:"OutDir=..\bin\Debug\;AssemblyName=MyAssembly"
+                                Examples:
+                                  -prop:Configuration=Release
+                                  -prop:"OutDir=..\bin\Debug\;AssemblyName=MyAssembly"
             
             """"");
     }

@@ -147,26 +147,6 @@ public partial class GenerateCommand
         }
     }
 
-    private static string GetOption(string[] args, string opt)
-    {
-        var dash = "-" + opt;
-        var val = args.FirstOrDefault(x => x.StartsWith(dash + ":", StringComparison.Ordinal));
-        if (val != null)
-            return val[(dash.Length + 1)..];
-
-        var idx = Array.IndexOf(args, dash);
-        if (idx >= 0 && idx < args.Length - 1)
-        {
-            val = args[idx + 1];
-            if (val.StartsWith('"') &&
-                val.EndsWith('"'))
-                return val[1..^1];
-            else
-                return val;
-        }
-
-        return null;
-    }
 
     private void Error(string error)
     {

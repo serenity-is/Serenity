@@ -12,10 +12,26 @@ public class Program
         {
             BuildSystemFactory = () => new MSBuild.MSBuildProjectSystem()
         };
-        
-        var exitCode = cli.Run(args);
-        if (exitCode != ExitCodes.Success &&
-            exitCode != ExitCodes.Help)
-            Environment.Exit((int)exitCode);
+
+        try
+        {
+            var exitCode = cli.Run(args);
+            if (exitCode != ExitCodes.Success &&
+                exitCode != ExitCodes.Help)
+                Environment.Exit((int)exitCode);
+        }
+        catch (Exception ex)
+        {
+            if (ex is ArgumentException)
+            {
+                console.Error(ex.Message);
+                Environment.Exit((int)ExitCodes.InvalidArguments);
+            }
+            else
+            {
+                console.Exception(ex);
+                Environment.Exit((int)ExitCodes.Exception);
+            }
+        }
     }
 }

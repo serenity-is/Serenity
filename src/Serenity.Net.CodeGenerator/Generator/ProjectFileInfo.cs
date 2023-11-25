@@ -219,35 +219,6 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return new();
     }
 
-    public static IEnumerable<string> FilterPropertyParams(IEnumerable<string> args,
-        out Dictionary<string, string> props)
-    {
-        var result = props = [];
-        return args.Where((x, i) =>
-        {
-            if (x.StartsWith("-prop:", StringComparison.Ordinal))
-            {
-                foreach (var assignment in x[6..].Split(propertySeps, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    var eq = assignment.IndexOf('=');
-                    if (eq <= 0)
-                    {
-                        result[x] = null;
-                        continue;
-                    }
-
-                    var propName = assignment[0..eq];
-                    var propValue = assignment[(eq + 1)..];
-                    result[propName] = propValue;
-                }
-
-                return false;
-            }
-
-            return true;
-        });
-    }
-
     public string[] GetAssemblyList(string[] configured)
     {
         ArgumentNullException.ThrowIfNull(onError);
