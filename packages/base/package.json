@@ -13,7 +13,9 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./tsconfig.json": "./tsconfig.json",
+    "./tsconfig.base.json": "./tsconfig.base.json"
   },
   "main": "dist/index.js",
   "import": "dist/index.js",
@@ -26,7 +28,8 @@
     "css/**/*.css",
     "src/**/*.ts",
     "src/**/*.css",
-    "src/**/tsconfig.json"
+    "tsconfig.base.json",
+    "tsconfig.json"
   ],
   "homepage": "https://github.com/serenity-is/serenity/#readme",
   "keywords": [

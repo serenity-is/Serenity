@@ -1,13 +1,10 @@
 ﻿{
-  "extends": "./node_modules/@serenity-is/base/tsconfig.base.json",
+  "extends": "@serenity-is/base/tsconfig.base.json",
   "compilerOptions": {
     "experimentalDecorators": true,
     "declarationDir": "./out",
     "rootDir": "./src",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
       "@optionaldeps/*": [
         "./src/globals/*-module"
       ]

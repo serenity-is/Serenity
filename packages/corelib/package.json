@@ -18,7 +18,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./tsconfig.json": "./tsconfig.json"
   },
   "main": "dist/index.js",
   "import": "dist/index.js",
