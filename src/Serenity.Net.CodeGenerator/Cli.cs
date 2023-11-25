@@ -11,31 +11,20 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
     public Func<string, Func<string, string>, IProjectFileInfo> ProjectFactory { get; set; }
     public Func<BaseGeneratorCommand, ExitCodes> RunCommandCallback { get; set; }
 
-    public ExitCodes Run(params string[] args)
+    public ExitCodes Run(IArgumentReader arguments)
     {
-        ArgumentNullException.ThrowIfNull(args);
+        ArgumentNullException.ThrowIfNull(arguments);
 
-        var arguments = args.ToList();
-        if (ArgumentParser.HasHelpSwitch(arguments))
+        if (arguments.HasHelpSwitch())
         {
             WriteHelp(Console);
             return ExitCodes.Help;
         }
 
-        var projectFile = ArgumentParser.GetSingleValue(arguments, ["p", "project"]);
-        var projectRefs = ArgumentParser.GetMultipleValues(arguments, ["projectrefs", "project-refs"]);
-        var propertyArgs = ArgumentParser.GetDictionary(arguments, ["prop", "props", "property"],
-            separators: [',', ';']);
-
-        string command = null;
-        var commandIndex = arguments.FindIndex(x => !string.IsNullOrWhiteSpace(x) &&
-            !ArgumentParser.IsSwitch(x));
-        if (commandIndex >= 0)
-        {
-            command = arguments[commandIndex].TrimToNull()?.ToLowerInvariant();
-            arguments.RemoveAt(commandIndex);
-        }
-
+        var projectFile = arguments.GetString(["p", "project"]);
+        var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"]);
+        var propertyArgs = arguments.GetDictionary(["prop", "props", "property"], separators: [',', ';']);
+        var command = arguments.GetCommand();
         if (string.IsNullOrEmpty(command))
         {
             WriteHelp(Console);
@@ -92,7 +81,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
                 "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
                 "mvct".StartsWith(command, StringComparison.Ordinal))
             {
-                ArgumentParser.EnsureEmpty(arguments);
+                arguments.EnsureEmpty();
 
                 List<ExternalType> tsTypesNamespaces = null;
                 List<ExternalType> tsTypesModules = null;

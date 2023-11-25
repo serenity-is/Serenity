@@ -15,7 +15,7 @@ public class Program
 
         try
         {
-            var exitCode = cli.Run(args);
+            var exitCode = cli.Run(new ArgumentReader(args));
             if (exitCode != ExitCodes.Success &&
                 exitCode != ExitCodes.Help)
                 Environment.Exit((int)exitCode);

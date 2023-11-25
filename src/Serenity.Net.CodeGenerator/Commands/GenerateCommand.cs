@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
-    public List<string> Arguments { get; set; }
+    public IArgumentReader Arguments { get; set; }
 
     public override ExitCodes Run()
     {
@@ -21,16 +21,16 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             return ExitCodes.NoConnectionString;
         }
 
-        var argsConnectionKey = ArgumentParser.GetSingleValue(Arguments, 
+        var argsConnectionKey = Arguments.GetString(
             ["cnk", "connkey", "connectionkey", "connection-key"]).TrimToNull();
-        var argsModule = ArgumentParser.GetSingleValue(Arguments, ["mod", "module"]).TrimToNull();
-        var argsIdentifier = ArgumentParser.GetSingleValue(Arguments, ["cls", "idn", "identifier"]).TrimToNull();
-        var argsPermissionKey = ArgumentParser.GetSingleValue(Arguments,
+        var argsModule = Arguments.GetString(["mod", "module"]).TrimToNull();
+        var argsIdentifier = Arguments.GetString(["cls", "idn", "identifier"]).TrimToNull();
+        var argsPermissionKey = Arguments.GetString(
             ["pms", "permission", "permissionkey", "permission-key"]).TrimToNull();
-        var argsTable = ArgumentParser.GetSingleValue(Arguments, ["tbl", "table"]).TrimToNull();
-        var argsWhat = ArgumentParser.GetSingleValue(Arguments, ["wtg", "what", "whattogenerate"]).TrimToNull();
+        var argsTable = Arguments.GetString(["tbl", "table"]).TrimToNull();
+        var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]).TrimToNull();
 
-        ArgumentParser.EnsureEmpty(Arguments);
+        Arguments.EnsureEmpty();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
             Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
