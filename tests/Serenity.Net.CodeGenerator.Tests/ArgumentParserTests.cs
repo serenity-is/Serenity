@@ -117,5 +117,6 @@ public partial class ArgumentParserTests
     {
         var list = arguments.ToList();
         Assert.Equal("val", ArgumentParser.GetSingleValue(list, ["test", "alt"]));
+        Assert.Equal(arguments.Length - 2, list.Count);
     }
 }
