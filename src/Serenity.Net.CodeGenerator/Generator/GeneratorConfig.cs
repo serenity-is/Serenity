@@ -170,21 +170,6 @@ public class GeneratorConfig
     public bool ShouldSerializeConnections() => Connections != null && Connections.Count > 0;
    
     /// <summary>
-    /// Full path of KDIFF3. This is no longer used.
-    /// </summary>
-    public string KDiff3Path { get; set; }
-    /// <summary>Used for Newtonsoft.JSON</summary>
-    public bool ShouldSerializeKDiff3Path() => !string.IsNullOrEmpty(KDiff3Path);
-
-    /// <summary>
-    /// Full path to TypeScript compiler. It is assumed to be in path
-    /// if not specified.
-    /// </summary>
-    public string TSCPath { get; set; }
-    /// <summary>Used for Newtonsoft.JSON</summary>
-    public bool ShouldSerializeTSCPath() => !string.IsNullOrEmpty(TSCPath);
-
-    /// <summary>
     /// List of base row classes to be used instead of Row.
     /// They are matched by list of base properties.
     /// </summary>

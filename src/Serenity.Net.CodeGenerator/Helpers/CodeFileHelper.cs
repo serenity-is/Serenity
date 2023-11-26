@@ -9,8 +9,7 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
     private readonly IGeneratorConsole console = console ?? throw new ArgumentNullException(nameof(console));
 
     public string Kdiff3Path { get; set; }
-    public string TSCPath { get; set; }
-    public bool NoUserInteraction { get; set; }
+    public bool Interactive { get; set; }
 
     private bool? overwriteAll;
 
@@ -39,108 +38,59 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
 
     public void MergeChanges(string backup, string file)
     {
-        if (backup == null || !fileSystem.FileExists(backup) || !fileSystem.FileExists(file))
+        if (backup == null || !fileSystem.FileExists(backup) || 
+            !fileSystem.FileExists(file))
             return;
 
         bool isEqual = FileContentsEqual(backup, file);
 
-        if (isEqual || NoUserInteraction)
+        if (isEqual || !Interactive)
         {
             CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
-            fileSystem.DeleteFile(backup);
+            if (isEqual)
+                fileSystem.DeleteFile(backup);
             return;
         }
-
-        if (!string.IsNullOrEmpty(Kdiff3Path) &&
-            !fileSystem.FileExists(Kdiff3Path))
+        
+        string answer;
+        if (overwriteAll == true)
+            answer = "y";
+        else if (overwriteAll == false)
+            answer = "n";
+        else
         {
-            if (string.IsNullOrEmpty(Kdiff3Path))
-                throw new InvalidOperationException(
-                    "Couldn't locate KDiff3 utility which is required to merge changes. " +
-                    "Please install it, or if it is not installed to default location, " +
-                    "set its path in CodeGenerator.config file!");
+            while (true)
+            {
+                console.Write("Overwrite " + fileSystem.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
+                answer = console.ReadLine();
 
-            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
-                "Please install it, or if it is not installed to default location, " +
-                "set its path in CodeGenerator.config file!", Kdiff3Path));
+                if (answer != null)
+                {
+                    answer = answer.Length > 0 ? answer.ToLowerInvariant()[0].ToString() : " ";
+                    if (answer == "a")
+                    {
+                        overwriteAll = true;
+                        break;
+                    }
+                    else if (answer == "s")
+                    {
+                        overwriteAll = false;
+                        break;
+                    }
+                    else if (answer == "y" || answer == "n")
+                        break;
+                }
+            }
         }
-        else if (!string.IsNullOrEmpty(Kdiff3Path))
+
+        if (answer == "y" || answer == "a")
         {
-            var generated = fileSystem.ChangeExtension(file, fileSystem.GetExtension(file) + ".gen.bak");
-            CheckoutAndWrite(generated, fileSystem.ReadAllBytes(file));
-            CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
-            Process.Start(Kdiff3Path, "--auto \"" + file + "\" \"" + generated + "\" -o \"" + file + "\"");
+            fileSystem.DeleteFile(backup);
         }
         else
         {
-            string answer;
-            if (overwriteAll == true)
-                answer = "y";
-            else if (overwriteAll == false)
-                answer = "n";
-            else
-            {
-                while (true)
-                {
-                    console.Write("Overwrite " + fileSystem.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
-                    answer = console.ReadLine();
-
-                    if (answer != null)
-                    {
-                        answer = answer.Length > 0 ? answer.ToLowerInvariant()[0].ToString() : " ";
-                        if (answer == "a")
-                        {
-                            overwriteAll = true;
-                            break;
-                        }
-                        else if (answer == "s")
-                        {
-                            overwriteAll = false;
-                            break;
-                        }
-                        else if (answer == "y" || answer == "n")
-                            break;
-                    }
-                }
-            }
-
-            if (answer == "y" || answer == "a")
-            {
-                fileSystem.DeleteFile(backup);
-            }
-            else
-            {
-                CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
-                fileSystem.DeleteFile(backup);
-            }
+            CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
+            fileSystem.DeleteFile(backup);
         }
-    }
-
-    public void ExecuteTSC(string workingDirectory, string arguments)
-    {
-        if (NoUserInteraction)
-            return;
-
-        if (string.IsNullOrEmpty(TSCPath) ||
-            !fileSystem.FileExists(TSCPath))
-        {
-            if (string.IsNullOrEmpty(TSCPath))
-                throw new InvalidOperationException(
-                    "Couldn't locate TSC.EXE file which is required for TypeScript compilation. " +
-                    "Please install it, or if it is not installed to default location, " +
-                    "set its path in CodeGenerator.config file (TSCPath setting)!");
-
-            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                "Couldn't locate TSC.EXE file at '{0}' which is required for TypeScript compilation. " +
-                "Please install it, or if it is not installed to default location, " +
-                "set its path in CodeGenerator.config file! (TSCPath setting)", TSCPath));
-        }
-
-        var psi = new ProcessStartInfo(TSCPath, arguments)
-        {
-            WorkingDirectory = workingDirectory
-        };
-        Process.Start(psi).WaitForExit(10000);
     }
 }

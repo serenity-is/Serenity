@@ -67,9 +67,7 @@ public partial class GenerateCommand
 
         var codeFileHelper = new CodeFileHelper(Project.FileSystem, Console)
         {
-            NoUserInteraction = !interactive,
-            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(Project.FileSystem.FileExists),
-            TSCPath = inputs.Config.TSCPath ?? "tsc"
+            Interactive = interactive
         };
 
         return new EntityCodeGenerator(Project, codeFileHelper, entityModel, inputs.Config);
