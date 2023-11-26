@@ -14,16 +14,20 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         var projectDir = FileSystem.GetDirectoryName(ProjectFile);
         var config = FileSystem.LoadGeneratorConfig(projectDir);
 
-        if (Modules && config.ServerTypings?.ModuleTypings == false)
+        if (Modules && config.ServerTypings?.ModuleTypings == false ||
+            !Modules && config.ServerTypings?.NamespaceTypings == false)
             return ExitCodes.Success;
 
-        if (!Modules && config.ServerTypings?.NamespaceTypings == false)
-            return ExitCodes.Success;
+        var transformType = Modules ? "Modular Server Types" : "Namespace Server Typings";
+        var transformFor = Path.GetFileNameWithoutExtension(ProjectFile);
+        Console.WriteLine($"Transforming {transformType} for {transformFor}", ConsoleColor.Cyan);
 
         var assemblyFiles = Project.GetAssemblyList(config.ServerTypings?.Assemblies);
-
         if (assemblyFiles == null || assemblyFiles.Length == 0)
+        {
+            Console.Error("Can't determine the output assemblies! Please ensure the project is built successfully.");
             return ExitCodes.CantDetermineOutputAssemblies;
+        }
 
         if (string.IsNullOrEmpty(config.RootNamespace))
             config.RootNamespace = config.GetRootNamespaceFor(Project);
@@ -42,9 +46,6 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
                 config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings"));
 
         generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
-
-        Console.WriteLine("Transforming " + (Modules ? "ServerTypes" : "ServerTypings"), ConsoleColor.Cyan);
-
         generator.RootNamespaces.Add(config.RootNamespace);
 
         foreach (var type in TsTypes)

@@ -17,10 +17,8 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
         if (string.IsNullOrEmpty(config.RootNamespace))
             config.RootNamespace = config.GetRootNamespaceFor(Project);
 
-        var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
-
-        Console.Write("Transforming ClientTypes at: ", ConsoleColor.Cyan);
-        Console.WriteLine(outDir);
+        var transformFor = FileSystem.GetFileNameWithoutExtension(ProjectFile);
+        Console.WriteLine($"Transforming Client Types for {transformFor}", ConsoleColor.Cyan);
 
         var generator = new ClientTypesGenerator()
         {
@@ -34,6 +32,9 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
 
         foreach (var type in TsTypes)
             generator.AddTSType(type);
+
+        var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(
+            config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes"));
 
         var generatedSources = generator.Run();
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
