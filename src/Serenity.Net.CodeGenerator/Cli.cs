@@ -23,7 +23,8 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         var projectFile = arguments.GetString(["p", "project"]);
         var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"]);
-        var propertyArgs = arguments.GetDictionary(["prop", "props", "property"], separators: [',', ';']);
+        var propertyArgs = arguments.GetDictionary(["prop", "props", "property"], 
+            separators: [',', ';']);
         var command = arguments.GetCommand();
         if (string.IsNullOrEmpty(command))
         {
@@ -63,117 +64,116 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
         var project = ProjectFactory?.Invoke(projectFile, getPropertyArgument)
             ?? new ProjectFileInfo(fileSystem, projectFile, getPropertyArgument, Console.Error);
 
-        try
+        bool isCommand(params string[] args)
         {
-            if ("restore".StartsWith(command, StringComparison.Ordinal))
-            {
-                ArgumentNullException.ThrowIfNull(BuildSystemFactory);
-
-                return RunCommand(new RestoreCommand(project, Console)
-                {
-                    BuildSystem = BuildSystemFactory(),
-                    ProjectReferences = projectRefs
-                });
-            }
-
-            if ("transform".StartsWith(command, StringComparison.Ordinal) ||
-                "servertypings".StartsWith(command, StringComparison.Ordinal) ||
-                "clienttypes".StartsWith(command, StringComparison.Ordinal) ||
-                "mvct".StartsWith(command, StringComparison.Ordinal))
-            {
-                arguments.EnsureEmpty();
-
-                List<ExternalType> tsTypesNamespaces = null;
-                List<ExternalType> tsTypesModules = null;
-
-                void ensureTSTypes()
-                {
-                    if (tsTypesNamespaces is null &&
-                        tsTypesModules is null)
-                    {
-                        TSConfigHelper.LocateTSConfigFiles(FileSystem, projectDir,
-                            out string modulesPath, out string namespacesPath);
-
-                        if (modulesPath is null &&
-                            namespacesPath is null)
-                            namespacesPath = FileSystem.Combine(projectDir, "tsconfig.json");
-
-                        if (namespacesPath is not null)
-                        {
-                            var nsLister = new TSTypeLister(FileSystem, namespacesPath);
-                            tsTypesNamespaces = nsLister.List();
-                        }
-
-                        if (modulesPath is not null)
-                        {
-                            var mdLister = new TSTypeLister(FileSystem, modulesPath);
-                            tsTypesModules = mdLister.List();
-                        }
-                    }
-                }
-
-                bool transformAll = "transform".StartsWith(command, StringComparison.Ordinal);
-
-                if (transformAll ||
-                    "mvct".StartsWith(command, StringComparison.Ordinal))
-                {
-                    RunCommand(new MvcCommand(project, Console));
-                }
-
-                if (transformAll ||
-                    "clienttypes".StartsWith(command, StringComparison.Ordinal) || command == "mvct")
-                {
-                    ensureTSTypes();
-                    RunCommand(new ClientTypesCommand(project, Console)
-                    {
-                        TsTypes = [.. (tsTypesNamespaces ?? []), .. tsTypesModules ?? []]
-                    });
-                }
-
-                if (transformAll ||
-                    "servertypings".StartsWith(command, StringComparison.Ordinal))
-                {
-                    ensureTSTypes();
-
-                    if (tsTypesNamespaces is not null)
-                        RunCommand(new ServerTypingsCommand(project, Console)
-                        {
-                            TsTypes = tsTypesNamespaces,
-                            Modules = false
-                        });
-
-                    if (tsTypesModules is not null)
-                        RunCommand(new ServerTypingsCommand(project, Console)
-                        {
-                            TsTypes = tsTypesModules,
-                            Modules = true
-                        });
-                }
-
-                return ExitCodes.Success;
-            }
-
-            if ("generate".StartsWith(command, StringComparison.Ordinal))
-            {
-                return RunCommand(new GenerateCommand(project, Console)
-                {
-                    Arguments = arguments
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Exception(ex);
-            return ExitCodes.Exception;
+            return args.Any(x => string.Equals(x, command, StringComparison.OrdinalIgnoreCase));
         }
 
-        WriteHelp(Console);
-        return ExitCodes.InvalidCommand;
+        if (isCommand("r", "restore"))
+        {
+            ArgumentNullException.ThrowIfNull(BuildSystemFactory);
+
+            return RunCommand(new RestoreCommand(project, Console)
+            {
+                BuildSystem = BuildSystemFactory(),
+                ProjectReferences = projectRefs
+            });
+        }
+
+        if (isCommand("g", "generate"))
+        {
+            return RunCommand(new GenerateCommand(project, Console)
+            {
+                Arguments = arguments
+            });
+        }
+
+        bool transform = isCommand("t", "transform");
+        bool mvct = isCommand("mvct");
+        bool clientTypes = transform || mvct || isCommand("c", "ct", "clienttypes");
+        bool serverTypings = transform || isCommand("s", "st", "serverTypings");
+        bool mvc = transform || mvct || isCommand("m", "mvc");
+
+        if (!transform && !clientTypes && !serverTypings && !mvc)
+        {
+            WriteHelp(Console);
+            return ExitCodes.InvalidCommand;
+        }
+
+        arguments.ThrowIfRemaining();
+
+        List<ExternalType> tsTypesNamespaces = null;
+        List<ExternalType> tsTypesModules = null;
+
+        void ensureTSTypes()
+        {
+            if (tsTypesNamespaces is null &&
+                tsTypesModules is null)
+            {
+                TSConfigHelper.LocateTSConfigFiles(FileSystem, projectDir,
+                    out string modulesPath, out string namespacesPath);
+
+                if (modulesPath is null &&
+                    namespacesPath is null)
+                    namespacesPath = FileSystem.Combine(projectDir, "tsconfig.json");
+
+                if (namespacesPath is not null)
+                {
+                    var nsLister = new TSTypeLister(FileSystem, namespacesPath);
+                    tsTypesNamespaces = nsLister.List();
+                }
+
+                if (modulesPath is not null)
+                {
+                    var mdLister = new TSTypeLister(FileSystem, modulesPath);
+                    tsTypesModules = mdLister.List();
+                }
+            }
+        }
+
+        ExitCodes? exitCode = null;
+        if (mvc)
+            exitCode = RunCommand(new MvcCommand(project, Console), exitCode);
+
+        if (clientTypes)
+        {
+            ensureTSTypes();
+            exitCode = RunCommand(new ClientTypesCommand(project, Console)
+            {
+                TsTypes = [.. (tsTypesNamespaces ?? []), .. tsTypesModules ?? []]
+            }, exitCode);
+        }
+
+        if (serverTypings)
+        {
+            ensureTSTypes();
+
+            if (tsTypesNamespaces is not null)
+            {
+                exitCode = RunCommand(new ServerTypingsCommand(project, Console)
+                {
+                    TsTypes = tsTypesNamespaces,
+                    Modules = false
+                }, exitCode);
+            }
+
+            if (tsTypesModules is not null)
+            {
+                exitCode = RunCommand(new ServerTypingsCommand(project, Console)
+                {
+                    TsTypes = tsTypesModules,
+                    Modules = true
+                }, exitCode);
+            }
+        }
+
+        return exitCode ?? ExitCodes.InvalidCommand;
     }
 
-    private ExitCodes RunCommand(BaseGeneratorCommand command)
+    private ExitCodes RunCommand(BaseGeneratorCommand command, ExitCodes? current = null)
     {
-        return RunCommandCallback?.Invoke(command) ?? command.Run();
+        var result = RunCommandCallback?.Invoke(command) ?? command.Run();
+        return current is null || current == ExitCodes.Success ? result : current.Value;
     }
 
     public static void WriteHelp(IGeneratorConsole console)
@@ -183,7 +183,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             Usage: sergen [switches] [command]
 
             Commands:
-              c[lienttypes]     Imports editor and formatter types from TypeScript to C#.
+              c[lienttypes]    Imports editor and formatter types from TypeScript to C#.
               g[enerate]        Launches the table code generator.
               m[vc]             Generates IntelliSense helpers for view locations.
               mvct              Executes client types and mvc commands simulatenously.

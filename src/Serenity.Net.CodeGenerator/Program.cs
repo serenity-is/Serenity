@@ -27,11 +27,9 @@ public class Program
                 console.Error(ex.Message);
                 Environment.Exit((int)ExitCodes.InvalidArguments);
             }
-            else
-            {
-                console.Exception(ex);
-                Environment.Exit((int)ExitCodes.Exception);
-            }
+
+            console.Exception(ex);
+            Environment.Exit((int)ExitCodes.Exception);
         }
     }
 }

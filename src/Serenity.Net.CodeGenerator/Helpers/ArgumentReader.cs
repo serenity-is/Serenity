@@ -10,7 +10,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     private readonly List<string> arguments = (arguments ??
         throw new ArgumentNullException(nameof(arguments))).ToList();
 
-    [GeneratedRegex("^(-|--|/)([a-zA-Z_][a-zA-Z0-9_-]*)([:=].*)?$")]
+    [GeneratedRegex("^(-|--|/)(\\?|([a-zA-Z_][a-zA-Z0-9_-]*)([:=].*)?)$")]
     private static partial Regex IsSwitchRegex();
 
     /// <summary>
@@ -61,7 +61,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     private IEnumerable<(string name, string value)> EnumerateValueArguments(
-        string[] names, bool allowEmpty)
+        string[] names, bool required)
     {
         ArgumentNullException.ThrowIfNull(names);
         if (names.Length == 0)
@@ -80,7 +80,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
                     if (i < arguments.Count &&
                         !IsSwitch(arguments[i]))
                     {
-                        value = arguments[i] ?? "";
+                        value = arguments[i];
                         arguments.RemoveAt(i);
                     }
                     else
@@ -89,17 +89,13 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
                             $"a value to be specified!", name);
                     }
                 }
-                else
-                {
-                    value ??= "";
-                }
 
-                if (!allowEmpty &&
-                    string.IsNullOrWhiteSpace(value))
+                if (required &&
+                    string.IsNullOrEmpty(value))
                     throw new ArgumentException($"A value is required when using " +
                         $"the switch '{name}'!", name);
 
-                yield return (name, value.Trim());
+                yield return (name, value);
             }
             else
                 i++;
@@ -107,7 +103,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
-    public void EnsureEmpty()
+    public void ThrowIfRemaining()
     {
         if (arguments.Count != 0)
             throw new ArgumentException($"Unknown argument: " +
@@ -125,11 +121,10 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     public string GetCommand()
     {
         string command = null;
-        var commandIndex = arguments.FindIndex(x =>
-            !string.IsNullOrWhiteSpace(x) && !IsSwitch(x));
+        var commandIndex = arguments.FindIndex(x => !string.IsNullOrEmpty(x) && !IsSwitch(x));
         if (commandIndex >= 0)
         {
-            command = arguments[commandIndex].TrimToNull()?.ToLowerInvariant();
+            command = arguments[commandIndex];
             arguments.RemoveAt(commandIndex);
             return command;
         }
@@ -137,27 +132,27 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
         return null;
     }
 
-
     /// <inheritdoc/>
-    public string GetString(string[] names, bool allowEmpty = false)
+    public string GetString(string[] names, bool required = true)
     {
-        foreach (var (name, value) in EnumerateValueArguments(names, allowEmpty))
+        string result = null;
+        foreach (var (name, value) in EnumerateValueArguments(names, required))
         {
-            if (arguments.Any(x => names.Contains(ParseSwitch(x, out string otherValue)) &&
-                    otherValue != value))
+            if (result != null &&
+                value != result)
                 throw new ArgumentException($"The switch '{name}' can only be specified once!", name);
 
-            return value;
+            result = value;
         }
 
-        return null;
+        return result;
     }
 
     /// <inheritdoc/>
-    public string[] GetStrings(string[] names, bool allowEmptyValue = false)
+    public string[] GetStrings(string[] names, bool required = true)
     {
         var values = new List<string>();
-        foreach (var (name, value) in EnumerateValueArguments(names, allowEmptyValue))
+        foreach (var (name, value) in EnumerateValueArguments(names, required))
         {
             values.Add(value);
         }
@@ -167,28 +162,28 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
 
     /// <inheritdoc/>
     public Dictionary<string, string> GetDictionary(string[] names,
-        char[] separators = null)
+        bool required = false, char[] separators = null)
     {
-        var assignments = GetStrings(names, allowEmptyValue: false)
-            .Select(x => (x ?? "").Trim())
-            .SelectMany(x => separators?.Length > 0 ? x.Split(separators) : [x])
-            .Where(x => !string.IsNullOrEmpty(x));
+        IEnumerable<string> assignments = GetStrings(names, required);
+        if (separators != null && separators.Length > 0)
+            assignments = assignments.SelectMany(x => x.Split(separators,
+                StringSplitOptions.RemoveEmptyEntries));
 
         var result = new Dictionary<string, string>();
 
         foreach (var assignment in assignments)
         {
             var eq = assignment.IndexOf('=');
-            if (eq <= 0)
+            if (eq < 0)
                 throw new ArgumentException($"The values for switch '{names[0]}' " +
                     $"should use 'Name=Value' format!", names[0]);
 
-            var propName = assignment[0..eq].Trim();
+            var propName = assignment[0..eq];
             if (propName.Length == 0)
                 throw new ArgumentException($"One of the keys specified for " +
                     $"switch '{names[0]}' is empty!", names[0]);
 
-            var value = assignment[(eq + 1)..].Trim();
+            var value = assignment[(eq + 1)..];
             if (result.TryGetValue(propName, out string existingValue))
             {
                 if (existingValue != value)

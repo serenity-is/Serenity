@@ -12,13 +12,8 @@ namespace Serenity.CodeGenerator
         /// providing the value in /param:A=B;C=D separated format is possible</param>
         /// <returns>A dictionary of key value pairs</returns>
         /// <exception cref="ArgumentException">Keys are specified multiple times</exception>
-        Dictionary<string, string> GetDictionary(string[] names, char[] separators = null);
-
-        /// <summary>
-        /// Throws argument null if arguments is not empty
-        /// </summary>
-        /// <exception cref="ArgumentException">Remaining argument count > 0</exception>
-        void EnsureEmpty();
+        Dictionary<string, string> GetDictionary(string[] names, bool required = true,
+            char[] separators = null);
 
         /// <summary>
         /// Determines the command from first argument which is not a switch
@@ -35,7 +30,7 @@ namespace Serenity.CodeGenerator
         /// <returns>The argument value or null if not found</returns>
         /// <exception cref="ArgumentException">The switch is specified multiple times,
         /// or its value is empty and allowEmpty is false.</exception>
-        string GetString(string[] names, bool allowEmptyValue = false);
+        string GetString(string[] names, bool required = true);
 
         /// <summary>
         /// Gets the value for a switch that can be specified multiple times
@@ -44,7 +39,7 @@ namespace Serenity.CodeGenerator
         /// <param name="names">Allowed switch names.</param>
         /// <param name="allowEmpty">True to allow empty values. Default is false.</param>
         /// <returns>The argument values</returns>
-        string[] GetStrings(string[] names, bool allowEmptyValue = false);
+        string[] GetStrings(string[] names, bool required = true);
 
         /// <summary>
         /// Returns true if any of switches are -?, --help, or -h
@@ -55,5 +50,11 @@ namespace Serenity.CodeGenerator
         /// Gets remaining argument count
         /// </summary>
         int Remaining { get; }
+
+        /// <summary>
+        /// Throws argument null if arguments is not empty
+        /// </summary>
+        /// <exception cref="ArgumentException">Remaining argument count > 0</exception>
+        void ThrowIfRemaining();
     }
 }

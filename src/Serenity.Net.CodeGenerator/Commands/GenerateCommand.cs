@@ -22,15 +22,15 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         }
 
         var argsConnectionKey = Arguments.GetString(
-            ["cnk", "connkey", "connectionkey", "connection-key"]).TrimToNull();
-        var argsModule = Arguments.GetString(["mod", "module"]).TrimToNull();
-        var argsIdentifier = Arguments.GetString(["cls", "idn", "identifier"]).TrimToNull();
+            ["cnk", "connkey", "connectionkey", "connection-key"]);
+        var argsModule = Arguments.GetString(["mod", "module"], required: false);
+        var argsIdentifier = Arguments.GetString(["cls", "idn", "identifier"]);
         var argsPermissionKey = Arguments.GetString(
-            ["pms", "permission", "permissionkey", "permission-key"]).TrimToNull();
-        var argsTable = Arguments.GetString(["tbl", "table"]).TrimToNull();
-        var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]).TrimToNull();
+            ["pms", "permission", "permissionkey", "permission-key"], required: false);
+        var argsTable = Arguments.GetString(["tbl", "table"]);
+        var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]);
 
-        Arguments.EnsureEmpty();
+        Arguments.ThrowIfRemaining();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
             Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
