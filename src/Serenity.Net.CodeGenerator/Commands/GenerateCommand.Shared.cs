@@ -41,38 +41,6 @@ public partial class GenerateCommand
         }
     }
 
-    private EntityModel CreateEntityModel(EntityModelInputs inputs, 
-        IEntityModelGenerator modelGenerator,
-        ISqlConnections sqlConnections)
-    {
-        using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
-        connection.EnsureOpen();
-
-        var csprojContent = FileSystem.ReadAllText(Project.ProjectFile);
-        inputs.Net5Plus = !targetFrameworkNetCoreRegexGen().IsMatch(csprojContent);
-
-        inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
-            StringComparison.OrdinalIgnoreCase);
-
-        inputs.DataSchema = new EntityDataSchema(connection);
-        return modelGenerator.GenerateModel(inputs);
-    }
-
-    private EntityCodeGenerator CreateCodeGenerator(EntityModelInputs inputs, 
-        IEntityModelGenerator modelGenerator,
-        ISqlConnections sqlConnections, 
-        bool interactive = true)
-    {
-        var entityModel = CreateEntityModel(inputs, modelGenerator, sqlConnections);
-
-        var codeFileHelper = new CodeFileHelper(Project.FileSystem, Console)
-        {
-            Interactive = interactive
-        };
-
-        return new EntityCodeGenerator(Project, codeFileHelper, entityModel, inputs.Config);
-    }
-
     private static void RegisterSqlProviders()
     {
         DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient",
@@ -145,14 +113,12 @@ public partial class GenerateCommand
         }
     }
 
-
     private void Error(string error)
     {
         Console.Error(error);
         Console.WriteLine();
     }
 
-
     [GeneratedRegex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
-    private static partial Regex targetFrameworkNetCoreRegexGen();
+    private static partial Regex Net5PlusRegex();
 }

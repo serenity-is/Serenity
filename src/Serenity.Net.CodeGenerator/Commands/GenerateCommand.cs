@@ -95,12 +95,12 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
             if (string.IsNullOrEmpty(module))
                 module = confTable?.Module?.TrimToNull() is null ?
-                    EntityModelGenerator.IdentifierForTable(connectionKey) : confTable.Module;
+                    EntityModelFactory.IdentifierForTable(connectionKey) : confTable.Module;
 
             module = argsModule ?? SelectModule(tableName, module);
 
             var defaultIdentifier = confTable?.Identifier?.IsTrimmedEmpty() != false ?
-                EntityModelGenerator.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
+                EntityModelFactory.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
 
             var identifier = (selectedTableNames.Count == 1 ? 
                 argsIdentifier : null) ?? SelectIdentifier(tableName, defaultIdentifier);
@@ -135,6 +135,23 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             config.GenerateCustom = whatToGenerate.Contains("Custom", StringComparer.Ordinal);
         }
 
+        var modelFactory = new EntityModelFactory();
+
+        EntityModel createModel(EntityModelInputs inputs)
+        {
+            using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
+            connection.EnsureOpen();
+
+            var csprojContent = FileSystem.ReadAllText(Project.ProjectFile);
+            inputs.Net5Plus = !Net5PlusRegex().IsMatch(csprojContent);
+
+            inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
+                StringComparison.OrdinalIgnoreCase);
+
+            inputs.DataSchema = new EntityDataSchema(connection);
+            return modelFactory.Create(inputs);
+        }
+
         ApplicationMetadata application = null;
         try
         {
@@ -151,8 +168,8 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
                     inputs.SkipForeignKeys = true;
                     try
                     {
-                        var entityModel = CreateEntityModel(inputs, new EntityModelGenerator(), sqlConnections);
-                        application.EntityModels.Add(entityModel);
+                        var model = createModel(inputs);
+                        application.EntityModels.Add(model);
                     }
                     finally
                     {
@@ -163,15 +180,13 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         }
         catch { }
 
+        var writer = new GeneratedFileWriter(Project.FileSystem, Console);
         foreach (var inputs in inputsList)
         {
             UpdateConfigTableFor(inputs, confConnection);
-
             inputs.Application = application;
-
-            var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
-                sqlConnections, interactive: true);
-
+            var model = createModel(inputs);
+            var generator = new EntityCodeGenerator(Project, model, inputs.Config, writer);
             generator.Run();
         }
 

@@ -1,6 +1,6 @@
 namespace Serenity.CodeGenerator;
 
-public class EntityModelGenerator : IEntityModelGenerator
+public class EntityModelFactory : IEntityModelFactory
 {
     private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
     {
@@ -82,7 +82,7 @@ public class EntityModelGenerator : IEntityModelGenerator
         return entityField;
     }
 
-    public EntityModel GenerateModel(IEntityModelInputs inputs)
+    public EntityModel Create(IEntityModelInputs inputs)
     {
         ArgumentNullException.ThrowIfNull(inputs);
 
