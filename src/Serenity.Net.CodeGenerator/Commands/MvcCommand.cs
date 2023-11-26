@@ -10,10 +10,8 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
 
         config.MVC ??= new();
 
-        var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
-
-        Console.Write("Transforming MVC at: ", ConsoleColor.Cyan);
-        Console.WriteLine(outDir);
+        var transformFor = FileSystem.GetFileNameWithoutExtension(ProjectFile);
+        Console.Write($"Transforming MVC for {transformFor}", ConsoleColor.Cyan);
 
         string[] stripViewPaths = config.MVC.StripViewPaths ?? [
             "Modules/",
@@ -140,6 +138,8 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
 
         });
 
+        var outDir = FileSystem.Combine(projectDir, 
+            PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir, new[]
         {
             ("MVC.cs", cw.ToString())

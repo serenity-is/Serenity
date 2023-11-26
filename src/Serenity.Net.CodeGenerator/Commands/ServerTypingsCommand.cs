@@ -1,5 +1,4 @@
 using Serenity.CodeGeneration;
-using System.IO;
 
 namespace Serenity.CodeGenerator;
 
@@ -19,7 +18,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
             return ExitCodes.Success;
 
         var transformType = Modules ? "Modular Server Types" : "Namespace Server Typings";
-        var transformFor = Path.GetFileNameWithoutExtension(ProjectFile);
+        var transformFor = FileSystem.GetFileNameWithoutExtension(ProjectFile);
         Console.WriteLine($"Transforming {transformType} for {transformFor}", ConsoleColor.Cyan);
 
         var assemblyFiles = Project.GetAssemblyList(config.ServerTypings?.Assemblies);
@@ -40,7 +39,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         generator.ModuleReExports = generator.ModuleTypings && config?.ServerTypings?.ModuleReExports != false;
         generator.NamespaceTypings = !Modules && config?.ServerTypings?.NamespaceTypings != false;
 
-        string outDir = Modules ? Path.Combine(generator.DetermineModulesRoot(
+        string outDir = Modules ? FileSystem.Combine(generator.DetermineModulesRoot(
             FileSystem, ProjectFile, config.RootNamespace), "ServerTypes") :
             FileSystem.Combine(projectDir, PathHelper.ToPath(
                 config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings"));
