@@ -415,9 +415,10 @@ public class GeneratorConfig
         public bool ShouldSerializeAssemblies() => Assemblies != null && Assemblies.Length > 0;
 
         /// <summary>
-        /// Output directory for server typings generated files
+        /// Output directory for server typings generated files. Not used for modules.
         /// </summary>
         public string OutDir { get; set; }
+
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
 

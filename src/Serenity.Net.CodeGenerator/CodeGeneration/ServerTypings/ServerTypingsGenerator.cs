@@ -133,6 +133,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
     {
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentExceptionHelper.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
+
         if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
             return;
 
@@ -151,5 +154,38 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         catch
         {
         }
+    }
+
+    public string DetermineModulesRoot(IFileSystem fileSystem, string projectFile,
+        string rootNamespace)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentExceptionHelper.ThrowIfNull(projectFile, nameof(projectFile));
+
+        var projectDir = fileSystem.GetDirectoryName(projectFile);
+        var modulesDir = fileSystem.Combine(projectDir, "Modules");
+
+        if (!fileSystem.DirectoryExists(modulesDir) ||
+            fileSystem.GetFiles(modulesDir, "*.*").Length == 0)
+        {
+            var rootNsDir = fileSystem.Combine(projectDir, 
+                fileSystem.GetFileName(projectFile));
+            if (fileSystem.DirectoryExists(rootNsDir))
+            {
+                modulesDir = rootNsDir;
+                ModulesPathFolder = fileSystem.GetFileName(projectFile);
+            }
+            else
+            {
+                rootNsDir = fileSystem.Combine(projectDir, rootNamespace);
+                if (fileSystem.DirectoryExists(rootNsDir))
+                {
+                    modulesDir = rootNsDir;
+                    ModulesPathFolder = rootNamespace;
+                }
+            }
+        }
+
+        return modulesDir;
     }
 }

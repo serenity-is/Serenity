@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using Serenity.CodeGeneration;
 using System.IO;
 
@@ -31,47 +30,20 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
 
         var generator = new ServerTypingsGenerator(FileSystem, assemblyFiles.ToArray())
         {
-            LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts
+            LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts,
+            ModuleTypings = Modules && config?.ServerTypings?.ModuleTypings != false
         };
-
-        
-
-        var outDir = FileSystem.Combine(projectDir, 
-            PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
-                (Modules ? "Modules/ServerTypes" : "Imports/ServerTypings"))));
-
-        generator.ModuleTypings = Modules && config?.ServerTypings?.ModuleTypings != false;
         generator.ModuleReExports = generator.ModuleTypings && config?.ServerTypings?.ModuleReExports != false;
         generator.NamespaceTypings = !Modules && config?.ServerTypings?.NamespaceTypings != false;
 
-        if (Modules)
-        {
-            var modulesDir = FileSystem.Combine(projectDir, "Modules");
-            if (!FileSystem.DirectoryExists(modulesDir) ||
-                FileSystem.GetFiles(modulesDir, "*.*").Length == 0)
-            {
-                var rootNsDir = FileSystem.Combine(projectDir, Path.GetFileName(ProjectFile));
-                if (FileSystem.DirectoryExists(rootNsDir))
-                {
-                    outDir = Path.Combine(rootNsDir, "ServerTypes");
-                    generator.ModulesPathFolder = Path.GetFileName(ProjectFile);
-                }
-                else
-                {
-                    rootNsDir = FileSystem.Combine(projectDir, config.RootNamespace);
-                    if (FileSystem.DirectoryExists(rootNsDir))
-                    {
-                        outDir = Path.Combine(rootNsDir, "ServerTypes");
-                        generator.ModulesPathFolder = config.RootNamespace;
-                    }
-                }
-            }
-        }
+        string outDir = Modules ? Path.Combine(generator.DetermineModulesRoot(
+            FileSystem, ProjectFile, config.RootNamespace), "ServerTypes") :
+            FileSystem.Combine(projectDir, PathHelper.ToPath(
+                config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings"));
 
         generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
 
-        Console.Write("Transforming " + (Modules ? "ServerTypes" : "ServerTypings") + " at: ", ConsoleColor.Cyan);
-        Console.WriteLine(outDir);
+        Console.WriteLine("Transforming " + (Modules ? "ServerTypes" : "ServerTypings"), ConsoleColor.Cyan);
 
         generator.RootNamespaces.Add(config.RootNamespace);
 
@@ -80,8 +52,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
 
         var generatedSources = generator.Run();
 
-        MultipleOutputHelper.WriteFiles(FileSystem, Console,
-            FileSystem.Combine(projectDir, PathHelper.ToPath(outDir)),
+        MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
             generatedSources.Where(x => x.Module == Modules)
                 .Select(x => (x.Filename, x.Text)),
             deleteExtraPattern: ["*.ts"],
