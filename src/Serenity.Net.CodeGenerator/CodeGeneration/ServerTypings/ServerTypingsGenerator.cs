@@ -130,4 +130,26 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         add(GenerateBasicType);
     }
+
+    public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
+    {
+        if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
+            return;
+
+        try
+        {
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(fileSystem.ReadAllText(appSettingsFile));
+            if ((obj["LocalTextPackages"] ?? ((obj["AppSettings"] 
+                as Newtonsoft.Json.Linq.JObject)?["LocalTextPackages"])) is 
+                Newtonsoft.Json.Linq.JObject packages)
+            {
+                foreach (var p in packages.PropertyValues())
+                    foreach (var x in p.Values<string>())
+                        LocalTextFilters.Add(x);
+            }
+        }
+        catch
+        {
+        }
+    }
 }

@@ -34,25 +34,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
             LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts
         };
 
-        var appSettings = FileSystem.Combine(projectDir, "appsettings.json");
-        if (generator.LocalTexts && FileSystem.FileExists(appSettings))
-        {
-            try
-            {
-                var obj = JObject.Parse(FileSystem.ReadAllText(appSettings));
-                if ((obj["LocalTextPackages"] ?? ((obj["AppSettings"] as JObject)?["LocalTextPackages"])) is JObject packages)
-                {
-                    foreach (var p in packages.PropertyValues())
-                        foreach (var x in p.Values<string>())
-                            generator.LocalTextFilters.Add(x);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error occurred while parsing appsettings.json!" + Environment.NewLine + 
-                    ex.ToString());
-            }
-        }
+        
 
         var outDir = FileSystem.Combine(projectDir, 
             PathHelper.ToPath((config.ServerTypings?.OutDir.TrimToNull() ?? 
@@ -85,6 +67,8 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
                 }
             }
         }
+
+        generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
 
         Console.Write("Transforming " + (Modules ? "ServerTypes" : "ServerTypings") + " at: ", ConsoleColor.Cyan);
         Console.WriteLine(outDir);

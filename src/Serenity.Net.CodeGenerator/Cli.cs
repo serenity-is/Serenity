@@ -1,3 +1,4 @@
+using Microsoft.Identity.Client;
 using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
@@ -25,6 +26,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
         var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"]);
         var propertyArgs = arguments.GetDictionary(["prop", "props", "property"], 
             separators: [',', ';']);
+
         var command = arguments.GetCommand();
         if (string.IsNullOrEmpty(command))
         {
@@ -37,15 +39,13 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             var csprojs = FileSystem.GetFiles(".", "*.csproj");
             if (csprojs.Length == 0)
             {
-                Console.Error("Can't find a project file in current directory!\n" + 
-                    "Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Console.Error(Texts.NoProjectFiles);
                 return ExitCodes.NoProjectFiles;
             }
 
             if (csprojs.Length > 1)
             {
-                Console.Error("Multiple project files found in current directory!\n" + 
-                    "Please run Sergen in a folder that contains only one Asp.Net Core project.");
+                Console.Error(Texts.MultipleProjectFiles);
                 return ExitCodes.MultipleProjectFiles;
             }
 
@@ -54,7 +54,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         if (!FileSystem.FileExists(projectFile))
         {
-            Console.Error($"Can't find a project file at: {projectFile}");
+            Console.Error(string.Format(Texts.CantFindProject, projectFile));
             return ExitCodes.ProjectNotFound;
         }
 
@@ -69,7 +69,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             return args.Any(x => string.Equals(x, command, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (isCommand("r", "restore"))
+        if (isCommand(CommandKeys.Restore, CommandAliases.Restore))
         {
             ArgumentNullException.ThrowIfNull(BuildSystemFactory);
 
@@ -80,7 +80,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             });
         }
 
-        if (isCommand("g", "generate"))
+        if (isCommand(CommandKeys.Generate, CommandAliases.Generate))
         {
             return RunCommand(new GenerateCommand(project, Console)
             {
@@ -88,11 +88,14 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             });
         }
 
-        bool transform = isCommand("t", "transform");
-        bool mvct = isCommand("mvct");
-        bool clientTypes = transform || mvct || isCommand("c", "ct", "clienttypes");
-        bool serverTypings = transform || isCommand("s", "st", "serverTypings");
-        bool mvc = transform || mvct || isCommand("m", "mvc");
+        bool transform = isCommand(CommandKeys.Transform);
+        bool mvcAndClientTypes = isCommand(CommandKeys.MvcAndClientTypes);
+        bool clientTypes = transform || mvcAndClientTypes || 
+            isCommand(CommandKeys.ClientTypes, CommandAliases.ClientTypes);
+        bool serverTypings = transform || 
+            isCommand(CommandKeys.ServerTypings, CommandAliases.ServerTypings);
+        bool mvc = transform || mvcAndClientTypes || 
+            isCommand(CommandKeys.Mvc, CommandAliases.Mvc);
 
         if (!transform && !clientTypes && !serverTypings && !mvc)
         {
@@ -178,33 +181,27 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
     public static void WriteHelp(IGeneratorConsole console)
     {
-        console.ShowHelp($"""""
-            Serenity Code Generator {Assembly.GetEntryAssembly().GetName().Version}
-            Usage: sergen [switches] [command]
+        console.ShowHelp(Texts.Help);
+    }
 
-            Commands:
-              c[lienttypes]    Imports editor and formatter types from TypeScript to C#.
-              g[enerate]        Launches the table code generator.
-              m[vc]             Generates IntelliSense helpers for view locations.
-              mvct              Executes client types and mvc commands simulatenously.
-              r[estore]         [Obsolete] Restores content (e.g., scripts, CSS) from .nupkg.
-              s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
-              t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
+    public static class CommandKeys
+    {
+        public const string ClientTypes = "clienttypes";
+        public const string Generate = "generate";
+        public const string Mvc = "mvc";
+        public const string MvcAndClientTypes = "mvct";
+        public const string Restore = "restore";
+        public const string ServerTypings = "servertypings";
+        public const string Transform = "transform";
+    }
 
-            Switches:
-              -p <ProjectFile>  Specifies the project file. Useful when multiple projects exist 
-                                in the current directory.
-              -prop:<n>=<v>     Provides hints to sergen for project-level properties, 
-                                where <n> is the property name and <v> is its value.
-                                Use a semicolon to separate multiple properties or specify each 
-                                property separately. This is helpful for improving performance
-                                as Sergen won't have to parse the project, and also for addressing 
-                                cases where sergen might not determine a property correctly.
-
-                                Examples:
-                                  -prop:Configuration=Release
-                                  -prop:"OutDir=..\bin\Debug\;AssemblyName=MyAssembly"
-            
-            """"");
+    public static class CommandAliases
+    {
+        public const string ClientTypes = "c";
+        public const string Generate = "g";
+        public const string Transform = "t";
+        public const string Mvc = "m";
+        public const string Restore = "r";
+        public const string ServerTypings = "s";
     }
 }
