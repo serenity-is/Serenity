@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Serenity.CodeGenerator;
 
 public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) : ICodeFileHelper
@@ -8,7 +6,6 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly IGeneratorConsole console = console ?? throw new ArgumentNullException(nameof(console));
 
-    public string Kdiff3Path { get; set; }
     public bool Interactive { get; set; }
 
     private bool? overwriteAll;
@@ -47,8 +44,7 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
         if (isEqual || !Interactive)
         {
             CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
-            if (isEqual)
-                fileSystem.DeleteFile(backup);
+            fileSystem.DeleteFile(backup);
             return;
         }
         
