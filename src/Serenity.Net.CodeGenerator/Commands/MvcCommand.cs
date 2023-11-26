@@ -11,7 +11,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
         config.MVC ??= new();
 
         var transformFor = FileSystem.GetFileNameWithoutExtension(ProjectFile);
-        Console.Write($"Transforming MVC for {transformFor}", ConsoleColor.Cyan);
+        Console.WriteLine($"Transforming MVC for {transformFor}", ConsoleColor.Cyan);
 
         string[] stripViewPaths = config.MVC.StripViewPaths ?? [
             "Modules/",
