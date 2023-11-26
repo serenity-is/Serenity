@@ -35,19 +35,18 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
 
     public void MergeChanges(string backup, string file)
     {
-        if (backup == null || !fileSystem.FileExists(backup) || 
+        if (backup == null || 
+            !fileSystem.FileExists(backup) || 
             !fileSystem.FileExists(file))
             return;
 
-        bool isEqual = FileContentsEqual(backup, file);
-
-        if (isEqual || !Interactive)
+        if (!Interactive ||
+            FileContentsEqual(backup, file))
         {
-            CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
             fileSystem.DeleteFile(backup);
             return;
         }
-        
+
         string answer;
         if (overwriteAll == true)
             answer = "y";
@@ -82,11 +81,10 @@ public class CodeFileHelper(IFileSystem fileSystem, IGeneratorConsole console) :
         if (answer == "y" || answer == "a")
         {
             fileSystem.DeleteFile(backup);
+            return;
         }
-        else
-        {
-            CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
-            fileSystem.DeleteFile(backup);
-        }
+
+        CheckoutAndWrite(file, fileSystem.ReadAllBytes(backup));
+        fileSystem.DeleteFile(backup);
     }
 }
