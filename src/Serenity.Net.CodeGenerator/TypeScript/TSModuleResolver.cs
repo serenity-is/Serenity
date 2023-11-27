@@ -217,8 +217,7 @@ public partial class TSModuleResolver
                                 var toCombine = removeMultiSlash.Replace(PathHelper.ToUrl(mapping), "/");
                                 if (toCombine.StartsWith("./"))
                                     toCombine = toCombine[2..];
-
-                                if (toCombine.StartsWith('/'))
+                                else if (toCombine.StartsWith('/'))
                                     continue; // not supported?
 
                                 toCombine = toCombine.Replace("*", replaceWith);

@@ -96,8 +96,8 @@ public class PhysicalFileSystem : IFileSystem
         if (!path.Contains(':', StringComparison.Ordinal))
             path = "z:\\" + path;
 
-        Uri fromUri = new(AppendDirectorySeparatorChar(relativeTo));
-        Uri toUri = new(AppendDirectorySeparatorChar(path));
+        Uri fromUri = new(AppendDirectorySeparatorChar(relativeTo, force: true));
+        Uri toUri = new(AppendDirectorySeparatorChar(path, force: false));
 
         if (fromUri.Scheme != toUri.Scheme)
             return path;
@@ -108,12 +108,15 @@ public class PhysicalFileSystem : IFileSystem
         if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
             relativePath = relativePath.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
+        if (relativePath == "")
+            return ".";
+
         return relativePath;
     }
 
-    private static string AppendDirectorySeparatorChar(string path)
+    private static string AppendDirectorySeparatorChar(string path, bool force)
     {
-        if (!System.IO.Path.HasExtension(path) &&
+        if (force || !System.IO.Path.HasExtension(path) &&
             !path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
             return path + System.IO.Path.DirectorySeparatorChar;
 
