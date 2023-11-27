@@ -88,7 +88,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             });
         }
 
-        bool transform = isCommand(CommandKeys.Transform);
+        bool transform = isCommand(CommandKeys.Transform, CommandAliases.Transform);
         bool mvcAndClientTypes = isCommand(CommandKeys.MvcAndClientTypes);
         bool clientTypes = transform || mvcAndClientTypes || 
             isCommand(CommandKeys.ClientTypes, CommandAliases.ClientTypes);
