@@ -4,15 +4,13 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": false,
     "inlineSources": true,
     "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "jsxImportSource": "jsx-dom/min",
-    "importHelpers": false,
     "lib": [
-      "ES5",
-      "ES2015",
       "ES2017",
       "DOM"
     ],
@@ -23,13 +21,13 @@
     "noImplicitAny": true,
     "outDir": "./out",    
     "rootDir": "./src",
-    "sourceMap": true,
     "skipLibCheck": true,
-    "useDefineForClassFields": false,
+    "sourceMap": true,
     "target": "ES2017",
     "types": [
       "jest"
-    ]
+    ],
+    "useDefineForClassFields": false
   },
   "include": [
     "src"
