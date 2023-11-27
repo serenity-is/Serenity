@@ -11,8 +11,12 @@
     "rootDir": "../",
     "outDir": "../out/test",
     "paths": {
-      "@/*": [ "../src/*" ],
-      "@optionaldeps/*": ["./testutil/*-testmodule"]
+      "@/*": [
+        "../src/*"
+      ],
+      "@optionaldeps/*": [
+        "./testutil/*-testmodule"
+      ]
     },
     "noImplicitAny": false
   },
