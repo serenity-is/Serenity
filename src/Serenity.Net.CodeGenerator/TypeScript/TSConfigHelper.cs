@@ -15,7 +15,7 @@ public static class TSConfigHelper
         return ListFiles(tsConfig, fileSystem, fileSystem.GetDirectoryName(configPath), cancellationToken);
     }
 
-    public static IEnumerable<string> ListFiles(TSConfig config,
+    private static IEnumerable<string> ListFiles(TSConfig config,
         IFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
@@ -29,13 +29,14 @@ public static class TSConfigHelper
                     fileSystem.Combine(rootDir, PathHelper.ToPath(x))));
         }
 
-        var include = config.Include;
-        if (include == null)
+        var includePatterns = config.Include;
+        if (includePatterns == null)
         {
             if (config.Exclude == null || config.Exclude.Length == 0)
-                return null;
+                return LegacyListFiles(fileSystem, 
+                    fileSystem.Combine(rootDir, "tsconfig.json"), cancellationToken);
 
-            include = ["**/*"];
+            includePatterns = ["**/*"];
         }
 
         var typeRoots = config.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
@@ -64,91 +65,11 @@ public static class TSConfigHelper
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var includePatterns = config.Include
-            .Select(PathHelper.ToUrl)
-            .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
-            .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                (x.StartsWith('/') ? x[1..] : x))
-            .Select(x => (!x.StartsWith("**/", StringComparison.Ordinal) && !x.StartsWith('/')) ? ("/" + x) : x)
-            .ToArray();
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var excludePatterns = (config.Exclude ?? [])
-            .Select(PathHelper.ToUrl)
-            .Where(x => !x.StartsWith("../", StringComparison.Ordinal))
-            .Select(x => x.StartsWith("./", StringComparison.Ordinal) ? x[2..] :
-                (x.StartsWith('/') ? x[1..] : x))
-            .ToArray();
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        files = files.Concat(config.Include.Select(PathHelper.ToUrl)
-            .Where(x => x.StartsWith("../", StringComparison.Ordinal) &&
-            !x.Contains('*', StringComparison.Ordinal))
-            .Select(x => fileSystem.Combine(rootDir, x))
-            .Select(PathHelper.ToPath)
-            .Where(fileSystem.FileExists));
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var includeGlob = new IO.GlobFilter(includePatterns);
-        var excludeGlob = new IO.GlobFilter(excludePatterns);
-
-        IEnumerable<string> allTsFiles;
-
-        if (includePatterns.Length > 0 &&
-            includePatterns.All(x =>
-                x.StartsWith('/') &&
-                !x.StartsWith(@"/*", StringComparison.Ordinal) &&
-                x[1..].Split('/')[0].IndexOf('*') < 0))
-        {
-            // may optimize by traversing directories at root manually, e.g. skip node_modules etc.
-            var scanDirs = includePatterns.Select(x =>
-                x[1..].Split('/')[0].Trim())
-                .Where(y => !string.IsNullOrEmpty(y))
-                .ToArray();
-
-            allTsFiles = fileSystem.GetFiles(rootDir, "*.ts");
-            foreach (var directory in fileSystem.GetDirectories(rootDir))
-            {
-                var directoryName = fileSystem.GetFileName(directory);
-                if (!scanDirs.Any(x => string.Equals(x, directoryName, StringComparison.OrdinalIgnoreCase)))
-                    continue;
-
-                allTsFiles = allTsFiles.Concat(fileSystem.GetFiles(directory, "*.ts", recursive: true));
-            }
-            allTsFiles = allTsFiles.ToArray();
-        }
-        else
-        {
-            allTsFiles = fileSystem.GetFiles(rootDir, "*.ts", recursive: true);
-        }
-
-        allTsFiles = allTsFiles.Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-            !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
-
-        files = files.Concat(allTsFiles.Where(x => includePatterns.Length > 0 &&
-            includeGlob.IsMatch(x[(rootDir.Length + 1)..]) &&
-            (excludePatterns.Length == 0 || !excludeGlob.IsMatch(x[(rootDir.Length + 1)..]))));
+        files = files.Concat(GetFilesMatchingPatterns(fileSystem, rootDir, includePatterns, config?.Exclude));
 
         cancellationToken.ThrowIfCancellationRequested();
 
         return files.Distinct().ToArray();
-    }
-
-    private static bool IsRelativeOrRooted(IFileSystem fileSystem, string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return false;
-
-        if (path.StartsWith('.') ||
-            path.StartsWith('/') ||
-            path.StartsWith('\\') ||
-            fileSystem.IsPathRooted(path))
-            return true;
-
-        return false;
     }
 
     public static TSConfig Read(IFileSystem fileSystem, string path)
@@ -184,7 +105,7 @@ public static class TSConfigHelper
             config.Files ??= baseConfig.Files;
             config.Include ??= baseConfig.Include;
             config.RootDir ??= baseConfig.RootDir;
-            
+
             if (baseConfig.CompilerOptions != null)
             {
                 config.CompilerOptions ??= new();
@@ -209,7 +130,7 @@ public static class TSConfigHelper
         return config;
     }
 
-    public static T TryParseJsonFile<T>(IFileSystem fileSystem, string path) where T: class
+    public static T TryParseJsonFile<T>(IFileSystem fileSystem, string path) where T : class
     {
         ArgumentExceptionHelper.ThrowIfNull(fileSystem);
         ArgumentExceptionHelper.ThrowIfNull(path);
@@ -222,7 +143,7 @@ public static class TSConfigHelper
             var text = fileSystem.ReadAllText(path);
 
 #if ISSOURCEGENERATOR
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(text, 
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(text,
                 new Newtonsoft.Json.JsonSerializerSettings
                 {
                     MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore
@@ -263,5 +184,157 @@ public static class TSConfigHelper
                 namespacesPath is not null)
                 break;
         }
+    }
+
+    private static readonly char[] wildcards = ['*', '?'];
+
+    private static bool IsRelativeOrRooted(IFileSystem fileSystem, string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        if (path.StartsWith('.') ||
+            path.StartsWith('/') ||
+            path.StartsWith('\\') ||
+            fileSystem.IsPathRooted(path))
+            return true;
+
+        return false;
+    }
+
+    private static string NormalizePattern(string pattern)
+    {
+        if (string.IsNullOrEmpty(pattern))
+            return "";
+
+        pattern = PathHelper.ToUrl(pattern);
+        if (pattern.StartsWith("./", StringComparison.Ordinal))
+            pattern = pattern[2..];
+
+        if (pattern.EndsWith('/'))
+            pattern += "**/*";
+        else
+        {
+            var filename = System.IO.Path.GetFileName(pattern);
+            if (string.IsNullOrEmpty(System.IO.Path.GetExtension(filename)) &&
+                filename.IndexOfAny(wildcards) < 0)
+                pattern += "/**/*";
+        }
+
+        return pattern;
+    }
+
+    private static IEnumerable<string> GetFilesMatchingPatterns(IFileSystem fileSystem,
+        string rootDir, string[] includePatterns, string[] excludePatterns)
+    {
+        List<string> result = [];
+
+        includePatterns = includePatterns.Select(NormalizePattern)
+            .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+        excludePatterns = (excludePatterns ?? []).Select(NormalizePattern)
+            .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+        includePatterns = includePatterns.Where(x =>
+        {
+            if (x.IndexOfAny(wildcards) < 0 ||
+                x.StartsWith('/') ||
+                x == ".." ||
+                x.IndexOf("../") >= 0 ||
+                x.IndexOf("..\\") >= 0 &&
+                x.IndexOf(':') >= 0)
+            {
+                var path = fileSystem.Combine(rootDir, PathHelper.ToPath(x));
+                if (fileSystem.FileExists(path))
+                    result.Add(path);
+                return false;
+            }
+            return true;
+        }).ToArray();
+
+        IEnumerable<string> enumerated = [];
+
+        var scanFolders = includePatterns.Select(x => x.Split('/')[0])
+            .Where(x => !string.IsNullOrEmpty(x) &&
+                x.IndexOfAny(wildcards) < 0)
+            .ToArray();
+
+        if (scanFolders.Length == includePatterns.Length)
+        {
+            var scanFoldersSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var s in scanFolders)
+                scanFoldersSet.Add(s);
+
+            enumerated = enumerated.Concat(fileSystem.GetFiles(rootDir, "*.ts"));
+            enumerated = enumerated.Concat(fileSystem.GetFiles(rootDir, "*.tsx"));
+
+            foreach (var directory in fileSystem.GetDirectories(rootDir))
+            {
+                var directoryName = fileSystem.GetFileName(directory);
+                if (!scanFoldersSet.Contains(directoryName))
+                    continue;
+
+                enumerated = enumerated.Concat(fileSystem.GetFiles(directory, "*.ts", recursive: true));
+                enumerated = enumerated.Concat(fileSystem.GetFiles(directory, "*.tsx", recursive: true));
+            }
+            enumerated = enumerated.ToArray();
+        }
+        else
+        {
+            enumerated = fileSystem.GetFiles(rootDir, "*.ts", recursive: true);
+        }
+
+        enumerated = enumerated.Where(x =>
+            !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
+            !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
+
+        var includeGlob = new IO.GlobFilter(includePatterns.Select(x => '/' + x));
+        var excludeGlob = new IO.GlobFilter(excludePatterns.Select(x => '/' + x));
+
+        enumerated = enumerated.Where(x => includePatterns.Length > 0 &&
+            includeGlob.IsMatch(fileSystem.GetRelativePath(rootDir, x)) &&
+            (excludePatterns.Length == 0 || 
+             !excludeGlob.IsMatch(fileSystem.GetRelativePath(rootDir, x))));
+
+        return result.Concat(enumerated);
+    }
+
+    private static IEnumerable<string> LegacyListFiles(IFileSystem fileSystem, 
+        string tsConfigPath, CancellationToken cancellationToken)
+    {
+        // legacy apps
+        var projectDir = fileSystem.GetDirectoryName(tsConfigPath);
+        var directories = new[]
+        {
+                fileSystem.Combine(projectDir, @"Modules"),
+                fileSystem.Combine(projectDir, @"Imports"),
+                fileSystem.Combine(projectDir, @"typings", "serenity"),
+                fileSystem.Combine(projectDir, @"wwwroot", "Scripts", "serenity")
+            }.Where(x => fileSystem.DirectoryExists(x));
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var files = directories.SelectMany(x =>
+            fileSystem.GetFiles(x, "*.ts", recursive: true))
+            .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
+                fileSystem.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
+                fileSystem.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var corelib = files.Where(x => string.Equals(fileSystem.GetFileName(x),
+            "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
+
+        static bool corelibUnderTypings(string x) =>
+            x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
+                StringComparison.OrdinalIgnoreCase);
+
+        if (corelib.Count() > 1 &&
+            corelib.Any(x => !corelibUnderTypings(x)))
+        {
+            files = files.Where(x => !corelibUnderTypings(x));
+        }
+
+        return files.OrderBy(x => x);
     }
 }

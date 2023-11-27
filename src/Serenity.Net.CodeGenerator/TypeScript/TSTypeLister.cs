@@ -1,7 +1,8 @@
 using Serenity.TypeScript.TsTypes;
-using System.Collections.Concurrent;
 using System.Threading;
-#if !ISSOURCEGENERATOR
+#if ISSOURCEGENERATOR
+using System.Collections.Concurrent;
+#else
 using Serenity.CodeGeneration;
 #endif
 
@@ -32,45 +33,7 @@ public class TSTypeLister
         var files = TSConfigHelper.ListFiles(fileSystem, tsConfigPath, 
             out var tsConfig, cancellationToken);
 
-        if (files == null)
-        {
-            // legacy apps
-            var projectDir = fileSystem.GetDirectoryName(tsConfigPath);
-            var directories = new[]
-            {
-                fileSystem.Combine(projectDir, @"Modules"),
-                fileSystem.Combine(projectDir, @"Imports"),
-                fileSystem.Combine(projectDir, @"typings", "serenity"),
-                fileSystem.Combine(projectDir, @"wwwroot", "Scripts", "serenity")
-            }.Where(x => fileSystem.DirectoryExists(x));
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            files = directories.SelectMany(x =>
-                fileSystem.GetFiles(x, "*.ts", recursive: true))
-                .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-                    fileSystem.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
-                    fileSystem.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var corelib = files.Where(x => string.Equals(fileSystem.GetFileName(x),
-                "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
-
-            static bool corelibUnderTypings(string x) =>
-                x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
-                    StringComparison.OrdinalIgnoreCase);
-
-            if (corelib.Count() > 1 &&
-                corelib.Any(x => !corelibUnderTypings(x)))
-            {
-                files = files.Where(x => !corelibUnderTypings(x));
-            }
-
-            files = files.OrderBy(x => x);
-        }
-
-        TSTypeListerAST typeListerAST = new(fileSystem, 
+        TSTypeListerAST typeListerAST = new(fileSystem,
             tsConfigDir: fileSystem.GetDirectoryName(tsConfigPath), tsConfig: tsConfig,
             astCache, cancellationToken);
 
