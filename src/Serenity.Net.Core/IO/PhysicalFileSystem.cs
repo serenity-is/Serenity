@@ -13,7 +13,7 @@ public class PhysicalFileSystem : IFileSystem
     {
         Directory.CreateDirectory(path);
     }
-    
+
     /// <inheritdoc/>
     public Stream CreateFile(string path, bool overwrite = true)
     {
@@ -77,58 +77,15 @@ public class PhysicalFileSystem : IFileSystem
         return File.GetLastWriteTimeUtc(path);
     }
 
-#if ISSOURCEGENERATOR
-    // https://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path/32113484#32113484
+    /// <inheritdoc/>
     public string GetRelativePath(string relativeTo, string path)
     {
-        if (string.IsNullOrEmpty(relativeTo))
-            throw new ArgumentNullException("fromPath");
-
-        if (string.IsNullOrEmpty(path))
-            throw new ArgumentNullException("toPath");
-
-        relativeTo = relativeTo.Replace("/", "\\", StringComparison.Ordinal);
-        path = path.Replace("/", "\\", StringComparison.Ordinal);
-
-        if (!relativeTo.Contains(':', StringComparison.Ordinal))
-            relativeTo = "z:\\" + relativeTo;
-
-        if (!path.Contains(':', StringComparison.Ordinal))
-            path = "z:\\" + path;
-
-        Uri fromUri = new(AppendDirectorySeparatorChar(relativeTo, force: true));
-        Uri toUri = new(AppendDirectorySeparatorChar(path, force: false));
-
-        if (fromUri.Scheme != toUri.Scheme)
-            return path;
-
-        Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-        string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-        if (string.Equals(toUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
-            relativePath = relativePath.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
-
-        if (relativePath == "")
-            return ".";
-
-        return relativePath;
-    }
-
-    private static string AppendDirectorySeparatorChar(string path, bool force)
-    {
-        if (force || !System.IO.Path.HasExtension(path) &&
-            !path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-            return path + System.IO.Path.DirectorySeparatorChar;
-
-        return path;
-    }
+#if ISSOURCEGENERATOR
+        return CodeGenerator.PathHelper.GetRelativePath(relativeTo, path);
 #else
-    /// <inheritdoc/>
-    public virtual string GetRelativePath(string relativeTo, string path)
-    {
         return Path.GetRelativePath(relativeTo, path);
-    }
 #endif
+    }
 
     /// <inheritdoc/>
     public Stream OpenRead(string path)
