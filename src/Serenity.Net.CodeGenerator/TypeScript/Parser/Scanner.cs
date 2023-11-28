@@ -771,26 +771,33 @@ public partial class Scanner
     {
         var quote = _text[_pos];
         _pos++;
-        var result = new StringBuilder();
+        StringBuilder result = null;
         var start = _pos;
         while (true)
         {
             if (_pos >= _end)
             {
-                result.Append(_text, start, _pos - start);
                 _tokenIsUnterminated = true;
                 Error(DiagnosticMessage.Unterminated_string_literal);
+                if (result is null)
+                    return _text[start.._pos];
+
+                result.Append(_text, start, _pos - start);
                 break;
             }
             var ch = _text[_pos];
             if (ch == quote)
             {
+                if (result is null)
+                    return _text[start.._pos++];
+
                 result.Append(_text, start, _pos - start);
                 _pos++;
                 break;
             }
             if (ch == '\\' && allowEscapes)
             {
+                result ??= new();
                 result.Append(_text, start, _pos - start);
                 ScanEscapeSequence(result);
                 start = _pos;
@@ -798,9 +805,12 @@ public partial class Scanner
             }
             if (IsLineBreak(ch))
             {
-                result.Append(_text, start, _pos - start);
                 _tokenIsUnterminated = true;
                 Error(DiagnosticMessage.Unterminated_string_literal);
+                if (result is null)
+                    return _text[start.._pos];
+
+                result.Append(_text, start, _pos - start);
                 break;
             }
             _pos++;
