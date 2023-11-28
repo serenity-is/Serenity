@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsParser;
+using Serenity.TypeScript.TsParser;
 
 namespace Serenity.TypeScript.TsTypes;
 
@@ -28,7 +28,7 @@ public class Node : TextRange, INode
     public NodeFlags Flags { get; set; }
     public ModifierFlags ModifierFlagsCache { get; set; }
     public NodeArray<Decorator> Decorators { get; set; }
-    public /*ModifiersArray*/NodeArray<Modifier> Modifiers { get; set; }
+    public NodeArray<Modifier> Modifiers { get; set; }
     public INode Parent { get; set; }
     public List<JsDoc> JsDoc { get; set; }
 

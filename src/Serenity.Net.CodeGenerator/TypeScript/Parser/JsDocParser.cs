@@ -42,24 +42,6 @@ public class JsDocParser(Parser parser)
         };
     }
 
-    public static (JsDocTypeExpression res, List<Diagnostic> diagnostics) ParseJsDocTypeExpressionForTests(string content, int? start, int? length)
-    {
-        var dp = new JsDocParser(new Parser());
-        dp.Parser.InitializeState(content, null, ScriptKind.Js);
-
-        dp.Parser.CreateSourceFile("file.js", ScriptKind.Js);
-        dp.Parser.Scanner.SetText(content, start, length);
-
-        dp.Parser.Scanner.Scan();
-        var jsDocTypeExpression = dp.ParseJsDocTypeExpression();
-        var diagnostics = dp.Parser.ParseDiagnostics;
-
-        dp.Parser.ClearState();
-
-        return (jsDocTypeExpression, diagnostics);
-    }
-
-
     public JsDocTypeExpression ParseJsDocTypeExpression()
     {
         var result = new JsDocTypeExpression();
@@ -433,8 +415,6 @@ public class JsDocParser(Parser parser)
     public JsDocLiteralType ParseJsDocLiteralType()
     {
         var result = new JsDocLiteralType { Literal = Parser.ParseLiteralTypeNode() };
-
-
         return FinishNode(result);
     }
 
@@ -461,23 +441,6 @@ public class JsDocParser(Parser parser)
             return FinishNode(result);
         }
     }
-
-
-    public Tuple<JsDoc, List<Diagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
-    {
-        Parser ??= new Parser();
-        Parser.InitializeState(content, null, ScriptKind.Js);
-
-        Parser.SourceFile = new SourceFile { LanguageVariant = LanguageVariant.Standard, Text = content };
-        var jsDoc = ParseJsDocCommentWorker(start, length);
-        var diagnostics = ParseDiagnostics;
-
-        ClearState();
-
-
-        return jsDoc != null ? Tuple.Create(jsDoc, diagnostics) : null;
-    }
-
 
     public JsDoc ParseJsDocComment(INode parent, int? start, int? length)
     {

@@ -1,5 +1,3 @@
-﻿using CommentKind = Serenity.TypeScript.TsTypes.SyntaxKind;
-
 namespace Serenity.TypeScript.TsTypes;
 
 public class Map<T> : Dictionary<string, T>
@@ -2339,7 +2337,7 @@ public class CheckJsDirective : TextRange
 public class CommentRange : TextRange
 {
     public bool HasTrailingNewLine { get; set; }
-    public CommentKind Kind { get; set; }
+    public SyntaxKind Kind { get; set; }
 }
 
 public class SynthesizedComment : CommentRange
@@ -2754,16 +2752,11 @@ public class SourceFile : Declaration, ISourceFileLike
     }
 
     public NodeArray<IStatement> Statements { get; set; }
-    public Token EndOfFileToken { get; set; } // Token<SyntaxKind.EndOfFileToken>
+    public Token EndOfFileToken { get; set; }
     public string FileName { get; set; }
-    public AmdDependency[] AmdDependencies { get; set; }
     public string ModuleName { get; set; }
-    public FileReference[] ReferencedFiles { get; set; }
-    public FileReference[] TypeReferenceDirectives { get; set; }
     public LanguageVariant LanguageVariant { get; set; }
     public bool IsDeclarationFile { get; set; }
-    public Map<string> RenamedDependencies { get; set; }
-    public bool HasNoDefaultLib { get; set; }
     public ScriptKind ScriptKind { get; set; }
     public INode ExternalModuleIndicator { get; set; }
     public Node CommonJsModuleIndicator { get; set; }

@@ -4,37 +4,6 @@ namespace Serenity.TypeScript.TsParser;
 
 public static class Core
 {
-    // from core.ts
-
-    public static int BinarySearch(int[] array, int value, Func<int, int, int> comparer = null, int? offset = null)
-    {
-        if (array == null || array.Length == 0)
-        {
-            return -1;
-        }
-        var low = offset ?? 0;
-        var high = array.Length - 1;
-        comparer ??= ((v1, v2) => (v1 < v2 ? -1 : (v1 > v2 ? 1 : 0)));
-        while (low <= high)
-        {
-            var middle = low + ((high - low) >> 1);
-            var midValue = array[middle];
-            if (comparer(midValue, value) == 0)
-            {
-                return middle;
-            }
-            else
-            if (comparer(midValue, value) > 0)
-            {
-                high = middle - 1;
-            }
-            else
-            {
-                low = middle + 1;
-            }
-        }
-        return ~low;
-    }
     public static bool PositionIsSynthesized(int pos)
     {
         // This is a fast way of testing the following conditions:

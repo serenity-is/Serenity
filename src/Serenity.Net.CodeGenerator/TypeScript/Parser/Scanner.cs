@@ -236,12 +236,10 @@ public partial class Scanner
         return false;
     }
 
-
     public static bool IsUnicodeIdentifierStart(int code)
     {
         return LookupInUnicodeMap(code, UnicodeEs5IdentifierStart);
     }
-
 
     public static bool IsUnicodeIdentifierPart(int code)
     {
@@ -296,33 +294,6 @@ public partial class Scanner
     public static int[] GetLineStarts(ISourceFileLike sourceFile)
     {
         return sourceFile.LineMap ??= [.. ComputeLineStarts(sourceFile.Text)];
-    }
-
-    public static LineAndCharacter ComputeLineAndCharacterOfPosition(int[] lineStarts, int position)
-    {
-        var lineNumber = BinarySearch(lineStarts, position);
-        if (lineNumber < 0)
-        {
-            // If the actual position was not found,
-            // the binary search returns the 2's-complement of the next line start
-            // e.g. if the line starts at [5, 10, 23, 80] and the position requested was 20
-            // then the search will return -2.
-            //
-            // We want the index of the previous line start, so we subtract 1.
-            // Review 2's-complement if this is confusing.
-            lineNumber = ~lineNumber - 1;
-            Debug.Assert(lineNumber != -1, "position cannot precede the beginning of the file");
-        }
-        return new LineAndCharacter
-        {
-            Line = lineNumber,
-            Character = position - lineStarts[lineNumber]
-        };
-    }
-
-    public static LineAndCharacter GetLineAndCharacterOfPosition(SourceFile sourceFile, int position)
-    {
-        return ComputeLineAndCharacterOfPosition(GetLineStarts(sourceFile), position);
     }
 
     public static bool IsWhiteSpace(int ch)

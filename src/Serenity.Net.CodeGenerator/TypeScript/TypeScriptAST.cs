@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsParser;
+using Serenity.TypeScript.TsParser;
 using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.TypeScript;
@@ -34,7 +34,7 @@ public class TypeScriptAST: ITypeScriptAST
         {
             Optimized = optimized
         };
-        var sourceFile = parser.ParseSourceFile(fileName, source, null, false, ScriptKind.Ts);
+        var sourceFile = parser.ParseSourceFile(fileName, source, false, ScriptKind.Ts);
         RootNode = sourceFile;
         RootNode.SourceStr = SourceStr;
         if (setChildren)
