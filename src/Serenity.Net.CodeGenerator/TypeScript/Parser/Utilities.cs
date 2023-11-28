@@ -1,4 +1,4 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Factory;
 using static Serenity.TypeScript.TsParser.Scanner;
 using static Serenity.TypeScript.TsParser.Ts;
@@ -138,7 +138,7 @@ public class Utilities
         if (node.Modifiers != null)
             foreach (var modifier in node.Modifiers)
                 flags |= ModifierToFlag(modifier.Kind);
-        if (node.Flags.HasFlag(NodeFlags.NestedNamespace) || node.Kind == SyntaxKind.Identifier &&
+        if ((node.Flags & NodeFlags.NestedNamespace) != 0 || node.Kind == SyntaxKind.Identifier &&
             ((Identifier) node).IsInJsDocNamespace)
             flags |= ModifierFlags.Export;
 
