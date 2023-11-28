@@ -4,6 +4,7 @@ using Serenity.TypeScript.TsTypes;
 using CharSpan = System.ReadOnlySpan<char>;
 #endif
 using static Serenity.TypeScript.TsParser.Core;
+using Debug = System.Diagnostics.Debug;
 
 namespace Serenity.TypeScript.TsParser;
 
@@ -468,7 +469,7 @@ public partial class Scanner
 
     public static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int> error = null)
     {
-        error?.Invoke(Diagnostics.Merge_conflict_marker_encountered, _mergeConflictMarkerLength);
+        error?.Invoke(DiagnosticMessage.Merge_conflict_marker_encountered, _mergeConflictMarkerLength);
         var ch = text[pos];
         var len = text.Length;
         if (ch == '<' || ch == '>')
@@ -701,7 +702,7 @@ public partial class Scanner
             }
             else
             {
-                Error(Diagnostics.Digit_expected);
+                Error(DiagnosticMessage.Digit_expected);
             }
         }
         return _text[start..end];
@@ -778,7 +779,7 @@ public partial class Scanner
             {
                 result.Append(_text, start, _pos - start);
                 _tokenIsUnterminated = true;
-                Error(Diagnostics.Unterminated_string_literal);
+                Error(DiagnosticMessage.Unterminated_string_literal);
                 break;
             }
             var ch = _text[_pos];
@@ -799,7 +800,7 @@ public partial class Scanner
             {
                 result.Append(_text, start, _pos - start);
                 _tokenIsUnterminated = true;
-                Error(Diagnostics.Unterminated_string_literal);
+                Error(DiagnosticMessage.Unterminated_string_literal);
                 break;
             }
             _pos++;
@@ -820,7 +821,7 @@ public partial class Scanner
             {
                 contents.Append(_text, start, _pos - start);
                 _tokenIsUnterminated = true;
-                Error(Diagnostics.Unterminated_template_literal);
+                Error(DiagnosticMessage.Unterminated_template_literal);
                 resultingToken = startedWithBacktick ? SyntaxKind.NoSubstitutionTemplateLiteral : SyntaxKind.TemplateTail;
                 break;
             }
@@ -870,7 +871,7 @@ public partial class Scanner
         _pos++;
         if (_pos >= _end)
         {
-            Error(Diagnostics.Unexpected_end_of_text);
+            Error(DiagnosticMessage.Unexpected_end_of_text);
         }
         var ch = _text[_pos];
         _pos++;
@@ -942,7 +943,7 @@ public partial class Scanner
         }
         else
         {
-            Error(Diagnostics.Hexadecimal_digit_expected);
+            Error(DiagnosticMessage.Hexadecimal_digit_expected);
         }
     }
 
@@ -951,19 +952,19 @@ public partial class Scanner
         var codePoint = ScanMinimumNumberOfHexDigits(1);
         if (codePoint < 0)
         {
-            Error(Diagnostics.Hexadecimal_digit_expected);
+            Error(DiagnosticMessage.Hexadecimal_digit_expected);
             return;
         }
         
         if (codePoint > 0x10FFFF)
         {
-            Error(Diagnostics.An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive);
+            Error(DiagnosticMessage.An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive);
             return;
         }
 
         if (_pos >= _end)
         {
-            Error(Diagnostics.Unexpected_end_of_text);
+            Error(DiagnosticMessage.Unexpected_end_of_text);
             return;
         }
 
@@ -974,7 +975,7 @@ public partial class Scanner
         }
         else
         {
-            Error(Diagnostics.Unterminated_Unicode_escape_sequence);
+            Error(DiagnosticMessage.Unterminated_Unicode_escape_sequence);
             return;
         }
 
@@ -1280,7 +1281,7 @@ public partial class Scanner
                         }
                         if (!commentClosed)
                         {
-                            Error(Diagnostics.Asterisk_Slash_expected);
+                            Error(DiagnosticMessage.Asterisk_Slash_expected);
                         }
                         continue;
                     }
@@ -1300,7 +1301,7 @@ public partial class Scanner
                         var value = ScanMinimumNumberOfHexDigits(1);
                         if (value < 0)
                         {
-                            Error(Diagnostics.Hexadecimal_digit_expected);
+                            Error(DiagnosticMessage.Hexadecimal_digit_expected);
                             value = 0;
                         }
                         _tokenValue = value.ToString();
@@ -1314,7 +1315,7 @@ public partial class Scanner
                         var value = ScanBinaryOrOctalDigits(/* base */ 2);
                         if (value < 0)
                         {
-                            Error(Diagnostics.Binary_digit_expected);
+                            Error(DiagnosticMessage.Binary_digit_expected);
                             value = 0;
                         }
                         _tokenValue = value.ToString();
@@ -1328,7 +1329,7 @@ public partial class Scanner
                         var value = ScanBinaryOrOctalDigits(/* base */ 8);
                         if (value < 0)
                         {
-                            Error(Diagnostics.Octal_digit_expected);
+                            Error(DiagnosticMessage.Octal_digit_expected);
                             value = 0;
                         }
                         _tokenValue = value.ToString();
@@ -1496,7 +1497,7 @@ public partial class Scanner
                         _token = GetIdentifierToken();
                         return _token;
                     }
-                    Error(Diagnostics.Invalid_character);
+                    Error(DiagnosticMessage.Invalid_character);
                     _pos++;
                     _token = SyntaxKind.Unknown;
                     return _token;
@@ -1523,7 +1524,7 @@ public partial class Scanner
                         _pos++;
                         continue;
                     }
-                    Error(Diagnostics.Invalid_character);
+                    Error(DiagnosticMessage.Invalid_character);
                     _pos++;
                     _token = SyntaxKind.Unknown;
                     return _token;
@@ -1581,14 +1582,14 @@ public partial class Scanner
                 if (p >= _end)
                 {
                     _tokenIsUnterminated = true;
-                    Error(Diagnostics.Unterminated_regular_expression_literal);
+                    Error(DiagnosticMessage.Unterminated_regular_expression_literal);
                     break;
                 }
                 var ch = _text[p];
                 if (IsLineBreak(ch))
                 {
                     _tokenIsUnterminated = true;
-                    Error(Diagnostics.Unterminated_regular_expression_literal);
+                    Error(DiagnosticMessage.Unterminated_regular_expression_literal);
                     break;
                 }
                 if (inEscape)

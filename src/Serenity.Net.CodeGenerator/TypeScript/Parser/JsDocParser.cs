@@ -1,5 +1,6 @@
 using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Scanner;
+using Debug = System.Diagnostics.Debug;
 
 namespace Serenity.TypeScript.TsParser;
 
@@ -17,11 +18,11 @@ public class JsDocParser(Parser parser)
     private void ClearState() => Parser.ClearState();
     private void FixupParentReferences(INode rootNode) => Parser.FixupParentReferences(rootNode);
     private void ParseErrorAtCurrentToken(DiagnosticMessage message, object arg0 = null) => Parser.ParseErrorAtCurrentToken(message, arg0);
-    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object arg0 = null) => Parser.ParseErrorAtPosition(start, length, message, arg0);
+    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object argument = null) => Parser.ParseErrorAtPosition(start, length, message, argument);
     private SyntaxKind Token() => Parser.Token();
     private SyntaxKind NextToken() => Parser.NextToken();
     private T TryParse<T>(Func<T> callback) => Parser.TryParse<T>(callback);
-    private bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
+    private bool ParseExpected(SyntaxKind kind) => Parser.ParseExpected(kind, null, true);
     private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
     private Node ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
     private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token());
@@ -298,7 +299,7 @@ public class JsDocParser(Parser parser)
             var start = (typeArguments.Pos ?? 0) - "<".Length;
             var end = SkipTriviaM(SourceText, (int)typeArguments.End) + ">".Length;
 
-            ParseErrorAtPosition(start, end - start, Diagnostics.Type_argument_list_cannot_be_empty);
+            ParseErrorAtPosition(start, end - start, DiagnosticMessage.Type_argument_list_cannot_be_empty);
         }
     }
 
@@ -362,7 +363,7 @@ public class JsDocParser(Parser parser)
         {
             var start = list.End - ",".Length;
 
-            Parser.ParseErrorAtPosition((int)start, ",".Length, Diagnostics.Trailing_comma_not_allowed);
+            Parser.ParseErrorAtPosition((int)start, ",".Length, DiagnosticMessage.Trailing_comma_not_allowed);
         }
     }
 
@@ -911,7 +912,7 @@ public class JsDocParser(Parser parser)
             if (name == null)
             {
 
-                ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
+                ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                 return null;
             }
@@ -955,7 +956,7 @@ public class JsDocParser(Parser parser)
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocReturnTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var result5 = new JsDocReturnTag
             {
@@ -976,7 +977,7 @@ public class JsDocParser(Parser parser)
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocTypeTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var result6 = new JsDocTypeTag
             {
@@ -1003,7 +1004,7 @@ public class JsDocParser(Parser parser)
             if (name == null)
             {
 
-                ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
+                ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                 return null;
             }
@@ -1243,7 +1244,7 @@ public class JsDocParser(Parser parser)
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocTemplateTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var typeParameters = CreateList<TypeParameterDeclaration>();
             while (true)
@@ -1254,7 +1255,7 @@ public class JsDocParser(Parser parser)
                 if (name == null)
                 {
 
-                    ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
+                    ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                     return null;
                 }
@@ -1315,7 +1316,7 @@ public class JsDocParser(Parser parser)
             if (!isIdentifier)
             {
 
-                ParseErrorAtCurrentToken(Diagnostics.Identifier_expected);
+                ParseErrorAtCurrentToken(DiagnosticMessage.Identifier_expected);
 
                 return null;
             }

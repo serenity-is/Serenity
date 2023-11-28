@@ -141,35 +141,15 @@ public static class Core
         return path.EndsWith(extension, StringComparison.Ordinal);
     }
     
-    public static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, params string[] arguments)
+    public static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, object argument)
     {
-        var end = start + length;
-        Debug.Assert(start >= 0, "start must be non-negative, is " + start);
-        Debug.Assert(length >= 0, "length must be non-negative, is " + length);
-        if (file != null)
-        {
-            Debug.Assert(start <= file.Text.Length, $"start must be within the bounds of the file. { start} > { file.Text.Length}");
-            Debug.Assert(end <= file.Text.Length, $"end must be the bounds of the file. { end} > { file.Text.Length}");
-        }
-        var text = GetLocaleSpecificMessage(message);
-        if (arguments.Length > 0) // 4)
-        {
-            //text = formatStringFromArgs(text, arguments, 4);
-        }
         return new Diagnostic
         {
             File = file,
             Start = start,
             Length = length,
-
-            MessageText = text,
-            Category = message?.Category ?? DiagnosticCategory.Unknown,
-            Code = message?.Code ?? 0,
+            Message = message,
+            Argument = argument
         };
     }
-    public static string GetLocaleSpecificMessage(DiagnosticMessage message)
-    {
-        return message?.Key ?? message?.Message ?? "localizedDiagnosticMessages";
-    }
-
 }

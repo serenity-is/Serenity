@@ -3353,30 +3353,13 @@ public class JsFileExtensionInfo
     public bool IsMixedContent { get; set; }
 }
 
-public class DiagnosticMessage
-{
-    public string Key { get; set; }
-    public DiagnosticCategory Category { get; set; }
-    public int Code { get; set; }
-    public string Message { get; set; }
-}
-
-public class DiagnosticMessageChain
-{
-    public string MessageText { get; set; }
-    public DiagnosticCategory Category { get; set; }
-    public int Code { get; set; }
-    public DiagnosticMessageChain Next { get; set; }
-}
-
 public class Diagnostic
 {
     public SourceFile File { get; set; }
     public int Start { get; set; }
     public int Length { get; set; }
-    public object MessageText { get; set; } //  string | DiagnosticMessageChain
-    public DiagnosticCategory Category { get; set; }
-    public int Code { get; set; }
+    public DiagnosticMessage Message { get; set; }
+    public object Argument { get; set; }
 }
 
 public class PluginImport
