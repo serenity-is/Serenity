@@ -3,7 +3,7 @@ namespace Serenity.TypeScript.TsTypes;
 public enum DiagnosticMessage
 {
 #pragma warning disable CS0649
-    Unknown = 0,
+    Null = 0,
     Merge_conflict_marker_encountered,
     Digit_expected,
     Unterminated_string_literal,

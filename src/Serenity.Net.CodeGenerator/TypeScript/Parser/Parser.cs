@@ -444,7 +444,7 @@ public class Parser
         return Token() > SyntaxKind.LastReservedWord;
     }
 
-    public bool ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true)
+    public bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = default, bool shouldAdvance = true)
     {
         if (Token() == kind)
         {
@@ -455,9 +455,9 @@ public class Parser
 
             return true;
         }
-        if (diagnosticMessage != null)
+        if (diagnosticMessage != default)
         {
-            ParseErrorAtCurrentToken(diagnosticMessage.Value);
+            ParseErrorAtCurrentToken(diagnosticMessage);
         }
         else
         {
@@ -573,24 +573,26 @@ public class Parser
         return node;
     }
 
-    public Node CreateMissingNode<T>(SyntaxKind _, bool reportAtCurrentPosition, DiagnosticMessage? diagnosticMessage = null, object argument = null) 
+    public Node CreateMissingNode<T>(SyntaxKind _, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage = default, object argument = null) 
         where T : Node, new()
     {
         if (reportAtCurrentPosition)
         {
-            ParseErrorAtPosition(Scanner.StartPos, 0, diagnosticMessage ?? DiagnosticMessage.Unknown, argument);
+            ParseErrorAtPosition(Scanner.StartPos, 0, diagnosticMessage, argument);
         }
         else
         {
-            ParseErrorAtCurrentToken(diagnosticMessage ?? DiagnosticMessage.Unknown, argument);
+            ParseErrorAtCurrentToken(diagnosticMessage, argument);
         }
-        var result = new T();
-        result.Kind = SyntaxKind.MissingDeclaration;
-        result.Pos = Scanner.StartPos;
+        var result = new T
+        {
+            Kind = SyntaxKind.MissingDeclaration,
+            Pos = Scanner.StartPos
+        };
         return FinishNode(result);
     }
 
-    public Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage? diagnosticMessage = null)
+    public Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage diagnosticMessage = default)
     {
         if (isIdentifier)
         {
@@ -607,10 +609,10 @@ public class Parser
             return FinishNode(node);
         }
 
-        return (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ false, diagnosticMessage ?? DiagnosticMessage.Identifier_expected);
+        return (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ false, diagnosticMessage);
     }
 
-    public Identifier ParseIdentifier(DiagnosticMessage? diagnosticMessage = null)
+    public Identifier ParseIdentifier(DiagnosticMessage diagnosticMessage = default)
     {
         return CreateIdentifier(IsIdentifier(), diagnosticMessage);
     }
@@ -1066,7 +1068,7 @@ public class Parser
             TsTypes.ParsingContext.JSDocTypeArguments => DiagnosticMessage.Type_argument_expected,
             TsTypes.ParsingContext.JSDocTupleTypes => DiagnosticMessage.Type_expected,
             TsTypes.ParsingContext.JSDocRecordMembers => DiagnosticMessage.Property_assignment_expected,
-            _ => DiagnosticMessage.Unknown,
+            _ => DiagnosticMessage.Null,
         };
     }
 
@@ -1136,7 +1138,7 @@ public class Parser
         return CreateMissingList<T>();
     }
 
-    public IEntityName ParseEntityName(bool allowReservedWords, DiagnosticMessage? diagnosticMessage = null)
+    public IEntityName ParseEntityName(bool allowReservedWords, DiagnosticMessage diagnosticMessage = default)
     {
         IEntityName entity = ParseIdentifier(diagnosticMessage);
         while (ParseOptional(SyntaxKind.DotToken))
@@ -1396,7 +1398,7 @@ public class Parser
         var node = new ParameterDeclaration() { Pos = Scanner.StartPos };
         if (Token() == SyntaxKind.ThisKeyword)
         {
-            node.Name = CreateIdentifier(/*isIdentifier*/true, null);
+            node.Name = CreateIdentifier(/*isIdentifier*/true, default);
 
             node.Type = ParseParameterType();
 
@@ -3097,7 +3099,7 @@ public class Parser
 
                         Right = invalidElement,
 
-                        OperatorToken = (/*BinaryOperator*/Token)CreateMissingNode<Token>(SyntaxKind.CommaToken, /*reportAtCurrentPosition*/ false, /*diagnosticMessage*/ null)
+                        OperatorToken = (/*BinaryOperator*/Token)CreateMissingNode<Token>(SyntaxKind.CommaToken, /*reportAtCurrentPosition*/ false, /*diagnosticMessage*/ default)
                     };
 
                     badNode.OperatorToken.Pos = badNode.OperatorToken.End = badNode.Right.Pos;
@@ -3130,7 +3132,7 @@ public class Parser
 
                         Right = invalidElement,
 
-                        OperatorToken = (/*BinaryOperator*/Token)CreateMissingNode<Token>(SyntaxKind.CommaToken, /*reportAtCurrentPosition*/ false, /*diagnosticMessage*/ null)
+                        OperatorToken = (/*BinaryOperator*/Token)CreateMissingNode<Token>(SyntaxKind.CommaToken, /*reportAtCurrentPosition*/ false, /*diagnosticMessage*/ default)
                     };
 
                     badNode.OperatorToken.Pos = badNode.OperatorToken.End = badNode.Right.Pos;
@@ -3254,7 +3256,7 @@ public class Parser
             }
             else
             {
-                ParseExpected(SyntaxKind.GreaterThanToken, /*diagnostic*/ null, /*shouldAdvance*/ false);
+                ParseExpected(SyntaxKind.GreaterThanToken, /*diagnostic*/ default, /*shouldAdvance*/ false);
 
                 ScanJsxText();
             }
@@ -3336,7 +3338,7 @@ public class Parser
         }
         else
         {
-            ParseExpected(SyntaxKind.CloseBraceToken, /*message*/ null, /*shouldAdvance*/ false);
+            ParseExpected(SyntaxKind.CloseBraceToken, /*message*/ default, /*shouldAdvance*/ false);
 
             ScanJsxText();
         }
@@ -3398,7 +3400,7 @@ public class Parser
         }
         else
         {
-            ParseExpected(SyntaxKind.GreaterThanToken, /*diagnostic*/ null, /*shouldAdvance*/ false);
+            ParseExpected(SyntaxKind.GreaterThanToken, /*diagnostic*/ default, /*shouldAdvance*/ false);
 
             ScanJsxText();
         }
@@ -3871,7 +3873,7 @@ public class Parser
         }
     }
 
-    public Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage? diagnosticMessage = null)
+    public Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = default)
     {
         var node = new Block() { Pos = Scanner.StartPos };
         if (ParseExpected(SyntaxKind.OpenBraceToken, diagnosticMessage) || ignoreMissingOpenBrace)
@@ -3893,7 +3895,7 @@ public class Parser
         return FinishNode(node);
     }
 
-    public Block ParseFunctionBlock(bool allowYield, bool allowAwait, bool ignoreMissingOpenBrace, DiagnosticMessage? diagnosticMessage = null)
+    public Block ParseFunctionBlock(bool allowYield, bool allowAwait, bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = default)
     {
         var savedYieldContext = InYieldContext();
 
@@ -4598,7 +4600,7 @@ public class Parser
         return !Scanner.HasPrecedingLineBreak && (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
     }
 
-    public Block ParseFunctionBlockOrSemicolon(bool isGenerator, bool isAsync, DiagnosticMessage? diagnosticMessage = null)
+    public Block ParseFunctionBlockOrSemicolon(bool isGenerator, bool isAsync, DiagnosticMessage diagnosticMessage = default)
     {
         if (Token() != SyntaxKind.OpenBraceToken && CanParseSemicolon())
         {
@@ -4826,7 +4828,7 @@ public class Parser
         return AddJsDocComment(FinishNode(node));
     }
 
-    public MethodDeclaration ParseMethodDeclaration(int fullStart, NodeArray<Decorator> decorators, NodeArray<Modifier> modifiers, AsteriskToken asteriskToken, IPropertyName name, QuestionToken questionToken, DiagnosticMessage? diagnosticMessage = null)
+    public MethodDeclaration ParseMethodDeclaration(int fullStart, NodeArray<Decorator> decorators, NodeArray<Modifier> modifiers, AsteriskToken asteriskToken, IPropertyName name, QuestionToken questionToken, DiagnosticMessage diagnosticMessage = default)
     {
         var method = new MethodDeclaration
         {

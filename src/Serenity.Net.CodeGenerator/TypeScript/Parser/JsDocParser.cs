@@ -22,7 +22,7 @@ public class JsDocParser(Parser parser)
     private SyntaxKind Token() => Parser.Token();
     private SyntaxKind NextToken() => Parser.NextToken();
     private T TryParse<T>(Func<T> callback) => Parser.TryParse<T>(callback);
-    private bool ParseExpected(SyntaxKind kind) => Parser.ParseExpected(kind, null, true);
+    private bool ParseExpected(SyntaxKind kind) => Parser.ParseExpected(kind, default, true);
     private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
     private Node ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
     private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token());
