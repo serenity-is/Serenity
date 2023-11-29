@@ -10,7 +10,7 @@ public static class TSConfigHelper
     {
         tsConfig = Read(fileSystem, configPath);
         if (tsConfig is null)
-            return null;
+            return LegacyListFiles(fileSystem, configPath, cancellationToken);
 
         return ListFiles(tsConfig, fileSystem, fileSystem.GetDirectoryName(configPath), cancellationToken);
     }

@@ -39,7 +39,7 @@ public class TSCachingFileSystem(IFileSystem fileSystem) : IFileSystem
     public bool FileExists(string path)
     {
         if (string.IsNullOrEmpty(path))
-            throw new ArgumentNullException(nameof(path));
+            return false;
 
         var cacheKey = TypeScript.TsParser.Core.NormalizePath(path);
 
