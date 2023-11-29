@@ -240,9 +240,9 @@ public static class TSConfigHelper
             if (x.IndexOfAny(wildcards) < 0 ||
                 x.StartsWith('/') ||
                 x == ".." ||
-                x.IndexOf("../") >= 0 ||
-                x.IndexOf("..\\") >= 0 &&
-                x.IndexOf(':') >= 0)
+                x.Contains("../", StringComparison.Ordinal) ||
+                x.Contains("..\\", StringComparison.Ordinal) &&
+                x.Contains(':', StringComparison.Ordinal))
             {
                 var path = fileSystem.Combine(rootDir, PathHelper.ToPath(x));
                 if (fileSystem.FileExists(path))

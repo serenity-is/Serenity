@@ -1,4 +1,3 @@
-using Microsoft.Identity.Client;
 using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
@@ -24,7 +23,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         var projectFile = arguments.GetString(["p", "project"]);
         var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"]);
-        var propertyArgs = arguments.GetDictionary(["prop", "props", "property"], 
+        var propertyArgs = arguments.GetDictionary(["prop", "props", "property"],
             separators: [',', ';']);
 
         var command = arguments.GetCommand();
@@ -90,11 +89,11 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         bool transform = isCommand(CommandKeys.Transform, CommandAliases.Transform);
         bool mvcAndClientTypes = isCommand(CommandKeys.MvcAndClientTypes);
-        bool clientTypes = transform || mvcAndClientTypes || 
+        bool clientTypes = transform || mvcAndClientTypes ||
             isCommand(CommandKeys.ClientTypes, CommandAliases.ClientTypes);
-        bool serverTypings = transform || 
+        bool serverTypings = transform ||
             isCommand(CommandKeys.ServerTypings, CommandAliases.ServerTypings);
-        bool mvc = transform || mvcAndClientTypes || 
+        bool mvc = transform || mvcAndClientTypes ||
             isCommand(CommandKeys.Mvc, CommandAliases.Mvc);
 
         if (!transform && !clientTypes && !serverTypings && !mvc)
@@ -113,22 +112,24 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             if (tsTypesNamespaces is null &&
                 tsTypesModules is null)
             {
-                TSConfigHelper.LocateTSConfigFiles(FileSystem, projectDir,
+                var fileSystem = new TSCachingFileSystem(FileSystem);
+
+                TSConfigHelper.LocateTSConfigFiles(fileSystem, projectDir,
                     out string modulesPath, out string namespacesPath);
 
                 if (modulesPath is null &&
                     namespacesPath is null)
-                    namespacesPath = FileSystem.Combine(projectDir, "tsconfig.json");
+                    namespacesPath = fileSystem.Combine(projectDir, "tsconfig.json");
 
                 if (namespacesPath is not null)
                 {
-                    var nsLister = new TSTypeLister(FileSystem, namespacesPath);
+                    var nsLister = new TSTypeLister(fileSystem, namespacesPath, new());
                     tsTypesNamespaces = nsLister.List();
                 }
 
                 if (modulesPath is not null)
                 {
-                    var mdLister = new TSTypeLister(FileSystem, modulesPath);
+                    var mdLister = new TSTypeLister(fileSystem, modulesPath, new());
                     tsTypesModules = mdLister.List();
                 }
             }

@@ -1,3 +1,7 @@
+#if ISSOURCEGENERATOR
+using System.Collections.Concurrent;
+#endif
+
 namespace Serenity.CodeGenerator;
 
 public partial class TSModuleResolver
@@ -75,14 +79,16 @@ public partial class TSModuleResolver
         return null;
     }
 
-    private ConcurrentDictionary<string, bool> fileExists = new();
+    private ConcurrentDictionary<string, Lazy<PackageJson>> packageJson = new();
 
-    public bool FileExists(string path)
+    private PackageJson TryParsePackageJson(string path)
     {
         if (string.IsNullOrEmpty(path))
-            return false;
+            return null;
 
-        return fileExists.GetOrAdd(path, fileSystem.FileExists);
+        var cacheKey = TypeScript.TsParser.Core.NormalizePath(path);
+
+        return packageJson.GetOrAdd(cacheKey, cacheKey => new(() => TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, path))).Value;
     }
 
     public string Resolve(string fileNameOrModule, string referencedFrom,
@@ -98,7 +104,7 @@ public partial class TSModuleResolver
         if (string.IsNullOrEmpty(referencedFrom))
         {
             resolvedPath = fileNameOrModule;
-            if (!FileExists(resolvedPath))
+            if (!fileSystem.FileExists(resolvedPath))
                 return null;
         }
         else if (fileNameOrModule.StartsWith('.') ||
@@ -124,29 +130,28 @@ public partial class TSModuleResolver
                 fileNameOrModule.EndsWith('/'))
                 resolvedPath = extensions
                     .Select(ext => fileSystem.Combine(searchBase, "index" + ext))
-                    .FirstOrDefault(FileExists);
+                    .FirstOrDefault(fileSystem.FileExists);
             else
             {
                 resolvedPath = extensions
                         .Select(ext => searchBase + ext)
-                        .FirstOrDefault(FileExists) ??
+                        .FirstOrDefault(fileSystem.FileExists) ??
                     extensions
                         .Select(ext => fileSystem.Combine(searchBase + "/index" + ext))
-                        .FirstOrDefault(FileExists);
+                        .FirstOrDefault(fileSystem.FileExists);
             }
         }
         else
         {
             void tryPackageJson(string path, ref string moduleName)
             {
-                var packageJson = TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, 
-                    fileSystem.Combine(path, "package.json"));
+                var packageJson = TryParsePackageJson(fileSystem.Combine(path, "package.json"));
 
                 if (packageJson is not null)
                 {
                     var types = packageJson.Types ?? packageJson.Typings;
                     if (!string.IsNullOrEmpty(types) &&
-                        FileExists(fileSystem.Combine(path, types)))
+                        fileSystem.FileExists(fileSystem.Combine(path, types)))
                     {
                         resolvedPath = fileSystem.Combine(path, types);
                         moduleName = packageJson.Name ?? TryGetNodePackageName(path) ?? fileSystem.GetFileName(path);
@@ -156,8 +161,7 @@ public partial class TSModuleResolver
 
                 var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(path));
 
-                packageJson = TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem,
-                    fileSystem.Combine(parentDir, "package.json"));
+                packageJson = TryParsePackageJson(fileSystem.Combine(parentDir, "package.json"));
 
                 if (packageJson is not null)
                 {
@@ -169,7 +173,7 @@ public partial class TSModuleResolver
                         resolvedPath = typesArr
                             .Where(x => !string.IsNullOrEmpty(x))
                             .Select(x => fileSystem.Combine(parentDir, x))
-                            .FirstOrDefault(x => FileExists(x));
+                            .FirstOrDefault(x => fileSystem.FileExists(x));
 
                         if (resolvedPath is not null)
                         {
@@ -181,7 +185,7 @@ public partial class TSModuleResolver
 
                     var types = packageJson.Types ?? packageJson.Typings;
                     if (!string.IsNullOrEmpty(types) &&
-                        FileExists(fileSystem.Combine(parentDir, types)))
+                        fileSystem.FileExists(fileSystem.Combine(parentDir, types)))
                     {
                         resolvedPath = fileSystem.Combine(parentDir, types);
                         moduleName = packageJson.Name ?? TryGetNodePackageName(parentDir) ?? fileSystem.GetFileName(parentDir);
@@ -195,14 +199,14 @@ public partial class TSModuleResolver
                 if (testBase[^1] != '\\' && testBase[^1] != '/')
                     resolvedPath = extensions
                         .Select(ext => testBase + ext)
-                        .FirstOrDefault(FileExists);
+                        .FirstOrDefault(fileSystem.FileExists);
 
                 if (resolvedPath is null)
                     tryPackageJson(testBase, ref moduleName);
 
                 resolvedPath ??= extensions
                     .Select(ext => fileSystem.Combine(testBase, "index" + ext))
-                    .FirstOrDefault(FileExists);
+                    .FirstOrDefault(fileSystem.FileExists);
             }
 
             if (paths != null)

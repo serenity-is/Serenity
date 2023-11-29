@@ -498,12 +498,12 @@ public partial class Scanner
     {
         // Shebangs check must only be done at the start of the file
         Debug.Assert(pos == 0);
-        return shebangTriviaRegex.Test(text);
+        return shebangTriviaRegex.IsMatch(text);
     }
 
     public static int ScanShebangTrivia(string text, int pos)
     {
-        var shebang = shebangTriviaRegex.Exec(text)[0];
+        var shebang = TsExtensions.Exec(shebangTriviaRegex, text)[0];
         pos += shebang.Length;
         return pos;
     }

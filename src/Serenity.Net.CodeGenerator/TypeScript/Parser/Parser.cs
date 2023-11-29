@@ -161,11 +161,7 @@ public class Parser
             Pos = 0,
             End = SourceText.Length,
             Text = SourceText,
-
-            BindDiagnostics = [],
-
-            FileName = Optimized ? fileName : NormalizePath(fileName),
-
+            FileName = NormalizePath(fileName),
             LanguageVariant = GetLanguageVariant(scriptKind)
         };
 
@@ -318,7 +314,7 @@ public class Parser
     {
         if (!Optimized)
         {
-            var lastError = LastOrUndefined(ParseDiagnostics);
+            var lastError = ParseDiagnostics?.LastOrDefault();
             if (lastError == null || start != lastError.Start)
             {
                 ParseDiagnostics.Add(CreateFileDiagnostic(SourceFile, start, length, message, argument));
@@ -1188,7 +1184,7 @@ public class Parser
         {
             templateSpans.Add(ParseTemplateSpan());
         }
-        while (LastOrUndefined(templateSpans).Literal.Kind == SyntaxKind.TemplateMiddle);
+        while (templateSpans.LastOrDefault()?.Literal.Kind == SyntaxKind.TemplateMiddle);
 
         templateSpans.End = GetNodeEnd();
         template.TemplateSpans = templateSpans;

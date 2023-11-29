@@ -2611,7 +2611,6 @@ public class SourceFile : Declaration, ISourceFileLike
     public int SymbolCount { get; set; }
     public List<Diagnostic> ParseDiagnostics { get; set; }
     public List<Diagnostic> AdditionalSyntacticDiagnostics { get; set; }
-    public List<Diagnostic> BindDiagnostics { get; set; }
     public Map<string> ClassifiableNames { get; set; }
     public Map<ResolvedModuleFull> ResolvedModules { get; set; }
     public Map<ResolvedTypeReferenceDirective> ResolvedTypeReferenceDirectiveNames { get; set; }

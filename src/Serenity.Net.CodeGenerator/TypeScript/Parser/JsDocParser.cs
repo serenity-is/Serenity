@@ -587,7 +587,7 @@ public class JsDocParser(Parser parser)
                        if (margin != null && (indent ?? 0) + whitespace.Length > margin)
                        {
 
-                           comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
+                           comments.Add(TsExtensions.Slice(whitespace, (int)margin - (indent ?? 0) - 1));
                        }
 
                        indent += whitespace.Length;
@@ -654,7 +654,7 @@ public class JsDocParser(Parser parser)
         {
             while (comments2.Count != 0 && (comments2[^1] == "\n" || comments2[^1] == "\r"))
             {
-                comments2.Pop();
+                comments2.RemoveAt(0);
             }
         }
 
@@ -774,7 +774,7 @@ public class JsDocParser(Parser parser)
                             if (margin != null && indent + whitespace.Length > margin)
                             {
 
-                                comments2.Add(whitespace.Slice((int)margin - indent - 1));
+                                comments2.Add(TsExtensions.Slice(whitespace, ((int)margin - indent - 1)));
                             }
 
                             indent += whitespace.Length;

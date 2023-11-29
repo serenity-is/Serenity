@@ -2,7 +2,7 @@ namespace Serenity.TypeScript.TsParser;
 
 public static class TsExtensions
 {
-    public static string[] Exec(this Regex r, string text)
+    public static string[] Exec(Regex r, string text)
     {
         var result = new List<string>();
         foreach (var x in r.Match(text).Captures)
@@ -11,10 +11,7 @@ public static class TsExtensions
         return [.. result];
     } 
 
-    public static bool Test(this Regex r, string text) => r.IsMatch(text);
-    public static void Pop<T>(this List<T> list) => list.RemoveAt(0);
-    
-    public static string Slice(this string str, int start, int end = int.MaxValue)
+    public static string Slice(string str, int start, int end = int.MaxValue)
     {
         if (start < 0)
             start += str.Length;
