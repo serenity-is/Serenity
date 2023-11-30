@@ -15,7 +15,7 @@ export function addLocalText(obj: string | Record<string, string | Record<string
         return;
     }
 
-    pre = pre || '';
+    pre ??= '';
     for (let k of Object.keys(obj)) {
         let actual = pre + k;
         let o = obj[k];
@@ -33,8 +33,7 @@ export function localText(key: string, defaultText?: string): string {
 }
 
 export function tryGetText(key: string): string {
-    var value = getTable()[key];
-    return value;
+    return getTable()[key];
 }
 
 export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
