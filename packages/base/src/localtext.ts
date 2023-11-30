@@ -39,6 +39,8 @@ export function tryGetText(key: string): string {
 export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
     return new Proxy(o, {
         get: (_: Object, y: string) => {
+            if (typeof y === "symbol")
+                return;
             var tv = t[y];
             if (tv == null)
                 return localText(p + y);
