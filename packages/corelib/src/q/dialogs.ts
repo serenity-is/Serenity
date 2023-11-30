@@ -1,7 +1,7 @@
 ﻿import { extend } from "./system-compat";
 import $ from "@optionaldeps/jquery";
 import bootstrap from "@optionaldeps/bootstrap";
-import { Config, htmlEncode, toggleClass, tryGetText } from "@serenity-is/base";
+import { Config, htmlEncode, localText, toggleClass } from "@serenity-is/base";
 
 /**
  * Options for a message dialog button
@@ -130,7 +130,7 @@ const defaultTxt: Record<string, string> = {
 };
 
 function txt(k: string) {
-    return htmlEncode(tryGetText("Dialogs." + k) ?? defaultTxt[k]);
+    return htmlEncode(localText("Dialogs." + k, defaultTxt[k]));
 }
 
 /** 
