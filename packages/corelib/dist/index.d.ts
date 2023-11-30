@@ -1349,8 +1349,8 @@ interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSe
 }
 
 declare function getCookie(name: string): any;
-declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
-declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
+declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
+declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 declare function setEquality(request: ListRequest, field: string, value: any): void;
 interface PostToServiceOptions {
     url?: string;
@@ -2644,7 +2644,7 @@ interface Select2InplaceAddOptions {
 }
 interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
 }
-interface Select2SearchPromise {
+interface Select2SearchPromise extends PromiseLike<any> {
     abort?(): void;
     catch?(callback: () => void): void;
     fail?(callback: () => void): void;

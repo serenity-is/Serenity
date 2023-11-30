@@ -507,7 +507,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
         var request = serviceCall(options);
-        fail && request.fail(fail);
+        fail && ((request as JQueryXHR)?.fail ? (request as JQueryXHR).fail(fail) : request.then(null, fail));
     }
 
     protected initLocalizationGrid(): void {

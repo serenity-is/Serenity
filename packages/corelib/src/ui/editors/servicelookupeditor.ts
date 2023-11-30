@@ -173,7 +173,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
         var opt = this.getServiceCallOptions(query, results);
-        return serviceCall(opt);
+        return serviceCall(opt) as Select2SearchPromise;
     }
 }
 

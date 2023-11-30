@@ -26,7 +26,7 @@ typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
     }
 });
 
-export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>) {
+export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse> {
     let handleError = function (response: any) {
         if (Config.notLoggedInHandler != null &&
             response &&
@@ -123,7 +123,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
 }
 
 export function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any,
-    onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>) {
+    onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse> {
     return serviceCall(extend<ServiceOptions<TResponse>>({
         service: service,
         request: request,

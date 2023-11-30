@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -56,7 +56,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 HandleMemberType(responseType, codeNamespace, module);
                 var serviceOptions = module ? ImportFromQ("ServiceOptions") : "Q.ServiceOptions";
 
-                sb.AppendLine($") => void, opt?: {serviceOptions}<any>): JQueryXHR;");
+                sb.Append($") => void, opt?: {serviceOptions}<any>): PromiseLike<");
+                HandleMemberType(responseType, codeNamespace, module);
+                sb.AppendLine(">;");
             }
 
             sb.AppendLine();

@@ -3038,8 +3038,8 @@ declare namespace Serenity {
     }
 
     function getCookie(name: string): any;
-    function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
+    function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
+    function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
     function setEquality(request: ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;
@@ -4206,7 +4206,7 @@ declare namespace Serenity {
     }
     interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
     }
-    interface Select2SearchPromise {
+    interface Select2SearchPromise extends PromiseLike<any> {
         abort?(): void;
         catch?(callback: () => void): void;
         fail?(callback: () => void): void;

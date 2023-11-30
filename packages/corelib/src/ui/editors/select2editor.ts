@@ -35,7 +35,7 @@ export interface Select2InplaceAddOptions {
 export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
 }
 
-export interface Select2SearchPromise {
+export interface Select2SearchPromise extends PromiseLike<any> {
     abort?(): void;
     catch?(callback: () => void): void;
     fail?(callback: () => void): void;
