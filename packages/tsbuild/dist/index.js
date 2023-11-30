@@ -120,7 +120,7 @@ export const esbuildOptions = (opt) => {
         plugins,
         sourcemap: true,
         splitting: splitting,
-        target: 'es6',
+        target: 'es2017',
         watch: process.argv.slice(2).some(x => x == "--watch"),
     }, opt);
 }
