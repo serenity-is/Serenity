@@ -185,12 +185,15 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 _setValue(row, null);
                 break;
             case JsonTokenType.String:
-                if (string.IsNullOrWhiteSpace(reader.GetString()))
+                var s = reader.GetString();
+                if (string.IsNullOrWhiteSpace(s))
                     _setValue(row, null);
                 else if (reader.TryGetDateTimeOffset(out var dtofs))
                     _setValue(row, dtofs);
+                else if (reader.TryGetDateTime(out var dt))
+                    _setValue(row, dt);
                 else
-                    _setValue(row, reader.GetDateTime());
+                    _setValue(row, DateTimeOffset.Parse(s.Trim(), CultureInfo.InvariantCulture));
                 break;
             default:
                 throw UnexpectedJsonToken(ref reader);

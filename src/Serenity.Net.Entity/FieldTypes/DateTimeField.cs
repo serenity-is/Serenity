@@ -291,12 +291,15 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
                 _setValue(row, null);
                 break;
             case JsonTokenType.String:
-                if (string.IsNullOrWhiteSpace(reader.GetString())) 
+                var s = reader.GetString();
+                if (string.IsNullOrWhiteSpace(s))
                     _setValue(row, null);
                 else if (reader.TryGetDateTimeOffset(out var dtofs))
                     _setValue(row, ToDateTimeKind(dtofs));
-                else 
-                    _setValue(row, ToDateTimeKind(reader.GetDateTime()));
+                else if (reader.TryGetDateTime(out var dt))
+                    _setValue(row, ToDateTimeKind(dt));
+                else
+                    _setValue(row, ToDateTimeKind(Convert.ToDateTime(s.Trim(), CultureInfo.InvariantCulture)));
                 break;
             default:
                 throw UnexpectedJsonToken(ref reader);
