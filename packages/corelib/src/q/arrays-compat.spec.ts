@@ -1,4 +1,4 @@
-﻿import { any, count, first, groupBy, indexOf, insert, isArray, single, toGrouping, tryFirst } from "./arrays";
+﻿import { any, count, first, groupBy, indexOf, insert, isArray, single, toGrouping, tryFirst } from "./arrays-compat";
 
 describe("Q.any", () => {
     it('returns false for empty array', function () {

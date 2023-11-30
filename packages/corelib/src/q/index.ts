@@ -1,4 +1,4 @@
-export * from "./arrays";
+export * from "./arrays-compat";
 export * from "./authorization";
 export * from "./blockui";
 export * from "./dialogs";
