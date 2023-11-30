@@ -5,6 +5,7 @@
 
 const mockLocalTextStore = (localTexts: Record<string, any>) => {
     jest.mock('./system', () => ({
+        ...jest.requireActual("./system"),
         getStateStore: jest.fn(() => localTexts)
     }));
 }
