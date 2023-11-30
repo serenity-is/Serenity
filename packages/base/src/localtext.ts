@@ -38,34 +38,21 @@ export function tryGetText(key: string): string {
 }
 
 export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
-    if (typeof Proxy != 'undefined') {
-        return new Proxy(o, {
-            get: (_: Object, y: string) => {
-                var tv = t[y];
-                if (tv == null)
-                    return localText(p + y);
-                else {
-                    var z = o[y];
-                    if (z != null)
-                        return z;
-                    o[y] = z = proxyTexts({}, p + y + '.', tv);
+    return new Proxy(o, {
+        get: (_: Object, y: string) => {
+            var tv = t[y];
+            if (tv == null)
+                return localText(p + y);
+            else {
+                var z = o[y];
+                if (z != null)
                     return z;
-                }
-            },
-            ownKeys: (_: Object) => Object.keys(t)
-        });
-    }
-    else {
-        for (var k of Object.keys(t)) {
-            if (typeof t[k] == 'number')
-                Object.defineProperty(o, k, {
-                    get: () => localText(p + k)
-                });
-            else
-                o[k] = proxyTexts({}, p + k + '.', t[k]);
-        }
-        return o;
-    }
+                o[y] = z = proxyTexts({}, p + y + '.', tv);
+                return z;
+            }
+        },
+        ownKeys: (_: Object) => Object.keys(t)
+    });
 }
 
 let globalThis: any = getGlobalThis();
