@@ -2097,7 +2097,7 @@ declare namespace Serenity {
      */
     function toggleClass(el: Element, cls: string, add?: boolean): void;
 
-    function addLocalText(obj: any, pre?: string): void;
+    function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;
     function tryGetText(key: string): string;
     function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
@@ -2270,6 +2270,9 @@ declare namespace Serenity {
         items: PropertyItem[];
         additionalItems: PropertyItem[];
     }
+
+    function resolveUrl(url: string): string;
+    function resolveServiceUrl(url: string): string;
 
     interface ServiceError {
         Code?: string;
@@ -2743,7 +2746,7 @@ declare namespace Serenity {
      * alertDialog("An error occured!"); }
      */
     function alertDialog(message: string, options?: AlertOptions): void;
-    /** @obsolete use alertDialog */
+    /** @deprecated use alertDialog */
     const alert: typeof alertDialog;
     /** Additional options for confirm dialog */
     interface ConfirmOptions extends CommonDialogOptions {
@@ -2772,7 +2775,7 @@ declare namespace Serenity {
      * }
      */
     function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
-    /** @obsolete use confirmDialog */
+    /** @deprecated use confirmDialog */
     const confirm: typeof confirmDialog;
     /** Options for `iframeDialog` **/
     interface IFrameDialogOptions {
@@ -2795,7 +2798,7 @@ declare namespace Serenity {
      * }
      */
     function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
-    /** @obsolete use informationDialog */
+    /** @deprecated use informationDialog */
     const information: typeof informationDialog;
     /**
      * Display a success dialog
@@ -2809,7 +2812,7 @@ declare namespace Serenity {
      * }
      */
     function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
-    /** @obsolete use successDialog */
+    /** @deprecated use successDialog */
     const success: typeof successDialog;
     /**
      * Display a warning dialog
@@ -2820,7 +2823,7 @@ declare namespace Serenity {
      * warningDialog("Something is odd!");
      */
     function warningDialog(message: string, options?: AlertOptions): void;
-    /** @obsolete use warningDialog */
+    /** @deprecated use warningDialog */
     const warning: typeof warningDialog;
     /**
      * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
@@ -2878,15 +2881,9 @@ declare namespace Serenity {
      * This is an alias for Culture.stringCompare, left in for compatibility reasons.
      */
     let turkishLocaleCompare: (a: string, b: string) => number;
-    /**
-     * @obsolete
-     * Use stringFormat
-     */
+    /** @deprecated Use stringFormat */
     let format: typeof stringFormat;
-    /**
-     * @obsolete
-     * Use stringFormatLocale
-     */
+    /** @deprecated Use stringFormatLocale */
     let localeFormat: typeof stringFormatLocale;
     /**
      * Formats a number containing number of minutes into a string in the format "d.hh:mm".
@@ -2915,7 +2912,7 @@ declare namespace Serenity {
      * Adds an option to the select.
      */
     function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
-    /** @obsolete use htmlEncode as it also encodes quotes */
+    /** @deprecated use htmlEncode as it also encodes quotes */
     const attrEncode: typeof htmlEncode;
     /** Clears the options in the select element */
     function clearOptions(select: JQuery): void;
@@ -2969,13 +2966,15 @@ declare namespace Serenity {
     function executeOnceWhenVisible(element: JQuery, callback: Function): void;
     function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
-    /** @obsolete prefer localText for better discoverability */
+    /** @deprecated prefer localText for better discoverability */
     const text: typeof localText;
     function dbText(prefix: string): ((key: string) => string);
     function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
     function dbTryText(prefix: string): ((key: string) => string);
     namespace LT {
+        /** @deprecated Use addLocalText */
         const add: typeof addLocalText;
+        /** @deprecated Use localText */
         const getDefault: typeof localText;
     }
 
@@ -3051,23 +3050,23 @@ declare namespace Serenity {
     function parseQueryString(s?: string): {};
     function postToService(options: PostToServiceOptions): void;
     function postToUrl(options: PostToUrlOptions): void;
-    function resolveUrl(url: string): string;
 
     /**
      * Checks if the string ends with the specified substring.
+     * @deprecated Use .endsWith method of String directly
      * @param s String to check.
      * @param suffix Suffix to check.
      * @returns True if the string ends with the specified substring.
-     */
+      */
     function endsWith(s: string, suffix: string): boolean;
     /**
-     * Checks if the string is empty or null.
+     * Checks if the string is empty or null. Prefer (!s) instead.
      * @param s String to check.
      * @returns True if the string is empty or null.
      */
     function isEmptyOrNull(s: string): boolean;
     /**
-     * Checks if the string is empty or null or whitespace.
+     * Checks if the string is empty or null or whitespace. Prefer !s?.Trim() instead.
      * @param s String to check.
      * @returns True if the string is empty or null or whitespace.
      */
@@ -3082,6 +3081,7 @@ declare namespace Serenity {
     function padLeft(s: string | number, len: number, ch?: string): any;
     /**
      * Checks if the string starts with the prefix
+     * @deprecated Use .startsWith method of String directly
      * @param s String to check.
      * @param prefix Prefix to check.
      * @returns True if the string starts with the prefix.

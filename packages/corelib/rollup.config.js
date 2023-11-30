@@ -221,6 +221,7 @@ export default [
                 sourcemap: true,
                 sourcemapExcludeSources: false,
                 name: "Serenity",
+                generatedCode: 'es2015',
                 extend: true,
                 freeze: false,
                 banner: fs.readFileSync('./node_modules/tslib/tslib.js',

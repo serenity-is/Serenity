@@ -10,7 +10,7 @@
       ]
     },
     "outDir": "./out",
-    "target": "ES5"
+    "target": "ES2017"
   },
   "include": [
     "src"

@@ -5,7 +5,8 @@ export default [
         input: "./src/index.ts",
         output: [{ 
             file: "./dist/index.d.ts",
-            format: "es"
+            format: "es",
+            generatedCode: 'es2015'
         }],
         plugins: [
             dts()

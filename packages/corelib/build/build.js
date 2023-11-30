@@ -57,7 +57,7 @@ var coreLibBase = {
     outdir: 'dist',
     sourcemap: true,
     splitting: false,
-    target: 'es6'
+    target: 'es2015'
 }
 
 await esbuild.build({
