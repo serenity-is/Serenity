@@ -1,11 +1,11 @@
-﻿import { getInstanceType, parseInteger } from "@serenity-is/base";
+﻿import validator from "@optionaldeps/jquery.validation";
+import { Config, getInstanceType, parseInteger, positionToastContainer } from "@serenity-is/base";
 import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, isEmptyOrNull, isMobileView, layoutFillHeight, newBodyDiv, openPanel, positionToastContainer, validateOptions } from "../../q";
+import { DialogButton, bsModalMarkup, closePanel, dialogButtonToBS, dialogButtonToUI, getAttributes, isMobileView, layoutFillHeight, newBodyDiv, openPanel, validateOptions } from "../../q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";
-import validator from "@optionaldeps/jquery.validation";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
@@ -41,11 +41,11 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             return null;
         }
 
-        if (!endsWith(cssSize, 'px')) {
+        if (!cssSize.endsWith('px')) {
             return null;
         }
 
-        cssSize = cssSize.substr(0, cssSize.length - 2);
+        cssSize = cssSize.substring(0, cssSize.length - 2);
         let i = parseInteger(cssSize);
         if (i == null || isNaN(i) || i == 0)
             return null;
@@ -371,7 +371,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         var value = this.dialogTitle ?? this.getDialogTitle();
         var pt = this.element.children('.panel-titlebar');
 
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             pt.remove();
         }
         else {

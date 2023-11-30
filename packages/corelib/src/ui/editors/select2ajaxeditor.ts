@@ -1,7 +1,7 @@
-﻿import { ListRequest, ListResponse, RetrieveResponse } from "@serenity-is/base";
+﻿import { ListRequest, ListResponse, RetrieveResponse, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { isEmptyOrNull, isValue, safeCast, serviceCall, ServiceOptions, localText, trimToNull } from "../../q";
+import { ServiceOptions, isValue, safeCast, serviceCall, trimToNull } from "../../q";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { Widget } from "../widgets/widget";
 import { WX } from "../widgets/wx";
@@ -91,7 +91,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         var queryTimeout = 0;
         return {
             minimumResultsForSearch: 10,
-            placeHolder: (!isEmptyOrNull(emptyItemText) ? emptyItemText : null),
+            placeHolder: emptyItemText || null,
             allowClear: isValue(emptyItemText),
             query: query => {
                 var request = {
@@ -120,7 +120,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
             },
             initSelection: (element, callback) => {
                 var val = element.val();
-                if (isEmptyOrNull(val)) {
+                if (!val) {
                     callback(null);
                     return;
                 }

@@ -1,13 +1,13 @@
-﻿import { ArgumentNullException, isEmptyOrNull, localText, notifyWarning, tryGetText } from "../../q";
+﻿import { Criteria, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
+import { ArgumentNullException } from "../../q";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
+import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 import { Widget } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
-import { Criteria, ListRequest, formatDate, parseDate, toId } from "@serenity-is/base";
-import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 
 export interface QuickFilterBarOptions {
     filters: QuickFilter<Widget<any>, any>[];
@@ -73,14 +73,14 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             quickFilter.data('qfloadstate', opt.loadState);
         }
 
-        if (!isEmptyOrNull(opt.cssClass)) {
+        if (opt.cssClass) {
             quickFilter.addClass(opt.cssClass);
         }
 
         var widget = Widget.create({
             type: opt.type,
             element: e => {
-                if (!isEmptyOrNull(opt.field)) {
+                if (opt.field) {
                     e.attr('id', this.options.idPrefix + opt.field);
                 }
                 e.attr('placeholder', ' ');
@@ -101,7 +101,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
 
             request.EqualityFilter = request.EqualityFilter || {};
             var value = EditorUtils.getValue(widget);
-            var active = value != null && !isEmptyOrNull(value.toString());
+            var active = !!value?.toString();
             if (opt.handler != null) {
                 var args = {
                     field: opt.field,
@@ -197,15 +197,14 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             displayText: function (w, l) {
                 var v1 = EditorUtils.getDisplayText(w);
                 var v2 = EditorUtils.getDisplayText(end);
-                if (isEmptyOrNull(v1) && isEmptyOrNull(v2)) {
+                if (!v1 && !v2)
                     return null;
-                }
                 var text1 = l + ' >= ' + v1;
                 var text2 = l + ' <= ' + v2;
-                if (!isEmptyOrNull(v1) && !isEmptyOrNull(v2)) {
+                if (v1 && v2) {
                     return text1 + ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ' + text2;
                 }
-                else if (!isEmptyOrNull(v1)) {
+                else if (v1) {
                     return text1;
                 }
                 else {
@@ -290,15 +289,15 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             displayText: function (w, l) {
                 var v1 = EditorUtils.getDisplayText(w);
                 var v2 = EditorUtils.getDisplayText(end);
-                if (isEmptyOrNull(v1) && isEmptyOrNull(v2)) {
+                if (!v1 && !v2) {
                     return null;
                 }
                 var text1 = l + ' >= ' + v1;
                 var text2 = l + ' <= ' + v2;
-                if (!isEmptyOrNull(v1) && !isEmptyOrNull(v2)) {
+                if (v1 && v2) {
                     return text1 + ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ' + text2;
                 }
-                else if (!isEmptyOrNull(v1)) {
+                else if (v1) {
                     return text1;
                 }
                 else {
@@ -348,7 +347,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             title: title,
             options: opt,
             handler: function (args) {
-                args.equalityFilter[args.field] = args.value == null || isEmptyOrNull(args.value.toString()) ?
+                args.equalityFilter[args.field] = !args.value?.toString() ?
                     null : !!toId(args.value);
             }
         };

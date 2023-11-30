@@ -1,8 +1,7 @@
 ﻿import { Authorization } from "./authorization";
 import { ScriptData } from "./scriptdata";
 import { UserDefinition } from "./userdefinition";
-import * as notify from "./notify";
-import * as localtext from "./localtext";
+import * as base from "@serenity-is/base";
 
 var userDefinition: UserDefinition;
 
@@ -406,8 +405,8 @@ describe('Authorization.validatePermissionAsync', () => {
     })
 
     it('throws if no permission', async function () {
-        const notifyError = jest.spyOn(notify, 'notifyError');
-        const localText = jest.spyOn(localtext, 'localText');
+        const notifyError = jest.spyOn(base, 'notifyError');
+        const localText = jest.spyOn(base, 'localText');
         try {
             var thrown = false;
             try {

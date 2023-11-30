@@ -22,7 +22,7 @@ describe("LookupEditor", () => {
 
         expect(() => new LookupEditor(null, {
             lookupKey: "Test"
-        })).toThrowError();
+        })).toThrow();
     });
 
     test('throws an error if lookupKey is not registered', () => {
@@ -30,7 +30,7 @@ describe("LookupEditor", () => {
 
         expect(() => new LookupEditor($("<input />"), {
             lookupKey: "Test"
-        })).toThrowError('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
+        })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
     });
 
     test('doesn\'t throw an error if lookupKey is registered', () => {

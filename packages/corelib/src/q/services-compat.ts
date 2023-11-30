@@ -1,10 +1,9 @@
-﻿import { extend } from "./system";
-import { Config } from "./config"
-import { ErrorHandling } from "./errorhandling";
-import { alertDialog, iframeDialog } from "./dialogs";
+﻿import { Config, ListRequest, ServiceResponse, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
-import { ServiceOptions } from "./servicetypes";
-import { ListRequest, ServiceResponse } from "@serenity-is/base";
+import { alertDialog, iframeDialog } from "./dialogs";
+import { ErrorHandling } from "./errorhandling";
+import { ServiceOptions } from "./servicetypes-compat";
+import { extend } from "./system-compat";
 
 export function getCookie(name: string) {
     if (($ as any).cookie)
@@ -44,9 +43,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
         ErrorHandling.showServiceError(response.Error);
     };
 
-    var url = options.service;
-    if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
-        url = resolveUrl("~/Services/") + url;
+    let url = resolveServiceUrl(options.service)
 
     options = extend<ServiceOptions<TResponse>>({
         dataType: 'json',
@@ -170,7 +167,7 @@ export function parseQueryString(s?: string): {} {
 export function postToService(options: PostToServiceOptions) {
     let form = $('<form/>')
         .attr('method', 'POST')
-        .attr('action', options.url ? (resolveUrl(options.url)) : resolveUrl('~/Services/' + options.service))
+        .attr('action', options.url ? (resolveUrl(options.url)) : resolveServiceUrl(options.service))
         .appendTo(document.body);
     if (options.target)
         form.attr('target', options.target);
@@ -213,12 +210,4 @@ export function postToUrl(options: PostToUrlOptions) {
         .appendTo(div);
     form.submit();
     window.setTimeout(function () { form.remove(); }, 0);
-}
-
-export function resolveUrl(url: string) {
-    if (url && url.substr(0, 2) === '~/') {
-        return Config.applicationPath + url.substr(2);
-    }
-
-    return url;
 }

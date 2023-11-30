@@ -1,5 +1,6 @@
-﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull, isValue, localText, trim } from "../../q";
+﻿import { localText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { isValue, trim } from "../../q";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
@@ -87,7 +88,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         }
 
         var value = this.get_value();
-        if (value == this.lastValue && (!this.fieldChanged || isEmptyOrNull(value))) {
+        if (value == this.lastValue && (!this.fieldChanged || !value)) {
             this.fieldChanged = false;
             return;
         }
@@ -168,8 +169,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         };
 
         if (this.options.onSearch != null) {
-            this.options.onSearch(((this.field != null &&
-                !isEmptyOrNull(this.field.name)) ? this.field.name : null), value, done);
+            this.options.onSearch(this.field?.name, value, done);
         }
         else {
             done(true);

@@ -1,4 +1,4 @@
-import { addAttribute, addTypeMember, MemberType, ISlickFormatter, startsWith, registerEditor as regEditor, EditorAttribute } from "../q";
+import { addAttribute, addTypeMember, MemberType, ISlickFormatter, registerEditor as regEditor, EditorAttribute } from "../q";
 import { registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum } from "@serenity-is/base";
 
 function Attr(name: string) {
@@ -284,7 +284,7 @@ export namespace Decorators {
     export function option() {
         return function (target: Object, propertyKey: string): void {
 
-            var isGetSet = startsWith(propertyKey, 'get_') || startsWith(propertyKey, 'set_');
+            var isGetSet = propertyKey?.startsWith('get_') || propertyKey?.startsWith('set_');
             var memberName = isGetSet ? propertyKey.substr(4) : propertyKey;
 
             addTypeMember(target.constructor, {

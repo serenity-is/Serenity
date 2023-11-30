@@ -1,5 +1,5 @@
-﻿import { htmlEncode, isAssignableFrom } from "@serenity-is/base";
-import { ArgumentNullException, EditorAttribute, Exception, getAttributes, isEmptyOrNull, notifyError } from "../q";
+﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
+import { ArgumentNullException, EditorAttribute, Exception, getAttributes } from "../q";
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 
@@ -12,7 +12,7 @@ export namespace EditorTypeRegistry {
         null, "Editor");
 
     export function get(key: string): any {
-        if (isEmptyOrNull(key)) 
+        if (!key) 
             throw new ArgumentNullException('key');
         
         var type = registry.tryGet(key);

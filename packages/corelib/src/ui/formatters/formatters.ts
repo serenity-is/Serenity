@@ -1,7 +1,7 @@
-﻿import { Culture, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, parseDecimal, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Culture, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { ISlickFormatter, getAttributes, isEmptyOrNull, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
+import { ISlickFormatter, getAttributes, replaceAll, safeCast } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
@@ -127,7 +127,7 @@ export class EnumFormatter implements Formatter {
     }
 
     static getText(enumKey: string, name: string) {
-        if (isEmptyOrNull(name)) {
+        if (!name) {
             return '';
         }
 
@@ -146,14 +146,13 @@ export class EnumFormatter implements Formatter {
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
-        var dbFile = safeCast(ctx.value, String);
-        if (isEmptyOrNull(dbFile)) {
+        var dbFile = ctx.value as string;
+        if (!dbFile)
             return '';
-        }
 
         var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
-        var originalName = (!isEmptyOrNull(this.originalNameProperty) ?
-            safeCast(ctx.item[this.originalNameProperty], String) : null);
+        var originalName = this.originalNameProperty ?
+            ctx.item[this.originalNameProperty] as string : null;
 
         originalName = (originalName ?? '');
         var text = stringFormat((this.displayFormat ?? '{0}'),
@@ -175,7 +174,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     initializeColumn(column: Column): void {
         column.referencedFields = column.referencedFields || [];
-        if (!isEmptyOrNull(this.originalNameProperty)) {
+        if (this.originalNameProperty) {
             column.referencedFields.push(this.originalNameProperty);
             return;
         }
@@ -253,28 +252,27 @@ export class NumberFormatter {
 export class UrlFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
-        var url = (!isEmptyOrNull(this.urlProperty) ?
+        var url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 
-        if (isEmptyOrNull(url))
+        if (!url)
             return '';
 
-        if (!isEmptyOrNull(this.urlFormat))
+        if (this.urlFormat)
             url = stringFormat(this.urlFormat, url);
 
-        if (url != null && startsWith(url, '~/'))
-            url = resolveUrl(url);
+        url = resolveUrl(url);
 
-        var display = (!isEmptyOrNull(this.displayProperty) ?
+        var display = (this.displayProperty ?
             (ctx.item[this.displayProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 
-        if (!isEmptyOrNull(this.displayFormat))
+        if (this.displayFormat)
             display = stringFormat(this.displayFormat, display);
 
         var s = "<a href='" + htmlEncode(url) + "'";
-        if (!isEmptyOrNull(this.target))
+        if (this.target)
             s += " target='" + this.target + "'";
 
         s += '>' + htmlEncode(display) + '</a>';
@@ -285,11 +283,11 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
     initializeColumn(column: Column): void {
         column.referencedFields = column.referencedFields || [];
 
-        if (!isEmptyOrNull(this.displayProperty)) {
+        if (this.displayProperty) {
             column.referencedFields.push(this.displayProperty);
         }
 
-        if (!isEmptyOrNull(this.urlProperty)) {
+        if (this.urlProperty) {
             column.referencedFields.push(this.urlProperty);
         }
     }

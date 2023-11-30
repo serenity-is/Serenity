@@ -1,7 +1,7 @@
-﻿import { Exception, getAttributes, notifyError } from "../q";
+﻿import { htmlEncode, isEnum, notifyError } from "@serenity-is/base";
 import { EnumKeyAttribute } from "../decorators";
+import { Exception, getAttributes } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
-import { htmlEncode, isEnum } from "@serenity-is/base";
 
 export namespace EnumTypeRegistry {
 

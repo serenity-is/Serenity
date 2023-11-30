@@ -1,6 +1,5 @@
-﻿import { ServiceError, htmlEncode } from "@serenity-is/base";
+﻿import { ServiceError, htmlEncode, notifyError } from "@serenity-is/base";
 import { alertDialog } from "./dialogs";
-import { notifyError } from "./notify";
 
 export namespace ErrorHandling {
 

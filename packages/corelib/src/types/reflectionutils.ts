@@ -1,6 +1,4 @@
-﻿import { isEmptyOrNull } from "../q";
-
-export namespace ReflectionUtils {
+﻿export namespace ReflectionUtils {
 
     export function getPropertyValue(o: any, property: string): any {
         var d = o;
@@ -33,7 +31,7 @@ export namespace ReflectionUtils {
     }
 
     export function makeCamelCase(s: string): string {
-        if (isEmptyOrNull(s)) {
+        if (!s) {
             return s;
         }
 

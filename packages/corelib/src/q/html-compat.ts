@@ -1,6 +1,5 @@
-﻿import { htmlEncode } from "@serenity-is/base";
-import { localText } from "./localtext";
-import $ from "@optionaldeps/jquery";
+﻿import $ from "@optionaldeps/jquery";
+import { htmlEncode, localText } from "@serenity-is/base";
 
 /**
  * Adds an empty option to the select.
@@ -17,7 +16,7 @@ export function addOption(select: JQuery | HTMLSelectElement, key: string, text:
     $('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select);
 }
 
-/** @obsolete use htmlEncode as it also encodes quotes */
+/** @deprecated use htmlEncode as it also encodes quotes */
 export const attrEncode = htmlEncode;
 
 /** Clears the options in the select element */

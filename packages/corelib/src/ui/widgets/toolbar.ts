@@ -1,6 +1,5 @@
 ﻿import { htmlEncode } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import {  isEmptyOrNull, startsWith } from "../../q";
 import { Widget } from "./widget";
 
 export interface ToolButton {
@@ -147,7 +146,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
             btn.addClass(cssClass);
         }
 
-        if (!isEmptyOrNull(b.hint)) {
+        if (b.hint) {
             btn.attr('title', b.hint);
         }
 
@@ -163,13 +162,13 @@ export class Toolbar extends Widget<ToolbarOptions> {
             text = htmlEncode(b.title);
         }
 
-        if (!isEmptyOrNull(b.icon)) {
+        if (b.icon) {
             btn.addClass('icon-tool-button');
             var klass = b.icon;
-            if (startsWith(klass, 'fa-')) {
+            if (klass.startsWith('fa-')) {
                 klass = 'fa ' + klass;
             }
-            else if (startsWith(klass, 'glyphicon-')) {
+            else if (klass.startsWith('glyphicon-')) {
                 klass = 'glyphicon ' + klass;
             }
             text = "<i class='" + htmlEncode(klass) + "'></i> " + text;
@@ -197,7 +196,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
             });
         }
 
-        if (!!(!isEmptyOrNull(b.hotkey) && window['Mousetrap' as any] != null)) {
+        if (b.hotkey && window['Mousetrap' as any] != null) {
             this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
                 b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
@@ -211,7 +210,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
     }
 
     findButton(className: string): JQuery {
-        if (className != null && startsWith(className, '.')) {
+        if (className != null && className.startsWith('.')) {
             className = className.substr(1);
         }
         return $('div.tool-button.' + className, this.element);

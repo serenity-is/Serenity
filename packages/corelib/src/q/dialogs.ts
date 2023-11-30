@@ -1,10 +1,7 @@
-﻿import { Config } from "./config";
-import { extend } from "./system";
-import { startsWith } from "./strings";
-import { tryGetText } from "./localtext";
+﻿import { extend } from "./system-compat";
 import $ from "@optionaldeps/jquery";
 import bootstrap from "@optionaldeps/bootstrap";
-import { htmlEncode, toggleClass } from "@serenity-is/base";
+import { Config, htmlEncode, toggleClass, tryGetText } from "@serenity-is/base";
 
 /**
  * Options for a message dialog button
@@ -60,9 +57,9 @@ if (typeof $ !== "undefined" && ($.fn as any)?.button?.noConflict && ($ as any).
 function toIconClass(icon: string): string {
     if (!icon)
         return null;
-    if (startsWith(icon, 'fa-'))
+    if (icon.startsWith('fa-'))
         return 'fa ' + icon;
-    if (startsWith(icon, 'glyphicon-'))
+    if (icon.startsWith('glyphicon-'))
         return 'glyphicon ' + icon;
     return icon;
 }
@@ -149,7 +146,7 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
         `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
     var div = document.createElement("div");
     div.classList.add("modal");
-    if (modalClass?.length)
+    if (modalClass)
         toggleClass(div, modalClass, true);
     div.setAttribute("tabindex", "-1");
     div.setAttribute("role", "dialog");
@@ -172,13 +169,13 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
-    if (iconClass?.length)
+    if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     var button = document.createElement("button");
     button.classList.add("btn");
-    if (x.cssClass?.length)
+    if (x.cssClass)
         toggleClass(button, x.cssClass, true);
-    if (x.hint?.length)
+    if (x.hint)
         button.setAttribute("title", x.hint);
     button.innerHTML = html;
     return button;
@@ -191,13 +188,13 @@ export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
 export function dialogButtonToUI(x: DialogButton): any {
     var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
     var iconClass = toIconClass(x.icon);
-    if (iconClass?.length)
+    if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
     var button = {
         text: html,
         click: x.click
     } as any;
-    if (x.cssClass?.length)
+    if (x.cssClass)
         button.cssClass = x.cssClass;
     return button;
 }
@@ -363,7 +360,7 @@ export function alertDialog(message: string, options?: AlertOptions) {
         internalUIDialog(options, bodyHtml, options.dialogClass ?? "s-AlertDialog");
 }
 
-/** @obsolete use alertDialog */
+/** @deprecated use alertDialog */
 export const alert = alertDialog;
 
 /** Additional options for confirm dialog */
@@ -450,7 +447,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         internalUIDialog(options, message, options.dialogClass ?? "s-ConfirmDialog");
 }
 
-/** @obsolete use confirmDialog */
+/** @deprecated use confirmDialog */
 export const confirm = confirmDialog;
 
 /** Options for `iframeDialog` **/
@@ -539,7 +536,7 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
     }, options));
 }
 
-/** @obsolete use informationDialog */
+/** @deprecated use informationDialog */
 export const information = informationDialog;
 
 /** 
@@ -570,7 +567,7 @@ export function successDialog(message: string, onOk?: () => void, options?: Conf
     }, options));
 }
 
-/** @obsolete use successDialog */
+/** @deprecated use successDialog */
 export const success = successDialog;
 
 /** 
@@ -590,7 +587,7 @@ export function warningDialog(message: string, options?: AlertOptions) {
     }, options));
 }
 
-/** @obsolete use warningDialog */
+/** @deprecated use warningDialog */
 export const warning = warningDialog;
 
 /** 
@@ -630,7 +627,7 @@ export function closePanel(element: JQuery | HTMLElement, e?: Event) {
     el.classList.add("hidden");
 
     var uniqueName = el.dataset.paneluniquename;
-    if (uniqueName?.length) {
+    if (uniqueName) {
         document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
             e.classList.remove("panel-hidden")
             e.removeAttribute("data-panelhiddenby");

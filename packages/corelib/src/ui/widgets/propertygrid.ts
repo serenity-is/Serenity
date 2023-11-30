@@ -1,6 +1,6 @@
-﻿import { Culture, type PropertyItem, getTypeShortName } from "@serenity-is/base";
+﻿import { Culture, getTypeShortName, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
-import { any, Authorization, extend, getAttributes, isBS3, isBS5Plus, isEmptyOrNull, startsWith, localText, trimToEmpty, trimToNull, tryGetText } from "../../q";
+import { Authorization, extend, getAttributes, isBS3, isBS5Plus, trimToEmpty, trimToNull } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
@@ -26,19 +26,17 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var items = this.options.items || [];
         this.items = [];
 
-        var useTabs = any(items, function (x) {
-            return !isEmptyOrNull(x.tab);
-        });
+        var useTabs = items.some(x => !!x.tab);
 
         if (useTabs) {
-            var itemsWithoutTab = items.filter(f => isEmptyOrNull(f.tab));
+            var itemsWithoutTab = items.filter(f => !f.tab);
             if (itemsWithoutTab.length > 0) {
                 this.createItems(this.element, itemsWithoutTab);
 
                 $("<div class='pad'></div>").appendTo(this.element);
             }
 
-            var itemsWithTab = items.filter(f => !isEmptyOrNull(f.tab));
+            var itemsWithTab = items.filter(f => f.tab);
 
             var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                 .appendTo(this.element);
@@ -60,7 +58,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 i = j;
 
                 var li = $(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
-                        `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" :  ""}toggle="tab" role="tab"></a></li>`)
+                    `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" : ""}toggle="tab" role="tab"></a></li>`)
                     .appendTo(ul);
 
                 if (tabIndex === 0) {
@@ -115,9 +113,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var categoryIndexes = {};
         var categoriesDiv = container;
 
-        var useCategories = this.options.useCategories !== false && any(items, function (x) {
-            return !isEmptyOrNull(x.category);
-        });
+        var useCategories = this.options.useCategories !== false && items.some(x => !!x.category);
 
         if (useCategories) {
             var linkContainer = $('<div/>').addClass('category-links');
@@ -173,11 +169,11 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
         var title = $('<div/>').addClass('category-title')
             .append($('<a/>').addClass('category-anchor')
-            .text(this.determineText(category, function (prefix) {
-                return prefix + 'Categories.' + category;
-            }))
-            .attr('name', this.idPrefix + 
-                'Category' + categoryIndexes[category].toString()))
+                .text(this.determineText(category, function (prefix) {
+                    return prefix + 'Categories.' + category;
+                }))
+                .attr('name', this.idPrefix +
+                    'Category' + categoryIndexes[category].toString()))
             .appendTo(categoryDiv);
 
         if (collapsed != null) {
@@ -232,18 +228,18 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 
     private determineText(text: string, getKey: (s: string) => string) {
-        if (text != null && !startsWith(text, '`')) {
+        if (text != null && !text.startsWith('`')) {
             var local = tryGetText(text);
             if (local != null) {
                 return local;
             }
         }
 
-        if (text != null && startsWith(text, '`')) {
+        if (text != null && text.startsWith('`')) {
             text = text.substring(1);
         }
 
-        if (!isEmptyOrNull(this.options.localTextPrefix)) {
+        if (this.options.localTextPrefix) {
             var local1 = tryGetText(getKey(this.options.localTextPrefix));
             if (local1 != null) {
                 return local1;
@@ -257,11 +253,11 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var fieldDiv = $('<div/>').addClass('field')
             .addClass(item.name).data('PropertyItem', item).appendTo(container);
 
-        if (!isEmptyOrNull(item.cssClass)) {
+        if (item.cssClass) {
             fieldDiv.addClass(item.cssClass);
         }
 
-        if (!isEmptyOrNull(item.formCssClass)) {
+        if (item.formCssClass) {
             fieldDiv.addClass(item.formCssClass);
             if (item.formCssClass.indexOf('line-break-') >= 0) {
                 var splitted = item.formCssClass.split(String.fromCharCode(32));
@@ -307,7 +303,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             .text(title ?? '')
             .appendTo(fieldDiv);
 
-        if (!isEmptyOrNull(item.labelWidth)) {
+        if (item.labelWidth) {
             if (item.labelWidth === '0') {
                 label.hide();
             }
@@ -333,7 +329,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             element.attr('name', item.name ?? '');
         }
 
-        if (!isEmptyOrNull(placeHolder)) {
+        if (placeHolder) {
             element.attr('placeholder', placeHolder);
         }
         var editorParams = item.editorParams;
@@ -498,7 +494,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 
     set_mode(value: PropertyGridMode) {
-        if(this.options.mode !== value) {
+        if (this.options.mode !== value) {
             this.options.mode = value;
             this.updateInterface();
         }

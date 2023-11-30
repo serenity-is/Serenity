@@ -1,6 +1,6 @@
-﻿import { PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import { PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName, localText } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
-import { DialogButton, endsWith, getAttributes, getFormData, getFormDataAsync, isEmptyOrNull, ScriptData, localText } from "../../q";
+import { DialogButton, ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -115,11 +115,11 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
             if (px >= 0) {
                 name = name.substring(px + 1);
             }
-            if (endsWith(name, 'Dialog')) {
-                name = name.substr(0, name.length - 6);
+            if (name.endsWith('Dialog')) {
+                name = name.substring(0, name.length - 6);
             }
-            else if (endsWith(name, 'Panel')) {
-                name = name.substr(0, name.length - 5);
+            else if (name.endsWith('Panel')) {
+                name = name.substring(0, name.length - 5);
             }
             return name;
         }
@@ -151,7 +151,7 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
             }
         }
 
-        if (!isEmptyOrNull(formKey)) {
+        if (formKey) {
             return getFormData(formKey);
         }
 
@@ -160,7 +160,7 @@ export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
 
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
         var formKey = this.getFormKey();
-        if (!isEmptyOrNull(formKey)) {
+        if (formKey) {
             return await getFormDataAsync(formKey);
         }
 

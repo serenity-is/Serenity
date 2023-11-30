@@ -1,5 +1,4 @@
 ﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull } from "../../q";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
@@ -14,7 +13,7 @@ export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item
     }
 
     protected emptyItemText() {
-        if (!isEmptyOrNull(this.options.emptyOptionText)) {
+        if (this.options.emptyOptionText) {
             return this.options.emptyOptionText;
         }
         return super.emptyItemText();

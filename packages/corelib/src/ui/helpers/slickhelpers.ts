@@ -1,7 +1,7 @@
-﻿import { Culture, type PropertyItem, SaveRequest, htmlEncode } from "@serenity-is/base";
+﻿import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, isEmptyOrNull, localText, replaceAll, safeCast, serviceCall, startsWith, tryGetText } from "../../q";
+import { Authorization, clearKeys, replaceAll, safeCast, serviceCall } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
@@ -558,7 +558,7 @@ export namespace PropertyItemSlickConverter {
         result.name = name;
 
         if (item.alignment != null && item.alignment.length > 0) {
-            if (!isEmptyOrNull(result.cssClass)) {
+            if (result.cssClass) {
                 result.cssClass += ' align-' + item.alignment;
             }
             else {
@@ -664,7 +664,7 @@ export namespace SlickFormatting {
             htmlEncode(itemType) + '"' + ' data-item-id="' +
             htmlEncode(id) + '"' + ' class="s-EditLink s-' +
             replaceAll(itemType, '.', '-') + 'Link' +
-            (isEmptyOrNull(extraClass) ? '' : (' ' + extraClass)) + '">' +
+            (!extraClass ? '' : (' ' + extraClass)) + '">' +
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
@@ -694,8 +694,8 @@ export namespace SlickHelper {
             col.id = id;
 
             if (localTextPrefix != null && col.id != null &&
-                (col.name == null || startsWith(col.name, '~'))) {
-                var key = (col.name != null ? col.name.substr(1) : col.id);
+                (col.name == null || col.name.startsWith('~'))) {
+                var key = (col.name != null ? col.name.substring(1) : col.id);
                 col.name = localText(localTextPrefix + key);
             }
         }

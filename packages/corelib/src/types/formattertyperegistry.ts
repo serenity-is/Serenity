@@ -1,5 +1,5 @@
-﻿import { htmlEncode, isAssignableFrom } from "@serenity-is/base";
-import { ArgumentNullException, Exception, isEmptyOrNull, ISlickFormatter, notifyError } from "../q";
+﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
+import { ArgumentNullException, Exception, ISlickFormatter } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace FormatterTypeRegistry {
@@ -9,7 +9,7 @@ export namespace FormatterTypeRegistry {
         null, "Formatter");
 
     export function get(key: string): any {
-        if (isEmptyOrNull(key)) 
+        if (!key) 
             throw new ArgumentNullException('key');
         
         var type = registry.tryGet(key);

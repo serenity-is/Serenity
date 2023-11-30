@@ -1,7 +1,7 @@
 ﻿import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { DataGrid } from "./datagrid";
 import $ from "@optionaldeps/jquery";
-import { addAttribute } from "../../q/system";
+import { addAttribute } from "../../q/system-compat";
 
 function getIdProperty(grid: DataGrid<any, any>): string {
     return grid["getIdProperty"]();

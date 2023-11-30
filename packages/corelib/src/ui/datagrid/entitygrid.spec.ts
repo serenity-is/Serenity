@@ -1,5 +1,5 @@
 import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { addAttribute } from "../../q/system";
+import { addAttribute } from "../../q/system-compat";
 import { EntityGrid } from "./entitygrid";
 
 function getIdProperty(grid: EntityGrid<any, any>): string {

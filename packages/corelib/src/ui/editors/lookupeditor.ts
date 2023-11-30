@@ -1,6 +1,6 @@
 ﻿import { getInstanceType, getTypeFullName, type Lookup } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { endsWith, getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../q";
+import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -47,8 +47,8 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
             key = key.substring(idx + 1);
         }
 
-        if (endsWith(key, 'Editor')) {
-            key = key.substr(0, key.length - 6);
+        if (key.endsWith('Editor')) {
+            key = key.substring(0, key.length - 6);
         }
 
         return key;

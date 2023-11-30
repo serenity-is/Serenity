@@ -1,6 +1,6 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
-import { endsWith, getAttributes, getForm } from "../../q";
+import { getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
 
@@ -59,11 +59,8 @@ export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
         if (px >= 0) {
             name = name.substring(px + 1);
         }
-        if (endsWith(name, 'Panel')) {
-            name = name.substr(0, name.length - 6);
-        }
-        else if (endsWith(name, 'Panel')) {
-            name = name.substr(0, name.length - 5);
+        else if (name.endsWith('Panel')) {
+            name = name.substring(0, name.length - 5);
         }
         return name;
     }

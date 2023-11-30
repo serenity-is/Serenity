@@ -1,8 +1,8 @@
-﻿import { Culture, ListResponse, htmlEncode, type PropertyItem, type Lookup } from "@serenity-is/base";
+﻿import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { ScriptData, getLookup, isEmptyOrNull, trimToNull, tryGetText } from "../../q";
+import { ScriptData, getLookup, trimToNull } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
@@ -50,10 +50,10 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             item.children = [];
-            if (!isEmptyOrNull(item.id)) {
+            if (item.id) {
                 itemById[item.id] = item;
             }
-            if (!isEmptyOrNull(item.parentId)) {
+            if (item.parentId) {
                 var parent = itemById[item.parentId];
                 if (parent != null) {
                     parent.children.push(item);
@@ -79,7 +79,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
 
     protected getButtons(): ToolButton[] {
         var selectAllText = this.getSelectAllText();
-        if (isEmptyOrNull(selectAllText)) {
+        if (!selectAllText) {
             return null;
         }
 
@@ -521,7 +521,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
 
         if (val == null || val === '') {
 
-            if (!isEmptyOrNull(this.get_cascadeField())) {
+            if (this.get_cascadeField()) {
                 return [];
             }
 
@@ -569,9 +569,8 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
 
     protected onViewFilter(item: CheckTreeItem<TItem>) {
         return super.onViewFilter(item) &&
-            (isEmptyOrNull(this.searchText) ||
-                Select2.util.stripDiacritics(item.text || '')
-                    .toUpperCase().indexOf(this.searchText) >= 0);
+            (!this.searchText || Select2.util.stripDiacritics(item.text || '')
+                .toUpperCase().indexOf(this.searchText) >= 0);
     }
 
     protected moveSelectedUp(): boolean {
@@ -594,7 +593,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
 
     protected setCascadeFrom(value: string) {
 
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             if (this.cascadeLink != null) {
                 this.cascadeLink.set_parentID(null);
                 this.cascadeLink = null;

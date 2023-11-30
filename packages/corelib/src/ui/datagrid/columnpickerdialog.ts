@@ -1,7 +1,7 @@
-﻿import { Culture, htmlEncode } from "@serenity-is/base";
+﻿import { Culture, htmlEncode, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, Router, centerDialog, localText, trimToNull } from "../../q";
+import { Authorization, Router, centerDialog, trimToNull } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";

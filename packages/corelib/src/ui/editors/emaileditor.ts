@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { tryGetText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { isEmptyOrNull, trimToNull, tryGetText } from "../../q";
+import { trimToNull } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export interface EmailEditorOptions {
@@ -29,7 +30,7 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
             }
         });
 
-        if (!isEmptyOrNull(this.options.domain)) {
+        if (this.options.domain) {
             domain.val(this.options.domain);
         }
 
@@ -83,8 +84,8 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         var domain = this.element.nextAll('.emaildomain');
         var value = this.element.val();
         var domainValue = domain.val();
-        if (isEmptyOrNull(value)) {
-            if (this.options.readOnlyDomain || isEmptyOrNull(domainValue)) {
+        if (!value) {
+            if (this.options.readOnlyDomain || !domainValue) {
                 return '';
             }
             return '@' + domainValue;
@@ -111,7 +112,7 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
                     domain.val(parts[1]);
                     this.element.val(parts[0]);
                 }
-                else if (!isEmptyOrNull(this.options.domain)) {
+                else if (this.options.domain) {
                     if (parts[1] !== this.options.domain)
                         this.element.val(value);
                     else 

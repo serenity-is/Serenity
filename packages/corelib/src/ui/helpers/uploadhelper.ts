@@ -1,5 +1,5 @@
-import { ServiceResponse, htmlEncode, round, stringFormat } from "@serenity-is/base";
-import { alertDialog, blockUI, blockUndo, endsWith, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, startsWith, localText } from "../../q";
+import { ServiceResponse, htmlEncode, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { alertDialog, blockUI, blockUndo, iframeDialog, replaceAll } from "../../q";
 
 export namespace UploadHelper {
 
@@ -159,12 +159,13 @@ export namespace UploadHelper {
     }
 
     export function hasImageExtension(filename: string): boolean {
-        if (isEmptyOrNull(filename)) {
+        if (!filename) {
             return false;
         }
         filename = filename.toLowerCase();
-        return endsWith(filename, '.jpg') || endsWith(filename, '.jpeg') ||
-            endsWith(filename, '.gif') || endsWith(filename, '.png');
+        return filename.endsWith('.jpg') || filename.endsWith('.jpeg') ||
+            filename.endsWith('.gif') || filename.endsWith('.png') || 
+            filename.endsWith('.webp');
     }
 
     export function thumbFileName(filename: string): string {
@@ -210,13 +211,13 @@ export namespace UploadHelper {
             var originalName = item.OriginalName ?? '';
             var fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
-                !startsWith(fileName, 'temporary/')) {
+                !fileName.startsWith('temporary/')) {
                 fileName = urlPrefix + fileName;
             }
 
             thumb.attr('href', dbFileUrl(fileName));
             thumb.attr('target', '_blank');
-            if (!isEmptyOrNull(originalName)) {
+            if (originalName) {
                 thumb.attr('title', originalName);
             }
 

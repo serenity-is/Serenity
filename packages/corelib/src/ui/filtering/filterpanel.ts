@@ -1,6 +1,6 @@
-﻿import { PropertyItem } from "@serenity-is/base";
+﻿import { PropertyItem, localText, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { cast, isEmptyOrNull, localText, tryGetText } from "../../q";
+import { cast } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
@@ -20,7 +20,7 @@ class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
     }
 
     emptyItemText() {
-        if (isEmptyOrNull(this.value)) {
+        if (!this.value) {
             return localText('Controls.FilterPanel.SelectField');
         }
 
@@ -408,7 +408,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var select = row.children('div.f').find('input.field-select')
             .getWidget(FilterFieldSelect);
 
-        if (isEmptyOrNull(select.value)) {
+        if (!select.value) {
             return null;
         }
 
@@ -464,7 +464,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var operatorSelect = row.children('div.o').find('input.op-select')
             .getWidget(FilterOperatorSelect);
 
-        if (isEmptyOrNull(operatorSelect.get_value()))
+        if (!operatorSelect.get_value())
             return;
         
         var ops = filtering.getOperators().filter(function (x) {

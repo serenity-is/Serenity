@@ -1,4 +1,4 @@
-﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html";
+﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
 import $ from "@optionaldeps/jquery";
 
 describe("addEmptyOption", () => {

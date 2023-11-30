@@ -1,14 +1,14 @@
-﻿import { DeleteRequest, DeleteResponse, type PropertyItem, type PropertyItemsData, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { any, Authorization, confirmDialog, endsWith, Exception, extend, getAttributes, getFormData, getFormDataAsync, isEmptyOrNull, localText, LT, notifySuccess, replaceAll, safeCast, ScriptData, serviceCall, ServiceOptions, startsWith, tryGetText, validatorAbortHandler } from "../../q";
+import { Authorization, Exception, ScriptData, ServiceOptions, confirmDialog, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, serviceCall, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
 
@@ -120,7 +120,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
                 localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
             var title = this.getEntityNameFieldValue() ?? '';
             return stringFormat(titleFormat,
-                this.getEntitySingular(), (isEmptyOrNull(title) ? '' : (' (' + title + ')')));
+                this.getEntitySingular(), !title ? '' : (' (' + title + ')'));
         }
     }
 
@@ -229,10 +229,10 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             name = name.substring(px + 1);
 
         // don't like this kind of convention, make it obsolete soon...
-        if (endsWith(name, 'Dialog') || endsWith(name, 'Control'))
-            name = name.substr(0, name.length - 6);
-        else if (endsWith(name, 'Panel'))
-            name = name.substr(0, name.length - 5);
+        if (name.endsWith('Dialog') || name.endsWith('Control'))
+            name = name.substring(0, name.length - 6);
+        else if (name.endsWith('Panel'))
+            name = name.substring(0, name.length - 5);
 
         return (this._entityType = name);
     }
@@ -259,7 +259,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
         this._localTextDbPrefix = this.getLocalTextPrefix() ?? '';
 
-        if (this._localTextDbPrefix.length > 0 && !endsWith(this._localTextDbPrefix, '.'))
+        if (this._localTextDbPrefix.length > 0 && !this._localTextDbPrefix.endsWith('.'))
             this._localTextDbPrefix = 'Db.' + this._localTextDbPrefix + '.';
 
         return this._localTextDbPrefix;
@@ -285,19 +285,8 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             return this._entitySingular;
 
         var attributes = this.attrs(ItemNameAttribute);
-
-        if (attributes.length >= 1) {
-            this._entitySingular = attributes[0].value;
-            this._entitySingular = LT.getDefault(this._entitySingular, this._entitySingular);
-        }
-        else {
-            var es = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
-            if (es == null) 
-                es = this.getEntityType();
-            this._entitySingular = es;
-        }
-
-        return this._entitySingular;
+        return (this._entitySingular = attributes.length >= 1 ? localText(attributes[0].value, attributes[0].value) : 
+            tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
     }
 
     private _nameProperty: string;
@@ -522,7 +511,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
     protected initLocalizationGridCommon(pgOptions: PropertyGridOptions) {
         var pgDiv = this.byId('PropertyGrid');
 
-        if (!any(pgOptions.items, x => x.localizable === true))
+        if (!pgOptions.items.some(x => x.localizable === true))
             return;
 
         var localGridDiv = $('<div/>')
@@ -718,7 +707,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             var prefix = language + '$';
 
             for (var k of Object.keys(this.localizationPendingValue)) {
-                if (startsWith(k, prefix)) 
+                if (k.startsWith(prefix))
                     entity[k.substr(prefix.length)] = this.localizationPendingValue[k];
             }
 
@@ -756,7 +745,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
             }
         }
 
-        if (!isEmptyOrNull(formKey)) {
+        if (formKey) {
             return getFormData(formKey);
         }
 
@@ -765,7 +754,7 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
         var formKey = this.getFormKey();
-        if (!isEmptyOrNull(formKey)) {
+        if (formKey) {
             return await getFormDataAsync(formKey);
         }
 
@@ -1032,17 +1021,17 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
         clone = extend(clone, this.get_entity());
 
         var idField = this.getIdProperty();
-        if (!isEmptyOrNull(idField)) {
+        if (idField) {
             delete clone[idField];
         }
 
         var isActiveField = this.getIsActiveProperty();
-        if (!isEmptyOrNull(isActiveField)) {
+        if (isActiveField) {
             delete clone[isActiveField];
         }
 
         var isDeletedField = this.getIsDeletedProperty();
-        if (!isEmptyOrNull(isDeletedField)) {
+        if (isDeletedField) {
             delete clone[isDeletedField];
         }
 

@@ -1,7 +1,7 @@
-﻿import { ArgumentNullException, Exception, isEmptyOrNull, notifyError } from "../q";
+﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
 import { IDialog } from "../interfaces";
+import { ArgumentNullException, Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
-import { htmlEncode, isAssignableFrom } from "@serenity-is/base";
 
 export namespace DialogTypeRegistry {
 
@@ -11,7 +11,7 @@ export namespace DialogTypeRegistry {
 
     export function get(key: string): any {
 
-        if (isEmptyOrNull(key))
+        if (!key)
             throw new ArgumentNullException('key');
 
         var type = registry.tryGet(key);

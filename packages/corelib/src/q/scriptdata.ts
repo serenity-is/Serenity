@@ -1,9 +1,7 @@
-﻿import { type PropertyItem, type PropertyItemsData, getStateStore, stringFormat, type Lookup } from "@serenity-is/base";
+﻿import { getStateStore, notifyError, stringFormat, type Lookup, type PropertyItem, type PropertyItemsData, resolveUrl } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
-import { notifyError } from "./notify";
-import { resolveUrl } from "./services";
-import { startsWith, trimToNull } from "./strings";
+import { trimToNull } from "./strings";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;
@@ -77,7 +75,7 @@ export namespace ScriptData {
                 $.globalEval(data);
             },
             error: function (xhr, textStatus, errorThrown) {
-                var isLookup = startsWith(name, "Lookup.");
+                var isLookup = name?.startsWith("Lookup.");
                 if (xhr.status == 403 && isLookup) {
                     notifyError('<p>Access denied while trying to load the lookup: "<b>' +
                         name.substr(7) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +

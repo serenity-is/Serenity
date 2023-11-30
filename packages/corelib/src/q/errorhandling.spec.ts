@@ -1,5 +1,5 @@
 import * as dialogs from "./dialogs";
-import * as notify from "./notify";
+import * as base from "@serenity-is/base";
 import { ErrorHandling } from "./errorhandling";
 
 beforeEach(() => jest.restoreAllMocks());
@@ -8,37 +8,37 @@ describe("showServiceError", function () {
     it("shows ??ERROR?? if error is null", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError(null);
-        expect(alertSpy).toBeCalledTimes(1);
-        expect(alertSpy).toBeCalledWith("??ERROR??");
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows ??ERROR?? if error message and code is null", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({});
-        expect(alertSpy).toBeCalledTimes(1);
-        expect(alertSpy).toBeCalledWith("??ERROR??");
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows error code if message is undefined", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({ Code: 'Test' });
-        expect(alertSpy).toBeCalledTimes(1);
-        expect(alertSpy).toBeCalledWith("Test");
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("Test");
     });
 
     it("shows message if both message and code is not null", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({ Code: 'TestCode', Message: 'TestMessage' });
-        expect(alertSpy).toBeCalledTimes(1);
-        expect(alertSpy).toBeCalledWith("TestMessage");
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("TestMessage");
 
     });
 
     it("shows message if code is undefined", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({ Message: 'TestMessage' });
-        expect(alertSpy).toBeCalledTimes(1);
-        expect(alertSpy).toBeCalledWith("TestMessage");
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("TestMessage");
     });
 
 });
@@ -99,7 +99,7 @@ describe("isDevelopmentMode", function () {
 
 describe("runtimeErrorHandler", function () {
     it("ignores if isDevelopmentMode() return false", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
+        const notifyErrorSpy = jest.spyOn(base, "notifyError").mockImplementation();
         const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation();
         jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => false);
 
@@ -110,14 +110,14 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("displayed text contains the passed error details", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
+        const notifyErrorSpy = jest.spyOn(base, "notifyError").mockImplementation();
         const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
         ErrorHandling.runtimeErrorHandler("test&><'\"", "test&.js", 13579, 24680);
 
-        expect(setTimeoutSpy).toBeCalledTimes(1);
-        expect(notifyErrorSpy).toBeCalledTimes(1);
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
         var text = notifyErrorSpy.mock.calls[0][0];
         expect(text).toContain("test&amp;&gt;&lt;&#39;&quot");
         expect(text).toContain("test&amp;.js");
@@ -126,7 +126,7 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("shows error stack if available", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
+        const notifyErrorSpy = jest.spyOn(base, "notifyError").mockImplementation();
         const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
@@ -135,15 +135,15 @@ describe("runtimeErrorHandler", function () {
             toString: () => 'uvw'
         } as any);
 
-        expect(setTimeoutSpy).toBeCalledTimes(1);
-        expect(notifyErrorSpy).toBeCalledTimes(1);
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
         var text = notifyErrorSpy.mock.calls[0][0];
         expect(text).toContain("xyz");
         expect(text).not.toContain("uvw");
     });
 
     it("shows error.toString() if stack not available", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
+        const notifyErrorSpy = jest.spyOn(base, "notifyError").mockImplementation();
         const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
@@ -151,8 +151,8 @@ describe("runtimeErrorHandler", function () {
             toString: () => 'uvw'
         } as any);
 
-        expect(setTimeoutSpy).toBeCalledTimes(1);
-        expect(notifyErrorSpy).toBeCalledTimes(1);
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
         var text = notifyErrorSpy.mock.calls[0][0];
         expect(text).toContain("uvw");
     });

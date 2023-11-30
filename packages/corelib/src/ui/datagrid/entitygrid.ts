@@ -1,7 +1,8 @@
-﻿import { getInstanceType, getTypeFullName, stringFormat } from "@serenity-is/base";
+﻿import $ from "@optionaldeps/jquery";
+import { getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, endsWith, HandleRouteEventArgs, LT, replaceAll, resolveUrl, Router, safeCast, localText, tryGetText } from "../../q";
+import { Authorization, HandleRouteEventArgs, Router, replaceAll, safeCast } from "../../q";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -10,7 +11,6 @@ import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetDialogClass } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
-import $ from "@optionaldeps/jquery"
 
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
@@ -99,11 +99,11 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             name = name.substring(px + 1);
         }
 
-        if (endsWith(name, 'Grid')) {
-            name = name.substr(0, name.length - 4);
+        if (name.endsWith('Grid')) {
+            name = name.substring(0, name.length - 4);
         }
-        else if (endsWith(name, 'SubGrid')) {
-            name = name.substr(0, name.length - 7);
+        else if (name.endsWith('SubGrid')) {
+            name = name.substring(0, name.length - 7);
         }
 
         this._entityType = name;
@@ -120,7 +120,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         var attr = this.attrs(DisplayNameAttribute);
         if (attr.length >= 1) {
             this._displayName = attr[0].displayName;
-            this._displayName = LT.getDefault(this._displayName, this._displayName);
+            this._displayName = localText(this._displayName, this._displayName);
         }
         else {
             this._displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural');
@@ -140,7 +140,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         var attr = this.attrs(ItemNameAttribute);
         if (attr.length >= 1) {
             this._itemName = attr[0].value;
-            this._itemName = LT.getDefault(this._itemName, this._itemName);
+            this._itemName = localText(this._itemName, this._itemName);
         }
         else {
             this._itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');

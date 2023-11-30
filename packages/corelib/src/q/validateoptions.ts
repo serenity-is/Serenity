@@ -1,8 +1,7 @@
-﻿import { extend } from "./system";
-import { notifyError } from "./notify";
-import { localText } from "./localtext";
-import { baseValidateOptions, getHighlightTarget } from "./validation";
+﻿import { localText, notifyError } from "@serenity-is/base";
 import { isBS3 } from "./dialogs";
+import { extend } from "./system-compat";
+import { baseValidateOptions, getHighlightTarget } from "./validation";
 
 let oldShowLabel: (e: HTMLElement, message: string) => void;
 

@@ -1691,6 +1691,41 @@ declare namespace Slick {
 }
 
 declare namespace Serenity {
+    var Config: {
+        /**
+         * This is the root path of your application. If your application resides under http://localhost/mysite/,
+         * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
+         * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
+         */
+        applicationPath: string;
+        /**
+         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+         */
+        emailAllowOnlyAscii: boolean;
+        /**
+         * @Obsolete defaulted to false before for backward compatibility, now it is true by default
+         */
+        responsiveDialogs: boolean;
+        /**
+         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
+         */
+        bootstrapMessages: boolean;
+        /**
+         * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
+         * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
+         * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
+         *
+         * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
+         */
+        rootNamespaces: string[];
+        /**
+         * This is an optional method for handling when user is not logged in. If a users session is expired
+         * and when a NotAuthorized response is received from a service call, Serenity will call this handler, so
+         * you may intercept it and notify user about this situation and ask if she wants to login again...
+         */
+        notLoggedInHandler: Function;
+    };
+
     /**
      * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
      */
@@ -2062,6 +2097,11 @@ declare namespace Serenity {
      */
     function toggleClass(el: Element, cls: string, add?: boolean): void;
 
+    function addLocalText(obj: any, pre?: string): void;
+    function localText(key: string, defaultText?: string): string;
+    function tryGetText(key: string): string;
+    function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
+
     interface LookupOptions<TItem> {
         idField?: string;
         parentIdField?: string;
@@ -2090,6 +2130,76 @@ declare namespace Serenity {
         constructor(options: LookupOptions<TItem>, items?: TItem[]);
         update?(value: TItem[]): void;
     }
+
+    type ToastContainerOptions = {
+        containerId?: string;
+        positionClass?: string;
+        target?: string;
+    };
+    type ToastrOptions = ToastContainerOptions & {
+        tapToDismiss?: boolean;
+        toastClass?: string;
+        showDuration?: number;
+        onShown?: () => void;
+        hideDuration?: number;
+        onHidden?: () => void;
+        closeMethod?: boolean;
+        closeDuration?: number | false;
+        closeEasing?: boolean;
+        closeOnHover?: boolean;
+        extendedTimeOut?: number;
+        iconClass?: string;
+        positionClass?: string;
+        timeOut?: number;
+        titleClass?: string;
+        messageClass?: string;
+        escapeHtml?: boolean;
+        target?: string;
+        closeHtml?: string;
+        closeClass?: string;
+        newestOnTop?: boolean;
+        preventDuplicates?: boolean;
+        onclick?: (event: MouseEvent) => void;
+        onCloseClick?: (event: Event) => void;
+        closeButton?: boolean;
+        rtl?: boolean;
+    };
+    type NotifyMap = {
+        type: string;
+        iconClass: string;
+        title?: string;
+        message?: string;
+    };
+    class Toastr {
+        private listener;
+        private toastId;
+        private previousToast;
+        options: ToastrOptions;
+        constructor(options?: ToastrOptions);
+        private createContainer;
+        getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
+        error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+        subscribe(callback: (response: Toastr) => void): void;
+        publish(args: Toastr): void;
+        clear(toastElement?: HTMLElement | null, clearOptions?: {
+            force?: boolean;
+        }): void;
+        remove(toastElement?: HTMLElement | null): void;
+        removeToast(toastElement: HTMLElement, options?: ToastrOptions): void;
+        private clearContainer;
+        private clearToast;
+        private notify;
+    }
+
+    let defaultNotifyOptions: ToastrOptions;
+    function positionToastContainer(create: boolean, options?: ToastrOptions): void;
+    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
+    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyError(message: string, title?: string, options?: ToastrOptions): void;
 
     enum SummaryType {
         Disabled = -1,
@@ -2548,41 +2658,6 @@ declare namespace Serenity {
      */
     function blockUndo(): void;
 
-    var Config: {
-        /**
-         * This is the root path of your application. If your application resides under http://localhost/mysite/,
-         * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
-         * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
-         */
-        applicationPath: string;
-        /**
-         * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-         */
-        emailAllowOnlyAscii: boolean;
-        /**
-         * @Obsolete defaulted to false before for backward compatibility, now it is true by default
-         */
-        responsiveDialogs: boolean;
-        /**
-         * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
-         */
-        bootstrapMessages: boolean;
-        /**
-         * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
-         * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
-         * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
-         *
-         * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
-         */
-        rootNamespaces: string[];
-        /**
-         * This is an optional method for handling when user is not logged in. If a users session is expired
-         * and when a NotAuthorized response is received from a service call, Serenity will call this handler, so
-         * you may intercept it and notify user about this situation and ask if she wants to login again...
-         */
-        notLoggedInHandler: Function;
-    };
-
     /**
      * Options for a message dialog button
      */
@@ -2894,94 +2969,15 @@ declare namespace Serenity {
     function executeOnceWhenVisible(element: JQuery, callback: Function): void;
     function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
 
-    function localText(key: string): string;
     /** @obsolete prefer localText for better discoverability */
     const text: typeof localText;
     function dbText(prefix: string): ((key: string) => string);
     function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
-    function tryGetText(key: string): string;
     function dbTryText(prefix: string): ((key: string) => string);
-    function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
-    class LT {
-        private key;
-        static empty: LT;
-        constructor(key: string);
-        static add(key: string, value: string): void;
-        get(): string;
-        toString(): string;
-        static initializeTextClass: (type: any, prefix: string) => void;
-        static getDefault: (key: string, defaultText: string) => string;
+    namespace LT {
+        const add: typeof addLocalText;
+        const getDefault: typeof localText;
     }
-
-    type ToastContainerOptions = {
-        containerId?: string;
-        positionClass?: string;
-        target?: string;
-    };
-    type ToastrOptions = ToastContainerOptions & {
-        tapToDismiss?: boolean;
-        toastClass?: string;
-        showDuration?: number;
-        onShown?: () => void;
-        hideDuration?: number;
-        onHidden?: () => void;
-        closeMethod?: boolean;
-        closeDuration?: number | false;
-        closeEasing?: boolean;
-        closeOnHover?: boolean;
-        extendedTimeOut?: number;
-        iconClass?: string;
-        positionClass?: string;
-        timeOut?: number;
-        titleClass?: string;
-        messageClass?: string;
-        escapeHtml?: boolean;
-        target?: string;
-        closeHtml?: string;
-        closeClass?: string;
-        newestOnTop?: boolean;
-        preventDuplicates?: boolean;
-        onclick?: (event: MouseEvent) => void;
-        onCloseClick?: (event: Event) => void;
-        closeButton?: boolean;
-        rtl?: boolean;
-    };
-    type NotifyMap = {
-        type: string;
-        iconClass: string;
-        title?: string;
-        message?: string;
-    };
-    class Toastr {
-        private listener;
-        private toastId;
-        private previousToast;
-        options: ToastrOptions;
-        constructor(options?: ToastrOptions);
-        private createContainer;
-        getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
-        error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-        warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-        success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-        info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-        subscribe(callback: (response: Toastr) => void): void;
-        publish(args: Toastr): void;
-        clear(toastElement?: HTMLElement | null, clearOptions?: {
-            force?: boolean;
-        }): void;
-        remove(toastElement?: HTMLElement | null): void;
-        removeToast(toastElement: HTMLElement, options?: ToastrOptions): void;
-        private clearContainer;
-        private clearToast;
-        private notify;
-    }
-
-    let defaultNotifyOptions: ToastrOptions;
-    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
-    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
-    function notifyError(message: string, title?: string, options?: ToastrOptions): void;
-    function positionToastContainer(create: boolean, options?: ToastrOptions): void;
 
     interface HandleRouteEventArgs {
         handled: boolean;

@@ -24,16 +24,10 @@ export function turkishLocaleToUpper(a: string): string {
  */
 export let turkishLocaleCompare = Culture.stringCompare;
 
-/** 
- * @obsolete
- * Use stringFormat
- */
+/** @deprecated Use stringFormat */
 export let format = stringFormat;
 
-/** 
- * @obsolete
- * Use stringFormatLocale
- */
+/** @deprecated Use stringFormatLocale */
 export let localeFormat = stringFormatLocale;
 
 /**

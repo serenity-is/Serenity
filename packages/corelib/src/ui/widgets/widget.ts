@@ -1,9 +1,9 @@
 ﻿import $ from "@optionaldeps/jquery";
-import { jQueryPatch } from "../../patch/jquerypatch";
+import { Config, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { addValidationRule as addValRule, ArgumentNullException, Config, Exception, getAttributes, notifyError, replaceAll, startsWith } from "../../q";
-import { getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, stringFormat } from "@serenity-is/base";
+import { jQueryPatch } from "../../patch/jquerypatch";
+import { ArgumentNullException, Exception, addValidationRule as addValRule, getAttributes, replaceAll } from "../../q";
 
 export interface WidgetClass<TOptions = object> {
     new(element: JQuery, options?: TOptions): Widget<TOptions>;
@@ -109,8 +109,8 @@ export class Widget<TOptions = any> {
         classList.push(fullClass);
 
         for (let k of Config.rootNamespaces) {
-            if (startsWith(fullClass, k + '-')) {
-                classList.push(fullClass.substr(k.length + 1));
+            if (fullClass.startsWith(k + '-')) {
+                classList.push(fullClass.substring(k.length + 1));
                 break;
             }
         }

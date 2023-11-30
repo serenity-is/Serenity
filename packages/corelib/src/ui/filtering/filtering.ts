@@ -1,6 +1,6 @@
-﻿import { Criteria, type PropertyItem, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { ArgumentNullException, Config, Exception, deepClone, endsWith, extend, getTypes, isEmptyOrNull, localText, startsWith, tryGetText } from "../../q";
+import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";
@@ -336,7 +336,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
     getCriteriaField() {
         if (this.useEditor() &&
             this.useIdField() &&
-            !isEmptyOrNull(this.get_field().filteringIdField)) {
+            this.get_field().filteringIdField) {
             return this.get_field().filteringIdField;
         }
 
@@ -703,7 +703,7 @@ export namespace FilteringTypeRegistry {
             knownTypes[fullName] = type;
 
             for (var k of Config.rootNamespaces) {
-                if (startsWith(fullName, k.toLowerCase() + '.')) {
+                if (fullName.startsWith(k.toLowerCase() + '.')) {
                     var kx = fullName.substr(k.length + 1).toLowerCase();
 
                     if (knownTypes[kx] == null) {
@@ -720,11 +720,11 @@ export namespace FilteringTypeRegistry {
         var suffix = 'filtering';
         
         for (var k of Object.keys(knownTypes)) {
-            if (!endsWith(k, suffix))
+            if (!k.endsWith(suffix))
                 continue;
             
-            var p = k.substr(0, k.length - suffix.length);
-            if (isEmptyOrNull(p))
+            var p = k.substring(0, k.length - suffix.length);
+            if (!p)
                 continue;
 
             if (knownTypes[p] != null)
@@ -740,7 +740,7 @@ export namespace FilteringTypeRegistry {
 
     export function get(key: string): Function {
 
-        if (isEmptyOrNull(key))
+        if (!key)
             throw new ArgumentNullException('key');
 
         initialize();

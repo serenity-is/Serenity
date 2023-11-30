@@ -1,5 +1,5 @@
 import { ListResponse, ServiceResponse } from "@serenity-is/base";
-import {  type ServiceOptions } from "../../q/servicetypes";
+import {  type ServiceOptions } from "../../q/servicetypes-compat";
 import { ServiceLookupEditor } from "./servicelookupeditor";
 
 let oldWindowAlert: any;

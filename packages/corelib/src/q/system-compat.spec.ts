@@ -1,4 +1,4 @@
-import { coalesce, isValue, today } from "./system";
+import { coalesce, isValue, today } from "./system-compat";
 
 describe("Q.coalesce", () => {
     it('returns first value if not null', function () {

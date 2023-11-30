@@ -1,9 +1,9 @@
-﻿import { PropertyItem, isInstanceOfType } from "@serenity-is/base";
+﻿import { PropertyItem, isInstanceOfType, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { endsWith, extend, isEmptyOrNull, isTrimmedEmpty, replaceAll, startsWith, localText, trimToNull } from "../../q";
-import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../helpers/uploadhelper";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
+import {  extend, isTrimmedEmpty, replaceAll, trimToNull } from "../../q";
+import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
@@ -29,7 +29,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
 
         div.addClass('s-FileUploadEditor');
         
-        if (isEmptyOrNull(this.options.originalNameProperty))
+        if (!this.options.originalNameProperty)
             div.addClass('hide-original-name');
 
         this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
@@ -237,7 +237,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     setEditValue(source: any, property: PropertyItem) {
         var value: UploadedFile = {};
         value.Filename = source[property.name];
-        if (isEmptyOrNull(this.options.originalNameProperty)) {
+        if (!this.options.originalNameProperty) {
 
             if (this.options.displayFileName) {
                 var s = (value.Filename ?? '');
@@ -455,7 +455,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
         var val = source[property.name];
         if (isInstanceOfType(val, String)) {
             var json = trimToNull(val) ?? '[]';
-            if (startsWith(json, '[') && endsWith(json, ']')) {
+            if (json.startsWith('[') && json.endsWith(']')) {
                 this.set_value($.parseJSON(json));
             }
             else {

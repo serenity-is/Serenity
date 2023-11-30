@@ -1,5 +1,4 @@
-﻿import { localText } from "./localtext";
-import { notifyError } from "./notify";
+﻿import { localText, notifyError } from "@serenity-is/base";
 import { getRemoteData, getRemoteDataAsync } from "./scriptdata";
 import { UserDefinition } from "./userdefinition";
 
@@ -202,14 +201,14 @@ export declare namespace Authorization {
 
 Object.defineProperty(Authorization, "isLoggedIn", {
     get: function () {
-        return !!(Authorization.userDefinition?.Username?.length);
+        return !!(Authorization.userDefinition?.Username);
     },
     configurable: true
 });
 
 Object.defineProperty(Authorization, "isLoggedInAsync", {
     get: async function () {
-        return !!((await Authorization.userDefinitionAsync)?.Username?.length);
+        return !!((await Authorization.userDefinitionAsync)?.Username);
     },
     configurable: true
 });

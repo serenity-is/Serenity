@@ -1,6 +1,6 @@
-﻿import { ColumnSelection, Criteria, ListRequest, ListResponse } from "@serenity-is/base";
+﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { isEmptyOrNull, resolveUrl, serviceCall, ServiceOptions, startsWith } from "../../q";
+import { ServiceOptions, serviceCall } from "../../q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -32,11 +32,11 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
             return dialogTypeKey;
 
         var service = this.getService();
-        if (startsWith(service, "~/Services/"))
-            service = service.substr("~/Services/".length);
+        if (service.startsWith("~/Services/"))
+            service = service.substring("~/Services/".length);
 
         if (service.split('/').length == 3)
-            service = service.substr(0, service.lastIndexOf('/'));
+            service = service.substring(0, service.lastIndexOf('/'));
 
         return service.replace("/", ".");
     }
@@ -50,13 +50,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
         if (url == null)
             throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
 
-        if (!startsWith(url, "~") && !startsWith(url, "/") && url.indexOf('://') < 0)
-            url = "~/Services/" + url;
-
-        if (startsWith(url, "~"))
-            url = resolveUrl(url);
-
-        return url;
+        return resolveServiceUrl(url);
     }
 
     protected getIncludeColumns() {
@@ -83,7 +77,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 
         if (val == null || val === '') {
 
-            if (!isEmptyOrNull(this.get_cascadeField())) {
+            if (this.get_cascadeField()) {
                 return ['0', '=', '1'];
             }
 

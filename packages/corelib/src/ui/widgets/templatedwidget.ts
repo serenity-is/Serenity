@@ -1,6 +1,6 @@
-﻿import { getBaseType, getInstanceType, getTypeFullName, getTypeShortName, stringFormat } from "@serenity-is/base";
+﻿import { Config, getBaseType, getInstanceType, getTypeFullName, getTypeShortName, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { Config, canLoadScriptData, getTemplate, localText, replaceAll, startsWith } from "../../q";
+import { canLoadScriptData, getTemplate, replaceAll } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
@@ -45,8 +45,8 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
             var name = TemplatedWidget.noGeneric(getTypeFullName(type));
 
             for (let k of Config.rootNamespaces) {
-                if (startsWith(name, k + '.')) {
-                    name = name.substr(k.length + 1);
+                if (name.startsWith(k + '.')) {
+                    name = name.substring(k.length + 1);
                     break;
                 }
             }

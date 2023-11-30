@@ -1,8 +1,7 @@
-﻿import { escape, Column, GroupTotals, NonDataRow, convertCompatFormatter } from "@serenity-is/sleekgrid";
-import { tryGetText } from "../q";
-import { formatNumber, htmlEncode } from "@serenity-is/base";
+﻿import { formatNumber, htmlEncode, tryGetText } from "@serenity-is/base";
+import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escape } from "@serenity-is/sleekgrid";
 
-export {}
+export { };
 
 export namespace Aggregators
 {

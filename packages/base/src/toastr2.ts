@@ -1,4 +1,4 @@
-﻿import { htmlEncode, toggleClass } from "@serenity-is/base";
+﻿import { htmlEncode, toggleClass } from "./html";
 
 // adapted from https://github.com/JPeer264/toastr2
 export type ToastContainerOptions = {

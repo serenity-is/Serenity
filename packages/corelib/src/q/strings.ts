@@ -1,15 +1,16 @@
 ﻿/**
  * Checks if the string ends with the specified substring.
+ * @deprecated Use .endsWith method of String directly
  * @param s String to check.
  * @param suffix Suffix to check.
  * @returns True if the string ends with the specified substring.
- */
+  */
 export function endsWith(s: string, suffix: string): boolean {
     return s.endsWith(suffix);
 }
 
 /**
- * Checks if the string is empty or null.
+ * Checks if the string is empty or null. Prefer (!s) instead.
  * @param s String to check.
  * @returns True if the string is empty or null.
  */
@@ -18,7 +19,7 @@ export function isEmptyOrNull(s: string) {
 }
 
 /**
- * Checks if the string is empty or null or whitespace.
+ * Checks if the string is empty or null or whitespace. Prefer !s?.Trim() instead.
  * @param s String to check.
  * @returns True if the string is empty or null or whitespace.
  */
@@ -44,6 +45,7 @@ export function padLeft(s: string | number, len: number, ch: string = ' ') {
 
 /**
  * Checks if the string starts with the prefix
+ * @deprecated Use .startsWith method of String directly
  * @param s String to check.
  * @param prefix Prefix to check.
  * @returns True if the string starts with the prefix.

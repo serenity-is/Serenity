@@ -1,7 +1,7 @@
-﻿import { Culture, Invariant, formatDate, formatISODateTimeUTC, parseDate, parseISODateTime, round, stringFormat, trunc } from "@serenity-is/base";
+﻿import { Culture, Invariant, formatDate, formatISODateTimeUTC, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addOption, addValidationRule, isEmptyOrNull, localText, today, tryGetText } from "../../q";
+import { addOption, addValidationRule, today } from "../../q";
 import { Widget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
@@ -81,15 +81,15 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
 
             addValidationRule(input, this.uniqueName, e1 => {
                 var value = this.get_value();
-                if (isEmptyOrNull(value)) {
+                if (!value) {
                     return null;
                 }
 
-                if (!isEmptyOrNull(this.get_minValue()) && Invariant.stringCompare(value, this.get_minValue()) < 0) {
+                if (this.get_minValue() && Invariant.stringCompare(value, this.get_minValue()) < 0) {
                     return stringFormat(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
                 }
     
-                if (!isEmptyOrNull(this.get_maxValue()) && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
+                if (this.get_maxValue() && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
                     return stringFormat(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
                 }
 
@@ -181,7 +181,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
     }
 
     set_value(value: string) {
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             this.element.val('');
             this.time && this.time.val('00:00');
         }
@@ -206,7 +206,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         }
 
         this.lastSetValue = null;
-        if (!isEmptyOrNull(value) && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
+        if (value && value.toLowerCase() != 'today' && value.toLowerCase() != 'now') {
             this.lastSetValueGet = this.get_value();
             this.lastSetValue = value;
         }
@@ -225,9 +225,8 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
     }
 
     private get_valueAsDate(): Date {
-        if (isEmptyOrNull(this.get_value())) {
+        if (!this.get_value())
             return null;
-        }
 
         return parseISODateTime(this.get_value());
     }

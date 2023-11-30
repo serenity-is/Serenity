@@ -1,10 +1,8 @@
 ﻿import validator from "@optionaldeps/jquery.validation";
-import { htmlEncode, parseDate, parseDecimal, parseInteger } from "@serenity-is/base";
-import { Config } from "./config";
+import { Config, htmlEncode, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { isBS3 } from "./dialogs";
-import { parseDayHourAndMin, parseHourAndMin } from "./formatting";
-import { tryGetText } from "./localtext";
-import { Exception, extend } from "./system";
+import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
+import { Exception, extend } from "./system-compat";
 
 if (validator && validator.methods && validator.addMethod) {
 

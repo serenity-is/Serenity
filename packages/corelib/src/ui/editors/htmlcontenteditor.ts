@@ -1,6 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { localText, resolveUrl } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, localText, trimToNull } from "../../q";
+import { isTrimmedEmpty, trimToNull } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { Widget } from "../widgets/widget";
 
@@ -168,7 +169,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     }
 
     get_readOnly(): boolean {
-        return !isEmptyOrNull(this.element.attr('disabled'));
+        return !!this.element.attr('disabled');
     }
 
     set_readOnly(value: boolean) {
@@ -200,7 +201,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
             else
                 return "~/Serenity.Assets/Scripts/ckeditor/";
         }
-        if (endsWith(path, '/'))
+        if (path.endsWith('/'))
             return path;
         return path + '/';
     }

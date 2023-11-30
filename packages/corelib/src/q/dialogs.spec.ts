@@ -1,10 +1,11 @@
 import type { CommonDialogOptions } from "./dialogs";
+import * as base from "@serenity-is/base";
 
 beforeEach(() => {
     jest.resetModules();
     jest.unmock('@optionaldeps/jquery');
     jest.unmock('@optionaldeps/bootstrap');
-    jest.unmock('./localtext');
+    jest.unmock('@serenity-is/base');
 })
 
 function mockUndefinedJQuery() {
@@ -452,13 +453,11 @@ describe("Q.alertDialog", () => {
 
     it('calls tryGetText for title', async function () {
         mockJQueryWithUIDialog();
-        jest.mock("./localtext", () => {
-            return {
-                __esModule: true,
-                localText: (s: string) => "Local" + s,
-                tryGetText: (s: string) => "Local" + s
-            }
-        });
+        jest.mock("@serenity-is/base", () => ({
+            ...jest.requireActual("@serenity-is/base"),
+            tryGetText: (key: string) => "Local" + key,
+            localText: (key: string) => "Local" + key
+        }));
         var $ = (await import("@optionaldeps/jquery")).default as any;
         const dialogs = await import("./dialogs");
         var opt = {

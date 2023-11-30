@@ -1,8 +1,8 @@
-﻿import { Criteria, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { Criteria, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, LayoutTimer, ScriptData, deepClone, endsWith, extend, getAttributes, getColumnsData, getColumnsDataAsync, indexOf, isEmptyOrNull, setEquality, startsWith, trimEnd, trimToNull, tryGetText } from "../../q";
+import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, indexOf, setEquality, trimEnd, trimToNull } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -342,10 +342,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected createIncludeDeletedButton(): void {
-        if (!isEmptyOrNull(this.getIsActiveProperty()) ||
-            !isEmptyOrNull(this.getIsDeletedProperty())) {
+        if (this.getIsActiveProperty() || this.getIsDeletedProperty())
             GridUtils.addIncludeDeletedToggle(this.toolbar.element, this.view, null, false);
-        }
     }
 
     protected getQuickSearchFields(): QuickSearchField[] {
@@ -394,9 +392,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected getItemCssClass(item: TItem, index: number): string {
         var activeFieldName = this.getIsActiveProperty();
         var deletedFieldName = this.getIsDeletedProperty();
-        if (isEmptyOrNull(activeFieldName) && isEmptyOrNull(deletedFieldName)) {
+        if (activeFieldName && deletedFieldName)
             return null;
-        }
 
         if (activeFieldName) {
             var value = (item as any)[activeFieldName];
@@ -427,7 +424,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected getItemMetadata(item: TItem, index: number): any {
         var itemClass = this.getItemCssClass(item, index);
-        if (isEmptyOrNull(itemClass)) {
+        if (!itemClass) {
             return new Object();
         }
         return { cssClasses: itemClass };
@@ -528,7 +525,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         var mapped = sortBy.map(function (s): ColumnSort {
             var x: ColumnSort;
-            if (s && endsWith(s.toLowerCase(), ' desc')) {
+            if (s && s.toLowerCase().endsWith(' desc')) {
                 return {
                     columnId: trimEnd(s.substr(0, s.length - 5)),
                     sortAsc: false
@@ -907,7 +904,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
 
 
-        if (!isEmptyOrNull(columnsKey)) {
+        if (columnsKey) {
             return getColumnsData(columnsKey);
         }
 
@@ -916,7 +913,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
         var columnsKey = this.getColumnsKey();
-        if (!isEmptyOrNull(columnsKey)) {
+        if (columnsKey) {
             return await getColumnsDataAsync(columnsKey);
         }
 
@@ -948,7 +945,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                         return (this.css.$ ?? '');
                     }.bind({ css: css }), false);
 
-                if (!isEmptyOrNull(item.editLinkIdField)) {
+                if (item.editLinkIdField) {
                     column.referencedFields = column.referencedFields || [];
                     column.referencedFields.push(item.editLinkIdField);
                 }
@@ -1053,7 +1050,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             return this._localTextDbPrefix;
 
         this._localTextDbPrefix = this.getLocalTextPrefix() ?? '';
-        if (this._localTextDbPrefix.length > 0 && !endsWith(this._localTextDbPrefix, '.'))
+        if (this._localTextDbPrefix.length > 0 && !this._localTextDbPrefix.endsWith('.'))
             this._localTextDbPrefix = 'Db.' + this._localTextDbPrefix + '.';
 
         return this._localTextDbPrefix;
@@ -1126,7 +1123,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
     protected determineText(getKey: (prefix: string) => string) {
         var localTextPrefix = this.getLocalTextDbPrefix();
-        if (!isEmptyOrNull(localTextPrefix)) {
+        if (localTextPrefix) {
             var local = tryGetText(getKey(localTextPrefix));
             if (local != null) {
                 return local;
@@ -1183,7 +1180,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     protected getPersistanceKey(): string {
         var key = 'GridSettings:';
         var path = window.location.pathname;
-        if (!isEmptyOrNull(path)) {
+        if (path) {
             key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
         }
 
@@ -1223,7 +1220,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         function fromJson(json: string) {
             json = trimToNull(json as string);
-            if (json != null && startsWith(json, '{') && endsWith(json, '}'))
+            if (json != null && json.startsWith('{') && json.endsWith('}'))
                 return JSON.parse(json);
             return null;
         }
@@ -1364,7 +1361,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 this.quickFiltersDiv.find('.quick-filter-item').each((i, e) => {
                     var field = $(e).data('qffield');
 
-                    if (isEmptyOrNull(field)) {
+                    if (!field?.length) {
                         return;
                     }
 
@@ -1458,7 +1455,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             settings.quickFilters = {};
             this.quickFiltersDiv.find('.quick-filter-item').each((i, e) => {
                 var field = $(e).data('qffield');
-                if (isEmptyOrNull(field)) {
+                if (!field?.length) {
                     return;
                 }
 
@@ -1483,8 +1480,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                         displayText = filterLabel + ' = ' + EditorUtils.getDisplayText(widget);
                     }
 
-                    if (!isEmptyOrNull(displayText)) {
-                        if (!isEmptyOrNull(settings.quickFilterText)) {
+                    if (displayText?.length) {
+                        if (settings.quickFilterText?.length) {
                             settings.quickFilterText += ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ';
                             settings.quickFilterText += displayText;
                         }

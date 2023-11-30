@@ -1,5 +1,4 @@
-﻿import { startsWith } from "./strings";
-import { closePanel } from "./dialogs";
+﻿import { closePanel } from "./dialogs";
 import $ from "@optionaldeps/jquery";
 
 export interface HandleRouteEventArgs {
@@ -106,7 +105,7 @@ export namespace Router {
                 if (idPrefix) {
                     idPrefix += "_";
                     var id = owner.attr("id");
-                    if (id && startsWith(id, idPrefix))
+                    if (id?.startsWith(idPrefix))
                         value = id.substr(idPrefix.length) + '@' + value;
                 }
             }

@@ -1,6 +1,6 @@
 ﻿import { ListResponse, htmlEncode } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { toGrouping, tryFirst } from "../../q";
+import { toGrouping } from "../../q";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { DataGrid } from "./datagrid";
 
@@ -46,7 +46,7 @@ export class TreeGridMixin<TItem> {
         };
 
         if (options.toggleField) {
-            var col = tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], x => x.field == options.toggleField) as Column<TItem>;
+            var col = (dg['allColumns'] || dg.slickGrid.getColumns())?.find(x => x.field == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
                     col.format || ((ctx: FormatterContext<TItem>) => htmlEncode(ctx.value)));

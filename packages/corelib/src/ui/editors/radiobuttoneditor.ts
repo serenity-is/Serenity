@@ -1,7 +1,7 @@
-﻿import { Enum } from "@serenity-is/base";
+﻿import { Enum, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { getAttributes, getLookup, isEmptyOrNull, tryGetText } from "../../q";
+import { getAttributes, getLookup } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { Widget } from "../widgets/widget";
 
@@ -19,13 +19,13 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
     constructor(input: JQuery, opt: RadioButtonEditorOptions) {
         super(input, opt);
 
-        if (isEmptyOrNull(this.options.enumKey) &&
+        if (!this.options.enumKey &&
             this.options.enumType == null &&
-            isEmptyOrNull(this.options.lookupKey)) {
+            !this.options.lookupKey) {
             return;
         }
 
-        if (!isEmptyOrNull(this.options.lookupKey)) {
+        if (this.options.lookupKey) {
             var lookup = getLookup(this.options.lookupKey);
             for (var item of lookup.items) {
                 var textValue = (item as any)[lookup.textField];
@@ -77,7 +77,7 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
             }
-            if (!isEmptyOrNull(value)) {
+            if (value) {
                 checks = inputs.filter('[value=' + value + ']');
                 if (checks.length > 0) {
                     (checks[0] as HTMLInputElement).checked = true;

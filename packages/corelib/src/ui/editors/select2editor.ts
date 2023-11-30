@@ -1,14 +1,14 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "../../q";
+import { PropertyItem, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
+import { Authorization, isTrimmedEmpty, trimToEmpty, trimToNull } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
-import { PropertyItem, stringFormat } from "@serenity-is/base";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;
@@ -186,7 +186,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         var emptyItemText = this.emptyItemText();
         var opt: Select2Options = {
             multiple: this.isMultiple(),
-            placeHolder: (!isEmptyOrNull(emptyItemText) ? emptyItemText : null),
+            placeHolder: emptyItemText || null,
             allowClear: this.allowClear(),
             createSearchChoicePosition: 'bottom'
         }
@@ -248,7 +248,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                         if (this.isAutoComplete &&
                             items.length != idList.length) {
                             for (var v of idList) {
-                                if (!any(items, z => z.id == v)) {
+                                if (!items.some(z => z.id == v)) {
                                     items.push({
                                         id: v,
                                         text: v
@@ -400,7 +400,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         this.get_select2Container().add(this.element).addClass('has-inplace-button');
 
         this.element.change(() => {
-            var isNew = this.isMultiple() || isEmptyOrNull(this.get_value());
+            var isNew = this.isMultiple() || !this.get_value();
             inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
         });
 
@@ -460,13 +460,13 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
             var isAsyncSource = false;
 
-            if (any(this._items || [], (x: Select2Item) => {
+            if ((this._items || []).some((x: Select2Item) => {
                     var text = getName ? getName(x.source) : x.text;
                     return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
 
-            if (!any(this._items || [], x1 => {
+            if (!(this._items || []).some(x1 => {
                 return (Select2.util.stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
             })) {
                 if (this.isAutoComplete()) {
@@ -539,7 +539,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             if (text == null || !text.length)
                 return false;
             text = Select2.util.stripDiacritics(text).toUpperCase();
-            if (startsWith(text, term))
+            if (text.startsWith(term))
                 return true;
             if (text.indexOf(term) >= 0)
                 contains.push(item);
@@ -571,7 +571,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
         if (value != this.get_value()) {
             var val: any = value;
-            if (!isEmptyOrNull(value) && this.isMultiple()) {
+            if (value && this.isMultiple()) {
                 val = value.split(String.fromCharCode(44)).map(function (x) {
                     return trimToNull(x);
                 }).filter(function (x1) {
@@ -633,7 +633,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         }
 
         var str = val;
-        if (isEmptyOrNull(str)) {
+        if (!str) {
             return [];
         }
 
@@ -667,7 +667,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     get_readOnly(): boolean {
-        return !isEmptyOrNull(this.element.attr('readonly'));
+        return !!this.element.attr('readonly');
     }
 
     get readOnly(): boolean {
@@ -703,7 +703,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected setCascadeFrom(value: string) {
 
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             if (this.cascadeLink != null) {
                 this.cascadeLink.set_parentID(null);
                 this.cascadeLink = null;
@@ -817,7 +817,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
         if (val == null || val === '') {
 
-            if (!isEmptyOrNull(this.get_cascadeField())) {
+            if (this.get_cascadeField()) {
                 return [];
             }
 
@@ -872,11 +872,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     public onInitNewEntity: (entity: TItem) => void;
 
     protected initNewEntity(entity: TItem) {
-        if (!isEmptyOrNull(this.get_cascadeField())) {
+        if (this.get_cascadeField()) {
             (entity as any)[this.get_cascadeField()] = this.get_cascadeValue();
         }
 
-        if (!isEmptyOrNull(this.get_filterField())) {
+        if (this.get_filterField()) {
             (entity as any)[this.get_filterField()] = this.get_filterValue();
         }
 
@@ -954,7 +954,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
                 }, null);
             }
-            else if (this.isMultiple() || isEmptyOrNull(this.get_value())) {
+            else if (this.isMultiple() || !this.get_value()) {
                 var entity: TItem = {} as any;
                 this.setTermOnNewEntity(entity, trimToEmpty(this.lastCreateTerm));
                 this.initNewEntity(entity);
