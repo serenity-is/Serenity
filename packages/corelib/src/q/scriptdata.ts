@@ -249,12 +249,12 @@ export async function reloadLookupAsync<TItem = any>(key: string, dynJS?: boolea
     return await ScriptData.reloadAsync('Lookup.' + key, dynJS);
 }
 
-export function getColumns(key: string): PropertyItem[] {
-    return getColumnsData(key).items;
+export function getColumns(key: string, dynJS?: boolean): PropertyItem[] {
+    return getColumnsData(key, dynJS).items;
 }
 
-export function getColumnsData(key: string): PropertyItemsData {
-    return ScriptData.ensure('Columns.' + key);
+export function getColumnsData(key: string, dynJS?: boolean): PropertyItemsData {
+    return ScriptData.ensure('Columns.' + key, dynJS);
 }
 
 export async function getColumnsAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]> {

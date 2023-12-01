@@ -2557,8 +2557,8 @@ declare namespace Serenity {
     function getLookupAsync<TItem>(key: string, dynJS?: boolean): Promise<Lookup<TItem>>;
     function reloadLookup<TItem = any>(key: string, dynJS?: boolean): Lookup<TItem>;
     function reloadLookupAsync<TItem = any>(key: string, dynJS?: boolean): Promise<Lookup<TItem>>;
-    function getColumns(key: string): PropertyItem[];
-    function getColumnsData(key: string): PropertyItemsData;
+    function getColumns(key: string, dynJS?: boolean): PropertyItem[];
+    function getColumnsData(key: string, dynJS?: boolean): PropertyItemsData;
     function getColumnsAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]>;
     function getColumnsDataAsync(key: string, dynJS?: boolean): Promise<PropertyItemsData>;
     function getForm(key: string, dynJS?: boolean): PropertyItem[];
