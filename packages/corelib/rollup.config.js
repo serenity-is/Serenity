@@ -9,7 +9,6 @@ var externalPackages = ["@serenity-is/sleekgrid"];
 
 var globals = {
     'flatpickr': 'flatpickr',
-    'tslib': 'this.window || this',
     '@serenity-is/sleekgrid': 'this.Slick = this.Slick || {}'
 }
 
@@ -224,8 +223,6 @@ export default [
                 generatedCode: 'es2015',
                 extend: true,
                 freeze: false,
-                banner: fs.readFileSync('./node_modules/tslib/tslib.js',
-                    'utf8').replace(/^\uFEFF/, '') + '\n',
                 footer: `(function (me) {
     if (!me.Q)
         me.Q = me.Serenity;
@@ -280,11 +277,7 @@ export default [
                     sequential: true,
                     order: 'post',
                     async handler({ dir }) {
-                        // inject tslib
-                        dtsOutputs.splice(0, 0, fs.readFileSync('./node_modules/tslib/tslib.d.ts',
-                            'utf8').replace(/^\uFEFF/, '').replace(/^[ \t]*export declare/gm, 'declare'));
-                        // inject sleekgrid typings after q
-                        dtsOutputs.splice(1, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
+                        dtsOutputs.splice(0, 0, convertModularToGlobal(fs.readFileSync("./node_modules/@serenity-is/sleekgrid/dist/index.d.ts").toString(), 'Slick'));
                         dtsOutputs.push(`
 import Q = Serenity;
 

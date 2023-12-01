@@ -2,7 +2,7 @@
 import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality, trimEnd, trimToNull } from "../../q";
+import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality, trimToNull } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -527,7 +527,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             var x: ColumnSort;
             if (s && s.toLowerCase().endsWith(' desc')) {
                 return {
-                    columnId: trimEnd(s.substr(0, s.length - 5)),
+                    columnId: s.substr(0, s.length - 5).trimEnd(),
                     sortAsc: false
                 }
             }
