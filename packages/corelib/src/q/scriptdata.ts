@@ -1,4 +1,4 @@
-﻿import { getStateStore, notifyError, stringFormat, type Lookup, type PropertyItem, type PropertyItemsData, resolveUrl } from "@serenity-is/base";
+﻿import { getStateStore, notifyError, stringFormat, Lookup, type PropertyItem, type PropertyItemsData, resolveUrl } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { trimToNull } from "./strings";
@@ -58,27 +58,27 @@ export namespace ScriptData {
         typeof $ !== "undefined" && typeof document !== "undefined" && $(document.body).unbind('scriptdatachange.' + regClass);
     }
 
-    function loadOptions(name: string, async: boolean): JQueryAjaxSettings {
+    function loadOptions(name: string, dynJS: boolean, async: boolean): JQueryAjaxSettings {
         return {
             async: async,
             cache: true,
             type: 'GET',
-            url: resolveUrl('~/DynJS.axd/') + name + '.js?v=' + (getHash(name) ?? new Date().getTime()),
+            url: resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getHash(name) ?? new Date().getTime()),
             data: null,
-            dataType: 'text',
+            dataType: dynJS ? 'text' : 'json',
             converters: {
                 "text script": function (text: string) {
                     return text;
                 }
             },
-            success: function (data, textStatus, jqXHR) {
+            success: dynJS ? function (data, textStatus, jqXHR) {
                 $.globalEval(data);
-            },
+            } : undefined,
             error: function (xhr, textStatus, errorThrown) {
                 var isLookup = name?.startsWith("Lookup.");
                 if (xhr.status == 403 && isLookup) {
                     notifyError('<p>Access denied while trying to load the lookup: "<b>' +
-                        name.substr(7) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
+                        name.substring(7) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
                         '<p><em>Lookups use the ReadPermission of their row by default. You may override that for the lookup ' +
                         'like [LookupScript("Some.Lookup", Permission = "?")] to grant all ' +
                         'authenticated users to read it (or use "*" for public).</em></p>' + 
@@ -91,7 +91,7 @@ export namespace ScriptData {
                 }
 
                 notifyError("An error occurred while trying to load " +
-                    (isLookup ? ' the lookup: "' + name.substr(7) :
+                    (isLookup ? ' the lookup: "' + name.substring(7) :
                         ' dynamic script: "' + name) +
                     '"!. Please check the error message displayed in the dialog below for more info.');
 
@@ -112,14 +112,14 @@ export namespace ScriptData {
 
     let loadScriptPromises: { [key: string]: Promise<any> }  = {}
 
-    function loadScriptAsync(name: string): Promise<any> {
+    function loadScriptAsync<TData>(name: string, dynJS: boolean): Promise<TData> {
         let key = name + '?' + (getHash(name) ?? '');
 
         var promise = loadScriptPromises[key];
         if (promise)
             return promise;
 
-        let options = loadOptions(name, true);
+        let options = loadOptions(name, dynJS, true);
         blockUI(null);
         loadScriptPromises[key] = promise = Promise.resolve(
             $.ajax(options).always(function () {
@@ -130,12 +130,12 @@ export namespace ScriptData {
         return promise;
     }
 
-    function loadScriptData(name: string) {
-        $.ajax(loadOptions(name, false));
+    function loadScriptData(name: string, dynJS: boolean): JQueryXHR {
+        return $.ajax(loadOptions(name, dynJS, false));
     }
 
-    async function loadScriptDataAsync(name: string): Promise<any> {
-        return await loadScriptAsync(name);
+    async function loadScriptDataAsync<TData = any>(name: string, dynJS: boolean): Promise<TData> {
+        return await loadScriptAsync<TData>(name, dynJS);
     }
 
     function loadError(name: string) {
@@ -154,41 +154,57 @@ export namespace ScriptData {
         throw new Error(message);
     }
 
-    export function ensure<TData = any>(name: string): TData {
-        var data = getLoadedData(name);
-        if (data == null) {
-            loadScriptData(name);
-        }
-
-        data = getLoadedData(name);
-
-        if (data == null) 
-            loadError(name);
-
-        return data;
-    }
-
-    export async function ensureAsync<TData = any>(name: string): Promise<TData> {
+    export function ensure<TData = any>(name: string, dynJS?: boolean): TData {
         var data = getLoadedData(name);
         if (data != null)
             return data;
-        await loadScriptDataAsync(name);
-        data = getLoadedData(name);
+
+        if (dynJS) {
+            loadScriptData(name, dynJS);
+            data = getLoadedData(name);
+            if (data == null)
+                loadError(name);
+            return data;
+        }
+        data = loadScriptData(name, dynJS).responseJSON;
         if (data == null)
             loadError(name);
+        if (name.startsWith("Lookup."))
+            data = new Lookup(data.Params, data.Items);
+        set(name, data);
         return data;
     }
 
-    export function reload<TData = any>(name: string): TData {
+    export async function ensureAsync<TData = any>(name: string, dynJS?: boolean): Promise<TData> {
+        var data = getLoadedData(name);
+        if (data != null)
+            return data;
+
+        if (dynJS) {
+            await loadScriptDataAsync(name, dynJS);
+            data = getLoadedData(name);
+            if (data == null)
+                loadError(name);
+            return data;
+        }
+
+        data = await loadScriptData(name, dynJS);
+        if (name.startsWith("Lookup."))
+            data = new Lookup(data.Params, data.Items);
+        set(name, data);
+        return data;
+    }
+
+    export function reload<TData = any>(name: string, dynJS?: boolean): TData {
         getHash(name, true);
-        loadScriptData(name);
+        loadScriptData(name, dynJS);
         var data = getLoadedData(name);
         return data;
     }
 
-    export async function reloadAsync<TData = any>(name: string): Promise<TData> {
+    export async function reloadAsync<TData = any>(name: string, dynJS?: boolean): Promise<TData> {
         getHash(name, true);
-        await loadScriptDataAsync(name);
+        await loadScriptDataAsync(name, dynJS);
         return getLoadedData(name);
     }
 
@@ -209,28 +225,28 @@ export namespace ScriptData {
     }
 }
 
-export function getRemoteData<TData = any>(key: string): TData {
-    return ScriptData.ensure('RemoteData.' + key);
+export function getRemoteData<TData = any>(key: string, dynJS?: boolean): TData {
+    return ScriptData.ensure('RemoteData.' + key, dynJS);
 }
 
-export async function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
-    return await ScriptData.ensureAsync('RemoteData.' + key);
+export async function getRemoteDataAsync<TData = any>(key: string, dynJS?: boolean): Promise<TData> {
+    return await ScriptData.ensureAsync('RemoteData.' + key, dynJS);
 }
 
-export function getLookup<TItem>(key: string): Lookup<TItem> {
-    return ScriptData.ensure('Lookup.' + key);
+export function getLookup<TItem>(key: string, dynJS?: boolean): Lookup<TItem> {
+    return ScriptData.ensure('Lookup.' + key, dynJS);
 }
 
-export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
-    return await ScriptData.ensureAsync('Lookup.' + key);
+export async function getLookupAsync<TItem>(key: string, dynJS?: boolean): Promise<Lookup<TItem>> {
+    return await ScriptData.ensureAsync('Lookup.' + key, dynJS);
 }
 
-export function reloadLookup<TItem = any>(key: string): Lookup<TItem> {
-    return ScriptData.reload('Lookup.' + key);
+export function reloadLookup<TItem = any>(key: string, dynJS?: boolean): Lookup<TItem> {
+    return ScriptData.reload('Lookup.' + key, dynJS);
 }
 
-export async function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>> {
-    return await ScriptData.reloadAsync('Lookup.' + key);
+export async function reloadLookupAsync<TItem = any>(key: string, dynJS?: boolean): Promise<Lookup<TItem>> {
+    return await ScriptData.reloadAsync('Lookup.' + key, dynJS);
 }
 
 export function getColumns(key: string): PropertyItem[] {
@@ -241,36 +257,36 @@ export function getColumnsData(key: string): PropertyItemsData {
     return ScriptData.ensure('Columns.' + key);
 }
 
-export async function getColumnsAsync(key: string): Promise<PropertyItem[]> {
-    return (await getColumnsDataAsync(key)).items;
+export async function getColumnsAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]> {
+    return (await getColumnsDataAsync(key, dynJS)).items;
 }
 
-export async function getColumnsDataAsync(key: string): Promise<PropertyItemsData> {
-    return ScriptData.ensureAsync('Columns.' + key);
+export async function getColumnsDataAsync(key: string, dynJS?: boolean): Promise<PropertyItemsData> {
+    return ScriptData.ensureAsync('Columns.' + key, dynJS);
 }
 
-export function getForm(key: string): PropertyItem[] {
-    return getFormData(key).items;
+export function getForm(key: string, dynJS?: boolean): PropertyItem[] {
+    return getFormData(key, dynJS).items;
 }
 
-export function getFormData(key: string): PropertyItemsData {
-    return ScriptData.ensure('Form.' + key);
+export function getFormData(key: string, dynJS?: boolean): PropertyItemsData {
+    return ScriptData.ensure('Form.' + key, dynJS);
 }
 
-export async function getFormAsync(key: string): Promise<PropertyItem[]> {
-    return (await getFormDataAsync(key)).items;
+export async function getFormAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]> {
+    return (await getFormDataAsync(key, dynJS)).items;
 }
 
-export async function getFormDataAsync(key: string): Promise<PropertyItemsData> {
-    return await ScriptData.ensureAsync('Form.' + key);
+export async function getFormDataAsync(key: string, dynJS?: boolean): Promise<PropertyItemsData> {
+    return await ScriptData.ensureAsync('Form.' + key, dynJS);
 }
 
-export function getTemplate(key: string): string {
-    return ScriptData.ensure('Template.' + key);
+export function getTemplate(key: string, dynJS?: boolean): string {
+    return ScriptData.ensure('Template.' + key, dynJS);
 }
 
-export async function getTemplateAsync(key: string): Promise<string> {
-    return await ScriptData.ensureAsync('Template.' + key);
+export async function getTemplateAsync(key: string, dynJS?: boolean): Promise<string> {
+    return await ScriptData.ensureAsync('Template.' + key, dynJS);
 }
 
 export function canLoadScriptData(name: string): boolean {

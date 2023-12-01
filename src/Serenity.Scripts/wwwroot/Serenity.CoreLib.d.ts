@@ -2543,30 +2543,30 @@ declare namespace Serenity {
         function bindToChange(name: string, regClass: string, onChange: () => void): void;
         function triggerChange(name: string): void;
         function unbindFromChange(regClass: string): void;
-        function ensure<TData = any>(name: string): TData;
-        function ensureAsync<TData = any>(name: string): Promise<TData>;
-        function reload<TData = any>(name: string): TData;
-        function reloadAsync<TData = any>(name: string): Promise<TData>;
+        function ensure<TData = any>(name: string, dynJS?: boolean): TData;
+        function ensureAsync<TData = any>(name: string, dynJS?: boolean): Promise<TData>;
+        function reload<TData = any>(name: string, dynJS?: boolean): TData;
+        function reloadAsync<TData = any>(name: string, dynJS?: boolean): Promise<TData>;
         function canLoad(name: string): boolean;
         function setRegisteredScripts(scripts: any[]): void;
         function set(name: string, value: any): void;
     }
-    function getRemoteData<TData = any>(key: string): TData;
-    function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
-    function getLookup<TItem>(key: string): Lookup<TItem>;
-    function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
-    function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
-    function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+    function getRemoteData<TData = any>(key: string, dynJS?: boolean): TData;
+    function getRemoteDataAsync<TData = any>(key: string, dynJS?: boolean): Promise<TData>;
+    function getLookup<TItem>(key: string, dynJS?: boolean): Lookup<TItem>;
+    function getLookupAsync<TItem>(key: string, dynJS?: boolean): Promise<Lookup<TItem>>;
+    function reloadLookup<TItem = any>(key: string, dynJS?: boolean): Lookup<TItem>;
+    function reloadLookupAsync<TItem = any>(key: string, dynJS?: boolean): Promise<Lookup<TItem>>;
     function getColumns(key: string): PropertyItem[];
     function getColumnsData(key: string): PropertyItemsData;
-    function getColumnsAsync(key: string): Promise<PropertyItem[]>;
-    function getColumnsDataAsync(key: string): Promise<PropertyItemsData>;
-    function getForm(key: string): PropertyItem[];
-    function getFormData(key: string): PropertyItemsData;
-    function getFormAsync(key: string): Promise<PropertyItem[]>;
-    function getFormDataAsync(key: string): Promise<PropertyItemsData>;
-    function getTemplate(key: string): string;
-    function getTemplateAsync(key: string): Promise<string>;
+    function getColumnsAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]>;
+    function getColumnsDataAsync(key: string, dynJS?: boolean): Promise<PropertyItemsData>;
+    function getForm(key: string, dynJS?: boolean): PropertyItem[];
+    function getFormData(key: string, dynJS?: boolean): PropertyItemsData;
+    function getFormAsync(key: string, dynJS?: boolean): Promise<PropertyItem[]>;
+    function getFormDataAsync(key: string, dynJS?: boolean): Promise<PropertyItemsData>;
+    function getTemplate(key: string, dynJS?: boolean): string;
+    function getTemplateAsync(key: string, dynJS?: boolean): Promise<string>;
     function canLoadScriptData(name: string): boolean;
 
     interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
