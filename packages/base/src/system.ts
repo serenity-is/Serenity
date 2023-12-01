@@ -77,8 +77,8 @@ export function getNested(from: any, name: string) {
 
 export function getType(name: string, target?: any): Type  {
     var type: any;
-    const types = getTypeStore();
     if (target == null) {
+        const types = getTypeStore();
         type = types[name];
         if (type != null || globalObj == void 0 || name === "Object")
             return type;
@@ -147,29 +147,14 @@ export function isInstanceOfType(instance: any, type: Type) {
 };
 
 export function getBaseType(type: any) {
-    if (type === Object ||
+    if (type == null ||
+        type === Object ||
         !type.prototype ||
-        (type as TypeExt).__interface === true) {
+        (type as TypeExt).__interface === true)
         return null;
-    }
-    else if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(type.prototype).constructor;
-    }
-    else {
-        var p = type.prototype;
-        if (Object.prototype.hasOwnProperty.call(p, 'constructor')) {
-            try {
-                var ownValue = p.constructor;
-                delete p.constructor;
-                return p.constructor;
-            }
-            finally {
-                p.constructor = ownValue;
-            }
-        }
-        return p.constructor;
-    }
-};
+        
+    return Object.getPrototypeOf(type.prototype).constructor;
+}
 
 function merge(arr1: any[], arr2: any[]) {
     if (!arr1 || !arr2)
@@ -194,7 +179,7 @@ function interfaceIsAssignableFrom(from: any) {
 
 function registerType(type: any, name: string, intf: any[]) {
     const types = getTypeStore();
-    if (name && name.length) {
+    if (name) {
         setTypeNameProp(type, name);
         types[name] = type;
     }
@@ -231,6 +216,12 @@ export function registerInterface(type: any, name: string, intf?: any[]) {
 
 export namespace Enum {
     export let toString = (enumType: any, value: number): string => {
+        if (value == null)
+            return "";
+
+        if (typeof value !== "number")
+            return "" + value;
+
         var values = enumType;
         if (value === 0 || !((enumType as TypeExt).__metadata?.enumFlags)) {
             for (var i in values) {
@@ -243,12 +234,16 @@ export namespace Enum {
         else {
             var parts: string[] = [];
             for (var i in values) {
+                if (typeof values[i] !== "number")
+                    continue;
+
                 if (values[i] & value) {
                     parts.push(i);
+                    value -= values[i];
                 }
-                else
-                    parts.push(value == null ? "" : value.toString());
             }
+            if (value != 0)
+                parts.push(value.toString());
             return parts.join(' | ');
         }
     };

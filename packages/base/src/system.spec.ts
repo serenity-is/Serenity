@@ -1,4 +1,4 @@
-import { Enum, getStateStore, getType, getTypeFullName, getTypeNameProp, isAssignableFrom, isEnum, registerClass, registerEnum, registerInterface } from "./system";
+import { Enum, ensureMetadata, fieldsProxy, getBaseType, getInstanceType, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface } from "./system";
 
 describe("Enum.getValues", () => {
     it('returns correct values', function () {
@@ -32,6 +32,16 @@ describe("Enum.toString", () => {
         Another = -1
     }
 
+    it('returns empty string for null', () => {
+        expect(Enum.toString(Test, null)).toBe("");
+        expect(Enum.toString(Test, undefined)).toBe("");
+    });
+
+    it('returns the value as string if value is not a number', () => {
+        expect(Enum.toString(Test, "test" as any)).toBe("test");
+        expect(Enum.toString(Test, "0" as any)).toBe("0");
+    });    
+
     it('returns names', function () {
         expect(Enum.toString(Test, 1)).toBe("Some");
         expect(Enum.toString(Test, 5)).toBe("Other");
@@ -42,9 +52,21 @@ describe("Enum.toString", () => {
         expect(Enum.toString(Test, 0)).toBe("0");
         expect(Enum.toString(Test, -5)).toBe("-5");
     });
+
+    it('works with flags', () => {
+        enum Test2 {
+            Some = 1,
+            Other = 2,
+            Another = 4
+        }
+
+        ensureMetadata(Test2 as any).enumFlags = true;
+        expect(Enum.toString(Test2, Test2.Some + Test2.Another)).toBe("Some | Another");
+        expect(Enum.toString(Test2, Test2.Some + Test2.Another + 16)).toBe("Some | Another | 16");
+    });
 });
 
-describe("Q.getStateStore", () => {
+describe("getStateStore", () => {
     it('if globalThis.Q is null, it can assign it', function () {
         var q = (globalThis as any).Q;
         try {
@@ -166,7 +188,7 @@ registerClass(Module1Class, "SomeClassUsingCopy1", [Module1.ISome]);
 class CopyModule1Class { }
 registerClass(CopyModule1Class, "SomeClassUsingCopy2", [CopyModule1.ISome]);
 
-describe("Q.isAssignableFrom", () => {
+describe("isAssignableFrom", () => {
 
     it("interfaces can also be matched by their registration names", function () {
         expect(isAssignableFrom(Module1.ISome, Module1Class)).toBe(true);
@@ -204,9 +226,21 @@ describe("Q.isAssignableFrom", () => {
         registerClass(X, "X", [ISome])
         expect(isAssignableFrom(Module1.ISome, X)).toBe(false);
     });
+
+    it("returns true for same class", function () {
+        expect(isAssignableFrom(String, String)).toBe(true);
+    });
+
+    it("returns true for sub class", function () {
+        class A {}
+        class B extends A {}
+        expect(isAssignableFrom(A, B)).toBe(true);
+        expect(isAssignableFrom(B, A)).toBe(false);
+    });
+
 });
 
-describe("Q.registerClass", () => {
+describe("registerClass", () => {
     function expectClassDetails(klass: any, name: string, intf?: any[]) {
         expect(isEnum(klass)).toBe(false);
 
@@ -366,9 +400,18 @@ describe("Q.registerClass", () => {
         // check base class again to make sure its interfaces are not modified
         expectClassDetails(Test, nameTest, [Intf1, Intf2]);
     });
+
+    it("works with types that already have a static __typeName property", () => {
+        class MyClass {
+            static __typeName = "MyClassName";
+        }
+
+        registerClass(MyClass, null);
+        expect(getType("MyClassName")).toBe(MyClass);
+    });
 });
 
-describe("Q.registerEnum", () => {
+describe("registerEnum", () => {
     function expectTypeDetails(enumObj: any, name: string) {
         expect(isEnum(enumObj)).toBe(true);
         expect(enumObj.__interface).toBeNull();
@@ -400,12 +443,11 @@ describe("Q.registerEnum", () => {
             B = 2
         }
 
-        const name = 'Test_Enum_NoName';
         registerEnum(Test, null);
         expectTypeDetails(Test, null);
     });
 
-    it('works with with name', function () {
+    it('works with name', function () {
 
         enum Test {
             A = 1,
@@ -415,9 +457,23 @@ describe("Q.registerEnum", () => {
         const name = 'Test_Enum_With_Name';
         registerEnum(Test, name);
     });
+
+    it('works with enum key', function () {
+
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        const name = 'Test_Enum_Name';
+        const key = 'Test_Enum_Key';
+        registerEnum(Test, name, key);
+        expect(getType(name)).toBe(Test);
+        expect(getType(key)).toBe(Test);
+    });    
 });
 
-describe("Q.registerInterface", () => {
+describe("registerInterface", () => {
     function expectTypeDetails(klass: any, name: string, intf?: any[]) {
         expect(isEnum(klass)).toBe(false);
 
@@ -585,5 +641,158 @@ describe("Q.registerInterface", () => {
 
         // check base class again to make sure its interfaces are not modified
         expectTypeDetails(ITest, nameTest, [Intf1, Intf2]);
+    });
+});
+
+describe("ensureMetadata", () => {
+    it("returns existing __metadata if available", () => {
+        class Test {
+        }
+        var existing = (Test as any)["__metadata"] = { y: 3 };
+        expect(ensureMetadata(Test)).toBe(existing);
+    });
+
+    it("does not return existing __metadata from base class", () => {
+        class Test {
+        }
+
+        class Sub {
+
+        }
+        var existing = (Test as any)["__metadata"] = { y: 3 };
+        expect(ensureMetadata(Sub)).not.toBe(existing);
+    });
+});
+
+describe("isInstanceOfType", () => {
+    it("returns false if instance is null or undefined", () => {
+        expect(isInstanceOfType(null, String)).toBe(false);
+        expect(isInstanceOfType(undefined, Object)).toBe(false);
+    });
+
+    it("uses __isInstanceOfType function if available", () => {
+        class Test1 {
+            static __isInstanceOfType(type: any) { return typeof type === "string" && type.startsWith("t"); }
+        }
+
+        class Test2 {
+            static __isInstanceOfType = true;
+        }
+
+        expect(isInstanceOfType("test", Test1)).toBe(true);
+        expect(isInstanceOfType("vest", Test1)).toBe(false);
+        expect(isInstanceOfType("test", Test2)).toBe(false);
+        expect(isInstanceOfType("vest", Test2)).toBe(false);
+    });
+});
+
+describe("getInstanceType", () => {
+    it("throws for null or undefined", () => {
+        expect(() => getInstanceType(undefined)).toThrow();
+        expect(() => getInstanceType(null)).toThrow();
+    });
+
+    it("returns Object if can't read constructor", () => {
+        let a = {
+            get constructor() { throw "test"; }
+        }
+        expect(getInstanceType(a)).toBe(Object);
+    });
+});
+
+describe("getBaseType", () => {
+    it("returns null for null, Object, NaN, and interfaces", () => {
+        expect(getBaseType(null)).toBeNull();
+        expect(getBaseType(undefined)).toBeNull();
+        expect(getBaseType(Object)).toBeNull();
+        expect(getBaseType(NaN)).toBeNull();
+
+        class ITest {
+        }
+        registerInterface(ITest, "getBaseType.ITest");
+        expect(getBaseType(ITest)).toBeNull();
+    });
+
+    it("uses getPrototypeOf for others", () => {
+
+        class Test {
+        }
+
+        class Sub extends Test {
+        }
+
+        expect(getBaseType(Test)).toBe(Object);
+        expect(getBaseType(Sub)).toBe(Test);
+    });
+});
+
+describe("initFormType", () => {
+    it("uses w function", () => {
+        class TestForm {
+            w(name: string, widget: string) {
+                return name + "_" + widget;
+            }
+        }
+
+        initFormType(TestForm, ["test1", "1", "test2", "2", "test3", "3"]);
+        var form = new TestForm();
+        expect((form as any).test1).toBe("test1_1");
+        expect((form as any).test2).toBe("test2_2");
+        expect((form as any).test3).toBe("test3_3");
+    });
+});
+
+describe("fieldsProxy", () => {
+    it("returns same instance every time", () => {
+        class Row1Fields {
+        }
+
+        class Row2Fields {
+        }
+
+        expect(fieldsProxy<Row1Fields>()).toBe(fieldsProxy<Row2Fields>());
+    });
+
+    it("returns property name as is", () => {
+        class Fields {
+            declare A: string;
+            declare B: string;
+        }
+
+        var proxy = fieldsProxy<Fields>();
+        expect(proxy.A).toBe("A");
+        expect(proxy.B).toBe("B");
+
+    });    
+});
+
+describe("getType", () => {
+    it("can return type from a root object", () => {
+        let root = {
+            A: {
+                B: class {
+                }
+            }
+        }
+
+        expect(getType("A.B", root)).toBe(root.A.B);
+    });
+});
+
+describe("getTypeShortName", () => {
+    it("returns part after last dot", () => {
+        class Test {
+        }
+        registerClass(Test, "NamespaceOf.C.IsD")
+    
+        expect(getTypeShortName(Test)).toBe("IsD");
+    });
+
+    it("returns as is if no dot", () => {
+        class Test {
+        }
+        registerClass(Test, "Me")
+    
+        expect(getTypeShortName(Test)).toBe("Me");
     });
 });
