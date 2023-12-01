@@ -198,7 +198,6 @@ public static class JSON
             options.Converters.Add(JsonConverters.SafeInt64JsonConverter.Instance);
             options.Converters.Add(JsonConverters.ObjectJsonConverter.Instance);
             options.Converters.Add(JsonConverters.NullableJsonConverter.Instance);
-            options.Converters.Add(new JsonStringEnumConverter());
 
             if (rowJsonConverter == null)
             {
