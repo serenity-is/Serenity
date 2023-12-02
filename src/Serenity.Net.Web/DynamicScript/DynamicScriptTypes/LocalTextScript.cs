@@ -157,7 +157,7 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
         jw.WriteEndObject();
         jw.Flush();
 
-        return "Q.LT.add(" + Encoding.UTF8.GetString(ms.ToArray()) + ");";
+        return "(Serenity.addLocalText || Q.LT.add)(" + Encoding.UTF8.GetString(ms.ToArray()) + ");";
     }
 
     /// <inheritdoc/>
