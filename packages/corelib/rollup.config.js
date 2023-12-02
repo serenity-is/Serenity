@@ -224,6 +224,7 @@ export default [
                 extend: true,
                 freeze: false,
                 footer: `(function (me) {
+    me.Serenity && delete me.Serenity.globalObject;
     if (!me.Q)
         me.Q = me.Serenity;
     else if (me.Q !== me.Serenity) {
