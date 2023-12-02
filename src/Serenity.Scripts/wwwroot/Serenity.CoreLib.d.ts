@@ -1664,7 +1664,6 @@ declare namespace Serenity {
         idField?: string;
         parentIdField?: string;
         textField?: string;
-        textFormatter?(item: TItem): string;
     }
     interface Lookup<TItem> {
         items: TItem[];
@@ -1674,7 +1673,6 @@ declare namespace Serenity {
         idField: string;
         parentIdField: string;
         textField: string;
-        textFormatter: (item: TItem) => string;
     }
     class Lookup<TItem> {
         items: TItem[];
@@ -1684,7 +1682,6 @@ declare namespace Serenity {
         idField: string;
         parentIdField: string;
         textField: string;
-        textFormatter: (item: TItem) => string;
         constructor(options: LookupOptions<TItem>, items?: TItem[]);
         update?(value: TItem[]): void;
     }

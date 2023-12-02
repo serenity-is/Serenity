@@ -425,7 +425,6 @@ interface LookupOptions<TItem> {
     idField?: string;
     parentIdField?: string;
     textField?: string;
-    textFormatter?(item: TItem): string;
 }
 interface Lookup<TItem> {
     items: TItem[];
@@ -435,7 +434,6 @@ interface Lookup<TItem> {
     idField: string;
     parentIdField: string;
     textField: string;
-    textFormatter: (item: TItem) => string;
 }
 declare class Lookup<TItem> {
     items: TItem[];
@@ -445,7 +443,6 @@ declare class Lookup<TItem> {
     idField: string;
     parentIdField: string;
     textField: string;
-    textFormatter: (item: TItem) => string;
     constructor(options: LookupOptions<TItem>, items?: TItem[]);
     update?(value: TItem[]): void;
 }

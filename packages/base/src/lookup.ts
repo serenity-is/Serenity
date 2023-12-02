@@ -18,7 +18,6 @@ export class Lookup<TItem> {
     public idField: string;
     public parentIdField: string;
     public textField: string;
-    public : (item: TItem) => string;
 
     constructor(options: LookupOptions<TItem>, items?: TItem[]) {
         options = options || {};
