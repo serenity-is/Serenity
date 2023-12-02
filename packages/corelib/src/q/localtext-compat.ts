@@ -1,4 +1,4 @@
-﻿import { addLocalText, localText, tryGetText } from "@serenity-is/base";
+﻿import { addLocalText, globalObject, localText, tryGetText } from "@serenity-is/base";
 
 /** @deprecated prefer localText for better discoverability */
 export const text = localText;
@@ -48,3 +48,7 @@ export namespace LT {
     /** @deprecated Use localText */
     export const getDefault = localText;
 }
+
+const serenity = globalObject.Serenity || (globalObject.Serenity = {});
+serenity.LT = serenity.LT || {};
+serenity.LT.add = addLocalText;

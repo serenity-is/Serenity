@@ -1,4 +1,4 @@
-﻿import { Lookup, blockUI, blockUndo, getStateStore, notifyError, resolveUrl, stringFormat, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { Lookup, blockUI, blockUndo, getStateStore, notifyError, resolveUrl, stringFormat, type PropertyItem, type PropertyItemsData, globalObject } from "@serenity-is/base";
 import { alertDialog, iframeDialog } from "./dialogs";
 
 function getHash(key: string, reload?: boolean): string {
@@ -308,9 +308,7 @@ var exported = {
     ScriptData
 }
 
-if (typeof globalThis !== "undefined") {
-    const Q = (globalThis as any).Q || ((globalThis as any).Q = {});
-    for (var i in exported)
-        if (Q[i] == null)
-            Q[i] = (exported as any)[i];
-}
+let serenity = (globalObject.Serenity || (globalObject.Serenity = Object.create(null)));
+for (var i in exported)
+    if (serenity[i] == null)
+        serenity[i] = (exported as any)[i];

@@ -67,82 +67,82 @@ describe("Enum.toString", () => {
 });
 
 describe("getStateStore", () => {
-    it('if globalThis.Q is null, it can assign it', function () {
-        var q = (globalThis as any).Q;
+    it('if globalThis.Serenity is null, it can assign it', function () {
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
-            expect((globalThis as any).Q).toBeUndefined();
+            delete (globalThis as any).Serenity;
+            expect((globalThis as any).Serenity).toBeUndefined();
             var stateStore = getStateStore();
-            expect((globalThis as any).Q).toBeTruthy();
-            expect(stateStore).toBe((globalThis as any).Q.__stateStore);
+            expect((globalThis as any).Serenity).toBeTruthy();
+            expect(stateStore).toBe((globalThis as any).Serenity.__stateStore);
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 
-    it('if globalThis.Q is not null, it can create __stateStore', function () {
-        var q = (globalThis as any).Q;
+    it('if globalThis.Serenity is not null, it can create __stateStore', function () {
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
-            expect((globalThis as any).Q).toBeUndefined();
-            var newQ = (globalThis as any).Q = Object.create(null);
+            delete (globalThis as any).Serenity;
+            expect((globalThis as any).Serenity).toBeUndefined();
+            var newQ = (globalThis as any).Serenity = Object.create(null);
             expect(newQ.__stateStore).toBeUndefined();
             var stateStore = getStateStore();
-            expect((globalThis as any).Q).toBeTruthy();
-            expect((globalThis as any).Q === newQ).toBe(true);
-            expect(typeof (globalThis as any).Q.__stateStore == "object").toBe(true);
-            expect(Object.keys((globalThis as any).Q.__stateStore).length).toBe(0);
-            expect(stateStore === (globalThis as any).Q.__stateStore).toBe(true);
+            expect((globalThis as any).Serenity).toBeTruthy();
+            expect((globalThis as any).Serenity === newQ).toBe(true);
+            expect(typeof (globalThis as any).Serenity.__stateStore == "object").toBe(true);
+            expect(Object.keys((globalThis as any).Serenity.__stateStore).length).toBe(0);
+            expect(stateStore === (globalThis as any).Serenity.__stateStore).toBe(true);
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 
-    it('if globalThis.Q.__stateStore is not null, it returns that', function () {
-        var q = (globalThis as any).Q;
+    it('if globalThis.Serenity.__stateStore is not null, it returns that', function () {
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
-            expect((globalThis as any).Q).toBeUndefined();
-            var newQ = (globalThis as any).Q = Object.create(null);
+            delete (globalThis as any).Serenity;
+            expect((globalThis as any).Serenity).toBeUndefined();
+            var newQ = (globalThis as any).Serenity = Object.create(null);
             var newStore = newQ.__stateStore = Object.create(null);
             newStore.__myKey = "theKey";
             var stateStore = getStateStore();
-            expect((globalThis as any).Q).toBeTruthy();
-            expect((globalThis as any).Q === newQ).toBe(true);
+            expect((globalThis as any).Serenity).toBeTruthy();
+            expect((globalThis as any).Serenity === newQ).toBe(true);
             expect(stateStore === newStore).toBe(true);
-            expect((globalThis as any).Q.__stateStore === newStore).toBe(true);
-            expect(Object.keys((globalThis as any).Q.__stateStore).length).toBe(1);
-            expect((globalThis as any).Q.__stateStore.__myKey).toBe("theKey");
+            expect((globalThis as any).Serenity.__stateStore === newStore).toBe(true);
+            expect(Object.keys((globalThis as any).Serenity.__stateStore).length).toBe(1);
+            expect((globalThis as any).Serenity.__stateStore.__myKey).toBe("theKey");
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 
     it('if a new store key is provided, it auto initializes it to empty object and returns', function () {
-        var q = (globalThis as any).Q;
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
+            delete (globalThis as any).Serenity;
             var newStore = {};
-            (globalThis as any).Q = { __stateStore: newStore };
+            (globalThis as any).Serenity = { __stateStore: newStore };
             var sub = getStateStore("sub");
             expect(typeof sub).toBe("object");
             expect(Object.keys(sub).length).toBe(0);
-            expect((globalThis as any).Q.__stateStore === newStore).toBe(true);
+            expect((globalThis as any).Serenity.__stateStore === newStore).toBe(true);
             expect(Object.keys(newStore).length).toBe(1);
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 
     it('if returns same sub store instance every time', function () {
-        var q = (globalThis as any).Q;
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
-            (globalThis as any).Q = { __stateStore: {} };
+            delete (globalThis as any).Serenity;
+            (globalThis as any).Serenity = { __stateStore: {} };
             var sub1 = getStateStore("sub");
             sub1.test = "A";
             var sub2 = getStateStore("sub");
@@ -150,15 +150,15 @@ describe("getStateStore", () => {
             expect(sub2.test).toBe("A");
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 
     it('if does not return same sub store for different keys', function () {
-        var q = (globalThis as any).Q;
+        var s = (globalThis as any).Serenity;
         try {
-            delete (globalThis as any).Q;
-            (globalThis as any).Q = { __stateStore: {} };
+            delete (globalThis as any).Serenity;
+            (globalThis as any).Serenity = { __stateStore: {} };
             var sub1 = getStateStore("sub1");
             sub1.test = "A";
             var sub2 = getStateStore("sub2");
@@ -167,7 +167,7 @@ describe("getStateStore", () => {
             expect(sub2.test).toBeUndefined();
         }
         finally {
-            (globalThis as any).Q = q;
+            (globalThis as any).Serenity = s;
         }
     });
 });

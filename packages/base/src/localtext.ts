@@ -1,4 +1,4 @@
-﻿import { getGlobalThis, getStateStore } from "./system";
+﻿import { globalObject, getStateStore } from "./system";
 
 function getTable(): { [key: string]: string } {
     return getStateStore("__localText");
@@ -56,9 +56,4 @@ export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, 
     });
 }
 
-let globalThis: any = getGlobalThis();
-if (globalThis) {
-    const Q = globalThis.Q || (globalThis.Q = {});
-    Q.LT = Q.LT || {};
-    Q.LT.add = addLocalText;
-}
+(globalObject.Serenity || (globalObject.Serenity = {})).addLocalText = addLocalText;

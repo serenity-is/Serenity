@@ -1,38 +1,26 @@
-﻿const globalObj: any = 
+﻿export const globalObject: any = 
     (typeof globalThis !== "undefined" && globalThis) || 
     (typeof window !== "undefined" && window) || 
     (typeof self !== "undefined" && self) ||
     // @ts-ignore check for global
-    (typeof global !== "undefined" && global) ||
-    (function () { return this; })() || Function('return this')();
-
-export function getGlobalThis(): any {
-    return globalObj;
-}
-
-const fallbackStore: any = {};
+    (typeof global !== "undefined" && global) || {};
 
 export function getStateStore(key?: string): any {
 
-    let store: any;
-    if (globalObj) {
-        if (!globalObj.Q)
-            globalObj.Q = {};
+    if (!globalObject.Serenity)
+        globalObject.Serenity = {};
 
-        store = globalObj.Q.__stateStore;
-        if (!store)
-            globalObj.Q.__stateStore = store = Object.create(null);
-    }
-    else
-        store = fallbackStore;
+    let stateStore = globalObject.Serenity.__stateStore;
+    if (!stateStore)
+        globalObject.Serenity.__stateStore = stateStore = Object.create(null);
 
     if (key == null)
-        return store;
+        return stateStore;
 
-    var s = store[key];
-    if (s == null)
-        store[key] = s = Object.create(null);
-    return s;
+    var store = stateStore[key];
+    if (store == null)
+        stateStore[key] = store = Object.create(null);
+    return store;
 }
 
 export function getTypeStore() {
@@ -80,10 +68,10 @@ export function getType(name: string, target?: any): Type  {
     if (target == null) {
         const types = getTypeStore();
         type = types[name];
-        if (type != null || globalObj == void 0 || name === "Object")
+        if (type != null || globalObject == void 0 || name === "Object")
             return type;
 
-        target = globalObj;
+        target = globalObject;
     }
 
     type = getNested(target, name)

@@ -1,5 +1,5 @@
 ﻿import $ from "@optionaldeps/jquery";
-import { Config, getGlobalThis, getNested } from "@serenity-is/base";
+import { Config, getNested, globalObject } from "@serenity-is/base";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
@@ -73,13 +73,12 @@ export function isMobileView() {
 }
 
 function initOnLoad() {
-    var globalObj = getGlobalThis();
-    if (globalObj && Config.rootNamespaces) {
-        for (var ns of Config.rootNamespaces) {
-            var obj = getNested(globalObj, ns);
-            if (obj != null)
-                initializeTypes(obj, ns + ".", 3);
-        }
+    if (!Config.rootNamespaces)
+        return;
+    for (var ns of Config.rootNamespaces) {
+        var obj = getNested(globalObject, ns);
+        if (obj != null)
+            initializeTypes(obj, ns + ".", 3);
     }
 }
 
