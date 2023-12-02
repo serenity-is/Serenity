@@ -2,7 +2,7 @@
 import { PropertyItem, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { Authorization, isTrimmedEmpty, trimToEmpty, trimToNull } from "../../q";
+import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -195,7 +195,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             opt.query = query => {
                 var pageSize = this.getPageSize();
                 var searchQuery: Select2SearchQuery = {
-                    searchTerm: trimToNull(query.term),
+                    searchTerm: query.term?.trim() || null,
                     skip: (query.page - 1) * pageSize,
                     take: pageSize,
                     checkMore: true
@@ -573,7 +573,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             var val: any = value;
             if (value && this.isMultiple()) {
                 val = value.split(String.fromCharCode(44)).map(function (x) {
-                    return trimToNull(x);
+                    return x?.trim() || null;
                 }).filter(function (x1) {
                     return x1 != null;
                 });
@@ -956,7 +956,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             }
             else if (this.isMultiple() || !this.get_value()) {
                 var entity: TItem = {} as any;
-                this.setTermOnNewEntity(entity, trimToEmpty(this.lastCreateTerm));
+                this.setTermOnNewEntity(entity, this.lastCreateTerm?.trim() ?? '');
                 this.initNewEntity(entity);
                 dialog.load(entity, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);

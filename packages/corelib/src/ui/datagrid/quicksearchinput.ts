@@ -1,6 +1,5 @@
 ﻿import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { isValue, trim } from "../../q";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
 
@@ -29,7 +28,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
 
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
-        this.lastValue = trim(input.val() ?? '');
+        this.lastValue = (input.val() ?? '').trim();
 
         var self = this;
         this.element.bind('keyup.' + this.uniqueName, function () {
@@ -43,7 +42,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         $('<span><i></i></span>').addClass('quick-search-icon')
             .insertBefore(input);
 
-        if (isValue(this.options.fields) && this.options.fields.length > 0) {
+        if (this.options.fields?.length > 0) {
             var a = $('<a/>').addClass('quick-search-field').attr('title',
                 localText('Controls.QuickSearch.FieldSelection')).insertBefore(input);
 
@@ -78,7 +77,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
             if (!!this.timer) {
                 window.clearTimeout(this.timer);
             }
-            this.searchNow(trim(this.element.val() ?? ''));
+            this.searchNow((this.element.val() ?? '').trim());
         });
     }
 
@@ -107,8 +106,8 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         this.lastValue = value;
     }
 
-    get_value() {
-        return trim(this.element.val() ?? '');
+    get_value(): string {
+        return (this.element.val() ?? '').trim();
     }
 
     get_field(): QuickSearchField {
@@ -137,7 +136,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
     public restoreState(value: string, field: QuickSearchField) {
         this.fieldChanged = false;
         this.field = field;
-        var value = trim(value ?? '');
+        var value = (value ?? '').trim();
         this.element.val(value);
         this.lastValue = value;
         if (!!this.timer) {

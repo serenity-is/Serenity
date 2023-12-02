@@ -1,6 +1,5 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { trimToNull } from "../../q";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
@@ -19,7 +18,7 @@ export class URLEditor extends StringEditor {
             if (!input.hasClass("error"))
                 return;
 
-            var value = trimToNull(input.val());
+            var value = input.val()?.trim();
             if (!value)
                 return;
 

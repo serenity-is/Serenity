@@ -1,7 +1,6 @@
 ﻿import { getStateStore, notifyError, stringFormat, Lookup, type PropertyItem, type PropertyItemsData, resolveUrl } from "@serenity-is/base";
 import { blockUI, blockUndo } from "./blockui";
 import { alertDialog, iframeDialog } from "./dialogs";
-import { trimToNull } from "./strings";
 
 function getHash(key: string, reload?: boolean): string {
     let k: string;
@@ -9,7 +8,7 @@ function getHash(key: string, reload?: boolean): string {
     const stateStore = getStateStore();
     if (stateStore.__scriptHash == null &&
         typeof document !== "undefined" && 
-        (k = trimToNull((document.querySelector('script#RegisteredScripts') || {}).innerHTML)) != null &&
+        (k = (document.querySelector('script#RegisteredScripts')?.innerHTML ?? '').trim()) && 
         k.charAt(0) == '{') {
         var regs = JSON.parse(k);
         ScriptData.setRegisteredScripts(regs);

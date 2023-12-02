@@ -1,7 +1,7 @@
 ﻿import { formatNumber, parseInteger } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
-import { extend, isTrimmedEmpty, trimToNull } from "../../q";
+import { extend, isTrimmedEmpty } from "../../q";
 import { Widget } from "../widgets/widget";
 import { DecimalEditor } from "./decimaleditor";
 
@@ -31,16 +31,17 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
     }
 
     get_value(): number {
+        var val: string;
         if (($.fn as any).autoNumeric) {
-            var val = (this.element as any).autoNumeric('get') as string;
-            if (!!isTrimmedEmpty(val))
+            val = (this.element as any).autoNumeric('get') as string;
+            if (isTrimmedEmpty(val))
                 return null;
             else 
                 return parseInt(val, 10);
         } 
         else {
-            var val = trimToNull(this.element.val());
-            if (val == null)
+            val = this.element.val()?.trim();
+            if (!val)
                 return null;
             return parseInteger(val)
         }

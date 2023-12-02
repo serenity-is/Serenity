@@ -2679,7 +2679,9 @@ declare namespace Serenity {
     type Dictionary<TItem> = {
         [key: string]: TItem;
     };
+    /** @deprecated Use ?? operator */
     function coalesce(a: any, b: any): any;
+    /** @deprecated Use a != null */
     function isValue(a: any): boolean;
     let today: () => Date;
     function extend<T = any>(a: T, b: T): T;

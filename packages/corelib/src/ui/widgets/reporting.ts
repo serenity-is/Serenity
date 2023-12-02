@@ -1,6 +1,6 @@
 ﻿import { PropertyItem, ServiceRequest, ServiceResponse } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { postToService, serviceCall, trimToNull } from "../../q";
+import { postToService, serviceCall } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { PropertyGrid } from "./propertygrid";
@@ -127,7 +127,7 @@ export namespace Reporting {
 
         protected updateMatchFlags(text: string) {
             var liList = $('#ReportList').find('li').removeClass('non-match');
-            text = trimToNull(text);
+            text = text?.trim() || null;
             if (text == null) {
                 liList.children('ul').hide();
                 liList.show().removeClass('expanded');
@@ -135,7 +135,7 @@ export namespace Reporting {
             }
             var parts = text.replace(',', ' ').split(' ');
             for (var i = 0; i < parts.length; i++) {
-                parts[i] = trimToNull(Select2.util.stripDiacritics(parts[i]).toUpperCase());
+                parts[i] = Select2.util.stripDiacritics(parts[i]).toUpperCase()?.trim() || null;
             }
             var reportItems = liList.filter('.report-item');
             reportItems.each(function (i1, e) {

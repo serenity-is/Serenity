@@ -2,7 +2,7 @@
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { ScriptData, getLookup, trimToNull } from "../../q";
+import { ScriptData, getLookup } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
@@ -423,8 +423,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         if (value != null) {
             if (typeof value == "string") {
                 value = value.split(',')
-                    .map(x => trimToNull(x))
-                    .filter(x => x != null);
+                    .map(x => x?.trim())
+                    .filter(x => !!x);
             }
 
             for (var i = 0; i < value.length; i++) {

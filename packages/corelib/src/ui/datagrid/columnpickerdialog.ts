@@ -1,7 +1,7 @@
 ﻿import { Culture, htmlEncode, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, Router, centerDialog, trimToNull } from "../../q";
+import { Authorization, Router, centerDialog } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
@@ -26,10 +26,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
 
         new QuickSearchInput(this.byId("Search"), {
             onSearch: (fld, txt, done) => {
-                txt = trimToNull(txt);
-                if (txt != null)
-                    txt = Select2.util.stripDiacritics(txt.toLowerCase());
-
+                txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
                 this.element.find('li').each((x, e) => {
                     $(e).toggle(!txt || Select2.util.stripDiacritics(
                         $(e).text().toLowerCase()).indexOf(txt) >= 0);

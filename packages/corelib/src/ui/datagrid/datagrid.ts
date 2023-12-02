@@ -2,7 +2,7 @@
 import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality, trimToNull } from "../../q";
+import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -1219,8 +1219,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             return null;
 
         function fromJson(json: string) {
-            json = trimToNull(json as string);
-            if (json != null && json.startsWith('{') && json.endsWith('}'))
+            json = json?.trim();
+            if (json?.startsWith('{') && json.endsWith('}'))
                 return JSON.parse(json);
             return null;
         }

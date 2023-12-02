@@ -1,7 +1,7 @@
 ﻿import { localText, resolveUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { isTrimmedEmpty, trimToNull } from "../../q";
+import { isTrimmedEmpty } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { Widget } from "../widgets/widget";
 
@@ -40,8 +40,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         this.addValidationRule(this.uniqueName, e => {
             if (e.hasClass('required')) {
-                var value = trimToNull(this.get_value());
-                if (value == null)
+                if (!this.get_value()?.trim())
                     return localText('Validation.Required');
             }
 
@@ -70,7 +69,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         var CKEDITOR = (window as any)['CKEDITOR'];
 
-        var lang = (trimToNull($('html').attr('lang')) ?? 'en');
+        var lang = $('html').attr('lang')?.trim() || 'en';
         if (!!CKEDITOR.lang.languages[lang]) {
             return lang;
         }

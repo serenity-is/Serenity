@@ -1,7 +1,7 @@
-﻿import { PropertyItem, isInstanceOfType, localText } from "@serenity-is/base";
+﻿import { PropertyItem, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import {  extend, isTrimmedEmpty, replaceAll, trimToNull } from "../../q";
+import { extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget } from "../widgets/widget";
@@ -131,7 +131,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
                 this.options.urlPrefix);
         }
 
-        this.hiddenInput.val(trimToNull((this.get_value() || {}).Filename));
+        this.hiddenInput.val(((this.get_value() || {}).Filename)?.trim() || null);
     }
 
     protected updateInterface(): void {
@@ -188,10 +188,9 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     set_value(value: UploadedFile): void {
-        var stringValue = value as string;
-        if (typeof stringValue === "string") {
-            var stringValue = trimToNull(stringValue);
-            if (value != null) {
+        if (typeof value === "string") {
+            var stringValue = (value as string).trim();
+            if (stringValue) {
                 var idx = stringValue.indexOf('/');
                 if (idx < 0)
                     idx = stringValue.indexOf('\\');
@@ -200,8 +199,10 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
                     OriginalName: stringValue.substring(idx + 1)
                 }
             }
+            else
+                value = null;
         }
-        else if (value != null && isTrimmedEmpty(value.Filename))
+        else if (!value?.Filename?.trim())
             value = null;
 
         if (value != null) {
@@ -230,8 +231,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     getEditValue(property: PropertyItem, target: any) {
-        target[property.name] = this.entity == null ? null :
-            trimToNull(this.entity.Filename);
+        target[property.name] = this.entity?.Filename?.trim() || null;
     }
 
     setEditValue(source: any, property: PropertyItem) {
@@ -378,7 +378,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
                 });
         });
 
-        this.hiddenInput.val(trimToNull((this.get_value()[0] || {}).Filename));
+        this.hiddenInput.val(this.get_value()[0]?.Filename || null);
     }
 
     protected updateInterface(): void {
@@ -453,8 +453,8 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
 
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
-        if (isInstanceOfType(val, String)) {
-            var json = trimToNull(val) ?? '[]';
+        if (typeof val == "string") {
+            var json = val.trim();
             if (json.startsWith('[') && json.endsWith(']')) {
                 this.set_value($.parseJSON(json));
             }

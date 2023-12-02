@@ -1,6 +1,5 @@
 ﻿import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { trimToNull } from "../../q";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
@@ -39,7 +38,7 @@ export class FilterDisplayBar extends FilterWidgetBase<any> {
     protected filterStoreChanged() {
         super.filterStoreChanged();
 
-        var displayText = trimToNull(this.get_store().get_displayText());
+        var displayText = this.get_store().get_displayText()?.trim() || null;
 
         this.element.find('.current').toggle(displayText != null);
         this.element.find('.reset').toggle(displayText != null);

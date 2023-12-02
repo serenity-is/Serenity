@@ -1,6 +1,6 @@
 ﻿import { Culture, getTypeShortName, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
-import { Authorization, extend, getAttributes, isBS3, isBS5Plus, trimToEmpty, trimToNull } from "../../q";
+import { Authorization, extend, getAttributes, isBS3, isBS5Plus } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
@@ -47,14 +47,14 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             var tabIndex = 0;
             var i = 0;
             while (i < itemsWithTab.length) {
-                var tab = { $: trimToEmpty(itemsWithTab[i].tab) };
+                var tab = { $: itemsWithTab[i].tab?.trim() ?? '' };
                 var tabItems = [];
 
                 var j = i;
                 do {
                     tabItems.push(itemsWithTab[j]);
                 } while (++j < itemsWithTab.length &&
-                    trimToEmpty(itemsWithTab[j].tab) === tab.$);
+                    (itemsWithTab[j].tab?.trim() ?? '') === tab.$);
                 i = j;
 
                 var li = $(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
@@ -379,11 +379,11 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     private getCategoryOrder(items: PropertyItem[]) {
         var order = 0;
         var result = {} as any;
-        var categoryOrder = trimToNull(this.options.categoryOrder);
+        var categoryOrder = this.options.categoryOrder?.trim() || null;
         if (categoryOrder != null) {
             var split = categoryOrder.split(';');
             for (var s of split) {
-                var x = trimToNull(s);
+                var x = s?.trim() || null;
                 if (x == null) {
                     continue;
                 }

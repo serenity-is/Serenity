@@ -12,7 +12,7 @@ export * from "./router";
 export * from "./scriptdata";
 export * from "./servicetypes-compat";
 export * from "./services-compat";
-export * from "./strings";
+export * from "./strings-compat";
 export * from "./system-compat";
 export * from "./userdefinition";
 export * from "./validateoptions";

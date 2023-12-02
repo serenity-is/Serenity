@@ -1444,7 +1444,9 @@ declare function zeroPad(n: number, len: number): string;
 type Dictionary<TItem> = {
     [key: string]: TItem;
 };
+/** @deprecated Use ?? operator */
 declare function coalesce(a: any, b: any): any;
+/** @deprecated Use a != null */
 declare function isValue(a: any): boolean;
 declare let today: () => Date;
 declare function extend<T = any>(a: T, b: T): T;

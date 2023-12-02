@@ -24,7 +24,7 @@ export function isEmptyOrNull(s: string) {
  * @returns True if the string is empty or null or whitespace.
  */
 export function isTrimmedEmpty(s: string) {
-    return trimToNull(s) == null;
+    return !s?.trim();
 }
 
 /**

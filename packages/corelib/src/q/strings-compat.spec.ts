@@ -1,4 +1,4 @@
-﻿import { endsWith, isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, startsWith, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, trimToNull, zeroPad } from "./strings";
+﻿import { endsWith, isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, startsWith, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, zeroPad } from "./strings-compat";
 
 describe("endsWith", () => {
     it("uses String.prototype.endsWith", () => {

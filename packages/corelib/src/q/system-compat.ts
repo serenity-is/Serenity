@@ -2,10 +2,12 @@
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
+/** @deprecated Use ?? operator */
 export function coalesce(a: any, b: any): any {
-    return a != null ? a : b;
+    return a ?? b;
 }
 
+/** @deprecated Use a != null */
 export function isValue(a: any): boolean {
     return a != null;
 }

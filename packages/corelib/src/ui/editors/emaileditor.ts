@@ -1,7 +1,6 @@
 ﻿import { tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { trimToNull } from "../../q";
 import { Widget } from "../widgets/widget";
 
 export interface EmailEditorOptions {
@@ -99,8 +98,8 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
 
     set_value(value: string): void {
         var domain = this.element.nextAll('.emaildomain');
-        value = trimToNull(value);
-        if (value == null) {
+        value = value?.trim();
+        if (!value) {
             if (!this.options.readOnlyDomain)
                 domain.val('');
             this.element.val('');
