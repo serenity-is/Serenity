@@ -76,7 +76,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         if (lookup == null)
             return super.itemText(item);
 
-        var textValue = lookup.textFormatter ? lookup.textFormatter(item) : (item as any)[lookup.textField];
+        var textValue = (item as any)[lookup.textField];
         return textValue == null ? '' : textValue.toString();
     }
 

@@ -322,25 +322,6 @@ describe("LookupEditor", () => {
         expect(editor.items[0].id).toBe("2");
     });
 
-    test('can show text using textFormatter', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
-            idField: "id",
-            textFormatter: (item) => item.text + "!",
-            items: [
-                { id: 1, text: "Test" },
-                { id: 2, text: "Test2" }
-            ]
-        });
-
-        const editor = new LookupEditor($("<input />"), {
-            lookupKey: "Test"
-        });
-
-        expect(editor.items).toHaveLength(2);
-        expect(editor.items[0].text).toBe("Test!");
-        expect(editor.items[1].text).toBe("Test2!");
-    });
-
     test('can update items when scriptData changes', () => {
         ScriptData.set("Lookup.Test", <Lookup<any>>{
             idField: "id",

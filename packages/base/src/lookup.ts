@@ -2,7 +2,6 @@
     idField?: string;
     parentIdField?: string;
     textField?: string;
-    textFormatter?(item: TItem): string;
 }
 
 export interface Lookup<TItem> {
@@ -11,7 +10,6 @@ export interface Lookup<TItem> {
     idField: string;
     parentIdField: string;
     textField: string;
-    textFormatter: (item: TItem) => string;
 }
 
 export class Lookup<TItem> {
@@ -20,15 +18,13 @@ export class Lookup<TItem> {
     public idField: string;
     public parentIdField: string;
     public textField: string;
-    public textFormatter: (item: TItem) => string;
+    public : (item: TItem) => string;
 
     constructor(options: LookupOptions<TItem>, items?: TItem[]) {
         options = options || {};
-        this.textFormatter = options.textFormatter;
         this.idField = options.idField;
         this.parentIdField = options.parentIdField;
         this.textField = options.textField;
-        this.textFormatter = options.textFormatter;
 
         if (items != null)
             this.update(items);
