@@ -1,5 +1,5 @@
-import { ServiceResponse, htmlEncode, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
-import { alertDialog, blockUI, blockUndo, iframeDialog, replaceAll } from "../../q";
+import { ServiceResponse, blockUI, blockUndo, htmlEncode, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { alertDialog, iframeDialog, replaceAll } from "../../q";
 
 export namespace UploadHelper {
 

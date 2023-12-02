@@ -1,5 +1,4 @@
-﻿import { getStateStore, notifyError, stringFormat, Lookup, type PropertyItem, type PropertyItemsData, resolveUrl } from "@serenity-is/base";
-import { blockUI, blockUndo } from "./blockui";
+﻿import { Lookup, blockUI, blockUndo, getStateStore, notifyError, resolveUrl, stringFormat, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { alertDialog, iframeDialog } from "./dialogs";
 
 function getHash(key: string, reload?: boolean): string {

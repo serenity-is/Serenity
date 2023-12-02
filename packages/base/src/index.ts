@@ -20,6 +20,7 @@
  * @packageDocumentation
  */
 
+export * from "./blockui";
 export * from "./config";
 export * from "./criteria";
 export * from "./debounce";

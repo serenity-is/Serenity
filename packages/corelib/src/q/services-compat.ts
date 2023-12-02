@@ -1,5 +1,4 @@
-﻿import { Config, ListRequest, ServiceResponse, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
-import { blockUI, blockUndo } from "./blockui";
+﻿import { Config, ListRequest, ServiceResponse, blockUI, blockUndo, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
 import { ServiceOptions } from "./servicetypes-compat";
@@ -60,9 +59,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
                 }
             }
             finally {
-                if (options.blockUI) {
-                    blockUndo();
-                }
+                options.blockUI && blockUndo();
                 options.onCleanup && options.onCleanup();
             }
         },
@@ -112,10 +109,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
         }
     }, options);
 
-    if (options.blockUI) {
-        blockUI(null);
-    }
-
+    options.blockUI && blockUI(null);
     return $.ajax(options);
 }
 

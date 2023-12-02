@@ -1237,6 +1237,18 @@ declare namespace Slick {
 }
 
 declare namespace Serenity {
+    /**
+     * Tries to block the page
+     */
+    function blockUI(options?: {
+        zIndex?: number;
+        useTimeout?: boolean;
+    }): void;
+    /**
+     * Unblocks the page.
+     */
+    function blockUndo(): void;
+
     var Config: {
         /**
          * This is the root path of your application. If your application resides under http://localhost/mysite/,
@@ -2188,24 +2200,6 @@ declare namespace Serenity {
          */
         let userDefinitionAsync: Promise<UserDefinition>;
     }
-
-    /** Options for the BlockUI plugin. */
-    interface JQBlockUIOptions {
-        useTimeout?: boolean;
-    }
-    /**
-     * Uses jQuery BlockUI plugin to block access to whole page (default) or
-     * a part of it, by using a transparent overlay covering the whole area.
-     * @param options Parameters for the BlockUI plugin
-     * @remarks If options are not specified, this function blocks
-     * whole page with a transparent overlay. Default z-order of the overlay
-     * div is 2000, so a higher z-order shouldn't be used in page.
-     */
-    function blockUI(options: JQBlockUIOptions): void;
-    /**
-     * Unblocks the page.
-     */
-    function blockUndo(): void;
 
     /**
      * Options for a message dialog button

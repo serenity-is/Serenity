@@ -1,3 +1,15 @@
+/**
+ * Tries to block the page
+ */
+declare function blockUI(options?: {
+    zIndex?: number;
+    useTimeout?: boolean;
+}): void;
+/**
+ * Unblocks the page.
+ */
+declare function blockUndo(): void;
+
 declare var Config: {
     /**
      * This is the root path of your application. If your application resides under http://localhost/mysite/,
@@ -705,4 +717,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { ColumnSelection, Config, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, compareStringFactory, debounce, defaultNotifyOptions, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, resolveServiceUrl, resolveUrl, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc, tryGetText };
+export { ColumnSelection, Config, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, blockUI, blockUndo, compareStringFactory, debounce, defaultNotifyOptions, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getGlobalThis, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, resolveServiceUrl, resolveUrl, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc, tryGetText };

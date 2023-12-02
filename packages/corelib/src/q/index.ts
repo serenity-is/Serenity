@@ -1,6 +1,5 @@
 export * from "./arrays-compat";
 export * from "./authorization";
-export * from "./blockui";
 export * from "./dialogs";
 export * from "./errorhandling";
 export * from "./formatting-compat";
