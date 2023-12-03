@@ -1363,7 +1363,7 @@ declare namespace ScriptData {
     function bindToChange(name: string, onChange: () => void): void | (() => void);
     const canLoad: typeof canLoadScriptData;
     function ensure<TData = any>(name: string, dynJS?: boolean): TData;
-    function reload<TData = any>(name: string): TData;
+    function reload<TData = any>(name: string, dynJS?: boolean): TData;
     function reloadAsync<TData = any>(name: string): Promise<TData>;
     function setRegisteredScripts(scripts: any[]): void;
     const set: typeof setScriptData;

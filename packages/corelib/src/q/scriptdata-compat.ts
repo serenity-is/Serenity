@@ -16,9 +16,9 @@ export namespace ScriptData {
         }
     }
 
-    function loadOptions(name: string, dynJS: boolean, async: boolean): JQueryAjaxSettings {
+    function xhrOptions(name: string, dynJS: boolean): JQueryAjaxSettings {
         return {
-            async: async,
+            async: false,
             cache: true,
             type: 'GET',
             url: resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime()),
@@ -38,10 +38,6 @@ export namespace ScriptData {
         }
     }
 
-    function legacyLoad(name: string, dynJS: boolean): JQueryXHR {
-        return $.ajax(loadOptions(name, dynJS, false));
-    }
-
     export const canLoad = canLoadScriptData;
 
     export function ensure<TData = any>(name: string, dynJS?: boolean): TData {
@@ -50,13 +46,13 @@ export namespace ScriptData {
             return data;
 
         if (dynJS) {
-            legacyLoad(name, dynJS);
+            $.ajax(xhrOptions(name, true))
             data = peekScriptData(name);
             if (data == null)
                 handleScriptDataError(name);
             return data;
         }
-        data = legacyLoad(name, dynJS).responseJSON;
+        data = $.ajax(xhrOptions(name, false)).responseJSON;
         if (data == null)
             handleScriptDataError(name);
         if (name.startsWith("Lookup."))
@@ -65,10 +61,10 @@ export namespace ScriptData {
         return data;
     }
 
-    export function reload<TData = any>(name: string): TData {
+    export function reload<TData = any>(name: string, dynJS?: boolean): TData {
         getScriptDataHash(name, true);
-        legacyLoad(name, false);
-        return peekScriptData(name);
+        setScriptData(name, null);
+        return ensure(name, dynJS);
     }
 
     export async function reloadAsync<TData = any>(name: string): Promise<TData> {
@@ -137,7 +133,7 @@ export function getFormData(key: string): PropertyItemsData {
 export const getFormDataAsync = getFormScript;
 
 export function getTemplate(key: string): string {
-    return ScriptData.ensure('Template.' + key, false);
+    return ScriptData.ensure('Template.' + key, true);
 }
 
 var compatExports = {
