@@ -225,6 +225,166 @@ interface DebouncedFunction<T extends (...args: any[]) => any> {
  */
 declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
+interface LookupOptions<TItem> {
+    idField?: string;
+    parentIdField?: string;
+    textField?: string;
+}
+interface Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+}
+declare class Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    constructor(options: LookupOptions<TItem>, items?: TItem[]);
+    update?(value: TItem[]): void;
+}
+
+declare enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+interface PropertyItem {
+    name?: string;
+    title?: string;
+    hint?: string;
+    placeholder?: string;
+    editorType?: string;
+    editorParams?: any;
+    category?: string;
+    collapsible?: boolean;
+    collapsed?: boolean;
+    tab?: string;
+    cssClass?: string;
+    headerCssClass?: string;
+    formCssClass?: string;
+    maxLength?: number;
+    required?: boolean;
+    insertable?: boolean;
+    insertPermission?: string;
+    hideOnInsert?: boolean;
+    updatable?: boolean;
+    updatePermission?: string;
+    hideOnUpdate?: boolean;
+    readOnly?: boolean;
+    readPermission?: string;
+    oneWay?: boolean;
+    defaultValue?: any;
+    localizable?: boolean;
+    visible?: boolean;
+    allowHide?: boolean;
+    formatterType?: string;
+    formatterParams?: any;
+    displayFormat?: string;
+    alignment?: string;
+    width?: number;
+    widthSet?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
+    labelWidth?: string;
+    resizable?: boolean;
+    sortable?: boolean;
+    sortOrder?: number;
+    groupOrder?: number;
+    summaryType?: SummaryType;
+    editLink?: boolean;
+    editLinkItemType?: string;
+    editLinkIdField?: string;
+    editLinkCssClass?: string;
+    filteringType?: string;
+    filteringParams?: any;
+    filteringIdField?: string;
+    notFilterable?: boolean;
+    filterOnly?: boolean;
+    quickFilter?: boolean;
+    quickFilterParams?: any;
+    quickFilterSeparator?: boolean;
+    quickFilterCssClass?: string;
+}
+interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
+
+/**
+ * Gets the known hash value for a given dynamic script name. They are usually
+ * registered server-side via dynamic script manager and their latest known
+ * hashes are passed to the client-side via a script element named RegisteredScripts.
+ * @param name The dynamic script name
+ * @param reload True to force resetting the script hash client side, e.g. for loading
+ * lookups etc.
+ * @returns The hash or null if no such known registration
+ */
+declare function getScriptDataHash(name: string, reload?: boolean): string;
+/**
+ * Fetches a script data with given name via ~/DynamicData endpoint
+ * @param name Dynamic script name
+ * @returns A promise that will return data if successfull
+ */
+declare function fetchScriptData<TData>(name: string): Promise<TData>;
+/**
+ * Returns the script data from cache if available, or via a fetch
+ * request to ~/DynamicData endpoint
+ * @param name
+ * @param reload Clear cache and force reload
+ * @returns
+ */
+declare function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData>;
+/**
+ * Gets or loads a [ColumnsScript] data
+ * @param key Form key
+ * @returns A property items data object containing items and additionalItems properties
+ */
+declare function getColumnsScript(key: string): Promise<PropertyItemsData>;
+/**
+ * Gets or loads a [FormScript] data
+ * @param key Form key
+ * @returns A property items data object containing items and additionalItems properties
+ */
+declare function getFormScript(key: string): Promise<PropertyItemsData>;
+/**
+ * Gets or loads a Lookup
+ * @param key Lookup key
+ */
+declare function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
+/**
+ * Gets or loads a [RemoteData]
+ * @param key Remote data key
+ */
+declare function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
+/**
+ * Shows a suitable error message for errors occured during loading of
+ * a dynamic script data.
+ * @param name Name of the dynamic script
+ * @param status HTTP status returned if available
+ * @param statusText HTTP status text returned if available
+ */
+declare function handleScriptDataError(name: string, status?: number, statusText?: string): void;
+declare function peekScriptData(name: string): any;
+/**
+ * Forces reload of a lookup from the server. Note that only the
+ * client side cache is cleared. This does not force reloading in the server-side.
+ * @param key Lookup key
+ * @returns Lookup
+ */
+declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+declare function setScriptData(name: string, value: any): void;
+
 /**
  * Interface for number formatting, similar to .NET's NumberFormatInfo
  */
@@ -421,32 +581,6 @@ declare function localText(key: string, defaultText?: string): string;
 declare function tryGetText(key: string): string;
 declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
 
-interface LookupOptions<TItem> {
-    idField?: string;
-    parentIdField?: string;
-    textField?: string;
-}
-interface Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-}
-declare class Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-    constructor(options: LookupOptions<TItem>, items?: TItem[]);
-    update?(value: TItem[]): void;
-}
-
 type ToastContainerOptions = {
     containerId?: string;
     positionClass?: string;
@@ -516,76 +650,6 @@ declare function notifyWarning(message: string, title?: string, options?: Toastr
 declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
 declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
 declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
-
-declare enum SummaryType {
-    Disabled = -1,
-    None = 0,
-    Sum = 1,
-    Avg = 2,
-    Min = 3,
-    Max = 4
-}
-interface PropertyItem {
-    name?: string;
-    title?: string;
-    hint?: string;
-    placeholder?: string;
-    editorType?: string;
-    editorParams?: any;
-    category?: string;
-    collapsible?: boolean;
-    collapsed?: boolean;
-    tab?: string;
-    cssClass?: string;
-    headerCssClass?: string;
-    formCssClass?: string;
-    maxLength?: number;
-    required?: boolean;
-    insertable?: boolean;
-    insertPermission?: string;
-    hideOnInsert?: boolean;
-    updatable?: boolean;
-    updatePermission?: string;
-    hideOnUpdate?: boolean;
-    readOnly?: boolean;
-    readPermission?: string;
-    oneWay?: boolean;
-    defaultValue?: any;
-    localizable?: boolean;
-    visible?: boolean;
-    allowHide?: boolean;
-    formatterType?: string;
-    formatterParams?: any;
-    displayFormat?: string;
-    alignment?: string;
-    width?: number;
-    widthSet?: boolean;
-    minWidth?: number;
-    maxWidth?: number;
-    labelWidth?: string;
-    resizable?: boolean;
-    sortable?: boolean;
-    sortOrder?: number;
-    groupOrder?: number;
-    summaryType?: SummaryType;
-    editLink?: boolean;
-    editLinkItemType?: string;
-    editLinkIdField?: string;
-    editLinkCssClass?: string;
-    filteringType?: string;
-    filteringParams?: any;
-    filteringIdField?: string;
-    notFilterable?: boolean;
-    filterOnly?: boolean;
-    quickFilter?: boolean;
-    quickFilterParams?: any;
-    quickFilterSeparator?: boolean;
-    quickFilterCssClass?: string;
-}
-interface PropertyItemsData {
-    items: PropertyItem[];
-    additionalItems: PropertyItem[];
-}
 
 declare function resolveUrl(url: string): string;
 declare function resolveServiceUrl(url: string): string;
@@ -714,4 +778,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { ColumnSelection, Config, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, blockUI, blockUndo, compareStringFactory, debounce, defaultNotifyOptions, ensureMetadata, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getInstanceType, getNested, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, globalObject, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, resolveServiceUrl, resolveUrl, round, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc, tryGetText };
+export { ColumnSelection, Config, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, blockUI, blockUndo, compareStringFactory, debounce, defaultNotifyOptions, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, globalObject, handleScriptDataError, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc, tryGetText };

@@ -8,7 +8,7 @@ export * from "./layout";
 export * from "./layouttimer";
 export * from "./localtext-compat";
 export * from "./router";
-export * from "./scriptdata";
+export * from "./scriptdata-compat";
 export * from "./servicetypes-compat";
 export * from "./services-compat";
 export * from "./strings-compat";

@@ -1,5 +1,5 @@
 import { Lookup } from "@serenity-is/base";
-import { ScriptData } from "../../q/scriptdata";
+import { ScriptData } from "../../q/scriptdata-compat";
 import { LookupEditor } from "./lookupeditor";
 
 let oldWindowAlert: any;
@@ -27,10 +27,21 @@ describe("LookupEditor", () => {
 
     test('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
-
-        expect(() => new LookupEditor($("<input />"), {
-            lookupKey: "Test"
-        })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
+        var logSpy = jest.spyOn(window.console, 'log').mockImplementation(() => {});
+        var oldAjax = $.ajax;
+        try {
+            $.ajax = function(settings: JQueryAjaxSettings): JQueryXHR {
+                settings.error({ status: 404 } as any, null, null);
+                return {} as any;
+            } as unknown as any;
+            expect(() => new LookupEditor($("<input />"), {
+                lookupKey: "Test"
+            })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
+        }
+        finally {
+            logSpy.mockRestore();
+            $.ajax = oldAjax;
+        }
     });
 
     test('doesn\'t throw an error if lookupKey is registered', () => {
@@ -462,8 +473,8 @@ describe("LookupEditor", () => {
             async: true
         });
 
-        expect(() => editor.items).toThrowError("Can't read items property of an async select editor!");
-        expect(() => editor.items = []).toThrowError("Can't set items of an async select editor!");
+        expect(() => editor.items).toThrow("Can't read items property of an async select editor!");
+        expect(() => editor.items = []).toThrow("Can't set items of an async select editor!");
     });
 
 });

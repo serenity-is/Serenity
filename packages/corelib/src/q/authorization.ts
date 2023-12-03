@@ -1,5 +1,5 @@
-﻿import { localText, notifyError } from "@serenity-is/base";
-import { getRemoteData, getRemoteDataAsync } from "./scriptdata";
+﻿import { getRemoteDataAsync, localText, notifyError } from "@serenity-is/base";
+import { getRemoteData } from "./scriptdata-compat";
 import { UserDefinition } from "./userdefinition";
 
 const andOrRegex = /[|&]/;

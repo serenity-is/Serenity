@@ -1,6 +1,6 @@
-﻿import { getInstanceType, getTypeFullName, type Lookup } from "@serenity-is/base";
+﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { getLookup, getLookupAsync, reloadLookup, ScriptData } from "../../q";
+import { getLookup, reloadLookup, ScriptData } from "../../q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -11,16 +11,14 @@ export interface LookupEditorOptions extends Select2EditorOptions {
 @Decorators.registerEditor("Serenity.LookupEditorBase")
 export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
 
+    private lookupChangeUnbind: any; 
+
     constructor(input: JQuery, opt?: TOptions) {
         super(input, opt);
 
         if (!this.hasAsyncSource()) {
             this.updateItems();
-            var self = this;
-            ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
-                if (!self.hasAsyncSource())
-                    self.updateItems();
-            });
+            this.lookupChangeUnbind = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.updateItems.bind(this));
         }
     }
 
@@ -29,8 +27,10 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
     }
 
     destroy(): void {
-        if (!this.hasAsyncSource())
-            ScriptData.unbindFromChange(this.uniqueName);
+        if (this.lookupChangeUnbind) {
+            this.lookupChangeUnbind();
+            this.lookupChangeUnbind = null;
+        }
 
         super.destroy();
     }

@@ -475,6 +475,7 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
 
     private searchText: string;
     private enableUpdateItems: boolean;
+    private lookupChangeUnbind: any; 
 
     constructor(div: JQuery, options: CheckLookupEditorOptions) {
         super(div, options);
@@ -482,8 +483,16 @@ export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIte
         this.enableUpdateItems = true;
         this.setCascadeFrom(this.options.cascadeFrom);
         this.updateItems();
-        ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName,
-            () => this.updateItems());
+        this.lookupChangeUnbind = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.updateItems.bind(this));
+    }
+
+    public destroy(): void {
+        if (this.lookupChangeUnbind) {
+            this.lookupChangeUnbind();
+            this.lookupChangeUnbind = null;
+        }
+
+        super.destroy();
     }
 
     protected updateItems() {

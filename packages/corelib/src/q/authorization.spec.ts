@@ -1,7 +1,4 @@
-﻿import { Authorization } from "./authorization";
-import { ScriptData } from "./scriptdata";
-import { UserDefinition } from "./userdefinition";
-import * as base from "@serenity-is/base";
+﻿import { UserDefinition } from "./userdefinition";
 
 var userDefinition: UserDefinition;
 
@@ -18,25 +15,34 @@ function mockUserDefinition(async = false) {
         }
     }
 
-    ScriptData.ensure = function (key: string) {
-        if (async)
-            throw new Error("not expected to call async ensure!");
+    jest.resetModules();
+    jest.mock("@serenity-is/base", () => ({
+        ...jest.requireActual("@serenity-is/base"),
+        getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
+            if (!async)
+                throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
 
-        if (key == "RemoteData.UserData")
-            return userDefinition as any;
+            if (key == "UserData")
+                return userDefinition as any;
 
-        throw new Error("not expected to load any other data!");
-    }
+            throw new Error(`not expected to load any other data: ${key}`);
+        }),
+        localText: jest.fn(key => key),
+        notifyError: jest.fn()
+    }));
 
-    ScriptData.ensureAsync = async function (key: string) {
-        if (!async)
-            throw new Error("not expected to call async ensure!");
-
-        if (key == "RemoteData.UserData")
-            return userDefinition as any;
-
-        throw new Error("not expected to load any other data!");
-    }
+    jest.mock("./scriptdata-compat", () => ({
+        ...jest.requireActual("./scriptdata-compat"),
+        getRemoteData: function (key: string) {
+            if (async)
+                throw new Error(`not expected to call getRemoteData for: ${key}!`);
+   
+            if (key == "UserData")
+                return userDefinition as any;
+   
+            throw new Error(`not expected to load any other data: ${key}`);
+        }
+    }));
 }
 
 function mockUserDefinitionAsync() {
@@ -233,7 +239,7 @@ describe('Authorization.hasPermission', () => {
         mockUserDefinition();
     });
 
-    sharedHasPermissionTests(async (permission) => Promise.resolve(Authorization.hasPermission(permission)));
+    sharedHasPermissionTests(async (permission) => Promise.resolve((await import("./authorization")).Authorization.hasPermission(permission)));
 });
 
 describe('Authorization.hasPermissionAsync', () => {
@@ -241,11 +247,11 @@ describe('Authorization.hasPermissionAsync', () => {
         mockUserDefinitionAsync();
     });
 
-    sharedHasPermissionTests(Authorization.hasPermissionAsync);
+    sharedHasPermissionTests(async (permission) => (await import("./authorization")).Authorization.hasPermissionAsync(permission));
 });
 
 describe('Authorization.isPermissionInSet', () => {
-    sharedPermissionSetBasedTests(async (permissionSet, permission) => Promise.resolve(Authorization.isPermissionInSet(permissionSet, permission)));
+    sharedPermissionSetBasedTests(async (permissionSet, permission) => Promise.resolve((await import("./authorization")).Authorization.isPermissionInSet(permissionSet, permission)));
 });
 
 
@@ -254,23 +260,26 @@ describe('Authorization.isLoggedIn', () => {
         mockUserDefinition();
     })
 
-    it('returns false if userdefinition is null', () => {
+    it('returns false if userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(Authorization.isLoggedIn).toBe(false);
+        expect(authorization.isLoggedIn).toBe(false);
     });
 
-    it('returns false if username is null or empty string', () => {
+    it('returns false if username is null or empty string', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = null;
-        expect(Authorization.isLoggedIn).toBe(false);
+        expect(authorization.isLoggedIn).toBe(false);
         userDefinition.Username = "";
-        expect(Authorization.isLoggedIn).toBe(false);
+        expect(authorization.isLoggedIn).toBe(false);
     });
 
-    it('returns true if the username from userdefinition not null or an empty string', () => {
+    it('returns true if the username from userdefinition not null or an empty string', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = 'x';
-        expect(Authorization.isLoggedIn).toBe(true);
+        expect(authorization.isLoggedIn).toBe(true);
         userDefinition.Username = '0' as any;
-        expect(Authorization.isLoggedIn).toBe(true);
+        expect(authorization.isLoggedIn).toBe(true);
     });
 });
 
@@ -281,22 +290,25 @@ describe('Authorization.isLoggedInAsync', () => {
     })
 
     it('returns false if userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(await Authorization.isLoggedInAsync).toBe(false);
+        expect(await authorization.isLoggedInAsync).toBe(false);
     });
 
     it('returns false if username is null or empty string', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = null;
-        expect(await Authorization.isLoggedInAsync).toBe(false);
+        expect(await authorization.isLoggedInAsync).toBe(false);
         userDefinition.Username = "";
-        expect(await Authorization.isLoggedInAsync).toBe(false);
+        expect(await authorization.isLoggedInAsync).toBe(false);
     });
 
     it('returns true if the username from userdefinition not null or an empty string', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = 'x';
-        expect(await Authorization.isLoggedInAsync).toBe(true);
+        expect(await authorization.isLoggedInAsync).toBe(true);
         userDefinition.Username = '0' as any;
-        expect(await Authorization.isLoggedInAsync).toBe(true);
+        expect(await authorization.isLoggedInAsync).toBe(true);
     });
 });
 
@@ -305,18 +317,20 @@ describe('Authorization.username', () => {
         mockUserDefinition();
     })
 
-    it('returns undefined if userdefinition is null', () => {
+    it('returns undefined if userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(Authorization.username).toBeUndefined();
+        expect(authorization.username).toBeUndefined();
     });
 
-    it('returns the username from userdefinition is null', () => {
+    it('returns the username from userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = 'x';
-        expect(Authorization.username).toBe("x");
+        expect(authorization.username).toBe("x");
         userDefinition.Username = "";
-        expect(Authorization.username).toBe("");
+        expect(authorization.username).toBe("");
         userDefinition.Username = null;
-        expect(Authorization.username).toBe(null);
+        expect(authorization.username).toBe(null);
     });
 });
 
@@ -326,17 +340,19 @@ describe('Authorization.usernameAsync()', () => {
     })
 
     it('returns undefined if userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(await Authorization.usernameAsync).toBeUndefined();
+        expect(await authorization.usernameAsync).toBeUndefined();
     });
 
     it('returns the username from userdefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition.Username = 'x';
-        expect(await Authorization.usernameAsync).toBe("x");
+        expect(await authorization.usernameAsync).toBe("x");
         userDefinition.Username = "";
-        expect(await  Authorization.usernameAsync).toBe("");
+        expect(await authorization.usernameAsync).toBe("");
         userDefinition.Username = null;
-        expect(await Authorization.usernameAsync).toBe(null);
+        expect(await authorization.usernameAsync).toBe(null);
     });
 });
 
@@ -345,13 +361,15 @@ describe('Authorization.userDefinition', () => {
         mockUserDefinition();
     })
 
-    it('returns null if userDefinition is null', () => {
+    it('returns null if userDefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(Authorization.userDefinition).toBeNull();
+        expect(authorization.userDefinition).toBeNull();
     });
 
-    it('returns the userDefinition as is', () => {
-        expect(Authorization.userDefinition === userDefinition).toBe(true);
+    it('returns the userDefinition as is', async () => {
+        let authorization = (await import("./authorization")).Authorization;
+        expect(authorization.userDefinition === userDefinition).toBe(true);
     });
 });
 
@@ -361,12 +379,14 @@ describe('Authorization.userDefinitionAsync', () => {
     })
 
     it('returns null if userDefinition is null', async () => {
+        let authorization = (await import("./authorization")).Authorization;
         userDefinition = null;
-        expect(await Authorization.userDefinitionAsync).toBeNull();
+        expect(await authorization.userDefinitionAsync).toBeNull();
     });
 
     it('returns the userDefinition as is', async () => {
-        expect(await Authorization.userDefinitionAsync === userDefinition).toBe(true);
+        let authorization = (await import("./authorization")).Authorization;
+        expect(await (authorization.userDefinitionAsync) === userDefinition).toBe(true);
     });
 });
 
@@ -375,10 +395,11 @@ describe('Authorization.validatePermission', () => {
         mockUserDefinition();
     })
 
-    it('throws if no permission', function () {
+    it('throws if no permission', async function () {
+        let authorization = (await import("./authorization")).Authorization;
         var thrown = false;
         try {
-            Authorization.validatePermission("FALSE");
+            authorization.validatePermission("FALSE");
         }
         catch (e) {
             thrown = true;
@@ -387,10 +408,11 @@ describe('Authorization.validatePermission', () => {
         expect(thrown).toBe(true);
     });
 
-    it('does not throw if have the permission', function () {
+    it('does not throw if have the permission', async function () {
+        let authorization = (await import("./authorization")).Authorization;
         var thrown = false;
         try {
-            Authorization.validatePermission("TRUE");
+            authorization.validatePermission("TRUE");
         }
         catch (e) {
             thrown = true;
@@ -405,12 +427,14 @@ describe('Authorization.validatePermissionAsync', () => {
     })
 
     it('throws if no permission', async function () {
-        const notifyError = jest.spyOn(base, 'notifyError');
-        const localText = jest.spyOn(base, 'localText');
+        const base = await import("@serenity-is/base");
+        const localText = base.localText as any;
+        const notifyError = base.notifyError as any;
+    let authorization = (await import("./authorization")).Authorization;
         try {
             var thrown = false;
             try {
-                await Authorization.validatePermissionAsync("FALSE");
+                await authorization.validatePermissionAsync("FALSE");
             }
             catch (e) {
                 thrown = true;
@@ -430,9 +454,10 @@ describe('Authorization.validatePermissionAsync', () => {
     });
 
     it('does not throw if have the permission', async function () {
+        let authorization = (await import("./authorization")).Authorization;
         var thrown = false;
         try {
-            await Authorization.validatePermissionAsync("TRUE");
+            await authorization.validatePermissionAsync("TRUE");
         }
         catch (e) {
             thrown = true;

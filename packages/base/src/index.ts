@@ -24,6 +24,7 @@ export * from "./blockui";
 export * from "./config";
 export * from "./criteria";
 export * from "./debounce";
+export * from "./scriptdata";
 export * from "./formatting";
 export * from "./html";
 export * from "./localtext";

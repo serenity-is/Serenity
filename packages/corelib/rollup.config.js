@@ -4,6 +4,7 @@ import fs from 'fs';
 import { basename, resolve } from "path";
 import { dts } from "rollup-plugin-dts";
 import { minify } from "terser";
+import cleanup from "rollup-plugin-cleanup";
 
 var externalPackages = ["@serenity-is/sleekgrid"];
 
@@ -257,6 +258,7 @@ export default [
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
             }),
+            cleanup({ comments: "istanbul", extensions: ["js", "ts"] })
         ],
         external: externalPackages
     },
