@@ -1,8 +1,8 @@
 ﻿import validator from "@optionaldeps/jquery.validation";
-import { Config, getInstanceType, parseInteger, positionToastContainer } from "@serenity-is/base";
+import { Config, DialogButton, bsModalMarkup, closePanel, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
 import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { DialogButton, bsModalMarkup, closePanel, dialogButtonToBS, dialogButtonToUI, getAttributes, isMobileView, layoutFillHeight, newBodyDiv, openPanel, validateOptions } from "../../q";
+import { getAttributes, isMobileView, layoutFillHeight, newBodyDiv, validateOptions } from "../../q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { DialogExtensions } from "./dialogextensions";

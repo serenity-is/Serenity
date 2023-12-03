@@ -1,4 +1,3 @@
-import * as dialogs from "./dialogs";
 import * as base from "@serenity-is/base";
 import { ErrorHandling } from "./errorhandling";
 
@@ -6,28 +5,28 @@ beforeEach(() => jest.restoreAllMocks());
 
 describe("showServiceError", function () {
     it("shows ??ERROR?? if error is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(base, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError(null);
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows ??ERROR?? if error message and code is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(base, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({});
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows error code if message is undefined", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(base, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({ Code: 'Test' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("Test");
     });
 
     it("shows message if both message and code is not null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(base, "alertDialog").mockImplementation();;
         ErrorHandling.showServiceError({ Code: 'TestCode', Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");
@@ -35,7 +34,7 @@ describe("showServiceError", function () {
     });
 
     it("shows message if code is undefined", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = jest.spyOn(base, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({ Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");

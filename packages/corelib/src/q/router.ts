@@ -1,5 +1,5 @@
-﻿import { closePanel } from "./dialogs";
-import $ from "@optionaldeps/jquery";
+﻿import $ from "@optionaldeps/jquery";
+import { closePanel } from "@serenity-is/base";
 
 export interface HandleRouteEventArgs {
     handled: boolean,

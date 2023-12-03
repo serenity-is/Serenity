@@ -1,6 +1,6 @@
 export * from "./arrays-compat";
 export * from "./authorization";
-export * from "./dialogs";
+export * from "./dialogs-compat";
 export * from "./errorhandling";
 export * from "./formatting-compat";
 export * from "./html-compat";
@@ -9,7 +9,6 @@ export * from "./layouttimer";
 export * from "./localtext-compat";
 export * from "./router";
 export * from "./scriptdata-compat";
-export * from "./servicetypes-compat";
 export * from "./services-compat";
 export * from "./strings-compat";
 export * from "./system-compat";

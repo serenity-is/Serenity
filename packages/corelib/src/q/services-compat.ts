@@ -1,7 +1,5 @@
-﻿import { Config, ListRequest, ServiceResponse, blockUI, blockUndo, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
-import { alertDialog, iframeDialog } from "./dialogs";
+﻿import { Config, ListRequest, ServiceResponse, alertDialog, blockUI, blockUndo, iframeDialog, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
 import { ErrorHandling } from "./errorhandling";
-import { ServiceOptions } from "./servicetypes-compat";
 import { extend } from "./system-compat";
 
 export function getCookie(name: string) {
@@ -23,6 +21,15 @@ typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
         }
     }
 });
+
+export interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+    request?: any;
+    service?: string;
+    blockUI?: boolean;
+    onError?(response: TResponse): void;
+    onSuccess?(response: TResponse): void;
+    onCleanup?(): void;
+}
 
 export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse> {
     let handleError = function (response: any) {

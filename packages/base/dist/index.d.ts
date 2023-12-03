@@ -225,6 +225,188 @@ interface DebouncedFunction<T extends (...args: any[]) => any> {
  */
 declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
+/**
+ * Options for a message dialog button
+ */
+interface DialogButton {
+    /** Button text */
+    text?: string;
+    /** Button hint */
+    hint?: string;
+    /** Button icon */
+    icon?: string;
+    /** Click handler */
+    click?: (e: MouseEvent) => void;
+    /** CSS class for button */
+    cssClass?: string;
+    /** HTML encode button text. Default is true. */
+    htmlEncode?: boolean;
+    /** The code that is returned from message dialog function when this button is clicked */
+    result?: string;
+}
+/**
+ * Options that apply to all message dialog types
+ */
+interface CommonDialogOptions {
+    /** Event handler that is called when dialog is opened */
+    onOpen?: () => void;
+    /** Event handler that is called when dialog is closed */
+    onClose?: (result: string) => void;
+    /** Dialog title */
+    title?: string;
+    /** HTML encode the message, default is true */
+    htmlEncode?: boolean;
+    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
+    preWrap?: boolean;
+    /** Dialog css class. Default is based on the message dialog type */
+    dialogClass?: string;
+    /** List of buttons to show on the dialog */
+    buttons?: DialogButton[];
+    /** Class to use for the modal element for Bootstrap dialogs */
+    modalClass?: string;
+    /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
+    bootstrap?: boolean;
+    /** The result code of the button used to close the dialog is returned via this variable in the options object */
+    result?: string;
+}
+/** Returns true if Bootstrap 3 is loaded */
+declare function isBS3(): boolean;
+/** Returns true if Bootstrap 5+ is loaded */
+declare function isBS5Plus(): boolean;
+/**
+ * Builds HTML DIV element for a Bootstrap modal dialog
+ * @param title Modal title
+ * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
+ * @param modalClass Optional class to add to the modal element
+ * @param escapeHtml True to html encode body, default is true
+ * @returns
+ */
+declare function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
+/** Converts a `DialogButton` declaration to Bootstrap button element
+ * @param x Dialog button declaration
+ * @returns Bootstrap button element
+*/
+declare function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
+/** Converts a `DialogButton` declaration to jQuery UI button type
+ * @param x Dialog button declaration
+ * @returns jQuery UI button type
+ */
+declare function dialogButtonToUI(x: DialogButton): any;
+/**
+ * Additional options for Alert dialogs
+ */
+interface AlertOptions extends CommonDialogOptions {
+    /** The title of OK button, or false to hide the OK button */
+    okButton?: string | boolean;
+    /** CSS class for OK button */
+    okButtonClass?: string;
+}
+/**
+ * Displays an alert dialog
+ * @param message The message to display
+ * @param options Additional options.
+ * @see AlertOptions
+ * @example
+ * alertDialog("An error occured!"); }
+ */
+declare function alertDialog(message: string, options?: AlertOptions): void;
+/** Additional options for confirm dialog */
+interface ConfirmOptions extends CommonDialogOptions {
+    /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
+    yesButton?: string | boolean;
+    /** CSS class for the Yes button. */
+    yesButtonClass?: string;
+    /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
+    noButton?: string | boolean;
+    /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
+    cancelButton?: string | boolean;
+    /** Event handler for cancel button click */
+    onCancel?: () => void;
+    /** Event handler for no button click */
+    onNo?: () => void;
+}
+/**
+ * Display a confirmation dialog
+ * @param message The message to display
+ * @param onYes Callback for Yes button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * confirmDialog("Are you sure you want to delete?", () => {
+ *     // do something when yes is clicked
+ * }
+ */
+declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
+/**
+ * Display an information dialog
+ * @param message The message to display
+ * @param onOk Callback for OK button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * informationDialog("Operation complete", () => {
+ *     // do something when OK is clicked
+ * }
+ */
+declare function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+/**
+ * Display a success dialog
+ * @param message The message to display
+ * @param onOk Callback for OK button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * successDialog("Operation complete", () => {
+ *     // do something when OK is clicked
+ * }
+ */
+declare function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+/**
+ * Display a warning dialog
+ * @param message The message to display
+ * @param options Additional options.
+ * @see AlertOptions
+ * @example
+ * warningDialog("Something is odd!");
+ */
+declare function warningDialog(message: string, options?: AlertOptions): void;
+/** Options for `iframeDialog` **/
+interface IFrameDialogOptions {
+    html?: string;
+}
+/** Options for `iframeDialog` **/
+interface IFrameDialogOptions {
+    html?: string;
+}
+/**
+ * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
+ * @param options The options
+ */
+declare function iframeDialog(options: IFrameDialogOptions): void;
+/**
+ * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
+ * If the panelbeforeclose prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param e  The event triggering the close
+ */
+declare function closePanel(element: (HTMLElement | {
+    jquery: string;
+    get: ((index: number) => HTMLElement);
+    length: number;
+}), e?: Event): void;
+/**
+ * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
+ * and panelopening and panelopened events on the window.
+ * If the panelbeforeopen prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
+ * @param e The event triggering the open
+ */
+declare function openPanel(element: (HTMLElement | {
+    jquery: string;
+    get: ((index: number) => HTMLElement);
+}), uniqueName?: string): void;
+
 interface LookupOptions<TItem> {
     idField?: string;
     parentIdField?: string;
@@ -778,4 +960,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { ColumnSelection, Config, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Enum, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, blockUI, blockUndo, compareStringFactory, debounce, defaultNotifyOptions, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, globalObject, handleScriptDataError, htmlEncode, initFormType, isAssignableFrom, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, toId, toggleClass, trunc, tryGetText };
+export { type AlertOptions, ColumnSelection, type CommonDialogOptions, Config, type ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, Enum, type IFrameDialogOptions, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, alertDialog, blockUI, blockUndo, bsModalMarkup, closePanel, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, globalObject, handleScriptDataError, htmlEncode, iframeDialog, informationDialog, initFormType, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, toId, toggleClass, trunc, tryGetText, warningDialog };

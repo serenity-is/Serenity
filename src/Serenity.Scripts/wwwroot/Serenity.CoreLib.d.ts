@@ -1464,6 +1464,188 @@ declare namespace Serenity {
      */
     function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
+    /**
+     * Options for a message dialog button
+     */
+    interface DialogButton {
+        /** Button text */
+        text?: string;
+        /** Button hint */
+        hint?: string;
+        /** Button icon */
+        icon?: string;
+        /** Click handler */
+        click?: (e: MouseEvent) => void;
+        /** CSS class for button */
+        cssClass?: string;
+        /** HTML encode button text. Default is true. */
+        htmlEncode?: boolean;
+        /** The code that is returned from message dialog function when this button is clicked */
+        result?: string;
+    }
+    /**
+     * Options that apply to all message dialog types
+     */
+    interface CommonDialogOptions {
+        /** Event handler that is called when dialog is opened */
+        onOpen?: () => void;
+        /** Event handler that is called when dialog is closed */
+        onClose?: (result: string) => void;
+        /** Dialog title */
+        title?: string;
+        /** HTML encode the message, default is true */
+        htmlEncode?: boolean;
+        /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
+        preWrap?: boolean;
+        /** Dialog css class. Default is based on the message dialog type */
+        dialogClass?: string;
+        /** List of buttons to show on the dialog */
+        buttons?: DialogButton[];
+        /** Class to use for the modal element for Bootstrap dialogs */
+        modalClass?: string;
+        /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
+        bootstrap?: boolean;
+        /** The result code of the button used to close the dialog is returned via this variable in the options object */
+        result?: string;
+    }
+    /** Returns true if Bootstrap 3 is loaded */
+    function isBS3(): boolean;
+    /** Returns true if Bootstrap 5+ is loaded */
+    function isBS5Plus(): boolean;
+    /**
+     * Builds HTML DIV element for a Bootstrap modal dialog
+     * @param title Modal title
+     * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
+     * @param modalClass Optional class to add to the modal element
+     * @param escapeHtml True to html encode body, default is true
+     * @returns
+     */
+    function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
+    /** Converts a `DialogButton` declaration to Bootstrap button element
+     * @param x Dialog button declaration
+     * @returns Bootstrap button element
+    */
+    function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
+    /** Converts a `DialogButton` declaration to jQuery UI button type
+     * @param x Dialog button declaration
+     * @returns jQuery UI button type
+     */
+    function dialogButtonToUI(x: DialogButton): any;
+    /**
+     * Additional options for Alert dialogs
+     */
+    interface AlertOptions extends CommonDialogOptions {
+        /** The title of OK button, or false to hide the OK button */
+        okButton?: string | boolean;
+        /** CSS class for OK button */
+        okButtonClass?: string;
+    }
+    /**
+     * Displays an alert dialog
+     * @param message The message to display
+     * @param options Additional options.
+     * @see AlertOptions
+     * @example
+     * alertDialog("An error occured!"); }
+     */
+    function alertDialog(message: string, options?: AlertOptions): void;
+    /** Additional options for confirm dialog */
+    interface ConfirmOptions extends CommonDialogOptions {
+        /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
+        yesButton?: string | boolean;
+        /** CSS class for the Yes button. */
+        yesButtonClass?: string;
+        /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
+        noButton?: string | boolean;
+        /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
+        cancelButton?: string | boolean;
+        /** Event handler for cancel button click */
+        onCancel?: () => void;
+        /** Event handler for no button click */
+        onNo?: () => void;
+    }
+    /**
+     * Display a confirmation dialog
+     * @param message The message to display
+     * @param onYes Callback for Yes button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * confirmDialog("Are you sure you want to delete?", () => {
+     *     // do something when yes is clicked
+     * }
+     */
+    function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
+    /**
+     * Display an information dialog
+     * @param message The message to display
+     * @param onOk Callback for OK button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * informationDialog("Operation complete", () => {
+     *     // do something when OK is clicked
+     * }
+     */
+    function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+    /**
+     * Display a success dialog
+     * @param message The message to display
+     * @param onOk Callback for OK button click
+     * @param options Additional options.
+     * @see ConfirmOptions
+     * @example
+     * successDialog("Operation complete", () => {
+     *     // do something when OK is clicked
+     * }
+     */
+    function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+    /**
+     * Display a warning dialog
+     * @param message The message to display
+     * @param options Additional options.
+     * @see AlertOptions
+     * @example
+     * warningDialog("Something is odd!");
+     */
+    function warningDialog(message: string, options?: AlertOptions): void;
+    /** Options for `iframeDialog` **/
+    interface IFrameDialogOptions {
+        html?: string;
+    }
+    /** Options for `iframeDialog` **/
+    interface IFrameDialogOptions {
+        html?: string;
+    }
+    /**
+     * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
+     * @param options The options
+     */
+    function iframeDialog(options: IFrameDialogOptions): void;
+    /**
+     * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
+     * If the panelbeforeclose prevents the default, the operation is cancelled.
+     * @param element The panel element
+     * @param e  The event triggering the close
+     */
+    function closePanel(element: (HTMLElement | {
+        jquery: string;
+        get: ((index: number) => HTMLElement);
+        length: number;
+    }), e?: Event): void;
+    /**
+     * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
+     * and panelopening and panelopened events on the window.
+     * If the panelbeforeopen prevents the default, the operation is cancelled.
+     * @param element The panel element
+     * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
+     * @param e The event triggering the open
+     */
+    function openPanel(element: (HTMLElement | {
+        jquery: string;
+        get: ((index: number) => HTMLElement);
+    }), uniqueName?: string): void;
+
     interface LookupOptions<TItem> {
         idField?: string;
         parentIdField?: string;
@@ -2262,186 +2444,16 @@ declare namespace Serenity {
         let userDefinitionAsync: Promise<UserDefinition>;
     }
 
-    /**
-     * Options for a message dialog button
-     */
-    interface DialogButton {
-        /** Button text */
-        text?: string;
-        /** Button hint */
-        hint?: string;
-        /** Button icon */
-        icon?: string;
-        /** Click handler */
-        click?: (e: MouseEvent) => void;
-        /** CSS class for button */
-        cssClass?: string;
-        /** HTML encode button text. Default is true. */
-        htmlEncode?: boolean;
-        /** The code that is returned from message dialog function when this button is clicked */
-        result?: string;
-    }
-    /**
-     * Options that apply to all message dialog types
-     */
-    interface CommonDialogOptions {
-        /** Event handler that is called when dialog is opened */
-        onOpen?: () => void;
-        /** Event handler that is called when dialog is closed */
-        onClose?: (result: string) => void;
-        /** Dialog title */
-        title?: string;
-        /** HTML encode the message, default is true */
-        htmlEncode?: boolean;
-        /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
-        preWrap?: boolean;
-        /** Dialog css class. Default is based on the message dialog type */
-        dialogClass?: string;
-        /** List of buttons to show on the dialog */
-        buttons?: DialogButton[];
-        /** Class to use for the modal element for Bootstrap dialogs */
-        modalClass?: string;
-        /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
-        bootstrap?: boolean;
-        /** The result code of the button used to close the dialog is returned via this variable in the options object */
-        result?: string;
-    }
-    /** Returns true if Bootstrap 3 is loaded */
-    function isBS3(): boolean;
-    /** Returns true if Bootstrap 5+ is loaded */
-    function isBS5Plus(): boolean;
-    /**
-     * Builds HTML DIV element for a Bootstrap modal dialog
-     * @param title Modal title
-     * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
-     * @param modalClass Optional class to add to the modal element
-     * @param escapeHtml True to html encode body, default is true
-     * @returns
-     */
-    function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
-    /** Converts a `DialogButton` declaration to Bootstrap button element
-     * @param x Dialog button declaration
-     * @returns Bootstrap button element
-    */
-    function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
-    /** Converts a `DialogButton` declaration to jQuery UI button type
-     * @param x Dialog button declaration
-     * @returns jQuery UI button type
-     */
-    function dialogButtonToUI(x: DialogButton): any;
-    /**
-     * Additional options for Alert dialogs
-     */
-    interface AlertOptions extends CommonDialogOptions {
-        /** The title of OK button, or false to hide the OK button */
-        okButton?: string | boolean;
-        /** CSS class for OK button */
-        okButtonClass?: string;
-    }
-    /**
-     * Displays an alert dialog
-     * @param message The message to display
-     * @param options Additional options.
-     * @see AlertOptions
-     * @example
-     * alertDialog("An error occured!"); }
-     */
-    function alertDialog(message: string, options?: AlertOptions): void;
     /** @deprecated use alertDialog */
     const alert: typeof alertDialog;
-    /** Additional options for confirm dialog */
-    interface ConfirmOptions extends CommonDialogOptions {
-        /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
-        yesButton?: string | boolean;
-        /** CSS class for the Yes button. */
-        yesButtonClass?: string;
-        /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
-        noButton?: string | boolean;
-        /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
-        cancelButton?: string | boolean;
-        /** Event handler for cancel button click */
-        onCancel?: () => void;
-        /** Event handler for no button click */
-        onNo?: () => void;
-    }
-    /**
-     * Display a confirmation dialog
-     * @param message The message to display
-     * @param onYes Callback for Yes button click
-     * @param options Additional options.
-     * @see ConfirmOptions
-     * @example
-     * confirmDialog("Are you sure you want to delete?", () => {
-     *     // do something when yes is clicked
-     * }
-     */
-    function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
     /** @deprecated use confirmDialog */
     const confirm: typeof confirmDialog;
-    /** Options for `iframeDialog` **/
-    interface IFrameDialogOptions {
-        html?: string;
-    }
-    /**
-     * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
-     * @param options The options
-     */
-    function iframeDialog(options: IFrameDialogOptions): void;
-    /**
-     * Display an information dialog
-     * @param message The message to display
-     * @param onOk Callback for OK button click
-     * @param options Additional options.
-     * @see ConfirmOptions
-     * @example
-     * informationDialog("Operation complete", () => {
-     *     // do something when OK is clicked
-     * }
-     */
-    function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
     /** @deprecated use informationDialog */
     const information: typeof informationDialog;
-    /**
-     * Display a success dialog
-     * @param message The message to display
-     * @param onOk Callback for OK button click
-     * @param options Additional options.
-     * @see ConfirmOptions
-     * @example
-     * successDialog("Operation complete", () => {
-     *     // do something when OK is clicked
-     * }
-     */
-    function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
     /** @deprecated use successDialog */
     const success: typeof successDialog;
-    /**
-     * Display a warning dialog
-     * @param message The message to display
-     * @param options Additional options.
-     * @see AlertOptions
-     * @example
-     * warningDialog("Something is odd!");
-     */
-    function warningDialog(message: string, options?: AlertOptions): void;
     /** @deprecated use warningDialog */
     const warning: typeof warningDialog;
-    /**
-     * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
-     * If the panelbeforeclose prevents the default, the operation is cancelled.
-     * @param element The panel element
-     * @param e  The event triggering the close
-     */
-    function closePanel(element: JQuery | HTMLElement, e?: Event): void;
-    /**
-     * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
-     * and panelopening and panelopened events on the window.
-     * If the panelbeforeopen prevents the default, the operation is cancelled.
-     * @param element The panel element
-     * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
-     * @param e The event triggering the open
-     */
-    function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
 
     namespace ErrorHandling {
         /**
@@ -2623,6 +2635,7 @@ declare namespace Serenity {
     const getFormDataAsync: typeof getFormScript;
     function getTemplate(key: string): string;
 
+    function getCookie(name: string): any;
     interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
         request?: any;
         service?: string;
@@ -2631,8 +2644,6 @@ declare namespace Serenity {
         onSuccess?(response: TResponse): void;
         onCleanup?(): void;
     }
-
-    function getCookie(name: string): any;
     function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
     function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
     function setEquality(request: ListRequest, field: string, value: any): void;

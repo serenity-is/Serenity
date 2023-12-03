@@ -1,5 +1,4 @@
-﻿import { localText, notifyError } from "@serenity-is/base";
-import { isBS3 } from "./dialogs";
+﻿import { isBS3, localText, notifyError } from "@serenity-is/base";
 import { extend } from "./system-compat";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
 

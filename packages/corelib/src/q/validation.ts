@@ -1,6 +1,5 @@
 ﻿import validator from "@optionaldeps/jquery.validation";
-import { Config, htmlEncode, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
-import { isBS3 } from "./dialogs";
+import { Config, htmlEncode, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
 import { Exception, extend } from "./system-compat";
 
