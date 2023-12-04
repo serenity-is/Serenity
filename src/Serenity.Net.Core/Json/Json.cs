@@ -62,7 +62,7 @@ public static class JSON
     /// <param name="target">Target object</param>
     /// <param name="jsonSource">JSON string</param>
     /// <param name="options">Serializer options</param>
-    public static void PopulateObject<T>(T target, string jsonSource, JsonSerializerOptions options) 
+    public static void PopulateObject<T>(T target, string jsonSource, JsonSerializerOptions options)
         where T : class
     {
         var json = JsonDocument.Parse(jsonSource).RootElement;
@@ -70,9 +70,12 @@ public static class JSON
             OverwriteProperty(target, property, options);
     }
 
-    static void OverwriteProperty<T>(T target, JsonProperty updatedProperty, JsonSerializerOptions options) where T : class
+    static void OverwriteProperty(object target, JsonProperty updatedProperty, JsonSerializerOptions options)
     {
-        var propertyInfo = typeof(T).GetProperty(updatedProperty.Name);
+        if (target is null)
+            return;
+
+        var propertyInfo = target.GetType().GetProperty(updatedProperty.Name);
 
         if (propertyInfo == null)
             return;
