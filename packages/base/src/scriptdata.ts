@@ -52,36 +52,35 @@ let fetchPromises: { [key: string]: Promise<any> } = {}
 export async function fetchScriptData<TData>(name: string): Promise<TData> {
     let key = name + '?' + (getScriptDataHash(name) ?? '');
 
-    var promise = fetchPromises[key];
-    if (promise)
+    var promise: Promise<TData> = fetchPromises[key];    
+    if (promise != null)
         return promise;
 
     if (typeof fetch === "undefined")
         throw "The fetch method is not available!";
 
+    function cleanup() {
+        delete fetchPromises[key];
+        typeof jQuery !== "undefined" && typeof jQuery.active === "number" && !(--jQuery.active) && jQuery.event?.trigger?.("ajaxStop");
+        blockUndo();
+    }
+
     blockUI();
-    fetchPromises[key] = promise = fetch(resolveUrl('~/DynamicData/') + name + '?v=' + (getScriptDataHash(name) ?? new Date().getTime()), {
+    typeof jQuery !== "undefined" && typeof jQuery.active === "number" && (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
+    return fetchPromises[key] = promise = fetch(resolveUrl('~/DynamicData/') + name + '?v=' + (getScriptDataHash(name) ?? new Date().getTime()), {
         method: 'GET',
         cache: "force-cache",
         headers: {
             "Accept": "application/json"
         }
-    });
-
-    typeof jQuery !== "undefined" && typeof jQuery.active === "number" && (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
-    try {
-        var response = (await promise) as Response;
+    }).then(response => {
+        cleanup();
         if (!response.ok) {
             handleScriptDataError(name, response.status, response.statusText ?? '');
             return Promise.reject();
         }
         return response.json();
-    }
-    finally {
-        delete fetchPromises[key];
-        typeof jQuery !== "undefined" && typeof jQuery.active === "number" && !(--jQuery.active) && jQuery.event?.trigger?.("ajaxStop");
-        blockUndo();
-    }
+    }, cleanup);
 }
 
 /**

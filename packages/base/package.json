@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/base",
-  "version": "8.0.5",
+  "version": "8.0.6",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity Base library with types and functions shared between corelib, ui, and others",

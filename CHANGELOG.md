@@ -1,3 +1,8 @@
+## 8.0.5 (2023-12-04)
+
+## Bugfixes:
+- Issue with async fetch not returning data properly, causing async lookup loading to fail
+
 ## 8.0.4 (2023-12-04)
 
 ## Features:
