@@ -70,11 +70,12 @@ export async function fetchScriptData<TData>(name: string): Promise<TData> {
 
     typeof jQuery !== "undefined" && typeof jQuery.active === "number" && (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
     try {
-        var response = await promise;
+        var response = (await promise) as Response;
         if (!response.ok) {
             handleScriptDataError(name, response.status, response.statusText ?? '');
             return Promise.reject();
         }
+        return response.json();
     }
     finally {
         delete fetchPromises[key];
