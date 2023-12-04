@@ -1,3 +1,8 @@
+## 8.0.4 (2023-12-04)
+
+## Features:
+- Trigger jQuery ajaxStop and ajaxStart events and increase/decrease jQuery.active during fetch requests so that processes like NProgress can be notified until we implement our own events
+
 ## 8.0.3 (2023-12-04)
 
 ### Features:
