@@ -1,3 +1,29 @@
+## 8.0.3 (2023-12-04)
+
+### Features:
+- Using MSBuild's new command-line build property extraction feature in Sergen for .NET 8+ to determine properties like OutDir, TargetFramework, etc. in a more consistent way.
+- Made it possible to pass MSBuild properties to Sergen so that it does not have to parse property items from the project file. This helps with cases where it cannot determine a property correctly, such as output path, configuration, etc. This may also speed up transforms as Sergen does not have to parse properties itself. Refer to Directory.Build.targets in the common-features repository for a sample and `-prop` syntax.
+- Implemented finding tsconfig extends from node_modules folders when the extends property contains a non-relative path. This is similar to how TypeScript implements extends via the node resolution algorithm.
+- Improved Sergen's algorithm for discovering included files from tsconfig.json to match TypeScript itself as closely as possible.
+- Cached file system for TypeScript parsing transformations, speeding up transform times in Sergen.
+- Added an option to ignore null value for `[Unique]` constraint on a single field.
+- Q.serviceCall / Q.serviceRequest methods and generated services now return `PromiseLike` instead of `JQueryXHR`. This is preparation for the replacement of jQuery ajax with fetch in the future. It is still possible to cast the return type to JQueryXHR for now, but don't rely on it always returning such type.
+- [BREAKING CHANGE] `IFileSystem` has a new `GetLastWriteTimeUtc` property. This is done to remove the extra `IGeneratorFileSystem` interface and the same property from `ITemporaryFileSystem`. If you have a custom implementation for `IFileSystem`, you should also implement the `GetLastWriteTimeUtc` method.
+- [BREAKING CHANGE] No longer shipping TypeScript's `tslib` functions (e.g., helpers) along with Serenity.CoreLib.js. If you still have namespaces (non-modular) TypeScript code, please remove the `"noEmitHelpers": true` line from your tsconfig.json.
+- The `localText` function now accepts a second optional parameter that will be used as default if a translation is not found in the registry.
+- Moved more functions into the base library from corelib. Removing usages of `Q.isEmptyOrNull`, `Q.startsWith`, `Q.endsWith`, `Q.some`, etc. functions as JavaScript has better alternatives.
+- Corelib and templates will target ES2017 instead of ES5. No issues are expected as ES2017 support in browsers is at 98%, and the remaining 2% mostly includes IE, which we haven't supported for a long time.
+- `ScriptData` functions like `getLookup`, `getForm`, `getColumns`, etc., will use `~/DynamicData` (e.g., JSON loading) instead of `~/DynJS.axd` (script loading) by default. This will avoid calling `eval`, which is considered harmful, while dynamically loading lookups, etc.
+- Using `fetch` instead of jQuery ajax/XHR for async versions of `ScriptData` functions like `getLookupAsync`, etc.
+- JSON.NET serialized enums as numbers by default, while we used `JsonStringEnumConverter` with `System.Text.Json`, which broke handling in some cases. We implemented a new `EnumJsonConverter` that is more compatible with the JSON.NET behavior.
+- In tsconfig.json, `jsx-dom/min` is set as the default `jsxImportSource` in common-features and pro-features projects, in addition to StartSharp itself.
+- Serenity no longer uses the legacy jQuery blockUI plugin even if it is loaded.
+
+### Bugfixes:
+- `GetRelativePath` workaround for Pro.Coder is not working exactly the same as `System.IO.Path.GetRelativePath`, which is not available in .NET Standard 2. This was causing strange paths in transformed files from time to time.
+- `PopulateObject` failed when the generic type is an interface, causing reports with parameters to not work properly.
+- Fixed NullReferenceException during impersonation.
+
 ## 8.0.2 (2023-11-22)
 
 ### Bugfixes:
