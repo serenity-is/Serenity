@@ -1,4 +1,4 @@
-﻿describe("Q.config", () => {
+﻿describe("Config", () => {
     it("has sensible defaults", async () => {
         jest.resetModules();
         document.head.childNodes.forEach(el => el.remove());

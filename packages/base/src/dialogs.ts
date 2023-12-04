@@ -81,7 +81,7 @@ function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialog
         }
     }, options);
 
-    opt.dialogClass = 's-MessageDialog' + (dialogClass ? (' ' + dialogClass) : '');
+    opt.dialogClass = 's-MessageDialog ' + dialogClass;
 
     if (options.buttons) {
         opt.buttons = options.buttons.map(x => {
@@ -121,6 +121,7 @@ const defaultTxt: Record<string, string> = {
     InformationTitle: 'Information',
     WarningTitle: 'Warning',
     ConfirmationTitle: 'Confirm',
+    SuccessTitle: 'Success',
     OkButton: 'OK',
     YesButton: 'Yes',
     NoButton: 'No',
@@ -274,9 +275,6 @@ function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalCl
                 show: true
             });
         }
-
-        if (isBS5Plus())
-            div.modal('show');
     }
 }
 
@@ -332,7 +330,7 @@ export function alertDialog(message: string, options?: AlertOptions) {
     if (options.htmlEncode == null)
         options.htmlEncode = true;
 
-    if (options.okButton == null)
+    if (options.okButton == null || options.okButton === true)
         options.okButton = txt('OkButton');
 
     if (options.title == null)
@@ -340,9 +338,9 @@ export function alertDialog(message: string, options?: AlertOptions) {
 
     if (options.buttons == null) {
         options.buttons = [];
-        if (options.okButton == null || options.okButton) {
+        if (options.okButton) {
             options.buttons.push({
-                text: typeof options.okButton == "boolean" ? txt('OkButton') : options.okButton,
+                text: options.okButton,
                 cssClass: options.okButtonClass ?? (useBS ? 'btn-danger' : undefined),
                 result: 'ok'
             });
@@ -458,20 +456,32 @@ export interface IFrameDialogOptions {
  * }
  */
 export function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions) {
+    options ??= {};
+
     if (useBrowserDialogs()) {
         window.alert(message);
+        options.result = "ok";
         onOk && onOk();
         return;
     }
 
-    confirmDialog(message, onOk, Object.assign({
-        title: txt("InformationTitle"),
-        dialogClass: "s-InformationDialog",
-        modalClass: "s-InformationModal",
-        yesButton: txt("OkButton"),
-        yesButtonClass: 'btn-info',
-        noButton: false,
-    }, options));
+    if (typeof options.title === "undefined")
+        options.title = txt("InformationTitle");
+    if (typeof options.dialogClass === "undefined")
+        options.dialogClass = "s-InformationDialog";
+    if (typeof options.modalClass === "undefined")
+        options.modalClass = "s-InformationModal";
+    if (typeof options.yesButton === "undefined")
+        options.yesButton = txt("OkButton");
+    if (typeof options.yesButtonClass === "undefined")
+        options.yesButtonClass = "btn-info";
+    if (typeof options.noButton === "undefined")
+        options.noButton = false;
+
+    confirmDialog(message, () => {
+        options.result = 'ok';
+        onOk && onOk();
+    }, options);
 }
 
 /** 
@@ -486,20 +496,16 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
  * }
  */
 export function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions) {
-    if (useBrowserDialogs()) {
-        window.alert(message);
-        onOk && onOk();
-        return;
-    }
-
-    confirmDialog(message, onOk, Object.assign({
-        title: txt("SuccessTitle"),
-        dialogClass: "s-SuccessDialog",
-        modalClass: "s-SuccessModal",
-        yesButton: txt("OkButton"),
-        yesButtonClass: 'btn-success',
-        noButton: false,
-    }, options));
+    options ??= {};
+    if (typeof options.title === "undefined")
+        options.title = txt("SuccessTitle");
+    if (typeof options.dialogClass === "undefined")
+        options.dialogClass = "s-SuccessDialog";
+    if (typeof options.modalClass === "undefined")
+        options.modalClass = "s-SuccessModal";
+    if (typeof options.yesButtonClass === "undefined")
+        options.yesButtonClass = "btn-success";
+    informationDialog(message, onOk, options);
 }
 
 /** 
