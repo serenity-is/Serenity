@@ -49,10 +49,10 @@ let fetchPromises: { [key: string]: Promise<any> } = {}
  * @param name Dynamic script name
  * @returns A promise that will return data if successfull
  */
-export async function fetchScriptData<TData>(name: string): Promise<TData> {
+export function fetchScriptData<TData>(name: string): Promise<TData> {
     let key = name + '?' + (getScriptDataHash(name) ?? '');
 
-    var promise: Promise<TData> = fetchPromises[key];    
+    var promise: Promise<TData> = fetchPromises[key];
     if (promise != null)
         return promise;
 
@@ -73,13 +73,16 @@ export async function fetchScriptData<TData>(name: string): Promise<TData> {
         headers: {
             "Accept": "application/json"
         }
-    }).then(response => {
+    }).then(async response => {
         cleanup();
         if (!response.ok) {
             handleScriptDataError(name, response.status, response.statusText ?? '');
             return Promise.reject();
         }
-        return response.json();
+        const data = await response.json();
+        if (name.startsWith("Lookup."))
+            return new Lookup(data.Params, data.Items);
+        return data;
     }, cleanup);
 }
 
@@ -100,8 +103,6 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
         return data;
 
     data = await fetchScriptData(name);
-    if (name.startsWith("Lookup."))
-        data = new Lookup(data.Params, data.Items);
     setScriptData(name, data);
     return data;
 }
@@ -112,7 +113,7 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
  * @returns A property items data object containing items and additionalItems properties
  */
 export async function getColumnsScript(key: string): Promise<PropertyItemsData> {
-    return getScriptData('Columns.' + key);
+    return getScriptData<PropertyItemsData>('Columns.' + key);
 }
 
 /**
@@ -121,7 +122,7 @@ export async function getColumnsScript(key: string): Promise<PropertyItemsData> 
  * @returns A property items data object containing items and additionalItems properties
  */
 export async function getFormScript(key: string): Promise<PropertyItemsData> {
-    return await getScriptData('Form.' + key);
+    return await getScriptData<PropertyItemsData>('Form.' + key);
 }
 
 /**
@@ -129,7 +130,7 @@ export async function getFormScript(key: string): Promise<PropertyItemsData> {
  * @param key Lookup key
  */
 export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
-    return await getScriptData('Lookup.' + key);
+    return await getScriptData<Lookup<TItem>>('Lookup.' + key);
 }
 
 /**
@@ -137,7 +138,7 @@ export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>
  * @param key Remote data key
  */
 export async function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
-    return await getScriptData('RemoteData.' + key);
+    return await getScriptData<TData>('RemoteData.' + key);
 }
 
 /**

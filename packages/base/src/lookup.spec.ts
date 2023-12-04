@@ -1,6 +1,6 @@
 import { Lookup } from "./lookup";
 
-describe("Q.Lookup", () => {
+describe("Lookup", () => {
     it('has itemById is populated', function () {
         var item1 = { x: 5, n: 'Item5' };
         var item2 = { x: 9, n: 'Item9' };
