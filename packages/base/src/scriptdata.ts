@@ -68,6 +68,7 @@ export async function fetchScriptData<TData>(name: string): Promise<TData> {
         }
     });
 
+    typeof jQuery !== "undefined" && typeof jQuery.active === "number" && (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
     try {
         var response = await promise;
         if (!response.ok) {
@@ -77,6 +78,7 @@ export async function fetchScriptData<TData>(name: string): Promise<TData> {
     }
     finally {
         delete fetchPromises[key];
+        typeof jQuery !== "undefined" && typeof jQuery.active === "number" && !(--jQuery.active) && jQuery.event?.trigger?.("ajaxStop");
         blockUndo();
     }
 }
