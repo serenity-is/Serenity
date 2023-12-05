@@ -43,7 +43,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       working-directory: "src"
 
-  js-corelib-tests:
+  js-tests:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository

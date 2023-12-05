@@ -1,5 +1,4 @@
 import { Lookup } from "./lookup";
-import { notifyError } from "./notify";
 import { fetchScriptData, getScriptDataHash } from "./scriptdata";
 import { getStateStore } from "./system";
 
@@ -245,7 +244,7 @@ describe("fetchScriptData", () => {
         };
         window["fetch"] = mockFetch as any;
         try {
-            const logSpy = jest.spyOn(console, "log");
+            const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
             let notify = await import("./notify");
             await expect(async () => {
                 await fetchScriptData("Lookup.Test")
