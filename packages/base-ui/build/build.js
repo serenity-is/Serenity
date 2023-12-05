@@ -25,6 +25,7 @@ await esbuild.build({
     entryPoints: [
         'src/index.ts'
     ],
+    external: ['@serenity-is/base', '@serenity-is/sleekgrid'],
     outbase: 'src',
     minify: true
 });

@@ -65,10 +65,11 @@ importers:
         version: 29.5.8
 
   packages/base-ui:
-    devDependencies:
+    dependencies:
       '@serenity-is/base':
         specifier: workspace:*
         version: link:../base
+    devDependencies:
       '@types/jest':
         specifier: 29.5.8
         version: 29.5.8

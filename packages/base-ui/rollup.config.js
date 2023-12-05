@@ -1,4 +1,10 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import dts from "rollup-plugin-dts";
+
+const externalPackages = ["@serenity-is/base"];
+const nodeResolvePlugin = () => nodeResolve({
+    resolveOnly: ['@serenity-is/base']
+});
 
 export default [
     {
@@ -9,7 +15,11 @@ export default [
             generatedCode: 'es2015'
         }],
         plugins: [
-            dts()
-        ]
+            nodeResolvePlugin(),
+            dts({
+                respectExternal: true
+            }),
+        ],
+        external: externalPackages
     }
 ];
