@@ -1,11 +1,17 @@
 import { Lookup } from "./lookup";
+import { notifyError } from "./notify";
 import { fetchScriptData, getScriptDataHash } from "./scriptdata";
 import { getStateStore } from "./system";
+
+jest.mock("./notify", () => ({
+    notifyError: jest.fn()
+}));
 
 const __scriptData = "__scriptData";
 const __scriptHash = "__scriptHash";
 
 beforeEach(() => {
+    jest.clearAllMocks();
     let store = getStateStore();
     delete store[__scriptHash];
     delete store[__scriptData];
@@ -209,4 +215,48 @@ describe("fetchScriptData", () => {
             window["fetch"] = orgFetch;
         }
     });
+
+    it("throws if fetch is not available", async () => {
+        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        let orgFetch = window["fetch"];
+        delete window["fetch"];
+        try {
+            await expect(async () => {
+                return await fetchScriptData("Lookup.Test");
+            }).rejects.toMatch("The fetch method is not available!");
+        }
+        finally {
+            window["fetch"] = orgFetch;
+        }
+    });
+
+    it("returns a rejected promise if response.ok is false", async () => {
+        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        let orgFetch = window["fetch"];
+        let calls = 0;
+        let mockFetch = async (url: string, init: RequestInit) => {
+            calls++;
+            expect(url).toBe("/DynamicData/Lookup.Test?v=123");
+            return Promise.resolve({
+                ok: false,
+                status: 500,
+                statusText: 'Server error'
+            });
+        };
+        window["fetch"] = mockFetch as any;
+        try {
+            const logSpy = jest.spyOn(console, "log");
+            let notify = await import("./notify");
+            await expect(async () => {
+                await fetchScriptData("Lookup.Test")
+            }).rejects.toMatch("Server error");
+
+            expect(notify.notifyError).toHaveBeenCalledTimes(1);
+            expect(logSpy).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            window["fetch"] = orgFetch;
+        }
+    });
+
 });

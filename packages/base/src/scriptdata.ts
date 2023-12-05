@@ -57,7 +57,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
         return promise;
 
     if (typeof fetch === "undefined")
-        throw "The fetch method is not available!";
+        return Promise.reject("The fetch method is not available!");
 
     function cleanup() {
         delete fetchPromises[key];
@@ -77,7 +77,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
         cleanup();
         if (!response.ok) {
             handleScriptDataError(name, response.status, response.statusText ?? '');
-            return Promise.reject();
+            return Promise.reject(response.statusText ?? response.status?.toString() ?? "unknown");
         }
         const data = await response.json();
         if (name.startsWith("Lookup."))
