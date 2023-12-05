@@ -1,7 +1,7 @@
 ﻿var Config = {
     /**
      * This is the root path of your application. If your application resides under http://localhost/mysite/,
-     * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
+     * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
      * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
      */
     applicationPath: '/',
