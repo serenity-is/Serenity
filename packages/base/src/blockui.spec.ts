@@ -84,4 +84,16 @@ describe("blockUI", () => {
         expect(div).toBeNull();
     });
 
+    it("ignores multiple blockUndo", () => {
+        blockUI();
+        let div = document.querySelector("div.blockUI.blockOverlay");
+        expect(div).toBeDefined();
+        blockUndo();
+        div = document.querySelector("div.blockUI.blockOverlay");
+        expect(div).toBe(null);
+        blockUndo();
+        div = document.querySelector("div.blockUI.blockOverlay");
+        expect(div).toBe(null);
+    });
+
 });
