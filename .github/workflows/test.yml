@@ -57,11 +57,11 @@ jobs:
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
 
-    - name: base package tests
+    - name: base tests
       run: pnpm test
       working-directory: "packages/base"
 
-    - name: base package tests
+    - name: base-ui tests
       run: pnpm test
       working-directory: "packages/base-ui"
 
