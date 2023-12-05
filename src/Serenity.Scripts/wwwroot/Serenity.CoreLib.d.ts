@@ -3651,18 +3651,11 @@ declare namespace Serenity {
         get_isValid(): boolean;
     }
 
-    let datePickerIconSvg: string;
+    const datePickerIconSvg: string;
     class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
         constructor(input: JQuery);
-        static useFlatpickr: boolean;
-        static flatPickrOptions(input: JQuery): {
-            clickOpens: boolean;
-            allowInput: boolean;
-            dateFormat: string;
-            onChange: () => void;
-        };
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
@@ -3685,8 +3678,15 @@ declare namespace Serenity {
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
         static dateInputChange: (e: JQueryEventObject) => void;
+        static dateInputKeyup(e: JQueryKeyEventObject): void;
+        static useFlatpickr: boolean;
+        static flatPickrOptions(input: JQuery): {
+            clickOpens: boolean;
+            allowInput: boolean;
+            dateFormat: string;
+            onChange: () => void;
+        };
         static flatPickrTrigger(input: JQuery): JQuery;
-        static dateInputKeyup(e: JQueryEventObject): void;
         static uiPickerZIndexWorkaround(input: JQuery): void;
     }
 

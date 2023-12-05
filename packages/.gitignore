@@ -1,6 +1,4 @@
 coverage/
 out/
-/corelib/dist/**/*.js
-/corelib/dist/**/*.map
-/base/dist/**/*.js
-/base/dist/**/*.map
+/*/dist/**/*.js
+/*/dist/**/*.map

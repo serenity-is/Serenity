@@ -13,7 +13,6 @@
     "flatpickr": "4.6.13",
     "rollup": "4.3.1",
     "rollup-plugin-dts": "6.1.0",
-    "rollup-plugin-cleanup": "3.2.1",
     "terser": "5.24.0",
     "tslib": "2.6.2",
     "typescript": "5.2.2"

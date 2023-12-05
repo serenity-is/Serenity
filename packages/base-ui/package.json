@@ -1,19 +1,14 @@
 {
-  "name": "@serenity-is/corelib",
+  "name": "@serenity-is/base-ui",
   "version": "8.0.6",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
-  "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
+  "description": "Serenity Base UI functions",
   "dependencies": {
-    "@serenity-is/sleekgrid": "1.6.3",
-    "@types/jquery": "2.0.48",
-    "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
     "@serenity-is/base": "workspace:*",
-    "@serenity-is/base-ui": "workspace:*",
-    "@types/jest": "29.5.8",
-    "tslib": "2.6.2"
+    "@types/jest": "29.5.8"
   },
   "exports": {
     ".": {
@@ -33,7 +28,7 @@
     "css/**/*.css",
     "src/**/*.ts",
     "src/**/*.css",
-    "src/**/tsconfig.json"
+    "tsconfig.json"
   ],
   "homepage": "https://github.com/serenity-is/serenity/#readme",
   "keywords": [
@@ -43,11 +38,11 @@
     "framework"
   ],
   "license": "MIT",
-  "repository": "https://github.com/serenity-is/serenity/packages/corelib",
+  "repository": "https://github.com/serenity-is/serenity/packages/base-ui",
   "scripts": {
     "build": "rollup -c && node build/build",
     "test": "pnpm build && pnpm jest --coverage",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src"
+    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/base-ui --json ./out/typedoc.json src"
   },
   "type": "module"
 }

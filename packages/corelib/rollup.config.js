@@ -4,7 +4,6 @@ import fs from 'fs';
 import { basename, resolve } from "path";
 import { dts } from "rollup-plugin-dts";
 import { minify } from "terser";
-import cleanup from "rollup-plugin-cleanup";
 
 var externalPackages = ["@serenity-is/sleekgrid"];
 
@@ -31,7 +30,7 @@ const replaceTypeRef = function(src, name, rep) {
 
 function moduleToGlobalName(fromModule) {
     return fromModule == "@serenity-is/sleekgrid" ? 'Slick' :
-        (fromModule == "@serenity-is/base" ? 'Serenity' : null);
+        ((fromModule == "@serenity-is/base" || fromModule == "@serenity-is/base-ui") ? 'Serenity' : null);
 }
 
 const convertModularToGlobal = (src, ns, isTS) => {
@@ -208,7 +207,7 @@ const mergeReferenceTypeComments = (src) => {
 }
 
 const nodeResolvePlugin = () => nodeResolve({
-    resolveOnly: ['@serenity-is/base']
+    resolveOnly: ['@serenity-is/base', '@serenity-is/base-ui']
 });    
 
 export default [
@@ -257,8 +256,7 @@ export default [
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
-            }),
-            cleanup({ comments: "istanbul", extensions: ["js", "ts"] })
+            })
         ],
         external: externalPackages
     },

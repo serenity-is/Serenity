@@ -1,0 +1,12 @@
+﻿{
+  "extends": "@serenity-is/base/tsconfig.base.json",
+  "compilerOptions": {
+    "experimentalDecorators": false,
+    "declarationDir": "./out",
+    "rootDir": "./src",
+    "outDir": "./out",
+  },
+  "include": [
+    "src"
+  ]
+}
