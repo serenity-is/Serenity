@@ -1,6 +1,6 @@
 import { resolveUrl, resolveServiceUrl } from "./services";
 
-jest.mock("./Config", () => ({
+jest.mock("./config", () => ({
     __esModule: true,
     Config: {
         applicationPath: "/app/"
