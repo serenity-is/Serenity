@@ -2047,7 +2047,6 @@ declare namespace Serenity {
         private previousToast;
         options: ToastrOptions;
         constructor(options?: ToastrOptions);
-        private createContainer;
         getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
         error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
         warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
@@ -2055,13 +2054,9 @@ declare namespace Serenity {
         info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
         subscribe(callback: (response: Toastr) => void): void;
         publish(args: Toastr): void;
-        clear(toastElement?: HTMLElement | null, clearOptions?: {
-            force?: boolean;
-        }): void;
-        remove(toastElement?: HTMLElement | null): void;
-        removeToast(toastElement: HTMLElement, options?: ToastrOptions): void;
-        private clearContainer;
-        private clearToast;
+        private removeContainerIfEmpty;
+        removeToast(toastElement: HTMLElement, options?: ToastContainerOptions): void;
+        clear(options?: ToastContainerOptions): void;
         private notify;
     }
 

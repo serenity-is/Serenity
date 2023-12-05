@@ -86,35 +86,26 @@ export class Toastr {
 
     public constructor(options?: ToastrOptions) {
         this.options = Object.assign(Object.assign({}, initialInstance?.options ?? initialOptions), options);
-        this.createContainer(options);
-    }
-
-    private createContainer(options: ToastContainerOptions = this.options): HTMLElement {
-        var container = document.createElement('div');
-
-        container.setAttribute('id', options.containerId);
-        if (options.positionClass)
-            toggleClass(container, options.positionClass, true);
-
-        const target = document.getElementsByTagName(options.target);
-
-        if (target && target[0]) {
-            target[0].appendChild(container);
-        }
-
-        return container;
     }
 
     public getContainer(options?: ToastContainerOptions, create = false): HTMLElement {
-        const container = document.getElementById(options?.containerId ?? this.options.containerId);
-
-        if (container)
+        let container = document.getElementById(options?.containerId ?? this.options.containerId);
+        if (container || !create)
             return container;
 
-        if (create)
-            return this.createContainer(options ?? this.options);
+        container = document.createElement('div');
 
-        return null;
+        container.setAttribute('id', this.options.containerId);
+        let positionClass = options?.positionClass ?? this.options.positionClass;
+        if (positionClass)
+            toggleClass(container, positionClass, true);
+
+        let targetSelector = options?.target ?? this.options.target;
+        const target = document.querySelector(targetSelector);
+        if (target)
+            target.appendChild(container);
+    
+        return container;            
     }
 
     public error(
@@ -181,85 +172,35 @@ export class Toastr {
         this.listener(args);
     }
 
-    public clear(toastElement?: HTMLElement | null, clearOptions: { force?: boolean } = {}) {
-        if (!this.clearToast(toastElement, this.options, clearOptions)) {
-            this.clearContainer(this.options);
-        }
-    }
-
-    public remove(toastElement?: HTMLElement | null) {
-        var container = this.getContainer(this.options);
+    private removeContainerIfEmpty(options?: ToastrOptions) {
+        let container = this.getContainer(options);
         if (!container)
             return;
-
-        if (toastElement && toastElement !== document.activeElement) {
-            this.removeToast(toastElement);
-
-            return;
-        }
-
-        if (!container.hasChildNodes()) {
-            const parentNode = container.parentElement;
-
-            if (parentNode) {
-                parentNode.removeChild(container);
-            }
-        }
+        if (!container.hasChildNodes() && container.parentNode)
+            container.parentNode.removeChild(container);
     }
 
-    public removeToast(toastElement: HTMLElement, options = this.options) {
-        var container = this.getContainer(options);
-
-        if (!container || !toastElement.parentNode) {
+    public removeToast(toastElement: HTMLElement, options?: ToastContainerOptions) {
+        if (!toastElement)
             return;
-        }
 
-        // todo set after visible state
-        // as this will be a transition of css
-        toastElement.parentNode.removeChild(toastElement);
-        // check if visible
-        if (toastElement.offsetWidth > 0 && toastElement.offsetHeight > 0) {
-            return;
-        }
-
-        if (!container.hasChildNodes()) {
-            if (container.parentNode) {
-                container.parentNode.removeChild(container);
-            }
-
+        if (toastElement !== document.activeElement) {
+            toastElement.parentNode?.removeChild(toastElement);
             this.previousToast = null;
+            this.removeContainerIfEmpty(options);
         }
     }
 
-    private clearContainer(options: Partial<ToastrOptions> = this.options) {
-        var container = this.getContainer(options);
+    public clear(options?: ToastContainerOptions) {
+        let container = this.getContainer(options);
         if (!container)
             return;
 
         const toastsToClear = Array.from(container.childNodes) as HTMLElement[];
+        for (let i = toastsToClear.length - 1; i >= 0; i -= 1)
+            this.removeToast(toastsToClear[i], options);
 
-        for (let i = toastsToClear.length - 1; i >= 0; i -= 1) {
-            this.clearToast(toastsToClear[i]);
-        }
-    }
-
-    private clearToast(
-        toastElement?: HTMLElement | null,
-        options?: ToastContainerOptions,
-        clearOptions: { force?: boolean } = {},
-    ): boolean {
-        if (!toastElement) {
-            return false;
-        }
-
-        const force = clearOptions.force || false;
-
-        if (toastElement && (force || toastElement !== document.activeElement)) {
-            this.removeToast(toastElement, options);
-            return true;
-        }
-
-        return false;
+        this.removeContainerIfEmpty();
     }
 
     private notify(map: NotifyMap, opt: ToastrOptions): HTMLElement | null {
@@ -289,9 +230,9 @@ export class Toastr {
         const toastElement = document.createElement('div');
         const $titleElement = document.createElement('div');
         const $messageElement = document.createElement('div');
-        const createdElement = document.createElement('div');
-        createdElement.innerHTML = opt.closeHtml.trim();
-        const closeElement = createdElement.firstChild as HTMLElement | null;
+        const closeContainer = document.createElement('div');
+        closeContainer.innerHTML = opt.closeHtml.trim();
+        const closeElement = closeContainer.firstChild as HTMLElement | null;
 
         const response: any = {
             toastId: this.toastId,
