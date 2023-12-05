@@ -4,6 +4,7 @@ export default {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base',
+    '^@serenity-is/base-ui$': '<rootDir>/node_modules/@serenity-is/base-ui',
     '^@serenity-is/corelib$': '<rootDir>/src',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid',
     '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
