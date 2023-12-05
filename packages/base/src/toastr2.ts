@@ -321,7 +321,8 @@ export class Toastr {
                         opt.onclick(event);
                     }
 
-                    hideToast();
+                    if (opt.tapToDismiss)
+                        hideToast();
                 });
             }
         };

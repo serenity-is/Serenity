@@ -9,8 +9,8 @@ export let defaultNotifyOptions: ToastrOptions = {
     positionClass: 'position-toast toast-top-full-width'
 }
 
-export function positionToastContainer(options?: ToastrOptions) {
-    let container = toastr.getContainer(options, true);
+export function positionToastContainer(options?: ToastrOptions, create = true) {
+    let container = toastr.getContainer(options, create);
     if (!container || !container.classList.contains('position-toast') || typeof document === "undefined" || !document.body)
         return;
 

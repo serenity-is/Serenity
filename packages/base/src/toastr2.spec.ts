@@ -77,8 +77,78 @@ describe('Toastr', () => {
         expect(toastr.getContainer()).toBeNull();
     });
 
-    it('can add a close button', () => {
+    it('hides toasts', (done) => {
+        let onHidden = jest.fn(() => {});
+        const toast = toastr.info('Test', null, {
+            onHidden,
+            timeOut: 1
+        });
+        setTimeout(() => {
+            try {
+                expect(onHidden).toHaveBeenCalledTimes(1);
+            }
+            finally {
+                done();
+            }
+        }, 5);
+    });
 
+    it('does not create duplicate toast if preventDuplicates is true', () => {
+        const toast1 = toastr.info('Test Message', null, {
+            preventDuplicates: true
+        });
+        expect(toast1).toBeDefined();
+        const toast2 = toastr.info('Test Message', null, {
+            preventDuplicates: true
+        });
+        expect(toast2).toBeNull();
+    });
+
+    it('adds rtl to classlist if rtl is true', () => {
+        const toast = toastr.info('Test Message', null, {
+            rtl: true
+        });
+        expect(toast).toBeDefined();
+        expect(toast.classList.contains("rtl")).toBe(true);
+    });
+
+    it('can create a close button', (done) => {
+        const toast = toastr.info('Test Message', null, {
+            closeButton: true,
+            closeClass: 'my-close-button',
+            timeOut: 1000,
+            closeDuration: false
+        });
+        expect(toast).toBeDefined();
+        let closeButton = toast.querySelector('.my-close-button') as HTMLElement;
+        expect(closeButton).toBeDefined();
+        closeButton.click();
+        setTimeout(() => {
+            try {
+                expect(toast.parentElement).toBeNull();
+            }
+            finally {
+                done();
+            }
+        }, 0);
+    });
+
+    it('can does not close if tapToDismiss is false and onClick is null', (done) => {
+        const toast = toastr.info('Test Message', null, {
+            tapToDismiss: false,
+            timeOut: 1000,
+            closeDuration: false
+        });
+        expect(toast).toBeDefined();
+        toast.click();
+        setTimeout(() => {
+            try {
+                expect(toast.parentElement).not.toBeNull();
+            }
+            finally {
+                done();
+            }
+        }, 0);
     });
 });
 

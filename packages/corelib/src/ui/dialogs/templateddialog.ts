@@ -1,5 +1,5 @@
 ﻿import validator from "@optionaldeps/jquery.validation";
-import { Config, DialogButton, bsModalMarkup, closePanel, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
+import { Config, DialogButton, bsModalMarkup, closePanel, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
 import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { getAttributes, isMobileView, layoutFillHeight, newBodyDiv, validateOptions } from "../../q";
@@ -309,7 +309,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             var element = this.element;
             this.destroy();
             element.remove();
-            positionToastContainer(false, null);
+            positionToastContainer(defaultNotifyOptions, false);
         }, 0);
     }
 

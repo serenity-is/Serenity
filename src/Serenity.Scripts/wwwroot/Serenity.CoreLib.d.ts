@@ -1252,7 +1252,7 @@ declare namespace Serenity {
     var Config: {
         /**
          * This is the root path of your application. If your application resides under http://localhost/mysite/,
-         * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
+         * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
          * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
          */
         applicationPath: string;
@@ -2061,11 +2061,11 @@ declare namespace Serenity {
     }
 
     let defaultNotifyOptions: ToastrOptions;
-    function positionToastContainer(create: boolean, options?: ToastrOptions): void;
-    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
-    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+    function positionToastContainer(options?: ToastrOptions, create?: boolean): void;
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
 
     function resolveUrl(url: string): string;
     function resolveServiceUrl(url: string): string;

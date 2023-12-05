@@ -13,7 +13,7 @@ declare function blockUndo(): void;
 declare var Config: {
     /**
      * This is the root path of your application. If your application resides under http://localhost/mysite/,
-     * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
+     * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
      * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
      */
     applicationPath: string;
@@ -822,11 +822,11 @@ declare class Toastr {
 }
 
 declare let defaultNotifyOptions: ToastrOptions;
-declare function positionToastContainer(create: boolean, options?: ToastrOptions): void;
-declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
-declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+declare function positionToastContainer(options?: ToastrOptions, create?: boolean): void;
 declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
 
 declare function resolveUrl(url: string): string;
 declare function resolveServiceUrl(url: string): string;
