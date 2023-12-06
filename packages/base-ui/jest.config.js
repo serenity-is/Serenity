@@ -2,7 +2,7 @@ export default {
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
-    '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base',
+    '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base/src/index.ts',
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transformIgnorePatterns: [],
