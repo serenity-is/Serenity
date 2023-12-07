@@ -4,7 +4,7 @@ namespace Serenity.Abstractions;
 /// <summary>
 /// Interface to access absolute base URL for current site,
 /// including the PathBase. Useful for reporting callbacks, 
-/// or e-mails etc.
+/// or emails etc.
 /// </summary>
 public interface ISiteAbsoluteUrl
 {
@@ -20,7 +20,7 @@ public interface ISiteAbsoluteUrl
 
     /// <summary>
     /// Returns the absolute external/public url of the current site,
-    /// used to generate links for activation e-mails etc. 
+    /// used to generate links for activation emails etc. 
     /// The default implementation builds it from one of these in this order:
     /// 1) The current http request base url if available, 
     /// 2) EnvironmentSettings:SiteExternalUrl setting
