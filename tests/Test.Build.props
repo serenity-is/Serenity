@@ -5,8 +5,6 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <ArtifactsPath>$(MSBuildThisFileDirectory)..\build\artifacts</ArtifactsPath>
-    <ArtifactsPath Condition="Exists('$(MSBuildThisFileDirectory)..\..\build')">$(MSBuildThisFileDirectory)..\..\build\artifacts</ArtifactsPath>
     <ReferenceSelenium>false</ReferenceSelenium>
     <ReferenceTestSdk>true</ReferenceTestSdk>
     <UsingSerenity>true</UsingSerenity>
