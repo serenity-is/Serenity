@@ -33,8 +33,12 @@ export class Lookup<TItem> {
         this.items = [];
         this.itemById = {};
         if (value) {
-            for (var k of value)
-                this.items.push(k);
+            for (var k of value) {
+                if (k == null || typeof k !== "object") // special case for distinct lookup
+                    this.items.push({ [this.idField]: k, [this.textField]: k } as any);
+                else
+                    this.items.push(k);
+            }
         }
         var idField = this.idField;
         if (idField) {
