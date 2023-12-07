@@ -1,3 +1,9 @@
+## 8.0.7 (2023-12-07)
+
+### Bugfixes:
+- Special case for distinct lookup scripts returning array of values instead of objects, causing distinct lookup scripts to fail displaying properly when fetched via DynamicData endpoint
+- Enum flags editor was broken after recent updates
+
 ## 8.0.5 (2023-12-04)
 
 ### Bugfixes:
