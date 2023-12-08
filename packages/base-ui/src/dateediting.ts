@@ -204,7 +204,7 @@ export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement, jQuery
         return;
     setTimeout(() => {
         let widget = jQuery(input).datepicker('widget');
-        if (!widget.length)
+        if (!widget || !widget.length)
             return;
         let zIndex = parseInt(widget.css('z-index'));
         if (!isNaN(zIndex) && zIndex <= dialogIndex)

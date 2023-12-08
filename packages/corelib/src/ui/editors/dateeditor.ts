@@ -28,7 +28,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
                 beforeShow: (inp: any, inst: any) => {
                     if (input.hasClass('readonly') as any)
                         return false as any;
-                    DateEditor.uiPickerZIndexWorkaround(this.element);
+                    DateEditor.uiPickerZIndexWorkaround(input);
                     return true;
                 },
                 yearRange: (this.yearRange ?? '-100:+50')
@@ -220,7 +220,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     }
 
     public static uiPickerZIndexWorkaround(input: JQuery) {
-        if (!input.length)
+        if (!input?.length)
             return;
         jQueryDatepickerZIndexWorkaround(input.get(0) as HTMLInputElement, $);
     }
