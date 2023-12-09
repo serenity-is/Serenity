@@ -1,3 +1,12 @@
+## 8.0.8 (2023-12-09)
+
+### Features:
+- Replace E-Mail with Email and e-mail with email in texts for consistency and it seems like it is now the accepted norm
+
+### Bugfixes:
+- Fix error in uiPickerZIndexWorkaround
+- Fix MailboxLoginView demo and predefined logins in Serenity.Pro.EmailClient
+
 ## 8.0.7 (2023-12-07)
 
 ### Bugfixes:
