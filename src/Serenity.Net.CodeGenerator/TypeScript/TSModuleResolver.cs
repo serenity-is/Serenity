@@ -69,6 +69,13 @@ public partial class TSModuleResolver
             remaining = remaining[1..];
         if (remaining.Length > 0)
         {
+            if (remaining.StartsWith(".dotnet/"))
+            {
+                remaining = remaining[(".dotnet/".Length)..];
+                if (remaining.Length == 0)
+                    return null;
+            }
+
             var parts = remaining.Split(slashSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (remaining.StartsWith('@'))
                 return string.Join("/", parts.Take(2));

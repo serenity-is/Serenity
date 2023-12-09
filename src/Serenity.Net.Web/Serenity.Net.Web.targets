@@ -1,22 +1,34 @@
 <Project>
   <PropertyGroup>
-    <CompileTypeScriptDependsOn>
-      RestoreTypings;
-      $(CompileTypeScriptDependsOn)
-    </CompileTypeScriptDependsOn>
+    <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">true</RestoreNodeTypes>
+    <CompileTypeScriptDependsOn Condition="'$(RestoreNodeTypes)' != 'false'">RestoreNodeTypes;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
+    <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
+    <CompileTypeScriptDependsOn Condition="'$(RestoreTypings)' != 'false'">RestoreTypings;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="texts\resources\**\*.json" />
     <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
-  </ItemGroup>  
+  </ItemGroup>
+  <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
+    <ItemGroup>
+      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*"
+            Condition="'$(RestoreNodeTypes)' != 'false' And !Exists($([System.String]::Copy('node_modules\%(ProjectReference.NuGetPackageId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
+        <PackageId>$([System.String]::Copy('%(ProjectReference.Filename)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())</PackageId>
+      </_NodeTypeToRestore>
+      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*"
+            Condition="'$(RestoreNodeTypes)' != 'false' And !Exists($([System.String]::Copy('node_modules\%(RuntimeCopyLocalItems.NuGetPackageId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
+        <PackageId>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())</PackageId>
+      </_NodeTypeToRestore>
+      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(PackageId)%\dist\%(RecursiveDir)%(Filename)%(Extension)')" />
+    </ItemGroup>
+    <Delete Files="@(_NodeTypeDeleteFiles)" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\%(PackageId)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(PackageId)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
   <Target Name="RestoreTypings"
-          BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
-          DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences"
-          Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
-    <PropertyGroup>
-      <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
-      <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And Exists('$(MSBuildProjectDirectory)\tsbuild.js')">true</RestoreNodeTypes>
-    </PropertyGroup>
+        BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+        DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences;RestoreNodeTypes"
+        Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
     <ItemGroup>
       <!--project reference typing, serenity.scripts -->
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts"
@@ -39,34 +51,6 @@
                         Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/'))">
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules mock types from project reference dist\index.d.ts files -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
-                        And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts')
-                        And !Exists(@(ProjectReference->'node_modules\%(Filename)\package.json'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant()))">
-        <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules index.js script from project reference dist\index.js files -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.js"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
-                        And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.js')
-                        And !Exists(@(ProjectReference->'node_modules\%(Filename)\package.json'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant()))">
-        <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.js</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules mock types from package reference dist\index.d.ts files -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
-                        And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.d.ts')
-                        And !Exists($([System.String]::Copy('node_modules\%(StaticWebAsset.SourceId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules index.js script from package reference dist\index.js files -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.js"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
-                        And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.js')
-                        And !Exists($([System.String]::Copy('node_modules\%(StaticWebAsset.SourceId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.js</TargetFile>
       </_TypingToRestore>
     </ItemGroup>
     <Copy SourceFiles="@(_TypingToRestore)" DestinationFiles="@(_TypingToRestore->'%(TargetFile)'->ToLowerInvariant())" SkipUnchangedFiles="true" />
