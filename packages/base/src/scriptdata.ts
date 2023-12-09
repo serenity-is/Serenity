@@ -59,31 +59,48 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
     if (typeof fetch === "undefined")
         return Promise.reject("The fetch method is not available!");
 
-    function cleanup() {
-        delete fetchPromises[key];
-        typeof jQuery !== "undefined" && typeof jQuery.active === "number" && !(--jQuery.active) && jQuery.event?.trigger?.("ajaxStop");
-        blockUndo();
-    }
+    return fetchPromises[key] = (async function () {
+        try {
+            blockUI();
+            try {
+                let url = resolveUrl('~/DynamicData/') + name + '?v=' +
+                    (getScriptDataHash(name) ?? new Date().getTime());
 
-    blockUI();
-    typeof jQuery !== "undefined" && typeof jQuery.active === "number" && (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
-    return fetchPromises[key] = promise = fetch(resolveUrl('~/DynamicData/') + name + '?v=' + (getScriptDataHash(name) ?? new Date().getTime()), {
-        method: 'GET',
-        cache: "force-cache",
-        headers: {
-            "Accept": "application/json"
+                typeof jQuery !== "undefined" && typeof jQuery.active === "number" &&
+                    (jQuery.active++ === 0) && jQuery.event?.trigger?.("ajaxStart");
+
+                try {
+                    var response = await fetch(url, {
+                        method: 'GET',
+                        cache: "force-cache",
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    });
+
+                    if (!response.ok) {
+                        handleScriptDataError(name, response.status, response.statusText ?? '');
+                        throw (response.statusText ?? response.status?.toString() ?? "unknown");
+                    }
+
+                    const data = await response.json();
+                    if (name.startsWith("Lookup."))
+                        return new Lookup(data.Params, data.Items);
+                    return data;
+                }
+                finally {
+                    typeof jQuery !== "undefined" && typeof jQuery.active === "number" &&
+                        !(--jQuery.active) && jQuery.event?.trigger?.("ajaxStop");
+                }
+            }
+            finally {
+                blockUndo();
+            }
         }
-    }).then(async response => {
-        cleanup();
-        if (!response.ok) {
-            handleScriptDataError(name, response.status, response.statusText ?? '');
-            return Promise.reject(response.statusText ?? response.status?.toString() ?? "unknown");
+        finally {
+            delete fetchPromises[key];
         }
-        const data = await response.json();
-        if (name.startsWith("Lookup."))
-            return new Lookup(data.Params, data.Items);
-        return data;
-    }, cleanup);
+    })();
 }
 
 /**
@@ -102,7 +119,7 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
     else if ((data = peekScriptData(name)) != null)
         return data;
 
-    data = await fetchScriptData(name);
+    data = await fetchScriptData<TData>(name);
     setScriptData(name, data);
     return data;
 }
