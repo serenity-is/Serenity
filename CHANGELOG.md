@@ -1,3 +1,10 @@
+## 8.0.9 (2023-12-10)
+
+### Features:
+- Also restore node types for project/package references to "./node_modules/.dotnet/" so that these files don't get erased during npm install, leading to typescript compilation warnings during initial project creation. Need to include `"./node_modules/.dotnet/@serenity-is/*/dist/index"` in tsconfig.json `@serenity-is/*` paths mapping array for it to work.
+- Try to run RestoreNodeTypes target also in design time builds. It is recommended to replace `"prepare": "dotnet build -target:RestoreTypings"` line with `"prepare": "dotnet build -target:RestoreNodeTypes"` if you only use modular code.
+- Changed fetchScriptData logic to better handle exceptions. Increase test coverage for lookup and scriptdata methods.
+
 ## 8.0.8 (2023-12-09)
 
 ### Features:
