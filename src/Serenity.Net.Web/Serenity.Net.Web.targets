@@ -34,7 +34,7 @@ foreach (var folderName in (FolderNames ?? "").Split(new char[] { ';' }, StringS
     ""."": {
       ""types"": ""./dist/index.d.ts"",
       ""import"": ""./dist/index.js""
-    },
+    }
   },
   ""main"": ""dist/index.js"",
   ""import"": ""dist/index.js"",
