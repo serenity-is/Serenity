@@ -1,3 +1,8 @@
+## 8.1.1 (2023-12-10)
+
+### Features:
+- Implemented a better method for installing node types from NuGet packages and project references. Just remove "prepare" script in package.json and add "preinstall": "dotnet build -target:RestoreNodeTypes". Serenity will automatically install nuget/package refs to node_modules/.dotnet directory and patch your package.json so that there is a reference to every library that is referenced by your project. This will improve TypeScript experience. As the folder name under .dotnet will be created with the project/nuget package names (not npm package id) alternative path mapping for `@serenity-is/*` suggested in 8.0.9 will not be useful, and `@serenity-is/*` path mapping can be removed after upgrading.
+
 ## 8.1.0 (2023-12-10)
 
 ### Bugfixes:
@@ -6,7 +11,7 @@
 ## 8.0.9 (2023-12-10)
 
 ### Features:
-- Also restore node types for project/package references to "./node_modules/.dotnet/" so that these files don't get erased during npm install, leading to typescript compilation warnings during initial project creation. Need to include `"./node_modules/.dotnet/@serenity-is/*/dist/index"` in tsconfig.json `@serenity-is/*` paths mapping array for it to work.
+- Also restore node types for project/package references to "./node_modules/.dotnet/" so that these files don't get erased during npm install, leading to typescript compilation warnings during initial project creation. 
 - Try to run RestoreNodeTypes target also in design time builds. It is recommended to replace `"prepare": "dotnet build -target:RestoreTypings"` line with `"prepare": "dotnet build -target:RestoreNodeTypes"` if you only use modular code.
 - Changed fetchScriptData logic to better handle exceptions. Increase test coverage for lookup and scriptdata methods.
 
