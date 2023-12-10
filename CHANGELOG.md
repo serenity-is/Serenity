@@ -1,4 +1,6 @@
 ## 8.1.0 (2023-12-10)
+
+### Bugfixes:
 - Reverted running RestoreNodeTypes in design time build as it might be breaking NuGet restore order
 
 ## 8.0.9 (2023-12-10)
