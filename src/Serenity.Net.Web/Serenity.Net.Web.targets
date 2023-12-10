@@ -9,7 +9,7 @@
     <Content Remove="texts\resources\**\*.json" />
     <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
   </ItemGroup>
-  <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
+  <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" AfterTargets="CollectAnalyzersDesignTime;CollectUpToDateCheckInputDesignTime;CollectPackageReferences" Condition="'$(RestoreNodeTypes)' != 'false'">
     <ItemGroup>
       <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*"
             Condition="'$(RestoreNodeTypes)' != 'false' And !Exists($([System.String]::Copy('node_modules\%(ProjectReference.NuGetPackageId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
