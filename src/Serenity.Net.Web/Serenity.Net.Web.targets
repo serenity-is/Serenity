@@ -1,4 +1,100 @@
 <Project>
+  <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <FolderNames ParameterType="System.String" />
+      <PatchDependencies ParameterType="System.String" />
+    </ParameterGroup>    
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+<![CDATA[
+Dictionary<string, string> dotnetDeps = new Dictionary<string, string>();
+foreach (var folderName in (FolderNames ?? "").Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+{
+    var dotnetPackageDir = Path.Combine("node_modules", ".dotnet", folderName);
+    if (!Directory.Exists(dotnetPackageDir))
+        Directory.CreateDirectory(dotnetPackageDir);
+    var packageId = folderName.ToLowerInvariant();
+    var idx = packageId.IndexOf('.');
+    if (idx > 0)
+    {
+        var company = packageId.Substring(0, idx);
+        if (company == "serenity")
+          company = "serenity-is";
+        packageId = "@" + company + "/" + packageId.Substring(idx + 1);
+    }
+    var dotnetPackageJson = Path.Combine(dotnetPackageDir, "package.json");
+    var expectedContent = @"{
+  ""name"": """ + packageId.Replace("\"", "\\\"") + @""",
+  ""exports"": {
+    ""."": {
+      ""types"": ""./dist/index.d.ts"",
+      ""import"": ""./dist/index.js""
+    },
+  },
+  ""main"": ""dist/index.js"",
+  ""import"": ""dist/index.js"",
+  ""types"": ""dist/index.d.ts""
+}";
+
+    if (!File.Exists(dotnetPackageJson) || File.ReadAllText(dotnetPackageJson) != expectedContent)
+        File.WriteAllText(dotnetPackageJson, expectedContent);
+
+    dotnetDeps[packageId] = "file:./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
+}
+
+var packageJson = "package.json";
+if (PatchDependencies != "false" && File.Exists(packageJson)) 
+{
+    var oldJson = File.ReadAllText(packageJson);
+    var newJson = new Regex(@"(\s*""dependencies""\s*:\s*\{\s*)([^}]+)(\s*\})").Replace(oldJson, group =>
+    {
+        var depsText = new Regex("\"\\s*:\\s*\\s*\"").Replace(group.Groups[2].Value, "\":\"");
+
+        foreach (var line in depsText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim()))
+        {
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            var parts = line.Split(new string[] { "\":\"" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+            if (parts.Length != 2 || !parts[0].StartsWith("\"") || !parts[1].EndsWith("\""))
+            {
+                dotnetDeps[line] = null;
+                continue;
+            }
+
+            var name = parts[0].Substring(1);
+            var value = parts[1].Substring(0, parts[1].Length - 1);
+            if (!value.StartsWith("file:./node_modules/.dotnet/"))
+            {
+                dotnetDeps[name] = value;
+                continue;
+            }
+        }
+
+        var newDeps = string.Join(",\n    ",
+            dotnetDeps.Select(x => x.Value == null ? x.Key : ('"' + x.Key + "\": " + '"' + x.Value + '"'))
+                .OrderBy(x => x, StringComparer.Ordinal));
+
+        return group.Groups[1].Value +
+            newDeps + "\n  " +
+            group.Groups[3].Value;
+    }, 1).Replace("\r", "");
+
+
+    if (oldJson.Trim().Replace("\r", "") != newJson.Trim())
+      File.WriteAllBytes(packageJson, System.Text.Encoding.UTF8.GetBytes(newJson.Replace("\r", "")));
+} 
+]]>
+      </Code>
+    </Task>
+  </UsingTask>    
+
   <PropertyGroup>
     <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">true</RestoreNodeTypes>
     <CompileTypeScriptDependsOn Condition="'$(RestoreNodeTypes)' != 'false'">RestoreNodeTypes;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
@@ -11,19 +107,17 @@
   </ItemGroup>
   <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
     <ItemGroup>
-      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*"
-            Condition="'$(RestoreNodeTypes)' != 'false' And !Exists($([System.String]::Copy('node_modules\%(ProjectReference.NuGetPackageId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <PackageId>$([System.String]::Copy('%(ProjectReference.Filename)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())</PackageId>
+      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
+        <FolderName>%(ProjectReference.Filename)</FolderName>
       </_NodeTypeToRestore>
-      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*"
-            Condition="'$(RestoreNodeTypes)' != 'false' And !Exists($([System.String]::Copy('node_modules\%(RuntimeCopyLocalItems.NuGetPackageId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <PackageId>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())</PackageId>
+      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
+        <FolderName>%(RuntimeCopyLocalItems.NuGetPackageId)</FolderName>
       </_NodeTypeToRestore>
-      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(PackageId)%\dist\%(RecursiveDir)%(Filename)%(Extension)')" />
+      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct())" />
     </ItemGroup>
     <Delete Files="@(_NodeTypeDeleteFiles)" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\%(PackageId)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(PackageId)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
   </Target>
   <Target Name="RestoreTypings"
         BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
