@@ -1,3 +1,8 @@
+## 8.1.2 (2023-12-10)
+
+### Bugfixes:
+- Remove extra comma in generated package.json files, causing failure only with pnpm
+
 ## 8.1.1 (2023-12-10)
 
 ### Features:
