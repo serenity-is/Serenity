@@ -5,7 +5,7 @@
       <PatchDependencies ParameterType="System.String" />
     </ParameterGroup>    
     <Task>
-      <Reference Include="$(NugetPackageRoot)\newtonsoft.json\13.0.3\lib\netstandard2.0\Newtonsoft.Json.dll"/>
+      <Reference Include="$(NugetPackageRoot)newtonsoft.json/13.0.3/lib/netstandard2.0/Newtonsoft.Json.dll"/>
       <Using Namespace="System.Text.RegularExpressions" />
       <Using Namespace="Newtonsoft.Json" />
       <Using Namespace="Newtonsoft.Json.Linq" />
