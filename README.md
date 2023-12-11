@@ -13,9 +13,29 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 <img src="https://github.com/serenity-is/Serene/blob/master/build/assets/SereneAnimation.webp" />
 
+## Quickstart (Serene)
+
+> Premium customers can also use the StartSharp template which they can download from the [Serenity members area](https://serenity.is/Account/Login/).
+
+Ensure you have the necessary [requirements](https://serenity.is/docs/getting_started/README#prerequisites) installed.
+```bash
+# Install Serene.Templates package.
+> dotnet new install Serene.Templates
+
+# Create a new Serene project.
+> dotnet new serene -n MySereneApp
+
+# Navigate into your project folder.
+> cd MySereneApp/MySereneApp.Web
+
+# Install NPM packages, build the project, and run the project.
+> npm i && dotnet build && dotnet run
+```
+That's it! ✨ You can visit `http://localhost:5000` (actual port may vary, check the console after `dotnet run`) to see your running [Serene](https://github.com/serenity-is/Serene) application.
+
 ## Documentation and Tutorials
 
-See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/docs/) for documentation, and step-by-step tutorials.
+See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/docs/) for documentation and step-by-step tutorials.
 
 **Serenity Blog:**
 - https://serenity.is/blog/
