@@ -5,91 +5,85 @@
       <PatchDependencies ParameterType="System.String" />
     </ParameterGroup>    
     <Task>
-      <Using Namespace="System" />
-      <Using Namespace="System.Collections.Generic" />
-      <Using Namespace="System.IO" />
-      <Using Namespace="System.Linq" />
+      <Reference Include="$(NugetPackageRoot)\newtonsoft.json\13.0.3\lib\netstandard2.0\Newtonsoft.Json.dll"/>
       <Using Namespace="System.Text.RegularExpressions" />
+      <Using Namespace="Newtonsoft.Json" />
+      <Using Namespace="Newtonsoft.Json.Linq" />
       <Code Type="Fragment" Language="cs">
 <![CDATA[
-Dictionary<string, string> dotnetDeps = new Dictionary<string, string>();
-foreach (var folderName in (FolderNames ?? "").Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+try
 {
-    var dotnetPackageDir = Path.Combine("node_modules", ".dotnet", folderName);
-    if (!Directory.Exists(dotnetPackageDir))
-        Directory.CreateDirectory(dotnetPackageDir);
-    var packageId = folderName.ToLowerInvariant();
-    var idx = packageId.IndexOf('.');
-    if (idx > 0)
+    var newDeps = new Dictionary<string, string>();
+    foreach (var folderName in (FolderNames ?? "").Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
     {
-        var company = packageId.Substring(0, idx);
-        if (company == "serenity")
-          company = "serenity-is";
-        packageId = "@" + company + "/" + packageId.Substring(idx + 1);
-    }
-    var dotnetPackageJson = Path.Combine(dotnetPackageDir, "package.json");
-    var expectedContent = @"{
-  ""name"": """ + packageId.Replace("\"", "\\\"") + @""",
-  ""exports"": {
-    ""."": {
-      ""types"": ""./dist/index.d.ts"",
-      ""import"": ""./dist/index.js""
-    }
-  },
-  ""main"": ""dist/index.js"",
-  ""import"": ""dist/index.js"",
-  ""types"": ""dist/index.d.ts""
-}";
-
-    if (!File.Exists(dotnetPackageJson) || File.ReadAllText(dotnetPackageJson) != expectedContent)
-        File.WriteAllText(dotnetPackageJson, expectedContent);
-
-    dotnetDeps[packageId] = "file:./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
-}
-
-var packageJson = "package.json";
-if (PatchDependencies != "false" && File.Exists(packageJson)) 
-{
-    var oldJson = File.ReadAllText(packageJson);
-    var newJson = new Regex(@"(\s*""dependencies""\s*:\s*\{\s*)([^}]+)(\s*\})").Replace(oldJson, group =>
-    {
-        var depsText = new Regex("\"\\s*:\\s*\\s*\"").Replace(group.Groups[2].Value, "\":\"");
-
-        foreach (var line in depsText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(s => s.Trim()))
+        var pkgPath = Path.Combine("node_modules", ".dotnet", folderName);
+        Directory.CreateDirectory(pkgPath);
+        var pkgId = folderName.ToLowerInvariant();
+        var idx = pkgId.IndexOf('.');
+        if (idx > 0)
         {
-            if (string.IsNullOrEmpty(line))
-                continue;
-
-            var parts = line.Split(new string[] { "\":\"" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
-            if (parts.Length != 2 || !parts[0].StartsWith("\"") || !parts[1].EndsWith("\""))
-            {
-                dotnetDeps[line] = null;
-                continue;
-            }
-
-            var name = parts[0].Substring(1);
-            var value = parts[1].Substring(0, parts[1].Length - 1);
-            if (!value.StartsWith("file:./node_modules/.dotnet/"))
-            {
-                dotnetDeps[name] = value;
-                continue;
-            }
+            var company = pkgId.Substring(0, idx);
+            if (company == "serenity")
+                company = "serenity-is";
+            pkgId = "@" + company + "/" + pkgId.Substring(idx + 1);
         }
+        var pkgJson = Path.Combine(pkgPath, "package.json");
+        var expectedContent = JsonConvert.SerializeObject(new
+        {
+            name = pkgId,
+            exports = new Dictionary<string, object>
+            {
+                ["."] = new
+                {
+                    types = "./dist/index.d.ts",
+                    import = "./dist/index.js",
+                }
+            },
+            main = "dist/index.js",
+            import = "dist/index.js",
+            types = "dist/index.d.ts"
+        }, Formatting.Indented).Replace("\r", "");
 
-        var newDeps = string.Join(",\n    ",
-            dotnetDeps.Select(x => x.Value == null ? x.Key : ('"' + x.Key + "\": " + '"' + x.Value + '"'))
-                .OrderBy(x => x, StringComparer.Ordinal));
+        if (!File.Exists(pkgJson) || File.ReadAllText(pkgJson) != expectedContent)
+            File.WriteAllText(pkgJson, expectedContent);
 
-        return group.Groups[1].Value +
-            newDeps + "\n  " +
-            group.Groups[3].Value;
-    }, 1).Replace("\r", "");
+        newDeps[pkgId] = "file:./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
+    }
 
-
-    if (oldJson.Trim().Replace("\r", "") != newJson.Trim())
-      File.WriteAllBytes(packageJson, System.Text.Encoding.UTF8.GetBytes(newJson.Replace("\r", "")));
-} 
+    var packageJson = "package.json";
+    if (PatchDependencies != "false")
+    {
+        if (!File.Exists(packageJson))
+        {
+            Log.LogWarning("Can't find package.json");
+            return Success;
+        }
+        var oldJson = File.ReadAllText(packageJson).Replace("\r", "").Trim();
+        var root = JObject.Parse(oldJson);
+        var oldDeps = root?["dependencies"] as JObject;
+        if (oldDeps == null)
+        {
+            Log.LogWarning("Can't find dependencies node in package.json");
+            return Success;
+        }
+        foreach (var x in oldDeps)
+        {
+            if (!newDeps.ContainsKey(x.Key) &&
+                x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true)
+                newDeps[x.Key] = x.Value.Value<string>();
+        }
+        oldDeps.RemoveAll();
+        foreach (var x in newDeps.OrderBy(x => x.Key, StringComparer.Ordinal))
+            oldDeps.Add(x.Key, x.Value);
+        var newJson = root.ToString().Replace("\r", "");
+        if (oldJson != newJson)
+            File.WriteAllBytes(packageJson, Encoding.UTF8.GetBytes(newJson.Replace("\r", "")));
+    }
+}
+catch (Exception ex)
+{
+    Log.LogWarning("Error during RestoreNodeTypesTask: " + ex.ToString());
+}
 ]]>
       </Code>
     </Task>
