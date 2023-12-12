@@ -15,7 +15,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 ## Quickstart (Serene)
 
-> Premium customers can also use the StartSharp template which they can download from the [Serenity members area](https://serenity.is/Account/Login/).
+> Premium customers should use the StartSharp template which they can download from the [Serenity members area](https://serenity.is/Account/Login/).
 
 Ensure you have the necessary [requirements](https://serenity.is/docs/getting_started/README#prerequisites) installed.
 ```bash
