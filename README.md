@@ -28,8 +28,11 @@ Ensure you have the necessary [requirements](https://serenity.is/docs/getting_st
 # Navigate into your project folder.
 > cd MySereneApp/MySereneApp.Web
 
-# Install NPM packages, build the project, and run the project.
-> npm i && dotnet build && dotnet run
+# Install NPM packages.
+> npm i
+
+# Build and run the project.
+> dotnet run
 ```
 That's it! ✨ You can visit `http://localhost:5000` (actual port may vary, check the console after `dotnet run`) to see your running [Serene](https://github.com/serenity-is/Serene) application.
 
