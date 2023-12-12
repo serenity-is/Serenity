@@ -1,4 +1,7 @@
+artifacts/
 coverage/
 out/
 /*/dist/**/*.js
 /*/dist/**/*.map
+/*/wwwroot/**/*.js
+/*/wwwroot/**/*.map

@@ -16,6 +16,4 @@ Thumbs.db
 ErrorLog.db
 StyleCop.Cache
 /build/tools/Addins/
-/src/Serenity.Scripts/wwwroot/**/*.js
-/src/Serenity.Scripts/wwwroot/**/*.map
 package-lock.json

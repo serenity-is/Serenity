@@ -1,0 +1,16 @@
+<Project>
+  <Import Project="..\src\RestoreNpmPackages.targets" />
+  <PropertyGroup>
+    <StaticWebAssetBasePath Condition="$('StaticWebAssetBasePath') == ''">/$(AssemblyName)</StaticWebAssetBasePath>
+    <ESMAssetBasePath Condition="$('ESMAssetBasePath') == ''">$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
+    <ProjectCapability Include="TypeScriptNuGet" />
+  </ItemGroup>
+  <Target Name="IncludeTypingsToPackage" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="@(TypingsToPackage)" Pack="true" PackagePath="%(TypingsToPackage.PackagePath)" />
+    </ItemGroup>
+  </Target>
+</Project>

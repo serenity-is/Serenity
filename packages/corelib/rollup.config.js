@@ -24,7 +24,7 @@ var rxReExports = /^\s*export\s*\{([\sA-Za-z0-9_,\$]*)\}\s*from\s*['"](.*)['"]\s
 var rxModuleAugmentation = /^(declare\s+module\s*['"]([A-Za-z\/@\-]+)['"]\s*\{\r?\n)((^\s+.*\r?\n)*)?\}/gm;
 var referenceTypeCommentsRegex = /^\/\/\/\s*\<reference\s*types\=\".*\r?\n/gm
 
-const replaceTypeRef = function(src, name, rep) {
+const replaceTypeRef = function (src, name, rep) {
     return src.replace(new RegExp('([<>:,]\\s*)' + name.replace('$', '\\$') + '([^A-Za-z0-9_\\$])', 'g'), (m, p1, p2) => p1 + rep + p2);
 }
 
@@ -140,7 +140,7 @@ const convertModularToGlobal = (src, ns, isTS) => {
                 if (/^export\sinterface\s+/.test(s))
                     return '    ' + (isTS ? 'export ' : '') + s.substring(7);
                 if (rxClassTypeIntfEnum.test(s))
-                    return '    ' + (isTS ? 'export ': '') + s;
+                    return '    ' + (isTS ? 'export ' : '') + s;
                 return '    ' + s;
             }).join('\n') + '\n}'
     }
@@ -156,7 +156,7 @@ var toGlobal = function (ns, outFile, isTS) {
         name: 'toGlobal',
         generateBundle(o, b) {
             for (var fileName of Object.keys(b)) {
-				if (b[fileName].code && fileName.indexOf('.bundle.d.ts') >= 0) {
+                if (b[fileName].code && fileName.indexOf('bundle.d.ts') >= 0) {
                     var src = b[fileName].code;
                     src = convertModularToGlobal(src, ns, isTS);
                     if (outFile) {
@@ -167,7 +167,7 @@ var toGlobal = function (ns, outFile, isTS) {
 
                         var toEmit = {
                             type: 'asset',
-                            fileName: fileName.replace('.bundle.d.ts', '.global.d.ts'),
+                            fileName: fileName.replace('bundle.d.ts', 'bundle.global.d.ts'),
                             source: src
                         };
                         this.emitFile(toEmit);
@@ -208,14 +208,14 @@ const mergeReferenceTypeComments = (src) => {
 
 const nodeResolvePlugin = () => nodeResolve({
     resolveOnly: ['@serenity-is/base', '@serenity-is/base-ui']
-});    
+});
 
 export default [
     {
         input: "src/index.ts",
         output: [
             {
-                file: './out/Serenity.CoreLib.js',
+                file: './out/index.global.js',
                 format: "iife",
                 sourcemap: true,
                 sourcemapExcludeSources: false,
@@ -249,7 +249,7 @@ export default [
             }
         ],
         plugins: [
-            nodeResolvePlugin(),        
+            nodeResolvePlugin(),
             typescript({
                 tsconfig: 'tsconfig.json',
                 resolveJsonModule: true,
@@ -262,7 +262,7 @@ export default [
     },
     {
         input: "./out/index.d.ts",
-        output: [{ 
+        output: [{
             file: "./out/index.bundle.d.ts",
             format: "es"
         }],
@@ -304,18 +304,28 @@ declare namespace Slick {
 }
 `);
 
+                        function writeIfDifferent(target, content) {
+                            if (!fs.existsSync(target) ||
+                                fs.readFileSync(target, 'utf8') != content) {
+                                fs.writeFileSync(target, content);
+                            }
+                        }
+
+                        function copyIfDifferent(source, target) {
+                            writeIfDifferent(target, fs.readFileSync(source, 'utf8'));
+                        }
+
+                        !fs.existsSync('./dist') && fs.mkdirSync('./dist');
+                        copyIfDifferent('./out/index.bundle.d.ts', './dist/index.d.ts');
+                        !fs.existsSync('./wwwroot') && fs.mkdirSync('./wwwroot');
                         var src = dtsOutputs.join('\n').replace(/\r/g, '');
                         src = mergeReferenceTypeComments(src);
-                        fs.writeFileSync('./out/Serenity.CoreLib.d.ts', src);
-                        await minifyScript('./out/Serenity.CoreLib.js');
-                        !fs.existsSync('./dist') && fs.mkdirSync('./dist');
-                        fs.copyFileSync('./out/index.bundle.d.ts', './dist/index.d.ts');
-                        const wwwroot = '../../src/Serenity.Scripts/wwwroot';
-                        fs.copyFileSync('./out/Serenity.CoreLib.min.js', `${wwwroot}/Serenity.CoreLib.min.js`);
-                        fs.copyFileSync('./out/Serenity.CoreLib.min.js.map', `${wwwroot}/Serenity.CoreLib.min.js.map`);
-                        fs.copyFileSync('./out/Serenity.CoreLib.d.ts', `${wwwroot}/Serenity.CoreLib.d.ts`);
-                        fs.copyFileSync('./out/Serenity.CoreLib.js', `${wwwroot}/Serenity.CoreLib.js`);
-                        fs.copyFileSync('./out/Serenity.CoreLib.js.map', `${wwwroot}/Serenity.CoreLib.js.map`);
+                        writeIfDifferent('./wwwroot/index.global.d.ts', src);
+                        copyIfDifferent('./out/index.global.js', './wwwroot/index.global.js');
+                        copyIfDifferent('./out/index.global.js.map', './wwwroot/index.global.js.map');
+                        await minifyScript('./out/index.global.js');
+                        copyIfDifferent('./out/index.global.min.js', './wwwroot/index.global.min.js');
+                        copyIfDifferent('./out/index.global.min.js.map', './wwwroot/index.global.min.js.map');
                     }
                 }
             }
