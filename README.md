@@ -19,7 +19,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 Ensure you have the necessary [requirements](https://serenity.is/docs/getting_started/README#prerequisites) installed.
 ```bash
-# Install Serene.Templates package.
+# Install/Update Serene.Templates package.
 > dotnet new install Serene.Templates
 
 # Create a new Serene project.
