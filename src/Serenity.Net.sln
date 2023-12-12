@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web", "Serenit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator", "Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj", "{7B2CED35-AD39-42D5-AF64-5AC73D11EEF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Scripts", "Serenity.Scripts\Serenity.Scripts.csproj", "{2ACB06BE-7058-4E19-A0B1-0171D15870E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Corelib", "..\packages\corelib\Serenity.Corelib.csproj", "{2ACB06BE-7058-4E19-A0B1-0171D15870E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core.Tests", "..\tests\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj", "{1EE57748-665F-4CFA-83DA-21F09BCBED7B}"
 EndProject

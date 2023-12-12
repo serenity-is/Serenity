@@ -129,7 +129,7 @@ Task("Clean")
     CreateDirectory(nupkgDir);
     CleanDirectories(src + "/Serenity.*/**/bin/" + configuration);
     CleanDirectories(root + "tests/**/bin/");
-    CleanDirectories(src + "/Serenity.Scripts/dist");
+    CleanDirectories(root + "/packages/*/out");
 });
 
 Task("Restore")
@@ -212,9 +212,9 @@ Task("Pack")
     myPack("Serenity.Net.Entity", null, null);
     myPack("Serenity.Net.Services", null, null);
     myPack("Serenity.Net.Web", null, null);
-    myPack("Serenity.Scripts", null, null);
     myPack("Serenity.Net.CodeGenerator", "sergen", null);
     myPack("Serenity.Assets", null, null);
+    myPack("../packages/corelib", "Serenity.Corelib", "Serenity.Corelib");
     
     fixNugetCache();
 });

@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <AssemblyName>Serenity.Corelib</AssemblyName>
     <Description>NuGet version of @serenity-is/corelib NPM package</Description>
   </PropertyGroup>
   <ItemGroup>
