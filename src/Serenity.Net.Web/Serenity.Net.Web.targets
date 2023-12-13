@@ -47,7 +47,7 @@ try
         if (!File.Exists(pkgJson) || File.ReadAllText(pkgJson) != expectedContent)
             File.WriteAllText(pkgJson, expectedContent);
 
-        newDeps[pkgId] = "file:./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
+        newDeps[pkgId] = "./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
     }
 
     var packageJson = "package.json";
@@ -68,7 +68,8 @@ try
         }
         foreach (var x in oldDeps)
         {
-            if (x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true)
+            if (x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true &&
+                x.Value.Value<string>()?.StartsWith("./node_modules/.dotnet/", StringComparison.Ordinal) != true)
                 newDeps[x.Key] = x.Value.Value<string>();
         }
         oldDeps.RemoveAll();
