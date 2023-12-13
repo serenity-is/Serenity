@@ -221,7 +221,7 @@ export function jQueryDatepickerInitialization(jQuery: any): boolean {
     let culture = typeof document === "undefined" ? 'en' : (document.documentElement.lang || 'en').toLowerCase();
     if (!jQuery.datepicker.regional[culture]) {
         culture = culture.split('-')[0];
-        if (jQuery.datepicker.regional[culture]) {
+        if (!jQuery.datepicker.regional[culture]) {
             culture = 'en';
         }
     }
