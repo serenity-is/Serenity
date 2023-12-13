@@ -101,10 +101,10 @@ catch (Exception ex)
   <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
     <ItemGroup>
       <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
-        <FolderName>%(ProjectReference.Filename)</FolderName>
+        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
       </_NodeTypeToRestore>
       <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
-        <FolderName>%(RuntimeCopyLocalItems.NuGetPackageId)</FolderName>
+        <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
       </_NodeTypeToRestore>
       <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct())" />
     </ItemGroup>

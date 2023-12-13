@@ -416,17 +416,12 @@ public partial class TSModuleResolver
 
     private string GetPossibleNuGetPackageId(string moduleName)
     {
-        string pascalize(string src)
-        {
-            if (src.Length > 0)
-                return char.ToUpperInvariant(src[0]) + src[1..];
-            return src;
-        }
+        moduleName = moduleName.ToLowerInvariant();
 
         string toNamespace(string src)
         {
             return string.Join(".", src.Split(packageIdSplitChars,
-                StringSplitOptions.RemoveEmptyEntries).Select(pascalize));
+                StringSplitOptions.RemoveEmptyEntries));
         }
 
         var idx = moduleName.IndexOf('/');
@@ -435,7 +430,7 @@ public partial class TSModuleResolver
 
         var company = moduleName[1..idx];
         if (company == "serenity-is")
-            company = "Serenity";
+            company = "serenity";
         else if (company.Length > 0)
             company = toNamespace(company);
 
