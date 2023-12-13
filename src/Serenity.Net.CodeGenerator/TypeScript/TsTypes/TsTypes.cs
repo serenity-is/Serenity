@@ -2612,7 +2612,6 @@ public class SourceFile : Declaration, ISourceFileLike
     public List<Diagnostic> ParseDiagnostics { get; set; }
     public List<Diagnostic> AdditionalSyntacticDiagnostics { get; set; }
     public Map<string> ClassifiableNames { get; set; }
-    public Map<ResolvedModuleFull> ResolvedModules { get; set; }
     public Map<ResolvedTypeReferenceDirective> ResolvedTypeReferenceDirectiveNames { get; set; }
     public LiteralExpression[] Imports { get; set; }
     public LiteralExpression[] ModuleAugmentations { get; set; }
@@ -3372,27 +3371,6 @@ public class CommandLineOptionOfListType : CommandLineOptionBase
     } // CommandLineOptionOfCustomType | CommandLineOptionOfPrimitiveType | TsConfigOnlyOption
 }
 
-public class ModuleResolutionHost
-{
-}
-
-public class ResolvedModule
-{
-    public string ResolvedFileName { get; set; }
-    public bool IsExternalLibraryImport { get; set; }
-}
-
-public class ResolvedModuleFull : ResolvedModule
-{
-    public Extension Extension { get; set; }
-}
-
-public class ResolvedModuleWithFailedLookupLocations
-{
-    public ResolvedModule ResolvedModule { get; set; } // ResolvedModuleFull
-    public string[] FailedLookupLocations { get; set; }
-}
-
 public class ResolvedTypeReferenceDirective
 {
     public bool Primary { get; set; }
@@ -3405,7 +3383,7 @@ public class ResolvedTypeReferenceDirectiveWithFailedLookupLocations
     public string[] FailedLookupLocations { get; set; }
 }
 
-public class CompilerHost : ModuleResolutionHost
+public class CompilerHost
 {
     public WriteFileCallback WriteFile { get; set; }
 }

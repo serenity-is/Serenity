@@ -237,7 +237,7 @@ public class TSTypeListerAST
                             {
                                 var module = id.Text;
                                 if (module.StartsWith(".", StringComparison.OrdinalIgnoreCase))
-                                    module = ResolveModule(id.Text, sourceFile.FileName, false).moduleName ?? module;
+                                    module = ResolveModule(id.Text, sourceFile.FileName, false)?.ModuleName ?? module;
 
                                 return module + ":" + nameIdentifier.Text + functionSuffix;
                             }
@@ -751,13 +751,13 @@ public class TSTypeListerAST
                 if (string.IsNullOrEmpty(identifier))
                     continue;
 
-                var (moduleName, fullPath) = ResolveModule(identifier, sourceFile.FileName, false);
-                if (fullPath is null ||
-                    visited.Contains(fullPath))
+                var resolveResult = ResolveModule(identifier, sourceFile.FileName, false);
+                if (resolveResult?.FullPath is null ||
+                    visited.Contains(resolveResult.FullPath))
                     continue;
 
-                visited.Add(fullPath);
-                var subFile = ParseFile(fullPath, sourceFileInfo?.ModuleName, true);
+                visited.Add(resolveResult.FullPath);
+                var subFile = ParseFile(resolveResult.ActualPath ?? resolveResult.FullPath, sourceFileInfo?.ModuleName, true);
                 if (subFile is null)
                     continue;
 
@@ -912,15 +912,14 @@ public class TSTypeListerAST
         }
     }
 
-    readonly ConcurrentQueue<(string fullPath, string moduleName)> processFileQueue = new();
+    readonly ConcurrentQueue<ResolveResult> processFileQueue = new();
     readonly ConcurrentDictionary<string, Lazy<string>> processByFullPath = new();
-    readonly ConcurrentDictionary<string, (string fullPath, string moduleName)> resolvedExternals = new();
+    readonly ConcurrentDictionary<string, ResolveResult> resolvedExternals = new();
     readonly ConcurrentDictionary<string, SourceFile> parsedFiles = new();
 
     private class SourceFileInfo
     {
         public string ModuleName { get; set; }
-        public Dictionary<string, ResolvedModuleFull> ResolvedModules { get; set; }
     }
 
     private readonly ConcurrentDictionary<SourceFile, SourceFileInfo> sourceFileInfos = new();
@@ -945,7 +944,6 @@ public class TSTypeListerAST
             {
                 var sourceFileInfo = sourceFileInfos.GetOrAdd(sourceFile, static (s) => new SourceFileInfo());
                 sourceFileInfo.ModuleName = moduleName;
-                sourceFileInfo.ResolvedModules ??= [];
 
                 foreach (var node in sourceFile.Statements)
                 {
@@ -958,18 +956,7 @@ public class TSTypeListerAST
                         node is ImportDeclaration id &&
                         id.ModuleSpecifier is StringLiteral sl)
                     {
-                        var resolved = ResolveModule(sl.Text, fileFullPath,
-                            enqueue: !extractExportsOnly);
-
-                        if (!string.IsNullOrEmpty(resolved.fullPath) &&
-                            !sourceFileInfo.ResolvedModules.ContainsKey(sl.Text))
-                        {
-                            sourceFileInfo.ResolvedModules[sl.Text] = new ResolvedModuleFull
-                            {
-                                ResolvedFileName = resolved.fullPath,
-                                IsExternalLibraryImport = !resolved.moduleName.StartsWith('/')
-                            };
-                        }
+                        ResolveModule(sl.Text, fileFullPath, enqueue: !extractExportsOnly);
                     }
                 }
             }
@@ -978,43 +965,41 @@ public class TSTypeListerAST
         });
     }
 
-    (string moduleName, string fullPath) ResolveModule(string fileNameOrModule, string referencedFrom, bool enqueue)
+    ResolveResult ResolveModule(string fileNameOrModule, string referencedFrom, bool enqueue)
     {
-        string resolvedModuleName;
-        string resolvedFullPath;
-
         bool nonRelative = fileNameOrModule is not null &&
             fileNameOrModule.Length > 0 &&
             fileNameOrModule[0] != '.';
 
         if (nonRelative &&
-            resolvedExternals.TryGetValue(fileNameOrModule, out var resolved))
+            resolvedExternals.TryGetValue(fileNameOrModule, out ResolveResult resolveResult))
         {
-            resolvedModuleName = resolved.moduleName;
-            resolvedFullPath = resolved.fullPath;
         }
         else
         {
-            resolvedFullPath = moduleResolver.Resolve(fileNameOrModule, referencedFrom,
-                out resolvedModuleName);
+            resolveResult = moduleResolver.Resolve(fileNameOrModule, referencedFrom);
 
-            if (resolvedFullPath is not null && nonRelative)
-                resolvedExternals.TryAdd(fileNameOrModule, (resolvedFullPath, resolvedModuleName));
+            if (resolveResult is not null && nonRelative)
+                resolvedExternals.TryAdd(fileNameOrModule, resolveResult);
         }
 
-        if (resolvedFullPath is null)
-            return (null, null);
+        if (resolveResult is null)
+            return null;
 
         if (enqueue)
         {
-            return (processByFullPath.GetOrAdd(resolvedFullPath, x => new Lazy<string>(() =>
+            return new ResolveResult
             {
-                processFileQueue.Enqueue((resolvedFullPath, resolvedModuleName));
-                return resolvedModuleName;
-            })).Value, resolvedFullPath);
+                ModuleName = processByFullPath.GetOrAdd(resolveResult.FullPath, x => new Lazy<string>(() =>
+                {
+                    processFileQueue.Enqueue(resolveResult);
+                    return resolveResult.ModuleName;
+                })).Value,
+                FullPath = resolveResult.FullPath
+            };
         }
         else
-            return (resolvedModuleName, resolvedFullPath);
+            return resolveResult;
     }
 
     public List<ExternalType> ExtractTypes()
@@ -1034,7 +1019,7 @@ public class TSTypeListerAST
             [
                 .. sourceFiles,
                 .. currentQueue.AsParallel()
-                    .Select(x => ParseFile(x.fullPath, x.moduleName, extractExportsOnly: false)),
+                    .Select(x => ParseFile(x.ActualPath ?? x.FullPath, x.ModuleName, extractExportsOnly: false)),
             ];
         }
 
@@ -1069,14 +1054,9 @@ public class TSTypeListerAST
             foreach (var k in types)
             {
                 if (resultIndex.TryGetValue(k.FullName, out int index))
-                {
                     continue;
-                }
-                else
-                {
-                    resultIndex[k.FullName] = result.Count;
-                    result.Add(k);
-                }
+                resultIndex[k.FullName] = result.Count;
+                result.Add(k);
             }
         }
 
