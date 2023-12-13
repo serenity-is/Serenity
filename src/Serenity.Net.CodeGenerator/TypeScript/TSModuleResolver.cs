@@ -389,13 +389,18 @@ public partial class TSModuleResolver
             if (fileSystem.FileExists(packageIndex))
                 return packageIndex;
         }
-
-        if (value.StartsWith("file:", StringComparison.Ordinal) && value.Length > 5)
+        else
         {
-            var path = fileSystem.Combine(rootPackageJsonFolder, value[5..]);
-            var packageIndex = fileSystem.Combine(path, "dist", "index.d.ts");
-            if (fileSystem.FileExists(packageIndex))
-                return packageIndex;
+            var relativePath = value.StartsWith("file:", StringComparison.Ordinal) && value.Length > 5 ?
+                value[5..] : ((value.StartsWith("./", StringComparison.Ordinal) ||
+                    value.StartsWith("../", StringComparison.Ordinal)) ? value : null);
+
+            if (relativePath != null)
+            {
+                var packageIndex = fileSystem.Combine(rootPackageJsonFolder, relativePath, "dist", "index.d.ts");
+                if (fileSystem.FileExists(packageIndex))
+                    return packageIndex;
+            }
         }
 
         if (!fileSystem.DirectoryExists(packageRoot))
