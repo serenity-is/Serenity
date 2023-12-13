@@ -68,8 +68,7 @@ try
         }
         foreach (var x in oldDeps)
         {
-            if (!newDeps.ContainsKey(x.Key) &&
-                x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true)
+            if (x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true)
                 newDeps[x.Key] = x.Value.Value<string>();
         }
         oldDeps.RemoveAll();
