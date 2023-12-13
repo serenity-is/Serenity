@@ -381,7 +381,7 @@ public partial class TSModuleResolver
         var nugetPackages = fileSystem.Combine(Environment.GetFolderPath(
             Environment.SpecialFolder.UserProfile), ".nuget", "packages");
         var packageRoot = fileSystem.Combine(nugetPackages,
-            GetPossibleNuGetPackageId(moduleName)?.ToLowerInvariant());
+            GetPossibleNuGetPackageId(moduleName));
 
         if (Version.TryParse(value, out _))
         {

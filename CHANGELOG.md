@@ -1,3 +1,9 @@
+## 8.1.4 (2023-12-13)
+
+### Features:
+- Use lowercase version of folder name while restoring to node_modules/.dotnet
+- Set @serenity-is/corelib to file:./node_modules/.dotnet/serenity.corelib so that it uses the same version of the Serenity.Corelib NuGet package referenced in the project.
+
 ## 8.1.3 (2023-12-13)
 
 ### Features:
