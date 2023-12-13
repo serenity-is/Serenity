@@ -1,3 +1,12 @@
+## 8.1.3 (2023-12-13)
+
+### Features:
+- [BREAKING CHANGE] Replacing Serenity.Scripts with a new `Serenity.Corelib` package which will be a NuGet version of the NPM package `@serenity-is/corelib`. Replace "Serenity.Scripts/Serenity.Corelib.js" in appsettings.bundles.json with "Serenity.Corelib/index.global.js".
+- When a module is not found, for example when npm install is not run, try to resolve modules via "file:" mappings configured in dependencies and also NuGet package folders.
+
+### Bugfixes:
+- Fix jquery ui datepicker culture not working
+
 ## 8.1.2 (2023-12-10)
 
 ### Bugfixes:
