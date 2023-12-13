@@ -4,6 +4,7 @@ import fs from 'fs';
 import { basename, resolve } from "path";
 import { dts } from "rollup-plugin-dts";
 import { minify } from "terser";
+import sourcemapsPlugin from './build/rollup-sourcemaps.js';
 
 var externalPackages = ["@serenity-is/sleekgrid"];
 
@@ -256,7 +257,8 @@ export default [
                 outDir: './out',
                 sourceRoot: resolve('./corelib'),
                 exclude: ["**/*.spec.ts", "**/*.spec.tsx"],
-            })
+            }),
+            sourcemapsPlugin()
         ],
         external: externalPackages
     },

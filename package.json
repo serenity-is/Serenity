@@ -3,6 +3,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "15.2.3",
     "@rollup/plugin-typescript": "11.1.5",
+    "@rollup/pluginutils": "5.1.0",
     "@swc/core": "1.3.96",
     "@swc/jest": "0.2.29",
     "esbuild": "0.19.5",
