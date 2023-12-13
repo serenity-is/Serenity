@@ -40,6 +40,7 @@ public static class SkipPackages
         return NotReferencingSerenity.Any(x => packageId.StartsWith(x, StringComparison.OrdinalIgnoreCase)) ||
             packageId.StartsWith("Serenity.Net.", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(packageId, "Serenity.Assets", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(packageId, "Serenity.Scripts");
+            string.Equals(packageId, "Serenity.Scripts") ||
+            string.Equals(packageId, "Serenity.Corelib");
     }
 }
