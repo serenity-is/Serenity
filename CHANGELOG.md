@@ -1,3 +1,10 @@
+## 8.1.5 (2023-12-14)
+
+### Features:
+- Removing jQuery.blockUI.js and toastr.js from Serenity.Assets as we no longer use them. Please remove them from appsettings.bundles.json if you still have them there.
+- Include source maps of base and base-ui in corelib
+- No need for "file:" prefix in package.json for "./node_modules/dotnet/"
+
 ## 8.1.4 (2023-12-13)
 
 ### Features:
