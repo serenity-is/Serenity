@@ -1,5 +1,5 @@
 ﻿import $ from "@optionaldeps/jquery";
-import { Config, getNested, globalObject } from "@serenity-is/base";
+import { Config, getGlobalObject, getNested } from "@serenity-is/base";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
@@ -76,7 +76,7 @@ function initOnLoad() {
     if (!Config.rootNamespaces)
         return;
     for (var ns of Config.rootNamespaces) {
-        var obj = getNested(globalObject, ns);
+        var obj = getNested(getGlobalObject(), ns);
         if (obj != null)
             initializeTypes(obj, ns + ".", 3);
     }

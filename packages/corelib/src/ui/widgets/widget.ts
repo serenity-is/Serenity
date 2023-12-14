@@ -1,5 +1,5 @@
 ﻿import $ from "@optionaldeps/jquery";
-import { Config, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
+import { Config, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { jQueryPatch } from "../../patch/jquerypatch";
@@ -18,28 +18,19 @@ export interface WidgetDialogClass<TOptions = object> {
 export type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
 
 export function reactPatch() {
-    // @ts-ignore check for global
-    let globalObj: any = typeof (global) !== "undefined" ? global : (typeof (window) !== "undefined" ? window : (typeof (self) !== "undefined" ? self : null));
-
-    // @ts-ignore
-    if (typeof React === "undefined" && typeof globalObj !== "undefined") {
-        if (globalObj['preact'] != null) {
-            globalObj['React'] = globalObj['ReactDOM'] = globalObj['preact'];
-            // @ts-ignore
-            (React as any).Fragment = (React as any).Fragment ?? "x-fragment";
-        }
-        else if (globalObj['Nerv'] != null) {
-            globalObj['React'] = globalObj['ReactDOM'] = globalObj['Nerv'];
-            // @ts-ignore
-            (React as any).Fragment = (React as any).Fragment ?? "x-fragment";
+    let global = getGlobalObject();
+    if (!global.React) {
+        if (global.preact) {
+            global.React = global.ReactDOM = global.preact;
+            global.React.Fragment = global.Fragment ?? "x-fragment";
         }
         else {
-            globalObj['React'] = {
-                Component: function () { } as any,
-                Fragment: "x-fragment" as any,
-                createElement: function () { return { _reactNotLoaded: true }; } as any
-            } as any
-            globalObj['ReactDOM'] = {
+            global.React = {
+                Component: function () { },
+                Fragment: "x-fragment",
+                createElement: function () { return { _reactNotLoaded: true }; }
+            }
+            global.ReactDOM = {
                 render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
             }
         }

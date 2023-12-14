@@ -2164,7 +2164,7 @@ declare namespace Serenity {
         };
     }
 
-    const globalObject: any;
+    function getGlobalObject(): any;
     function getStateStore(key?: string): any;
     function getTypeStore(): any;
     interface TypeMetadata {

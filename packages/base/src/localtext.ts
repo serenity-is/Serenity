@@ -1,4 +1,4 @@
-﻿import { globalObject, getStateStore } from "./system";
+﻿import { getGlobalObject, getStateStore } from "./system";
 
 function getTable(): { [key: string]: string } {
     return getStateStore("__localText");
@@ -56,4 +56,5 @@ export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, 
     });
 }
 
-(globalObject.Serenity || (globalObject.Serenity = {})).addLocalText = addLocalText;
+let global = getGlobalObject();
+(global.Serenity || (global.Serenity = {})).addLocalText = addLocalText;

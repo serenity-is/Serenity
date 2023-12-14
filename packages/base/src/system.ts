@@ -1,9 +1,13 @@
-﻿export const globalObject: any = 
+﻿let globalObject: any = 
     (typeof globalThis !== "undefined" && globalThis) || 
     (typeof window !== "undefined" && window) || 
     (typeof self !== "undefined" && self) ||
     // @ts-ignore check for global
     (typeof global !== "undefined" && global) || {};
+
+export function getGlobalObject(): any {
+    return globalObject;
+}
 
 export function getStateStore(key?: string): any {
 

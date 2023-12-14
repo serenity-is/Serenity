@@ -1,5 +1,7 @@
 ﻿import {
-    Lookup, getColumnsScript, getFormScript, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, globalObject,
+    Lookup, getColumnsScript, getFormScript,
+    getGlobalObject,
+    getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore,
     handleScriptDataError, peekScriptData, reloadLookupAsync, resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
 } from "@serenity-is/base";
 
@@ -152,7 +154,8 @@ var compatExports = {
     ScriptData
 }
 
-let serenity = (globalObject.Serenity || (globalObject.Serenity = Object.create(null)));
+let global = getGlobalObject();
+let serenity = (global.Serenity || (global.Serenity = Object.create(null)));
 for (var i in compatExports)
     if (serenity[i] == null)
         serenity[i] = (compatExports as any)[i];
