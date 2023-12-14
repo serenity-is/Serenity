@@ -705,6 +705,9 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
             var result = Request.DistinctFields.Select(x =>
             {
+                if (x == null || string.IsNullOrEmpty(x.Field))
+                    return null;
+
                 var field = Row.FindFieldByPropertyName(x.Field) ??
                     Row.FindField(x.Field);
 
