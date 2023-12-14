@@ -1,11 +1,7 @@
-import {
-    compatCore, compatDataGroupItemMetadataProvider, compatEditors,
-    compatFormatters, compatGrid,
-    compatLayoutsFrozen, compatPluginsAutoTooltips
-} from "@serenity-is/sleekgrid/build/defines";
 import esbuild from "esbuild";
 import { createRequire } from 'node:module';
 import { join, resolve } from "path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from 'url';
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
@@ -14,37 +10,34 @@ const require = createRequire(import.meta.url);
 const sleekRoot = resolve(join(require.resolve('@serenity-is/sleekgrid/build/defines'), '..', '..'));
 const assetsSlick = resolve(join(root, '..', '..', 'src', 'Serenity.Assets', 'wwwroot', 'Scripts', 'SlickGrid'));
 
+function writeIfDifferent(target, content) {
+    if (!existsSync(target) ||
+        readFileSync(target, 'utf8') != content) {
+        writeFileSync(target, content);
+    }
+}
+
+function copyIfDifferent(source, target) {
+    var content = readFileSync(source, 'utf8').replace(/^\/\/#\s*sourceMappingURL=.*\.map\s*$/mg, '');
+    writeIfDifferent(target, content);
+}
+
 const minify = true;
 for (var esmOpt of [
-    { ...compatCore, minify },
-    { ...compatGrid, minify },
-    { ...compatLayoutsFrozen },
-    { ...compatEditors },
-    { ...compatFormatters },
-    { ...compatDataGroupItemMetadataProvider, minify },
-    { ...compatPluginsAutoTooltips, minify }
+    { file: 'layouts/slick.frozenlayout.js' },
+    { file: 'plugins/slick.autotooltips.js', minify },
+    { file: 'slick.core.js', minify },
+    { file: 'slick.editors.js' },
+    { file: 'slick.formatters.js' },
+    { file: 'slick.grid.js', minify },
+    { file: 'slick.groupitemmetadataprovider.js', minify }
 ]) {
     var shouldMinify = esmOpt.minify;
-
-    esmOpt = { 
-        ...esmOpt, 
-        absWorkingDir: sleekRoot,
-        outfile: esmOpt.outfile.replace('./dist/compat/', assetsSlick + '/').replace('/plugins/', '/Plugins/'),
-        minify: false,
-        sourcemap: false,
-        tsconfig: join(sleekRoot, 'tsconfig.json')
-    };
-
-    esbuild.build(esmOpt).catch(() => process.exit());
-
-    if (shouldMinify) {
-        await esbuild.build({
-            ...esmOpt,
-            minify: true,
-            outfile: esmOpt.outfile.replace(/\.js$/, '.min.js')
-        }).catch(() => process.exit());
-    }
-
+    var sourceFile = join(sleekRoot, 'dist/compat/' + esmOpt.file);
+    var targetFile = join(assetsSlick, esmOpt.file).replace('/plugins/', '/Plugins/');
+    copyIfDifferent(sourceFile, targetFile);
+    if (shouldMinify)
+        copyIfDifferent(sourceFile.replace(/\.js$/, '.min.js'), targetFile.replace(/\.js$/, '.min.js'));
 }
 
 var coreLibBase = {
