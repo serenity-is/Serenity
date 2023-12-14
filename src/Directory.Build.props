@@ -3,16 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Company>Serenity</Company>
-    <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <Authors>Volkan Ceylan</Authors>
-    <PackageIcon>package-icon.png</PackageIcon>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
-    <PackageTags>Serenity</PackageTags>
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
     <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -32,12 +24,6 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <Pack>false</Pack>
     </Content>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
-        <Link>Properties\package-icon.png</Link>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-readme.md" Pack="true" PackagePath="\README.md">
-        <Link>Properties\README.md</Link>
-    </None>
     <Content Remove="texts\**\*.json" />
     <EmbeddedResource Include="texts\**\*.json" WithCulture="false" Culture="" />
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />

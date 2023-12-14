@@ -4,25 +4,11 @@
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <Company>Serenity</Company>
-    <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
-    <Authors>Volkan Ceylan</Authors>
-    <PackageIcon>package-icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <DefaultItemExcludes>node_modules\**;out\**;coverage\**;$(DefaultItemExcludes);**\package*.json;**\tsconfig.json</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
-        <Link>Properties\package-icon.png</Link>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-readme.md" Pack="true" PackagePath="\README.md">
-        <Link>Properties\README.md</Link>
-    </None>
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" />
     <None Remove="$(MSBuildProjectDirectory)\*.json" />
     <Content Include="$(MSBuildProjectDirectory)\*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
