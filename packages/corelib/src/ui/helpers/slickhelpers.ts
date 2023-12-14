@@ -1,5 +1,5 @@
 ﻿import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
-import { Column, FormatterContext, Grid } from "@serenity-is/sleekgrid";
+import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { Authorization, clearKeys, replaceAll, safeCast, serviceCall } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
@@ -18,7 +18,7 @@ export interface GridRowSelectionMixinOptions {
 export class GridRowSelectionMixin {
 
     private idField: string;
-    private include: { [key: string]: boolean}
+    private include: { [key: string]: boolean }
     private grid: IDataGrid;
     private options: GridRowSelectionMixinOptions;
 
@@ -363,9 +363,9 @@ export namespace GridUtils {
             return true;
         };
 
-        if (hint == null) 
+        if (hint == null)
             hint = localText('Controls.EntityGrid.IncludeDeletedToggle');
-        
+
         addToggleButton(toolDiv, 's-IncludeDeletedToggle',
             function (pressed) {
                 includeDeleted = pressed;
@@ -401,9 +401,9 @@ export namespace GridUtils {
                 }
             }
 
-            if (oldSubmit != null) 
+            if (oldSubmit != null)
                 return oldSubmit(v);
-            
+
             return true;
         };
 
@@ -443,9 +443,9 @@ export namespace GridUtils {
     }
 
     export function makeOrderable(grid: Grid,
-        handleMove: (p1: any, p2: number) => void): void {
+        handleMove: (rows: number[], insertBefore: number) => void): void {
 
-        var moveRowsPlugin = new Slick.RowMoveManager({ cancelEditOnDrag: true });
+        var moveRowsPlugin = new RowMoveManager({ cancelEditOnDrag: true });
         moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
             for (var i = 0; !!(i < data.rows.length); i++) {
                 if (!!(data.rows[i] === data.insertBefore ||
@@ -458,20 +458,20 @@ export namespace GridUtils {
             return true;
         });
 
-        moveRowsPlugin.onMoveRows.subscribe(function (e1, data1) {
-            handleMove(data1.rows, data1.insertBefore);
+        moveRowsPlugin.onMoveRows.subscribe(function (_, data) {
+            handleMove(data.rows, data.insertBefore);
             try {
                 grid.setSelectedRows([]);
             }
-            catch ($t1) {
+            catch {
             }
         });
         grid.registerPlugin(moveRowsPlugin);
     }
 
-    export function makeOrderableWithUpdateRequest(grid: IDataGrid,
-        getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string,
-        getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void {
+    export function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid,
+        getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string,
+        getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void {
 
         makeOrderable(grid.getGrid(), function (rows, insertBefore) {
             if (rows.length === 0) {
@@ -506,7 +506,7 @@ export namespace GridUtils {
                     service: service,
                     request: getUpdateRequest(getId(
                         grid.getGrid().getDataItem(rows[i])), order++),
-                    onSuccess: function (response) {
+                    onSuccess: function () {
                         i++;
                         if (i < rows.length) {
                             next();

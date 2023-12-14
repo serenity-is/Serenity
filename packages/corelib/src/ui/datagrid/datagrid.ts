@@ -24,29 +24,6 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-declare global {
-    namespace Slick {
-        interface RowMoveManagerOptions {
-            cancelEditOnDrag: boolean;
-        }
-    
-        class RowMoveManager implements IPlugin {
-            constructor(options: RowMoveManagerOptions);
-            init(): void;
-            onBeforeMoveRows: EventEmitter;
-            onMoveRows: EventEmitter;
-        }
-
-        class RowSelectionModel implements SelectionModel {
-            init(grid: Grid): void;
-            destroy?: () => void;
-            setSelectedRanges(ranges: Range[]): void;
-            onSelectedRangesChanged: EventEmitter<Range[]>;
-            refreshSelections?(): void;
-        }        
-    }
-}
-
 export interface SettingStorage {
     getItem(key: string): string | Promise<string>;
     setItem(key: string, value: string): void | Promise<void>;

@@ -1,138 +1,125 @@
-(function ($) {
-  // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "RowMoveManager": RowMoveManager
+var Slick = Slick || {};
+Slick._ = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
     }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/plugins/rowmovemanager.ts
+  var rowmovemanager_exports = {};
+  __export(rowmovemanager_exports, {
+    RowMoveManager: () => RowMoveManager
   });
 
-  function RowMoveManager(options) {
-    var _grid;
-    var _canvas;
-    var _dragging;
-    var _self = this;
-    var _handler = new Slick.EventHandler();
-    var _defaults = {
-      cancelEditOnDrag: false
-    };
+  // global-externals:_
+  var { EventEmitter, EventSubscriber, H } = Slick;
 
-    function init(grid) {
-      options = $.extend(true, {}, _defaults, options);
-      _grid = grid;
-      _canvas = _grid.getCanvasNode();
-      _handler
-        .subscribe(_grid.onDragInit, handleDragInit)
-        .subscribe(_grid.onDragStart, handleDragStart)
-        .subscribe(_grid.onDrag, handleDrag)
-        .subscribe(_grid.onDragEnd, handleDragEnd);
+  // src/plugins/rowmovemanager.ts
+  var _RowMoveManager = class _RowMoveManager {
+    constructor(options) {
+      this.handler = new EventSubscriber();
+      this.onBeforeMoveRows = new EventEmitter();
+      this.onMoveRows = new EventEmitter();
+      this.options = Object.assign({}, _RowMoveManager.defaults, options);
     }
-
-    function destroy() {
-      _handler.unsubscribeAll();
+    init(grid) {
+      this.grid = grid;
+      this.handler.subscribe(grid.onDragInit, this.handleDragInit.bind(this)).subscribe(grid.onDragStart, this.handleDragStart.bind(this)).subscribe(grid.onDrag, this.handleDrag.bind(this)).subscribe(grid.onDragEnd, this.handleDragEnd.bind(this));
     }
-
-    function handleDragInit(e, dd) {
-      // prevent the grid from cancelling drag'n'drop by default
+    destroy() {
+      var _a;
+      (_a = this.handler) == null ? void 0 : _a.unsubscribeAll();
+    }
+    handleDragInit(e) {
       e.stopImmediatePropagation();
     }
-
-    function handleDragStart(e, dd) {
-      var cell = _grid.getCellFromEvent(e);
-
-      if (options.cancelEditOnDrag && _grid.getEditorLock().isActive()) {
-        _grid.getEditorLock().cancelCurrentEdit();
+    handleDragStart(e, dd) {
+      let cell = this.grid.getCellFromEvent(e);
+      if (this.options.cancelEditOnDrag && this.grid.getEditorLock().isActive()) {
+        this.grid.getEditorLock().cancelCurrentEdit();
       }
-
-      if (_grid.getEditorLock().isActive() || !/move|selectAndMove/.test(_grid.getColumns()[cell.cell].behavior)) {
+      if (this.grid.getEditorLock().isActive() || !/move|selectAndMove/.test(this.grid.getColumns()[cell.cell].behavior)) {
         return false;
       }
-
-      _dragging = true;
+      this.dragging = true;
       e.stopImmediatePropagation();
-
-      var selectedRows = _grid.getSelectedRows();
-
-      if (selectedRows.length == 0 || $.inArray(cell.row, selectedRows) == -1) {
+      let selectedRows = this.grid.getSelectedRows();
+      if (selectedRows.length == 0 || selectedRows.indexOf(cell.row) == -1) {
         selectedRows = [cell.row];
-        _grid.setSelectedRows(selectedRows);
+        this.grid.setSelectedRows(selectedRows);
       }
-
-      var rowHeight = _grid.getOptions().rowHeight;
-
+      let rowHeight = this.grid.getOptions().rowHeight;
       dd.selectedRows = selectedRows;
-
-      dd.selectionProxy = $("<div class='slick-reorder-proxy'/>")
-          .css("position", "absolute")
-          .css("zIndex", "99999")
-          .css("width", $(_canvas).innerWidth())
-          .css("height", rowHeight * selectedRows.length)
-          .appendTo(_canvas);
-
-      dd.guide = $("<div class='slick-reorder-guide'/>")
-          .css("position", "absolute")
-          .css("zIndex", "99998")
-          .css("width", $(_canvas).innerWidth())
-          .css("top", -1000)
-          .appendTo(_canvas);
-
+      let canvas = this.grid.getCanvasNode();
+      dd.selectionProxy = canvas.appendChild(H("div", {
+        "class": "slick-reorder-proxy",
+        "style": `position: absolute; z-index: 9999; width: ${canvas.clientWidth}px; height: ${rowHeight * selectedRows.length}px`
+      }));
+      dd.guide = canvas.appendChild(H("div", {
+        "class": "slick-reorder-guide",
+        "style": `position: absolute; z-index: 99998; width: ${canvas.clientWidth}px; top: -1000`
+      }));
       dd.insertBefore = -1;
     }
-
-    function handleDrag(e, dd) {
-      if (!_dragging) {
+    handleDrag(e, dd) {
+      if (!this.dragging)
         return;
-      }
-
       e.stopImmediatePropagation();
-
-      var top = e.pageY - $(_canvas).offset().top;
-      dd.selectionProxy.css("top", top - 5);
-
-      var insertBefore = Math.max(0, Math.min(Math.round(top / _grid.getOptions().rowHeight), _grid.getDataLength()));
+      let canvas = this.grid.getCanvasNode();
+      let box = canvas.getBoundingClientRect();
+      let docElem = document.documentElement;
+      let canvasTop = box.top + window.scrollY - docElem.clientTop;
+      let top = e.pageY - canvasTop;
+      dd.selectionProxy.style.top = top - 5 + "px";
+      let insertBefore = Math.max(0, Math.min(Math.round(top / this.grid.getOptions().rowHeight), this.grid.getDataLength()));
       if (insertBefore !== dd.insertBefore) {
-        var eventData = {
-          "rows": dd.selectedRows,
-          "insertBefore": insertBefore
+        let eventData = {
+          rows: dd.selectedRows,
+          insertBefore
         };
-
-        if (_self.onBeforeMoveRows.notify(eventData) === false) {
-          dd.guide.css("top", -1000);
+        if (this.onBeforeMoveRows.notify(eventData) === false) {
+          dd.guide.style.top = "-1000";
           dd.canMove = false;
         } else {
-          dd.guide.css("top", insertBefore * _grid.getOptions().rowHeight);
+          dd.guide.style.top = insertBefore * this.grid.getOptions().rowHeight + "px";
           dd.canMove = true;
         }
-
         dd.insertBefore = insertBefore;
       }
     }
-
-    function handleDragEnd(e, dd) {
-      if (!_dragging) {
+    handleDragEnd(e, dd) {
+      if (!this.dragging)
         return;
-      }
-      _dragging = false;
+      this.dragging = false;
       e.stopImmediatePropagation();
-
       dd.guide.remove();
       dd.selectionProxy.remove();
-
       if (dd.canMove) {
-        var eventData = {
-          "rows": dd.selectedRows,
-          "insertBefore": dd.insertBefore
+        let eventData = {
+          rows: dd.selectedRows,
+          insertBefore: dd.insertBefore
         };
-        // TODO:  _grid.remapCellCssClasses ?
-        _self.onMoveRows.notify(eventData);
+        this.onMoveRows.notify(eventData);
       }
     }
-
-    $.extend(this, {
-      "onBeforeMoveRows": new Slick.Event(),
-      "onMoveRows": new Slick.Event(),
-
-      "init": init,
-      "destroy": destroy
-    });
-  }
-})(jQuery);
+  };
+  _RowMoveManager.defaults = {
+    cancelEditOnDrag: false
+  };
+  var RowMoveManager = _RowMoveManager;
+  return __toCommonJS(rowmovemanager_exports);
+})();
+["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

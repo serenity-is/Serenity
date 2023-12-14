@@ -26,6 +26,8 @@ const minify = true;
 for (var esmOpt of [
     { file: 'layouts/slick.frozenlayout.js' },
     { file: 'plugins/slick.autotooltips.js', minify },
+    { file: 'plugins/slick.rowmovemanager.js' },
+    { file: 'plugins/slick.rowselectionmodel.js' },
     { file: 'slick.core.js', minify },
     { file: 'slick.editors.js' },
     { file: 'slick.formatters.js' },

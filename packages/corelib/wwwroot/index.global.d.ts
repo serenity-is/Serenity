@@ -993,7 +993,7 @@ declare namespace Slick {
     	getCellNode(row: number, cell: number): HTMLElement;
     	setActiveCell(row: number, cell: number): void;
     	setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
-    	private canCellBeActive;
+    	canCellBeActive(row: number, cell: number): boolean;
     	canCellBeSelected(row: number, cell: number): any;
     	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
     	commitCurrentEdit(): boolean;
@@ -1225,6 +1225,53 @@ declare namespace Slick {
     	private handleMouseEnter;
     	private handleHeaderMouseEnter;
     	pluginName: string;
+    }
+    interface RowMoveManagerOptions {
+    	cancelEditOnDrag?: boolean;
+    }
+    interface ArgsMoveRows {
+    	rows: number[];
+    	insertBefore: number;
+    }
+    class RowMoveManager implements IPlugin {
+    	private grid;
+    	private options;
+    	private dragging;
+    	private handler;
+    	onBeforeMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
+    	onMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
+    	constructor(options?: RowMoveManagerOptions);
+    	static readonly defaults: RowMoveManagerOptions;
+    	init(grid: Grid): void;
+    	destroy(): void;
+    	private handleDragInit;
+    	private handleDragStart;
+    	private handleDrag;
+    	private handleDragEnd;
+    }
+    interface RowSelectionModelOptions {
+    	selectActiveRow?: boolean;
+    }
+    class RowSelectionModel implements IPlugin, SelectionModel {
+    	private grid;
+    	private handler;
+    	private inHandler;
+    	private options;
+    	private ranges;
+    	onSelectedRangesChanged: EventEmitter<Range[], IEventData>;
+    	constructor(options?: RowSelectionModelOptions);
+    	static readonly defaults: RowSelectionModelOptions;
+    	init(grid: Grid): void;
+    	destroy(): void;
+    	private wrapHandler;
+    	private rowsToRanges;
+    	getSelectedRows(): number[];
+    	setSelectedRows(rows: number[]): void;
+    	setSelectedRanges(ranges: Range[]): void;
+    	getSelectedRanges(): Range[];
+    	private handleActiveCellChange;
+    	private handleKeyDown;
+    	private handleClick;
     }
 }
 
@@ -4580,8 +4627,8 @@ declare namespace Serenity {
         function addIncludeDeletedToggle(toolDiv: JQuery, view: RemoteView<any>, hint?: string, initial?: boolean): void;
         function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
         function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
-        function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
-        function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+        function makeOrderable(grid: Slick.Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
+        function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
     }
     namespace PropertyItemSlickConverter {
         function toSlickColumns(items: PropertyItem[]): Slick.Column[];
@@ -5445,24 +5492,6 @@ interface JQuery {
     flexWidthHeight(flexX: number, flexY: number): JQuery;
     flexX(flexX: number): JQuery;
     flexY(flexY: number): JQuery;
-}
-declare namespace Slick {
-    interface RowMoveManagerOptions {
-        cancelEditOnDrag: boolean;
-    }
-    class RowMoveManager implements IPlugin {
-        constructor(options: RowMoveManagerOptions);
-        init(): void;
-        onBeforeMoveRows: Slick.EventEmitter;
-        onMoveRows: Slick.EventEmitter;
-    }
-    class RowSelectionModel implements SelectionModel {
-        init(grid: Slick.Grid): void;
-        destroy?: () => void;
-        setSelectedRanges(ranges: Slick.Range[]): void;
-        onSelectedRangesChanged: Slick.EventEmitter<Slick.Range[]>;
-        refreshSelections?(): void;
-    }
 }
 
 import Q = Serenity;

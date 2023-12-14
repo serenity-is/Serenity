@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, IPlugin, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 /**
  * Tries to block the page
@@ -3472,8 +3472,8 @@ declare namespace GridUtils {
     function addIncludeDeletedToggle(toolDiv: JQuery, view: RemoteView<any>, hint?: string, initial?: boolean): void;
     function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
     function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
-    function makeOrderable(grid: Grid, handleMove: (p1: any, p2: number) => void): void;
-    function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+    function makeOrderable(grid: Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
+    function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }
 declare namespace PropertyItemSlickConverter {
     function toSlickColumns(items: PropertyItem[]): Column[];
@@ -3569,26 +3569,6 @@ declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
 }
 
-declare global {
-    namespace Slick {
-        interface RowMoveManagerOptions {
-            cancelEditOnDrag: boolean;
-        }
-        class RowMoveManager implements IPlugin {
-            constructor(options: RowMoveManagerOptions);
-            init(): void;
-            onBeforeMoveRows: EventEmitter;
-            onMoveRows: EventEmitter;
-        }
-        class RowSelectionModel implements SelectionModel {
-            init(grid: Grid): void;
-            destroy?: () => void;
-            setSelectedRanges(ranges: Range[]): void;
-            onSelectedRangesChanged: EventEmitter<Range[]>;
-            refreshSelections?(): void;
-        }
-    }
-}
 interface SettingStorage {
     getItem(key: string): string | Promise<string>;
     setItem(key: string, value: string): void | Promise<void>;
