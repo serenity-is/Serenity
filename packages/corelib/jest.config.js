@@ -5,11 +5,14 @@ export default {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base/src/index.ts',
     '^@serenity-is/base-ui$': '<rootDir>/node_modules/@serenity-is/base-ui/src/index.ts',
-    '^@serenity-is/corelib$': '<rootDir>/src',
-    '^@serenity-is/sleekgrid$': '<rootDir>/../sleekgrid/dist/index.js',
+    '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts',
     '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
     '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',
   },
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/node_modules/",
+    "<rootDir>/../../src/Serenity.Assets/"
+  ],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transformIgnorePatterns: [],
   transform: {
