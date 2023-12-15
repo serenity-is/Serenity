@@ -7,9 +7,6 @@
   "dependencies": {
     "@serenity-is/base": "workspace:*"
   },
-  "devDependencies": {
-    "@types/jest": "29.5.8"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

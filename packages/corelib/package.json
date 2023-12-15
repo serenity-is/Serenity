@@ -5,14 +5,13 @@
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity CoreLib including Q, Serenity and Slick namespaces",
   "dependencies": {
-    "@serenity-is/sleekgrid": "1.6.4",
+    "@serenity-is/sleekgrid": "workspace:*",
     "@types/jquery": "2.0.48",
     "@types/jquery.validation": "1.16.7"
   },
   "devDependencies": {
     "@serenity-is/base": "workspace:*",
     "@serenity-is/base-ui": "workspace:*",
-    "@types/jest": "29.5.8",
     "tslib": "2.6.2"
   },
   "exports": {
