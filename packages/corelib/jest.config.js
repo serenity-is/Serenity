@@ -11,7 +11,7 @@ export default {
   },
   "coveragePathIgnorePatterns": [
     "<rootDir>/node_modules/",
-    "<rootDir>/../../src/Serenity.Assets/"
+    "**/src/Serenity.Assets/**"
   ],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transformIgnorePatterns: [],
