@@ -5,10 +5,7 @@
       <PatchDependencies ParameterType="System.String" />
     </ParameterGroup>    
     <Task>
-      <Reference Include="$(NugetPackageRoot)newtonsoft.json/13.0.3/lib/netstandard2.0/Newtonsoft.Json.dll"/>
       <Using Namespace="System.Text.RegularExpressions" />
-      <Using Namespace="Newtonsoft.Json" />
-      <Using Namespace="Newtonsoft.Json.Linq" />
       <Code Type="Fragment" Language="cs">
 <![CDATA[
 try
@@ -28,21 +25,20 @@ try
             pkgId = "@" + company + "/" + pkgId.Substring(idx + 1);
         }
         var pkgJson = Path.Combine(pkgPath, "package.json");
-        var expectedContent = JsonConvert.SerializeObject(new
-        {
-            name = pkgId,
-            exports = new Dictionary<string, object>
-            {
-                ["."] = new
-                {
-                    types = "./dist/index.d.ts",
-                    import = "./dist/index.js",
-                }
-            },
-            main = "dist/index.js",
-            import = "dist/index.js",
-            types = "dist/index.d.ts"
-        }, Formatting.Indented).Replace("\r", "");
+        var expectedContent = @"{
+  ""name"": """ + pkgId.Replace("\"", "\\\"") + @""",
+  ""exports"": {
+  {
+    ""."": new
+    {
+      ""types"": ""./dist/index.d.ts"",
+      ""import"": ""./dist/index.js"",
+    }
+  },
+  ""main"": ""dist/index.js"",
+  ""import"": ""dist/index.js"",
+  ""types"": ""dist/index.d.ts""
+}".Replace("\r", "");
 
         if (!File.Exists(pkgJson) || File.ReadAllText(pkgJson) != expectedContent)
             File.WriteAllText(pkgJson, expectedContent);
@@ -59,25 +55,45 @@ try
             return Success;
         }
         var oldJson = File.ReadAllText(packageJson).Replace("\r", "").Trim();
-        var root = JObject.Parse(oldJson);
-        var oldDeps = root?["dependencies"] as JObject;
-        if (oldDeps == null)
+
+        var newJson = new Regex(@"(\s*""dependencies""\s*:\s*\{\s*)([^}]+)(\s*\})").Replace(oldJson, group =>
         {
-            Log.LogWarning("Can't find dependencies node in package.json");
-            return Success;
-        }
-        foreach (var x in oldDeps)
-        {
-            if (x.Value.Value<string>()?.StartsWith("file:./node_modules/.dotnet/", StringComparison.Ordinal) != true &&
-                x.Value.Value<string>()?.StartsWith("./node_modules/.dotnet/", StringComparison.Ordinal) != true)
-                newDeps[x.Key] = x.Value.Value<string>();
-        }
-        oldDeps.RemoveAll();
-        foreach (var x in newDeps.OrderBy(x => x.Key, StringComparer.Ordinal))
-            oldDeps.Add(x.Key, x.Value);
-        var newJson = root.ToString().Replace("\r", "");
+            var depsText = new Regex("\"\\s*:\\s*\\s*\"").Replace(group.Groups[2].Value, "\":\"");
+
+            foreach (var line in depsText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim()))
+            {
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                var parts = line.Split(new string[] { "\":\"" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+                if (parts.Length != 2 || !parts[0].StartsWith("\"") || !parts[1].EndsWith("\""))
+                {
+                    newDeps[line] = null;
+                    continue;
+                }
+
+                var name = parts[0].Substring(1);
+                var value = parts[1].Substring(0, parts[1].Length - 1);
+                if (!value.StartsWith("file:./node_modules/.dotnet/") &&
+                    !value.StartsWith("./node_modules/.dotnet/"))
+                {
+                    newDeps[name] = value;
+                    continue;
+                }
+            }
+
+            var newDepsJson = string.Join(",\n    ",
+                newDeps.Select(x => x.Value == null ? x.Key : ('"' + x.Key + "\": " + '"' + x.Value + '"'))
+                    .OrderBy(x => x, StringComparer.Ordinal));
+
+            return group.Groups[1].Value +
+                newDepsJson + "\n  " +
+                group.Groups[3].Value;
+        }, 1).Replace("\r", "");
+
         if (oldJson != newJson)
-            File.WriteAllBytes(packageJson, Encoding.UTF8.GetBytes(newJson.Replace("\r", "")));
+            File.WriteAllBytes(packageJson, Encoding.UTF8.GetBytes(newJson));
     }
 }
 catch (Exception ex)
