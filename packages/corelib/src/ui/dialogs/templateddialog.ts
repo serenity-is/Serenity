@@ -278,7 +278,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         return openPanel(element, uniqueName);
     }
 
-    public static closePanel(element: JQuery, e?: JQueryEventObject) {
+    public static closePanel(element: JQuery, e?: Event) {
         return closePanel(element, e);
     }
 

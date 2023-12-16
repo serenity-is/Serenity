@@ -163,16 +163,16 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         return response;
     }
 
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void {
+    protected onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
-        if (!e.isDefaultPrevented()) {
+        if (!(e as any).isDefaultPrevented?.()) {
             SlickTreeHelper.toggleClick(e, row, cell, this.view, function (x) {
                 return x.id;
             });
         }
 
-        if (e.isDefaultPrevented()) {
+        if ((e as any).isDefaultPrevented?.()) {
             return;
         }
 

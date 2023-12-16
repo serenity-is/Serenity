@@ -421,7 +421,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         });
 
         if (this.isMultiple()) {
-            this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: JQueryEventObject) => {
+            this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
                 var q = $(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
@@ -899,7 +899,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected setTermOnNewEntity(entity: TItem, term: string) {
     }
 
-    protected inplaceCreateClick(e: JQueryEventObject) {
+    protected inplaceCreateClick(e: Event) {
 
         if (this.get_readOnly() &&
             ((this.isMultiple() && !(e as any)['editItem']) || !this.value))

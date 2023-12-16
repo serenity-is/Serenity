@@ -200,7 +200,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
             this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
                 b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
-            this.mouseTrap.bind(b.hotkey, function (e1: BaseJQueryEventObject, action: any) {
+            this.mouseTrap.bind(b.hotkey, function () {
                 if (btn.is(':visible')) {
                     btn.triggerHandler('click');
                 }

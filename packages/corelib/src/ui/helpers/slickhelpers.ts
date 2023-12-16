@@ -775,7 +775,7 @@ export namespace SlickTreeHelper {
         }
     }
 
-    export function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number,
+    export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: RemoteView<TItem>, getId: (x: TItem) => any): void {
         var target = $(e.target);
         if (!target.hasClass('s-TreeToggle')) {
@@ -792,7 +792,7 @@ export namespace SlickTreeHelper {
                 }
                 view.updateItem(getId(item), item);
             }
-            if (e.shiftKey) {
+            if ((e as any).shiftKey) {
                 view.beginUpdate();
                 try {
                     setCollapsed(view.getItems(), !!item._collapsed);

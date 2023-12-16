@@ -160,7 +160,7 @@ export namespace Reporting {
             }
         }
 
-        protected categoryClick(e: JQueryEventObject) {
+        protected categoryClick(e: Event) {
             var li = $(e.target).closest('li');
             if (li.hasClass('expanded')) {
                 li.find('ul').hide('fast');
@@ -176,7 +176,7 @@ export namespace Reporting {
             }
         }
 
-        protected reportLinkClick(e: JQueryEventObject) {
+        protected reportLinkClick(e: Event) {
             e.preventDefault();
             var dialog = new ReportDialog({ reportKey: $(e.target).data('key') });
         }

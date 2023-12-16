@@ -183,7 +183,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
             .click((e) => this.resetButtonClick(e));
     }
 
-    protected searchButtonClick(e: JQueryEventObject) {
+    protected searchButtonClick(e: Event) {
         e.preventDefault();
         this.search();
     }
@@ -254,12 +254,12 @@ export class FilterPanel extends FilterWidgetBase<any> {
         this.get_store().raiseChanged();
     }
 
-    protected addButtonClick(e: JQueryEventObject) {
+    protected addButtonClick(e: Event) {
         this.addEmptyRow(true);
         e.preventDefault();
     }
 
-    protected resetButtonClick(e: JQueryEventObject) {
+    protected resetButtonClick(e: Event) {
         e.preventDefault();
 
         if (this.get_updateStoreOnReset()) {
@@ -361,7 +361,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         return row;
     }
 
-    protected onRowFieldChange(e: JQueryEventObject) {
+    protected onRowFieldChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
         this.rowFieldChange(row);
         var opSelect = row.children('div.o').find('input.op-select');
@@ -438,7 +438,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         return filtering;
     }
 
-    protected onRowOperatorChange(e: JQueryEventObject) {
+    protected onRowOperatorChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
         this.rowOperatorChange(row);
         var firstInput = row.children('div.v').find(':input:visible').first();
@@ -479,7 +479,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         filtering.createEditor();
     }
 
-    protected deleteRowClick(e: JQueryEventObject): void {
+    protected deleteRowClick(e: Event): void {
         e.preventDefault();
         var row = $(e.target).closest('div.filter-line');
         row.remove();
@@ -499,14 +499,14 @@ export class FilterPanel extends FilterWidgetBase<any> {
             this.rowsDiv.children().length >= 1);
     }
 
-    protected andOrClick(e: JQueryEventObject): void {
+    protected andOrClick(e: Event): void {
         e.preventDefault();
         var andor = $(e.target).toggleClass('or');
         andor.text(localText('Controls.FilterPanel.' +
             (andor.hasClass('or') ? 'Or' : 'And')));
     }
 
-    protected leftRightParenClick(e: JQueryEventObject): void {
+    protected leftRightParenClick(e: Event): void {
         e.preventDefault();
         $(e.target).toggleClass('active');
         this.updateParens();

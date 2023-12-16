@@ -131,11 +131,11 @@ export class Widget<TOptions = any> {
         return this.element.closest('.field');
     } 
 
-    public change(handler: (e: JQueryEventObject) => void) {
+    public change(handler: (e: Event) => void) {
         this.element.on('change.' + this.uniqueName, handler);
     };
 
-    public changeSelect2(handler: (e: JQueryEventObject) => void) {
+    public changeSelect2(handler: (e: Event) => void) {
         this.element.on('change.' + this.uniqueName, function (e, valueSet) {
             if (valueSet !== true)
                 handler(e);
@@ -241,15 +241,15 @@ export interface WidgetComponentProps<W extends Widget<any>> {
     required?: boolean;
     readOnly?: boolean;
     oneWay?: boolean;
-    onChange?: (e: JQueryEventObject) => void;
-    onChangeSelect2?: (e: JQueryEventObject) => void;
+    onChange?: (e: Event) => void;
+    onChangeSelect2?: (e: Event) => void;
     value?: any;
     defaultValue?: any;
 }
 
 export declare interface Widget<TOptions> {
-    change(handler: (e: JQueryEventObject) => void): void;
-    changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    change(handler: (e: Event) => void): void;
+    changeSelect2(handler: (e: Event) => void): void;
 }
 
 if (typeof $ === "function") {

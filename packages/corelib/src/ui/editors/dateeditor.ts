@@ -197,7 +197,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         }
     }
 
-    static dateInputChange = function (e: JQueryEventObject) {
+    static dateInputChange = function (e: Event) {
         dateInputChangeHandler(e);
     };
 

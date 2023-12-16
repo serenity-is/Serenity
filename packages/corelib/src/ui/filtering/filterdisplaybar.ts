@@ -18,7 +18,7 @@ export class FilterDisplayBar extends FilterWidgetBase<any> {
         this.element.find('.reset').attr('title',
             localText('Controls.FilterPanel.ResetFilterHint'));
 
-        var openFilterDialog = (e: JQueryEventObject) => {
+        var openFilterDialog = (e: Event) => {
             e.preventDefault();
             var dialog = new FilterDialog();
             dialog.get_filterPanel().set_store(this.get_store());

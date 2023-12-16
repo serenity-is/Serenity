@@ -1,5 +1,5 @@
 ﻿import { Criteria, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
-import { AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
+import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, IPlugin, Range, SelectionModel } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
@@ -465,7 +465,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 .filter(c => this.canFilterColumn(c))
                 .map(x => x.sourceItem)));
 
-        this.filterBar.get_store().add_changed((s: JQueryEventObject, e: any) => {
+        this.filterBar.get_store().add_changed(() => {
             if (this.restoringSettings <= 0) {
                 this.persistSettings(null);
                 this.view && (this.view.seekToPage = 1);
@@ -577,17 +577,17 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         this.slickGrid.onSort.subscribe(this._slickGridOnSort);
 
-        this._slickGridOnClick = (e1: JQueryEventObject, p1: any) => {
+        this._slickGridOnClick = (e1: MouseEvent, p1: ArgsCell) => {
             self.onClick(e1, p1.row, p1.cell);
         }
 
         this.slickGrid.onClick.subscribe(this._slickGridOnClick);
 
-        this.slickGrid.onColumnsReordered.subscribe((e2: JQueryEventObject, p2: any) => {
+        this.slickGrid.onColumnsReordered.subscribe(() => {
             return this.persistSettings(null);
         });
 
-        this.slickGrid.onColumnsResized.subscribe((e3: JQueryEventObject, p3: any) => {
+        this.slickGrid.onColumnsResized.subscribe(() => {
             return this.persistSettings(null);
         });
     }
@@ -613,8 +613,8 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         throw new Error("Not Implemented!");
     }
 
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void {
-        if (e.isDefaultPrevented()) {
+    protected onClick(e: Event, row: number, cell: number): void {
+        if ((e as any).isDefaultPrevented?.()) {
             return;
         }
 
@@ -1144,7 +1144,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }
     }
 
-    protected quickFilterChange(e: JQueryEventObject) {
+    protected quickFilterChange(e: Event) {
         this.persistSettings(null);
         this.view && (this.view.seekToPage = 1);
         this.refresh();

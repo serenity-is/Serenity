@@ -152,11 +152,11 @@ export class FilterStore {
         this.changed && this.changed(this, {});
     }
 
-    add_changed(value: (e: JQueryEventObject, a: any) => void): void {
+    add_changed(value: (e: Event, a: any) => void): void {
         this.changed = delegateCombine(this.changed, value);
     }
 
-    remove_changed(value: (e: JQueryEventObject, a: any) => void): void {
+    remove_changed(value: (e: Event, a: any) => void): void {
         this.changed = delegateRemove(this.changed, value);
     }
 

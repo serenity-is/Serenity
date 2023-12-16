@@ -29,7 +29,7 @@ export namespace UploadHelper {
             dataType: 'json',
             dropZone: options.zone,
             pasteZone: options.zone,
-            done: function (e: JQueryEventObject, data: any) {
+            done: function (e: Event, data: any) {
                 var response = data.result;
                 if (response.Error) {
                     notifyError(response.Error.Message);
@@ -40,7 +40,7 @@ export namespace UploadHelper {
                     options.fileDone(response, data.files[0].name, data);
                 }
             },
-            fail: function(e: JQueryEventObject, opt: any) {
+            fail: function(e: Event, opt: any) {
                 var xhr = opt?._response?.jqXHR;
                 if (!xhr) {
                     notifyError('An error occurred during file upload.');
@@ -87,7 +87,7 @@ export namespace UploadHelper {
                     options.progress.hide();
                 }
             },
-            progress: function (e1: JQueryEventObject, data1: any) {
+            progress: function (e: Event, data1: any) {
                 if (options.progress != null) {
                     var percent = data1.loaded / data1.total * 100;
                     options.progress.children().css('width', percent.toString() + '%');

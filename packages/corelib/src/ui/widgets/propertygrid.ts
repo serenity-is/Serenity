@@ -192,10 +192,10 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         return categoryDiv;
     }
 
-    private categoryLinkClick = (e: JQueryEventObject) => {
+    private categoryLinkClick = (e: Event) => {
         e.preventDefault();
 
-        var title = $('a[name=' + e.target.getAttribute('href')
+        var title = $('a[name=' + (e.target as HTMLElement).getAttribute('href')
             .toString().substr(1) + ']');
 
         if (title.closest('.category').hasClass('collapsed'))

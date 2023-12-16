@@ -353,7 +353,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
         };
     }
 
-    public onChange: (e: JQueryEventObject) => void;
+    public onChange: (e: Event) => void;
 
     private submitHandlers: any;
 
