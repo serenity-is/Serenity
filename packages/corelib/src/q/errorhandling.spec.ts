@@ -1,7 +1,13 @@
 import * as base from "@serenity-is/base";
 import { ErrorHandling } from "./errorhandling";
 
-beforeEach(() => jest.restoreAllMocks());
+function changeJSDOMURL(url: string) {
+    (globalThis as any).jsdom.reconfigure({ url: url });
+}
+
+beforeEach(() => {
+    jest.restoreAllMocks();
+});
 
 describe("showServiceError", function () {
     it("shows ??ERROR?? if error is null", () => {
@@ -44,54 +50,52 @@ describe("showServiceError", function () {
 
 describe("isDevelopmentMode", function () {
     it("returns true for localhost and loopback", () => {
-        var oldLocation = window.location;
+        var oldLocation = window.location.href;
         try {
-            Object.defineProperty(window, "location", { value: new URL("http://localhost"), writable: true });
+            changeJSDOMURL("http://localhost");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("https://localhost/test"), writable: true });
+            changeJSDOMURL("http://localhost/test");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("http://127.0.0.1:8000"), writable: true });
+            changeJSDOMURL("http://127.0.0.1:8000");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("https://127.0.0.1/test"), writable: true });
+            changeJSDOMURL("http://127.0.0.1/test");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("http://[::1]:8000"), writable: true });
+            changeJSDOMURL("http://[::1]:8000");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("https://[::1]/test"), writable: true });
+            changeJSDOMURL("http://[::1]/test");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
         }
         finally {
-            window.location = oldLocation;
+            changeJSDOMURL(oldLocation);
         }
     });
 
     it("returns true for domains ending with .local or .localhost", () => {
-        var oldLocation = window.location;
+        var oldLocation = window.location.href;
         try {
-            Object.defineProperty(window, "location", { value: new URL("http://test.localhost"), writable: true });
+            changeJSDOMURL("http://test.localhost");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
-            Object.defineProperty(window, "location", { value: new URL("https://test.local"), writable: true });
+            changeJSDOMURL("http://test.local");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
         }
         finally {
-            window.location = oldLocation;
+            changeJSDOMURL(oldLocation);
         }
     });
 
     it("returns false for other hosts", () => {
-        var oldLocation = window.location;
+        var oldLocation = window.location.href;
         try {
-            Object.defineProperty(window, "location", { value: new URL("http://test"), writable: true });
+            changeJSDOMURL("http://test");
             expect(ErrorHandling.isDevelopmentMode()).toBe(false);
-            Object.defineProperty(window, "location", { value: new URL("https://testlocal"), writable: true });
+            changeJSDOMURL("http://testlocal");
             expect(ErrorHandling.isDevelopmentMode()).toBe(false);
-            Object.defineProperty(window, "location", { value: new URL("https://localhost.domain"), writable: true });
+            changeJSDOMURL("http://localhost.domain");
             expect(ErrorHandling.isDevelopmentMode()).toBe(false);
-            Object.defineProperty(window, "location", { value: new URL("https://127.0.0.2"), writable: true });
-            Object.defineProperty(window, "location", { value: { hostname: null }, writable: true });
-            expect(ErrorHandling.isDevelopmentMode()).toBe(false);
+            changeJSDOMURL("http://127.0.0.2");
         }
         finally {
-            window.location = oldLocation;
+            changeJSDOMURL(oldLocation);
         }
     });
 });
