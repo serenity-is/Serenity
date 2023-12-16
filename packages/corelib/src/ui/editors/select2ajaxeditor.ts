@@ -121,7 +121,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
 
             },
             initSelection: (element, callback) => {
-                var val = element.val();
+                var val = element.val() as string;
                 if (!val) {
                     callback(null);
                     return;

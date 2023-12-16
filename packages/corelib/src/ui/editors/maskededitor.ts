@@ -17,7 +17,7 @@ export class MaskedEditor extends Widget<MaskedEditorOptions> {
 
     public get value(): string {
         this.element.triggerHandler("blur.mask");
-        return this.element.val();
+        return this.element.val() as string;
     }
 
     protected get_value(): string {

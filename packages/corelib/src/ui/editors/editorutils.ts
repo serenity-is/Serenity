@@ -166,7 +166,6 @@ export namespace EditorUtils {
             else {
                 elx.removeClass('readonly').removeAttr('readonly');
             }
-            return true;
         });
         return elements;
     }

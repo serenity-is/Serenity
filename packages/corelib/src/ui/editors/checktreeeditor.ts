@@ -167,7 +167,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends
         super.onClick(e, row, cell);
 
         if (!(e as any).isDefaultPrevented?.()) {
-            SlickTreeHelper.toggleClick(e, row, cell, this.view, function (x) {
+            SlickTreeHelper.toggleClick(e as any, row, cell, this.view, function (x) {
                 return x.id;
             });
         }

@@ -47,7 +47,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
     }
 
     get_value(): string {
-        return this.element.find('.g-recaptcha-response').val();
+        return this.element.find('.g-recaptcha-response').val() as string;
     }
 
     set_value(value: string): void {

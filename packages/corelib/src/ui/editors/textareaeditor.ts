@@ -23,7 +23,7 @@ export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
     }
 
     public get value(): string {
-        return this.element.val();
+        return this.element.val() as string;
     }
 
     protected get_value(): string {

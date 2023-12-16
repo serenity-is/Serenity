@@ -190,7 +190,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         var buttons = this.getDialogButtons();
         if (buttons != null) {
             for (var x of buttons) {
-                $(dialogButtonToBS(x)).appendTo(footer).click(x.click);
+                $(dialogButtonToBS(x)).appendTo(footer).click(x.click as any);
             }
         }
         else
@@ -386,7 +386,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                     $('<button class="panel-titlebar-close">&nbsp;</button>')
                         .prependTo(pt)
                         .click(e => {
-                            TemplatedDialog.closePanel(this.element, e);
+                            TemplatedDialog.closePanel(this.element, e as any);
                         });
                 }
             }

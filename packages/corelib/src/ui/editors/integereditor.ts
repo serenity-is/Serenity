@@ -40,7 +40,7 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
                 return parseInt(val, 10);
         } 
         else {
-            val = this.element.val()?.trim();
+            val = (this.element.val() as string)?.trim();
             if (!val)
                 return null;
             return parseInteger(val)

@@ -11,7 +11,7 @@ export class StringEditor extends Widget<any> {
     }
 
     public get value(): string {
-        return this.element.val();
+        return this.element.val() as string;
     }
 
     protected get_value(): string {

@@ -99,7 +99,7 @@ export class SlickPager extends Widget<PagerOptions> {
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt($('input.slick-pg-current', this.element).val());
+                var nv = parseInt($('input.slick-pg-current', this.element).val() as string);
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)

@@ -31,7 +31,7 @@ describe("LookupEditor", () => {
         var oldAjax = $.ajax;
         try {
             $.ajax = function(settings: JQueryAjaxSettings): JQueryXHR {
-                settings.error({ status: 404 } as any, null, null);
+                (settings.error as any)({ status: 404 } as any, null, null);
                 return {} as any;
             } as unknown as any;
             expect(() => new LookupEditor($("<input />"), {

@@ -174,13 +174,13 @@ export class FilterPanel extends FilterWidgetBase<any> {
 
     protected initButtons(): void {
         this.byId('AddButton').text(localText('Controls.FilterPanel.AddFilter'))
-            .click((e) => this.addButtonClick(e));
+            .click((e) => this.addButtonClick(e as any));
 
         this.byId('SearchButton').text(localText('Controls.FilterPanel.SearchButton'))
-            .click((e) => this.searchButtonClick(e));
+            .click((e) => this.searchButtonClick(e as any));
 
         this.byId('ResetButton').text(localText('Controls.FilterPanel.ResetButton'))
-            .click((e) => this.resetButtonClick(e));
+            .click((e) => this.resetButtonClick(e as any));
     }
 
     protected searchButtonClick(e: Event) {
@@ -282,15 +282,13 @@ export class FilterPanel extends FilterWidgetBase<any> {
         this.rowsDiv.children().each(function (index, row) {
             var fieldInput = $(row).children('div.f')
                 .children('input.field-select').first();
-            if (fieldInput.length === 0) {
-                return true;
-            }
-            var val = fieldInput.val();
+            if (fieldInput.length === 0)
+                return;
+            var val = fieldInput.val() as string;
             if (val == null || val.length === 0) {
                 result = $(row);
                 return false;
             }
-            return true;
         });
 
         return result;
@@ -329,7 +327,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var parenDiv = row.children('div.l').hide();
 
         parenDiv.children('a.leftparen, a.rightparen')
-            .click((e) => this.leftRightParenClick(e));
+            .click((e) => this.leftRightParenClick(e as any));
 
         var andor = parenDiv.children('a.andor').attr('title', localText('Controls.FilterPanel.ChangeAndOr'));
         if (isLastRowOr) {
@@ -339,11 +337,11 @@ export class FilterPanel extends FilterWidgetBase<any> {
             andor.text(localText('Controls.FilterPanel.And'));
         }
 
-        andor.click((e) => this.andOrClick(e));
+        andor.click((e) => this.andOrClick(e as any));
 
         row.children('a.delete')
             .attr('title', localText('Controls.FilterPanel.RemoveField'))
-            .click((e) => this.deleteRowClick(e));
+            .click((e) => this.deleteRowClick(e as any));
 
         var fieldSel = new FilterFieldSelect(row.children('div.f')
             .children('input'), this.get_store().get_fields())
@@ -363,7 +361,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
 
     protected onRowFieldChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
-        this.rowFieldChange(row);
+        this.rowFieldChange(row as any);
         var opSelect = row.children('div.o').find('input.op-select');
         opSelect.select2('focus');
     }
@@ -440,7 +438,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
 
     protected onRowOperatorChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
-        this.rowOperatorChange(row);
+        this.rowOperatorChange(row as any);
         var firstInput = row.children('div.v').find(':input:visible').first();
         try {
             firstInput.focus();

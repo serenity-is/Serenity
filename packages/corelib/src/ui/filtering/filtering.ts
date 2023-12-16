@@ -230,7 +230,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'gt':
             case 'ge': {
                 var input = this.get_container().find(':input').first();
-                return input.val();
+                return input.val() as string;
             }
         }
         return null;
@@ -267,7 +267,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         return this.validateEditorValue(value);
     }
 
-    getEditorText() {
+    getEditorText(): string {
         var input = this.get_container().find(':input').not('.select2-focusser').not('.select2-input').first();
         if (input.length === 0) {
             return this.get_container().text().trim();
@@ -277,7 +277,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             value = (input.select2('data') ?? {}).text;
         }
         else {
-            value = input.val();
+            value = input.val() as string;
         }
         return value;
     }

@@ -22,7 +22,7 @@ export class TreeGridMixin<TItem> {
                 var src = dg.slickGrid.getCellFromEvent(e);
                 if (src.cell >= 0 &&
                     src.row >= 0) {
-                    SlickTreeHelper.toggleClick<TItem>(e, src.row, src.row, dg.view, getId);
+                    SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.row, dg.view, getId);
                 }
             }
         });

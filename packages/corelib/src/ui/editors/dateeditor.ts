@@ -47,7 +47,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
                 }
             }
             else {
-                DateEditor.dateInputKeyup(e);
+                DateEditor.dateInputKeyup(e as any);
             }
         });
 
@@ -74,7 +74,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     }
 
     get_value(): string {
-        var value = this.element.val()?.trim();
+        var value = (this.element.val() as string)?.trim();
         if (!value) {
             return null;
         }
@@ -201,7 +201,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
         dateInputChangeHandler(e);
     };
 
-    static dateInputKeyup(e: JQueryKeyEventObject) {
+    static dateInputKeyup(e: KeyboardEvent) {
         dateInputKeyupHandler(e as any);
     };
 

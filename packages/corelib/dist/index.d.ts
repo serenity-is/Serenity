@@ -2140,8 +2140,8 @@ interface WidgetComponentProps<W extends Widget<any>> {
     required?: boolean;
     readOnly?: boolean;
     oneWay?: boolean;
-    onChange?: (e: JQueryEventObject) => void;
-    onChangeSelect2?: (e: JQueryEventObject) => void;
+    onChange?: (e: Event) => void;
+    onChangeSelect2?: (e: Event) => void;
     value?: any;
     defaultValue?: any;
 }
@@ -2169,8 +2169,8 @@ declare class Widget<TOptions = any> {
     private static __isWidgetType;
 }
 declare interface Widget<TOptions> {
-    change(handler: (e: JQueryEventObject) => void): void;
-    changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    change(handler: (e: Event) => void): void;
+    changeSelect2(handler: (e: Event) => void): void;
 }
 
 declare global {
@@ -2277,7 +2277,7 @@ declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     private useBSModal;
     static bootstrapModal: boolean;
     static openPanel(element: JQuery, uniqueName: string): void;
-    static closePanel(element: JQuery, e?: JQueryEventObject): void;
+    static closePanel(element: JQuery, e?: Event): void;
     protected onDialogOpen(): void;
     arrange(): void;
     protected onDialogClose(): void;
@@ -2569,8 +2569,8 @@ declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly 
     set_maxDate(value: Date): void;
     get_sqlMinMax(): boolean;
     set_sqlMinMax(value: boolean): void;
-    static dateInputChange: (e: JQueryEventObject) => void;
-    static dateInputKeyup(e: JQueryKeyEventObject): void;
+    static dateInputChange: (e: Event) => void;
+    static dateInputKeyup(e: KeyboardEvent): void;
     static useFlatpickr: boolean;
     static flatPickrOptions(input: JQuery): {
         clickOpens: boolean;
@@ -2820,7 +2820,7 @@ declare class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected setEditDialogReadOnly(dialog: any): void;
     protected editDialogDataChange(): void;
     protected setTermOnNewEntity(entity: TItem, term: string): void;
-    protected inplaceCreateClick(e: JQueryEventObject): void;
+    protected inplaceCreateClick(e: Event): void;
     openDialogAsPanel: boolean;
 }
 declare function select2LocaleInitialization(): boolean;
@@ -3121,7 +3121,7 @@ declare class QuickFilterBar extends Widget<QuickFilterBarOptions> {
     static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
     addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
-    onChange: (e: JQueryEventObject) => void;
+    onChange: (e: Event) => void;
     private submitHandlers;
     destroy(): void;
     onSubmit(request: ListRequest): void;
@@ -3214,8 +3214,8 @@ declare class FilterStore {
     };
     get_items(): FilterLine[];
     raiseChanged(): void;
-    add_changed(value: (e: JQueryEventObject, a: any) => void): void;
-    remove_changed(value: (e: JQueryEventObject, a: any) => void): void;
+    add_changed(value: (e: Event, a: any) => void): void;
+    remove_changed(value: (e: Event, a: any) => void): void;
     get_activeCriteria(): any[];
     get_displayText(): string;
 }
@@ -3268,11 +3268,11 @@ declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     protected getCriteriaField(): string;
     getCriteria(): CriteriaWithText;
     loadState(state: any): void;
-    saveState(): any;
+    saveState(): string;
     protected argumentNull(): Error;
     validateEditorValue(value: string): string;
     getEditorValue(): string;
-    getEditorText(): any;
+    getEditorText(): string;
     initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
@@ -3373,25 +3373,25 @@ declare class FilterPanel extends FilterWidgetBase<any> {
     set_updateStoreOnReset(value: boolean): void;
     protected getTemplate(): string;
     protected initButtons(): void;
-    protected searchButtonClick(e: JQueryEventObject): void;
+    protected searchButtonClick(e: Event): void;
     get_hasErrors(): boolean;
     search(): void;
-    protected addButtonClick(e: JQueryEventObject): void;
-    protected resetButtonClick(e: JQueryEventObject): void;
+    protected addButtonClick(e: Event): void;
+    protected resetButtonClick(e: Event): void;
     protected findEmptyRow(): JQuery;
     protected addEmptyRow(popupField: boolean): JQuery;
-    protected onRowFieldChange(e: JQueryEventObject): void;
+    protected onRowFieldChange(e: Event): void;
     protected rowFieldChange(row: JQuery): void;
     protected removeFiltering(row: JQuery): void;
     protected populateOperatorList(row: JQuery): void;
     protected getFieldFor(row: JQuery): PropertyItem;
     protected getFilteringFor(row: JQuery): IFiltering;
-    protected onRowOperatorChange(e: JQueryEventObject): void;
+    protected onRowOperatorChange(e: Event): void;
     protected rowOperatorChange(row: JQuery): void;
-    protected deleteRowClick(e: JQueryEventObject): void;
+    protected deleteRowClick(e: Event): void;
     protected updateButtons(): void;
-    protected andOrClick(e: JQueryEventObject): void;
-    protected leftRightParenClick(e: JQueryEventObject): void;
+    protected andOrClick(e: Event): void;
+    protected leftRightParenClick(e: Event): void;
     protected updateParens(): void;
 }
 
@@ -3500,7 +3500,7 @@ declare namespace SlickTreeHelper {
     function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
     function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
     function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-    function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
+    function toggleClick<TItem>(e: Event, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
 }
 declare class ColumnsBase<TRow = any> {
     constructor(items: Column<TRow>[]);
@@ -3669,7 +3669,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected getButtons(): ToolButton[];
     protected editItem(entityOrId: any): void;
     protected editItemOfType(itemType: string, entityOrId: any): void;
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void;
+    protected onClick(e: Event, row: number, cell: number): void;
     protected viewDataChanged(e: any, rows: TItem[]): void;
     protected bindToViewEvents(): void;
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
@@ -3739,7 +3739,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
     protected invokeSubmitHandlers(): void;
-    protected quickFilterChange(e: JQueryEventObject): void;
+    protected quickFilterChange(e: Event): void;
     protected getPersistanceStorage(): SettingStorage;
     protected getPersistanceKey(): string;
     protected gridPersistanceFlags(): GridPersistanceFlags;
@@ -3835,7 +3835,7 @@ declare class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extend
     protected onViewFilter(item: TItem): boolean;
     protected getInitialCollapse(): boolean;
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void;
+    protected onClick(e: Event, row: number, cell: number): void;
     protected updateSelectAll(): void;
     protected updateFlags(): void;
     protected getDescendantsSelected(item: TItem): boolean;
@@ -4116,8 +4116,8 @@ declare namespace Reporting {
     class ReportPage extends Widget<any> {
         constructor(div: JQuery);
         protected updateMatchFlags(text: string): void;
-        protected categoryClick(e: JQueryEventObject): void;
-        protected reportLinkClick(e: JQueryEventObject): void;
+        protected categoryClick(e: Event): void;
+        protected reportLinkClick(e: Event): void;
     }
     interface ReportRetrieveRequest extends ServiceRequest {
         ReportKey?: string;

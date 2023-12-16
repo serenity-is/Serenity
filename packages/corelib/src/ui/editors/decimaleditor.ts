@@ -38,8 +38,9 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
     }
 
     get_value(): number {
+        var val;
         if (($.fn as any).autoNumeric) {
-            var val = (this.element as any).autoNumeric('get');
+            val = (this.element as any).autoNumeric('get');
 
             if (!!(val == null || val === ''))
                 return null;
@@ -47,7 +48,7 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
             return parseFloat(val);
         }
 
-        var val = this.element.val();
+         val = this.element.val() as any;
         return parseDecimal(val);
     }
 

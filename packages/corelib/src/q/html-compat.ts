@@ -42,7 +42,7 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string, c
  * @returns the element with the given relative id to the source element.
  */
 export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
-export function findElementWithRelativeId(element: JQuery | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | Element {
+export function findElementWithRelativeId(element: JQuery | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
 
     const isJQuery = element instanceof $ && element != null;
     const from: HTMLElement = isJQuery ? (element as JQuery).get(0) : element as HTMLElement;
@@ -59,7 +59,7 @@ export function findElementWithRelativeId(element: JQuery | HTMLElement, relativ
 
     let fromId = from.id ?? "";
     while (true) {
-        var res = context?.querySelector("#" + fromId + relativeId);
+        var res = context?.querySelector("#" + fromId + relativeId) as HTMLElement;
         
         if (!res && noContext)
             res = doc?.getElementById(fromId + relativeId);

@@ -94,7 +94,6 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
                 .children('.category-title')
                 .each((i, x) => {
                     $(x).click();
-                    return true;
                 });
 
             if (validator.errorList.length)

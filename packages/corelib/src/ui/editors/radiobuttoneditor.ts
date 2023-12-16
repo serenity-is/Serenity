@@ -63,7 +63,7 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
     }
 
     get_value(): string {
-        return this.element.find('input:checked').first().val();
+        return this.element.find('input:checked').first().val() as string;
     }
 
     get value(): string {

@@ -583,7 +583,7 @@ describe('jsx: widget integration', () => {
 
     it('can create input', () => {
         var ed: StringEditor;
-        window.$ = window.jQuery = $;
+        (window as any).$ = (window as any).jQuery = $;
         var el = <StringEditor_ ref={x => ed = x} readOnly={true} />;
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);

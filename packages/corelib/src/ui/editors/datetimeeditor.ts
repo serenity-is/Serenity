@@ -47,7 +47,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
 
             input.bind('change.' + this.uniqueName, (e) => {
                 this.lastSetValue = null;
-                DateEditor.dateInputChange(e);
+                DateEditor.dateInputChange(e as any);
             });
 
             this.time = $('<select/>').addClass('editor s-DateTimeEditor time');
@@ -65,7 +65,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                 }
             }
 
-            this.time.on('change', function (e3) {
+            this.time.on('change', () => {
                 this.lastSetValue = null;
                 input.triggerHandler('change');
             });
@@ -112,7 +112,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                 }
                 else {
                     var before = this.element.val();
-                    DateEditor.dateInputKeyup(e);
+                    DateEditor.dateInputKeyup(e as any);
                     if (before != this.element.val())
                         this.lastSetValue = null;
                 }
@@ -152,7 +152,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
     }
 
     get_value(): string {           
-        var value = this.element.val().trim();
+        var value = (this.element.val() as string).trim();
         if (value != null && value.length === 0) {
             return null;
         }
@@ -164,7 +164,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                 result = datePart + 'T' + timePart + ':00.000';
         }
         else
-            result = formatDate(parseDate(this.element.val()), "yyyy-MM-ddTHH:mm:ss.fff");
+            result = formatDate(parseDate(this.element.val() as string), "yyyy-MM-ddTHH:mm:ss.fff");
 
         if (this.options.useUtc)
             result = formatISODateTimeUTC(parseISODateTime(result));

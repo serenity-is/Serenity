@@ -148,7 +148,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
             return instance.getData();
         }
         else {
-            return this.element.val();
+            return this.element.val() as string;
         }
     }
 

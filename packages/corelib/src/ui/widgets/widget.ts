@@ -138,7 +138,7 @@ export class Widget<TOptions = any> {
     public changeSelect2(handler: (e: Event) => void) {
         this.element.on('change.' + this.uniqueName, function (e, valueSet) {
             if (valueSet !== true)
-                handler(e);
+                handler(e as any);
         });
     };
 
@@ -215,7 +215,7 @@ if (typeof $ !== "undefined" && $.fn) {
         }
         if (this.length === 0) {
             throw new Exception(stringFormat("Searching for widget of type '{0}' on a non-existent element! ({1})",
-                getTypeFullName(type), this.selector));
+                getTypeFullName(type), (this as any).selector));
         }
 
         var w = (this as any).tryGetWidget(type);

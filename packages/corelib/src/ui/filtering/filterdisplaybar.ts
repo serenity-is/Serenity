@@ -25,8 +25,8 @@ export class FilterDisplayBar extends FilterWidgetBase<any> {
             dialog.dialogOpen(null);
         };
 
-        this.element.find('.edit').click(openFilterDialog);
-        this.element.find('.txt').click(openFilterDialog);
+        this.element.find('.edit').click(openFilterDialog as any);
+        this.element.find('.txt').click(openFilterDialog as any);
 
         this.element.find('.reset').click(e1 => {
             e1.preventDefault();

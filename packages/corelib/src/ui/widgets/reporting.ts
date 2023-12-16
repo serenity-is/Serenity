@@ -114,8 +114,8 @@ export namespace Reporting {
         constructor(div: JQuery) {
             super(div);
 
-            $('.report-link').click((e) => this.reportLinkClick(e));
-            $('div.line').click((e) => this.categoryClick(e));
+            $('.report-link').click((e) => this.reportLinkClick(e as any));
+            $('div.line').click((e) => this.categoryClick(e as any));
             var self = this;
             new QuickSearchInput($('#QuickSearchInput'), {
                 onSearch: function (field, text, done) {

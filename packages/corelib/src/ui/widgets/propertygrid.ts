@@ -103,8 +103,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             }
             this.editors = null;
         }
-        this.element.find('a.category-link').unbind('click',
-            this.categoryLinkClick).remove();
+        this.element.find('a.category-link').off('click',
+            this.categoryLinkClick as any).remove();
 
         Widget.prototype.destroy.call(this);
     }
@@ -122,8 +122,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 linkContainer.appendTo(container);
             }
             else {
-                linkContainer.find('a.category-link').unbind('click',
-                    this.categoryLinkClick).remove();
+                linkContainer.find('a.category-link').off('click',
+                    this.categoryLinkClick as any).remove();
             }
         }
 
@@ -468,7 +468,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                     .attr('tabindex', '-1')
                     .attr('href', '#' + this.idPrefix +
                         'Category' + index.toString())
-                    .click(this.categoryLinkClick)
+                    .click(this.categoryLinkClick as any)
                     .prependTo(container);
             }
         }

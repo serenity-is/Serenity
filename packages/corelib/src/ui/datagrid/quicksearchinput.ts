@@ -28,7 +28,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
 
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
-        this.lastValue = (input.val() ?? '').trim();
+        this.lastValue = ((input.val() ?? '') as string).trim();
 
         var self = this;
         this.element.bind('keyup.' + this.uniqueName, function () {
@@ -77,7 +77,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
             if (!!this.timer) {
                 window.clearTimeout(this.timer);
             }
-            this.searchNow((this.element.val() ?? '').trim());
+            this.searchNow((this.element.val() as string ?? '').trim());
         });
     }
 
@@ -107,7 +107,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
     }
 
     get_value(): string {
-        return (this.element.val() ?? '').trim();
+        return (this.element.val() as string ?? '').trim();
     }
 
     get_field(): QuickSearchField {

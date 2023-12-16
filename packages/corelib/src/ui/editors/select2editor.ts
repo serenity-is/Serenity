@@ -232,7 +232,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 }
 
                 var isMultiple = this.isMultiple();
-                var idList = isMultiple ? val.split(',') : [val]; 
+                var idList = isMultiple ? (val as string).split(',') : [val as string]; 
                 var searchQuery = {
                     idList: idList
                 }
@@ -291,11 +291,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 });
             }
             opt.initSelection = (element, callback) => {
-                var val = element.val();
+                var val = element.val() as string;
                 var isAutoComplete = this.isAutoComplete();
                 if (this.isMultiple()) {
                     var list = [];
-                    for (var z of val.split(',')) {
+                    for (var z of (val as string).split(',')) {
                         var item2 = this._itemById[z];
                         if (item2 == null && isAutoComplete) {
                             item2 = { id: z, text: z };
@@ -394,7 +394,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             .addClass('inplace-button inplace-create')
             .attr('title', addTitle)
             .insertAfter(this.element).click(function (e) {
-                self.inplaceCreateClick(e);
+                self.inplaceCreateClick(e as any);
             });
 
         this.get_select2Container().add(this.element).addClass('has-inplace-button');

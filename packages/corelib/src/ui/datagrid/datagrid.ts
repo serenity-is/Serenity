@@ -618,7 +618,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
             return;
         }
 
-        var target = $(e.target);
+        var target = $(e.target) as JQuery;
         if (!target.hasClass('s-EditLink')) {
             target = target.closest('a');
         }
@@ -1423,7 +1423,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 var qsWidget = qsInput.tryGetWidget(QuickSearchInput);
                 if (qsWidget != null) {
                     settings.quickSearchField = qsWidget.get_field();
-                    settings.quickSearchText = qsWidget.element.val();
+                    settings.quickSearchText = qsWidget.element.val() as string;
                 }
             }
         }

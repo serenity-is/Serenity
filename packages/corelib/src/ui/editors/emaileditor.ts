@@ -54,7 +54,7 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         });
 
         if (!this.options.readOnlyDomain) {
-            input.change(e2 => this.set_value(input.val()));
+            input.change(e2 => this.set_value(input.val() as string));
         }
     }
 

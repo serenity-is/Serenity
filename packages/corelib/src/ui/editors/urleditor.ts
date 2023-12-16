@@ -18,7 +18,7 @@ export class URLEditor extends StringEditor {
             if (!input.hasClass("error"))
                 return;
 
-            var value = input.val()?.trim();
+            var value = (input.val() as string)?.trim();
             if (!value)
                 return;
 
