@@ -614,7 +614,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected onClick(e: Event, row: number, cell: number): void {
-        if ((e as any).isDefaultPrevented?.()) {
+        if ((e as any).isDefaultPrevented?.() || e.defaultPrevented) {
             return;
         }
 

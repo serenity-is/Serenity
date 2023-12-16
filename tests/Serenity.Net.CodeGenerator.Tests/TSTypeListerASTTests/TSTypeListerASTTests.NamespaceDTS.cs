@@ -14,8 +14,8 @@ declare namespace Serenity {
     }
 
     interface Widget<TOptions> {
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
+        change(handler: (e: Event) => void): void;
+        changeSelect2(handler: (e: Event) => void): void;
     }
 
     class StringEditor extends Widget<any> {
