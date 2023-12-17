@@ -1,4 +1,4 @@
-﻿using Serenity.PropertyGrid;
+using Serenity.PropertyGrid;
 
 namespace Serenity.Web;
 
@@ -15,26 +15,28 @@ public class FormScriptRegistration
     /// <param name="propertyProvider">Property item provider</param>
     /// <param name="serviceProvider">Service provider</param>
     /// <exception cref="ArgumentNullException">Script manager or type source is null</exception>
-    public static void RegisterFormScripts(IDynamicScriptManager scriptManager,
+    public static IEnumerable<FormScript> RegisterFormScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(scriptManager);
-
         ArgumentNullException.ThrowIfNull(typeSource);
-
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        var scripts = new List<Func<string>>();
-
+        var scripts = new List<FormScript>();
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
         {
             var attr = type.GetCustomAttribute<FormScriptAttribute>();
             var key = attr.Key ?? type.FullName;
             var script = new FormScript(key, type, propertyProvider, serviceProvider);
             scriptManager.Register(script);
-            scripts.Add(script.GetScript);
+            scripts.Add(script);
         }
 
-        scriptManager.Register("FormBundle", new ConcatenatedScript(scripts));
+        scriptManager.Register("FormBundle", new ConcatenatedScript(new Func<string>[]
+        {
+            () => PropertyItemsScript.Compact(scripts.Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
+        }));
+
+        return scripts;
     }
 }

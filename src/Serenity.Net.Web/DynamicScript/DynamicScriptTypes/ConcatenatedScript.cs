@@ -1,4 +1,6 @@
-﻿namespace Serenity.Web;
+using Microsoft.AspNetCore.WebUtilities;
+
+namespace Serenity.Web;
 
 /// <summary>
 /// A dynamic script that is formed from concentanation of other scripts
@@ -34,10 +36,9 @@ public class ConcatenatedScript(IEnumerable<Func<string>> scriptParts,
         foreach (var part in scriptParts)
         {
             string partSource = part();
-
-            sb.AppendLine(partSource);
-            if (!string.IsNullOrEmpty(separator))
+            if (sb.Length > 0 && !string.IsNullOrEmpty(separator))
                 sb.AppendLine(separator);
+            sb.AppendLine(partSource);
         }
 
         return sb.ToString();

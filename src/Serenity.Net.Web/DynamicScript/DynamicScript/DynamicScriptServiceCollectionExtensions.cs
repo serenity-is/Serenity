@@ -184,17 +184,17 @@ public static class DynamicScriptServiceCollectionExtensions
         DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager,
             typeSource, serviceProvider);
 
-        ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager,
+        var columnScripts = ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager,
             typeSource, propertyProvider, serviceProvider);
 
-        FormScriptRegistration.RegisterFormScripts(scriptManager,
+        var formScripts = FormScriptRegistration.RegisterFormScripts(scriptManager,
             typeSource, propertyProvider, serviceProvider);
 
         scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
             new Func<string>[]
             {
-                () => scriptManager.GetScriptText("ColumnsBundle"),
-                () => scriptManager.GetScriptText("FormBundle")
+                () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
+                    .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
             }));
 
         return serviceProvider;
