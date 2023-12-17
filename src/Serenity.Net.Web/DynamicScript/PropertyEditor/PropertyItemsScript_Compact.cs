@@ -13,7 +13,7 @@ public abstract partial class PropertyItemsScript
 
     private static string[] PropertyNames = null;
     private static Func<object, object>[] PropertyGetters = null;
-    private static readonly char[] separators = ['.', '/'];
+    private static readonly char[] separators = ['.', '/', '_', ':'];
 
     internal static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
     {
