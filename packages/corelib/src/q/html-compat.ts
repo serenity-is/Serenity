@@ -44,7 +44,7 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string, c
 export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
 export function findElementWithRelativeId(element: JQuery | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
 
-    const isJQuery = (element as JQuery).jquery && element != null;
+    const isJQuery = (element as JQuery)?.jquery;
     const from: HTMLElement = isJQuery ? (element as JQuery).get(0) : element as HTMLElement;
     const doc = typeof document === "undefined" ? null : document;
 
