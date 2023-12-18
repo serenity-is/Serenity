@@ -1,64 +1,64 @@
 ﻿import { isMobileView } from "../q";
 
-export function jQueryPatch($: any) {
+export function jQueryPatch(jQuery: any) {
     
     function applyJQueryUIFixes(): boolean {
-        if (typeof $ == "undefined" || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)
+        if (typeof jQuery == "undefined" || !jQuery.ui || !jQuery.ui.dialog || !jQuery.ui.dialog.prototype)
             return false;
             
-        $.ui.dialog.prototype._allowInteraction = function (event: any) {
-            if ($(event.target).closest(".ui-dialog").length) {
+        jQuery.ui.dialog.prototype._allowInteraction = function (event: any) {
+            if (jQuery(event.target).closest(".ui-dialog").length) {
                 return true;
             }
-            return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
+            return !!jQuery(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
         };
 
         (function (orig) {
-            $.ui.dialog.prototype._focusTabbable = function () {
+            jQuery.ui.dialog.prototype._focusTabbable = function () {
                 if (isMobileView) {
                     this.uiDialog && this.uiDialog.focus();
                     return;
                 }
                 orig.call(this);
             }
-        })($.ui.dialog.prototype._focusTabbable);
+        })(jQuery.ui.dialog.prototype._focusTabbable);
 
         (function (orig) {
-            $.ui.dialog.prototype._createTitlebar = function () {
+            jQuery.ui.dialog.prototype._createTitlebar = function () {
                 orig.call(this);
                 this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html('<i class="fa fa-times" />');
             }
-        })($.ui.dialog.prototype._createTitlebar);
+        })(jQuery.ui.dialog.prototype._createTitlebar);
     }
 
-    !applyJQueryUIFixes() && typeof $ !== "undefined" && $.fn && $(applyJQueryUIFixes);
+    !applyJQueryUIFixes() && typeof jQuery !== "undefined" && jQuery.fn && jQuery(applyJQueryUIFixes);
 
-    if (typeof $ !== "undefined" && $.fn) {
+    if (typeof jQuery !== "undefined" && jQuery.fn) {
 
         // for backward compatibility
-        if (!$.toJSON)
-            $.toJSON = JSON.stringify;
-        if (!$.parseJSON)
-            $.parseJSON = JSON.parse;
+        if (!jQuery.toJSON)
+            jQuery.toJSON = JSON.stringify;
+        if (!jQuery.parseJSON)
+            jQuery.parseJSON = JSON.parse;
 
-        ($ as any).cleanData = (function (orig) {
+        (jQuery as any).cleanData = (function (orig) {
             return function (elems: any[]) {
                 var events, elem, i, e;
                 var cloned = elems;
                 for (i = 0; (elem = cloned[i]) != null; i++) {
                     try {
-                        events = ($ as any)._data(elem, "events");
+                        events = (jQuery as any)._data(elem, "events");
                         if (events && events.remove) {
                             // html collection might change during remove event, so clone it!
                             if (cloned === elems)
                                 cloned = Array.prototype.slice.call(elems);
-                            $(elem).triggerHandler("remove");
+                            jQuery(elem).triggerHandler("remove");
                             delete events.remove;
                         }
                     } catch (e) { }
                 }
                 orig(elems);
             };
-        })(($ as any).cleanData);
+        })((jQuery as any).cleanData);
     }
 }

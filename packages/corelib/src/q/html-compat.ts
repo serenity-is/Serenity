@@ -1,4 +1,4 @@
-﻿import $ from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/jquery";
 import { htmlEncode, localText } from "@serenity-is/base";
 
 /**
@@ -13,7 +13,7 @@ export function addEmptyOption(select: JQuery | HTMLSelectElement) {
  * Adds an option to the select.
  */
 export function addOption(select: JQuery | HTMLSelectElement, key: string, text: string) {
-    $('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select);
+    sQuery('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select);
 }
 
 /** @deprecated use htmlEncode as it also encodes quotes */
@@ -44,7 +44,7 @@ export function findElementWithRelativeId(element: JQuery, relativeId: string, c
 export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
 export function findElementWithRelativeId(element: JQuery | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
 
-    const isJQuery = element instanceof $ && element != null;
+    const isJQuery = (element as JQuery).jquery && element != null;
     const from: HTMLElement = isJQuery ? (element as JQuery).get(0) : element as HTMLElement;
     const doc = typeof document === "undefined" ? null : document;
 
@@ -71,7 +71,7 @@ export function findElementWithRelativeId(element: JQuery | HTMLElement, relativ
         }
 
         if (res || !fromId.length)
-            return isJQuery ? $(res ?? null) : (res ?? null);
+            return isJQuery ? sQuery(res ?? null) : (res ?? null);
 
         let idx = fromId.lastIndexOf('_');
         if (idx <= 0)
@@ -86,12 +86,12 @@ export function findElementWithRelativeId(element: JQuery | HTMLElement, relativ
  * @returns the new DIV element.
  */
 export function newBodyDiv(): JQuery {
-    return $('<div/>').appendTo(document.body);
+    return sQuery('<div/>').appendTo(document.body);
 }
 
 /**
  * Returns the outer HTML of the element.
  */
 export function outerHtml(element: JQuery) {
-    return $('<i/>').append(element.eq(0).clone()).html();
+    return sQuery('<i/>').append(element.eq(0).clone()).html();
 }

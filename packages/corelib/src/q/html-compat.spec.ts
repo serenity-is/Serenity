@@ -1,10 +1,10 @@
 ﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
-import $ from "@optionaldeps/jquery";
+import sQuery from "@optionaldeps/jquery";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addEmptyOption($(select));
+        addEmptyOption(sQuery(select));
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("Controls.SelectEditor.EmptyItemText");
@@ -14,7 +14,7 @@ describe("addEmptyOption", () => {
 describe("addOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addOption($(select), "test", "text");
+        addOption(sQuery(select), "test", "text");
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("test");
         expect(select.children[0].textContent).toBe("text");
@@ -22,7 +22,7 @@ describe("addOption", () => {
 
     it("can handle null values", () => {
         const select = document.createElement("select");
-        addOption($(select), null, null);
+        addOption(sQuery(select), null, null);
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("");
@@ -39,9 +39,9 @@ describe("attrEncode", () => {
 describe("clearOptions", () => {
     it("clears all options from the select", () => {
         const select = document.createElement("select");
-        addOption($(select), "test", "text");
-        addEmptyOption($(select));
-        clearOptions($(select));
+        addOption(sQuery(select), "test", "text");
+        addEmptyOption(sQuery(select));
+        clearOptions(sQuery(select));
         expect(select.children.length).toBe(0);
     });
 });
@@ -136,7 +136,7 @@ describe("findElementWithRelativeId", () => {
         document.body.append(target);
         document.body.append(from);
         try {
-            expect(findElementWithRelativeId($(from), "test")?.get(0) === target).toBe(true);
+            expect(findElementWithRelativeId(sQuery(from), "test")?.get(0) === target).toBe(true);
         }
         finally {
             target.remove();
@@ -254,7 +254,7 @@ describe("findElementWithRelativeId", () => {
         document.body.append(country);
         document.body.append(city);
         try {
-            expect(findElementWithRelativeId($(city), "Country")?.get?.(0) === country).toBe(true);
+            expect(findElementWithRelativeId(sQuery(city), "Country")?.get?.(0) === country).toBe(true);
         }
         finally {
             city.remove();
@@ -280,7 +280,7 @@ describe("outerHtml", () => {
     it("returns the outer html of the element", () => {
         const div = document.createElement("div");
         div.innerHTML = "<span>test</span>";
-        expect(outerHtml($(div))).toBe("<div><span>test</span></div>");
+        expect(outerHtml(sQuery(div))).toBe("<div><span>test</span></div>");
     });
 });
 

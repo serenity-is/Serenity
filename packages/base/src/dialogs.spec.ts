@@ -184,12 +184,12 @@ function mockJQueryWithUIDialog(): any {
 describe("Bootstrap version detection", () => {
 
     it('detects BS3 when modal version starts with 3', async function () {
-        let $ = mockJQueryWithBootstrapModal();
-        $.fn.modal.Constructor.VERSION = "3.3.1";
+        let jQuery = mockJQueryWithBootstrapModal();
+        jQuery.fn.modal.Constructor.VERSION = "3.3.1";
         let dialogs = await import("./dialogs");
         dialogs.alertDialog("hello");
-        expect($.fn.modal).toHaveBeenCalledTimes(1);
-        let html = $.fn.modal.mock?.contexts[0]?._selectorHtml;
+        expect(jQuery.fn.modal).toHaveBeenCalledTimes(1);
+        let html = jQuery.fn.modal.mock?.contexts[0]?._selectorHtml;
         expect(html).toBeDefined();
         let idx1 = html.indexOf('class="close"');
         let idx2 = html.indexOf('<h5');
@@ -1027,16 +1027,16 @@ describe("closePanel", () => {
     });
 
     it("can close panel via jQuery", async function () {
-        let $ = mockJQuery({});
+        let jQuery = mockJQuery({});
         var divEl = document.body.appendChild(document.createElement('div'));
         divEl.classList.add("s-Panel");
-        let div = $(divEl);
+        let div = jQuery(divEl);
         let closingPanel: any;
         let closedPanel: any;
         let panelClosing = (e: any) => closingPanel = e.panel;
         let panelClosed = (e: any) => closedPanel = e.panel;
-        $(window).on('panelclosing', panelClosing);
-        $(window).on('panelclosed', panelClosed);
+        jQuery(window).on('panelclosing', panelClosing);
+        jQuery(window).on('panelclosed', panelClosed);
         try {
             let dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
@@ -1045,8 +1045,8 @@ describe("closePanel", () => {
             expect(closedPanel).toBe(divEl);
         }
         finally {
-            $(window).off('panelclosing', panelClosing);
-            $(window).off('panelclosed', panelClosed);
+            jQuery(window).off('panelclosing', panelClosing);
+            jQuery(window).off('panelclosed', panelClosed);
             div.remove();
         }
     });
@@ -1094,15 +1094,15 @@ describe("closePanel", () => {
     });
 
     it("can be cancelled with preventDefault with jQuery", async function () {
-        let $ = mockJQuery({});
+        let jQuery = mockJQuery({});
         let div = document.body.appendChild(document.createElement("div"));
         try {
             div.classList.add("s-Panel");
-            $(div).on("panelbeforeclose", (e: Event) => {
+            jQuery(div).on("panelbeforeclose", (e: Event) => {
                 e.preventDefault();
             });
             let dialogs = (await import("./dialogs"));
-            dialogs.closePanel($(div));
+            dialogs.closePanel(jQuery(div));
             expect(div.classList.contains("panel-hidden")).toBe(false);
             expect(div.classList.contains("hidden")).toBe(false);
         }
@@ -1112,22 +1112,22 @@ describe("closePanel", () => {
     });
 
     it("removes .panel-hidden from other panels that were hidden by this one with jQuery", async function () {
-        let $ = mockJQuery({});
+        let jQuery = mockJQuery({});
         document.body.classList.add(".panels-container");
         let div1El = document.body.appendChild(document.createElement("div"));
         div1El.classList.add("s-Panel");
         div1El.classList.add("panel-hidden");
         div1El.setAttribute("data-panelhiddenby", "test"); 
-        let div1 = $(div1El);
+        let div1 = jQuery(div1El);
         let div2El = document.body.appendChild(document.createElement("div"));
         div2El.classList.add("s-Panel");
         div2El.classList.add("panel-hidden");
         div2El.setAttribute("data-panelhiddenby", "test2");
-        let div2 = $(div2El);
+        let div2 = jQuery(div2El);
         let div3El = document.body.appendChild(document.createElement("div"));
         div3El.classList.add("s-Panel");
         div3El.setAttribute('data-paneluniquename', 'test');
-        let div3 = $(div3El);
+        let div3 = jQuery(div3El);
         try {
             let dialogs = (await import("./dialogs"));
             dialogs.closePanel(div3);
@@ -1236,15 +1236,15 @@ describe("openPanel", () => {
     });
 
     it("can open panel via jQuery", async function () {
-        let $ = mockJQuery({});
+        let jQuery = mockJQuery({});
 
         document.body.classList.add("panels-container");
         let div1El = document.body.appendChild(document.createElement("div"));
         div1El.classList.add("s-Panel");
-        let div1 = $(div1El);
+        let div1 = jQuery(div1El);
         let div2El = document.createElement("div");
         div2El.classList.add("s-Panel");
-        let div2 = $(div2El);
+        let div2 = jQuery(div2El);
         let openingPanel, openedPanel;
         const panelOpening = function(e: any) {
             openingPanel = e?.panel;
@@ -1252,8 +1252,8 @@ describe("openPanel", () => {
         const panelOpened = function(e: any) {
             openedPanel = e?.panel;
         }
-        $(window).on('panelopening', panelOpening);
-        $(window).on('panelopened', panelOpened);
+        jQuery(window).on('panelopening', panelOpening);
+        jQuery(window).on('panelopened', panelOpened);
 
         try {
             let dialogs = (await import("./dialogs"));
@@ -1267,8 +1267,8 @@ describe("openPanel", () => {
             expect(div2.hasClass("panel-hidden")).toBe(false);
         }
         finally {
-            $(window).off('panelopening', panelOpening);
-            $(window).off('panelopened', panelOpened);
+            jQuery(window).off('panelopening', panelOpening);
+            jQuery(window).off('panelopened', panelOpened);
             div1.remove();
             div2.remove();
         }

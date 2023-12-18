@@ -1,43 +1,43 @@
-﻿import $ from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/jquery";
 import { Config, getGlobalObject, getNested } from "@serenity-is/base";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
    
 export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { noRoute?: boolean, setHeight?: boolean }) {
-    var el = ($ && gridDiv instanceof $) ? (gridDiv as JQuery).get(0) : gridDiv as HTMLElement
+    var el = (gridDiv as JQuery).jquery ? (gridDiv as JQuery).get(0) : gridDiv as HTMLElement
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
-    let setHeight = opt?.setHeight ?? ($ && (!el.classList.contains('s-DataGrid') &&
+    let setHeight = opt?.setHeight ?? (sQuery && (!el.classList.contains('s-DataGrid') &&
         !el.classList.contains('s-Panel')));
 
     let layout = function () {
-        setHeight && layoutFillHeight($(el));
-        $ ? $(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
+        setHeight && layoutFillHeight(sQuery(el));
+        !sQuery.isMock ? sQuery(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
     };
 
     if (document.body.classList.contains('has-layout-event')) {
-        $ ? $(document.body).on('layout', layout) : el.addEventListener('layout', layout);
+        !sQuery.isMock ? sQuery(document.body).on('layout', layout) : el.addEventListener('layout', layout);
     }
     else if ((window as any).Metronic?.addResizeHandler) {
         (window as any).Metronic.addResizeHandler(layout);
     }
     else {
-        $ ? $(window).resize(layout) : window.addEventListener('resize', layout);
+        !sQuery.isMock ? sQuery(window).resize(layout) : window.addEventListener('resize', layout);
     }
 
     layout();
 
-    $ && $(el).one('remove', () => {
-        $(window).off('resize', layout);
-        $('body').off('layout', layout);
+    !sQuery.isMock && sQuery(el).one('remove', () => {
+        sQuery(window).off('resize', layout);
+        sQuery('body').off('layout', layout);
     });
 
     if (!opt?.noRoute && 
         typeof document !== "undefined" &&
-        !$(document.body).attr('data-fhrouteinit')) {
-            $(document.body).attr('data-fhrouteinit', 'true');
+        !document.body?.getAttribute?.('data-fhrouteinit')) {
+            document.body?.setAttribute?.('data-fhrouteinit', 'true');
             // ugly, but to it is to make old pages work without having to add this
             typeof Router !== "undefined" && Router.resolve?.();
     }
@@ -46,7 +46,7 @@ export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { no
 export function layoutFillHeightValue(element: JQuery) {
     let h = 0;
     element.parent().children().not(element).each(function (i, e) {
-        let q = $(e);
+        let q = sQuery(e);
         if (q.is(':visible')) {
             h += q.outerHeight(true);
         }
@@ -82,12 +82,7 @@ function initOnLoad() {
     }
 }
 
-if (typeof $ !== "undefined")
-    $(initOnLoad);
-else if (typeof document !== "undefined" && document.readyState === 'loading')
-    document.addEventListener('DOMContentLoaded', initOnLoad);
-else
-    initOnLoad();
+sQuery(initOnLoad);
 
 export function triggerLayoutOnShow(element: JQuery) {
     executeEverytimeWhenVisible(element, function () {
