@@ -3,18 +3,8 @@
     jest.unmock('@optionaldeps/jquery');
 });
 
-function mockUndefinedJQuery() {
-    jest.mock('@optionaldeps/jquery', () => {
-        return {
-            __esModule: true,
-            default: undefined
-        }
-    });
-}
-
 describe('initFullHeightGridPage', () => {
     it('works without jQuery', async () => {
-        mockUndefinedJQuery();
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
         var div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
