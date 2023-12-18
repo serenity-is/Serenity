@@ -1,0 +1,35 @@
+﻿{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./out",
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": false,
+    "inlineSources": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@serenity-is/tsx",
+    "lib": [
+      "ES2017",
+      "DOM"
+    ],
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "newLine": "lf",
+    "noImplicitAny": true,
+    "outDir": "./out",    
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES2017",
+    "types": [
+      "jest"
+    ],
+    "useDefineForClassFields": false
+  },
+  "include": [
+    "src"
+  ]
+}
