@@ -136,28 +136,69 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     private static readonly HashSet<string> PossibleNodeArguments = [
         "jQueryApi.jQueryObject",
         "JQuery",
-        "HtmlElement",
-        "jQuery | HtmlElement",
+        "HTMLElement",
+        "JQuery | HTMLElement",
         "WidgetNode",
         "jQueryLike",
         "jQueryInstance"
     ];
 
-    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
-    {
-        var result = new SortedDictionary<string, ExternalMember>();
 
-        var argument = type.Methods?.Where(x => x.IsConstructor == true && x.Arguments != null)
+    private ExternalType GetOptionsTypeFor(ExternalType type)
+    {
+        if (type is null)
+            return null;
+        var constructors = type.Methods?.Where(x => x.IsConstructor == true) ?? [];
+        var argument = constructors.Where(x => x.Arguments != null)
             .SelectMany(x => x.Arguments.Where(x => !PossibleNodeArguments.Contains(x.Type)))
             .FirstOrDefault();
 
         if (argument != null)
         {
-            var optionsType = GetScriptTypeFrom(type, argument?.Type);
-            if (optionsType != null)
-                AddOptionMembers(result, optionsType, isOptions: true);
+            var optionsType = GetScriptTypeFrom(type, argument.Type);
+            if (!string.IsNullOrEmpty(argument.GenericArguments) &&
+                (argument.Type == "@serenity-is/corelib:WidgetProps" ||
+                 argument.Type == "Serenity.WidgetProps" ||
+                 argument.Type == "@serenity-is/corelib:EditorProps" ||
+                 argument.Type == "Serenity.EditorProps" ||
+                 (optionsType == null && 
+                  (argument.Type == "WidgetProps" || 
+                   argument.Type == "EditorProps"))))
+            {
+                var genericParam = type.GenericParameters?.FirstOrDefault(x => x.Name == argument.GenericArguments);
+                if (genericParam != null)
+                {
+                    if (!string.IsNullOrEmpty(genericParam.Default))
+                        optionsType = GetScriptTypeFrom(type, genericParam.Default);
+                    if (optionsType != null)
+                        return optionsType;
+                    return !string.IsNullOrEmpty(genericParam.Extends) ?
+                        GetScriptTypeFrom(type, genericParam.Extends) : null;
+                }
+                else
+                {
+                    optionsType = GetScriptTypeFrom(optionsType ?? type, argument.GenericArguments) ??
+                        GetScriptTypeFrom(type, argument.GenericArguments) ??
+                        optionsType;
+                }
+            }
+
+            return optionsType;
         }
 
+        if (!constructors.Any() && (type = GetBaseType(type)) != null)
+            return GetOptionsTypeFor(type);
+
+        return null;
+    }
+
+    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
+    {
+        var result = new SortedDictionary<string, ExternalMember>();
+        var optionsType = GetOptionsTypeFor(type);
+        if (optionsType != null)
+            AddOptionMembers(result, optionsType, isOptions: true);
+        
         int loop = 0;
         do
         {

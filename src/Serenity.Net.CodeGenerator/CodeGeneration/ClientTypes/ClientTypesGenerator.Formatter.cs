@@ -39,7 +39,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         if (type.IsAbstract == true)
             return false;
 
-        if (type.GenericParameters?.Count > 0)
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
             return false;
 
         if (GetAttribute(type, inherited: true, attributeNames: FormatterAttributeNames) != null)

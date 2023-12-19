@@ -162,6 +162,13 @@ public class TSTypeListerAST
 
     string GetTypeReferenceExpression(INode node, bool isDecorator = false)
     {
+        return GetTypeReferenceExpression(node, out _, isDecorator);
+    }
+
+    string GetTypeReferenceExpression(INode node, out string genericArgs, bool isDecorator = false)
+    {
+        genericArgs = null;
+
         if (node == null)
             return string.Empty;
 
@@ -174,14 +181,16 @@ public class TSTypeListerAST
             text.Contains('|'))
             return null;
 
-
         if (text == "number" || text == "string" || text == "boolean")
             return text;
 
         var noGeneric = text;
         var lt = noGeneric.IndexOf('<');
         if (lt >= 0 && noGeneric[^1] == '>')
+        {
+            genericArgs = text[(lt + 1)..^1];
             noGeneric = noGeneric[..lt];
+        }
 
         string functionSuffix = string.Empty;
         if (isDecorator)
@@ -357,7 +366,9 @@ public class TSTypeListerAST
 
         return p.Select(k => new ExternalGenericParameter
         {
-            Name = GetText(k)
+            Name = GetText(k.Name),
+            Default = GetText(k.Default),
+            Extends = k.Constraint is TypeReferenceNode trn ? GetText(trn.TypeName) : null
         }).ToList();
     }
 
@@ -477,13 +488,7 @@ public class TSTypeListerAST
                     externalMember.Type = GetTypeReferenceExpression(md.Type);
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else if (member.Kind == SyntaxKind.Constructor)
             {
@@ -495,13 +500,7 @@ public class TSTypeListerAST
                 var md = member as ConstructorDeclaration;
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else
                 continue;
@@ -557,14 +556,7 @@ public class TSTypeListerAST
                     externalMember.Type = GetTypeReferenceExpression(md.Type);
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = (arg.Name as ILiteralLikeNode)?.Text ??
-                            (arg.Name as Identifier).Text,
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else
                 continue;
@@ -641,6 +633,17 @@ public class TSTypeListerAST
         return result;
     }
 
+    private ExternalArgument MapMethodParam(ParameterDeclaration arg)
+    {
+        var type = GetTypeReferenceExpression(arg.Type, out string genericArguments);
+        return new()
+        {
+            Name = GetText(arg.Name),
+            Type = type,
+            GenericArguments = genericArguments
+        };
+    }
+
     List<ExternalMember> GetModuleMembers(ModuleDeclaration node)
     {
         var result = new List<ExternalMember>();
@@ -681,11 +684,7 @@ public class TSTypeListerAST
 
                 foreach (var arg in md.Parameters)
                 {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
                 }
             }
             else
