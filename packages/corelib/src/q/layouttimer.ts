@@ -1,4 +1,6 @@
-﻿export {}
+﻿import { JQueryLike } from "@serenity-is/base";
+
+export {}
 
 interface LayoutTimerReg {
     handler: () => void;
@@ -135,8 +137,8 @@ export namespace LayoutTimer {
     }
 }
 
-export function executeOnceWhenVisible(element: JQuery, callback: Function): void {
-    var el = element && element[0];
+export function executeOnceWhenVisible(element: JQueryLike, callback: Function): void {
+    var el = element && element.get(0);
     if (!el)
         return;
     
@@ -151,8 +153,8 @@ export function executeOnceWhenVisible(element: JQuery, callback: Function): voi
     });
 }
 
-export function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void {
-    var el = element && element[0];
+export function executeEverytimeWhenVisible(element: JQueryLike, callback: Function, callNowIfVisible: boolean): void {
+    var el = element && element.get(0);
     if (!el)
         return;
     

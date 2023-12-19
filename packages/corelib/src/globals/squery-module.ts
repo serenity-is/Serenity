@@ -303,9 +303,6 @@ const sQuery: any = function (a: any) {
     }
 
     var $ = sQueryInstance.from(nodes);
-    // workaround for subclassing array until corelib switched to ES6
-    //@ts-ignore
-    //!$.eq && ($.__proto__ = sQueryInstance.prototype);
     return $;
 };
 

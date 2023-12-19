@@ -1,5 +1,5 @@
 ﻿import { Config } from "./config";
-import { htmlEncode, toggleClass } from "./html";
+import { JQueryLike, htmlEncode, isJQueryLike, toggleClass } from "./html";
 import { localText } from "./localtext";
 
 /**
@@ -590,9 +590,9 @@ export function iframeDialog(options: IFrameDialogOptions) {
  * @param element The panel element
  * @param e  The event triggering the close
  */
-export function closePanel(element: (HTMLElement | { jquery: string, get: ((index: number) => HTMLElement), length: number }), e?: Event) {
+export function closePanel(element: (HTMLElement | JQueryLike), e?: Event) {
 
-    var el = typeof (element as any)?.get === "function" && typeof (element as any).jquery === "string" ? (element as any).get(0) : element as HTMLElement;
+    var el = isJQueryLike(element) ? element.get(0) : element;
     if (!el || !el.classList?.contains("s-Panel") || el.classList?.contains("hidden"))
         return;
 

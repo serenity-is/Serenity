@@ -226,6 +226,24 @@ interface DebouncedFunction<T extends (...args: any[]) => any> {
 declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
 /**
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+ * @param s String (or number etc.) to be HTML encoded
+ */
+declare function htmlEncode(s: any): string;
+type JQueryLike = {
+    jquery: string;
+    get: (index: number) => HTMLElement;
+};
+declare function isJQueryLike(val: any): val is JQueryLike;
+/**
+ * Toggles the class on the element handling spaces like addClass does.
+ * @param el the element
+ * @param cls the class to toggle
+ * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ */
+declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+/**
  * Options for a message dialog button
  */
 interface DialogButton {
@@ -389,11 +407,7 @@ declare function iframeDialog(options: IFrameDialogOptions): void;
  * @param element The panel element
  * @param e  The event triggering the close
  */
-declare function closePanel(element: (HTMLElement | {
-    jquery: string;
-    get: ((index: number) => HTMLElement);
-    length: number;
-}), e?: Event): void;
+declare function closePanel(element: (HTMLElement | JQueryLike), e?: Event): void;
 /**
  * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
  * and panelopening and panelopened events on the window.
@@ -745,19 +759,6 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
-/**
- * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
- * @param s String (or number etc.) to be HTML encoded
- */
-declare function htmlEncode(s: any): string;
-/**
- * Toggles the class on the element handling spaces like addClass does.
- * @param el the element
- * @param cls the class to toggle
- * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
- */
-declare function toggleClass(el: Element, cls: string, add?: boolean): void;
-
 declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 declare function localText(key: string, defaultText?: string): string;
 declare function tryGetText(key: string): string;
@@ -955,4 +956,4 @@ declare let isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 
-export { type AlertOptions, ColumnSelection, type CommonDialogOptions, Config, type ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, Enum, type IFrameDialogOptions, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, alertDialog, blockUI, blockUndo, bsModalMarkup, closePanel, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, handleScriptDataError, htmlEncode, iframeDialog, informationDialog, initFormType, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, toId, toggleClass, trunc, tryGetText, warningDialog };
+export { type AlertOptions, ColumnSelection, type CommonDialogOptions, Config, type ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, Enum, type IFrameDialogOptions, Invariant, type JQueryLike, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, alertDialog, blockUI, blockUndo, bsModalMarkup, closePanel, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, handleScriptDataError, htmlEncode, iframeDialog, informationDialog, initFormType, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, isJQueryLike, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, toId, toggleClass, trunc, tryGetText, warningDialog };

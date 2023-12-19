@@ -1512,6 +1512,24 @@ declare namespace Serenity {
     function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
     /**
+     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+     * @param s String (or number etc.) to be HTML encoded
+     */
+    function htmlEncode(s: any): string;
+    type JQueryLike = {
+        jquery: string;
+        get: (index: number) => HTMLElement;
+    };
+    function isJQueryLike(val: any): val is JQueryLike;
+    /**
+     * Toggles the class on the element handling spaces like addClass does.
+     * @param el the element
+     * @param cls the class to toggle
+     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+     */
+    function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+    /**
      * Options for a message dialog button
      */
     interface DialogButton {
@@ -1675,11 +1693,7 @@ declare namespace Serenity {
      * @param element The panel element
      * @param e  The event triggering the close
      */
-    function closePanel(element: (HTMLElement | {
-        jquery: string;
-        get: ((index: number) => HTMLElement);
-        length: number;
-    }), e?: Event): void;
+    function closePanel(element: (HTMLElement | JQueryLike), e?: Event): void;
     /**
      * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
      * and panelopening and panelopened events on the window.
@@ -2030,19 +2044,6 @@ declare namespace Serenity {
      * @param s The string to split.
      */
     function splitDateString(s: string): string[];
-
-    /**
-     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
-     * @param s String (or number etc.) to be HTML encoded
-     */
-    function htmlEncode(s: any): string;
-    /**
-     * Toggles the class on the element handling spaces like addClass does.
-     * @param el the element
-     * @param cls the class to toggle
-     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
-     */
-    function toggleClass(el: Element, cls: string, add?: boolean): void;
 
     function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;
@@ -2558,19 +2559,20 @@ declare namespace Serenity {
      */
     function parseDayHourAndMin(s: string): number;
 
+    function isJQueryReal(val: any): val is JQuery;
     /**
      * Adds an empty option to the select.
      * @param select the select element
      */
-    function addEmptyOption(select: JQuery | HTMLSelectElement): void;
+    function addEmptyOption(select: JQueryLike | HTMLSelectElement): void;
     /**
      * Adds an option to the select.
      */
-    function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
+    function addOption(select: JQueryLike | HTMLSelectElement, key: string, text: string): void;
     /** @deprecated use htmlEncode as it also encodes quotes */
     const attrEncode: typeof htmlEncode;
     /** Clears the options in the select element */
-    function clearOptions(select: JQuery): void;
+    function clearOptions(select: JQueryLike): void;
     /**
      * Finds the first element with the given relative id to the source element.
      * It can handle underscores in the source element id.
@@ -2579,7 +2581,7 @@ declare namespace Serenity {
      * @param context the context element (optional)
      * @returns the element with the given relative id to the source element.
      */
-    function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+    function findElementWithRelativeId(element: JQueryLike, relativeId: string, context?: HTMLElement): JQuery;
     /**
      * Finds the first element with the given relative id to the source element.
      * It can handle underscores in the source element id.
@@ -2597,9 +2599,9 @@ declare namespace Serenity {
     /**
      * Returns the outer HTML of the element.
      */
-    function outerHtml(element: JQuery): string;
+    function outerHtml(element: JQueryLike): string;
 
-    function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
+    function initFullHeightGridPage(gridDiv: JQueryLike | HTMLElement, opt?: {
         noRoute?: boolean;
         setHeight?: boolean;
     }): void;
@@ -2618,8 +2620,8 @@ declare namespace Serenity {
         function onShown(element: () => HTMLElement, handler: () => void): number;
         function off(key: number): number;
     }
-    function executeOnceWhenVisible(element: JQuery, callback: Function): void;
-    function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    function executeOnceWhenVisible(element: JQueryLike, callback: Function): void;
+    function executeEverytimeWhenVisible(element: JQueryLike, callback: Function, callNowIfVisible: boolean): void;
 
     /** @deprecated prefer localText for better discoverability */
     const text: typeof localText;
@@ -3285,11 +3287,6 @@ declare namespace Serenity {
     }
 
     type NoInfer<T> = [T][T extends any ? 0 : never];
-    type JQueryLike = {
-        jquery: string;
-        get: (index: number) => HTMLElement;
-    };
-    type JQueryInstance = JQuery;
     type WidgetNode = JQueryLike | HTMLElement;
     type WidgetProps<P> = {
         id?: string;
@@ -3310,10 +3307,9 @@ declare namespace Serenity {
         type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
         options?: WidgetProps<P>;
         container?: WidgetNode;
-        element?: (e: JQueryInstance) => void;
+        element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
     }
-    function isJQuery(val: any): val is JQueryLike;
     class WidgetComponent<P> extends Widget<P> {
         constructor(props?: WidgetProps<P>);
         static isWidgetComponent: true;
@@ -3329,7 +3325,7 @@ declare namespace Serenity {
         protected uniqueName: string;
         readonly idPrefix: string;
         readonly node: HTMLElement;
-        get element(): JQueryInstance;
+        get element(): JQuery;
         constructor(node: WidgetNode, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;

@@ -24,6 +24,15 @@ export function htmlEncode(s: any): string {
     return s.replace(/[<>"'&]/g, escFunc)
 }
 
+export type JQueryLike = {
+    jquery: string;
+    get: (index: number) => HTMLElement;
+}
+
+export function isJQueryLike(val: any): val is JQueryLike {
+    return val && val.get && typeof val.jquery === "string";
+}
+
 /** 
  * Toggles the class on the element handling spaces like addClass does.
  * @param el the element

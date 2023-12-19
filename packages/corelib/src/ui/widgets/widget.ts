@@ -1,5 +1,5 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { Config, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, notifyError, stringFormat, toggleClass } from "@serenity-is/base";
+import { Config, JQueryLike, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, isJQueryLike, notifyError, stringFormat, toggleClass } from "@serenity-is/base";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { jQueryPatch } from "../../patch/jquerypatch";
@@ -7,13 +7,6 @@ import { ArgumentNullException, Exception, addValidationRule as addValRule, getA
 import { EditorUtils } from "../editors/editorutils";
 
 export type NoInfer<T> = [T][T extends any ? 0 : never];
-
-export type JQueryLike = {
-    jquery: string;
-    get: (index: number) => HTMLElement;
-}
-
-export type JQueryInstance = JQuery;
 
 export type WidgetNode = JQueryLike | HTMLElement;
 
@@ -39,12 +32,8 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
     options?: WidgetProps<P>;
     container?: WidgetNode;
-    element?: (e: JQueryInstance) => void;
+    element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
-}
-
-export function isJQuery(val: any): val is JQueryLike {
-    return val && val.get && typeof val.jquery === "string";
 }
 
 @Decorators.registerClass('Serenity.Widget')
@@ -56,19 +45,19 @@ export class Widget<P = {}> {
     declare public readonly idPrefix: string;
     public readonly node: HTMLElement;
 
-    public get element(): JQueryInstance {
+    public get element(): JQuery {
         return jQuery(this.node);
     }
 
     constructor(node: WidgetNode, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
-        if (isJQuery(props))
+        if (isJQueryLike(props))
             this.node = props.get(0);
         else if (props instanceof HTMLElement)
             this.node = props;
         else {
-            if (isJQuery(opt))
+            if (isJQueryLike(opt))
                 this.node = opt.get(0);
             else if (opt instanceof HTMLElement)
                 this.node = opt;
@@ -189,8 +178,8 @@ export class Widget<P = {}> {
                 params.options.nodeRef = (node => {
                     typeof oldRef === "function" && oldRef(node);
                     if (params.container) {
-                        if (isJQuery(params.container))
-                            (params.container as JQueryInstance).append(node);
+                        if (isJQueryLike(params.container))
+                            (params.container as JQuery).append(node);
                         else
                             params.container.appendChild(node);
                     }
@@ -202,7 +191,7 @@ export class Widget<P = {}> {
         else {
             var e = Widget.elementFor(params.type);
             if (params.container)
-                e.appendTo(params.container as JQueryInstance);
+                e.appendTo(params.container as JQuery);
             params.element && params.element(e);
             widget = new params.type(e as any, params.options as any);
         }

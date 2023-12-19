@@ -25,8 +25,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID)
-            .tryGetWidget(this.parentType);
+        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
 
         if (parent != null) {
             parent.element.bind('change.' + (this.widget as any).uniqueName, () => {
