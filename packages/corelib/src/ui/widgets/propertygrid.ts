@@ -352,7 +352,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
         let editor = Widget.create({
             type: editorType,
-            options: editorParams
+            options: Object.assign(editorParams, { replaceNode: element[0] })
         });
         editor.initialize();
 
