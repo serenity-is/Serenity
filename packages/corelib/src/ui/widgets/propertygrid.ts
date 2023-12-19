@@ -4,7 +4,7 @@ import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget, WidgetProps } from "./widget";
+import { Widget, WidgetNode, WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
@@ -13,8 +13,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     private items: PropertyItem[];
     declare public readonly idPrefix: string;
 
-    constructor(element?: JQuery, props?: any) {
-        super(element, props);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         let div = this.element;
         this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
@@ -649,7 +651,7 @@ export interface PropertyGridOptions {
 
 export class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

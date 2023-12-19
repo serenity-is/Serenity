@@ -4,7 +4,7 @@ import { postToService, serviceCall } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { PropertyGrid } from "./propertygrid";
-import { Widget } from "./widget";
+import { Widget, WidgetNode, WidgetProps } from "./widget";
 
 export namespace Reporting {
     export interface ReportDialogOptions {
@@ -12,12 +12,12 @@ export namespace Reporting {
     }
 
     @Decorators.registerClass('Serenity.Reporting.ReportDialog')
-    export class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
-        constructor(opt: ReportDialogOptions) {
-            super(opt);
+    export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends TemplatedDialog<P> {
+        constructor(props: WidgetProps<P>) {
+            super(props);
 
-            if (opt.reportKey) {
-                this.loadReport(opt.reportKey);
+            if (this.options.reportKey) {
+                this.loadReport(this.options.reportKey);
             }
         }
 
@@ -110,9 +110,11 @@ export namespace Reporting {
     }
 
     @Decorators.registerClass('Serenity.Reporting.ReportPage')
-    export class ReportPage extends Widget<any> {
-        constructor(div: JQuery) {
-            super(div);
+    export class ReportPage<P = {}> extends Widget<P> {
+        constructor(node: WidgetNode, opt?: WidgetProps<{}>);
+        constructor(props?: WidgetProps<{}>);
+        constructor(props?: any, opt?: any) {
+            super(props, opt);
 
             $('.report-link').click((e) => this.reportLinkClick(e as any));
             $('div.line').click((e) => this.categoryClick(e as any));

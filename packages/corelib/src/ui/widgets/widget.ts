@@ -6,31 +6,44 @@ import { jQueryPatch } from "../../patch/jquerypatch";
 import { ArgumentNullException, Exception, addValidationRule as addValRule, getAttributes, replaceAll } from "../../q";
 import { EditorUtils } from "../editors/editorutils";
 
-export type WidgetProps<T> = {
+export type NoInfer<T> = [T][T extends any ? 0 : never];
+
+export type JQueryLike = {
+    jquery: string;
+    get: (index: number) => HTMLElement;
+}
+
+export type JQueryInstance = JQuery;
+
+export type WidgetNode = JQueryLike | HTMLElement;
+
+export type WidgetProps<P> = {
     id?: string;
-    name?: string;
     class?: string;
     nodeRef?: (el: HTMLElement) => void;
     replaceNode?: HTMLElement;
-} & T;
+} & NoInfer<P>
+
+export type WidgetNodeOrProps<P> = WidgetNode | WidgetProps<P>;
 
 export type EditorProps<T> = WidgetProps<T> & {
     initialValue?: any;
     maxLength?: number;
+    name?: string;
     placeholder?: string;
     required?: boolean;
     readOnly?: boolean;
 }
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: (new (element: JQuery, options: P) => TWidget) | (new (options?: P) => TWidget);
+    type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
     options?: WidgetProps<P>;
-    container?: JQuery | HTMLElement;
-    element?: (e: JQuery) => void;
+    container?: WidgetNode;
+    element?: (e: JQueryInstance) => void;
     init?: (w: TWidget) => void;
 }
 
-export function isJQuery(val: any): val is JQuery {
+export function isJQuery(val: any): val is JQueryLike {
     return val && val.get && typeof val.jquery === "string";
 }
 
@@ -43,32 +56,33 @@ export class Widget<P = {}> {
     declare public readonly idPrefix: string;
     public readonly node: HTMLElement;
 
-    public get element(): JQuery {
+    public get element(): JQueryInstance {
         return jQuery(this.node);
     }
 
-    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>) {
-        
-        if (isJQuery(element))
-            this.node = element.get(0);
-        else if (element instanceof HTMLElement)
-            this.node = element;
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        if (isJQuery(props))
+            this.node = props.get(0);
+        else if (props instanceof HTMLElement)
+            this.node = props;
         else {
-            if (isJQuery(props)) 
-                this.node = props.get(0);
-            else if (props instanceof HTMLElement)
-                this.node = props;
-            else if (element && (element as WidgetProps<P>).replaceNode) {
-                this.node = (element as WidgetProps<P>).replaceNode
-                delete (element as WidgetProps<P>).nodeRef;
+            if (isJQuery(opt))
+                this.node = opt.get(0);
+            else if (opt instanceof HTMLElement)
+                this.node = opt;
+            else if (props && (props as WidgetProps<P>).replaceNode) {
+                this.node = props.replaceNode
+                delete props.replaceNode;
             }
-            else 
+            else
                 this.node = getInstanceType(this).createNode();
-            props ??= element;
+            props ??= props;
         }
 
         Widget.setElementProps(this.node, props);
-        this.options = props || ({} as P);
+        this.options = props || {};
 
         this.widgetName = Widget.getWidgetName(getInstanceType(this));
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
@@ -175,7 +189,7 @@ export class Widget<P = {}> {
                     typeof oldRef === "function" && oldRef(node);
                     if (params.container) {
                         if (isJQuery(params.container))
-                            params.container.append(node);
+                            (params.container as JQueryInstance).append(node);
                         else
                             params.container.appendChild(node);
                     }
@@ -187,7 +201,7 @@ export class Widget<P = {}> {
         else {
             var e = Widget.elementFor(params.type);
             if (params.container)
-                e.appendTo(params.container);
+                e.appendTo(params.container as JQueryInstance);
             params.element && params.element(e);
             widget = new params.type(e as any, params.options as any);
         }
@@ -271,7 +285,7 @@ export class Widget<P = {}> {
     static isWidgetComponent: boolean = false;
 }
 
-Object.defineProperties(Widget.prototype, { isReactComponent: { value: true }});
+Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
 export declare interface Widget<P> {
     change(handler: (e: Event) => void): void;
@@ -280,7 +294,7 @@ export declare interface Widget<P> {
 
 export class WidgetComponent<P> extends Widget<P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;
@@ -288,8 +302,10 @@ export class WidgetComponent<P> extends Widget<P> {
 
 export class EditorComponent<P> extends Widget<EditorProps<P>> {
     constructor(props?: EditorProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
+
+    static override isWidgetComponent: true;
 }
 
 export declare interface Widget<P> {

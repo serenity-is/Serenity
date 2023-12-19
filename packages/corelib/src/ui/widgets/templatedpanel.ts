@@ -2,13 +2,15 @@
 import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
-import { WidgetProps } from "./widget";
+import { WidgetNode, WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
-    constructor(container: JQuery, props?: P) {
-        super(container, props);
-
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
+        
         this.initValidator();
         this.initTabs();
         this.initToolbar();
@@ -89,7 +91,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
 
 export class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

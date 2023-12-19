@@ -2,8 +2,8 @@
 import { Decorators, FormKeyAttribute } from "../../decorators";
 import { ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
-import { TemplatedDialog } from "./templateddialog";
 import { WidgetProps } from "../widgets/widget";
+import { TemplatedDialog } from "./templateddialog";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
 export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {

@@ -1,6 +1,6 @@
 ﻿import { htmlEncode } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { EditorComponent, EditorProps, Widget, WidgetComponent, WidgetProps } from "./widget";
+import { Widget, WidgetComponent, WidgetNode, WidgetProps } from "./widget";
 
 export interface ToolButton {
     action?: string;
@@ -26,10 +26,11 @@ export interface PopupMenuButtonOptions {
 }
 
 @Decorators.registerEditor('Serenity.PopupMenuButton')
-export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-    constructor(div: JQuery, opt: PopupMenuButtonOptions) {
-        super(div, opt);
-        div = this.element;
+export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends WidgetComponent<P> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
+
+        let div = this.element;
         div.addClass('s-PopupMenuButton');
         div.click(e => {
             e.preventDefault();
@@ -70,12 +71,12 @@ export interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 }
 
 @Decorators.registerEditor('Serenity.PopupToolButton')
-export class PopupToolButton extends PopupMenuButton {
-    constructor(div: JQuery, opt: PopupToolButtonOptions) {
-        super(div, opt);
+export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        div.addClass('s-PopupToolButton');
-        $('<b/>').appendTo(div.children('.button-outer').children('span'));
+        this.element.addClass('s-PopupToolButton');
+        $('<b/>').appendTo(this.element.children('.button-outer').children('span'));
     }
 }
 
@@ -86,9 +87,11 @@ export interface ToolbarOptions {
 
 @Decorators.registerClass('Serenity.Toolbar')
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    constructor(div?: JQuery, props?: WidgetProps<P>) {
-        super(div, props);
-
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
+        
         this.element.addClass('s-Toolbar clearfix')
             .html('<div class="tool-buttons"><div class="buttons-outer">' +
                 '<div class="buttons-inner"></div></div></div>');
@@ -225,7 +228,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
 export class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

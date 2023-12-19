@@ -4,10 +4,10 @@ import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
-import { DataGrid } from "../datagrid/datagrid";
+import { DataGrid, DataGridComponent } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetNode, WidgetNodeOrProps, WidgetProps } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -24,15 +24,15 @@ export interface CheckTreeItem<TSource> {
 
 @Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
 @Decorators.element("<div/>")
-export class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions>
+export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGridComponent<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
 
     private byId: { [key: string]: TItem };
 
-    constructor(div: JQuery, opt?: TOptions) {
-        super(div, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        div.addClass('s-CheckTreeEditor');
+        this.element.addClass('s-CheckTreeEditor');
         this.updateItems();
     }
 
@@ -471,14 +471,14 @@ export interface CheckLookupEditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.CheckLookupEditor")
-export class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
 
     private searchText: string;
     private enableUpdateItems: boolean;
     private lookupChangeUnbind: any; 
 
-    constructor(div: JQuery, options: CheckLookupEditorOptions) {
-        super(div, options);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.enableUpdateItems = true;
         this.setCascadeFrom(this.options.cascadeFrom);

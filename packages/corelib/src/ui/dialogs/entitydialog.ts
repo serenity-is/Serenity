@@ -9,11 +9,11 @@ import { TabsExtensions } from "../helpers/tabsextensions";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
-export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
+export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
 
     protected entity: TItem;
     protected entityId: any;
@@ -35,8 +35,8 @@ export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> imp
 
     static defaultLanguageList: () => string[][];
 
-    constructor(opt?: TOptions) {
-        super(opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         if (this.useAsync())
             this.initAsync();

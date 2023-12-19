@@ -2,6 +2,7 @@ import { StringEditor } from '../editors/stringeditor';
 import { FC } from 'jsx-dom';
 import { jsxDomWidget } from './jsx';
 import { PropertyGrid, PropertyGridComponent } from './propertygrid';
+import { BooleanEditor } from '../editors/booleaneditor';
 
 test('render childless element', function () {
     const element = <br />;
@@ -577,7 +578,7 @@ describe('jsx: interpolation', () => {
         (<div ref={el => el}>{date.toUTCString()}</div>).textContent!).toBe(date.toUTCString()));
 });
 
-const StringEditor_ = jsxDomWidget(StringEditor);        
+const StringEditor_ = jsxDomWidget(StringEditor);
 
 describe('jsx: widget integration', () => {
 
@@ -609,9 +610,11 @@ describe('jsx: widget integration', () => {
         expect(pg.node).toBe(el);
     });
 
-    it('can create property gridxyz', () => {
+    it('can create boolean editor', () => {
         var pg: PropertyGrid;
-        var el = <PropertyGrid items={[]} ref={w => pg = w } />;
+        var el = <PropertyGrid items={[]} ref={w => pg = w }  />;
+
+        var x = <BooleanEditor />
         expect(pg?.node).toBeDefined();
         expect(pg.node).toBe(el);
     });

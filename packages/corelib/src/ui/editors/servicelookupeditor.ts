@@ -1,6 +1,7 @@
-﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
+﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { ServiceOptions, serviceCall } from "../../q";
+import { WidgetNode, WidgetProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -20,10 +21,12 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
-export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
 
-    constructor(input: JQuery, opt?: TOptions) {
-        super(input, opt);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
     }
 
     protected getDialogTypeKey() {
@@ -172,8 +175,10 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 }
 
 @Decorators.registerEditor('Serenity.ServiceLookupEditor')
-export class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions) {
-        super(hidden, opt);
+export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions,TItem=any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
     }
+
+    static override isWidgetComponent: true;
 }

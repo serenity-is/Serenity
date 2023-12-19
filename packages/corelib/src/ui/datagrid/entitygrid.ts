@@ -8,15 +8,17 @@ import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
-    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>) {
-        super(element, props);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         this.element.addClass('route-handler')
             .on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
@@ -362,7 +364,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
 export class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

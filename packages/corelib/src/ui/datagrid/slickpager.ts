@@ -1,19 +1,18 @@
 ﻿import { htmlEncode, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { extend } from "../../q";
 import { PagerOptions } from "../../slick";
-import { Widget } from "../widgets/widget";
+import { WidgetComponent, WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass("Serenity.SlickPager")
-export class SlickPager extends Widget<PagerOptions> {
+export class SlickPager<P extends PagerOptions = PagerOptions> extends WidgetComponent<P> {
 
-    constructor(div: JQuery, o: PagerOptions) {
-        super(div, extend({
-            showRowsPerPage: true,
-            rowsPerPageOptions: [20, 100, 500, 2000]
-        } as any, o));
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        o = this.options;
+        let o = this.options;
+        o.showRowsPerPage ??= true;
+        o.rowsPerPageOptions ??= [20, 100, 500, 2000];
+
         var v = o.view;
 
         if (!v)

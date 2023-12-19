@@ -6,7 +6,7 @@ import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
-import { WidgetComponent, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetComponent, WidgetNode, WidgetProps } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
 
 export interface QuickFilterBarOptions {
@@ -17,10 +17,12 @@ export interface QuickFilterBarOptions {
 
 @Decorators.registerClass('Serenity.QuickFilterBar')
 @Decorators.element("<div/>")
-export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends WidgetComponent<P> {
+export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
-    constructor(props?: WidgetProps<P>) {
-        super(props);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         this.element.addClass('quick-filters-bar').addClass('clear');
 

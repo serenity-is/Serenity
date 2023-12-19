@@ -3,6 +3,7 @@ import { Decorators } from "../../decorators";
 import { cast } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
+import { WidgetNode, WidgetProps } from "../widgets/widget";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
 import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
@@ -61,12 +62,14 @@ class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
 }
 
 @Decorators.registerClass("Serenity.FilterPanel")
-export class FilterPanel extends FilterWidgetBase<any> {
+export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     private rowsDiv: JQuery;
 
-    constructor(div: JQuery) {
-        super(div);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         this.element.addClass('s-FilterPanel');
         this.rowsDiv = this.byId('Rows');

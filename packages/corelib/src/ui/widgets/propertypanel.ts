@@ -3,7 +3,7 @@ import { Decorators, FormKeyAttribute } from "../../decorators";
 import { getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
-import { WidgetProps } from "./widget";
+import { WidgetNode, WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')
 export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
@@ -11,8 +11,10 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity: TItem;
     private _entityId: any;
 
-    constructor(container?: JQuery, props?: WidgetProps<P>) {
-        super(container, props);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         this.initPropertyGrid();
         this.loadInitialEntity();
@@ -114,7 +116,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 
 export class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

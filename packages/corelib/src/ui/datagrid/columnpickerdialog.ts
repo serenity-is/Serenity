@@ -5,12 +5,13 @@ import { Authorization, Router, centerDialog } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
+import { WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 
 @Decorators.registerClass('Serenity.ColumnPickerDialog')
 @Decorators.resizable()
 @Decorators.responsive()
-export class ColumnPickerDialog extends TemplatedDialog<any> {
+export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
     private ulVisible: JQuery;
     private ulHidden: JQuery;
@@ -21,8 +22,8 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
     public defaultColumns: string[];
     public done: () => void;
 
-    constructor() {
-        super();
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         new QuickSearchInput(this.byId("Search"), {
             onSearch: (fld, txt, done) => {

@@ -1,8 +1,8 @@
 ﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { getLookup, reloadLookup, ScriptData } from "../../q";
+import { WidgetNode, WidgetProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
-import { WidgetProps } from "../widgets/widget";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
     lookupKey?: string;
@@ -14,8 +14,10 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
     private lookupChangeUnbind: any; 
 
-    constructor(input?: JQuery, opt?: WidgetProps<P>) {
-        super(input, opt);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         if (!this.hasAsyncSource()) {
             this.updateItems();
@@ -149,7 +151,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
     
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;

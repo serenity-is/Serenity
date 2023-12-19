@@ -16,7 +16,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected validator: JQueryValidation.Validator;
 
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
 
         this.element.attr("id", this.element.attr("id") || this.uniqueName);
 

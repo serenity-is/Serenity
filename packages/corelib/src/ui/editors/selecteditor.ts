@@ -1,12 +1,16 @@
 ﻿import { Decorators } from "../../decorators";
+import { WidgetProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
-export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
-    constructor(hidden: JQuery, opt?: SelectEditorOptions) {
-        super(hidden, opt);
+export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
+
         this.updateItems();
     }
+
+    static override isWidgetComponent: true;
 
     getItems() {
         return this.options.items || [];

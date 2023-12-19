@@ -3,17 +3,20 @@ import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { ServiceOptions, safeCast, serviceCall } from "../../q";
 import { ValidationHelper } from "../helpers/validationhelper";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
 import { WX } from "../widgets/wx";
 
 @Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
 @Decorators.element('<input type="hidden" />')
-export class Select2AjaxEditor<TOptions, TItem = any> extends Widget<TOptions> implements IStringValue {
+export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number = 50;
 
-    constructor(hidden: JQuery, opt: TOptions) {
-        super(hidden, opt);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
+        let hidden = this.element;
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null)
             hidden.attr("placeholder", emptyItemText);

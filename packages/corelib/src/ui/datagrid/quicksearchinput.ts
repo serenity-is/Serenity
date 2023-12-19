@@ -1,7 +1,7 @@
 ﻿import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { PopupMenuButton } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
     name: string;
@@ -17,15 +17,18 @@ export interface QuickSearchInputOptions {
 }
 
 @Decorators.registerClass('Serenity.QuickSearchInput')
-export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
+export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
     private lastValue: string;
     private field: QuickSearchField;
     private fieldChanged: boolean;
     private timer: number;
 
-    constructor(input: JQuery, opt: QuickSearchInputOptions) {
-        super(input, opt);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
+        let input = this.element;
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
         this.lastValue = ((input.val() ?? '') as string).trim();
@@ -63,10 +66,11 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
                     }));
             }
 
-            new PopupMenuButton(a, {
+            new PopupMenuButton({
                 positionMy: 'right top',
                 positionAt: 'right bottom',
-                menu: menu
+                menu: menu,
+                replaceNode: a[0]
             });
 
             this.field = this.options.fields[0];

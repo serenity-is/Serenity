@@ -64,9 +64,10 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = (new LookupEditor as any)({
-            lookupKey: "Test"
-        }, $("<input placeholder='test' />"));
+        const editor = new LookupEditor({
+            lookupKey: "Test",
+            nodeRef: el => el.setAttribute("placeholder", "test")
+        });
 
         expect(editor.element.attr("placeholder")).toBe("test");
     });

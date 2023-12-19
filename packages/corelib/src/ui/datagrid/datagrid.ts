@@ -16,7 +16,7 @@ import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
-import { Widget, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -85,8 +85,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>) {
-        super(element, props);
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
+    constructor(props?: any, opt?: any) {
+        super(props, opt);
 
         var self = this;
 
@@ -779,8 +781,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createPager(): void {
-        var pagerDiv = $('<div></div>').appendTo(this.element);
-        new SlickPager(pagerDiv, this.getPagerOptions());
+        new SlickPager({ ...this.getPagerOptions(), nodeRef: el => this.element.append(el) });
     }
 
     protected getViewOptions() {
@@ -806,10 +807,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createToolbar(buttons: ToolButton[]): void {
-        this.toolbar = new ToolbarComponent({ 
-            buttons: buttons, 
-            hotkeyContext: this.element[0], 
-            nodeRef: el => $(el).addClass("grid-toolbar").appendTo(this.element) 
+        this.toolbar = new ToolbarComponent({
+            buttons: buttons,
+            hotkeyContext: this.element[0],
+            nodeRef: el => $(el).addClass("grid-toolbar").appendTo(this.element)
         });
     }
 
@@ -1495,7 +1496,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
 export class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props?: WidgetProps<P>) {
-        super(arguments[1], props);
+        super(props);
     }
 
     static override isWidgetComponent: true;
