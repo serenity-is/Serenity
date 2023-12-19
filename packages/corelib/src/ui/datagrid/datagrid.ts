@@ -767,8 +767,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createFilterBar(): void {
-        var filterBarDiv = $('<div/>').appendTo(this.element);
-        this.filterBar = new FilterDisplayBar(filterBarDiv);
+        this.filterBar = new FilterDisplayBar({
+            nodeRef: el => this.element.append(el)
+        });
         this.initializeFilterBar();
     }
 

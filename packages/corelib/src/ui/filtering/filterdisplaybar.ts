@@ -1,13 +1,14 @@
 ﻿import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
+import { WidgetProps } from "../widgets/widget";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
 @Decorators.registerClass('Serenity.FilterDisplayBar')
-export class FilterDisplayBar extends FilterWidgetBase<any> {
+export class FilterDisplayBar<P={}> extends FilterWidgetBase<P> {
 
-    constructor(div: JQuery) {
-        super(div);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         this.element.find('.cap').text(
             localText('Controls.FilterPanel.EffectiveFilter'));

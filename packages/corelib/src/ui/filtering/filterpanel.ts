@@ -9,12 +9,16 @@ import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
-@Decorators.registerClass('Serenity.FilterFieldSelect')
-class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
-    constructor(hidden: JQuery, fields: PropertyItem[]) {
-        super(hidden);
+export interface FilterFieldSelectOptions {
+    fields: PropertyItem[];
+}
 
-        for (var field of fields) {
+@Decorators.registerClass('Serenity.FilterFieldSelect')
+class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends Select2Editor<P, PropertyItem> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
+
+        for (var field of this.options.fields) {
             this.addOption(field.name, (tryGetText(field.title) ??
                 field.title ?? field.name), field);
         }
@@ -346,9 +350,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             .attr('title', localText('Controls.FilterPanel.RemoveField'))
             .click((e) => this.deleteRowClick(e as any));
 
-        var fieldSel = new FilterFieldSelect(row.children('div.f')
-            .children('input'), this.get_store().get_fields())
-            .changeSelect2(e => this.onRowFieldChange(e));
+        new FilterFieldSelect({
+            fields: this.get_store().get_fields(),
+            replaceNode: row.children('div.f').children('input')[0]
+        }).changeSelect2(e => this.onRowFieldChange(e));
 
         this.updateParens();
         this.updateButtons();
@@ -374,7 +379,6 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         var select = row.children('div.f').find('input.field-select')
             .getWidget(FilterFieldSelect);
         var fieldName = select.get_value();
-        var isEmpty = fieldName == null || fieldName === '';
         this.removeFiltering(row);
         this.populateOperatorList(row);
         this.rowOperatorChange(row);
@@ -461,13 +465,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         var filtering = this.getFilteringFor(row);
         if (filtering == null)
             return;
-        
+
         var operatorSelect = row.children('div.o').find('input.op-select')
             .getWidget(FilterOperatorSelect);
 
         if (!operatorSelect.get_value())
             return;
-        
+
         var ops = filtering.getOperators().filter(function (x) {
             return x.key === operatorSelect.value;
         });
