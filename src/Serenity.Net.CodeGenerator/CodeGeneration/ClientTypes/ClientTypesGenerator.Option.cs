@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -139,16 +139,19 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     {
         var result = new SortedDictionary<string, ExternalMember>();
 
-        var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor == true && 
-            x.Arguments?.Count == (isWidget ? 2 : 1));
+        var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor == true &&
+            x.Arguments?.Count >= 1);
 
         if (constructor != null)
         {
-            if (!isWidget ||
-                (constructor.Arguments[0].Type == "jQueryApi.jQueryObject" ||
-                 constructor.Arguments[0].Type == "JQuery"))
+            var argument = constructor.Arguments.FirstOrDefault(x =>
+                    x.Type != "jQueryApi.jQueryObject" &&
+                    x.Type != "JQuery" &&
+                    x.Type != "HtmlElement" &&
+                    x.Type != "jQuery | HtmlElement");
+            if (argument != null)
             {
-                var optionsType = GetScriptTypeFrom(type, constructor.Arguments[isWidget ? 1 : 0].Type);
+                var optionsType = GetScriptTypeFrom(type, argument?.Type);
                 if (optionsType != null)
                     AddOptionMembers(result, optionsType, isOptions: true);
             }
