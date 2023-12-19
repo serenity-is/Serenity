@@ -20,7 +20,7 @@ public partial class TSModuleResolver
 
     private readonly string[] extensions =
     [
-            ".ts",
+        ".ts",
         ".tsx",
         ".d.ts"
     ];
@@ -269,7 +269,24 @@ public partial class TSModuleResolver
             {
                 var nodeModules = fileSystem.Combine(parentDir, "node_modules");
                 if (fileSystem.DirectoryExists(nodeModules))
-                    resolvedPath = TryResolveFromPackageFolder(fileSystem.Combine(nodeModules, fileNameOrModule), ref moduleName);
+                {
+                    resolvedPath = TryResolveFromPackageFolder(fileSystem.Combine(
+                        nodeModules, fileNameOrModule), ref moduleName);
+
+                    if (resolvedPath == null)
+                    {
+                        var searchBase = fileSystem.Combine(nodeModules, PathHelper.ToPath(fileNameOrModule));
+                        var index = fileSystem.Combine(searchBase, "index.d.ts");
+                        if (fileSystem.FileExists(index))
+                        {
+                            moduleName = fileNameOrModule;
+                            resolvedPath = index;
+                            break;
+                        }
+                    }
+                    else
+                        break;
+                }
                 parentDir = fileSystem.GetDirectoryName(RemoveTrailing(parentDir));
             }
         }
@@ -345,7 +362,7 @@ public partial class TSModuleResolver
         var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(path));
         packageJson = TryParsePackageJson(fileSystem.Combine(parentDir, "package.json"));
 
-        if (packageJson is null)
+        if (packageJson is null || fileSystem.GetFileName(parentDir) == "node_modules")
             return null;
 
         if (packageJson.TypesVersions is not null &&
