@@ -33,8 +33,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
             GenerateOptionMembers(type, 
                 skip: isLookupEditor ? lookupEditorBaseOptions : 
-                    (isServiceLookupEditor ? serviceLookupEditorBaseOptions : null),
-                isWidget: true);
+                    (isServiceLookupEditor ? serviceLookupEditorBaseOptions : null));
         });
     }
 

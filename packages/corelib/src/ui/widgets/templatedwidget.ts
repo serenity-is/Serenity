@@ -4,6 +4,7 @@ import { canLoadScriptData, getTemplate, replaceAll } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
+@Decorators.element("<div/>")
 export class TemplatedWidget<P> extends Widget<P> {
 
     private static templateNames: { [key: string]: string } = {};

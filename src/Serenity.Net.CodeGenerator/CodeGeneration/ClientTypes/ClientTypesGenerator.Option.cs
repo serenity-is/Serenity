@@ -31,13 +31,12 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         return typeName;
     }
 
-    private void GenerateOptionMembers(ExternalType type,
-        HashSet<string> skip, bool isWidget)
+    private void GenerateOptionMembers(ExternalType type, HashSet<string> skip)
     {
         bool preserveMemberCase = type.Attributes != null && type.Attributes.Any(x =>
             x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
-        var options = GetOptionMembers(type, isWidget);
+        var options = GetOptionMembers(type);
 
         foreach (var option in options.Values)
         {
@@ -134,27 +133,29 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         }
     }
 
-    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type,
-        bool isWidget)
+    private static readonly HashSet<string> PossibleNodeArguments = [
+        "jQueryApi.jQueryObject",
+        "JQuery",
+        "HtmlElement",
+        "jQuery | HtmlElement",
+        "WidgetNode",
+        "jQueryLike",
+        "jQueryInstance"
+    ];
+
+    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
     {
         var result = new SortedDictionary<string, ExternalMember>();
 
-        var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor == true &&
-            x.Arguments?.Count >= 1);
+        var argument = type.Methods?.Where(x => x.IsConstructor == true && x.Arguments != null)
+            .SelectMany(x => x.Arguments.Where(x => !PossibleNodeArguments.Contains(x.Type)))
+            .FirstOrDefault();
 
-        if (constructor != null)
+        if (argument != null)
         {
-            var argument = constructor.Arguments.FirstOrDefault(x =>
-                    x.Type != "jQueryApi.jQueryObject" &&
-                    x.Type != "JQuery" &&
-                    x.Type != "HtmlElement" &&
-                    x.Type != "jQuery | HtmlElement");
-            if (argument != null)
-            {
-                var optionsType = GetScriptTypeFrom(type, argument?.Type);
-                if (optionsType != null)
-                    AddOptionMembers(result, optionsType, isOptions: true);
-            }
+            var optionsType = GetScriptTypeFrom(type, argument?.Type);
+            if (optionsType != null)
+                AddOptionMembers(result, optionsType, isOptions: true);
         }
 
         int loop = 0;

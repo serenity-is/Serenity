@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -22,7 +22,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             cw.IndentedLine("{");
             cw.IndentedLine("}");
 
-            GenerateOptionMembers(type, skip: null, isWidget: false);
+            GenerateOptionMembers(type, skip: null);
         });
     }
 

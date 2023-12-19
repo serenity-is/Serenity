@@ -343,16 +343,17 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if (optionsAttr != null && optionsAttr.length > 0) {
             optionsType = optionsAttr[0].optionsType;
         }
-        var editor;
         if (optionsType != null) {
             editorParams = extend(new optionsType(), item.editorParams);
-            editor = new (editorType as any)(element, editorParams);
         }
         else {
             editorParams = extend(new Object(), item.editorParams);
-            editor = new (editorType as any)(element, editorParams);
         }
 
+        let editor = Widget.create({
+            type: editorType,
+            options: editorParams
+        });
         editor.initialize();
 
         if (getTypeShortName(editor) == "BooleanEditor" &&
@@ -654,5 +655,5 @@ export class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridO
         super(props);
     }
 
-    static override isWidgetComponent: true;
+    static override isWidgetComponent: true = true;
 }

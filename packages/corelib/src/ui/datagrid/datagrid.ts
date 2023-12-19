@@ -1499,5 +1499,5 @@ export class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
         super(props);
     }
 
-    static override isWidgetComponent: true;
+    static override isWidgetComponent: true = true;
 }

@@ -78,11 +78,11 @@ export class Widget<P = {}> {
             }
             else
                 this.node = getInstanceType(this).createNode();
-            props ??= props;
+            opt ??= props;
         }
 
-        Widget.setElementProps(this.node, props);
-        this.options = props || {};
+        Widget.setElementProps(this.node, opt);
+        this.options = opt || {};
 
         this.widgetName = Widget.getWidgetName(getInstanceType(this));
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
@@ -184,7 +184,8 @@ export class Widget<P = {}> {
         if (isAssignableFrom(IDialog, params.type) ||
             (params.type as any).isWidgetComponent) {
             if (params.container || params.element) {
-                var oldRef = params.options.nodeRef;
+                var oldRef = params.options?.nodeRef;
+                params.options ??= {} as any;
                 params.options.nodeRef = (node => {
                     typeof oldRef === "function" && oldRef(node);
                     if (params.container) {
@@ -282,7 +283,7 @@ export class Widget<P = {}> {
         return this.options;
     }
 
-    static isWidgetComponent: boolean = false;
+    static isWidgetComponent: boolean;
 }
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
@@ -297,7 +298,7 @@ export class WidgetComponent<P> extends Widget<P> {
         super(props);
     }
 
-    static override isWidgetComponent: true;
+    static override isWidgetComponent: true = true;
 }
 
 export class EditorComponent<P> extends Widget<EditorProps<P>> {
@@ -305,7 +306,7 @@ export class EditorComponent<P> extends Widget<EditorProps<P>> {
         super(props);
     }
 
-    static override isWidgetComponent: true;
+    static override isWidgetComponent: true = true;
 }
 
 export declare interface Widget<P> {

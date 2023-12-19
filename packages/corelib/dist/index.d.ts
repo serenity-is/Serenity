@@ -2158,7 +2158,7 @@ declare class Widget<P = {}> {
     protected uniqueName: string;
     readonly idPrefix: string;
     readonly node: HTMLElement;
-    get element(): JQuery;
+    get element(): JQueryInstance;
     constructor(node: WidgetNode, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     destroy(): void;
@@ -2946,8 +2946,9 @@ interface ServiceLookupEditorOptions extends Select2EditorOptions {
     equalityFilter?: any;
     criteria?: any[];
 }
-declare abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
-    constructor(input: JQuery, opt?: TOptions);
+declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(props?: WidgetProps<P>);
     protected getDialogTypeKey(): string;
     protected getService(): string;
     protected getServiceUrl(): string;
@@ -2962,8 +2963,9 @@ declare abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdi
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
 }
-declare class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions);
+declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 interface HtmlContentEditorOptions {

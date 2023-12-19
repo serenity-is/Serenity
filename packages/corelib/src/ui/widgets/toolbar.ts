@@ -86,6 +86,7 @@ export interface ToolbarOptions {
 }
 
 @Decorators.registerClass('Serenity.Toolbar')
+@Decorators.element("<div/>")
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
     constructor(node: WidgetNode, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
@@ -231,5 +232,5 @@ export class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends
         super(props);
     }
 
-    static override isWidgetComponent: true;
+    static override isWidgetComponent: true = true;
 }
