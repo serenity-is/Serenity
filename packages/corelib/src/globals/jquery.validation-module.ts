@@ -1,4 +1,4 @@
 ﻿/// <reference types="jquery.validation" />
-import sQuery from "@optionaldeps/jquery"
+import jQuery from "@optionaldeps/jquery"
 
-export default sQuery.validator;
+export default jQuery?.validator;

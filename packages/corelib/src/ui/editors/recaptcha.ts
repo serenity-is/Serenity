@@ -2,7 +2,7 @@
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { addValidationRule } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 
 export interface RecaptchaOptions {
     siteKey?: string;
@@ -11,9 +11,9 @@ export interface RecaptchaOptions {
 
 @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
 @Decorators.element("<div/>")
-export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
-    constructor(div: JQuery, opt: RecaptchaOptions) {
-        super(div, opt);
+export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorComponent<P> implements IStringValue {
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
         this.element.addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
         if (!!((window as any)['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {

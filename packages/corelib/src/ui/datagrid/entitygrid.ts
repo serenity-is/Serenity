@@ -1,4 +1,4 @@
-﻿import $ from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/squery";
 import { getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
@@ -8,15 +8,15 @@ import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget, WidgetDialogClass } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 @Decorators.registerClass('Serenity.EntityGrid')
-export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
+    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>) {
+        super(element, props);
 
         this.element.addClass('route-handler')
             .on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
@@ -32,7 +32,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
             return;
         }
 
-        var oldRequests = ($ as any)?.["active"];
+        var oldRequests = (sQuery as any)?.["active"];
 
         var parts = args.route.split('/');
         if (!!(parts.length === 2 && parts[0] === 'edit')) {
@@ -50,8 +50,8 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         else
             return;
 
-        if (($ as any)?.["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
-            $(document).one('ajaxStop', () => {
+        if ((sQuery as any)?.["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
+            sQuery(document).one('ajaxStop', () => {
                 setTimeout(() => Router.resolve('#' + args.parts.join('/+/')), 1);
             });
         }
@@ -343,7 +343,7 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         return DialogTypeRegistry.get(itemType) as any;
     }
 
-    private _dialogType: WidgetDialogClass;
+    private _dialogType: any;
 
     protected getDialogType(): { new(...args: any[]): Widget<any> } {
 
@@ -358,4 +358,12 @@ export class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
 
         return this._dialogType;
     }
+}
+
+export class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
+    }
+
+    static override isWidgetComponent: true;
 }

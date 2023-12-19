@@ -1,7 +1,7 @@
 ﻿import { PropertyItem, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
-import { Widget } from "../widgets/widget";
+import { type Widget } from "../widgets/widget";
 
 export namespace EditorUtils {
     export function getDisplayText(editor: Widget<any>): string {
@@ -210,7 +210,7 @@ export namespace EditorUtils {
 
             container.removeClass('readonly-container').find(".editor.container-readonly")
                 .removeClass('container-readonly').each((i, e) => {
-                    var w = $(e).tryGetWidget(Widget);
+                    var w = $(e).tryGetWidget() as any;
                     if (w != null)
                         EditorUtils.setReadOnly(w, false);
                     else
@@ -223,7 +223,7 @@ export namespace EditorUtils {
         container.addClass('readonly-container').find(".editor")
             .not('.container-readonly')
             .each((i, e) => {
-                var w = $(e).tryGetWidget(Widget) as any;
+                var w = $(e).tryGetWidget() as any;
                 if (w != null) {
 
                     if (w['get_readOnly']) {

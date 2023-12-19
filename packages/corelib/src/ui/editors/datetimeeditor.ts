@@ -2,13 +2,13 @@
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, addValidationRule, today } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
 
 @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
+export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
 
     private minValue: string;
     private maxValue: string;
@@ -16,9 +16,10 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
     private lastSetValue: string;
     private lastSetValueGet: string;
 
-    constructor(input: JQuery, opt?: DateTimeEditorOptions) {
-        super(input, opt);
-        
+    constructor(props?: EditorProps<P>) {
+        super(props);
+
+        let input = this.element;
         input.addClass('s-DateTimeEditor');
 
         if (this.options.inputOnly) {
@@ -40,7 +41,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                     if (input.hasClass('readonly') as any)
                         return false as any;
                     DateEditor.uiPickerZIndexWorkaround(this.element);
-                    return true;                    
+                    return true;
                 } as any,
                 yearRange: (this.options.yearRange ?? '-100:+50')
             });
@@ -88,21 +89,21 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
                 if (this.get_minValue() && Invariant.stringCompare(value, this.get_minValue()) < 0) {
                     return stringFormat(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
                 }
-    
+
                 if (this.get_maxValue() && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
                     return stringFormat(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
                 }
 
                 return null;
-            });   
+            });
         }
-        else 
+        else
             input.attr('type', 'datetime').addClass('dateTimeQ');
 
         input.bind('keyup.' + this.uniqueName, e => {
             if (this.get_readOnly())
                 return;
-            
+
             if (this.time) {
                 if (e.which === 32) {
                     if (this.get_valueAsDate() !== new Date()) {
@@ -151,7 +152,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         }
     }
 
-    get_value(): string {           
+    get_value(): string {
         var value = (this.element.val() as string).trim();
         if (value != null && value.length === 0) {
             return null;
@@ -161,7 +162,7 @@ export class DateTimeEditor extends Widget<DateTimeEditorOptions> implements ISt
         if (this.time) {
             var datePart = formatDate(value, 'yyyy-MM-dd');
             var timePart = this.time.val();
-                result = datePart + 'T' + timePart + ':00.000';
+            result = datePart + 'T' + timePart + ':00.000';
         }
         else
             result = formatDate(parseDate(this.element.val() as string), "yyyy-MM-ddTHH:mm:ss.fff");

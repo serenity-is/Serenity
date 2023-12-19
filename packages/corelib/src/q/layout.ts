@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/squery";
 import { Config, getGlobalObject, getNested } from "@serenity-is/base";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
@@ -9,7 +9,7 @@ export function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: { no
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
-    let setHeight = opt?.setHeight ?? (sQuery && (!el.classList.contains('s-DataGrid') &&
+    let setHeight = opt?.setHeight ?? (!sQuery.isMock && (!el.classList.contains('s-DataGrid') &&
         !el.classList.contains('s-Panel')));
 
     let layout = function () {

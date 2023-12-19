@@ -2113,47 +2113,46 @@ declare class PrefixedContext {
     }): TWidget;
 }
 
-interface WidgetClass<TOptions = object> {
-    new (element: JQuery, options?: TOptions): Widget<TOptions>;
-    element: JQuery;
-}
-interface WidgetDialogClass<TOptions = object> {
-    new (options?: TOptions): Widget<TOptions> & IDialog;
-    element: JQuery;
-}
-type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
-declare function reactPatch(): void;
-interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
-    type?: new (element: JQuery, options?: TOptions) => TWidget;
-    options?: TOptions;
-    container?: JQuery;
+type WidgetProps<T> = {
+    id?: string;
+    name?: string;
+    class?: string;
+    nodeRef?: (el: HTMLElement) => void;
+    replaceNode?: HTMLElement;
+} & T;
+type EditorProps<T> = WidgetProps<T> & {
+    initialValue?: any;
+    maxLength?: number;
+    placeholder?: string;
+    required?: boolean;
+    readOnly?: boolean;
+};
+interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+    type?: (new (element: JQuery, options: P) => TWidget) | (new (options?: P) => TWidget);
+    options?: WidgetProps<P>;
+    container?: JQuery | HTMLElement;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
 }
-interface WidgetComponentProps<W extends Widget<any>> {
-    id?: string;
-    name?: string;
-    className?: string;
-    maxLength?: number;
-    placeholder?: string;
-    setOptions?: any;
-    required?: boolean;
-    readOnly?: boolean;
-    oneWay?: boolean;
-    onChange?: (e: Event) => void;
-    onChangeSelect2?: (e: Event) => void;
-    value?: any;
-    defaultValue?: any;
+declare function isJQuery(val: any): val is JQuery;
+declare class WidgetComponent<P> extends Widget<P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
-declare class Widget<TOptions = any> {
+declare class EditorComponent<P> extends Widget<EditorProps<P>> {
+    constructor(props?: EditorProps<P>);
+}
+declare class Widget<P = {}> {
     private static nextWidgetNumber;
-    element: JQuery;
-    protected options: TOptions;
+    protected options: WidgetProps<P>;
     protected widgetName: string;
     protected uniqueName: string;
     readonly idPrefix: string;
-    constructor(element: JQuery, options?: TOptions);
+    readonly node: HTMLElement;
+    get element(): JQuery;
+    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>);
     destroy(): void;
+    static createNode(): HTMLElement;
     protected addCssClass(): void;
     protected getCssClass(): string;
     static getWidgetName(type: Function): string;
@@ -2162,23 +2161,32 @@ declare class Widget<TOptions = any> {
     }): JQuery;
     addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
     getGridField(): JQuery;
-    static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+    static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
+    static setElementProps(el: HTMLElement, props: any): void;
+    private static setInstanceProps;
     initialize(): void;
     init(action?: (widget: any) => void): this;
+    render(): HTMLElement;
     protected renderContents(): void;
-    private static __isWidgetType;
+    get props(): WidgetProps<P>;
+    static isWidgetComponent: boolean;
 }
-declare interface Widget<TOptions> {
+declare interface Widget<P> {
     change(handler: (e: Event) => void): void;
     changeSelect2(handler: (e: Event) => void): void;
 }
+declare interface Widget<P> {
+    change(handler: (e: Event) => void): void;
+    changeSelect2(handler: (e: Event) => void): void;
+}
+declare function reactPatch(): void;
 
 declare global {
     interface JQuery {
         getWidget<TWidget>(widgetType: {
             new (...args: any[]): TWidget;
         }): TWidget;
-        tryGetWidget<TWidget>(widgetType: {
+        tryGetWidget<TWidget>(widgetType?: {
             new (...args: any[]): TWidget;
         }): TWidget;
         flexHeightOnly(flexY?: number): JQuery;
@@ -2223,8 +2231,8 @@ interface ToolbarOptions {
     buttons?: ToolButton[];
     hotkeyContext?: any;
 }
-declare class Toolbar extends Widget<ToolbarOptions> {
-    constructor(div: JQuery, options: ToolbarOptions);
+declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
+    constructor(div?: JQuery, props?: WidgetProps<P>);
     destroy(): void;
     protected mouseTrap: any;
     protected createButtons(): void;
@@ -2232,8 +2240,12 @@ declare class Toolbar extends Widget<ToolbarOptions> {
     findButton(className: string): JQuery;
     updateInterface(): void;
 }
+declare class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
+}
 
-declare class TemplatedWidget<TOptions> extends Widget<TOptions> {
+declare class TemplatedWidget<P> extends Widget<P> {
     private static templateNames;
     protected byId(id: string): JQuery;
     private byID;
@@ -2254,11 +2266,13 @@ type IdPrefixType = {
 };
 declare function useIdPrefix(prefix: string): IdPrefixType;
 
-declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected tabs: JQuery;
     protected toolbar: Toolbar;
     protected validator: JQueryValidation.Validator;
-    constructor(options?: TOptions);
+    constructor(props?: WidgetProps<P>);
+    static createNode(): HTMLDivElement;
+    static isWidgetComponent: true;
     private get isMarkedAsPanel();
     private get isResponsive();
     private static getCssSize;
@@ -2300,8 +2314,8 @@ interface ModalOptions {
     modalClass?: string;
 }
 
-declare class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
-    constructor(container: JQuery, options?: TOptions);
+declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
+    constructor(container: JQuery, props?: P);
     destroy(): void;
     protected tabs: JQuery;
     protected toolbar: Toolbar;
@@ -2316,6 +2330,10 @@ declare class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
     protected initValidator(): void;
     protected resetValidation(): void;
     protected validateForm(): boolean;
+}
+declare class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 declare namespace ValidationHelper {
@@ -2355,11 +2373,11 @@ declare namespace ReflectionOptionsSetter {
     function set(target: any, options: any): void;
 }
 
-declare class PropertyGrid extends Widget<PropertyGridOptions> {
+declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
     private editors;
     private items;
     readonly idPrefix: string;
-    constructor(div: JQuery, opt: PropertyGridOptions);
+    constructor(element?: JQuery, props?: any);
     destroy(): void;
     private createItems;
     private createCategoryDiv;
@@ -2393,18 +2411,22 @@ declare enum PropertyGridMode {
 }
 interface PropertyGridOptions {
     idPrefix?: string;
-    items?: PropertyItem[];
+    items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
     defaultCategory?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }
+declare class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
+}
 
-declare class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity;
     private _entityId;
-    constructor(container: JQuery, options?: TOptions);
+    constructor(container?: JQuery, props?: WidgetProps<P>);
     destroy(): void;
     protected initPropertyGrid(): void;
     protected loadInitialEntity(): void;
@@ -2418,6 +2440,10 @@ declare class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
     protected set_entityId(value: any): void;
     protected validateBeforeSave(): boolean;
     protected propertyGrid: PropertyGrid;
+}
+declare class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 declare namespace SubDialogHelper {
@@ -2435,11 +2461,11 @@ declare namespace DialogExtensions {
     function dialogFlexify(dialog: JQuery): JQuery;
 }
 
-declare class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+declare class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
-    constructor(opt?: TOptions);
+    constructor(props?: WidgetProps<P>);
     internalInit(): void;
     protected initSync(): void;
     protected initAsync(): Promise<void>;
@@ -2481,31 +2507,29 @@ declare namespace EditorUtils {
     function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
 }
 
-declare class StringEditor extends Widget<any> {
-    constructor(input: JQuery);
+declare class StringEditor<P = {}> extends EditorComponent<P> {
     get value(): string;
     protected get_value(): string;
     set value(value: string);
     protected set_value(value: string): void;
 }
 
-declare class PasswordEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
 }
 
 interface TextAreaEditorOptions {
     cols?: number;
     rows?: number;
 }
-declare class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-    constructor(input: JQuery, opt?: TextAreaEditorOptions);
+declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorComponent<P> {
+    constructor(props?: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
     protected set_value(value: string): void;
 }
 
-declare class BooleanEditor extends Widget<any> {
+declare class BooleanEditor<P = {}> extends EditorComponent<P> {
     get value(): boolean;
     protected get_value(): boolean;
     set value(value: boolean);
@@ -2519,8 +2543,8 @@ interface DecimalEditorOptions {
     padDecimals?: any;
     allowNegatives?: boolean;
 }
-declare class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
-    constructor(input: JQuery, opt?: DecimalEditorOptions);
+declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorComponent<P> implements IDoubleValue {
+    constructor(props?: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2534,8 +2558,8 @@ interface IntegerEditorOptions {
     maxValue?: number;
     allowNegatives?: boolean;
 }
-declare class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
-    constructor(input: JQuery, opt?: IntegerEditorOptions);
+declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorComponent<P> implements IDoubleValue {
+    constructor(props?: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2544,10 +2568,15 @@ declare class IntegerEditor extends Widget<IntegerEditorOptions> implements IDou
 }
 
 declare const datePickerIconSvg: string;
-declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
+interface DateEditorOptions {
+    yearRange?: string;
+    minValue?: string;
+    sqlMinMax?: boolean;
+}
+declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
-    constructor(input: JQuery);
+    constructor(props?: EditorProps<P>);
     get_value(): string;
     get value(): string;
     set_value(value: string): void;
@@ -2582,13 +2611,13 @@ declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly 
     static uiPickerZIndexWorkaround(input: JQuery): void;
 }
 
-declare class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
+declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
     private time;
     private lastSetValue;
     private lastSetValueGet;
-    constructor(input: JQuery, opt?: DateTimeEditorOptions);
+    constructor(props?: EditorProps<P>);
     getFlatpickrOptions(): any;
     get_value(): string;
     get value(): string;
@@ -2631,9 +2660,9 @@ interface TimeEditorOptions {
     endHour?: any;
     intervalMinutes?: any;
 }
-declare class TimeEditor extends Widget<TimeEditorOptions> {
+declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorComponent<P> {
     private minutes;
-    constructor(input: JQuery, opt?: TimeEditorOptions);
+    constructor(props?: EditorProps<P>);
     get value(): number;
     protected get_value(): number;
     set value(value: number);
@@ -2646,8 +2675,8 @@ interface EmailEditorOptions {
     domain?: string;
     readOnlyDomain?: boolean;
 }
-declare class EmailEditor extends Widget<EmailEditorOptions> {
-    constructor(input: JQuery, opt: EmailEditorOptions);
+declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorComponent<P> {
+    constructor(props?: EditorProps<P>);
     static registerValidationMethods(): void;
     get_value(): string;
     get value(): string;
@@ -2657,12 +2686,12 @@ declare class EmailEditor extends Widget<EmailEditorOptions> {
     set_readOnly(value: boolean): void;
 }
 
-declare class EmailAddressEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class EmailAddressEditor<TOptions = {}> extends StringEditor<TOptions> {
+    constructor(opt?: TOptions);
 }
 
-declare class URLEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class URLEditor<P = {}> extends StringEditor<P> {
+    constructor(opt?: P);
 }
 
 interface RadioButtonEditorOptions {
@@ -2670,8 +2699,8 @@ interface RadioButtonEditorOptions {
     enumType?: any;
     lookupKey?: string;
 }
-declare class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
-    constructor(input: JQuery, opt: RadioButtonEditorOptions);
+declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorComponent<P> implements IReadOnly {
+    constructor(props?: EditorProps<P>);
     protected addRadio(value: string, text: string): void;
     get_value(): string;
     get value(): string;
@@ -2718,11 +2747,11 @@ interface Select2SearchResult<TItem> {
     items: TItem[];
     more: boolean;
 }
-declare class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
     private _items;
     private _itemById;
     protected lastCreateTerm: string;
-    constructor(hidden: JQuery, opt?: any);
+    constructor(element?: JQuery, opt?: WidgetProps<P>);
     destroy(): void;
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
@@ -2860,9 +2889,9 @@ interface LookupEditorOptions extends Select2EditorOptions {
     lookupKey?: string;
     async?: boolean;
 }
-declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
     private lookupChangeUnbind;
-    constructor(input: JQuery, opt?: TOptions);
+    constructor(input?: JQuery, opt?: WidgetProps<P>);
     hasAsyncSource(): boolean;
     destroy(): void;
     protected getLookupKey(): string;
@@ -2880,8 +2909,9 @@ declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TI
     protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
     protected editDialogDataChange(): void;
 }
-declare class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: LookupEditorOptions);
+declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -2925,9 +2955,9 @@ interface HtmlContentEditorOptions {
 }
 interface CKEditorConfig {
 }
-declare class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
     private _instanceReady;
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+    constructor(props?: EditorProps<P>);
     protected instanceReady(x: any): void;
     protected getLanguage(): string;
     protected getConfig(): CKEditorConfig;
@@ -2944,17 +2974,15 @@ declare class HtmlContentEditor extends Widget<HtmlContentEditorOptions> impleme
     static getCKEditorBasePath(): string;
     static includeCKEditor(): void;
 }
-declare class HtmlNoteContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     protected getConfig(): CKEditorConfig;
 }
-declare class HtmlReportContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     protected getConfig(): CKEditorConfig;
 }
 
-declare class MaskedEditor extends Widget<MaskedEditorOptions> {
-    constructor(input: JQuery, opt?: MaskedEditorOptions);
+declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorComponent<P> {
+    constructor(props?: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
@@ -2969,8 +2997,8 @@ interface RecaptchaOptions {
     siteKey?: string;
     language?: string;
 }
-declare class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
-    constructor(div: JQuery, opt: RecaptchaOptions);
+declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorComponent<P> implements IStringValue {
+    constructor(props?: EditorProps<P>);
     get_value(): string;
     set_value(value: string): void;
 }
@@ -3026,8 +3054,8 @@ interface FileUploadEditorOptions extends FileUploadConstraints {
 }
 interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
-declare class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-    constructor(div: JQuery, opt: FileUploadEditorOptions);
+declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    constructor(props?: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -3050,17 +3078,17 @@ declare class FileUploadEditor extends Widget<FileUploadEditorOptions> implement
     protected uploadInput: JQuery;
     protected hiddenInput: JQuery;
 }
-declare class ImageUploadEditor extends FileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+    constructor(props?: WidgetProps<P>);
 }
-declare class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     private entities;
     private toolbar;
     private fileSymbols;
     private uploadInput;
     protected progress: JQuery;
     protected hiddenInput: JQuery;
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+    constructor(props?: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -3078,8 +3106,8 @@ declare class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> i
     setEditValue(source: any, property: PropertyItem): void;
     jsonEncodeValue: boolean;
 }
-declare class MultipleImageUploadEditor extends MultipleFileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+    constructor(props?: WidgetProps<P>);
 }
 
 interface QuickFilterArgs<TWidget> {
@@ -3091,12 +3119,12 @@ interface QuickFilterArgs<TWidget> {
     active?: boolean;
     handled?: boolean;
 }
-interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+interface QuickFilter<TWidget extends Widget<P>, P> {
     field?: string;
-    type?: new (element: JQuery, options: TOptions) => TWidget;
+    type?: (new (element: JQuery, options: P) => TWidget) | (new (options?: P) => TWidget);
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     title?: string;
-    options?: TOptions;
+    options?: P;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
     separator?: boolean;
@@ -3107,17 +3135,17 @@ interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
 }
 
 interface QuickFilterBarOptions {
-    filters: QuickFilter<Widget<any>, any>[];
-    getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
+    filters: QuickFilter<WidgetComponent<any>, any>[];
+    getTitle?: (filter: QuickFilter<WidgetComponent<any>, any>) => string;
     idPrefix?: string;
 }
-declare class QuickFilterBar extends Widget<QuickFilterBarOptions> {
-    constructor(container: JQuery, options?: QuickFilterBarOptions);
+declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends WidgetComponent<P> {
+    constructor(props?: WidgetProps<P>);
     addSeparator(): void;
-    add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+    add<TWidget extends WidgetComponent<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
     addDateRange(field: string, title?: string): DateEditor;
     static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-    addDateTimeRange(field: string, title?: string): DateTimeEditor;
+    addDateTimeRange(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
     static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
     addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
@@ -3600,7 +3628,7 @@ interface GridPersistanceFlags {
     quickSearch?: boolean;
     includeDeleted?: boolean;
 }
-declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
+declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
     private _isDisabled;
     private _layoutTimer;
     private _slickGridOnSort;
@@ -3623,7 +3651,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     static defaultPersistanceStorage: SettingStorage;
     static defaultColumnWidthScale: number;
     static defaultColumnWidthDelta: number;
-    constructor(container: JQuery, options?: TOptions);
+    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>);
     protected internalInit(): void;
     protected initSync(): void;
     protected initAsync(): Promise<void>;
@@ -3731,11 +3759,11 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected subDialogDataChange(): void;
     protected addFilterSeparator(): void;
     protected determineText(getKey: (prefix: string) => string): string;
-    protected addQuickFilter<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+    protected addQuickFilter<TWidget extends Widget<any>, P>(opt: QuickFilter<TWidget, P>): TWidget;
     protected addDateRangeFilter(field: string, title?: string): DateEditor;
-    protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-    protected addDateTimeRangeFilter(field: string, title?: string): DateTimeEditor;
-    protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
+    protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor<DateEditorOptions>, DateTimeEditorOptions>;
+    protected addDateTimeRangeFilter(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
+    protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor<DateTimeEditorOptions>, DateTimeEditorOptions>;
     protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
     protected invokeSubmitHandlers(): void;
@@ -3753,6 +3781,10 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     getGrid(): Grid;
     getView(): RemoteView<TItem>;
     getFilterStore(): FilterStore;
+}
+declare class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 declare class ColumnPickerDialog extends TemplatedDialog<any> {
@@ -3911,8 +3943,8 @@ declare class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIt
     set filterValue(value: any);
 }
 
-declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-    constructor(container: JQuery, options?: TOptions);
+declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
+    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>);
     protected handleRoute(args: HandleRouteEventArgs): void;
     protected usePager(): boolean;
     protected createToolbarExtensions(): void;
@@ -3950,6 +3982,10 @@ declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     protected getDialogType(): {
         new (...args: any[]): Widget<any>;
     };
+}
+declare class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
+    constructor(props?: WidgetProps<P>);
+    static isWidgetComponent: true;
 }
 
 declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
@@ -4078,7 +4114,7 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     protected getFallbackTemplate(): string;
 }
 
-type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
+type JsxDomWidgetProps<P> = EditorProps<P> & {
     children?: any | undefined;
     class?: string;
 };
@@ -4174,23 +4210,23 @@ interface GoogleMapOptions {
     markerLatitude?: any;
     markerLongitude?: any;
 }
-declare class GoogleMap extends Widget<GoogleMapOptions> {
+declare class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorComponent<P> {
     private map;
-    constructor(container: JQuery, opt: GoogleMapOptions);
+    constructor(props?: EditorProps<P>);
     get_map(): any;
 }
 
-declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+declare class Select2AjaxEditor<TOptions, TItem = any> extends Widget<TOptions> implements IStringValue {
     pageSize: number;
     constructor(hidden: JQuery, opt: TOptions);
     protected emptyItemText(): string;
     protected getService(): string;
-    protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-    protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+    protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void;
+    protected executeQuery(options: ServiceOptions<ListResponse<TItem>>): void;
     protected queryByKey(key: string, callback: (p1: any) => void): void;
-    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
-    protected getItemKey(item: any): string;
-    protected getItemText(item: any): string;
+    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<TItem>>): void;
+    protected getItemKey(item: TItem): string;
+    protected getItemText(item: TItem): string;
     protected getTypeDelay(): number;
     protected getSelect2Options(): Select2Options;
     protected addInplaceCreate(title: string): void;
@@ -4227,4 +4263,4 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AlertOptions, type AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, type WidgetClass, type WidgetComponentProps, type WidgetDialogClass, addAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, ensureMetadata, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getTypes, groupBy, handleScriptDataError, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AggregateFormatting, Aggregators, type AlertOptions, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DataGridComponent, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, type DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorComponent, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityGridComponent, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridComponent, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, PropertyPanelComponent, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedPanelComponent, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, ToolbarComponent, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, VX, ValidationHelper, WX, Widget, WidgetComponent, type WidgetProps, addAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, ensureMetadata, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getTypes, groupBy, handleScriptDataError, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isJQuery, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

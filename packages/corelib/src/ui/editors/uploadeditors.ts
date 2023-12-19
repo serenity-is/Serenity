@@ -3,8 +3,8 @@ import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
-import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
+import { EditorComponent, EditorProps, WidgetProps } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
@@ -18,22 +18,24 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 
 @Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class FileUploadEditor extends Widget<FileUploadEditorOptions>
+export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
-    constructor(div: JQuery, opt: FileUploadEditorOptions) {
-        super(div, opt);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
-        if (!opt || opt.allowNonImage == null)
+        if (!this.options || this.options.allowNonImage == null)
             this.options.allowNonImage = true;
 
+        let div = this.element;
         div.addClass('s-FileUploadEditor');
         
         if (!this.options.originalNameProperty)
             div.addClass('hide-original-name');
 
-        this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
-            buttons: this.getToolButtons()
+        this.toolbar = new ToolbarComponent({
+            buttons: this.getToolButtons(),
+            nodeRef: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -266,20 +268,20 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
-export class ImageUploadEditor extends FileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
+export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        if (opt && opt.allowNonImage == null)
+        if (this.options.allowNonImage == null)
             this.options.allowNonImage = false;
 
-        div.addClass('s-ImageUploadEditor');
+        this.element.addClass('s-ImageUploadEditor');
     }
 }
 
 @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
+export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
     private entities: UploadedFile[];
@@ -289,14 +291,15 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     protected progress: JQuery;
     protected hiddenInput: JQuery;
 
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
         this.entities = [];
+        let div = this.element;
         div.addClass('s-MultipleFileUploadEditor');
-        var self = this;
-        this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
-            buttons: this.getToolButtons()
+        this.toolbar = new ToolbarComponent({
+            buttons: this.getToolButtons(),
+            nodeRef: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -475,10 +478,9 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
-export class MultipleImageUploadEditor extends MultipleFileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
-
-        div.addClass('s-MultipleImageUploadEditor');
+export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+    constructor(props?: WidgetProps<P>) {
+        super(props);
+        this.element.addClass('s-MultipleImageUploadEditor');
     }
 }

@@ -8,7 +8,7 @@ import { WX } from "../widgets/wx";
 
 @Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
 @Decorators.element('<input type="hidden" />')
-export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+export class Select2AjaxEditor<TOptions, TItem = any> extends Widget<TOptions> implements IStringValue {
     pageSize: number = 50;
 
     constructor(hidden: JQuery, opt: TOptions) {
@@ -42,7 +42,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         throw new Error("Not implemented!");
     }
 
-    protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void {
+    protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void {
         var options: ServiceOptions<any> = {
             blockUI: false,
             service: this.getService() + '/List',
@@ -54,7 +54,7 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         this.executeQuery(options);
     }
 
-    protected executeQuery(options: ServiceOptions<ListResponse<any>>): void {
+    protected executeQuery(options: ServiceOptions<ListResponse<TItem>>): void {
         serviceCall(options);
     }
 
@@ -70,15 +70,15 @@ export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> impleme
         this.executeQueryByKey(options);
     }
 
-    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void {
+    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<TItem>>): void {
         serviceCall(options);
     }
 
-    protected getItemKey(item: any): string {
+    protected getItemKey(item: TItem): string {
         return null;
     }
 
-    protected getItemText(item: any): string {
+    protected getItemText(item: TItem): string {
         return null;
     }
 

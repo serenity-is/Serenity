@@ -17,13 +17,6 @@ afterEach(() => {
 });
 
 describe("LookupEditor", () => {
-    test('throws an error if element is null', () => {
-        ScriptData.set("Lookup.Test", { items: [] });
-
-        expect(() => new LookupEditor(null, {
-            lookupKey: "Test"
-        })).toThrow();
-    });
 
     test('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
@@ -34,7 +27,7 @@ describe("LookupEditor", () => {
                 (settings.error as any)({ status: 404 } as any, null, null);
                 return {} as any;
             } as unknown as any;
-            expect(() => new LookupEditor($("<input />"), {
+            expect(() => new LookupEditor({
                 lookupKey: "Test"
             })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
         }
@@ -49,21 +42,9 @@ describe("LookupEditor", () => {
             items: [{ id: 1, text: "Test" }]
         });
 
-        new LookupEditor($("<input />"), {
+        new LookupEditor({
             lookupKey: "Test"
         });
-    });
-
-    test('sets input type to text', () => {
-        ScriptData.set("Lookup.Test", {
-            items: []
-        });
-
-        const editor = new LookupEditor($("<input type='number' />"), {
-            lookupKey: "Test"
-        });
-
-        expect(editor.element.attr("type")).toBe("text");
     });
 
     test('sets placeholder to default if its null', () => {
@@ -71,7 +52,7 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -83,9 +64,9 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = new LookupEditor($("<input placeholder='test' />"), {
+        const editor = (new LookupEditor as any)({
             lookupKey: "Test"
-        });
+        }, $("<input placeholder='test' />"));
 
         expect(editor.element.attr("placeholder")).toBe("test");
     });
@@ -95,7 +76,7 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
             inplaceAdd: true
         });
@@ -108,7 +89,7 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -123,17 +104,16 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const select2Container = $(`<div class="select2-container"><input /></div>`);
+        const select2Container = $(`<div class="select2-container" />`);
         document.body.appendChild(select2Container[0]);
-        const editorInput = select2Container.find("input");
 
-        const editor = new LookupEditor(editorInput, {
+        const editor = new LookupEditor({
             lookupKey: "Test",
-            inplaceAdd: true
+            inplaceAdd: true,
+            nodeRef: el => select2Container.append(el)
         });
 
         expect(select2Container.find(".inplace-button").attr('title')).toBe("Controls.SelectEditor.InplaceAdd");
-
         editor.value = "1";
         expect(select2Container.find(".inplace-button").attr('title')).toBe("Controls.SelectEditor.InplaceEdit");
     });
@@ -143,7 +123,7 @@ describe("LookupEditor", () => {
             items: []
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -155,7 +135,7 @@ describe("LookupEditor", () => {
             items: [{ id: 1, text: "Test" }]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -170,7 +150,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -182,7 +162,7 @@ describe("LookupEditor", () => {
             items: [{ id: 1, text: "Test" }]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -195,7 +175,7 @@ describe("LookupEditor", () => {
             items: [{ id: 1, text: "Test" }]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -208,7 +188,7 @@ describe("LookupEditor", () => {
             items: [{ id: 1, text: "Test" }]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -222,7 +202,7 @@ describe("LookupEditor", () => {
             idField: "id"
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -236,7 +216,7 @@ describe("LookupEditor", () => {
             textField: "text"
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -251,7 +231,7 @@ describe("LookupEditor", () => {
             textField: "text"
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -268,7 +248,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
             cascadeField: "parentId",
             cascadeValue: 1,
@@ -294,14 +274,13 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const parentIdInput = $("<input id='parentId' />");
-        document.body.appendChild(parentIdInput[0]);
-
-        const parentIdEditor = new LookupEditor(parentIdInput, {
+        const parentIdEditor = new LookupEditor({
             lookupKey: "TestParent",
+            id: "parentId",
+            nodeRef: el => document.body.append(el)
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
             cascadeFrom: "parentId"
         });
@@ -323,7 +302,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
             filterField: "text",
             filterValue: "Test2"
@@ -342,7 +321,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -377,17 +356,17 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const parentIdInput = $("<input id='parentId' />");
-        document.body.appendChild(parentIdInput[0]);
-
-        const parentIdEditor = new LookupEditor(parentIdInput, {
+        const parentIdEditor = new LookupEditor({
+            id: "parentId",
             lookupKey: "TestParent",
+            nodeRef: el => document.body.appendChild(el)
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
-            cascadeFrom: "parentId"
-        });
+            cascadeFrom: "parentId",
+            nodeRef: el => document.body.appendChild(el)
+        })
 
         expect(editor.items).toHaveLength(0);
 
@@ -416,13 +395,9 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const select2Container = $(`<div class="select2-container"><input /></div>`);
-        document.body.appendChild(select2Container[0]);
-        const editorInput = select2Container.find("input");
-
-        document.body.appendChild(editorInput[0]);
-        const editor = new LookupEditor(editorInput, {
-            lookupKey: "Test"
+        const editor = new LookupEditor({
+            lookupKey: "Test",
+            nodeRef: el => document.body.appendChild(el)
         });
 
         expect(editor.items).toHaveLength(2);
@@ -451,7 +426,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test"
         });
 
@@ -468,7 +443,7 @@ describe("LookupEditor", () => {
     test('throws error if editor is async and items getter or setter is accessed', () => {
         ScriptData.set("Lookup.Test", <Lookup<any>>{ items: [] });
 
-        const editor = new LookupEditor($("<input />"), {
+        const editor = new LookupEditor({
             lookupKey: "Test",
             async: true
         });

@@ -3,7 +3,7 @@ import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
     cols?: any;
@@ -15,14 +15,15 @@ export interface CKEditorConfig {
 
 @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
 @Decorators.element('<textarea/>')
-export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
+export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorComponent<P>
     implements IStringValue, IReadOnly {
 
     private _instanceReady: boolean;
 
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt)
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
+        let textArea = this.element;
         this._instanceReady = false;
         HtmlContentEditor.includeCKEditor();
 
@@ -224,10 +225,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.HtmlNoteContentEditor')
-export class HtmlNoteContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt);
-    }
+export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();
@@ -244,10 +242,7 @@ export class HtmlNoteContentEditor extends HtmlContentEditor {
 }
 
 @Decorators.registerEditor('Serenity.HtmlReportContentEditor')
-export class HtmlReportContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt);
-    }
+export class HtmlReportContentEditor <P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();

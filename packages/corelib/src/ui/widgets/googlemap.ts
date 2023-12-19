@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
-import { Widget } from "./widget";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
+import { EditorComponent, EditorProps } from "./widget";
 
 export interface GoogleMapOptions {
     latitude?: any;
@@ -14,12 +14,12 @@ export interface GoogleMapOptions {
 
 @Decorators.registerEditor('Serenity.GoogleMap', [])
 @Decorators.element('<div/>')
-export class GoogleMap extends Widget<GoogleMapOptions> {
+export class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorComponent<P> {
 
     private map: any;
 
-    constructor(container: JQuery, opt: GoogleMapOptions) {
-        super(container, opt);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
         // @ts-ignore
         var center = new google.m ?? s.LatLng(
@@ -54,7 +54,7 @@ export class GoogleMap extends Widget<GoogleMapOptions> {
             new google.maps.Marker(markerOpt);
         }
 
-        LazyLoadHelper.executeOnceWhenShown(container, () => {
+        LazyLoadHelper.executeOnceWhenShown(this.element, () => {
             // @ts-ignore
             google.maps.event.trigger(this.map, 'resize', []);
             this.map.setCenter(center);

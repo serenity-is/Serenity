@@ -4,18 +4,19 @@ import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
-export class PropertyGrid extends Widget<PropertyGridOptions> {
+export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
     private editors: Widget<any>[];
     private items: PropertyItem[];
     declare public readonly idPrefix: string;
 
-    constructor(div: JQuery, opt: PropertyGridOptions) {
-        super(div, opt);
+    constructor(element?: JQuery, props?: any) {
+        super(element, props);
 
+        let div = this.element;
         this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
 
         if (this.options.mode == null)
@@ -638,10 +639,18 @@ export enum PropertyGridMode {
 
 export interface PropertyGridOptions {
     idPrefix?: string;
-    items?: PropertyItem[];
+    items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
     defaultCategory?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
+}
+
+export class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
+    }
+
+    static override isWidgetComponent: true;
 }

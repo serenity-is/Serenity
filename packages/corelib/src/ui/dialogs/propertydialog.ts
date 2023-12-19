@@ -3,15 +3,16 @@ import { Decorators, FormKeyAttribute } from "../../decorators";
 import { ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { TemplatedDialog } from "./templateddialog";
+import { WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
-export class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
 
-    constructor(opt?: TOptions) {
-        super(opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         if (this.useAsync())
             this.initAsync();

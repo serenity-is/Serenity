@@ -2,11 +2,10 @@
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.EmailAddressEditor')
-export class EmailAddressEditor extends StringEditor {
-    constructor(input: JQuery) {
-        super(input);
-
-        input.attr('type', 'email')
-            .addClass('email');
+@Decorators.element("<input type=\"email\"/>")
+export class EmailAddressEditor<TOptions = {}> extends StringEditor<TOptions> {
+    constructor(opt?: TOptions) {
+        super(opt);
+        this.node?.classList.add('email');
     }
 }

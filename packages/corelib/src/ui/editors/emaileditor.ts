@@ -1,7 +1,7 @@
 ﻿import { tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 
 export interface EmailEditorOptions {
     domain?: string;
@@ -10,11 +10,11 @@ export interface EmailEditorOptions {
 
 @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class EmailEditor extends Widget<EmailEditorOptions> {
+export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorComponent<P> {
 
-    constructor(input: JQuery, opt: EmailEditorOptions) {
-        super(input, opt);
-
+    constructor(props?: EditorProps<P>) {
+        super(props);
+        let input = this.element;
         EmailEditor.registerValidationMethods();
 
         input.addClass('emailuser');
@@ -22,7 +22,7 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
 
         var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
-        domain.bind('blur.' + this.uniqueName, function () {
+        domain.on('blur.' + this.uniqueName, function () {
             var validator = domain.closest('form').data('validator');
             if (validator != null) {
                 validator.element(input[0]);
@@ -114,10 +114,10 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
                 else if (this.options.domain) {
                     if (parts[1] !== this.options.domain)
                         this.element.val(value);
-                    else 
+                    else
                         this.element.val(parts[0]);
                 }
-                else 
+                else
                     this.element.val(parts[0]);
             }
             else

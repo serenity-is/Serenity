@@ -2,7 +2,7 @@
 import { Decorators } from "../../decorators";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
 import { addOption } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 import { EditorUtils } from "./editorutils";
 
 export interface TimeEditorOptions {
@@ -14,13 +14,14 @@ export interface TimeEditorOptions {
 
 @Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
 @Decorators.element("<select />")
-export class TimeEditor extends Widget<TimeEditorOptions> {
+export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorComponent<P> {
 
     private minutes: JQuery;
 
-    constructor(input: JQuery, opt?: TimeEditorOptions) {
-        super(input, opt);
-
+    constructor(props?: EditorProps<P>) {
+        super(props);
+        
+        let input = this.element;
         input.addClass('editor s-TimeEditor hour');
 
         if (!this.options.noEmptyOption) {

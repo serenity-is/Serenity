@@ -2,7 +2,7 @@
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend, isTrimmedEmpty } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 import { DecimalEditor } from "./decimaleditor";
 
 export interface IntegerEditorOptions {
@@ -13,11 +13,12 @@ export interface IntegerEditorOptions {
 
 @Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
 @Decorators.element('<input type="text"/>')
-export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorComponent<P> implements IDoubleValue {
 
-    constructor(input: JQuery, opt?: IntegerEditorOptions) {
-        super(input, opt);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
+        let input = this.element;
         input.addClass('integerQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
             {
@@ -36,9 +37,9 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
             val = (this.element as any).autoNumeric('get') as string;
             if (isTrimmedEmpty(val))
                 return null;
-            else 
+            else
                 return parseInt(val, 10);
-        } 
+        }
         else {
             val = (this.element.val() as string)?.trim();
             if (!val)

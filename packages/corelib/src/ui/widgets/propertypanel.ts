@@ -3,15 +3,16 @@ import { Decorators, FormKeyAttribute } from "../../decorators";
 import { getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
+import { WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')
-export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 
     private _entity: TItem;
     private _entityId: any;
 
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
+    constructor(container?: JQuery, props?: WidgetProps<P>) {
+        super(container, props);
 
         this.initPropertyGrid();
         this.loadInitialEntity();
@@ -109,4 +110,12 @@ export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
     }
 
     protected propertyGrid: PropertyGrid;
+}
+
+export class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
+    }
+
+    static override isWidgetComponent: true;
 }

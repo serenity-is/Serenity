@@ -6,7 +6,7 @@ import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -57,15 +57,16 @@ export interface Select2SearchResult<TItem> {
 @Decorators.registerClass('Serenity.Select2Editor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
 @Decorators.element("<input type=\"hidden\"/>")
-export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
+export class Select2Editor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
     private _items: Select2Item[];
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(hidden: JQuery, opt?: any) {
-        super(hidden, opt);
+    constructor(element?: JQuery, opt?: WidgetProps<P>) {
+        super(element, opt);
+        let hidden = this.element;
 
         this._items = [];
         this._itemById = {};

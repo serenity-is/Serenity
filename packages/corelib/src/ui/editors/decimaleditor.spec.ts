@@ -13,12 +13,10 @@ describe("DecimalEditor", () => {
             expect(options.aSep).toBe(',');
             return null;
         })
-
-        var editor = new DecimalEditor($("<input type='text'/>"));
     });
 
     it("gets current value using autonumeric if exists", () => {
-        var editor = new DecimalEditor($("<input type='text'/>"));
+        var editor = new DecimalEditor();
 
         ($.fn as any).autoNumeric = jest.fn().mockImplementationOnce((request) => {
             expect(request).toBe('get');
@@ -33,16 +31,15 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var input = $("<input type='text'/>");
-        var editor = new DecimalEditor(input);
+        var editor = new DecimalEditor();
         
-        input.val('543.21');
+        editor.element.val('543.21');
         expect(editor.value).toBe(543.21);
     });
 
 
     it("sets current value using autonumeric if exists", () => {
-        var editor = new DecimalEditor($("<input type='text'/>"));
+        var editor = new DecimalEditor();
 
         ($.fn as any).autoNumeric = jest.fn().mockImplementationOnce((request, value) => {
             expect(request).toBe('set');
@@ -57,12 +54,11 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var input = $("<input type='text'/>");
-        var editor = new DecimalEditor(input);
+        var editor = new DecimalEditor();
         
         editor.value = 123.45;
 
-        expect(input.val()).toBe('123.45');
+        expect(editor.element.val()).toBe('123.45');
     });
 
     it("sets element value directly if value is null or empty", () => {
@@ -70,14 +66,13 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var input = $("<input type='text'/>");
-        var editor = new DecimalEditor(input);
+        var editor = new DecimalEditor();
         
         editor.value = null;
-        expect(input.val()).toBe('');
+        expect(editor.element.val()).toBe('');
 
         (editor.value as any) = '';
-        expect(input.val()).toBe('');
+        expect(editor.element.val()).toBe('');
     });
 
     it("returns true from isvalid if value is valid", () => {
@@ -85,8 +80,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var input = $("<input type='text'/>");
-        var editor = new DecimalEditor(input);
+        var editor = new DecimalEditor();
         
         editor.element.val('');
         expect(editor.get_isValid()).toBe(true);
@@ -99,8 +93,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var input = $("<input type='text'/>");
-        var editor = new DecimalEditor(input);
+        var editor = new DecimalEditor();
         
         editor.element.val('not valid');
         expect(editor.get_isValid()).toBe(false);

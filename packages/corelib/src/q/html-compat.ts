@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/squery";
 import { htmlEncode, localText } from "@serenity-is/base";
 
 /**

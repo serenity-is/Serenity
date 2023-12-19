@@ -3,7 +3,7 @@ import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getAttributes, getLookup } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 
 export interface RadioButtonEditorOptions {
     enumKey?: string;
@@ -13,11 +13,11 @@ export interface RadioButtonEditorOptions {
 
 @Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
 @Decorators.element('<div/>')
-export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
+export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorComponent<P>
     implements IReadOnly {
 
-    constructor(input: JQuery, opt: RadioButtonEditorOptions) {
-        super(input, opt);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
         if (!this.options.enumKey &&
             this.options.enumType == null &&

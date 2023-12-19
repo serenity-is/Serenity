@@ -2,6 +2,7 @@
 import { Decorators } from "../../decorators";
 import { getLookup, reloadLookup, ScriptData } from "../../q";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
+import { WidgetProps } from "../widgets/widget";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
     lookupKey?: string;
@@ -9,11 +10,11 @@ export interface LookupEditorOptions extends Select2EditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.LookupEditorBase")
-export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
 
     private lookupChangeUnbind: any; 
 
-    constructor(input: JQuery, opt?: TOptions) {
+    constructor(input?: JQuery, opt?: WidgetProps<P>) {
         super(input, opt);
 
         if (!this.hasAsyncSource()) {
@@ -145,8 +146,11 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
 }
 
 @Decorators.registerEditor("Serenity.LookupEditor")
-export class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: LookupEditorOptions) {
-        super(hidden, opt);
+export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
+    
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
     }
+
+    static override isWidgetComponent: true;
 }

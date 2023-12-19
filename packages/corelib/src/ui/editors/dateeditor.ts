@@ -3,20 +3,27 @@ import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as dat
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addValidationRule, today } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorComponent, EditorProps } from "../widgets/widget";
 
 export const datePickerIconSvg = datePickerIconSvg_;
 
+export interface DateEditorOptions {
+    yearRange?: string;
+    minValue?: string;
+    sqlMinMax?: boolean;
+}
+
 @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
+export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
 
     private minValue: string;
     private maxValue: string;
 
-    constructor(input: JQuery) {
-        super(input);
+    constructor(props?: EditorProps<P>) {
+        super(props);
 
+        var input = this.element;
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker)) {
             // @ts-ignore
@@ -208,7 +215,7 @@ export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
     public static useFlatpickr: boolean;
 
     public static flatPickrOptions(input: JQuery) {
-        return flatPickrOptions(function() {
+        return flatPickrOptions(function () {
             input.triggerHandler('change');
         });
     }

@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/squery";
 import { closePanel } from "@serenity-is/base";
 
 export interface HandleRouteEventArgs {

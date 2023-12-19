@@ -1,5 +1,5 @@
 ﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
-import sQuery from "@optionaldeps/jquery";
+import sQuery from "@optionaldeps/squery";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {

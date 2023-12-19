@@ -6,23 +6,23 @@ import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
-import { Widget } from "../widgets/widget";
+import { WidgetComponent, WidgetProps } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
 
 export interface QuickFilterBarOptions {
-    filters: QuickFilter<Widget<any>, any>[];
-    getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
+    filters: QuickFilter<WidgetComponent<any>, any>[];
+    getTitle?: (filter: QuickFilter<WidgetComponent<any>, any>) => string;
     idPrefix?: string;
 }
 
 @Decorators.registerClass('Serenity.QuickFilterBar')
 @Decorators.element("<div/>")
-export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
+export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends WidgetComponent<P> {
 
-    constructor(container: JQuery, options?: QuickFilterBarOptions) {
-        super(container, options);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        container.addClass('quick-filters-bar').addClass('clear');
+        this.element.addClass('quick-filters-bar').addClass('clear');
 
         var filters = this.options.filters;
         for (var f = 0; f < filters.length; f++) {
@@ -37,7 +37,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
         this.element.append($('<hr/>'));
     }
 
-    public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
+    public add<TWidget extends WidgetComponent<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
         if (opt == null) {
             throw new ArgumentNullException('opt');
@@ -77,7 +77,7 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             quickFilter.addClass(opt.cssClass);
         }
 
-        var widget = Widget.create({
+        var widget = WidgetComponent.create({
             type: opt.type,
             element: e => {
                 if (opt.field) {
@@ -147,21 +147,13 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             field: field,
             type: DateEditor,
             title: title,
-            element: function (e1) {
-                end = Widget.create({
-                    type: DateEditor,
-                    element: function (e2) {
-                        e2.insertAfter(e1);
-                    },
-                    options: null,
-                    init: null
-                });
-
+            element: function (el) {
+                end = new DateEditor();
+                end.element.insertAfter(el);
                 end.element.change(function (x) {
-                    e1.triggerHandler('change');
+                    el.triggerHandler('change');
                 });
-
-                $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
+                $('<span/>').addClass('range-separator').text('-').insertAfter(el);
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
@@ -236,21 +228,14 @@ export class QuickFilterBar extends Widget<QuickFilterBarOptions> {
             field: field,
             type: DateTimeEditor,
             title: title,
-            element: function (e1) {
-                end = Widget.create({
-                    type: DateTimeEditor,
-                    element: function (e2) {
-                        e2.insertAfter(e1);
-                    },
-                    options: useUtc == null ? null : { useUtc },
-                    init: null
-                });
-
+            element: function (el) {
+                end = new DateTimeEditor(useUtc == null ? null : { useUtc });
+                end.element.insertAfter(el);
                 end.element.change(function (x) {
-                    e1.triggerHandler('change');
+                    el.triggerHandler('change');
                 });
 
-                $('<span/>').addClass('range-separator').text('-').insertAfter(e1);
+                $('<span/>').addClass('range-separator').text('-').insertAfter(el);
             },
             init: function (i) {
                 i.element.parent().find('.time').change(function (x1) {

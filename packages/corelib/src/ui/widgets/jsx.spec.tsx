@@ -1,7 +1,7 @@
 import { StringEditor } from '../editors/stringeditor';
-import { type FC } from 'jsx-dom';
-import $ from "@optionaldeps/jquery";
+import { FC } from 'jsx-dom';
 import { jsxDomWidget } from './jsx';
+import { PropertyGrid, PropertyGridComponent } from './propertygrid';
 
 test('render childless element', function () {
     const element = <br />;
@@ -574,21 +574,45 @@ describe('jsx: interpolation', () => {
     ).toBe('true'));
 
     it('can render Date objects', () => expect(
-        (<div>{date.toUTCString()}</div>).textContent!).toBe(date.toUTCString()));
+        (<div ref={el => el}>{date.toUTCString()}</div>).textContent!).toBe(date.toUTCString()));
 });
 
-const StringEditor_ = jsxDomWidget(StringEditor);
+const StringEditor_ = jsxDomWidget(StringEditor);        
 
 describe('jsx: widget integration', () => {
 
-    it('can create input', () => {
+    it('can create input via jsxDomWidget', () => {
         var ed: StringEditor;
-        (window as any).$ = (window as any).jQuery = $;
         var el = <StringEditor_ ref={x => ed = x} readOnly={true} />;
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();
-        expect(ed.element[0]).toBe(el);
+        expect(ed.element[0] === el).toBe(true);
         expect(el.getAttribute('readonly')).toBe('readonly');
+    });
+
+    it('can create input directly', () => {
+        var ed: StringEditor;
+        var el = <StringEditor ref={x => ed = x} readOnly={true} />;
+        expect(el.tagName).toBe('INPUT');
+        expect(el.classList.contains('s-StringEditor')).toBe(true);
+        expect(ed).toBeDefined();
+        expect(ed.node === el).toBe(true);
+        expect(ed.element[0]).toEqual(el);
+        expect(el.getAttribute('readonly')).toBe('readonly');
+    });
+
+    it('can create property grid component', () => {
+        var pg: PropertyGridComponent;
+        var el = <PropertyGridComponent items={[]} ref={w => pg = w } />;
+        expect(pg?.node).toBeDefined();
+        expect(pg.node).toBe(el);
+    });
+
+    it('can create property gridxyz', () => {
+        var pg: PropertyGrid;
+        var el = <PropertyGrid items={[]} ref={w => pg = w } />;
+        expect(pg?.node).toBeDefined();
+        expect(pg.node).toBe(el);
     });
 });

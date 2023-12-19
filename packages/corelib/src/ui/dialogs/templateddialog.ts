@@ -2,27 +2,37 @@
 import { Config, DialogButton, bsModalMarkup, closePanel, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
 import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { getAttributes, isMobileView, layoutFillHeight, newBodyDiv, validateOptions } from "../../q";
+import { getAttributes, isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { WidgetProps } from "../widgets/widget";
 import { DialogExtensions } from "./dialogextensions";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
-export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected tabs: JQuery;
     protected toolbar: Toolbar;
     protected validator: JQueryValidation.Validator;
 
-    constructor(options?: TOptions) {
-        super(newBodyDiv().addClass('s-TemplatedDialog hidden'), options);
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
 
-        this.element.attr("id", this.uniqueName);
+        this.element.attr("id", this.element.attr("id") || this.uniqueName);
 
         this.initValidator();
         this.initTabs();
         this.initToolbar();
     }
+
+    static override createNode() {
+        var div = document.body.appendChild(document.createElement("div"));
+        div.classList.add("s-TemplatedDialog");
+        div.classList.add("hidden");
+        return div;
+    }
+
+    static override isWidgetComponent: true;
 
     private get isMarkedAsPanel() {
         var panelAttr = getAttributes(getInstanceType(this),
@@ -58,7 +68,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         let dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
         try {
             var sizeHelper = $('<div/>').addClass('size').appendTo(dialog);
-            size = TemplatedDialog.getCssSize(sizeHelper, 'minWidth'); 
+            size = TemplatedDialog.getCssSize(sizeHelper, 'minWidth');
             if (size != null)
                 opt.minWidth = size;
 
@@ -97,7 +107,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             this.element && this.element.removeClass('modal-body');
             window.setTimeout(() => modal.remove(), 0);
         }
-        
+
         $(window).unbind('.' + this.uniqueName);
         super.destroy();
     }
@@ -129,7 +139,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             DialogExtensions["dialogFlexify"](this.element);
             DialogExtensions.dialogResizable(this.element);
         }
-        
+
         if (getAttributes(type, MaximizableAttribute, true).length > 0) {
             DialogExtensions.dialogMaximizable(this.element);
         }
@@ -163,12 +173,12 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected initModal(): void {
         if (this.element.hasClass('modal-body'))
             return;
-        
+
         var title = this.element.data('dialogtitle') ?? this.getDialogTitle() ?? '';
         var opt = this.getModalOptions();
         (opt as any)["show"] = false;
         var modalClass = "s-Modal";
-        
+
         if (opt.modalClass)
             modalClass += ' ' + opt.modalClass;
 
@@ -214,8 +224,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                 hotkeyContext = this.element;
         }
 
-        var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
-        this.toolbar = new Toolbar(toolbarDiv, opt);
+        this.toolbar = new Toolbar(toolbarDiv, { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
     }
 
     protected getToolbarButtons(): ToolButton[] {

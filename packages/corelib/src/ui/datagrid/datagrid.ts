@@ -15,8 +15,8 @@ import { FilterStore } from "../filtering/filterstore";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
-import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -59,10 +59,10 @@ export interface GridPersistanceFlags {
 
 @Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
 @Decorators.element("<div/>")
-export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
+export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
     private _isDisabled: boolean;
-    private _layoutTimer: number; 
+    private _layoutTimer: number;
     private _slickGridOnSort: any;
     private _slickGridOnClick: any;
     protected titleDiv: JQuery;
@@ -85,14 +85,14 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
+    constructor(element?: JQuery | HTMLElement, props?: WidgetProps<P>) {
+        super(element, props);
 
         var self = this;
 
         this.element.addClass('s-DataGrid').html('');
 
-        var layout = function() {
+        var layout = function () {
             self.layout();
             if (self._layoutTimer != null)
                 LayoutTimer.store(self._layoutTimer);
@@ -114,7 +114,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         if (this.useAsync())
             this.initAsync();
-        else 
+        else
             this.initSync();
     }
 
@@ -142,7 +142,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         this.updateInterface();
 
         this.initialSettings = this.getCurrentSettings(null);
-        
+
         var restoreResult = this.restoreSettings(null, null);
         if ((restoreResult as any)?.then)
             (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
@@ -227,10 +227,11 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 this.quickFiltersDiv.appendTo($('<div/>').addClass('s-Toolbar').insertBefore(this.slickContainer));
             }
 
-            this.quickFiltersBar = new QuickFilterBar(this.quickFiltersDiv, {
+            this.quickFiltersBar = new QuickFilterBar({
                 filters: filters,
                 getTitle: (filter: QuickFilter<Widget<any>, any>) => this.determineText(pre => pre + filter.field),
-                idPrefix: this.uniqueName + '_QuickFilter_'
+                idPrefix: this.uniqueName + '_QuickFilter_',
+                replaceNode: this.quickFiltersDiv[0]
             });
             this.quickFiltersBar.onChange = (e) => this.quickFilterChange(e);
         }
@@ -452,7 +453,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected canFilterColumn(column: Column): boolean {
-        return (column.sourceItem != null && 
+        return (column.sourceItem != null &&
             column.sourceItem.notFilterable !== true &&
             (column.sourceItem.readPermission == null ||
                 Authorization.hasPermission(column.sourceItem.readPermission)));
@@ -487,7 +488,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         }));
 
         this.slickGrid = grid;
-        
+
         this.setInitialSortOrder();
 
         return grid;
@@ -805,8 +806,11 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     }
 
     protected createToolbar(buttons: ToolButton[]): void {
-        var toolbarDiv = $('<div class="grid-toolbar"></div>').appendTo(this.element);
-        this.toolbar = new Toolbar(toolbarDiv, { buttons: buttons, hotkeyContext: this.element[0] });
+        this.toolbar = new ToolbarComponent({ 
+            buttons: buttons, 
+            hotkeyContext: this.element[0], 
+            nodeRef: el => $(el).addClass("grid-toolbar").appendTo(this.element) 
+        });
     }
 
     getTitle(): string {
@@ -912,13 +916,13 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
                 column.format = this.itemLink(
                     item.editLinkItemType != null ? item.editLinkItemType : null,
                     item.editLinkIdField != null ? item.editLinkIdField : null,
-                    function(ctx: FormatterContext) {
+                    function (ctx: FormatterContext) {
                         if (this.oldFormat.$ != null) {
                             return this.oldFormat.$(ctx);
                         }
                         return htmlEncode(ctx.value);
                     }.bind({ oldFormat: oldFormat }),
-                    function(ctx1: FormatterContext) {
+                    function (ctx1: FormatterContext) {
                         return (this.css.$ ?? '');
                     }.bind({ css: css }), false);
 
@@ -1043,7 +1047,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         if (attr.length >= 1)
             return attr[0].value;
     }
-   
+
     private _idProperty: string;
 
     protected getIdProperty(): string {
@@ -1110,7 +1114,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
         return null;
     }
 
-    protected addQuickFilter<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
+    protected addQuickFilter<TWidget extends Widget<any>, P>(opt: QuickFilter<TWidget, P>): TWidget {
         return this.ensureQuickFilterBar().add(opt);
     }
 
@@ -1226,7 +1230,7 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
 
         var columns = this.slickGrid.getColumns();
         var colById: { [key: string]: Column } = null;
-        var updateColById = function(cl: Column[]) {
+        var updateColById = function (cl: Column[]) {
             colById = {};
             for (var $t1 = 0; $t1 < cl.length; $t1++) {
                 var c = cl[$t1];
@@ -1487,4 +1491,12 @@ export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IData
     getFilterStore(): FilterStore {
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
+}
+
+export class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
+    constructor(props?: WidgetProps<P>) {
+        super(arguments[1], props);
+    }
+
+    static override isWidgetComponent: true;
 }
