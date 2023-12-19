@@ -354,7 +354,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             type: editorType,
             options: Object.assign(editorParams, { replaceNode: element[0] })
         });
-        editor.initialize();
+        editor.init();
 
         if (getTypeShortName(editor) == "BooleanEditor" &&
             (item.editorParams == null || !!!item.editorParams['labelFor'])) {

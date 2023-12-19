@@ -38,7 +38,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
-        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init(null);
+        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init();
         if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }

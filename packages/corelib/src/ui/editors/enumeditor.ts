@@ -1,4 +1,4 @@
-﻿import { Enum, tryGetText } from "@serenity-is/base";
+import { Enum, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { getAttributes } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
@@ -17,6 +17,8 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
 
         this.updateItems();
     }
+
+    static override isWidgetComponent: true = true;
 
     protected updateItems(): void {
         this.clearItems();

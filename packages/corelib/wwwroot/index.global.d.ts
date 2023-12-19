@@ -3340,9 +3340,9 @@ declare namespace Serenity {
         getGridField(): JQuery;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
         static setElementProps(el: HTMLElement, props: any): void;
-        private static setInstanceProps;
-        initialize(): void;
-        init(action?: (widget: any) => void): this;
+        protected initialized: boolean;
+        protected initialize(): void;
+        init(): this;
         render(): HTMLElement;
         protected renderContents(): void;
         get props(): WidgetProps<P>;
@@ -4048,6 +4048,7 @@ declare namespace Serenity {
     }
     class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
         constructor(props?: WidgetProps<P>);
+        static isWidgetComponent: true;
         protected updateItems(): void;
         protected allowClear(): boolean;
     }

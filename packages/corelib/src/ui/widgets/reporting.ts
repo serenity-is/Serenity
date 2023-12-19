@@ -34,7 +34,7 @@ export namespace Reporting {
                 idPrefix: this.idPrefix,
                 useCategories: true,
                 items: this.propertyItems
-            })).init(null);
+            })).init();
         }
 
         loadReport(reportKey: string): void {
