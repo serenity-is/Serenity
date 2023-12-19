@@ -4046,8 +4046,8 @@ declare namespace Serenity {
         enumKey?: string;
         enumType?: any;
     }
-    class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
-        constructor(hidden: JQuery, opt: EnumEditorOptions);
+    class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
+        constructor(props?: WidgetProps<P>);
         protected updateItems(): void;
         protected allowClear(): boolean;
     }
@@ -4558,6 +4558,9 @@ declare namespace Serenity {
         set_store(value: FilterStore): void;
     }
 
+    interface FilterFieldSelectOptions {
+        fields: PropertyItem[];
+    }
     class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         private rowsDiv;
         constructor(node: WidgetNode, opt?: WidgetProps<P>);
@@ -4608,8 +4611,8 @@ declare namespace Serenity {
         }[];
     }
 
-    class FilterDisplayBar extends FilterWidgetBase<any> {
-        constructor(div: JQuery);
+    class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
+        constructor(props?: WidgetProps<P>);
         protected filterStoreChanged(): void;
         protected getTemplate(): string;
     }
