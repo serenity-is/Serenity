@@ -157,6 +157,11 @@ public class TSTypeListerAST
         }
         else if (node is Declaration de && de.Name != null)
             return GetText(de.Name);
+        else if (node is TypeLiteralNode tln)
+        {
+            var text = tln.GetText();
+            return string.IsNullOrEmpty(text) ? "{}" : text;
+        }
         return node?.GetText();
     }
 
