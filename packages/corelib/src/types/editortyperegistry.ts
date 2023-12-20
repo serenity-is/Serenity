@@ -3,8 +3,6 @@ import { ArgumentNullException, EditorAttribute, Exception, getAttributes } from
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 
-let knownTypes: { [key: string] : any };
-
 export namespace EditorTypeRegistry {
     
     let registry = commonTypeRegistry(
