@@ -60,7 +60,16 @@ export class Widget<P = {}> {
             this.options = opt ?? {};
         }
         else {
-            this.options = opt ?? props ?? {};
+            this.options = props ?? opt ?? {};
+            if (props != null && opt != null) {
+                for (let k in opt) {
+                    if (typeof props[k] === "undefined" &&
+                        typeof opt[k] !== "undefined") {
+                        props[k] = opt[k];
+                    }
+                }
+                Object.assign(props, opt);
+            }
             this.node = this.options.replaceNode ?? getInstanceType(this).createNode();
         }
         delete this.options.replaceNode;
