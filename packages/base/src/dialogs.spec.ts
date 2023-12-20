@@ -65,6 +65,8 @@ function mockBS5PlusWithUndefinedJQuery() {
 function mockJQuery(fn: any) {
     let jQuery = function (selector: string | HTMLElement) {
         let result = {
+            [0]: selector,
+            length: 1,
             _selector: selector,
             _selectorHtml: typeof selector === 'string' ? selector : selector.outerHTML,
             html: function () {
