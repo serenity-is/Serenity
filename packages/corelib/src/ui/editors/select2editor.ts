@@ -388,6 +388,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         });
     }
 
+    protected static override requiresFragmentWorkaround = true;
+
     protected addInplaceCreate(addTitle: string, editTitle: string) {
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));

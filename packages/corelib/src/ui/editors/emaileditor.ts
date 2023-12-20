@@ -12,6 +12,8 @@ export interface EmailEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
+    protected static override requiresFragmentWorkaround = true;
+
     constructor(props?: EditorProps<P>) {
         super(props);
         let input = this.element;

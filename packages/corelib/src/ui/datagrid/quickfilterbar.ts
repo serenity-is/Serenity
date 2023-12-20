@@ -147,8 +147,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             type: DateEditor,
             title: title,
             element: function (el) {
-                end = new DateEditor();
-                end.element.insertAfter(el);
+                end = new DateEditor({ element: el2 => $(el2).insertAfter(el) });
                 end.element.change(function (x) {
                     el.triggerHandler('change');
                 });
@@ -163,8 +162,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                         date1 = null;
                     }
                     else {
-                        args.request.Criteria = Criteria.and(args.request.Criteria, 
-                            Criteria(args.field).ge(args.widget.value));   
+                        args.request.Criteria = Criteria.and(args.request.Criteria,
+                            Criteria(args.field).ge(args.widget.value));
                     }
                 }
 
@@ -228,8 +227,10 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             type: DateTimeEditor,
             title: title,
             element: function (el) {
-                end = new DateTimeEditor(useUtc == null ? null : { useUtc });
-                end.element.insertAfter(el);
+                end = new DateTimeEditor({ 
+                    element: el2 => $(el2).insertAfter(el),
+                    useUtc: useUtc == null ? undefined : useUtc,
+                });
                 end.element.change(function (x) {
                     el.triggerHandler('change');
                 });
@@ -248,7 +249,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                         notifyWarning(localText('Validation.DateInvalid'), '', null);
                         args.widget.element.val('');
                         date1 = null;
-                    } 
+                    }
                     else {
                         args.request.Criteria = Criteria.and(args.request.Criteria,
                             Criteria(args.field).ge(args.widget.value));
@@ -267,7 +268,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                             Criteria(args.field).le(end.value));
                     }
                 }
-                
+
                 args.active = !!(date1 || date2);
             },
             displayText: function (w, l) {

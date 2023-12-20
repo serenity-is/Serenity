@@ -3754,6 +3754,7 @@ declare namespace Serenity {
         private time;
         private lastSetValue;
         private lastSetValueGet;
+        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         getFlatpickrOptions(): any;
         get_value(): string;
@@ -3799,6 +3800,7 @@ declare namespace Serenity {
     }
     class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
         private minutes;
+        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         get value(): number;
         protected get_value(): number;
@@ -3813,6 +3815,7 @@ declare namespace Serenity {
         readOnlyDomain?: boolean;
     }
     class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         static registerValidationMethods(): void;
         get_value(): string;
@@ -3921,6 +3924,7 @@ declare namespace Serenity {
         clearItems(): void;
         addItem(item: Select2Item): void;
         addOption(key: string, text: string, source?: any, disabled?: boolean): void;
+        protected static requiresFragmentWorkaround: boolean;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
         protected useInplaceAdd(): boolean;
         protected isAutoComplete(): boolean;
@@ -5362,6 +5366,7 @@ declare namespace Serenity {
         protected getItemText(item: TItem): string;
         protected getTypeDelay(): number;
         protected getSelect2Options(): Select2Options;
+        protected static requiresFragmentWorkaround: boolean;
         protected addInplaceCreate(title: string): void;
         protected inplaceCreateClick(e: any): void;
         protected get_select2Container(): JQuery;

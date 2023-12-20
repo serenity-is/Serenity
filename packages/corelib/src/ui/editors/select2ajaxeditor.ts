@@ -138,6 +138,8 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
         };
     }
 
+    protected static override requiresFragmentWorkaround = true;
+
     protected addInplaceCreate(title: string): void {
         var self = this;
         $('<a><b/></a>').addClass('inplace-button inplace-create')

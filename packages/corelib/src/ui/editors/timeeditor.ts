@@ -18,6 +18,8 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
 
     private minutes: JQuery;
 
+    protected static override requiresFragmentWorkaround = true;
+
     constructor(props?: EditorProps<P>) {
         super(props);
         
