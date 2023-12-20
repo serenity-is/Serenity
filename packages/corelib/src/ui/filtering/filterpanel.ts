@@ -70,10 +70,8 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     private rowsDiv: JQuery;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.element.addClass('s-FilterPanel');
         this.rowsDiv = this.byId('Rows');

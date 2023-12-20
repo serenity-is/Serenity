@@ -6,10 +6,8 @@ import { WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
         
         this.initValidator();
         this.initTabs();
@@ -67,7 +65,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         var toolbarDiv = this.byId('Toolbar');
         if (!toolbarDiv.length)
             return;
-        this.toolbar = new Toolbar(toolbarDiv, { buttons: this.getToolbarButtons() });
+        this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv });
     }
 
     protected initValidator(): void {

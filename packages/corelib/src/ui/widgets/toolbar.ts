@@ -88,10 +88,8 @@ export interface ToolbarOptions {
 @Decorators.registerClass('Serenity.Toolbar')
 @Decorators.element("<div/>")
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props: WidgetProps<P>) {
+        super(props);
         
         this.element.addClass('s-Toolbar clearfix')
             .html('<div class="tool-buttons"><div class="buttons-outer">' +

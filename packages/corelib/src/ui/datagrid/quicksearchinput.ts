@@ -23,10 +23,8 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     private fieldChanged: boolean;
     private timer: number;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         let input = this.element;
         input.attr('title', localText('Controls.QuickSearch.Hint'))

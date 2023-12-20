@@ -9,10 +9,8 @@ export class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
 
     private onFilterStoreChanged: () => void;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props: WidgetProps<P>) {
+        super(props);
         
         this.store = new FilterStore([]);
         this.onFilterStoreChanged = () => this.filterStoreChanged();

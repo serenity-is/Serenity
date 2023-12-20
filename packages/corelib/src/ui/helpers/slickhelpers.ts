@@ -436,7 +436,8 @@ export namespace GridUtils {
             div.addClass('has-quick-search-fields');
         }
 
-        return new QuickSearchInput(div.children(), {
+        return new QuickSearchInput({
+            element: div.children(),
             fields: fields,
             onSearch: onSearch as any
         });

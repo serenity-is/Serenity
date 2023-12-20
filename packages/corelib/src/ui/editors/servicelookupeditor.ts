@@ -23,12 +23,6 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
 @Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
 export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
-    }
-
     protected getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
         if (dialogTypeKey)

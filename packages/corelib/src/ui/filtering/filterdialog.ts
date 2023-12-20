@@ -11,7 +11,7 @@ export class FilterDialog extends TemplatedDialog<any> {
     constructor() {
         super();
 
-        this.filterPanel = new FilterPanel(this.byId('FilterPanel'));
+        this.filterPanel = new FilterPanel({ element: this.byId('FilterPanel') });
         this.filterPanel.set_showInitialLine(true);
         this.filterPanel.set_showSearchButton(false);
         this.filterPanel.set_updateStoreOnReset(false);

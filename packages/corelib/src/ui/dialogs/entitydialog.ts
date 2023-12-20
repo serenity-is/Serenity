@@ -553,7 +553,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         pgOptions.items = items;
 
-        this.localizationGrid = (new PropertyGrid(localGridDiv, pgOptions)).init();
+        this.localizationGrid = (new PropertyGrid({ element: localGridDiv, ...pgOptions })).init();
         localGridDiv.addClass('s-LocalizationGrid');
     }
 
@@ -723,7 +723,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
-        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init();
+        this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
         if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }

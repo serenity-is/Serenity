@@ -30,10 +30,11 @@ export namespace Reporting {
                 this.byId('PropertyGrid').html('').attr('class', '');
                 this.propertyGrid = null;
             }
-            this.propertyGrid = (new PropertyGrid(this.byId('PropertyGrid'), {
+            this.propertyGrid = (new PropertyGrid({
+                element: this.byId('PropertyGrid'),
                 idPrefix: this.idPrefix,
                 useCategories: true,
-                items: this.propertyItems
+                items: this.propertyItems,
             })).init();
         }
 
@@ -111,10 +112,8 @@ export namespace Reporting {
 
     @Decorators.registerClass('Serenity.Reporting.ReportPage')
     export class ReportPage<P = {}> extends Widget<P> {
-        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<{}>);
-        constructor(props?: WidgetProps<{}>);
-        constructor(props?: any, opt?: any) {
-            super(props, opt);
+        constructor(props?: WidgetProps<P>) {
+            super(props);
 
             $('.report-link').click((e) => this.reportLinkClick(e as any));
             $('div.line').click((e) => this.categoryClick(e as any));

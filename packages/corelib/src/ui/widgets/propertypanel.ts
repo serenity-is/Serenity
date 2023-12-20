@@ -11,10 +11,8 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity: TItem;
     private _entityId: any;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         this.initPropertyGrid();
         this.loadInitialEntity();
@@ -38,7 +36,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
-        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init();
+        this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
         if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }

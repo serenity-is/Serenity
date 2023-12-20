@@ -19,10 +19,8 @@ export interface QuickFilterBarOptions {
 @Decorators.element("<div/>")
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         this.element.addClass('quick-filters-bar').addClass('clear');
 

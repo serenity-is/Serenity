@@ -85,10 +85,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>) {
+        super(props as any);
 
         var self = this;
 

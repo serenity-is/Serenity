@@ -23,7 +23,7 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: (new (element: ArrayLike<HTMLElement>, options?: P) => TWidget) | (new (props?: P) => TWidget);
+    type?: (new (options?: P) => TWidget);
     options?: WidgetProps<P>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
     element?: (e: JQuery) => void;
@@ -43,23 +43,13 @@ export class Widget<P = {}> {
         return jQuery(this.node);
     }
 
-    constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
+    constructor(props?: WidgetProps<P>) {
         if (isArrayLike(props)) {
             this.node = props[0];
-            this.options = opt ?? {};
+            this.options = {} as any;
         }
         else {
-            this.options = props ?? opt ?? {};
-            if (props != null && opt != null) {
-                for (let k in opt) {
-                    if (typeof (this.options as any)[k] === "undefined" &&
-                        typeof opt[k] !== "undefined") {
-                        (this.options as any)[k] = opt[k];
-                    }
-                }
-            }
+            this.options = props ?? {} as any;
             this.node = handleElementProp(getInstanceType(this), this.options.element);
         }
 

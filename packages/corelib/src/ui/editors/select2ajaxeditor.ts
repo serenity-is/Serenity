@@ -11,10 +11,8 @@ import { WX } from "../widgets/wx";
 export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number = 50;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         let hidden = this.element;
         var emptyItemText = this.emptyItemText();

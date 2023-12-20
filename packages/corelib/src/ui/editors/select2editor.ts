@@ -64,10 +64,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
         
         let hidden = this.element;
 

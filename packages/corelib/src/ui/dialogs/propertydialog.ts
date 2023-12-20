@@ -98,7 +98,7 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
-        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init();
+        this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
         if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }

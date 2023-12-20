@@ -25,7 +25,8 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        new QuickSearchInput(this.byId("Search"), {
+        new QuickSearchInput({
+            element: this.byId("Search"),
             onSearch: (fld, txt, done) => {
                 txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
                 this.element.find('li').each((x, e) => {

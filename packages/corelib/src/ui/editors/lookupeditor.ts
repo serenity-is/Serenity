@@ -14,10 +14,8 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
     private lookupChangeUnbind: any; 
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         if (!this.hasAsyncSource()) {
             this.updateItems();

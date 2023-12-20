@@ -15,10 +15,8 @@ import { DataGrid } from "./datagrid";
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
-    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
-    constructor(props?: WidgetProps<P>);
-    constructor(props?: any, opt?: any) {
-        super(props, opt);
+    constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>) {
+        super(props);
 
         this.element.addClass('route-handler')
             .on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));

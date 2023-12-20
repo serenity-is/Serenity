@@ -27,9 +27,9 @@ export class Flexify extends Widget<FlexifyOptions> {
     private xDifference = 0;
     private yDifference = 0;
     constructor(container: JQuery, options: FlexifyOptions) {
-        super(container, options);
+        super({ element: container, ...options });
 
-        LazyLoadHelper.executeOnceWhenShown(container, () => {
+        LazyLoadHelper.executeOnceWhenShown(this.element, () => {
             this.storeInitialSize();
         });
     }

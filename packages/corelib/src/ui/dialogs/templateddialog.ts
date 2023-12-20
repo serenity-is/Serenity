@@ -222,7 +222,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                 hotkeyContext = this.element;
         }
 
-        this.toolbar = new Toolbar(toolbarDiv, { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
+        this.toolbar = new Toolbar({ element:toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
     }
 
     protected getToolbarButtons(): ToolButton[] {
