@@ -118,6 +118,4 @@ export class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, 
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

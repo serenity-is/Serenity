@@ -654,6 +654,4 @@ export class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridO
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

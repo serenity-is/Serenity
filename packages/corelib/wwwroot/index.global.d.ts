@@ -3312,11 +3312,9 @@ declare namespace Serenity {
     }
     class WidgetComponent<P> extends Widget<P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
     class EditorComponent<P> extends Widget<EditorProps<P>> {
         constructor(props?: EditorProps<P>);
-        static isWidgetComponent: true;
     }
     class Widget<P = {}> {
         private static nextWidgetNumber;
@@ -3346,7 +3344,6 @@ declare namespace Serenity {
         render(): HTMLElement;
         protected renderContents(): void;
         get props(): WidgetProps<P>;
-        static isWidgetComponent: boolean;
     }
     interface Widget<P> {
         change(handler: (e: Event) => void): void;
@@ -3404,7 +3401,6 @@ declare namespace Serenity {
     }
     class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     class TemplatedWidget<P> extends Widget<P> {
@@ -3434,7 +3430,6 @@ declare namespace Serenity {
         protected validator: JQueryValidation.Validator;
         constructor(props?: WidgetProps<P>);
         static createNode(): HTMLDivElement;
-        static isWidgetComponent: true;
         private get isMarkedAsPanel();
         private get isResponsive();
         private static getCssSize;
@@ -3496,7 +3491,6 @@ declare namespace Serenity {
     }
     class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     namespace ValidationHelper {
@@ -3584,7 +3578,6 @@ declare namespace Serenity {
     }
     class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
@@ -3608,7 +3601,6 @@ declare namespace Serenity {
     }
     class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     namespace SubDialogHelper {
@@ -4022,7 +4014,6 @@ declare namespace Serenity {
 
     class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
         getItems(): any[];
         protected emptyItemText(): string;
         updateItems(): void;
@@ -4048,7 +4039,6 @@ declare namespace Serenity {
     }
     class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
         protected updateItems(): void;
         protected allowClear(): boolean;
     }
@@ -4080,7 +4070,6 @@ declare namespace Serenity {
     }
     class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -4117,7 +4106,6 @@ declare namespace Serenity {
     }
     class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     interface HtmlContentEditorOptions {
@@ -4963,7 +4951,6 @@ declare namespace Serenity {
     }
     class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
@@ -5165,7 +5152,6 @@ declare namespace Serenity {
     }
     class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
         constructor(props?: WidgetProps<P>);
-        static isWidgetComponent: true;
     }
 
     class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {

@@ -2141,11 +2141,9 @@ interface CreateWidgetParams<TWidget extends Widget<P>, P> {
 }
 declare class WidgetComponent<P> extends Widget<P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 declare class EditorComponent<P> extends Widget<EditorProps<P>> {
     constructor(props?: EditorProps<P>);
-    static isWidgetComponent: true;
 }
 declare class Widget<P = {}> {
     private static nextWidgetNumber;
@@ -2175,7 +2173,6 @@ declare class Widget<P = {}> {
     render(): HTMLElement;
     protected renderContents(): void;
     get props(): WidgetProps<P>;
-    static isWidgetComponent: boolean;
 }
 declare interface Widget<P> {
     change(handler: (e: Event) => void): void;
@@ -2249,7 +2246,6 @@ declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<
 }
 declare class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare class TemplatedWidget<P> extends Widget<P> {
@@ -2279,7 +2275,6 @@ declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected validator: JQueryValidation.Validator;
     constructor(props?: WidgetProps<P>);
     static createNode(): HTMLDivElement;
-    static isWidgetComponent: true;
     private get isMarkedAsPanel();
     private get isResponsive();
     private static getCssSize;
@@ -2341,7 +2336,6 @@ declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
 }
 declare class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare namespace ValidationHelper {
@@ -2429,7 +2423,6 @@ interface PropertyGridOptions {
 }
 declare class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
@@ -2453,7 +2446,6 @@ declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 }
 declare class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare namespace SubDialogHelper {
@@ -2867,7 +2859,6 @@ declare function select2LocaleInitialization(): boolean;
 
 declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
     getItems(): any[];
     protected emptyItemText(): string;
     updateItems(): void;
@@ -2893,7 +2884,6 @@ interface EnumEditorOptions extends Select2CommonOptions {
 }
 declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
     protected updateItems(): void;
     protected allowClear(): boolean;
 }
@@ -2925,7 +2915,6 @@ declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ex
 }
 declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -2962,7 +2951,6 @@ declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOpti
 }
 declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 interface HtmlContentEditorOptions {
@@ -3808,7 +3796,6 @@ declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IR
 }
 declare class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
@@ -4010,7 +3997,6 @@ declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 }
 declare class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
     constructor(props?: WidgetProps<P>);
-    static isWidgetComponent: true;
 }
 
 declare class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {

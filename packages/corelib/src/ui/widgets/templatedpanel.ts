@@ -93,6 +93,4 @@ export class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

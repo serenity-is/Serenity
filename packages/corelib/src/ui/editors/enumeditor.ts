@@ -18,8 +18,6 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         this.updateItems();
     }
 
-    static override isWidgetComponent: true = true;
-
     protected updateItems(): void {
         this.clearItems();
 

@@ -294,8 +294,6 @@ export class Widget<P = {}> {
     public get props(): WidgetProps<P> {
         return this.options;
     }
-
-    static isWidgetComponent: boolean;
 }
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
@@ -309,16 +307,12 @@ export class WidgetComponent<P> extends Widget<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }
 
 export class EditorComponent<P> extends Widget<EditorProps<P>> {
     constructor(props?: EditorProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }
 
 export declare interface Widget<P> {

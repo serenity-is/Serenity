@@ -10,8 +10,6 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
         this.updateItems();
     }
 
-    static override isWidgetComponent: true = true;
-
     getItems() {
         return this.options.items || [];
     }

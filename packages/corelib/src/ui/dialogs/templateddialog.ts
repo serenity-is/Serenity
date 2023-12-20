@@ -32,8 +32,6 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return div;
     }
 
-    static override isWidgetComponent: true = true;
-
     private get isMarkedAsPanel() {
         var panelAttr = getAttributes(getInstanceType(this),
             PanelAttribute, true) as PanelAttribute[];

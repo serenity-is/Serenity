@@ -231,6 +231,4 @@ export class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

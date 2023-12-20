@@ -366,6 +366,4 @@ export class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

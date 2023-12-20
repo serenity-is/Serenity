@@ -179,6 +179,4 @@ export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceL
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }

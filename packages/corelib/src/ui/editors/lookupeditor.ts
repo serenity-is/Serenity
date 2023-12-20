@@ -153,6 +153,4 @@ export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> e
     constructor(props?: WidgetProps<P>) {
         super(props);
     }
-
-    static override isWidgetComponent: true = true;
 }
