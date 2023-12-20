@@ -1512,24 +1512,6 @@ declare namespace Serenity {
     function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 
     /**
-     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
-     * @param s String (or number etc.) to be HTML encoded
-     */
-    function htmlEncode(s: any): string;
-    type JQueryLike = {
-        jquery: string;
-        get: (index: number) => HTMLElement;
-    };
-    function isJQueryLike(val: any): val is JQueryLike;
-    /**
-     * Toggles the class on the element handling spaces like addClass does.
-     * @param el the element
-     * @param cls the class to toggle
-     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
-     */
-    function toggleClass(el: Element, cls: string, add?: boolean): void;
-
-    /**
      * Options for a message dialog button
      */
     interface DialogButton {
@@ -1693,7 +1675,7 @@ declare namespace Serenity {
      * @param element The panel element
      * @param e  The event triggering the close
      */
-    function closePanel(element: (HTMLElement | JQueryLike), e?: Event): void;
+    function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event): void;
     /**
      * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
      * and panelopening and panelopened events on the window.
@@ -2045,6 +2027,19 @@ declare namespace Serenity {
      */
     function splitDateString(s: string): string[];
 
+    /**
+     * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+     * @param s String (or number etc.) to be HTML encoded
+     */
+    function htmlEncode(s: any): string;
+    /**
+     * Toggles the class on the element handling spaces like addClass does.
+     * @param el the element
+     * @param cls the class to toggle
+     * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+     */
+    function toggleClass(el: Element, cls: string, add?: boolean): void;
+
     function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;
     function tryGetText(key: string): string;
@@ -2241,6 +2236,7 @@ declare namespace Serenity {
     let isEnum: (type: any) => boolean;
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+    function isArrayLike(obj: any): obj is ArrayLike<any>;
 
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
@@ -2564,15 +2560,15 @@ declare namespace Serenity {
      * Adds an empty option to the select.
      * @param select the select element
      */
-    function addEmptyOption(select: JQueryLike | HTMLSelectElement): void;
+    function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement): void;
     /**
      * Adds an option to the select.
      */
-    function addOption(select: JQueryLike | HTMLSelectElement, key: string, text: string): void;
+    function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string): void;
     /** @deprecated use htmlEncode as it also encodes quotes */
     const attrEncode: typeof htmlEncode;
     /** Clears the options in the select element */
-    function clearOptions(select: JQueryLike): void;
+    function clearOptions(select: ArrayLike<HTMLElement>): void;
     /**
      * Finds the first element with the given relative id to the source element.
      * It can handle underscores in the source element id.
@@ -2581,7 +2577,7 @@ declare namespace Serenity {
      * @param context the context element (optional)
      * @returns the element with the given relative id to the source element.
      */
-    function findElementWithRelativeId(element: JQueryLike, relativeId: string, context?: HTMLElement): JQuery;
+    function findElementWithRelativeId(element: ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery;
     /**
      * Finds the first element with the given relative id to the source element.
      * It can handle underscores in the source element id.
@@ -2599,9 +2595,9 @@ declare namespace Serenity {
     /**
      * Returns the outer HTML of the element.
      */
-    function outerHtml(element: JQueryLike): string;
+    function outerHtml(element: ArrayLike<HTMLElement>): string;
 
-    function initFullHeightGridPage(gridDiv: JQueryLike | HTMLElement, opt?: {
+    function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement>, opt?: {
         noRoute?: boolean;
         setHeight?: boolean;
     }): void;
@@ -2620,8 +2616,8 @@ declare namespace Serenity {
         function onShown(element: () => HTMLElement, handler: () => void): number;
         function off(key: number): number;
     }
-    function executeOnceWhenVisible(element: JQueryLike, callback: Function): void;
-    function executeEverytimeWhenVisible(element: JQueryLike, callback: Function, callNowIfVisible: boolean): void;
+    function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void;
+    function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void;
 
     /** @deprecated prefer localText for better discoverability */
     const text: typeof localText;
@@ -3287,14 +3283,11 @@ declare namespace Serenity {
     }
 
     type NoInfer<T> = [T][T extends any ? 0 : never];
-    type WidgetNode = JQueryLike | HTMLElement;
     type WidgetProps<P> = {
         id?: string;
         class?: string;
-        nodeRef?: (el: HTMLElement) => void;
-        replaceNode?: HTMLElement;
+        element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
     } & NoInfer<P>;
-    type WidgetNodeOrProps<P> = WidgetNode | WidgetProps<P>;
     type EditorProps<T> = WidgetProps<T> & {
         initialValue?: any;
         maxLength?: number;
@@ -3304,9 +3297,9 @@ declare namespace Serenity {
         readOnly?: boolean;
     };
     interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-        type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
+        type?: (new (element: ArrayLike<HTMLElement>, options?: P) => TWidget) | (new (props?: P) => TWidget);
         options?: WidgetProps<P>;
-        container?: WidgetNode;
+        container?: HTMLElement | ArrayLike<HTMLElement>;
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
     }
@@ -3324,7 +3317,7 @@ declare namespace Serenity {
         readonly idPrefix: string;
         readonly node: HTMLElement;
         get element(): JQuery;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         static createNode(): HTMLElement;
@@ -3337,7 +3330,7 @@ declare namespace Serenity {
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
-        static setElementProps(el: HTMLElement, props: any): void;
+        private setElementProps;
         protected initialized: boolean;
         protected initialize(): void;
         init(): this;
@@ -3390,7 +3383,7 @@ declare namespace Serenity {
         hotkeyContext?: any;
     }
     class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         protected mouseTrap: any;
@@ -3472,7 +3465,7 @@ declare namespace Serenity {
     }
 
     class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         protected tabs: JQuery;
@@ -3534,7 +3527,7 @@ declare namespace Serenity {
         private editors;
         private items;
         readonly idPrefix: string;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         private createItems;
@@ -3583,7 +3576,7 @@ declare namespace Serenity {
     class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         private _entity;
         private _entityId;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         protected initPropertyGrid(): void;
@@ -3908,7 +3901,7 @@ declare namespace Serenity {
         private _items;
         private _itemById;
         protected lastCreateTerm: string;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         protected hasAsyncSource(): boolean;
@@ -4049,7 +4042,7 @@ declare namespace Serenity {
     }
     abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
         private lookupChangeUnbind;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         hasAsyncSource(): boolean;
         destroy(): void;
@@ -4088,7 +4081,7 @@ declare namespace Serenity {
         criteria?: any[];
     }
     abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         protected getDialogTypeKey(): string;
         protected getService(): string;
@@ -4280,7 +4273,7 @@ declare namespace Serenity {
     }
     interface QuickFilter<TWidget extends Widget<P>, P> {
         field?: string;
-        type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
+        type?: (new (element: ArrayLike<HTMLElement>, opt?: P) => TWidget) | (new (props?: P) => TWidget);
         handler?: (h: QuickFilterArgs<TWidget>) => void;
         title?: string;
         options?: P;
@@ -4299,7 +4292,7 @@ declare namespace Serenity {
         idPrefix?: string;
     }
     class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         addSeparator(): void;
         add<TWidget extends WidgetComponent<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
@@ -4340,7 +4333,7 @@ declare namespace Serenity {
         private field;
         private fieldChanged;
         private timer;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         protected checkIfValueChanged(): void;
         get_value(): string;
@@ -4539,7 +4532,7 @@ declare namespace Serenity {
     class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
         private store;
         private onFilterStoreChanged;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         destroy(): void;
         protected filterStoreChanged(): void;
@@ -4552,7 +4545,7 @@ declare namespace Serenity {
     }
     class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         private rowsDiv;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         private showInitialLine;
         get_showInitialLine(): boolean;
@@ -4817,7 +4810,7 @@ declare namespace Serenity {
         static defaultPersistanceStorage: SettingStorage;
         static defaultColumnWidthScale: number;
         static defaultColumnWidthDelta: number;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         protected internalInit(): void;
         protected initSync(): void;
@@ -5110,7 +5103,7 @@ declare namespace Serenity {
     }
 
     class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         protected handleRoute(args: HandleRouteEventArgs): void;
         protected usePager(): boolean;
@@ -5287,7 +5280,7 @@ declare namespace Serenity {
     interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
         (props: JsxDomWidgetProps<P>, context?: any): TElement | null;
     }
-    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: (new (element: WidgetNode, options?: TOptions) => Widget<TOptions>) | (new (options?: TOptions) => TWidget)): JsxDomWidget<TOptions & {
+    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: (new (element: ArrayLike<HTMLElement>, options?: TOptions) => Widget<TOptions>) | (new (options?: TOptions) => TWidget)): JsxDomWidget<TOptions & {
         ref?: (r: TWidget) => void;
     }>;
 
@@ -5316,7 +5309,7 @@ declare namespace Serenity {
             Parameters?: any;
         }
         class ReportPage<P = {}> extends Widget<P> {
-            constructor(node: WidgetNode, opt?: WidgetProps<{}>);
+            constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<{}>);
             constructor(props?: WidgetProps<{}>);
             protected updateMatchFlags(text: string): void;
             protected categoryClick(e: Event): void;
@@ -5385,7 +5378,7 @@ declare namespace Serenity {
 
     class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
         pageSize: number;
-        constructor(node: WidgetNode, opt?: WidgetProps<P>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
         constructor(props?: WidgetProps<P>);
         protected emptyItemText(): string;
         protected getService(): string;

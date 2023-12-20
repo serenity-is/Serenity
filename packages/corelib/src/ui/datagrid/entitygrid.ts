@@ -8,14 +8,14 @@ import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);

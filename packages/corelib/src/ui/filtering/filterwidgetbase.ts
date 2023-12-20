@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { TemplatedWidget } from "../widgets/templatedwidget";
-import { WidgetNode, WidgetProps } from "../widgets/widget";
+import { WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
 @Decorators.registerClass('Serenity.FilterWidgetBase')
@@ -9,7 +9,7 @@ export class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
 
     private onFilterStoreChanged: () => void;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);

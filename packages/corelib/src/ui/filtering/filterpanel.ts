@@ -3,7 +3,7 @@ import { Decorators } from "../../decorators";
 import { cast } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
-import { WidgetNode, WidgetProps } from "../widgets/widget";
+import { WidgetProps } from "../widgets/widget";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
 import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
@@ -70,7 +70,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     private rowsDiv: JQuery;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);
@@ -352,7 +352,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         new FilterFieldSelect({
             fields: this.get_store().get_fields(),
-            replaceNode: row.children('div.f').children('input')[0]
+            element: row.children('div.f').children('input')[0]
         }).changeSelect2(e => this.onRowFieldChange(e));
 
         this.updateParens();

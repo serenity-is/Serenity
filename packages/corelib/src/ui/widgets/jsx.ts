@@ -1,4 +1,4 @@
-﻿import { EditorProps, Widget, WidgetNode, WidgetProps } from "./widget";
+﻿import { EditorProps, Widget } from "./widget";
 
 function _widgetFactory(this: any, props: any) {
 
@@ -23,7 +23,7 @@ export interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
 }
 
 export function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(
-    type: (new (element: WidgetNode, options?: TOptions) => Widget<TOptions>) | 
+    type: (new (element: ArrayLike<HTMLElement>, options?: TOptions) => Widget<TOptions>) | 
           (new (options?: TOptions) => TWidget)): JsxDomWidget<TOptions & { ref?: (r: TWidget) => void }> {
     return _widgetFactory.bind(type);
 }

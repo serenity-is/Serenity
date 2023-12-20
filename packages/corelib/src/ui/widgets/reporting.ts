@@ -4,7 +4,7 @@ import { postToService, serviceCall } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { PropertyGrid } from "./propertygrid";
-import { Widget, WidgetNode, WidgetProps } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 export namespace Reporting {
     export interface ReportDialogOptions {
@@ -111,7 +111,7 @@ export namespace Reporting {
 
     @Decorators.registerClass('Serenity.Reporting.ReportPage')
     export class ReportPage<P = {}> extends Widget<P> {
-        constructor(node: WidgetNode, opt?: WidgetProps<{}>);
+        constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<{}>);
         constructor(props?: WidgetProps<{}>);
         constructor(props?: any, opt?: any) {
             super(props, opt);
@@ -119,7 +119,8 @@ export namespace Reporting {
             $('.report-link').click((e) => this.reportLinkClick(e as any));
             $('div.line').click((e) => this.categoryClick(e as any));
             var self = this;
-            new QuickSearchInput($('#QuickSearchInput'), {
+            new QuickSearchInput({
+                element: "#QuickSearchInput",
                 onSearch: function (field, text, done) {
                     self.updateMatchFlags(text);
                     done(true);

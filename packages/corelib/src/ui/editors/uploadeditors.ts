@@ -35,7 +35,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         this.toolbar = new ToolbarComponent({
             buttons: this.getToolButtons(),
-            nodeRef: el => this.element.append(el)
+            element: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -299,7 +299,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         div.addClass('s-MultipleFileUploadEditor');
         this.toolbar = new ToolbarComponent({
             buttons: this.getToolButtons(),
-            nodeRef: el => this.element.append(el)
+            element: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')

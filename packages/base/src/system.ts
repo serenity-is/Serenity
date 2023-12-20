@@ -277,4 +277,8 @@ export function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>> {
     return _fieldsProxy
 }
 
+export function isArrayLike(obj: any): obj is ArrayLike<any> {
+    return typeof obj === "object" && obj != null && typeof obj.length === "number" && typeof obj.nodeType !== "number";
+}
+
 export {}

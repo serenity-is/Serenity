@@ -1,5 +1,5 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { Config, JQueryLike, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isAssignableFrom, isJQueryLike, notifyError, stringFormat, toggleClass } from "@serenity-is/base";
+import { Config, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, isAssignableFrom, notifyError, stringFormat, toggleClass } from "@serenity-is/base";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { ArgumentNullException, Exception, addValidationRule as addValRule, getAttributes, replaceAll } from "../../q";
@@ -7,16 +7,11 @@ import { EditorUtils } from "../editors/editorutils";
 
 export type NoInfer<T> = [T][T extends any ? 0 : never];
 
-export type WidgetNode = JQueryLike | HTMLElement;
-
 export type WidgetProps<P> = {
     id?: string;
     class?: string;
-    nodeRef?: (el: HTMLElement) => void;
-    replaceNode?: HTMLElement;
+    element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
 } & NoInfer<P>
-
-export type WidgetNodeOrProps<P> = WidgetNode | WidgetProps<P>;
 
 export type EditorProps<T> = WidgetProps<T> & {
     initialValue?: any;
@@ -28,9 +23,9 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: (new (node: WidgetNode, options?: P) => TWidget) | (new (props?: P) => TWidget);
+    type?: (new (element: ArrayLike<HTMLElement>, options?: P) => TWidget) | (new (props?: P) => TWidget);
     options?: WidgetProps<P>;
-    container?: WidgetNode;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
 }
@@ -48,33 +43,28 @@ export class Widget<P = {}> {
         return jQuery(this.node);
     }
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
-        if (isJQueryLike(props)) {
-            this.node = props.get(0);
-            this.options = opt ?? {};
-        }
-        else if (props instanceof HTMLElement) {
-            this.node = props;
+        if (isArrayLike(props)) {
+            this.node = props[0];
             this.options = opt ?? {};
         }
         else {
             this.options = props ?? opt ?? {};
             if (props != null && opt != null) {
                 for (let k in opt) {
-                    if (typeof props[k] === "undefined" &&
+                    if (typeof (this.options as any)[k] === "undefined" &&
                         typeof opt[k] !== "undefined") {
-                        props[k] = opt[k];
+                        (this.options as any)[k] = opt[k];
                     }
                 }
-                Object.assign(props, opt);
             }
-            this.node = this.options.replaceNode ?? getInstanceType(this).createNode();
+            this.node = handleElementProp(getInstanceType(this), this.options.element);
         }
-        delete this.options.replaceNode;
 
-        Widget.setElementProps(this.node, this.options);
+        delete this.options.element;
+        this.setElementProps();
 
         this.widgetName = Widget.getWidgetName(getInstanceType(this));
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
@@ -170,68 +160,22 @@ export class Widget<P = {}> {
     };
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
-        let opt: WidgetProps<P> = params.options ?? ({} as any);
-        
-        var container = params.container;
-        var element = params.element;
-
-        function processNode(node: HTMLElement) {
-            if (!node)
-                return;
-
-            if (container) {
-                if (isJQueryLike(container))
-                    (container as JQuery).append(node);
-                else
-                    container.appendChild(node);
-                container = null;
-            }
-
-            if (element) {
-                element(sQuery(node));
-                element = null;
-            }
-        }
-
-        if (opt.replaceNode)
-            processNode(opt.replaceNode);
-        else if (container || element) {
-            var oldRef = opt.nodeRef;
-            opt.nodeRef = node => {
-                oldRef?.(node);
-                processNode(node);
-                delete opt.nodeRef;
-            };
-        }
-
-        let widget = new params.type(opt as any);
-        if (widget.node && opt.nodeRef)
-            opt.nodeRef(widget.node);
-
-        if (opt !== widget.options) {
-            // widget might have a constructor that does not accept options
-            Widget.setElementProps(widget.node, opt);
-            var x = opt as EditorProps<{}>;
-            typeof x.required !== "undefined" && ((widget.props as any).required ??= x.required);
-            typeof x.readOnly !== "undefined" && ((widget.props as any).readOnly ??= x.readOnly);
-            typeof x.initialValue !== "undefined" && ((widget.props as any).initialValue ??= x.initialValue);
-            typeof (x as any).ref !== "undefined" && ((widget.props as any).ref ??= (x as any).ref);
-        }
-
+        let props: WidgetProps<P> = params.options ?? ({} as any);
+        let node = handleElementProp(params.type as any, props.element);
+        params.container && (isArrayLike(params.container) ? sQuery(params.container).append(node) : params.container.appendChild(node));
+        params.element?.(sQuery(node));
+        props.element = node;
+        let widget = new params.type(props as any);
         widget.init();
-        params.init && params.init(widget);
-
+        params.init?.(widget);
         return widget;
     }
 
-    static setElementProps(el: HTMLElement, props: any): void {
+    private setElementProps(): void {
+        let el = this.node;
+        let props = this.props as EditorProps<{}>;
         if (!el || !props)
             return;
-
-        if (typeof props.nodeRef === "function") {
-            props.nodeRef(el);
-            delete props.nodeRef;
-        }
 
         if (props.id != null)
             el.id = props.id;
@@ -294,6 +238,27 @@ export class Widget<P = {}> {
     public get props(): WidgetProps<P> {
         return this.options;
     }
+}
+
+function handleElementProp(type: typeof Widget, element: (((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string)): HTMLElement {
+    let node: HTMLElement;
+    if (typeof element == "string") {
+        node = document.querySelector(element);
+        if (node == null)
+            throw `The element ${element} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
+    }
+    else if (isArrayLike(element)) {
+        node = element[0];
+    }
+    else if (element instanceof HTMLElement) {
+        node = element;
+    }
+    else {
+        node = type.createNode();
+        if (typeof element === "function")
+            element(node);
+    }
+    return node;
 }
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });

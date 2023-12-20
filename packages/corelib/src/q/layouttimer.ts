@@ -1,6 +1,6 @@
-﻿import { JQueryLike } from "@serenity-is/base";
+﻿import { isArrayLike } from "@serenity-is/base";
 
-export {}
+export { };
 
 interface LayoutTimerReg {
     handler: () => void;
@@ -137,24 +137,21 @@ export namespace LayoutTimer {
     }
 }
 
-export function executeOnceWhenVisible(element: JQueryLike, callback: Function): void {
-    var el = element && element.get(0);
-    if (!el)
-        return;
-    
+export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void {
+    el = isArrayLike(el) ? el[0] : el;
     if (el.offsetWidth > 0 && el.offsetHeight > 0) {
         callback();
         return;
     }
 
-    var timer = LayoutTimer.onShown(() => el, () => {
+    var timer = LayoutTimer.onShown(() => el as HTMLElement, () => {
         LayoutTimer.off(timer);
         callback();
     });
 }
 
-export function executeEverytimeWhenVisible(element: JQueryLike, callback: Function, callNowIfVisible: boolean): void {
-    var el = element && element.get(0);
+export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void {
+    el = isArrayLike(el) ? el[0] : el;
     if (!el)
         return;
     
@@ -162,7 +159,7 @@ export function executeEverytimeWhenVisible(element: JQueryLike, callback: Funct
         callback();
     }
 
-    LayoutTimer.onShown(() => el, () => {
+    LayoutTimer.onShown(() => el as HTMLElement, () => {
         callback();
     });
 }

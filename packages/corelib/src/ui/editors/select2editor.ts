@@ -6,7 +6,7 @@ import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -64,7 +64,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);

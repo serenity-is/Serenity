@@ -4,7 +4,7 @@ import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget, WidgetNode, WidgetProps } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
@@ -13,7 +13,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     private items: PropertyItem[];
     declare public readonly idPrefix: string;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);
@@ -352,7 +352,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
         let editor = Widget.create({
             type: editorType,
-            options: Object.assign(editorParams, { replaceNode: element[0] })
+            options: { ...editorParams, element: element }
         });
         editor.init();
 

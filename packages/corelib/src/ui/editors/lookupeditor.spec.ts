@@ -66,7 +66,7 @@ describe("LookupEditor", () => {
 
         const editor = new LookupEditor({
             lookupKey: "Test",
-            nodeRef: el => el.setAttribute("placeholder", "test")
+            element: el => el.setAttribute("placeholder", "test")
         });
 
         expect(editor.element.attr("placeholder")).toBe("test");
@@ -111,7 +111,7 @@ describe("LookupEditor", () => {
         const editor = new LookupEditor({
             lookupKey: "Test",
             inplaceAdd: true,
-            nodeRef: el => select2Container.append(el)
+            element: el => select2Container.append(el)
         });
 
         expect(select2Container.find(".inplace-button").attr('title')).toBe("Controls.SelectEditor.InplaceAdd");
@@ -278,7 +278,7 @@ describe("LookupEditor", () => {
         const parentIdEditor = new LookupEditor({
             lookupKey: "TestParent",
             id: "parentId",
-            nodeRef: el => document.body.append(el)
+            element: el => document.body.append(el)
         });
 
         const editor = new LookupEditor({
@@ -360,13 +360,13 @@ describe("LookupEditor", () => {
         const parentIdEditor = new LookupEditor({
             id: "parentId",
             lookupKey: "TestParent",
-            nodeRef: el => document.body.appendChild(el)
+            element: el => document.body.appendChild(el)
         });
 
         const editor = new LookupEditor({
             lookupKey: "Test",
             cascadeFrom: "parentId",
-            nodeRef: el => document.body.appendChild(el)
+            element: el => document.body.appendChild(el)
         })
 
         expect(editor.items).toHaveLength(0);
@@ -398,7 +398,7 @@ describe("LookupEditor", () => {
 
         const editor = new LookupEditor({
             lookupKey: "Test",
-            nodeRef: el => document.body.appendChild(el)
+            element: el => document.body.appendChild(el)
         });
 
         expect(editor.items).toHaveLength(2);

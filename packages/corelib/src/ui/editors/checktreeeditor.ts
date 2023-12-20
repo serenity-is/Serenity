@@ -4,10 +4,10 @@ import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
-import { DataGrid, DataGridComponent } from "../datagrid/datagrid";
+import { DataGridComponent } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget, WidgetNode, WidgetNodeOrProps, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 

@@ -1,6 +1,7 @@
 ﻿import { Config } from "./config";
-import { JQueryLike, htmlEncode, isJQueryLike, toggleClass } from "./html";
+import { htmlEncode, toggleClass } from "./html";
 import { localText } from "./localtext";
+import { isArrayLike } from "./system";
 
 /**
  * Options for a message dialog button
@@ -590,9 +591,9 @@ export function iframeDialog(options: IFrameDialogOptions) {
  * @param element The panel element
  * @param e  The event triggering the close
  */
-export function closePanel(element: (HTMLElement | JQueryLike), e?: Event) {
+export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
 
-    var el = isJQueryLike(element) ? element.get(0) : element;
+    var el = isArrayLike(element) ? element[0] : element;
     if (!el || !el.classList?.contains("s-Panel") || el.classList?.contains("hidden"))
         return;
 

@@ -1,11 +1,11 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { Config, JQueryLike, getGlobalObject, getNested, isJQueryLike } from "@serenity-is/base";
+import { Config, getGlobalObject, getNested, isArrayLike } from "@serenity-is/base";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
    
-export function initFullHeightGridPage(gridDiv: JQueryLike | HTMLElement, opt?: { noRoute?: boolean, setHeight?: boolean }) {
-    var el = isJQueryLike(gridDiv) ? gridDiv.get(0) : gridDiv;
+export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement>, opt?: { noRoute?: boolean, setHeight?: boolean }) {
+    var el = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv;
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 

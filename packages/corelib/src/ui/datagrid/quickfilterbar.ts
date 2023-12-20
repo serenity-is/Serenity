@@ -6,7 +6,7 @@ import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
-import { Widget, WidgetComponent, WidgetNode, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetComponent, WidgetProps } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
 
 export interface QuickFilterBarOptions {
@@ -19,7 +19,7 @@ export interface QuickFilterBarOptions {
 @Decorators.element("<div/>")
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);
@@ -79,12 +79,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             quickFilter.addClass(opt.cssClass);
         }
 
-        var widget = WidgetComponent.create({
+        var widget = Widget.create({
             type: opt.type,
             element: e => {
-                if (opt.field) {
+                if (opt.field)
                     e.attr('id', this.options.idPrefix + opt.field);
-                }
                 e.attr('placeholder', ' ');
                 e.appendTo(quickFilter);
                 if (opt.element != null) {

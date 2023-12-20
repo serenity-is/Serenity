@@ -1,7 +1,7 @@
 ﻿import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { PopupMenuButton } from "../widgets/toolbar";
-import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
     name: string;
@@ -23,7 +23,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     private fieldChanged: boolean;
     private timer: number;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);
@@ -70,7 +70,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
                 positionMy: 'right top',
                 positionAt: 'right bottom',
                 menu: menu,
-                replaceNode: a[0]
+                element: a[0]
             });
 
             this.field = this.options.fields[0];

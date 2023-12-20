@@ -2,11 +2,11 @@
 import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
-import { WidgetNode, WidgetProps } from "./widget";
+import { WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);

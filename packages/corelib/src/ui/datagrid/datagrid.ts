@@ -16,7 +16,7 @@ import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
-import { Widget, WidgetNode, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -85,7 +85,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(element: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);
@@ -233,7 +233,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 filters: filters,
                 getTitle: (filter: QuickFilter<Widget<any>, any>) => this.determineText(pre => pre + filter.field),
                 idPrefix: this.uniqueName + '_QuickFilter_',
-                replaceNode: this.quickFiltersDiv[0]
+                element: this.quickFiltersDiv
             });
             this.quickFiltersBar.onChange = (e) => this.quickFilterChange(e);
         }
@@ -768,7 +768,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected createFilterBar(): void {
         this.filterBar = new FilterDisplayBar({
-            nodeRef: el => this.element.append(el)
+            element: el => this.element.append(el)
         });
         this.initializeFilterBar();
     }
@@ -782,7 +782,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createPager(): void {
-        new SlickPager({ ...this.getPagerOptions(), nodeRef: el => this.element.append(el) });
+        new SlickPager({ ...this.getPagerOptions(), element: el => this.element.append(el) });
     }
 
     protected getViewOptions() {
@@ -811,7 +811,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.toolbar = new ToolbarComponent({
             buttons: buttons,
             hotkeyContext: this.element[0],
-            nodeRef: el => $(el).addClass("grid-toolbar").appendTo(this.element)
+            element: el => this.node.appendChild(el).classList.add("grid-toolbar")
         });
     }
 

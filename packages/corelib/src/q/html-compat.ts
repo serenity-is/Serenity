@@ -1,22 +1,22 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { JQueryLike, htmlEncode, isJQueryLike, localText } from "@serenity-is/base";
+import { htmlEncode, isArrayLike, localText } from "@serenity-is/base";
 
 export function isJQueryReal(val: any): val is JQuery {
-    return isJQueryLike(val) && !(val as any).isMock && typeof (val as JQuery).outerHeight === "function";
+    return isArrayLike(val) && !(val as any).isMock && typeof (val as JQuery).outerHeight === "function";
 }
 
 /**
  * Adds an empty option to the select.
  * @param select the select element
  */
-export function addEmptyOption(select: JQueryLike | HTMLSelectElement) {
+export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement) {
     addOption(select, '', localText("Controls.SelectEditor.EmptyItemText"));
 }
 
 /**
  * Adds an option to the select.
  */
-export function addOption(select: JQueryLike | HTMLSelectElement, key: string, text: string) {
+export function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string) {
     sQuery('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select as any);
 }
 
@@ -24,7 +24,7 @@ export function addOption(select: JQueryLike | HTMLSelectElement, key: string, t
 export const attrEncode = htmlEncode;
 
 /** Clears the options in the select element */
-export function clearOptions(select: JQueryLike) {
+export function clearOptions(select: ArrayLike<HTMLElement>) {
     (select as any).html('');
 }
 
@@ -36,7 +36,7 @@ export function clearOptions(select: JQueryLike) {
  * @param context the context element (optional)
  * @returns the element with the given relative id to the source element.
  */
-export function findElementWithRelativeId(element: JQueryLike, relativeId: string, context?: HTMLElement): JQuery;
+export function findElementWithRelativeId(element: ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery;
 /**
  * Finds the first element with the given relative id to the source element.
  * It can handle underscores in the source element id.
@@ -46,9 +46,9 @@ export function findElementWithRelativeId(element: JQueryLike, relativeId: strin
  * @returns the element with the given relative id to the source element.
  */
 export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
-export function findElementWithRelativeId(element: JQueryLike | HTMLElement, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
+export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
 
-    const from: HTMLElement = isJQueryLike(element) ? element.get(0) : element as HTMLElement;
+    const from: HTMLElement = isArrayLike(element) ? element[0] : element as HTMLElement;
     const doc = typeof document === "undefined" ? null : document;
 
     if (from == null)
@@ -74,7 +74,7 @@ export function findElementWithRelativeId(element: JQueryLike | HTMLElement, rel
         }
 
         if (res || !fromId.length)
-            return isJQueryLike(element) ? sQuery(res ?? null) : (res ?? null);
+            return isArrayLike(element) ? sQuery(res ?? null) : (res ?? null);
 
         let idx = fromId.lastIndexOf('_');
         if (idx <= 0)
@@ -95,6 +95,6 @@ export function newBodyDiv(): JQuery {
 /**
  * Returns the outer HTML of the element.
  */
-export function outerHtml(element: JQueryLike) {
+export function outerHtml(element: ArrayLike<HTMLElement>) {
     return sQuery('<i/>').append((element as any).eq(0).clone()).html();
 }

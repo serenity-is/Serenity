@@ -1,6 +1,6 @@
 ﻿import { htmlEncode } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { Widget, WidgetComponent, WidgetNode, WidgetProps } from "./widget";
+import { Widget, WidgetComponent, WidgetProps } from "./widget";
 
 export interface ToolButton {
     action?: string;
@@ -88,7 +88,7 @@ export interface ToolbarOptions {
 @Decorators.registerClass('Serenity.Toolbar')
 @Decorators.element("<div/>")
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    constructor(node: WidgetNode, opt?: WidgetProps<P>);
+    constructor(legacy: ArrayLike<HTMLElement>, opt?: WidgetProps<P>);
     constructor(props?: WidgetProps<P>);
     constructor(props?: any, opt?: any) {
         super(props, opt);

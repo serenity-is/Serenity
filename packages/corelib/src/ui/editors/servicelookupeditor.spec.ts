@@ -24,7 +24,7 @@ test('ServiceLookupEditor loads items from service', () => {
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)
+        element: el => document.body.appendChild(el)
     })
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -60,7 +60,7 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)
+        element: el => document.body.appendChild(el)
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -91,7 +91,7 @@ test('ServiceLookupEditor can search items', () => {
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)        
+        element: el => document.body.appendChild(el)        
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -128,7 +128,7 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)
+        element: el => document.body.appendChild(el)
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -167,7 +167,7 @@ test('ServiceLookupEditor aborts previous requests', () => {
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)
+        element: el => document.body.appendChild(el)
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();
@@ -221,7 +221,7 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)        
+        element: el => document.body.appendChild(el)        
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();
@@ -298,7 +298,7 @@ test('ServiceLookupEditor aborts while request is pending', () => {
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-        nodeRef: el => document.body.appendChild(el)
+        element: el => document.body.appendChild(el)
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();
