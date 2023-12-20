@@ -87,11 +87,19 @@ export class Widget<P = {}> {
     static createNode(): HTMLElement {
         var elementAttr = getAttributes(this, ElementAttribute, true);
         if (elementAttr.length) {
-            if (!jQuery.isMock)
-                return jQuery(elementAttr[0].value).get(0);
-            var el = document.createElement("div");
-            el.innerHTML = elementAttr[0].value;
-            return el.children[0] as HTMLElement ?? document.createElement("input");
+            let node: HTMLElement;
+            if (!jQuery.isMock) {
+                node =  jQuery(elementAttr[0].value).get(0);
+                node.parentNode?.removeChild(node);
+                return node;
+            }
+            let wrap = document.createElement("div");
+            wrap.innerHTML = elementAttr[0].value;
+            node = wrap.children[0] as HTMLElement;
+            if (!node)
+                return document.createElement("input");
+            node.parentNode?.removeChild(node);
+            return node;
         }
         else {
             return document.createElement("input");
@@ -148,6 +156,8 @@ export class Widget<P = {}> {
                 handler(e as any);
         });
     };
+
+    static requiresFragmentWorkaround: boolean;
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
@@ -222,7 +232,10 @@ export class Widget<P = {}> {
     }
 
     public render(): HTMLElement {
-        return this.init().node;
+        let node = this.init().node;
+        if (node && node.parentNode && node.parentNode instanceof DocumentFragment && (node.parentNode as any).__isFragmentWorkaround)
+            node.parentNode;
+        return node;
     }
 
     protected renderContents(): void {
@@ -251,6 +264,13 @@ function handleElementProp(type: typeof Widget, element: (((el: HTMLElement) => 
         if (typeof element === "function")
             element(node);
     }
+
+    if (node && !node.parentNode && type.requiresFragmentWorkaround) {
+        let fragment = document.createDocumentFragment();
+        fragment.appendChild(node);
+        (fragment as any).__isFragmentWorkaround = true;
+    }
+
     return node;
 }
 
