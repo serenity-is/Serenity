@@ -2159,7 +2159,7 @@ declare class Widget<P = {}> {
     }): JQuery;
     addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
     getGridField(): JQuery;
-    static requiresFragmentWorkaround: boolean;
+    protected static requiresFragmentWorkaround: boolean;
     static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
     private setElementProps;
     protected initialized: boolean;
@@ -2557,7 +2557,7 @@ interface DateEditorOptions {
 declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
-    static requiresFragmentWorkaround: boolean;
+    protected static requiresFragmentWorkaround: boolean;
     constructor(props?: EditorProps<P>);
     get_value(): string;
     get value(): string;

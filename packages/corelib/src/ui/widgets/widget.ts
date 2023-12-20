@@ -157,7 +157,7 @@ export class Widget<P = {}> {
         });
     };
 
-    static requiresFragmentWorkaround: boolean;
+    protected static requiresFragmentWorkaround: boolean;
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
@@ -265,7 +265,7 @@ function handleElementProp(type: typeof Widget, element: (((el: HTMLElement) => 
             element(node);
     }
 
-    if (node && !node.parentNode && type.requiresFragmentWorkaround) {
+    if (node && !node.parentNode && (type as any).requiresFragmentWorkaround) {
         let fragment = document.createDocumentFragment();
         fragment.appendChild(node);
         (fragment as any).__isFragmentWorkaround = true;

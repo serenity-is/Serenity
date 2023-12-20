@@ -3330,6 +3330,7 @@ declare namespace Serenity {
         }): JQuery;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
+        protected static requiresFragmentWorkaround: boolean;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
         private setElementProps;
         protected initialized: boolean;
@@ -3711,6 +3712,7 @@ declare namespace Serenity {
     class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
+        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         get_value(): string;
         get value(): string;
