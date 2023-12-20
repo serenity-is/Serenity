@@ -23,8 +23,8 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: (new (options?: P) => TWidget);
-    options?: WidgetProps<P>;
+    type?: { new (options?: P): TWidget, prototype: TWidget };
+    options?: P & WidgetProps<{}>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
@@ -167,8 +167,10 @@ export class Widget<P = {}> {
         if (!el || !props)
             return;
 
-        if (props.id != null)
+        if (props.id != null) {
             el.id = props.id;
+            delete props.id;
+        }
 
         if (props.name != null)
             el.setAttribute('name', props.name);
@@ -176,8 +178,14 @@ export class Widget<P = {}> {
         if (props.placeholder != null)
             el.setAttribute("placeholder", props.placeholder);
 
-        if (props.class != null)
+        if (props.class != null) {
             el.className = props.class;
+            delete props.class
+        }
+        else if (typeof (props as any).className === "string") {
+            el.className = (props as any).className;
+            delete (props as any).className;
+        }
 
         if (props.maxLength != null)
             el.setAttribute("maxLength", (props.maxLength || 0).toString());

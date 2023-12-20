@@ -2126,8 +2126,11 @@ type EditorProps<T> = WidgetProps<T> & {
     readOnly?: boolean;
 };
 interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: (new (options?: P) => TWidget);
-    options?: WidgetProps<P>;
+    type?: {
+        new (options?: P): TWidget;
+        prototype: TWidget;
+    };
+    options?: P & WidgetProps<{}>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
@@ -2881,7 +2884,7 @@ interface LookupEditorOptions extends Select2EditorOptions {
 }
 declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
     private lookupChangeUnbind;
-    constructor(props?: WidgetProps<P>);
+    constructor(props?: EditorProps<P>);
     hasAsyncSource(): boolean;
     destroy(): void;
     protected getLookupKey(): string;
@@ -2899,8 +2902,8 @@ declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ex
     protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
     protected editDialogDataChange(): void;
 }
-declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
-    constructor(props?: WidgetProps<P>);
+declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
+    constructor(props?: EditorProps<P>);
 }
 
 interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -3109,10 +3112,13 @@ interface QuickFilterArgs<TWidget> {
 }
 interface QuickFilter<TWidget extends Widget<P>, P> {
     field?: string;
-    type?: (new (props?: P) => TWidget);
+    type?: {
+        new (options?: P): TWidget;
+        prototype: TWidget;
+    };
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     title?: string;
-    options?: P;
+    options?: P & WidgetProps<{}>;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
     separator?: boolean;

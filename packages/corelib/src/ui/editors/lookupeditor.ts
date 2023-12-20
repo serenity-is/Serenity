@@ -1,7 +1,7 @@
 ﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { getLookup, reloadLookup, ScriptData } from "../../q";
-import { WidgetProps } from "../widgets/widget";
+import { EditorProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -14,7 +14,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
     private lookupChangeUnbind: any; 
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props?: EditorProps<P>) {
         super(props);
 
         if (!this.hasAsyncSource()) {
@@ -146,9 +146,9 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 }
 
 @Decorators.registerEditor("Serenity.LookupEditor")
-export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, any> {
+export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
     
-    constructor(props?: WidgetProps<P>) {
+    constructor(props?: EditorProps<P>) {
         super(props);
     }
 }
