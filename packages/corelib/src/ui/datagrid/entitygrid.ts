@@ -15,11 +15,11 @@ import { DataGrid } from "./datagrid";
 @Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
-    constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>) {
+    constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.element.addClass('route-handler')
-            .on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
+        this.node.classList.add('route-handler');
+        this.element.on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
     }
 
     protected handleRoute(args: HandleRouteEventArgs): void {
@@ -357,11 +357,5 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             this._dialogType = DialogTypeRegistry.get(this.getEntityType());
 
         return this._dialogType;
-    }
-}
-
-export class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
     }
 }

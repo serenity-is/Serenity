@@ -647,9 +647,3 @@ export interface PropertyGridOptions {
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }
-
-export class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
-    }
-}

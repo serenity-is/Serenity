@@ -4,7 +4,7 @@ import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";
-import { DataGridComponent } from "../datagrid/datagrid";
+import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -24,7 +24,7 @@ export interface CheckTreeItem<TSource> {
 
 @Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
 @Decorators.element("<div/>")
-export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGridComponent<TItem, P>
+export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
 
     private byId: { [key: string]: TItem };
@@ -32,7 +32,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.element.addClass('s-CheckTreeEditor');
+        this.node.classList.add('s-CheckTreeEditor');
         this.updateItems();
     }
 

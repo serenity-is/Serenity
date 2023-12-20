@@ -2,7 +2,7 @@
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend } from "../../q";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface DecimalEditorOptions {
     minValue?: string;
@@ -14,7 +14,7 @@ export interface DecimalEditorOptions {
 
 @Decorators.registerEditor('Serenity.DecimalEditor', [IDoubleValue])
 @Decorators.element('<input type="text"/>')
-export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorComponent<P> implements IDoubleValue {
+export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
     constructor(props?: EditorProps<P>) {
         super(props);

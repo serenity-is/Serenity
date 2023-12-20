@@ -1,10 +1,10 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { EditorComponent } from "../widgets/widget";
+import { EditorWidget } from "../widgets/widget";
 
 @Decorators.registerEditor('Serenity.StringEditor', [IStringValue])
 @Decorators.element("<input type=\"text\"/>")
-export class StringEditor<P={}> extends EditorComponent<P> {
+export class StringEditor<P={}> extends EditorWidget<P> {
 
     public get value(): string {
         return this.element.val() as string;

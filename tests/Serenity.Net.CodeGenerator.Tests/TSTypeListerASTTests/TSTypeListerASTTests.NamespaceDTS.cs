@@ -19,7 +19,7 @@ declare namespace Serenity {
     }
 
     class StringEditor extends Widget<any> {
-        constructor(input: JQuery);
+        constructor(props?: any);
         get value(): string;
         protected get_value(): string;
         set value(value: string);

@@ -1,5 +1,4 @@
-﻿
-namespace {{ModuleNamespace}} {
+﻿namespace {{ModuleNamespace}} {
 
     @Serenity.Decorators.registerClass('{{GridFullName}}')
     export class {{GridClassName}} extends Serenity.EntityGrid<{{RowClassName}}, any> {
@@ -9,9 +8,5 @@ namespace {{ModuleNamespace}} {
         protected getInsertPermission() { return {{RowClassName}}.insertPermission; }
         protected getLocalTextPrefix() { return {{RowClassName}}.localTextPrefix; }
         protected getService() { return {{ServiceClassName}}.baseUrl; }
-
-        constructor(container: JQuery) {
-            super(container);
-        }
     }
 }

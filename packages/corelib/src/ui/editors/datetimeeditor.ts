@@ -2,13 +2,13 @@
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, addValidationRule, today } from "../../q";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
 
 @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
+export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
     private minValue: string;
     private maxValue: string;

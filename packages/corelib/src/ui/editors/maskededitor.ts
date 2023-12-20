@@ -1,11 +1,11 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
 @Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
 @Decorators.element("<input type=\"text\"/>")
-export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorComponent<P> {
+export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
     constructor(props?: EditorProps<P>) {
         super(props);

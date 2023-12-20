@@ -1,10 +1,10 @@
 ﻿import { htmlEncode, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { PagerOptions } from "../../slick";
-import { WidgetComponent, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass("Serenity.SlickPager")
-export class SlickPager<P extends PagerOptions = PagerOptions> extends WidgetComponent<P> {
+export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
 
     constructor(props?: WidgetProps<P>) {
         super(props);

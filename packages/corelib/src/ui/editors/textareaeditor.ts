@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface TextAreaEditorOptions {
     cols?: number;
@@ -9,7 +9,7 @@ export interface TextAreaEditorOptions {
 
 @Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
 @Decorators.element("<textarea />")
-export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorComponent<P> {
+export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
 
     constructor(props?: EditorProps<P>) {
         super(props);

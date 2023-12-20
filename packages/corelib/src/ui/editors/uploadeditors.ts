@@ -3,8 +3,8 @@ import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
-import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
-import { EditorComponent, EditorProps, WidgetProps } from "../widgets/widget";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { EditorProps, EditorWidget, WidgetProps } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
@@ -18,7 +18,7 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 
 @Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P>
+export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
     constructor(props?: EditorProps<P>) {
@@ -33,7 +33,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (!this.options.originalNameProperty)
             div.addClass('hide-original-name');
 
-        this.toolbar = new ToolbarComponent({
+        this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
             element: el => this.element.append(el)
         });
@@ -281,7 +281,7 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
 
 @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P>
+export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
     private entities: UploadedFile[];
@@ -297,7 +297,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         this.entities = [];
         let div = this.element;
         div.addClass('s-MultipleFileUploadEditor');
-        this.toolbar = new ToolbarComponent({
+        this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
             element: el => this.element.append(el)
         });

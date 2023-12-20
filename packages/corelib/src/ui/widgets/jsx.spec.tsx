@@ -1,7 +1,7 @@
 import { StringEditor } from '../editors/stringeditor';
 import { FC } from 'jsx-dom';
 import { jsxDomWidget } from './jsx';
-import { PropertyGrid, PropertyGridComponent } from './propertygrid';
+import { PropertyGrid } from './propertygrid';
 import { BooleanEditor } from '../editors/booleaneditor';
 
 test('render childless element', function () {
@@ -601,13 +601,6 @@ describe('jsx: widget integration', () => {
         expect(ed.node === el).toBe(true);
         expect(ed.element[0]).toEqual(el);
         expect(el.getAttribute('readonly')).toBe('readonly');
-    });
-
-    it('can create property grid component', () => {
-        var pg: PropertyGridComponent;
-        var el = <PropertyGridComponent items={[]} ref={w => pg = w } />;
-        expect(pg?.node).toBeDefined();
-        expect(pg.node).toBe(el);
     });
 
     it('can create boolean editor', () => {

@@ -3,7 +3,7 @@ import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
     cols?: any;
@@ -15,7 +15,7 @@ export interface CKEditorConfig {
 
 @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
 @Decorators.element('<textarea/>')
-export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorComponent<P>
+export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
 
     private _instanceReady: boolean;

@@ -1,7 +1,7 @@
 ﻿import { tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface EmailEditorOptions {
     domain?: string;
@@ -10,7 +10,7 @@ export interface EmailEditorOptions {
 
 @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorComponent<P> {
+export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
     constructor(props?: EditorProps<P>) {
         super(props);

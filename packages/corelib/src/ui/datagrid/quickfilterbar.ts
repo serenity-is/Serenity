@@ -6,12 +6,12 @@ import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
-import { Widget, WidgetComponent, WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
 
 export interface QuickFilterBarOptions {
-    filters: QuickFilter<WidgetComponent<any>, any>[];
-    getTitle?: (filter: QuickFilter<WidgetComponent<any>, any>) => string;
+    filters: QuickFilter<Widget<any>, any>[];
+    getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
     idPrefix?: string;
 }
 
@@ -37,7 +37,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         this.element.append($('<hr/>'));
     }
 
-    public add<TWidget extends WidgetComponent<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
+    public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
         if (opt == null) {
             throw new ArgumentNullException('opt');

@@ -23,7 +23,7 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: { new (options?: P): TWidget, prototype: TWidget };
+    type?: { new(options?: P): TWidget, prototype: TWidget };
     options?: P & WidgetProps<{}>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
     element?: (e: JQuery) => void;
@@ -167,29 +167,24 @@ export class Widget<P = {}> {
         if (!el || !props)
             return;
 
-        if (props.id != null) {
+        if (typeof props.id === "string")
             el.id = props.id;
-            delete props.id;
-        }
 
-        if (props.name != null)
-            el.setAttribute('name', props.name);
+        if (typeof props.name === "string")
+            el.setAttribute("name", props.name);
 
-        if (props.placeholder != null)
+        if (typeof props.placeholder === "string")
             el.setAttribute("placeholder", props.placeholder);
 
-        if (props.class != null) {
-            el.className = props.class;
-            delete props.class
-        }
-        else if (typeof (props as any).className === "string") {
-            el.className = (props as any).className;
-            delete (props as any).className;
-        }
+        if (typeof props.class === "string")
+            toggleClass(el, props.class, true);
 
-        if (props.maxLength != null)
+        if (typeof (props as any).className === "string")
+            toggleClass(el, (props as any).className, true);
+
+        if (typeof props.maxLength === "number")
             el.setAttribute("maxLength", (props.maxLength || 0).toString());
-        else if ((props as any).maxlength != null)
+        else if (typeof (props as any).maxlength === "number")
             el.setAttribute("maxLength", ((props as any).maxlength || 0).toString());
     }
 
@@ -266,13 +261,7 @@ export declare interface Widget<P> {
     changeSelect2(handler: (e: Event) => void): void;
 }
 
-export class WidgetComponent<P> extends Widget<P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
-    }
-}
-
-export class EditorComponent<P> extends Widget<EditorProps<P>> {
+export class EditorWidget<P> extends Widget<EditorProps<P>> {
     constructor(props?: EditorProps<P>) {
         super(props);
     }

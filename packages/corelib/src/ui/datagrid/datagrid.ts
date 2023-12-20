@@ -15,7 +15,7 @@ import { FilterStore } from "../filtering/filterstore";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
-import { ToolButton, Toolbar, ToolbarComponent } from "../widgets/toolbar";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
@@ -85,8 +85,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public static defaultColumnWidthScale: number;
     public static defaultColumnWidthDelta: number;
 
-    constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>) {
-        super(props as any);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
         var self = this;
 
@@ -806,7 +806,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createToolbar(buttons: ToolButton[]): void {
-        this.toolbar = new ToolbarComponent({
+        this.toolbar = new Toolbar({
             buttons: buttons,
             hotkeyContext: this.element[0],
             element: el => this.node.appendChild(el).classList.add("grid-toolbar")
@@ -1490,11 +1490,5 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     getFilterStore(): FilterStore {
         return (this.filterBar == null) ? null : this.filterBar.get_store();
-    }
-}
-
-export class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
     }
 }

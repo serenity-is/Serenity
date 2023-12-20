@@ -111,9 +111,3 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 
     protected propertyGrid: PropertyGrid;
 }
-
-export class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
-    }
-}

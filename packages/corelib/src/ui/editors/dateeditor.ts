@@ -3,7 +3,7 @@ import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as dat
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addValidationRule, today } from "../../q";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export const datePickerIconSvg = datePickerIconSvg_;
 
@@ -15,7 +15,7 @@ export interface DateEditorOptions {
 
 @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
+export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
     private minValue: string;
     private maxValue: string;

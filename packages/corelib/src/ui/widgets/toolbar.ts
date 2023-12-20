@@ -1,6 +1,6 @@
 ﻿import { htmlEncode } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { Widget, WidgetComponent, WidgetProps } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 export interface ToolButton {
     action?: string;
@@ -26,7 +26,7 @@ export interface PopupMenuButtonOptions {
 }
 
 @Decorators.registerEditor('Serenity.PopupMenuButton')
-export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends WidgetComponent<P> {
+export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends Widget<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -222,11 +222,5 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         this.element.find('.tool-button').each(function (i: number, el: Element) {
             $(el).triggerHandler('updateInterface')
         });
-    }
-}
-
-export class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
     }
 }

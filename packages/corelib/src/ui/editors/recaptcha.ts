@@ -2,7 +2,7 @@
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { addValidationRule } from "../../q";
-import { EditorComponent, EditorProps } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface RecaptchaOptions {
     siteKey?: string;
@@ -11,7 +11,7 @@ export interface RecaptchaOptions {
 
 @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
 @Decorators.element("<div/>")
-export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorComponent<P> implements IStringValue {
+export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
     constructor(props?: EditorProps<P>) {
         super(props);
 

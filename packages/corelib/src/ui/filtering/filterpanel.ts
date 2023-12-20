@@ -41,17 +41,17 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
 
 @Decorators.registerClass('Serenity.FilterOperatorSelect')
 class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
-    constructor(hidden: JQuery, source: FilterOperator[]) {
-        super(hidden);
+    constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
+        super(props);
 
-        for (var op of source) {
+        for (var op of this.options.source) {
             var title = (op.title ?? (
                 tryGetText("Controls.FilterPanel.OperatorNames." + op.key) ?? op.key));
             this.addOption(op.key, title, op);
         }
 
-        if (source.length && source[0])
-            this.value = source[0].key;
+        if (this.options.source.length && this.options.source[0])
+            this.value = this.options.source[0].key;
     }
 
     emptyItemText(): string {
@@ -400,7 +400,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             .children().attr('type', 'hidden').addClass('op-select');
 
         var operators = filtering.getOperators();
-        var opSelect = new FilterOperatorSelect(hidden, operators);
+        var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
         opSelect.changeSelect2(e => this.onRowOperatorChange(e));
     }
 

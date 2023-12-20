@@ -2597,7 +2597,9 @@ declare namespace Serenity {
      */
     function outerHtml(element: ArrayLike<HTMLElement>): string;
 
-    function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement>, opt?: {
+    function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | {
+        node: HTMLElement;
+    }, opt?: {
         noRoute?: boolean;
         setHeight?: boolean;
     }): void;
@@ -3306,10 +3308,7 @@ declare namespace Serenity {
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
     }
-    class WidgetComponent<P> extends Widget<P> {
-        constructor(props?: WidgetProps<P>);
-    }
-    class EditorComponent<P> extends Widget<EditorProps<P>> {
+    class EditorWidget<P> extends Widget<EditorProps<P>> {
         constructor(props?: EditorProps<P>);
     }
     class Widget<P = {}> {
@@ -3371,7 +3370,7 @@ declare namespace Serenity {
         positionMy?: string;
         positionAt?: string;
     }
-    class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends WidgetComponent<P> {
+    class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends Widget<P> {
         constructor(props: WidgetProps<P>);
         destroy(): void;
     }
@@ -3392,9 +3391,6 @@ declare namespace Serenity {
         protected createButton(container: JQuery, b: ToolButton): void;
         findButton(className: string): JQuery;
         updateInterface(): void;
-    }
-    class ToolbarComponent<P extends ToolbarOptions = ToolbarOptions> extends Toolbar<P> {
-        constructor(props?: WidgetProps<P>);
     }
 
     class TemplatedWidget<P> extends Widget<P> {
@@ -3482,9 +3478,6 @@ declare namespace Serenity {
         protected resetValidation(): void;
         protected validateForm(): boolean;
     }
-    class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
-        constructor(props?: WidgetProps<P>);
-    }
 
     namespace ValidationHelper {
         function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
@@ -3568,9 +3561,6 @@ declare namespace Serenity {
         localTextPrefix?: string;
         mode?: PropertyGridMode;
     }
-    class PropertyGridComponent<P extends PropertyGridOptions = PropertyGridOptions> extends PropertyGrid<P> {
-        constructor(props?: WidgetProps<P>);
-    }
 
     class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         private _entity;
@@ -3589,9 +3579,6 @@ declare namespace Serenity {
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: PropertyGrid;
-    }
-    class PropertyPanelComponent<TItem, P = {}> extends PropertyPanel<TItem, P> {
-        constructor(props?: WidgetProps<P>);
     }
 
     namespace SubDialogHelper {
@@ -3655,7 +3642,7 @@ declare namespace Serenity {
         function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
     }
 
-    class StringEditor<P = {}> extends EditorComponent<P> {
+    class StringEditor<P = {}> extends EditorWidget<P> {
         get value(): string;
         protected get_value(): string;
         set value(value: string);
@@ -3669,7 +3656,7 @@ declare namespace Serenity {
         cols?: number;
         rows?: number;
     }
-    class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorComponent<P> {
+    class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
         constructor(props?: EditorProps<P>);
         get value(): string;
         protected get_value(): string;
@@ -3677,7 +3664,7 @@ declare namespace Serenity {
         protected set_value(value: string): void;
     }
 
-    class BooleanEditor<P = {}> extends EditorComponent<P> {
+    class BooleanEditor<P = {}> extends EditorWidget<P> {
         get value(): boolean;
         protected get_value(): boolean;
         set value(value: boolean);
@@ -3691,7 +3678,7 @@ declare namespace Serenity {
         padDecimals?: any;
         allowNegatives?: boolean;
     }
-    class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorComponent<P> implements IDoubleValue {
+    class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
         constructor(props?: EditorProps<P>);
         get_value(): number;
         get value(): number;
@@ -3706,7 +3693,7 @@ declare namespace Serenity {
         maxValue?: number;
         allowNegatives?: boolean;
     }
-    class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorComponent<P> implements IDoubleValue {
+    class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
         constructor(props?: EditorProps<P>);
         get_value(): number;
         get value(): number;
@@ -3721,7 +3708,7 @@ declare namespace Serenity {
         minValue?: string;
         sqlMinMax?: boolean;
     }
-    class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
+    class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
         constructor(props?: EditorProps<P>);
@@ -3759,7 +3746,7 @@ declare namespace Serenity {
         static uiPickerZIndexWorkaround(input: JQuery): void;
     }
 
-    class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
+    class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
         private time;
@@ -3808,7 +3795,7 @@ declare namespace Serenity {
         endHour?: any;
         intervalMinutes?: any;
     }
-    class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorComponent<P> {
+    class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
         private minutes;
         constructor(props?: EditorProps<P>);
         get value(): number;
@@ -3823,7 +3810,7 @@ declare namespace Serenity {
         domain?: string;
         readOnlyDomain?: boolean;
     }
-    class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorComponent<P> {
+    class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
         constructor(props?: EditorProps<P>);
         static registerValidationMethods(): void;
         get_value(): string;
@@ -3847,7 +3834,7 @@ declare namespace Serenity {
         enumType?: any;
         lookupKey?: string;
     }
-    class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorComponent<P> implements IReadOnly {
+    class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
         constructor(props?: EditorProps<P>);
         protected addRadio(value: string, text: string): void;
         get_value(): string;
@@ -4101,7 +4088,7 @@ declare namespace Serenity {
     }
     interface CKEditorConfig {
     }
-    class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorComponent<P> implements IStringValue, IReadOnly {
+    class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private _instanceReady;
         constructor(props?: EditorProps<P>);
         protected instanceReady(x: any): void;
@@ -4127,7 +4114,7 @@ declare namespace Serenity {
         protected getConfig(): CKEditorConfig;
     }
 
-    class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorComponent<P> {
+    class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
         constructor(props?: EditorProps<P>);
         get value(): string;
         protected get_value(): string;
@@ -4143,7 +4130,7 @@ declare namespace Serenity {
         siteKey?: string;
         language?: string;
     }
-    class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorComponent<P> implements IStringValue {
+    class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
         constructor(props?: EditorProps<P>);
         get_value(): string;
         set_value(value: string): void;
@@ -4200,7 +4187,7 @@ declare namespace Serenity {
     }
     interface ImageUploadEditorOptions extends FileUploadEditorOptions {
     }
-    class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         constructor(props?: EditorProps<P>);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;
@@ -4227,7 +4214,7 @@ declare namespace Serenity {
     class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
         constructor(props?: WidgetProps<P>);
     }
-    class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorComponent<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         private entities;
         private toolbar;
         private fileSymbols;
@@ -4284,14 +4271,14 @@ declare namespace Serenity {
     }
 
     interface QuickFilterBarOptions {
-        filters: QuickFilter<WidgetComponent<any>, any>[];
-        getTitle?: (filter: QuickFilter<WidgetComponent<any>, any>) => string;
+        filters: QuickFilter<Widget<any>, any>[];
+        getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
         idPrefix?: string;
     }
     class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
         constructor(props?: WidgetProps<P>);
         addSeparator(): void;
-        add<TWidget extends WidgetComponent<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+        add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
         addDateRange(field: string, title?: string): DateEditor;
         static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
         addDateTimeRange(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
@@ -4592,7 +4579,7 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 
-    class SlickPager<P extends PagerOptions = PagerOptions> extends WidgetComponent<P> {
+    class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
         constructor(props?: WidgetProps<P>);
         _changePage(ctype: string): boolean;
         _updatePager(): void;
@@ -4803,7 +4790,7 @@ declare namespace Serenity {
         static defaultPersistanceStorage: SettingStorage;
         static defaultColumnWidthScale: number;
         static defaultColumnWidthDelta: number;
-        constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>);
+        constructor(props?: WidgetProps<P>);
         protected internalInit(): void;
         protected initSync(): void;
         protected initAsync(): Promise<void>;
@@ -4934,9 +4921,6 @@ declare namespace Serenity {
         getView(): RemoteView<TItem>;
         getFilterStore(): FilterStore;
     }
-    class DataGridComponent<TItem, P = {}> extends DataGrid<TItem, P> {
-        constructor(props?: WidgetProps<P>);
-    }
 
     class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         private ulVisible;
@@ -5002,7 +4986,7 @@ declare namespace Serenity {
         children?: CheckTreeItem<TSource>[];
         source?: TSource;
     }
-    class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGridComponent<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
+    class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
         private byId;
         constructor(props?: WidgetProps<P>);
         protected getIdProperty(): string;
@@ -5095,7 +5079,7 @@ declare namespace Serenity {
     }
 
     class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-        constructor(props?: WidgetProps<P> | ArrayLike<HTMLElement>);
+        constructor(props?: WidgetProps<P>);
         protected handleRoute(args: HandleRouteEventArgs): void;
         protected usePager(): boolean;
         protected createToolbarExtensions(): void;
@@ -5133,9 +5117,6 @@ declare namespace Serenity {
         protected getDialogType(): {
             new (...args: any[]): Widget<any>;
         };
-    }
-    class EntityGridComponent<TItem, P = {}> extends EntityGrid<TItem, P> {
-        constructor(props?: WidgetProps<P>);
     }
 
     class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
@@ -5360,7 +5341,7 @@ declare namespace Serenity {
         markerLatitude?: any;
         markerLongitude?: any;
     }
-    class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorComponent<P> {
+    class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorWidget<P> {
         private map;
         constructor(props?: EditorProps<P>);
         get_map(): any;

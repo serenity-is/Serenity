@@ -86,9 +86,3 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         return this.validator == null || !!this.validator.form();
     }
 }
-
-export class TemplatedPanelComponent<P = {}> extends TemplatedPanel<P> {
-    constructor(props?: WidgetProps<P>) {
-        super(props);
-    }
-}

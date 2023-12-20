@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { EditorComponent, EditorProps } from "./widget";
+import { EditorWidget, EditorProps } from "./widget";
 
 export interface GoogleMapOptions {
     latitude?: any;
@@ -14,7 +14,7 @@ export interface GoogleMapOptions {
 
 @Decorators.registerEditor('Serenity.GoogleMap', [])
 @Decorators.element('<div/>')
-export class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorComponent<P> {
+export class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorWidget<P> {
 
     private map: any;
 
