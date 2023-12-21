@@ -12,12 +12,12 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     private readonly HashSet<string> visited = [];
     private Queue<TypeDefinition> generateQueue;
     protected List<TypeDefinition> lookupScripts = [];
-    protected HashSet<string> localTextKeys = [];
     protected List<GeneratedTypeInfo> generatedTypes = [];
     protected List<AnnotationTypeInfo> annotationTypes = [];
     protected ILookup<string, ExternalType> modularEditorTypeByKey;
     protected ILookup<string, ExternalType> modularFormatterTypeByKey;
     protected ILookup<string, ExternalType> modularDialogTypeByKey;
+    protected TypeDefinition[] emptyTypes = [];
 
     public string ModulesPathAlias { get; set; } = "@/";
     public string ModulesPathFolder { get; set; } = "Modules";
@@ -208,7 +208,6 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         generateQueue = new Queue<TypeDefinition>();
         visited.Clear();
         lookupScripts.Clear();
-        localTextKeys.Clear();
         generatedTypes.Clear();
         annotationTypes.Clear();
     }
@@ -375,27 +374,10 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 }
 #endif
 
-                TypeDefinition[] emptyTypes = [];
 
                 foreach (var fromType in types)
                 {
-                    var nestedLocalTexts = TypingsUtils.GetAttr(fromType, "Serenity.Extensibility",
-                        "NestedLocalTextsAttribute", emptyTypes) ??
-                        TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", 
-                            "NestedLocalTextsAttribute", emptyTypes);
-                    if (nestedLocalTexts != null)
-                    {
-                        string prefix = null;
-#if ISSOURCEGENERATOR
-                        prefix = nestedLocalTexts.NamedArguments.FirstOrDefault(x => x.Key == "Prefix").Value.Value as string;
-#else
-                        if (nestedLocalTexts.HasProperties)
-                            prefix = nestedLocalTexts.Properties.FirstOrDefault(x => x.Name == "Prefix").Argument.Value as string;
-#endif
-
-                        AddNestedLocalTexts(fromType, prefix ?? "");
-                    }
-
+                    PreVisitType(fromType);
                     ScanAnnotationTypeAttributes(fromType);
 
                     if (fromType.IsAbstract ||
@@ -1011,7 +993,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return url;
     }
 
-    protected virtual void AddNestedLocalTexts(TypeDefinition type, string prefix)
+    protected virtual void PreVisitType(TypeDefinition type)
     {
     }
 

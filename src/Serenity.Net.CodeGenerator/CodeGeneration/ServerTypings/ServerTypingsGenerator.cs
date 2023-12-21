@@ -26,6 +26,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     public readonly HashSet<string> LocalTextFilters = [];
 
+    protected HashSet<string> localTextKeys = [];
+    protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
+
     protected override void GenerateAll()
     {
         base.GenerateAll();
@@ -35,6 +38,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (LocalTexts && ModuleTypings)
             GenerateTexts(module: true);
+
+        if (ModuleTypings)
+            GenerateScriptDataKeys(module: true);
 
         if (ModuleTypings && ModuleReExports)
             GenerateModuleReExports();
@@ -154,6 +160,22 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         catch
         {
         }
+    }
+
+    protected override void PreVisitType(TypeDefinition type)
+    {
+        base.PreVisitType(type);
+        PreVisitTypeForTexts(type);
+        PreVisitTypeForScriptData(type);
+    }
+
+    protected override void Reset()
+    {
+        base.Reset();
+
+        localTextKeys.Clear();
+        scriptDataKeys.Clear();
+
     }
 
     public string DetermineModulesRoot(IFileSystem fileSystem, string projectFile,
