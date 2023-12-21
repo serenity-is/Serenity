@@ -3473,7 +3473,7 @@ declare namespace Serenity {
         protected onDialogClose(): void;
         protected addCssClass(): void;
         protected getDialogButtons(): DialogButton[];
-        protected getDialogOptions(): DialogOptions;
+        protected getDialogOptions(): any;
         protected getDialogTitle(): string;
         dialogClose(): void;
         get dialogTitle(): string;
@@ -3488,14 +3488,6 @@ declare namespace Serenity {
         keyboard?: boolean;
         size?: 'lg' | 'sm';
         modalClass?: string;
-    }
-    interface DialogOptions {
-        autoOpen?: boolean;
-        buttons?: DialogButton[];
-        dialogClass?: string;
-        resizable?: boolean;
-        title?: string;
-        [k: string]: any;
     }
 
     class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
@@ -3642,7 +3634,7 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
-        protected getDialogOptions(): DialogOptions;
+        protected getDialogOptions(): any;
         protected getDialogButtons(): DialogButton[];
         protected okClick(): void;
         protected okClickValidated(): void;
@@ -4969,7 +4961,7 @@ declare namespace Serenity {
             text: string;
             click: () => void;
         }[];
-        protected getDialogOptions(): DialogOptions;
+        protected getDialogOptions(): any;
         private getTitle;
         private allowHide;
         private createLI;
