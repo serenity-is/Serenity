@@ -317,12 +317,12 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
 
     createEditor() {
         if (this.useEditor()) {
-            this.editor = Widget.create({
-                type: this.editorType,
-                container: this.get_container(),
-                options: this.getEditorOptions(),
-                init: null
-            }) as any;
+            this.editor = new (this.editorType as typeof Widget<{}>)({
+                element: (el: HTMLElement) => {
+                    this.get_container().append(el);
+                },
+                ...this.getEditorOptions()
+            }).init() as TEditor;
             return;
         }
         this.editor = null;
@@ -553,12 +553,11 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 
     createEditor() {
         if (this.useEditor()) {
-            var editorType = EditorTypeRegistry.get(this.editorType);
+            var editorType = EditorTypeRegistry.get(this.editorType) as typeof Widget<{}>;
 
-            this.editor = Widget.create({
-                type: editorType ,
-                element: e => e.appendTo(this.get_container()),
-                options: this.getEditorOptions()
+            this.editor = new editorType({
+                element: (el: HTMLElement) => this.get_container().append(el),
+                ...this.getEditorOptions()
             });
 
             return;

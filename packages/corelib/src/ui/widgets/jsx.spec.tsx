@@ -1,8 +1,10 @@
+import jQuery from "@optionaldeps/jquery";
 import { StringEditor } from '../editors/stringeditor';
 import { FC } from 'jsx-dom';
 import { jsxDomWidget } from './jsx';
 import { PropertyGrid } from './propertygrid';
 import { BooleanEditor } from '../editors/booleaneditor';
+import { FileUploadEditor } from '../editors/uploadeditors';
 
 test('render childless element', function () {
     const element = <br />;
@@ -598,17 +600,38 @@ describe('jsx: widget integration', () => {
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();
-        expect(ed.node === el).toBe(true);
+        expect(ed.domNode === el).toBe(true);
         expect(ed.element[0]).toEqual(el);
         expect(el.getAttribute('readonly')).toBe('readonly');
     });
 
-    it('can create boolean editor', () => {
+    it('can create PropertyGrid', () => {
         var pg: PropertyGrid;
         var el = <PropertyGrid items={[]} ref={w => pg = w }  />;
-
-        var x = <BooleanEditor />
-        expect(pg?.node).toBeDefined();
-        expect(pg.node).toBe(el);
+        expect(pg?.domNode).toBe(el);
     });
+
+    it('can create PropertyGrid', () => {
+        var pg: PropertyGrid;
+        var el = <PropertyGrid items={[]} ref={w => pg = w }  />;
+        expect(pg?.domNode).toBe(el);
+    });
+
+    it('can create FileUploadEditor with JSX', () => {
+        (jQuery.fn as any).fileupload = jest.fn(() => {});
+        var el = <FileUploadEditor readOnly={true}  />;
+        expect(el).toBeTruthy();
+        let input = el.querySelector("input[type=file]");
+        expect(input).toBeTruthy();
+        expect(input.getAttribute("disabled")).toBe("disabled");
+    });
+
+    it('can create FileUploadEditor without JSX and no init call', () => {
+        (jQuery.fn as any).fileupload = jest.fn(() => {});
+        var el = new FileUploadEditor({ readOnly: true }).domNode;
+        expect(el).toBeTruthy();
+        let input = el.querySelector("input[type=file]");
+        expect(input).toBeTruthy();
+        expect(input.getAttribute("disabled")).toBe("disabled");
+    });    
 });

@@ -13,28 +13,16 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
 
     constructor(props?: WidgetProps<P>) {
         super(props);
-
-        if (this.useAsync())
-            this.initAsync();
-        else 
-            this.initSync();        
+        this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
+            this.propertyItemsReady(itemsData);
+            this.afterInit();
+        });
     }
 
-    internalInit() {
+    protected propertyItemsReady(itemsData: PropertyItemsData) {
+        this.propertyItemsData = itemsData;
         this.initPropertyGrid();
         this.loadInitialEntity();
-    }
-
-    protected initSync() {
-        this.propertyItemsData = this.getPropertyItemsData();
-        this.internalInit();
-        this.afterInit();
-    }
-
-    protected async initAsync() {
-        this.propertyItemsData = await this.getPropertyItemsDataAsync();
-        this.internalInit();
-        this.afterInit();
     }
 
     protected afterInit() {

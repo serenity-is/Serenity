@@ -319,20 +319,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 .prependTo(label);
         }
 
-        var editorType = EditorTypeRegistry
-            .get(item.editorType ?? 'String');
+        var editorType = EditorTypeRegistry.get(item.editorType ?? 'String') as typeof Widget<WidgetProps<P>>;
 
-        var element = Widget.elementFor(editorType as any)
-            .addClass('editor')
-            .attr('id', editorId).appendTo(fieldDiv);
-
-        if (element.is(':input')) {
-            element.attr('name', item.name ?? '');
-        }
-
-        if (placeHolder) {
-            element.attr('placeholder', placeHolder);
-        }
         var editorParams = item.editorParams;
         var optionsType = null;
         var optionsAttr = getAttributes(editorType,
@@ -348,11 +336,21 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             editorParams = extend(new Object(), item.editorParams);
         }
 
-        let editor = Widget.create({
-            type: editorType,
-            options: { ...editorParams, element: element }
-        });
-        editor.init();
+        let editor = new editorType({
+            ...editorParams,
+            id: editorId,
+            element: el => {
+                el.classList.add("editor");
+                
+                if (/^(?:input|select|textarea|button)$/i.test(el.nodeName))
+                    el.setAttribute("name", item.name ?? "");
+
+                if (placeHolder)
+                    el.setAttribute("placeholder", placeHolder);
+
+                fieldDiv.append(el);
+            }
+        }).init();
 
         if (getTypeShortName(editor) == "BooleanEditor" &&
             (item.editorParams == null || !!!item.editorParams['labelFor'])) {

@@ -1,16 +1,18 @@
-﻿import { Config, getBaseType, getInstanceType, getTypeFullName, getTypeShortName, localText, stringFormat } from "@serenity-is/base";
+import sQuery from "@optionaldeps/squery";
+import { Config, getBaseType, getInstanceType, getTypeFullName, getTypeShortName, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { canLoadScriptData, getTemplate, replaceAll } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
-@Decorators.element("<div/>")
 export class TemplatedWidget<P> extends Widget<P> {
+
+    static override defaultTagName = "div";
 
     private static templateNames: { [key: string]: string } = {};
 
     protected byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id, this.element);
+        return $('#' + this.idPrefix + id, this.domNode);
     }
 
     private byID<TWidget>(id: string, type: { new(...args: any[]): TWidget }) {

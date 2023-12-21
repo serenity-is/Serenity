@@ -20,8 +20,6 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     private minValue: string;
     private maxValue: string;
 
-    protected static override requiresFragmentWorkaround = true;
-
     constructor(props?: EditorProps<P>) {
         super(props);
 

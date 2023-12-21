@@ -4,8 +4,8 @@ import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
    
-export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | { node: HTMLElement }, opt?: { noRoute?: boolean, setHeight?: boolean }) {
-    var el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.node;
+export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | { domNode: HTMLElement }, opt?: { noRoute?: boolean, setHeight?: boolean }) {
+    var el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.domNode;
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 

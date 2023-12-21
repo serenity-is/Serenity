@@ -44,6 +44,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         var uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
+        if (this.options.readOnly)
+            this.set_readOnly(true);
 
         this.fileSymbols = $('<ul/>').appendTo(this.element);
 
@@ -145,7 +147,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     }
 
     get_readOnly(): boolean {
-        return this.uploadInput.attr('disabled') != null;
+        return this.uploadInput?.attr('disabled') != null;
     }
 
     set_readOnly(value: boolean): void {

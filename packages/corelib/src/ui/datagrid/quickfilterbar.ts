@@ -1,4 +1,5 @@
-﻿import { Criteria, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Criteria, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { ArgumentNullException } from "../../q";
 import { DateEditor } from "../editors/dateeditor";
@@ -79,18 +80,20 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         var widget = Widget.create({
             type: opt.type,
-            element: e => {
-                if (opt.field)
-                    e.attr('id', this.options.idPrefix + opt.field);
-                e.attr('placeholder', ' ');
-                e.appendTo(quickFilter);
-                if (opt.element != null) {
-                    opt.element(e);
-                }
-            },
-            options: opt.options,
-            init: opt.init
+            options: {
+                element: el => {
+                    if (opt.field)
+                        el.setAttribute('id', this.options.idPrefix + opt.field);
+                    el.setAttribute('placeholder', ' ');
+                    quickFilter.append(el);
+                    if (opt.element != null) {
+                        opt.element(sQuery(el));
+                    }
+                },
+                ...opt.options
+            }
         });
+        opt.init?.(widget);
 
         var submitHandler = (request: ListRequest) => {
 
@@ -227,7 +230,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             type: DateTimeEditor,
             title: title,
             element: function (el) {
-                end = new DateTimeEditor({ 
+                end = new DateTimeEditor({
                     element: el2 => $(el2).insertAfter(el),
                     useUtc: useUtc == null ? undefined : useUtc,
                 });

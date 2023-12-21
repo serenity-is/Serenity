@@ -2596,9 +2596,16 @@ declare namespace Serenity {
      * Returns the outer HTML of the element.
      */
     function outerHtml(element: ArrayLike<HTMLElement>): string;
+    /**
+     * Appends child at first argument to given node at second argument.
+     * From https://github.com/alex-kinokon/jsx-dom.
+     * @param child Child element or elements
+     * @param node Target parent element
+     */
+    function appendChild(child: any, node: HTMLElement): void;
 
     function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | {
-        node: HTMLElement;
+        domNode: HTMLElement;
     }, opt?: {
         noRoute?: boolean;
         setHeight?: boolean;
@@ -3308,47 +3315,52 @@ declare namespace Serenity {
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
     }
-    class EditorWidget<P> extends Widget<EditorProps<P>> {
-        constructor(props?: EditorProps<P>);
-    }
     class Widget<P = {}> {
         private static nextWidgetNumber;
-        protected options: WidgetProps<P>;
-        protected widgetName: string;
-        protected uniqueName: string;
+        protected readonly options: WidgetProps<P>;
+        protected readonly widgetName: string;
+        protected readonly uniqueName: string;
         readonly idPrefix: string;
-        readonly node: HTMLElement;
-        get element(): JQuery;
+        readonly domNode: HTMLElement;
         constructor(props?: WidgetProps<P>);
         destroy(): void;
-        static createNode(): HTMLElement;
+        static createDefaultElement(): HTMLElement;
+        /**
+         * @deprecated
+         * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+         */
+        get element(): JQuery;
         protected addCssClass(): void;
         protected getCssClass(): string;
         static getWidgetName(type: Function): string;
-        static elementFor<TWidget>(editorType: {
-            new (...args: any[]): TWidget;
-        }): JQuery;
+        /**
+         * @deprecated Prefer WidgetType.createDefaultElement
+         */
+        static elementFor(editorType: typeof Widget): JQuery;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getFieldElement(): HTMLElement;
         getGridField(): JQuery;
-        protected static requiresFragmentWorkaround: boolean;
+        change(handler: (e: Event) => void): void;
+        changeSelect2(handler: (e: Event) => void): void;
+        protected static defaultTagName: string;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
         private setElementProps;
-        protected initialized: boolean;
-        protected initialize(): void;
+        protected internalInit(): void;
         init(): this;
-        render(): HTMLElement;
-        protected renderContents(): void;
+        /**
+         * Returns the main element for this widget or the document fragment.
+         * As widgets may get their elements from props unlike regular JSX widgets,
+         * this method should not be overridden. Override renderContents() instead.
+         */
+        render(): HTMLElement | DocumentFragment;
+        protected internalRenderContents(): void;
+        protected renderContents(): any | void;
         get props(): WidgetProps<P>;
+        protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
     }
-    interface Widget<P> {
-        change(handler: (e: Event) => void): void;
-        changeSelect2(handler: (e: Event) => void): void;
+    class EditorWidget<P> extends Widget<EditorProps<P>> {
+        constructor(props?: EditorProps<P>);
     }
-    interface Widget<P> {
-        change(handler: (e: Event) => void): void;
-        changeSelect2(handler: (e: Event) => void): void;
-    }
-    function reactPatch(): void;
 
     interface ToolButton {
         action?: string;
@@ -3395,6 +3407,7 @@ declare namespace Serenity {
     }
 
     class TemplatedWidget<P> extends Widget<P> {
+        static defaultTagName: string;
         private static templateNames;
         protected byId(id: string): JQuery;
         private byID;
@@ -3420,7 +3433,7 @@ declare namespace Serenity {
         protected toolbar: Toolbar;
         protected validator: JQueryValidation.Validator;
         constructor(props?: WidgetProps<P>);
-        static createNode(): HTMLDivElement;
+        static createDefaultElement(): HTMLDivElement;
         private get isMarkedAsPanel();
         private get isResponsive();
         private static getCssSize;
@@ -3602,9 +3615,7 @@ declare namespace Serenity {
         protected entityId: any;
         protected propertyItemsData: PropertyItemsData;
         constructor(props?: WidgetProps<P>);
-        internalInit(): void;
-        protected initSync(): void;
-        protected initAsync(): Promise<void>;
+        protected propertyItemsReady(itemsData: PropertyItemsData): void;
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
@@ -3712,7 +3723,6 @@ declare namespace Serenity {
     class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private minValue;
         private maxValue;
-        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         get_value(): string;
         get value(): string;
@@ -3754,7 +3764,6 @@ declare namespace Serenity {
         private time;
         private lastSetValue;
         private lastSetValueGet;
-        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         getFlatpickrOptions(): any;
         get_value(): string;
@@ -3800,7 +3809,6 @@ declare namespace Serenity {
     }
     class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
         private minutes;
-        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         get value(): number;
         protected get_value(): number;
@@ -3815,7 +3823,6 @@ declare namespace Serenity {
         readOnlyDomain?: boolean;
     }
     class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
-        protected static requiresFragmentWorkaround: boolean;
         constructor(props?: EditorProps<P>);
         static registerValidationMethods(): void;
         get_value(): string;
@@ -3924,7 +3931,6 @@ declare namespace Serenity {
         clearItems(): void;
         addItem(item: Select2Item): void;
         addOption(key: string, text: string, source?: any, disabled?: boolean): void;
-        protected static requiresFragmentWorkaround: boolean;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
         protected useInplaceAdd(): boolean;
         protected isAutoComplete(): boolean;
@@ -4797,9 +4803,7 @@ declare namespace Serenity {
         static defaultColumnWidthScale: number;
         static defaultColumnWidthDelta: number;
         constructor(props?: WidgetProps<P>);
-        protected internalInit(): void;
-        protected initSync(): void;
-        protected initAsync(): Promise<void>;
+        protected propertyItemsReady(itemsData: PropertyItemsData): void;
         protected afterInit(): void;
         protected useAsync(): boolean;
         protected useLayoutTimer(): boolean;
@@ -5143,9 +5147,7 @@ declare namespace Serenity {
         protected localizationLastValue: any;
         static defaultLanguageList: () => string[][];
         constructor(props?: WidgetProps<P>);
-        internalInit(): void;
-        protected initSync(): void;
-        protected initAsync(): Promise<void>;
+        protected propertyItemsReady(itemsData: PropertyItemsData): void;
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
@@ -5366,7 +5368,6 @@ declare namespace Serenity {
         protected getItemText(item: TItem): string;
         protected getTypeDelay(): number;
         protected getSelect2Options(): Select2Options;
-        protected static requiresFragmentWorkaround: boolean;
         protected addInplaceCreate(title: string): void;
         protected inplaceCreateClick(e: any): void;
         protected get_select2Container(): JQuery;

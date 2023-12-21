@@ -18,16 +18,15 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.element.attr("id", this.element.attr("id") || this.uniqueName);
-
+        this.domNode.classList.add("s-TemplatedDialog");
+        this.domNode.setAttribute("id", this.domNode.getAttribute("id") || this.uniqueName);
         this.initValidator();
         this.initTabs();
         this.initToolbar();
     }
 
-    static override createNode() {
+    static override createDefaultElement() {
         var div = document.body.appendChild(document.createElement("div"));
-        div.classList.add("s-TemplatedDialog");
         div.classList.add("hidden");
         return div;
     }

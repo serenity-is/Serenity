@@ -32,7 +32,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.node.classList.add('s-CheckTreeEditor');
+        this.domNode.classList.add('s-CheckTreeEditor');
         this.updateItems();
     }
 

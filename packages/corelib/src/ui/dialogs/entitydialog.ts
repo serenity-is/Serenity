@@ -38,35 +38,24 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        if (this.useAsync())
-            this.initAsync();
-        else 
-            this.initSync();        
+        this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
+            this.propertyItemsReady(itemsData);
+            this.afterInit();
+        });
     }
 
-    internalInit() {
+    protected propertyItemsReady(itemsData: PropertyItemsData) {
+        this.propertyItemsData = itemsData;
         this.initPropertyGrid();
         this.initLocalizationGrid();
     }
 
-    protected initSync() {
-        this.propertyItemsData = this.getPropertyItemsData();
-        this.internalInit();
-        this.afterInit();
-    }
-
-    protected async initAsync() {
-        this.propertyItemsData = await this.getPropertyItemsDataAsync();
-        this.internalInit();
-        this.afterInit();
-    }
-
     protected afterInit() {
-    }    
+    }
 
     protected useAsync() {
         return false;
-    }    
+    }
 
     destroy(): void {
 
@@ -277,7 +266,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         return this.getEntityType();
     }
-   
+
     private _entitySingular: string;
 
     protected getEntitySingular(): string {
@@ -285,7 +274,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             return this._entitySingular;
 
         var attributes = this.attrs(ItemNameAttribute);
-        return (this._entitySingular = attributes.length >= 1 ? localText(attributes[0].value, attributes[0].value) : 
+        return (this._entitySingular = attributes.length >= 1 ? localText(attributes[0].value, attributes[0].value) :
             tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
     }
 
@@ -303,7 +292,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         if (attributes.length >= 1)
             return this._nameProperty = attributes[0].value ?? '';
-            
+
         return this._nameProperty = 'Name';
     }
 
@@ -426,7 +415,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         if (idField != null)
             this.set_entityId((entity as any)[idField]);
-        
+
         this.set_entity(entity);
 
         if (this.propertyGrid != null) {
@@ -567,7 +556,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
 
         var newValue = this.getLocalizationGridValue();
-        return JSON.stringify(this.localizationLastValue) !=  JSON.stringify(newValue);
+        return JSON.stringify(this.localizationLastValue) != JSON.stringify(newValue);
     }
 
     protected localizationButtonClick(): void {
@@ -642,7 +631,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                         }
                     }
                 }
-                
+
                 this.localizationGrid.load(copy);
                 this.setLocalizationGridCurrentValues();
                 this.localizationPendingValue = null;
@@ -759,7 +748,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
 
         return { items: [], additionalItems: [] };
-    }    
+    }
 
     protected getPropertyGridOptions(): PropertyGridOptions {
         return {
@@ -781,25 +770,25 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         opt.service = this.getService() + '/' + (this.isEditMode() ? 'Update' : 'Create'),
 
-        opt.onSuccess = response => {
-            this.onSaveSuccess(response);
+            opt.onSuccess = response => {
+                this.onSaveSuccess(response);
 
-            callback && callback(response);
+                callback && callback(response);
 
-            var typ = (this.isEditMode() ? 'update' : 'create');
+                var typ = (this.isEditMode() ? 'update' : 'create');
 
-            var ent = opt.request == null ? null : opt.request.Entity;
-            var eid: any = this.isEditMode() ? this.get_entityId() :
-                (response == null ? null : response.EntityId);
+                var ent = opt.request == null ? null : opt.request.Entity;
+                var eid: any = this.isEditMode() ? this.get_entityId() :
+                    (response == null ? null : response.EntityId);
 
-            var dci = {
-                type: typ,
-                entity: ent,
-                entityId: eid
+                var dci = {
+                    type: typ,
+                    entity: ent,
+                    entityId: eid
+                };
+
+                this.element.triggerHandler('ondatachange', [dci]);
             };
-
-            this.element.triggerHandler('ondatachange', [dci]);
-        };
 
         opt.onCleanup = () => {
             this.validator && validatorAbortHandler(this.validator);
@@ -994,19 +983,13 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             cssClass: 'clone-button',
             icon: 'fa-clone',
             onClick: () => {
-
-                if (!this.isEditMode()) {
+                if (!this.isEditMode())
                     return;
-                }
 
                 var cloneEntity = this.getCloningEntity();
-
-                Widget.create({
-                    type: getInstanceType(this),
-                    init: w => SubDialogHelper.bubbleDataChange(
-                        SubDialogHelper.cascade(w, this.element), this, true)
-                        .loadEntityAndOpenDialog(cloneEntity, null)
-                });
+                var cloneDialog = Widget.create({ type: getInstanceType(this) })
+                SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.element), this, true);
+                (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
             },
             visible: () => false,
             disabled: () => !this.hasInsertPermission() || this.readOnly

@@ -88,15 +88,13 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        var self = this;
-
-        this.element.addClass('s-DataGrid').html('');
+        this.domNode.classList.add('s-DataGrid');
 
         var layout = function () {
-            self.layout();
-            if (self._layoutTimer != null)
-                LayoutTimer.store(self._layoutTimer);
-        }
+            this.layout();
+            if (this._layoutTimer != null)
+                LayoutTimer.store(this._layoutTimer);
+        }.bind(this);
         this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
 
         if (this.useLayoutTimer())
@@ -112,13 +110,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.slickContainer = this.createSlickContainer();
         this.view = this.createView();
 
-        if (this.useAsync())
-            this.initAsync();
-        else
-            this.initSync();
+        this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
+            this.propertyItemsReady(itemsData);
+            this.afterInit();
+        });
     }
 
-    protected internalInit() {
+    protected propertyItemsReady(itemsData: PropertyItemsData) {
+        this.propertyItemsData = itemsData;
         this.allColumns = this.allColumns ?? this.getColumns();
         this.slickGrid = this.createSlickGrid();
 
@@ -148,18 +147,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
         else
             window.setTimeout(() => this.initialPopulate(), 0);
-    }
-
-    protected initSync() {
-        this.propertyItemsData = this.getPropertyItemsData();
-        this.internalInit();
-        this.afterInit();
-    }
-
-    protected async initAsync() {
-        this.propertyItemsData = await this.getPropertyItemsDataAsync();
-        this.internalInit();
-        this.afterInit();
     }
 
     protected afterInit() {
@@ -809,7 +796,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.toolbar = new Toolbar({
             buttons: buttons,
             hotkeyContext: this.element[0],
-            element: el => this.node.appendChild(el).classList.add("grid-toolbar")
+            element: el => this.domNode.appendChild(el).classList.add("grid-toolbar")
         });
     }
 

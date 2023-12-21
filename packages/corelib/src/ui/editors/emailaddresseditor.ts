@@ -6,6 +6,6 @@ import { StringEditor } from "./stringeditor";
 export class EmailAddressEditor<TOptions = {}> extends StringEditor<TOptions> {
     constructor(opt?: TOptions) {
         super(opt);
-        this.node?.classList.add('email');
+        this.domNode?.classList.add('email');
     }
 }

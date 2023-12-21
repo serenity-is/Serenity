@@ -1,16 +1,7 @@
 ﻿import { EditorProps, Widget } from "./widget";
 
 function _widgetFactory(this: any, props: any) {
-
-    var widget = Widget.create({
-        type: this,
-        options: props
-    });
-
-    if (props.ref)
-        props.ref(widget);
-
-    return widget.render();
+    return new this(props).render();
 }
 
 type JsxDomWidgetProps<P> = EditorProps<P> & {

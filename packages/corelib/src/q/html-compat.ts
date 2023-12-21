@@ -63,7 +63,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
     let fromId = from.id ?? "";
     while (true) {
         var res = context?.querySelector("#" + fromId + relativeId) as HTMLElement;
-        
+
         if (!res && noContext)
             res = doc?.getElementById(fromId + relativeId);
 
@@ -98,3 +98,40 @@ export function newBodyDiv(): JQuery {
 export function outerHtml(element: ArrayLike<HTMLElement>) {
     return sQuery('<i/>').append((element as any).eq(0).clone()).html();
 }
+
+/**
+ * Appends child at first argument to given node at second argument. 
+ * From https://github.com/alex-kinokon/jsx-dom.
+ * @param child Child element or elements
+ * @param node Target parent element
+ */
+export function appendChild(child: any, node: HTMLElement) {
+    if (isArrayLike(child)) {
+        appendChildren(child, node)
+    } else if (typeof child === "string" || typeof child === "number") {
+        appendChildToNode(document.createTextNode(child.toString()), node)
+    } else if (child === null) {
+        appendChildToNode(document.createComment(""), node)
+    } else if (child != null && child.nodeType === "number") {
+        appendChildToNode(child, node);
+    }
+    else
+        node.append(child);
+
+}
+
+function appendChildren(children: any, node: HTMLElement): HTMLElement {
+    for (const child of [...children]) {
+        appendChild(child, node)
+    }
+    return node;
+}
+
+function appendChildToNode(child: any, node: HTMLElement) {
+    if (node instanceof HTMLTemplateElement) {
+        node.content.appendChild(child)
+    } else {
+        node.appendChild(child)
+    }
+}
+

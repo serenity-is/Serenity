@@ -16,8 +16,6 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     private lastSetValue: string;
     private lastSetValueGet: string;
 
-    protected static override requiresFragmentWorkaround = true;
-
     constructor(props?: EditorProps<P>) {
         super(props);
 

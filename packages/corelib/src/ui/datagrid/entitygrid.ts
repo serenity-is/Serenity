@@ -17,8 +17,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
     constructor(props?: WidgetProps<P>) {
         super(props);
-
-        this.node.classList.add('route-handler');
+        this.domNode.classList.add('route-handler');
         this.element.on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
     }
 
@@ -310,16 +309,12 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     }
 
     protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any> {
-        var dialogClass = this.getDialogTypeFor(itemType);
         var dialog = Widget.create({
-            type: dialogClass,
-            options: this.getDialogOptionsFor(itemType),
-            init: d => {
-                this.initEntityDialog(itemType, d);
-                callback && callback(d);
-            }
+            type: this.getDialogTypeFor(itemType),
+            options: this.getDialogOptionsFor(itemType)
         });
-
+        this.initEntityDialog(itemType, dialog);
+        callback?.(dialog);
         return dialog;
     }
 

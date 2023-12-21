@@ -388,8 +388,6 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         });
     }
 
-    protected static override requiresFragmentWorkaround = true;
-
     protected addInplaceCreate(addTitle: string, editTitle: string) {
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
@@ -866,11 +864,9 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     protected createEditDialog(callback: (dlg: IEditDialog) => void) {
         var dialogTypeKey = this.getDialogTypeKey();
-        var dialogType = DialogTypeRegistry.get(dialogTypeKey);
-        Widget.create({
-            type: dialogType,
-            init: x => callback(x as any)
-        });
+        var dialogType = DialogTypeRegistry.get(dialogTypeKey) as typeof Widget<{}>;
+        var dialog = new dialogType().init();
+        callback?.(dialog as unknown as IEditDialog);
     }
 
     public onInitNewEntity: (entity: TItem) => void;

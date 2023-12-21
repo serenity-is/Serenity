@@ -1,8 +1,9 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { Config, getGlobalObject, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, isAssignableFrom, notifyError, stringFormat, toggleClass } from "@serenity-is/base";
+import { Config, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, stringFormat, toggleClass } from "@serenity-is/base";
 import { Decorators, ElementAttribute } from "../../decorators";
 import { jQueryPatch } from "../../patch/jquerypatch";
-import { ArgumentNullException, Exception, addValidationRule as addValRule, getAttributes, replaceAll } from "../../q";
+import { reactPatch } from "../../patch/reactpatch";
+import { Exception, addValidationRule as addValRule, appendChild, getAttributes, replaceAll } from "../../q";
 import { EditorUtils } from "../editors/editorutils";
 
 export type NoInfer<T> = [T][T extends any ? 0 : never];
@@ -30,27 +31,27 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     init?: (w: TWidget) => void;
 }
 
+let initialized = Symbol();
+let isFragmentWorkaround = Symbol();
+let renderContentsCalled = Symbol();
+
 @Decorators.registerClass('Serenity.Widget')
 export class Widget<P = {}> {
     private static nextWidgetNumber = 0;
-    protected options: WidgetProps<P>;
-    protected widgetName: string;
-    protected uniqueName: string;
+    declare protected readonly options: WidgetProps<P>;
+    declare protected readonly widgetName: string;
+    declare protected readonly uniqueName: string;
     declare public readonly idPrefix: string;
-    public readonly node: HTMLElement;
-
-    public get element(): JQuery {
-        return jQuery(this.node);
-    }
+    declare public readonly domNode: HTMLElement;
 
     constructor(props?: WidgetProps<P>) {
         if (isArrayLike(props)) {
-            this.node = props[0];
+            this.domNode = ensureParentOrFragment(props[0]);
             this.options = {} as any;
         }
         else {
             this.options = props ?? {} as any;
-            this.node = handleElementProp(getInstanceType(this), this.options.element);
+            this.domNode = handleElementProp(getInstanceType(this), this.options);
         }
 
         delete this.options.element;
@@ -60,10 +61,10 @@ export class Widget<P = {}> {
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
 
         if (!jQuery.isMock) {
-            if (jQuery(this.node).data(this.widgetName))
+            if (jQuery(this.domNode).data(this.widgetName))
                 throw new Exception(stringFormat("The element already has widget '{0}'!", this.widgetName));
 
-            jQuery(this.node).on('remove.' + this.widgetName, e => {
+            jQuery(this.domNode).on('remove.' + this.widgetName, e => {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -71,25 +72,25 @@ export class Widget<P = {}> {
             }).data(this.widgetName, this);
         }
 
-        this.addCssClass();
         this.idPrefix = this.uniqueName + '_';
-        this.renderContents();
+        this.addCssClass();
+        !getInstanceType(this).deferRenderContents && this.internalRenderContents();
     }
 
     public destroy(): void {
-        if (this.node) {
-            toggleClass(this.node, this.getCssClass(), false);
-            !jQuery.isMock && jQuery(this.node).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
-            delete (this as any).node;
+        if (this.domNode) {
+            toggleClass(this.domNode, this.getCssClass(), false);
+            !jQuery.isMock && jQuery(this.domNode).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+            delete (this as any).domNode;
         }
     }
 
-    static createNode(): HTMLElement {
+    static createDefaultElement(): HTMLElement {
         var elementAttr = getAttributes(this, ElementAttribute, true);
         if (elementAttr.length) {
             let node: HTMLElement;
             if (!jQuery.isMock) {
-                node =  jQuery(elementAttr[0].value).get(0);
+                node = jQuery(elementAttr[0].value).get(0);
                 node.parentNode?.removeChild(node);
                 return node;
             }
@@ -97,17 +98,25 @@ export class Widget<P = {}> {
             wrap.innerHTML = elementAttr[0].value;
             node = wrap.children[0] as HTMLElement;
             if (!node)
-                return document.createElement("input");
+                return document.createElement(this.defaultTagName);
             node.parentNode?.removeChild(node);
             return node;
         }
         else {
-            return document.createElement("input");
+            return document.createElement(typeof this.defaultTagName);
         }
     }
 
+    /**
+     * @deprecated
+     * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+     */
+    public get element(): JQuery {
+        return jQuery(this.domNode);
+    }
+
     protected addCssClass(): void {
-        toggleClass(this.node, this.getCssClass(), true);
+        toggleClass(this.domNode, this.getCssClass(), true);
     }
 
     protected getCssClass(): string {
@@ -134,34 +143,41 @@ export class Widget<P = {}> {
         return replaceAll(getTypeFullName(type), '.', '_');
     }
 
-    public static elementFor<TWidget>(editorType: { new(...args: any[]): TWidget }): JQuery {
-        return $((editorType as any).createNode());
+    /**
+     * @deprecated Prefer WidgetType.createDefaultElement
+     */
+    public static elementFor(editorType: typeof Widget): JQuery {
+        return sQuery(editorType.createDefaultElement());
     }
 
     public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return addValRule(sQuery(this.node), eventClass, rule);
+        return addValRule(sQuery(this.domNode), eventClass, rule);
+    }
+
+    public getFieldElement(): HTMLElement {
+        return this.domNode.closest('.field');
     }
 
     public getGridField(): JQuery {
-        return sQuery(this.node).closest('.field');
+        return sQuery(this.domNode).closest('.field');
     }
 
     public change(handler: (e: Event) => void) {
-        sQuery(this.node).on('change.' + this.uniqueName, handler);
+        sQuery(this.domNode).on('change.' + this.uniqueName, handler);
     };
 
     public changeSelect2(handler: (e: Event) => void) {
-        sQuery(this.node).on('change.' + this.uniqueName, function (e, valueSet) {
+        sQuery(this.domNode).on('change.' + this.uniqueName, function (e, valueSet) {
             if (valueSet !== true)
                 handler(e as any);
         });
     };
 
-    protected static requiresFragmentWorkaround: boolean;
+    protected static defaultTagName: string = "div";
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
-        let node = handleElementProp(params.type as any, props.element);
+        let node = handleElementProp(params.type as any, props);
         params.container && (isArrayLike(params.container) ? sQuery(params.container).append(node) : params.container.appendChild(node));
         params.element?.(sQuery(node));
         props.element = node;
@@ -172,7 +188,7 @@ export class Widget<P = {}> {
     }
 
     private setElementProps(): void {
-        let el = this.node;
+        let el = this.domNode;
         let props = this.props as EditorProps<{}>;
         if (!el || !props)
             return;
@@ -196,90 +212,124 @@ export class Widget<P = {}> {
             el.setAttribute("maxLength", (props.maxLength || 0).toString());
         else if (typeof (props as any).maxlength === "number")
             el.setAttribute("maxLength", ((props as any).maxlength || 0).toString());
-    }
 
-    protected initialized: boolean;
-
-    protected initialize(): void {
-        if (this.initialized)
-            return;
-
-        let props = this.props as EditorProps<any>;
+        // using try catch here as some editors might not be able
+        // to set them in the constructor if forwarding these
+        // properties to any elements created in the constructor
         if (props.required != null)
-            EditorUtils.setRequired(this, props.required);
+        {
+            try {
+                EditorUtils.setRequired(this, props.required);
+            }
+            catch {
+            }
+        }
 
-        if (props.readOnly !== null)
-            EditorUtils.setReadOnly(this, props.readOnly);
+        if (props.readOnly != null) {
+            try {
+                EditorUtils.setReadOnly(this, props.readOnly);
+            }
+            catch {
+            }
+        }
 
-        if (props.initialValue != undefined)
-            EditorUtils.setValue(this, props.initialValue);
-
-        if (typeof (props as any).ref === "function") {
-            (props as any).ref(this);
+        if (props.initialValue != null) {
+            try {
+                EditorUtils.setValue(this, props.initialValue);            
+            }
+            catch {
+            }
         }
     }
 
+    protected internalInit() {
+        getInstanceType(this).deferRenderContents && this.internalRenderContents();
+
+        if (typeof (this.options as any)?.ref === "function")
+            (this.options as any)?.ref(this);
+    }
+
     public init(): this {
-        if (!this.initialized) {
-            try {
-                this.initialize();
-            }
-            finally {
-                this.initialized = true;
-            }
+        if (!(this as any)[initialized]) {
+            (this as any)[initialized] = true;
+            this.internalInit();
         }
         return this;
     }
 
-    public render(): HTMLElement {
-        let node = this.init().node;
-        if (node && node.parentNode && node.parentNode instanceof DocumentFragment && (node.parentNode as any).__isFragmentWorkaround)
-            node.parentNode;
-        return node;
+    /**
+     * Returns the main element for this widget or the document fragment.
+     * As widgets may get their elements from props unlike regular JSX widgets, 
+     * this method should not be overridden. Override renderContents() instead.
+     */
+    public render(): HTMLElement | DocumentFragment {
+        let el = this.init().domNode;
+        let parent = el?.parentNode;
+        if (parent instanceof DocumentFragment &&
+            parent.childNodes.length > 1 && 
+            (parent as any)[isFragmentWorkaround])
+            return parent;
+        return el;
     }
 
-    protected renderContents(): void {
+    protected internalRenderContents() {
+        if ((this as any)[renderContentsCalled])
+            return;
+        (this as any)[renderContentsCalled] = true;
+        let contents = this.renderContents();
+        if (typeof contents !== "undefined" && contents !== false && this.domNode)
+            appendChild(contents, this.domNode);
+    }
+
+    protected renderContents(): any | void {
+        return (this.options as any).children;
     }
 
     public get props(): WidgetProps<P> {
         return this.options;
     }
+
+    protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void) {
+        if (!(this as any).useAsync?.())
+            then.call(this, syncMethod.call(this));
+        else
+            asyncMethod.call(this).then(then.bind(this));
+    }
 }
 
-function handleElementProp(type: typeof Widget, element: (((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string)): HTMLElement {
-    let node: HTMLElement;
-    if (typeof element == "string") {
-        node = document.querySelector(element);
-        if (node == null)
-            throw `The element ${element} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
-    }
-    else if (isArrayLike(element)) {
-        node = element[0];
-    }
-    else if (element instanceof HTMLElement) {
-        node = element;
-    }
-    else {
-        node = type.createNode();
-        if (typeof element === "function")
-            element(node);
-    }
-
-    if (node && !node.parentNode && (type as any).requiresFragmentWorkaround) {
-        let fragment = document.createDocumentFragment();
-        fragment.appendChild(node);
-        (fragment as any).__isFragmentWorkaround = true;
-    }
-
+function ensureParentOrFragment(node: HTMLElement): HTMLElement {
+    if (!node || node.parentNode)
+        return node;
+    let fragment = document.createDocumentFragment();
+    fragment.appendChild(node);
+    (fragment as any)[isFragmentWorkaround] = true;
     return node;
 }
 
-Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
+function handleElementProp(type: typeof Widget, props: WidgetProps<{}>): HTMLElement {
+    let elementProp = props?.element;
+    let domNode: HTMLElement;
+    if (typeof elementProp == "string") {
+        domNode = document.querySelector(elementProp);
+        if (domNode == null)
+            throw `The element ${elementProp} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
+    }
+    else if (isArrayLike(elementProp)) {
+        domNode = elementProp[0];
+    }
+    else if (elementProp instanceof HTMLElement) {
+        domNode = elementProp;
+    }
+    else {
+        domNode = type.createDefaultElement();
+        if (typeof elementProp === "function")
+            elementProp(domNode);
+    }
 
-export declare interface Widget<P> {
-    change(handler: (e: Event) => void): void;
-    changeSelect2(handler: (e: Event) => void): void;
+    return ensureParentOrFragment(domNode);
 }
+
+Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
     constructor(props?: EditorProps<P>) {
@@ -287,82 +337,5 @@ export class EditorWidget<P> extends Widget<EditorProps<P>> {
     }
 }
 
-export declare interface Widget<P> {
-    change(handler: (e: Event) => void): void;
-    changeSelect2(handler: (e: Event) => void): void;
-}
-
-sQuery.fn.tryGetWidget = function (this: JQuery, type?: any) {
-    var element = this;
-    var w;
-    type ??= Widget;
-    if (isAssignableFrom(Widget, type)) {
-        var widgetName = Widget.getWidgetName(type);
-        w = element.data(widgetName);
-        if (w != null && !isAssignableFrom(type, getInstanceType(w))) {
-            w = null;
-        }
-        if (w != null) {
-            return w;
-        }
-    }
-
-    var data = element.data();
-    if (data == null) {
-        return null;
-    }
-
-    for (var key of Object.keys(data)) {
-        w = data[key];
-        if (w != null && isAssignableFrom(type, getInstanceType(w))) {
-            return w;
-        }
-    }
-
-    return null;
-};
-
-sQuery.fn.getWidget = function <TWidget>(this: JQuery, type: { new(...args: any[]): TWidget }) {
-    if (this == null) {
-        throw new ArgumentNullException('element');
-    }
-    if (this.length === 0) {
-        throw new Exception(stringFormat("Searching for widget of type '{0}' on a non-existent element! ({1})",
-            getTypeFullName(type), (this as any).selector));
-    }
-
-    var w = (this as any).tryGetWidget(type);
-    if (w == null) {
-        var message = stringFormat("Element has no widget of type '{0}'! If you have recently changed " +
-            "editor type of a property in a form class, or changed data type in row (which also changes " +
-            "editor type) your script side Form definition might be out of date. Make sure your project " +
-            "builds successfully and transform T4 templates", getTypeFullName(type));
-        notifyError(message, '', null);
-        throw new Exception(message);
-    }
-    return w;
-};
-
-!sQuery.isMock && jQueryPatch(sQuery);
-
-export function reactPatch() {
-    let global = getGlobalObject();
-    if (!global.React) {
-        if (global.preact) {
-            global.React = global.ReactDOM = global.preact;
-            global.React.Fragment = global.Fragment ?? "x-fragment";
-        }
-        else {
-            global.React = {
-                Component: function () { },
-                Fragment: "x-fragment",
-                createElement: function () { return { _reactNotLoaded: true }; }
-            }
-            global.ReactDOM = {
-                render: function () { throw Error("To use React, it should be included before Serenity.CoreLib.js"); }
-            }
-        }
-    }
-}
-
+jQueryPatch(sQuery, Widget);
 reactPatch();
