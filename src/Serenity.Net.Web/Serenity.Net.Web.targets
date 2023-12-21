@@ -28,11 +28,9 @@ try
         var expectedContent = @"{
   ""name"": """ + pkgId.Replace("\"", "\\\"") + @""",
   ""exports"": {
-  {
-    ""."": new
-    {
+    ""."": {
       ""types"": ""./dist/index.d.ts"",
-      ""import"": ""./dist/index.js"",
+      ""import"": ""./dist/index.js""
     }
   },
   ""main"": ""dist/index.js"",
