@@ -21,9 +21,9 @@ export class BooleanFormatter implements Formatter {
             return '';
 
         if (!!ctx.value)
-            return htmlEncode(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
+            return ctx.escape(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
 
-        htmlEncode(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
+        return ctx.escape(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
     }
 
     @Decorators.option()
@@ -109,9 +109,8 @@ export class EnumFormatter implements Formatter {
     }
 
     static getText(enumKey: string, name: string) {
-        if (!name) {
+        if (!name)
             return '';
-        }
 
         return htmlEncode(tryGetText('Enums.' + enumKey + '.' + name) ?? name);
     }

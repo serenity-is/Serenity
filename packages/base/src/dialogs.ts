@@ -65,7 +65,7 @@ function toIconClass(icon: string): string {
 }
 
 function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialogClass: string) {
-    var opt = Object.assign(<any>{
+    let opt = Object.assign(<any>{
         modal: true,
         width: '40%',
         maxWidth: 450,
@@ -86,7 +86,7 @@ function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialog
 
     if (options.buttons) {
         opt.buttons = options.buttons.map(x => {
-            var btn = dialogButtonToUI(x);
+            let btn = dialogButtonToUI(x);
             btn.click = function (e: any) {
                 options.result = x.result;
                 jQuery(this).dialog('close');
@@ -147,10 +147,10 @@ export namespace DialogTexts {
     };
 
     function get(this: string) {
-        return htmlEncode(localText("Dialogs." + this, defaultTxt[k]));
+        return htmlEncode(localText("Dialogs." + this, defaultTxt[this]));
     }
 
-    for (var k of Object.keys(defaultTxt)) {
+    for (let k of Object.keys(defaultTxt)) {
         Object.defineProperty(DialogTexts, k, {
             get: get.bind(k)
         });
@@ -166,9 +166,9 @@ export namespace DialogTexts {
  * @returns 
  */
 export function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml: boolean = true): HTMLDivElement {
-    var closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${DialogTexts.CloseButton}">` +
+    let closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${DialogTexts.CloseButton}">` +
         `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
-    var div = document.createElement("div");
+    let div = document.createElement("div");
     div.classList.add("modal");
     if (modalClass)
         toggleClass(div, modalClass, true);
@@ -191,11 +191,11 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
  * @returns Bootstrap button element
 */
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
-    var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    var iconClass = toIconClass(x.icon);
+    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let iconClass = toIconClass(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
-    var button = document.createElement("button");
+    let button = document.createElement("button");
     button.classList.add("btn");
     if (x.cssClass)
         toggleClass(button, x.cssClass, true);
@@ -210,11 +210,11 @@ export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
  * @returns jQuery UI button type
  */
 export function dialogButtonToUI(x: DialogButton): any {
-    var html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    var iconClass = toIconClass(x.icon);
+    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let iconClass = toIconClass(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
-    var button = {
+    let button = {
         text: html,
         click: x.click
     } as any;
@@ -224,9 +224,9 @@ export function dialogButtonToUI(x: DialogButton): any {
 }
 
 function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalClass: string) {
-    var modalDiv = bsModalMarkup(options.title, bodyHtml, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""), false);
-    var footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
-    var rawBS5 = typeof jQuery === "undefined" && isBS5Plus();
+    let modalDiv = bsModalMarkup(options.title, bodyHtml, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""), false);
+    let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
+    let rawBS5 = typeof jQuery === "undefined" && isBS5Plus();
 
     function createButton(x: DialogButton) {
 
@@ -234,7 +234,7 @@ function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalCl
             return;
         }
 
-        var button = dialogButtonToBS(x);
+        let button = dialogButtonToBS(x);
         footer.append(button);
         button.addEventListener("click", e => {
             options.result = x.result;
@@ -248,7 +248,7 @@ function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalCl
     }
 
     if (options.buttons) {
-        for (var button of options.buttons) {
+        for (let button of options.buttons) {
             createButton(button);
         }
     }
@@ -273,7 +273,7 @@ function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalCl
         }).show();
     }
     else {
-        var div = jQuery(modalDiv).appendTo(document.body);
+        let div = jQuery(modalDiv).appendTo(document.body);
 
         if (options.onOpen)
             div.one('shown.bs.modal', options.onOpen);
@@ -315,11 +315,11 @@ function useBSModal(options: CommonDialogOptions): boolean {
 }
 
 function getMessageBodyHtml(message: string, options?: CommonDialogOptions): string {
-    var encode = options == null || options.htmlEncode == null || options.htmlEncode;
+    let encode = options == null || options.htmlEncode == null || options.htmlEncode;
     if (encode)
         message = htmlEncode(message);
 
-    var preWrap = options == null || (options.preWrap == null && encode) || options.preWrap;
+    let preWrap = options == null || (options.preWrap == null && encode) || options.preWrap;
     return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
 }
 
@@ -371,7 +371,7 @@ export function alertDialog(message: string, options?: AlertOptions) {
         }
     }
 
-    var bodyHtml = getMessageBodyHtml(message, options);
+    let bodyHtml = getMessageBodyHtml(message, options);
 
     if (useBS)
         internalBSModal(options, bodyHtml, options.modalClass ?? "s-AlertModal");
@@ -566,10 +566,10 @@ export function iframeDialog(options: IFrameDialogOptions) {
         return;
     }
 
-    var doc: Document;
+    let doc: Document;
     function onOpen(div: HTMLElement) {
         if (div) {
-            var iframe = div.appendChild(document.createElement('iframe'));
+            let iframe = div.appendChild(document.createElement('iframe'));
             iframe.setAttribute("style", "border: none; width: 100%; height: 100%;");
             doc = iframe.contentDocument;
             if (doc) {
@@ -589,7 +589,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
         return;
     }
 
-    var div = document.createElement('div');
+    let div = document.createElement('div');
     div.style.overflow = "hidden";
     document.body.appendChild(div);
     let settings: IFrameDialogOptions = Object.assign({
@@ -616,11 +616,11 @@ export function iframeDialog(options: IFrameDialogOptions) {
  */
 export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
 
-    var el = isArrayLike(element) ? element[0] : element;
+    let el = isArrayLike(element) ? element[0] : element;
     if (!el || !el.classList?.contains("s-Panel") || el.classList?.contains("hidden"))
         return;
 
-    var event: any;
+    let event: any;
     if (typeof jQuery !== "undefined") {
         event = jQuery.Event('panelbeforeclose', { target: el });
         jQuery(el).trigger(event);
@@ -642,7 +642,7 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
 
     el.classList.add("hidden");
 
-    var uniqueName = el.dataset.paneluniquename;
+    let uniqueName = el.dataset.paneluniquename;
     if (uniqueName) {
         document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
             e.classList.remove("panel-hidden")
@@ -661,7 +661,7 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
     else {
         window.dispatchEvent(new Event("resize"));
 
-        var layoutEvent = new Event("layout");
+        let layoutEvent = new Event("layout");
         document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
             if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
                 rl.dispatchEvent(layoutEvent);
@@ -684,10 +684,10 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
  */
  export function openPanel(element: (HTMLElement | { jquery: string, get: ((index: number) => HTMLElement) }), uniqueName?: string) {
 
-    var el = typeof (element as any)?.get === "function" && typeof (element as any).jquery === "string" ? (element as any).get(0) : element as HTMLElement;
+    let el = typeof (element as any)?.get === "function" && typeof (element as any).jquery === "string" ? (element as any).get(0) : element as HTMLElement;
     if (!el)
         return;
-    var event: any;
+    let event: any;
 
     if (typeof jQuery !== "undefined") {
         event = jQuery.Event('panelopening', { panel: el });
@@ -699,7 +699,7 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         window.dispatchEvent(event);
     }
 
-    var container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
+    let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
     el.dataset.paneluniquename = uniqueName ?? el.id ?? new Date().getTime().toString();
     function hide(e: HTMLElement) {
@@ -715,9 +715,9 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
     }
 
     if (container) {
-        var c = container.children;
+        let c = container.children;
         const cl = c.length;
-        for (var i = 0; i < cl; i++) {
+        for (let i = 0; i < cl; i++) {
             hide(c[i] as HTMLElement);
         }
 
