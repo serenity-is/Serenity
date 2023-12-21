@@ -1559,6 +1559,20 @@ declare namespace Serenity {
     function isBS3(): boolean;
     /** Returns true if Bootstrap 5+ is loaded */
     function isBS5Plus(): boolean;
+    namespace DialogTexts {
+        const AlertTitle: string;
+        const CancelButton: string;
+        const CloseButton: string;
+        const ConfirmationTitle: string;
+        const InformationTitle: string;
+        const MaximizeHint: string;
+        const NoButton: string;
+        const OkButton: string;
+        const RestoreHint: string;
+        const SuccessTitle: string;
+        const WarningTitle: string;
+        const YesButton: string;
+    }
     /**
      * Builds HTML DIV element for a Bootstrap modal dialog
      * @param title Modal title
@@ -3459,7 +3473,7 @@ declare namespace Serenity {
         protected onDialogClose(): void;
         protected addCssClass(): void;
         protected getDialogButtons(): DialogButton[];
-        protected getDialogOptions(): any;
+        protected getDialogOptions(): DialogOptions;
         protected getDialogTitle(): string;
         dialogClose(): void;
         get dialogTitle(): string;
@@ -3474,6 +3488,14 @@ declare namespace Serenity {
         keyboard?: boolean;
         size?: 'lg' | 'sm';
         modalClass?: string;
+    }
+    interface DialogOptions {
+        autoOpen?: boolean;
+        buttons?: DialogButton[];
+        dialogClass?: string;
+        resizable?: boolean;
+        title?: string;
+        [k: string]: any;
     }
 
     class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
@@ -3620,7 +3642,7 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
-        protected getDialogOptions(): any;
+        protected getDialogOptions(): DialogOptions;
         protected getDialogButtons(): DialogButton[];
         protected okClick(): void;
         protected okClickValidated(): void;
@@ -4947,7 +4969,7 @@ declare namespace Serenity {
             text: string;
             click: () => void;
         }[];
-        protected getDialogOptions(): any;
+        protected getDialogOptions(): DialogOptions;
         private getTitle;
         private allowHide;
         private createLI;

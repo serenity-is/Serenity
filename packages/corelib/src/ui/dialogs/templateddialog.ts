@@ -332,7 +332,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return undefined;
     }
 
-    protected getDialogOptions(): any {
+    protected getDialogOptions(): DialogOptions {
         var opt: any = {};
         var dialogClass = 's-Dialog ' + this.getCssClass();
         opt.dialogClass = dialogClass;
@@ -474,4 +474,13 @@ export interface ModalOptions {
     keyboard?: boolean,
     size?: 'lg' | 'sm',
     modalClass?: string;
+}
+
+export interface DialogOptions {
+    autoOpen?: boolean;
+    buttons?: DialogButton[],
+    dialogClass?: string;
+    resizable?: boolean;
+    title?: string;
+    [k: string]: any;
 }

@@ -1,4 +1,4 @@
-﻿import { localText } from "@serenity-is/base";
+﻿import { DialogTexts } from "@serenity-is/base";
 import { Flexify } from "../widgets/flexify";
 
 export namespace DialogExtensions {
@@ -70,8 +70,8 @@ function registerDialogExtendPlugin($: JQueryStatic) {
         _initButtons: function () {
             var _this = this;
 
-            this._addButton("maximize", this.options.maximizable, localText('Dialogs.MaximizeHint'), "fa fa-window-maximize");
-            this._addButton("restore", false, localText('Dialogs.RestoreHint'), "fa fa-window-restore");
+            this._addButton("maximize", this.options.maximizable, DialogTexts.MaximizeHint, "fa fa-window-maximize");
+            this._addButton("restore", false, DialogTexts.RestoreHint, "fa fa-window-restore");
 
             var titlebar = this.element.closest('.ui-dialog').children('.ui-dialog-titlebar');
             titlebar.dblclick(function () {

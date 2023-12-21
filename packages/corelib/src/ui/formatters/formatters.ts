@@ -1,7 +1,7 @@
-﻿import { Culture, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+﻿import { Culture, DialogTexts, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { ISlickFormatter, getAttributes, replaceAll, safeCast } from "../../q";
+import { ISlickFormatter, getAttributes, replaceAll } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
@@ -17,31 +17,13 @@ export class IInitializeColumn {
 export class BooleanFormatter implements Formatter {
     format(ctx: FormatterContext) {
 
-        if (ctx.value == null) {
+        if (ctx.value == null)
             return '';
-        }
 
-        var text;
-        if (!!ctx.value) {
-            text = tryGetText(this.trueText);
-            if (text == null) {
-                text = this.trueText;
-                if (text == null) {
-                    text = tryGetText('Dialogs.YesButton') ?? 'Yes';
-                }
-            }
-        }
-        else {
-            text = tryGetText(this.falseText);
-            if (text == null) {
-                text = this.falseText;
-                if (text == null) {
-                    text = tryGetText('Dialogs.NoButton') ?? 'No';
-                }
-            }
-        }
+        if (!!ctx.value)
+            return htmlEncode(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
 
-        return htmlEncode(text);
+        htmlEncode(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
     }
 
     @Decorators.option()

@@ -273,6 +273,20 @@ interface CommonDialogOptions {
 declare function isBS3(): boolean;
 /** Returns true if Bootstrap 5+ is loaded */
 declare function isBS5Plus(): boolean;
+declare namespace DialogTexts {
+    const AlertTitle: string;
+    const CancelButton: string;
+    const CloseButton: string;
+    const ConfirmationTitle: string;
+    const InformationTitle: string;
+    const MaximizeHint: string;
+    const NoButton: string;
+    const OkButton: string;
+    const RestoreHint: string;
+    const SuccessTitle: string;
+    const WarningTitle: string;
+    const YesButton: string;
+}
 /**
  * Builds HTML DIV element for a Bootstrap modal dialog
  * @param title Modal title
@@ -953,4 +967,4 @@ declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function isArrayLike(obj: any): obj is ArrayLike<any>;
 declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
 
-export { type AlertOptions, ColumnSelection, type CommonDialogOptions, Config, type ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, Enum, type IFrameDialogOptions, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, alertDialog, blockUI, blockUndo, bsModalMarkup, closePanel, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, handleScriptDataError, htmlEncode, iframeDialog, informationDialog, initFormType, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, isPromiseLike, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, toId, toggleClass, trunc, tryGetText, warningDialog };
+export { type AlertOptions, ColumnSelection, type CommonDialogOptions, Config, type ConfirmOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, Enum, type IFrameDialogOptions, Invariant, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, addLocalText, alertDialog, blockUI, blockUndo, bsModalMarkup, closePanel, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, handleScriptDataError, htmlEncode, iframeDialog, informationDialog, initFormType, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, isPromiseLike, localText, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, toId, toggleClass, trunc, tryGetText, warningDialog };

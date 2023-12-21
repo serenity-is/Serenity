@@ -117,21 +117,44 @@ export function isBS5Plus(): boolean {
     return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
 }
 
-const defaultTxt: Record<string, string> = {
-    AlertTitle: 'Alert',
-    InformationTitle: 'Information',
-    WarningTitle: 'Warning',
-    ConfirmationTitle: 'Confirm',
-    SuccessTitle: 'Success',
-    OkButton: 'OK',
-    YesButton: 'Yes',
-    NoButton: 'No',
-    CancelButton: 'Cancel',
-    CloseButton: 'Close'
-};
+export namespace DialogTexts {
+    export declare const AlertTitle: string;
+    export declare const CancelButton: string;
+    export declare const CloseButton: string;
+    export declare const ConfirmationTitle: string;
+    export declare const InformationTitle: string;
+    export declare const MaximizeHint: string;
+    export declare const NoButton: string;
+    export declare const OkButton: string;
+    export declare const RestoreHint: string;
+    export declare const SuccessTitle: string;
+    export declare const WarningTitle: string;
+    export declare const YesButton: string;
 
-function txt(k: string) {
-    return htmlEncode(localText("Dialogs." + k, defaultTxt[k]));
+    const defaultTxt: Record<string, string> = {
+        AlertTitle: 'Alert',
+        CancelButton: 'Cancel',
+        CloseButton: 'Close',
+        ConfirmationTitle: 'Confirm',
+        InformationTitle: 'Information',
+        MaximizeHint: 'Maximize',
+        NoButton: 'No',
+        OkButton: 'OK',
+        RestoreHint: 'Restore',
+        SuccessTitle: 'Success',
+        WarningTitle: 'Warning',
+        YesButton: 'Yes'
+    };
+
+    function get(this: string) {
+        return htmlEncode(localText("Dialogs." + this, defaultTxt[k]));
+    }
+
+    for (var k of Object.keys(defaultTxt)) {
+        Object.defineProperty(DialogTexts, k, {
+            get: get.bind(k)
+        });
+    }
 }
 
 /** 
@@ -143,7 +166,7 @@ function txt(k: string) {
  * @returns 
  */
 export function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml: boolean = true): HTMLDivElement {
-    var closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${txt('CloseButton')}">` +
+    var closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${DialogTexts.CloseButton}">` +
         `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
     var div = document.createElement("div");
     div.classList.add("modal");
@@ -332,10 +355,10 @@ export function alertDialog(message: string, options?: AlertOptions) {
         options.htmlEncode = true;
 
     if (options.okButton == null || options.okButton === true)
-        options.okButton = txt('OkButton');
+        options.okButton = DialogTexts.OkButton;
 
     if (options.title == null)
-        options.title = txt('AlertTitle')
+        options.title = DialogTexts.AlertTitle;
 
     if (options.buttons == null) {
         options.buttons = [];
@@ -397,19 +420,19 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         options.htmlEncode = true;
 
     if (options.yesButton == null)
-        options.yesButton = txt('YesButton');
+        options.yesButton = DialogTexts.YesButton;
 
     if (options.noButton == null)
-        options.noButton = txt('NoButton');
+        options.noButton = DialogTexts.NoButton;
 
     if (typeof options.title === "undefined")
-        options.title = txt('ConfirmationTitle');
+        options.title = DialogTexts.ConfirmationTitle;
 
     if (options.buttons == null) {
         options.buttons = [];
         if (options.yesButton == null || options.yesButton) {
             options.buttons.push({
-                text: typeof options.yesButton == "boolean" ? txt('YesButton') : options.yesButton,
+                text: typeof options.yesButton == "boolean" ? DialogTexts.YesButton : options.yesButton,
                 cssClass: options.yesButtonClass ?? (useBS ? 'btn-primary' : undefined),
                 result: 'yes',
                 click: onYes
@@ -417,7 +440,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         }
         if (options.noButton == null || options.noButton) {
             options.buttons.push({
-                text: typeof options.noButton == "boolean" ? txt('NoButton') : options.noButton,
+                text: typeof options.noButton == "boolean" ? DialogTexts.NoButton : options.noButton,
                 cssClass: useBS ? (isBS5Plus() ? 'btn-danger' : 'btn-default') : undefined,
                 result: 'no',
                 click: options.onNo
@@ -425,7 +448,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         }
         if (options.cancelButton) {
             options.buttons.push({
-                text: typeof options.cancelButton == "boolean" ? txt('CancelButton') : options.cancelButton,
+                text: typeof options.cancelButton == "boolean" ? DialogTexts.CancelButton : options.cancelButton,
                 cssClass: useBS ? (isBS5Plus() ? 'btn-secondary' : 'btn-default') : undefined,
                 result: 'cancel',
                 click: options.onCancel
@@ -467,13 +490,13 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
     }
 
     if (typeof options.title === "undefined")
-        options.title = txt("InformationTitle");
+        options.title = DialogTexts.InformationTitle;
     if (typeof options.dialogClass === "undefined")
         options.dialogClass = "s-InformationDialog";
     if (typeof options.modalClass === "undefined")
         options.modalClass = "s-InformationModal";
     if (typeof options.yesButton === "undefined")
-        options.yesButton = txt("OkButton");
+        options.yesButton = DialogTexts.OkButton;
     if (typeof options.yesButtonClass === "undefined")
         options.yesButtonClass = "btn-info";
     if (typeof options.noButton === "undefined")
@@ -499,7 +522,7 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
 export function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions) {
     options ??= {};
     if (typeof options.title === "undefined")
-        options.title = txt("SuccessTitle");
+        options.title = DialogTexts.SuccessTitle;
     if (typeof options.dialogClass === "undefined")
         options.dialogClass = "s-SuccessDialog";
     if (typeof options.modalClass === "undefined")
@@ -519,7 +542,7 @@ export function successDialog(message: string, onOk?: () => void, options?: Conf
  */
 export function warningDialog(message: string, options?: AlertOptions) {
     alertDialog(message, Object.assign({
-        title: txt("WarningTitle"),
+        title: DialogTexts.WarningTitle,
         dialogClass: "s-WarningDialog",
         modalClass: "s-WarningModal",
         okButtonClass: 'btn-warning'
@@ -559,7 +582,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
 
     if (useBSModal(options as any)) {
         internalBSModal({
-            title: txt('AlertTitle'),
+            title: DialogTexts.AlertTitle,
             modalClass: 'modal-lg',
             onOpen: function () { onOpen(this.querySelector(".modal-body>div")) }
         }, '<div style="overflow: hidden"></div>', 's-IFrameModal');
@@ -574,7 +597,7 @@ export function iframeDialog(options: IFrameDialogOptions) {
         modal: true,
         width: '60%',
         height: '400',
-        title: txt('AlertTitle'),
+        title: DialogTexts.AlertTitle,
         open: function () {
             onOpen(div);
         },

@@ -1,4 +1,4 @@
-﻿import { Culture, htmlEncode, localText } from "@serenity-is/base";
+﻿import { Culture, DialogTexts, htmlEncode, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { Authorization, Router, centerDialog } from "../../q";
@@ -112,7 +112,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                 }
             },
             {
-                text: localText("Dialogs.OkButton"),
+                text: DialogTexts.OkButton,
                 click: () => {
                     let newColumns: Column[] = [];
 
@@ -138,7 +138,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                 }
             },
             {
-                text: localText("Dialogs.CancelButton"),
+                text: DialogTexts.CancelButton,
                 click: () => {
                     this.dialogClose()
                 }

@@ -1,4 +1,4 @@
-﻿import { localText, notifyError } from "@serenity-is/base";
+﻿import { DialogTexts, localText, notifyError } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { FilterPanel } from "./filterpanel";
@@ -30,7 +30,7 @@ export class FilterDialog extends TemplatedDialog<any> {
     protected getDialogButtons() {
         return [
             {
-                text: localText('Dialogs.OkButton'),
+                text: DialogTexts.OkButton,
                 click: () => {
                     this.filterPanel.search();
                     if (this.filterPanel.get_hasErrors()) {
@@ -42,7 +42,7 @@ export class FilterDialog extends TemplatedDialog<any> {
                 }
             },
             {
-                text: localText('Dialogs.CancelButton'),
+                text: DialogTexts.CancelButton,
                 click: () => this.dialogClose()
             }
         ];
