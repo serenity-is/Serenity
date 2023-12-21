@@ -2237,6 +2237,7 @@ declare namespace Serenity {
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
     function isArrayLike(obj: any): obj is ArrayLike<any>;
+    function isPromiseLike(obj: any): obj is PromiseLike<any>;
 
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).

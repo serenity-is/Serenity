@@ -26,5 +26,5 @@ await esbuild.build({
         'src/index.ts'
     ],
     outbase: 'src',
-    minify: true
+    minify: false
 });

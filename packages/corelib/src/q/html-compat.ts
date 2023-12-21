@@ -1,5 +1,5 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { htmlEncode, isArrayLike, localText } from "@serenity-is/base";
+import { htmlEncode, isArrayLike, isPromiseLike, localText } from "@serenity-is/base";
 
 export function isJQueryReal(val: any): val is JQuery {
     return isArrayLike(val) && !(val as any).isMock && typeof (val as JQuery).outerHeight === "function";
@@ -114,6 +114,9 @@ export function appendChild(child: any, node: HTMLElement) {
         appendChildToNode(document.createComment(""), node)
     } else if (child != null && child.nodeType === "number") {
         appendChildToNode(child, node);
+    }
+    else if (isPromiseLike(child)) {
+        child.then(result => appendChild(result, node));
     }
     else
         node.append(child);

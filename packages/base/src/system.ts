@@ -281,4 +281,8 @@ export function isArrayLike(obj: any): obj is ArrayLike<any> {
     return typeof obj === "object" && obj != null && typeof obj.length === "number" && typeof obj.nodeType !== "number";
 }
 
+export function isPromiseLike(obj: any): obj is PromiseLike<any> {
+    return obj instanceof Promise || ((typeof obj === "object" && obj != null && typeof obj.then === "function" && typeof obj.catch === "function"));
+}
+
 export {}
