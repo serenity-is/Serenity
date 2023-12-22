@@ -28,8 +28,7 @@
     }
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r jest",
-    "tsc": "pnpm -r --filter !*workspace-serenity tsc"
+    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r jest"
   },
   "private": true,
   "license": "MIT",
