@@ -190,20 +190,26 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         if (!constructors.Any())
         {
             var genericParams = type.GenericParameters?.Where(x => !string.IsNullOrEmpty(x.Default) ||
-                !string.IsNullOrEmpty(x.Extends));
-            var genericParam = genericParams?.FirstOrDefault(x => x.Name == "P") ??
-                genericParams?.FirstOrDefault(x => x.Name == "TOptions") ??
-                genericParams?.FirstOrDefault(x => x.Name == "TParams") ??
-                genericParams?.FirstOrDefault(x => x.Name != "TItem");
-
-            if (genericParam != null)
+                !string.IsNullOrEmpty(x.Extends))?.ToArray();
+            if (genericParams != null && genericParams.Length > 0)
             {
-                if (!string.IsNullOrEmpty(genericParam.Default))
-                    optionsType = GetScriptTypeFrom(type, genericParam.Default);
-                if (optionsType != null)
-                    return optionsType;
-                return !string.IsNullOrEmpty(genericParam.Extends) ?
-                    GetScriptTypeFrom(type, genericParam.Extends) : null;
+                ExternalGenericParameter genericParam = null;
+                foreach (var candidate in PropsParamCandidates)
+                {
+                    if ((genericParam = genericParams.FirstOrDefault(x => x.Name == candidate)) != null)
+                        break;
+                }
+                genericParam ??= genericParams?.FirstOrDefault(x => x.Name != "TItem");
+
+                if (genericParam != null)
+                {
+                    if (!string.IsNullOrEmpty(genericParam.Default))
+                        optionsType = GetScriptTypeFrom(type, genericParam.Default);
+                    if (optionsType != null)
+                        return optionsType;
+                    return !string.IsNullOrEmpty(genericParam.Extends) ?
+                        GetScriptTypeFrom(type, genericParam.Extends) : null;
+                }
             }
 
             if ((type = GetBaseType(type)) != null)
@@ -212,6 +218,8 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
         return null;
     }
+
+    static readonly string[] PropsParamCandidates = ["P", "Props", "TProps", "TOptions", "TParams"];
 
     private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
     {
