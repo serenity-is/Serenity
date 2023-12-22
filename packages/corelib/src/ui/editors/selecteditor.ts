@@ -4,7 +4,7 @@ import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
 export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.updateItems();

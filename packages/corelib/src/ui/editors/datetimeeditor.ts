@@ -16,7 +16,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     private lastSetValue: string;
     private lastSetValueGet: string;
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let input = this.element;

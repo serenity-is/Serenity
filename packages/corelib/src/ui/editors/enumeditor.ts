@@ -12,7 +12,7 @@ export interface EnumEditorOptions extends Select2CommonOptions {
 
 @Decorators.registerEditor('Serenity.EnumEditor')
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.updateItems();

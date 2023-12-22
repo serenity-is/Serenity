@@ -20,7 +20,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     private _instanceReady: boolean;
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let textArea = this.element;

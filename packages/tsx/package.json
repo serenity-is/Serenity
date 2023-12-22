@@ -35,7 +35,9 @@
   "repository": "https://github.com/serenity-is/serenity/packages/tsx",
   "scripts": {
     "build": "node build/build",
+    "jest": "jest",
     "test": "pnpm build && pnpm jest --coverage",
+    "tsc": "tsc",
     "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/tsx --json ./out/typedoc.json src"
   },
   "type": "module"

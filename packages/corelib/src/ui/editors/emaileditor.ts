@@ -12,7 +12,7 @@ export interface EmailEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
         let input = this.element;
         EmailEditor.registerValidationMethods();

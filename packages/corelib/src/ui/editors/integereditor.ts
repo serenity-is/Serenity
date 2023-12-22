@@ -15,7 +15,7 @@ export interface IntegerEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let input = this.element;

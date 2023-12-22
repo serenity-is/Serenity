@@ -29,7 +29,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     private byId: { [key: string]: TItem };
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.domNode.classList.add('s-CheckTreeEditor');

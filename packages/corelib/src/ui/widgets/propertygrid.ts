@@ -13,7 +13,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     private items: PropertyItem[];
     declare public readonly idPrefix: string;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         let div = this.element;

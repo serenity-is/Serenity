@@ -15,7 +15,7 @@ export interface FilterFieldSelectOptions {
 
 @Decorators.registerClass('Serenity.FilterFieldSelect')
 class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends Select2Editor<P, PropertyItem> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         for (var field of this.options.fields) {

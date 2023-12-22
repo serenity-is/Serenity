@@ -20,7 +20,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     private minValue: string;
     private maxValue: string;
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         var input = this.element;

@@ -23,7 +23,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     private fieldChanged: boolean;
     private timer: number;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         let input = this.element;

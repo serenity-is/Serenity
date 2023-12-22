@@ -7,7 +7,7 @@ import { EditorWidget, EditorProps } from "../widgets/widget";
 @Decorators.element("<input type=\"text\"/>")
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let input = this.element;

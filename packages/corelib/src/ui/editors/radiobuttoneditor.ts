@@ -16,7 +16,7 @@ export interface RadioButtonEditorOptions {
 export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P>
     implements IReadOnly {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         if (!this.options.enumKey &&

@@ -18,7 +18,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
 
     private minutes: JQuery;
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
         
         let input = this.element;

@@ -22,7 +22,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     public defaultColumns: string[];
     public done: () => void;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         new QuickSearchInput({
@@ -44,7 +44,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
     public static createToolButton(grid: IDataGrid): ToolButton {
         function onClick() {
-            var picker = new ColumnPickerDialog();
+            var picker = new ColumnPickerDialog({});
             picker.allColumns = (grid as any).allColumns;
             if ((grid as any).initialSettings) {
                 var initialSettings = (grid as any).initialSettings;

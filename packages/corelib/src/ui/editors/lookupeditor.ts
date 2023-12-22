@@ -14,7 +14,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
     private lookupChangeUnbind: any; 
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         if (!this.hasAsyncSource()) {
@@ -148,7 +148,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 @Decorators.registerEditor("Serenity.LookupEditor")
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
     
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
     }
 }

@@ -72,7 +72,7 @@ export interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 
 @Decorators.registerEditor('Serenity.PopupToolButton')
 export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.element.addClass('s-PopupToolButton');

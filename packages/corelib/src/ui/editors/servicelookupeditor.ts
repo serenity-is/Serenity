@@ -170,7 +170,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 
 @Decorators.registerEditor('Serenity.ServiceLookupEditor')
 export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions,TItem=any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
     }
 }

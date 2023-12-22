@@ -18,7 +18,7 @@ export class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends Ed
 
     private map: any;
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         // @ts-ignore

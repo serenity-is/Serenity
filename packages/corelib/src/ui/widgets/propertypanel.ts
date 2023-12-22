@@ -11,7 +11,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity: TItem;
     private _entityId: any;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.initPropertyGrid();

@@ -11,7 +11,7 @@ export interface TextAreaEditorOptions {
 @Decorators.element("<textarea />")
 export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
         let input = this.element;
         if (this.options.cols !== 0) {

@@ -112,7 +112,7 @@ export namespace Reporting {
 
     @Decorators.registerClass('Serenity.Reporting.ReportPage')
     export class ReportPage<P = {}> extends Widget<P> {
-        constructor(props?: WidgetProps<P>) {
+        constructor(props: WidgetProps<P>) {
             super(props);
 
             $('.report-link').click((e) => this.reportLinkClick(e as any));

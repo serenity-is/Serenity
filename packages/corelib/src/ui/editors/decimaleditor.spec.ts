@@ -16,7 +16,7 @@ describe("DecimalEditor", () => {
     });
 
     it("gets current value using autonumeric if exists", () => {
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
 
         ($.fn as any).autoNumeric = jest.fn().mockImplementationOnce((request) => {
             expect(request).toBe('get');
@@ -31,7 +31,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
         
         editor.element.val('543.21');
         expect(editor.value).toBe(543.21);
@@ -39,7 +39,7 @@ describe("DecimalEditor", () => {
 
 
     it("sets current value using autonumeric if exists", () => {
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
 
         ($.fn as any).autoNumeric = jest.fn().mockImplementationOnce((request, value) => {
             expect(request).toBe('set');
@@ -54,7 +54,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
         
         editor.value = 123.45;
 
@@ -66,7 +66,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
         
         editor.value = null;
         expect(editor.element.val()).toBe('');
@@ -80,7 +80,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
         
         editor.element.val('');
         expect(editor.get_isValid()).toBe(true);
@@ -93,7 +93,7 @@ describe("DecimalEditor", () => {
         Culture.groupSeparator = ",";
         ($.fn as any).autoNumeric = undefined;
 
-        var editor = new DecimalEditor();
+        var editor = new DecimalEditor({});
         
         editor.element.val('not valid');
         expect(editor.get_isValid()).toBe(false);

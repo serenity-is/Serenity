@@ -6,7 +6,7 @@ import { WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
         
         this.initValidator();

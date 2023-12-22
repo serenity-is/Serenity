@@ -6,7 +6,7 @@ import { Widget, WidgetProps } from "../widgets/widget";
 @Decorators.registerClass("Serenity.SlickPager")
 export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         let o = this.options;

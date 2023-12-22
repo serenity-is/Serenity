@@ -64,7 +64,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
         
         let hidden = this.element;
@@ -865,7 +865,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     protected createEditDialog(callback: (dlg: IEditDialog) => void) {
         var dialogTypeKey = this.getDialogTypeKey();
         var dialogType = DialogTypeRegistry.get(dialogTypeKey) as typeof Widget<{}>;
-        var dialog = new dialogType().init();
+        var dialog = new dialogType({}).init();
         callback?.(dialog as unknown as IEditDialog);
     }
 

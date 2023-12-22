@@ -7,7 +7,7 @@ import { FilterWidgetBase } from "./filterwidgetbase";
 @Decorators.registerClass('Serenity.FilterDisplayBar')
 export class FilterDisplayBar<P={}> extends FilterWidgetBase<P> {
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.element.find('.cap').text(

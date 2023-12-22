@@ -12,7 +12,7 @@ export interface RecaptchaOptions {
 @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
 @Decorators.element("<div/>")
 export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.element.addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);

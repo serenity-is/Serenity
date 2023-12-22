@@ -16,7 +16,7 @@ export interface DecimalEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let input = this.element;

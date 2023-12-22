@@ -5,7 +5,7 @@ import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 @Decorators.registerEditor('Serenity.DateYearEditor')
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         this.updateItems();

@@ -44,7 +44,7 @@ export class Widget<P = {}> {
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
 
-    constructor(props?: WidgetProps<P>) {
+    constructor(props: WidgetProps<P>) {
         if (isArrayLike(props)) {
             this.domNode = ensureParentOrFragment(props[0]);
             this.options = {} as any;
@@ -332,7 +332,7 @@ function handleElementProp(type: typeof Widget, props: WidgetProps<{}>): HTMLEle
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
-    constructor(props?: EditorProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
     }
 }
