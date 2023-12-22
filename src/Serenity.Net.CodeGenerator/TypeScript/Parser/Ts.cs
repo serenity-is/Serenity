@@ -167,7 +167,7 @@ public class Ts
             case SyntaxKind.ObjectBindingPattern:
             case SyntaxKind.ArrayBindingPattern:
 
-                return visitNodes(cbNodes, ((IBindingPattern) node).Elements);
+                return visitNodes(cbNodes, ((IBindingPattern)node).Elements);
             case SyntaxKind.ArrayLiteralExpression:
 
                 return visitNodes(cbNodes, (node as ArrayLiteralExpression)?.Elements);
@@ -583,6 +583,13 @@ public class Ts
 
         switch (node.Kind)
         {
+            case SyntaxKind.TypeParameter:
+                visitor((node as TypeParameterDeclaration)?.Name);
+                visitor((node as TypeParameterDeclaration)?.Constraint);
+                visitor((node as TypeParameterDeclaration)?.Default);
+                visitor((node as TypeParameterDeclaration)?.Expression);
+                break;
+
             case SyntaxKind.Parameter:
             case SyntaxKind.PropertyDeclaration:
             case SyntaxKind.PropertySignature:
@@ -592,7 +599,7 @@ public class Ts
                 visitor((node as IVariableLikeDeclaration)?.Name);
                 visitor((node as IVariableLikeDeclaration)?.Type);
                 break;
-            
+
             case SyntaxKind.MethodDeclaration:
             case SyntaxKind.MethodSignature:
             case SyntaxKind.Constructor:
@@ -606,33 +613,34 @@ public class Ts
 
             case SyntaxKind.TypeReference:
                 visitor((node as TypeReferenceNode)?.TypeName);
+                visitNodes((node as TypeReferenceNode)?.TypeArguments);
                 break;
 
             case SyntaxKind.PropertyAccessExpression:
                 visitor((node as PropertyAccessExpression)?.Expression);
                 visitor((node as PropertyAccessExpression)?.Name);
                 break;
-            
+
             case SyntaxKind.ElementAccessExpression:
             case SyntaxKind.CallExpression:
                 visitor((node as CallExpression)?.Expression);
                 visitNodes((node as CallExpression)?.TypeArguments);
                 visitNodes((node as CallExpression)?.Arguments);
                 break;
-            
+
             case SyntaxKind.Block:
             case SyntaxKind.ModuleBlock:
                 visitNodes((node as Block)?.Statements);
                 break;
-            
+
             case SyntaxKind.SourceFile:
                 visitNodes((node as SourceFile)?.Statements);
                 break;
-            
+
             case SyntaxKind.Decorator:
                 visitor((node as Decorator)?.Expression);
                 break;
-            
+
             case SyntaxKind.ClassDeclaration:
                 visitNodes(node.Decorators);
                 visitor((node as ClassDeclaration)?.Name);
@@ -640,7 +648,7 @@ public class Ts
                 visitNodes((node as ClassDeclaration)?.HeritageClauses);
                 visitNodes((node as ClassDeclaration)?.Members);
                 break;
-            
+
             case SyntaxKind.InterfaceDeclaration:
                 visitNodes(node.Decorators);
                 visitNodes(node.Modifiers);
@@ -692,26 +700,26 @@ public class Ts
             case SyntaxKind.NamespaceExportDeclaration:
                 visitor((node as NamespaceExportDeclaration)?.Name);
                 break;
-            
+
             case SyntaxKind.NamespaceImport:
                 visitor((node as NamespaceImport)?.Name);
                 break;
-            
+
             case SyntaxKind.NamedImports:
             case SyntaxKind.NamedExports:
-                if (node is NamedImports) 
+                if (node is NamedImports)
                     visitNodes((node as NamedImports)?.Elements);
-                else 
+                else
                     visitNodes((node as NamedExports)?.Elements);
                 break;
-            
+
             case SyntaxKind.ExportDeclaration:
                 visitNodes(node.Decorators);
                 visitNodes(node.Modifiers);
                 visitor((node as ExportDeclaration)?.ExportClause);
                 visitor((node as ExportDeclaration)?.ModuleSpecifier);
                 break;
-            
+
             case SyntaxKind.ImportSpecifier:
             case SyntaxKind.ExportSpecifier:
                 visitor((node as IImportOrExportSpecifier)?.PropertyName);

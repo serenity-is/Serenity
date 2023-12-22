@@ -199,7 +199,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                     if ((genericParam = genericParams.FirstOrDefault(x => x.Name == candidate)) != null)
                         break;
                 }
-                genericParam ??= genericParams?.FirstOrDefault(x => x.Name != "TItem");
+                genericParam ??= genericParams.FirstOrDefault(x => x.Name != "TItem");
 
                 if (genericParam != null)
                 {

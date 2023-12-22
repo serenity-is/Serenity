@@ -2968,8 +2968,8 @@ declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = Service
 }
 
 interface HtmlContentEditorOptions {
-    cols?: any;
-    rows?: any;
+    cols?: number;
+    rows?: number;
 }
 interface CKEditorConfig {
 }

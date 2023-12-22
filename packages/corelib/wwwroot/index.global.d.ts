@@ -4123,8 +4123,8 @@ declare namespace Serenity {
     }
 
     interface HtmlContentEditorOptions {
-        cols?: any;
-        rows?: any;
+        cols?: number;
+        rows?: number;
     }
     interface CKEditorConfig {
     }

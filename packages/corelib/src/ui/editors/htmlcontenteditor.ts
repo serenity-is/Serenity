@@ -6,8 +6,8 @@ import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
-    cols?: any;
-    rows?: any;
+    cols?: number;
+    rows?: number;
 }
 
 export interface CKEditorConfig {

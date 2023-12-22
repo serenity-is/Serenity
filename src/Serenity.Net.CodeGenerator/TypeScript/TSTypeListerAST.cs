@@ -364,7 +364,7 @@ public class TSTypeListerAST
         return result.Count == 0 ? null : result;
     }
 
-    static List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p) 
+    List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p) 
     {
         if (p == null || p.Count == 0)
             return null;
@@ -372,8 +372,8 @@ public class TSTypeListerAST
         return p.Select(k => new ExternalGenericParameter
         {
             Name = GetText(k.Name),
-            Default = GetText(k.Default),
-            Extends = k.Constraint is TypeReferenceNode trn ? GetText(trn.TypeName) : null
+            Default = GetTypeReferenceExpression(k.Default) ?? GetText(k.Default),
+            Extends = k.Constraint is TypeReferenceNode trn ? (GetTypeReferenceExpression(trn.TypeName) ?? GetText(trn.TypeName)) : null
         }).ToList();
     }
 
