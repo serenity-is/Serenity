@@ -7,7 +7,7 @@ import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
-import { Widget, WidgetProps } from "../widgets/widget";
+import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -29,7 +29,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     private byId: { [key: string]: TItem };
 
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.domNode.classList.add('s-CheckTreeEditor');
@@ -475,9 +475,9 @@ export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions =
 
     private searchText: string;
     private enableUpdateItems: boolean;
-    private lookupChangeUnbind: any; 
+    private lookupChangeUnbind: any;
 
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.enableUpdateItems = true;

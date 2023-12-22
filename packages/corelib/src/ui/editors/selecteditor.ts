@@ -1,10 +1,10 @@
 ﻿import { Decorators } from "../../decorators";
-import { WidgetProps } from "../widgets/widget";
+import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
 export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.updateItems();

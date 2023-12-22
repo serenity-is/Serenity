@@ -29,7 +29,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         let div = this.element;
         div.addClass('s-FileUploadEditor');
-        
+
         if (!this.options.originalNameProperty)
             div.addClass('hide-original-name');
 
@@ -271,7 +271,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
 export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         if (this.options.allowNonImage == null)
@@ -481,7 +481,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
 @Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
         this.element.addClass('s-MultipleImageUploadEditor');
     }

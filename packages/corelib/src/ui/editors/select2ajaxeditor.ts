@@ -3,7 +3,7 @@ import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { ServiceOptions, safeCast, serviceCall } from "../../q";
 import { ValidationHelper } from "../helpers/validationhelper";
-import { Widget, WidgetProps } from "../widgets/widget";
+import { EditorProps, Widget } from "../widgets/widget";
 import { WX } from "../widgets/wx";
 
 @Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
@@ -11,7 +11,7 @@ import { WX } from "../widgets/wx";
 export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number = 50;
 
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         let hidden = this.element;

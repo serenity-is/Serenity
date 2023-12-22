@@ -2,7 +2,7 @@ import { Enum, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { getAttributes } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { WidgetProps } from "../widgets/widget";
+import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 export interface EnumEditorOptions extends Select2CommonOptions {
@@ -12,7 +12,7 @@ export interface EnumEditorOptions extends Select2CommonOptions {
 
 @Decorators.registerEditor('Serenity.EnumEditor')
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.updateItems();

@@ -1,7 +1,7 @@
 ﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { ServiceOptions, serviceCall } from "../../q";
-import { WidgetProps } from "../widgets/widget";
+import { EditorProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -169,8 +169,8 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 }
 
 @Decorators.registerEditor('Serenity.ServiceLookupEditor')
-export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions,TItem=any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-    constructor(props: WidgetProps<P>) {
+export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    constructor(props: EditorProps<P>) {
         super(props);
     }
 }

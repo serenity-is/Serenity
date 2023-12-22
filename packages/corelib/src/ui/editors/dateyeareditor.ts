@@ -1,11 +1,11 @@
 ﻿import { Decorators } from "../../decorators";
-import { WidgetProps } from "../widgets/widget";
+import { EditorProps } from "../widgets/widget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
 @Decorators.registerEditor('Serenity.DateYearEditor')
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
 
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
 
         this.updateItems();

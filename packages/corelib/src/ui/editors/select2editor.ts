@@ -6,7 +6,7 @@ import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { Widget, WidgetProps } from "../widgets/widget";
+import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -64,9 +64,9 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(props: WidgetProps<P>) {
+    constructor(props: EditorProps<P>) {
         super(props);
-        
+
         let hidden = this.element;
 
         this._items = [];
@@ -82,7 +82,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         // for jquery validate to work
         hidden.on('change.' + this.uniqueName, (e: any, valueSet) => {
             if (valueSet !== true && hidden.closest('form').data('validator'))
-                    hidden.valid();
+                hidden.valid();
         });
 
         this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
@@ -234,7 +234,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 }
 
                 var isMultiple = this.isMultiple();
-                var idList = isMultiple ? (val as string).split(',') : [val as string]; 
+                var idList = isMultiple ? (val as string).split(',') : [val as string];
                 var searchQuery = {
                     idList: idList
                 }
@@ -463,8 +463,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             var isAsyncSource = false;
 
             if ((this._items || []).some((x: Select2Item) => {
-                    var text = getName ? getName(x.source) : x.text;
-                    return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
+                var text = getName ? getName(x.source) : x.text;
+                return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
 
@@ -500,7 +500,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
-        if(Array.isArray(val)) {
+        if (Array.isArray(val)) {
             this.set_values(val);
         }
         else {
