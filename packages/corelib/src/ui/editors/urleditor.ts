@@ -3,10 +3,11 @@ import { IStringValue } from "../../interfaces";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
-export class URLEditor<P={}> extends StringEditor<P> {
+export class URLEditor<P = {}> extends StringEditor<P> {
 
-    constructor(opt?: P) {
-        super(opt);
+    constructor(props: P) {
+        super(props);
+
         let input = this.element;
         input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
