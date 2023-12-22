@@ -153,9 +153,10 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             .SelectMany(x => x.Arguments.Where(x => !PossibleNodeArguments.Contains(x.Type)))
             .FirstOrDefault();
 
+        ExternalType optionsType = null;
         if (argument != null)
         {
-            var optionsType = GetScriptTypeFrom(type, argument.Type);
+            optionsType = GetScriptTypeFrom(type, argument.Type);
             if (!string.IsNullOrEmpty(argument.GenericArguments) &&
                 (argument.Type == "@serenity-is/corelib:WidgetProps" ||
                  argument.Type == "Serenity.WidgetProps" ||
@@ -186,8 +187,28 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             return optionsType;
         }
 
-        if (!constructors.Any() && (type = GetBaseType(type)) != null)
-            return GetOptionsTypeFor(type);
+        if (!constructors.Any())
+        {
+            var genericParams = type.GenericParameters?.Where(x => !string.IsNullOrEmpty(x.Default) ||
+                !string.IsNullOrEmpty(x.Extends));
+            var genericParam = genericParams?.FirstOrDefault(x => x.Name == "P") ??
+                genericParams?.FirstOrDefault(x => x.Name == "TOptions") ??
+                genericParams?.FirstOrDefault(x => x.Name == "TParams") ??
+                genericParams?.FirstOrDefault(x => x.Name != "TItem");
+
+            if (genericParam != null)
+            {
+                if (!string.IsNullOrEmpty(genericParam.Default))
+                    optionsType = GetScriptTypeFrom(type, genericParam.Default);
+                if (optionsType != null)
+                    return optionsType;
+                return !string.IsNullOrEmpty(genericParam.Extends) ?
+                    GetScriptTypeFrom(type, genericParam.Extends) : null;
+            }
+
+            if ((type = GetBaseType(type)) != null)
+                return GetOptionsTypeFor(type);
+        }
 
         return null;
     }
