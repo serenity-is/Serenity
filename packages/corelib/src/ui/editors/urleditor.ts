@@ -1,11 +1,12 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
+import { WidgetProps } from "../widgets/widget";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
 export class URLEditor<P = {}> extends StringEditor<P> {
 
-    constructor(props: P) {
+    constructor(props: WidgetProps<P>) {
         super(props);
 
         let input = this.element;
