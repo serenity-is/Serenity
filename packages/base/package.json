@@ -39,8 +39,10 @@
   "repository": "https://github.com/serenity-is/serenity/packages/base",
   "scripts": {
     "build": "rollup -c && node build/build",
-    "test": "pnpm build && pnpm jest --coverage",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/base --json ./out/typedoc.json src"
+    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/base --json ./out/typedoc.json src",
+    "jest": "jest",
+    "tsc": "tsc",    
+    "test": "pnpm build && jest --coverage"
   },
   "type": "module"
 }

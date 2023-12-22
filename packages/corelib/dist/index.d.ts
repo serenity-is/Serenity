@@ -2166,7 +2166,7 @@ declare class Widget<P = {}> {
     protected readonly uniqueName: string;
     readonly idPrefix: string;
     readonly domNode: HTMLElement;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     static createDefaultElement(): HTMLElement;
     /**
@@ -2203,7 +2203,7 @@ declare class Widget<P = {}> {
     protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 }
 declare class EditorWidget<P> extends Widget<EditorProps<P>> {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
 }
 
 declare global {
@@ -2250,7 +2250,7 @@ declare class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButton
 interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 }
 declare class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
 }
 interface ToolbarOptions {
     buttons?: ToolButton[];
@@ -2336,7 +2336,7 @@ interface ModalOptions {
 }
 
 declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected tabs: JQuery;
     protected toolbar: Toolbar;
@@ -2394,7 +2394,7 @@ declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> 
     private editors;
     private items;
     readonly idPrefix: string;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     private createItems;
     private createCategoryDiv;
@@ -2439,7 +2439,7 @@ interface PropertyGridOptions {
 declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity;
     private _entityId;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected initPropertyGrid(): void;
     protected loadInitialEntity(): void;
@@ -2529,7 +2529,7 @@ interface TextAreaEditorOptions {
     rows?: number;
 }
 declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
@@ -2551,7 +2551,7 @@ interface DecimalEditorOptions {
     allowNegatives?: boolean;
 }
 declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2566,7 +2566,7 @@ interface IntegerEditorOptions {
     allowNegatives?: boolean;
 }
 declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2583,7 +2583,7 @@ interface DateEditorOptions {
 declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get_value(): string;
     get value(): string;
     set_value(value: string): void;
@@ -2624,7 +2624,7 @@ declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpt
     private time;
     private lastSetValue;
     private lastSetValueGet;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     getFlatpickrOptions(): any;
     get_value(): string;
     get value(): string;
@@ -2669,7 +2669,7 @@ interface TimeEditorOptions {
 }
 declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
     private minutes;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get value(): number;
     protected get_value(): number;
     set value(value: number);
@@ -2683,7 +2683,7 @@ interface EmailEditorOptions {
     readOnlyDomain?: boolean;
 }
 declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     static registerValidationMethods(): void;
     get_value(): string;
     get value(): string;
@@ -2707,7 +2707,7 @@ interface RadioButtonEditorOptions {
     lookupKey?: string;
 }
 declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     protected addRadio(value: string, text: string): void;
     get_value(): string;
     get value(): string;
@@ -2758,7 +2758,7 @@ declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue
     private _items;
     private _itemById;
     protected lastCreateTerm: string;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
@@ -2862,7 +2862,7 @@ declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue
 declare function select2LocaleInitialization(): boolean;
 
 declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     getItems(): any[];
     protected emptyItemText(): string;
     updateItems(): void;
@@ -2873,7 +2873,7 @@ interface SelectEditorOptions extends Select2CommonOptions {
 }
 
 declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     getItems(): any[];
 }
 interface DateYearEditorOptions extends SelectEditorOptions {
@@ -2887,7 +2887,7 @@ interface EnumEditorOptions extends Select2CommonOptions {
     enumType?: any;
 }
 declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected updateItems(): void;
     protected allowClear(): boolean;
 }
@@ -2898,7 +2898,7 @@ interface LookupEditorOptions extends Select2EditorOptions {
 }
 declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
     private lookupChangeUnbind;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     hasAsyncSource(): boolean;
     destroy(): void;
     protected getLookupKey(): string;
@@ -2917,7 +2917,7 @@ declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ex
     protected editDialogDataChange(): void;
 }
 declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
 }
 
 interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -2951,7 +2951,7 @@ declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOpti
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
 }
 declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
 }
 
 interface HtmlContentEditorOptions {
@@ -2962,7 +2962,7 @@ interface CKEditorConfig {
 }
 declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private _instanceReady;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     protected instanceReady(x: any): void;
     protected getLanguage(): string;
     protected getConfig(): CKEditorConfig;
@@ -2987,7 +2987,7 @@ declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlC
 }
 
 declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
@@ -3003,7 +3003,7 @@ interface RecaptchaOptions {
     language?: string;
 }
 declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get_value(): string;
     set_value(value: string): void;
 }
@@ -3060,7 +3060,7 @@ interface FileUploadEditorOptions extends FileUploadConstraints {
 interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -3084,7 +3084,7 @@ declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdi
     protected hiddenInput: JQuery;
 }
 declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
 }
 declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     private entities;
@@ -3093,7 +3093,7 @@ declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileU
     private uploadInput;
     protected progress: JQuery;
     protected hiddenInput: JQuery;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -3112,7 +3112,7 @@ declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileU
     jsonEncodeValue: boolean;
 }
 declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
 }
 
 interface QuickFilterArgs<TWidget> {
@@ -3148,7 +3148,7 @@ interface QuickFilterBarOptions {
     idPrefix?: string;
 }
 declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     addSeparator(): void;
     add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
     addDateRange(field: string, title?: string): DateEditor;
@@ -3188,7 +3188,7 @@ declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchIn
     private field;
     private fieldChanged;
     private timer;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected checkIfValueChanged(): void;
     get_value(): string;
     get_field(): QuickSearchField;
@@ -3446,13 +3446,13 @@ declare class FilterDialog extends TemplatedDialog<any> {
 }
 
 declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected filterStoreChanged(): void;
     protected getTemplate(): string;
 }
 
 declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     _changePage(ctype: string): boolean;
     _updatePager(): void;
 }
@@ -3662,7 +3662,7 @@ declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IR
     static defaultPersistanceStorage: SettingStorage;
     static defaultColumnWidthScale: number;
     static defaultColumnWidthDelta: number;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected propertyItemsReady(itemsData: PropertyItemsData): void;
     protected afterInit(): void;
     protected useAsync(): boolean;
@@ -3800,7 +3800,7 @@ declare class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     visibleColumns: string[];
     defaultColumns: string[];
     done: () => void;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     static createToolButton(grid: IDataGrid): ToolButton;
     protected getDialogButtons(): {
         text: string;
@@ -3858,7 +3858,7 @@ interface CheckTreeItem<TSource> {
 }
 declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
     private byId;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected getIdProperty(): string;
     protected getTreeItems(): TItem[];
     protected updateItems(): void;
@@ -3949,7 +3949,7 @@ declare class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions 
 }
 
 declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected handleRoute(args: HandleRouteEventArgs): void;
     protected usePager(): boolean;
     protected createToolbarExtensions(): void;
@@ -4149,7 +4149,7 @@ declare namespace Reporting {
         Parameters?: any;
     }
     class ReportPage<P = {}> extends Widget<P> {
-        constructor(props?: WidgetProps<P>);
+        constructor(props: WidgetProps<P>);
         protected updateMatchFlags(text: string): void;
         protected categoryClick(e: Event): void;
         protected reportLinkClick(e: Event): void;
@@ -4211,13 +4211,13 @@ interface GoogleMapOptions {
 }
 declare class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorWidget<P> {
     private map;
-    constructor(props?: EditorProps<P>);
+    constructor(props: EditorProps<P>);
     get_map(): any;
 }
 
 declare class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number;
-    constructor(props?: WidgetProps<P>);
+    constructor(props: WidgetProps<P>);
     protected emptyItemText(): string;
     protected getService(): string;
     protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void;
