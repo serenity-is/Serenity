@@ -2,14 +2,15 @@
 import { Decorators } from "../../decorators";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { FilterPanel } from "./filterpanel";
+import { WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass('Serenity.FilterDialog')
-export class FilterDialog extends TemplatedDialog<any> {
+export class FilterDialog<P = {}> extends TemplatedDialog<P> {
 
     private filterPanel: FilterPanel;
 
-    constructor() {
-        super();
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.filterPanel = new FilterPanel({ element: this.byId('FilterPanel') });
         this.filterPanel.set_showInitialLine(true);

@@ -5,7 +5,7 @@ import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
 @Decorators.registerClass('Serenity.FilterDisplayBar')
-export class FilterDisplayBar<P={}> extends FilterWidgetBase<P> {
+export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -21,7 +21,7 @@ export class FilterDisplayBar<P={}> extends FilterWidgetBase<P> {
 
         var openFilterDialog = (e: Event) => {
             e.preventDefault();
-            var dialog = new FilterDialog();
+            var dialog = new FilterDialog({});
             dialog.get_filterPanel().set_store(this.get_store());
             dialog.dialogOpen(null);
         };
@@ -51,7 +51,7 @@ export class FilterDisplayBar<P={}> extends FilterWidgetBase<P> {
     }
 
     protected getTemplate() {
-        return "<div><a class='reset'></a><a class='edit'></a>" + 
+        return "<div><a class='reset'></a><a class='edit'></a>" +
             "<div class='current'><span class='cap'></span>" +
             "<a class='txt'></a></div></div>";
     }

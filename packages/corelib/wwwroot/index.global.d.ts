@@ -4602,9 +4602,9 @@ declare namespace Serenity {
         protected updateParens(): void;
     }
 
-    class FilterDialog extends TemplatedDialog<any> {
+    class FilterDialog<P = {}> extends TemplatedDialog<P> {
         private filterPanel;
-        constructor();
+        constructor(props: WidgetProps<P>);
         get_filterPanel(): FilterPanel;
         protected getTemplate(): string;
         protected getDialogButtons(): {
