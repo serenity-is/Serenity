@@ -6,15 +6,15 @@ export function bgColor(color: UtilityColor) {
 }
 
 export function textColor(color: TextColor): string {
-    return color ? "text-" + color : "";
+    return "text-" + color;
 }
 
 export function faIcon(key: faIconKey, color?: TextColor): string {
-    return "fa fa-" + key + textColor(color);
+    return "fa fa-" + key + (color ? " " + textColor(color) : "");
 }
 
 export function fabIcon(key: fabIconKey, color?: TextColor): string {
-    return "fab fa-" + key + textColor(color);
+    return "fab fa-" + key + (color ? " " + textColor(color) : "");
 }
 
 export type KnownIconClass = `fa fa-${faIconKey}` | `fab fa-${fabIconKey}`;
