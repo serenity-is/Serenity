@@ -28,6 +28,7 @@ export * from "./dialogs";
 export * from "./scriptdata";
 export * from "./formatting";
 export * from "./html";
+export * from "./icons";
 export * from "./localtext";
 export * from "./lookup";
 export * from "./notify";

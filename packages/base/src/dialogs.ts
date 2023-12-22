@@ -1,5 +1,6 @@
 ﻿import { Config } from "./config";
 import { htmlEncode, toggleClass } from "./html";
+import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
 import { isArrayLike } from "./system";
 
@@ -12,7 +13,7 @@ export interface DialogButton {
     /** Button hint */
     hint?: string;
     /** Button icon */
-    icon?: string;
+    icon?: IconClassName;
     /** Click handler */
     click?: (e: MouseEvent) => void;
     /** CSS class for button */
@@ -52,16 +53,6 @@ export interface CommonDialogOptions {
 // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
 if (typeof jQuery !== "undefined" && (jQuery.fn as any)?.button?.noConflict && (jQuery as any).ui?.button) {
     (jQuery.fn as any).btn = (jQuery as any).fn.button.noConflict();
-}
-
-function toIconClass(icon: string): string {
-    if (!icon)
-        return null;
-    if (icon.startsWith('fa-'))
-        return 'fa ' + icon;
-    if (icon.startsWith('glyphicon-'))
-        return 'glyphicon ' + icon;
-    return icon;
 }
 
 function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialogClass: string) {
@@ -192,7 +183,7 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
 */
 export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    let iconClass = toIconClass(x.icon);
+    let iconClass = iconClassName(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     let button = document.createElement("button");
@@ -211,7 +202,7 @@ export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
  */
 export function dialogButtonToUI(x: DialogButton): any {
     let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    let iconClass = toIconClass(x.icon);
+    let iconClass = iconClassName(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
     let button = {

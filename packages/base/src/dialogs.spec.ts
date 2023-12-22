@@ -911,20 +911,6 @@ describe("dialogButtonToBS", () => {
         expect(i).toBeNull();
     });
 
-    it("adds 'glyphicon' class when icon starts with 'glyphicon-'", async function () {
-        mockBS5PlusWithUndefinedJQuery();
-        const dialogs = await import("./dialogs");
-        let button = dialogs.dialogButtonToBS({
-            result: "ok",
-            icon: 'glyphicon-test',
-            text: "ok"
-        });
-        expect(button != null).toBe(true);
-        let i = button.querySelector("i");
-        expect(i.classList.contains("glyphicon-test")).toBe(true);
-        expect(i.classList.contains("glyphicon")).toBe(true);
-    });
-
     it("returns other icon classes as is", async function () {
         mockBS5PlusWithUndefinedJQuery();
         const dialogs = await import("./dialogs");

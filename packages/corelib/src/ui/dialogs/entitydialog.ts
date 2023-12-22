@@ -1,4 +1,4 @@
-﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ServiceOptions, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, serviceCall, validatorAbortHandler } from "../../q";
@@ -883,7 +883,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             title: localText('Controls.EntityDialog.SaveButton'),
             action: 'save-and-close',
             cssClass: 'save-and-close-button',
-            icon: 'fa-check-circle text-purple',
+            icon: faIcon("check-circle", "purple"),
             hotkey: 'alt+s',
             onClick: () => {
                 this.save(response => {
@@ -899,7 +899,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             hint: localText('Controls.EntityDialog.ApplyChangesButton'),
             action: 'apply-changes',
             cssClass: 'apply-changes-button',
-            icon: 'fa-clipboard-check text-purple',
+            icon: faIcon("clipboard-check", "purple"),
             hotkey: 'alt+a',
             onClick: () => {
                 this.save(response1 => {
@@ -925,7 +925,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         list.push({
             title: localText('Controls.EntityDialog.DeleteButton'),
             cssClass: 'delete-button',
-            icon: 'fa-trash-o text-red',
+            icon: faIcon("trash-o", "danger"),
             hotkey: 'alt+x',
             onClick: () => {
                 confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'), () => {
@@ -956,7 +956,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                 title: localText('Controls.EntityDialog.EditButton'),
                 action: 'delete',
                 cssClass: 'edit-button',
-                icon: 'fa-edit',
+                icon: faIcon("edit"),
                 onClick: () => {
                     if (!this.isEditMode())
                         return;
@@ -981,7 +981,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             title: localText('Controls.EntityDialog.CloneButton'),
             action: 'clone',
             cssClass: 'clone-button',
-            icon: 'fa-clone',
+            icon: faIcon("clone"),
             onClick: () => {
                 if (!this.isEditMode())
                     return;

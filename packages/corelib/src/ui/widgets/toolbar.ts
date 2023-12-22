@@ -1,4 +1,4 @@
-﻿import { htmlEncode } from "@serenity-is/base";
+﻿import { IconClassName, htmlEncode, iconClassName } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { Widget, WidgetProps } from "./widget";
 
@@ -7,7 +7,7 @@ export interface ToolButton {
     title?: string;
     hint?: string;
     cssClass?: string;
-    icon?: string;
+    icon?: IconClassName;
     onClick?: any;
     htmlEncode?: any;
     hotkey?: string;
@@ -90,7 +90,7 @@ export interface ToolbarOptions {
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
-        
+
         this.element.addClass('s-Toolbar clearfix')
             .html('<div class="tool-buttons"><div class="buttons-outer">' +
                 '<div class="buttons-inner"></div></div></div>');
@@ -166,14 +166,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
         if (b.icon) {
             btn.addClass('icon-tool-button');
-            var klass = b.icon;
-            if (klass.startsWith('fa-')) {
-                klass = 'fa ' + klass;
-            }
-            else if (klass.startsWith('glyphicon-')) {
-                klass = 'glyphicon ' + klass;
-            }
-            text = "<i class='" + htmlEncode(klass) + "'></i> " + text;
+            text = "<i class='" + htmlEncode(iconClassName(b.icon)) + "'></i> " + text;
         }
         if (text == null || text.length === 0) {
             btn.addClass('no-text');

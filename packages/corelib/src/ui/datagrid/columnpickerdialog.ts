@@ -1,4 +1,4 @@
-﻿import { Culture, DialogTexts, htmlEncode, localText } from "@serenity-is/base";
+﻿import { Culture, DialogTexts, faIcon, htmlEncode, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { Authorization, Router, centerDialog } from "../../q";
@@ -73,7 +73,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
             hint: localText("Controls.ColumnPickerDialog.Title"),
             action: 'column-picker',
             cssClass: "column-picker-button",
-            icon: 'fa-th-list text-blue',
+            icon: faIcon("th-list", "blue"),
             onClick: onClick
         }
     }
@@ -168,9 +168,9 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         return $(`
 <li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
 <span class="drag-handle">☰</span>
-${ htmlEncode(this.getTitle(col)) }
-${ allowHide ? `<i class="js-hide fa fa-eye-slash" title="${htmlEncode(localText("Controls.ColumnPickerDialog.HideHint"))}"></i>` : '' }
-<i class="js-show fa fa-eye" title="${ htmlEncode(localText("Controls.ColumnPickerDialog.ShowHint")) }"></i>
+${htmlEncode(this.getTitle(col))}
+${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(localText("Controls.ColumnPickerDialog.HideHint"))}"></i>` : ''}
+<i class="js-show ${faIcon("eye")} title="${htmlEncode(localText("Controls.ColumnPickerDialog.ShowHint"))}"></i>
 </li>`);
     }
 
@@ -269,15 +269,14 @@ ${ allowHide ? `<i class="js-hide fa fa-eye-slash" title="${htmlEncode(localText
     }
 
     protected getTemplate() {
-        return `
-<div class="search"><input id="~_Search" type="text" disabled /></div>
+        return `<div class="search"><input id="~_Search" type="text" disabled /></div>
 <div class="columns-container">
 <div class="column-list visible-list bg-success">
-<h5><i class="fa fa-eye"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.VisibleColumns"))}</h5>
+<h5><i class="${faIcon("eye")}"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.VisibleColumns"))}</h5>
 <ul id="~_VisibleCols"></ul>
 </div>
 <div class="column-list hidden-list bg-info">
-<h5><i class="fa fa-eye-slash"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.HiddenColumns"))}</h5>
+<h5><i class="${faIcon("eye-slash")}"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.HiddenColumns"))}</h5>
 <ul id="~_HiddenCols"></ul>
 </div>
 </div>`;

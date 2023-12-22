@@ -1,4 +1,4 @@
-﻿import { Culture, getTypeShortName, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, faIcon, getTypeShortName, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
 import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
@@ -181,12 +181,11 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             categoryDiv.addClass(((collapsed === true) ?
                 'collapsible collapsed' : 'collapsible'));
 
-            var img = $('<i/>').addClass(((collapsed === true) ?
-                'fa fa-plus' : 'fa fa-minus')).appendTo(title);
+            var img = $('<i/>').addClass(faIcon((collapsed === true) ? "plus" : "minus")).appendTo(title);
 
             title.click(function (e) {
                 categoryDiv.toggleClass('collapsed');
-                img.toggleClass('fa-plus').toggleClass('fa-minus');
+                img.toggleClass(faIcon("plus")).toggleClass(faIcon("minus"));
             });
         }
 

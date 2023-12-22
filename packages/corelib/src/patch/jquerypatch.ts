@@ -1,4 +1,4 @@
-﻿import { getInstanceType, getTypeFullName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
+﻿import { faIcon, getInstanceType, getTypeFullName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
 import { isMobileView } from "../q";
 
 function applyGetWidgetExtensions(jQuery: any, widgetType: { getWidgetName(type: any): string }) {
@@ -81,7 +81,7 @@ function applyJQueryUIFixes(jQuery: any): boolean {
     (function (orig) {
         jQuery.ui.dialog.prototype._createTitlebar = function () {
             orig.call(this);
-            this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html('<i class="fa fa-times" />');
+            this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html(`<i class="${faIcon("times")}" />`);
         }
     })(jQuery.ui.dialog.prototype._createTitlebar);
 }

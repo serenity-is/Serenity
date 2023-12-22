@@ -6606,7 +6606,7 @@ readers do not read off random characters that represent icons */
 }
 
 .fa.fa-trash:before {
-    content: "\f2ed";
+    content: "\f1f8";
 }
 
 .fa.fa-eyedropper:before {

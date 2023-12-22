@@ -1,5 +1,5 @@
 ﻿import sQuery from "@optionaldeps/squery";
-import { getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+import { faIcon, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
 import { Authorization, HandleRouteEventArgs, Router, replaceAll, safeCast } from "../../q";
@@ -161,7 +161,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             title: this.getAddButtonCaption(),
             action: 'add',
             cssClass: 'add-button',
-            icon: 'fa-plus-circle text-green',
+            icon: faIcon("plus-circle", "green"),
             hotkey: 'alt+n',
             onClick: () => {
                 this.addButtonClick();
@@ -179,7 +179,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return {
             title: (noText ? null : localText('Controls.EntityGrid.RefreshButton')),
             hint: (noText ? localText('Controls.EntityGrid.RefreshButton') : null),
-            icon: 'fa-refresh text-blue',
+            icon: faIcon("refresh", "blue"),
             action: 'refresh',
             cssClass: 'refresh-button',
             onClick: () => {

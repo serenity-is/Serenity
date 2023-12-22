@@ -1,4 +1,4 @@
-﻿import { Culture, DialogTexts, Enum, formatDate, formatNumber, getTypeFullName, htmlEncode, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { ISlickFormatter, getAttributes, replaceAll } from "../../q";
@@ -139,10 +139,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         var text = stringFormat((this.displayFormat ?? '{0}'),
             originalName, dbFile, downloadUrl);
 
-        var iconClass = this.iconClass ?? "fa fa-download";
-
-        if (iconClass.startsWith("fa-"))
-            iconClass = "fa " + iconClass;
+        var iconClass = iconClassName(this.iconClass ?? faIcon("download"));
 
         return "<a class='file-download-link' target='_blank' href='" +
             htmlEncode(downloadUrl) + "'><i class='" + iconClass + "'></i> " + htmlEncode(text) + '</a>';
