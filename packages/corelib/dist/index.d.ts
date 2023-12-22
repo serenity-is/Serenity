@@ -2706,12 +2706,12 @@ declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> ext
     set_readOnly(value: boolean): void;
 }
 
-declare class EmailAddressEditor<TOptions = {}> extends StringEditor<TOptions> {
-    constructor(opt?: TOptions);
+declare class EmailAddressEditor<P = {}> extends StringEditor<P> {
+    constructor(props: EditorProps<P>);
 }
 
 declare class URLEditor<P = {}> extends StringEditor<P> {
-    constructor(opt?: P);
+    constructor(props: EditorProps<P>);
 }
 
 interface RadioButtonEditorOptions {
@@ -2771,7 +2771,7 @@ declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue
     private _items;
     private _itemById;
     protected lastCreateTerm: string;
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     destroy(): void;
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
@@ -2875,7 +2875,7 @@ declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue
 declare function select2LocaleInitialization(): boolean;
 
 declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     getItems(): any[];
     protected emptyItemText(): string;
     updateItems(): void;
@@ -2886,7 +2886,7 @@ interface SelectEditorOptions extends Select2CommonOptions {
 }
 
 declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     getItems(): any[];
 }
 interface DateYearEditorOptions extends SelectEditorOptions {
@@ -2900,7 +2900,7 @@ interface EnumEditorOptions extends Select2CommonOptions {
     enumType?: any;
 }
 declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     protected updateItems(): void;
     protected allowClear(): boolean;
 }
@@ -2964,7 +2964,7 @@ declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOpti
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
 }
 declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
 }
 
 interface HtmlContentEditorOptions {
@@ -3097,7 +3097,7 @@ declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdi
     protected hiddenInput: JQuery;
 }
 declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
 }
 declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     private entities;
@@ -3125,7 +3125,7 @@ declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileU
     jsonEncodeValue: boolean;
 }
 declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
 }
 
 interface QuickFilterArgs<TWidget> {
@@ -3871,7 +3871,7 @@ interface CheckTreeItem<TSource> {
 }
 declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
     private byId;
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     protected getIdProperty(): string;
     protected getTreeItems(): TItem[];
     protected updateItems(): void;
@@ -3923,7 +3923,7 @@ declare class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions 
     private searchText;
     private enableUpdateItems;
     private lookupChangeUnbind;
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     destroy(): void;
     protected updateItems(): void;
     protected getLookupKey(): string;
@@ -4230,7 +4230,7 @@ declare class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends E
 
 declare class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number;
-    constructor(props: WidgetProps<P>);
+    constructor(props: EditorProps<P>);
     protected emptyItemText(): string;
     protected getService(): string;
     protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void;
