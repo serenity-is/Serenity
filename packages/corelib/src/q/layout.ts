@@ -1,9 +1,61 @@
 ﻿import sQuery from "@optionaldeps/squery";
 import { Config, getGlobalObject, getNested, isArrayLike } from "@serenity-is/base";
+import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
 import { initializeTypes } from "./system-compat";
-   
+
+function initWidgetPage<TWidget extends Widget<P>, P>(widgetOrType: (CreateWidgetParams<TWidget, P>["type"]) | TWidget,
+    props?: WidgetProps<P>, defaultElement?: string, noRoute?: boolean): TWidget {
+    let widget: TWidget;
+
+    if ((widgetOrType as Widget)?.domNode) {
+        if (props && typeof props.element === "function") {
+            props.element((widgetOrType as Widget).domNode);
+        }
+        widget = widgetOrType as TWidget;
+    }
+    else {
+        props ??= {} as any;
+        let oldFunction: (el: HTMLElement) => void;
+        if (defaultElement) {
+            if (typeof props.element === "function") {
+                oldFunction = props.element;
+                props.element = defaultElement;
+            }
+            else {
+                props.element ??= defaultElement;
+            }
+        }
+
+        widget = new (widgetOrType as CreateWidgetParams<TWidget, P>["type"])(props) as TWidget
+        oldFunction?.(widget.domNode);
+        widget.init();
+    }
+    initFullHeightGridPage(widget.domNode, { setHeight: false, noRoute: noRoute });
+    return widget;
+}
+
+export function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: { type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P> }) {
+    return initWidgetPage(type, props, "#GridDiv").domNode;
+}
+
+export function PanelPageInit<TPanel extends Widget<P>, P>({ type, props }: { type: CreateWidgetParams<TPanel, P>["type"], props?: WidgetProps<P> }) {
+    return initWidgetPage(type, props, "#Panel", false).domNode;
+}
+
+export function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & { domNode: HTMLElement }): TGrid;
+export function gridPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
+export function gridPageInit<TGrid extends Widget<P>, P>(gridOrType: (CreateWidgetParams<TGrid, P>["type"]) | TGrid, props?: WidgetProps<P>): TGrid {
+    return initWidgetPage(gridOrType, props, "#GridDiv");
+}
+
+export function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & { domNode: HTMLElement }): TGrid;
+export function panelPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
+export function panelPageInit<TGrid extends Widget<P>, P>(panelOrType: (CreateWidgetParams<TGrid, P>["type"]) | TGrid, props?: WidgetProps<P>): TGrid {
+    return initWidgetPage(panelOrType, props, "#PanelDiv", true);
+}
+
 export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | { domNode: HTMLElement }, opt?: { noRoute?: boolean, setHeight?: boolean }) {
     var el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.domNode;
     document.documentElement.classList.add('full-height-page');
@@ -34,12 +86,12 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
         sQuery('body').off('layout', layout);
     });
 
-    if (!opt?.noRoute && 
+    if (!opt?.noRoute &&
         typeof document !== "undefined" &&
         !document.body?.getAttribute?.('data-fhrouteinit')) {
-            document.body?.setAttribute?.('data-fhrouteinit', 'true');
-            // ugly, but to it is to make old pages work without having to add this
-            typeof Router !== "undefined" && Router.resolve?.();
+        document.body?.setAttribute?.('data-fhrouteinit', 'true');
+        // ugly, but to it is to make old pages work without having to add this
+        typeof Router !== "undefined" && Router.resolve?.();
     }
 }
 
@@ -69,7 +121,7 @@ export function layoutFillHeight(element: JQuery) {
 export function isMobileView() {
     return typeof window !== 'undefined' &&
         (window.matchMedia?.('(max-width: 767px)')?.matches ??
-         window.innerWidth < 768);
+            window.innerWidth < 768);
 }
 
 function initOnLoad() {

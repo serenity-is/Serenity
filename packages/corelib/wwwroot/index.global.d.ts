@@ -2632,6 +2632,93 @@ declare namespace Serenity {
      */
     function appendChild(child: any, node: HTMLElement): void;
 
+    type NoInfer<T> = [T][T extends any ? 0 : never];
+    type WidgetProps<P> = {
+        id?: string;
+        class?: string;
+        element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
+    } & NoInfer<P>;
+    type EditorProps<T> = WidgetProps<T> & {
+        initialValue?: any;
+        maxLength?: number;
+        name?: string;
+        placeholder?: string;
+        required?: boolean;
+        readOnly?: boolean;
+    };
+    interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+        type?: {
+            new (options?: P): TWidget;
+            prototype: TWidget;
+        };
+        options?: P & WidgetProps<{}>;
+        container?: HTMLElement | ArrayLike<HTMLElement>;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+    }
+    class Widget<P = {}> {
+        private static nextWidgetNumber;
+        protected readonly options: WidgetProps<P>;
+        protected readonly widgetName: string;
+        protected readonly uniqueName: string;
+        readonly idPrefix: string;
+        readonly domNode: HTMLElement;
+        constructor(props: WidgetProps<P>);
+        destroy(): void;
+        static createDefaultElement(): HTMLElement;
+        /**
+         * @deprecated
+         * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+         */
+        get element(): JQuery;
+        protected addCssClass(): void;
+        protected getCssClass(): string;
+        static getWidgetName(type: Function): string;
+        /**
+         * @deprecated Prefer WidgetType.createDefaultElement
+         */
+        static elementFor(editorType: typeof Widget): JQuery;
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getFieldElement(): HTMLElement;
+        getGridField(): JQuery;
+        change(handler: (e: Event) => void): void;
+        changeSelect2(handler: (e: Event) => void): void;
+        protected static defaultTagName: string;
+        static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
+        private setElementProps;
+        protected internalInit(): void;
+        init(): this;
+        /**
+         * Returns the main element for this widget or the document fragment.
+         * As widgets may get their elements from props unlike regular JSX widgets,
+         * this method should not be overridden. Override renderContents() instead.
+         */
+        render(): HTMLElement | DocumentFragment;
+        protected internalRenderContents(): void;
+        protected renderContents(): any | void;
+        get props(): WidgetProps<P>;
+        protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
+    }
+    class EditorWidget<P> extends Widget<EditorProps<P>> {
+        constructor(props: EditorProps<P>);
+    }
+
+    function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
+        type: CreateWidgetParams<TGrid, P>["type"];
+        props?: WidgetProps<P>;
+    }): HTMLElement;
+    function PanelPageInit<TPanel extends Widget<P>, P>({ type, props }: {
+        type: CreateWidgetParams<TPanel, P>["type"];
+        props?: WidgetProps<P>;
+    }): HTMLElement;
+    function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & {
+        domNode: HTMLElement;
+    }): TGrid;
+    function gridPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
+    function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & {
+        domNode: HTMLElement;
+    }): TGrid;
+    function panelPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
     function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | {
         domNode: HTMLElement;
     }, opt?: {
@@ -3317,77 +3404,6 @@ declare namespace Serenity {
         w<TWidget>(id: string, type: {
             new (...args: any[]): TWidget;
         }): TWidget;
-    }
-
-    type NoInfer<T> = [T][T extends any ? 0 : never];
-    type WidgetProps<P> = {
-        id?: string;
-        class?: string;
-        element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
-    } & NoInfer<P>;
-    type EditorProps<T> = WidgetProps<T> & {
-        initialValue?: any;
-        maxLength?: number;
-        name?: string;
-        placeholder?: string;
-        required?: boolean;
-        readOnly?: boolean;
-    };
-    interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-        type?: {
-            new (options?: P): TWidget;
-            prototype: TWidget;
-        };
-        options?: P & WidgetProps<{}>;
-        container?: HTMLElement | ArrayLike<HTMLElement>;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-    }
-    class Widget<P = {}> {
-        private static nextWidgetNumber;
-        protected readonly options: WidgetProps<P>;
-        protected readonly widgetName: string;
-        protected readonly uniqueName: string;
-        readonly idPrefix: string;
-        readonly domNode: HTMLElement;
-        constructor(props: WidgetProps<P>);
-        destroy(): void;
-        static createDefaultElement(): HTMLElement;
-        /**
-         * @deprecated
-         * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
-         */
-        get element(): JQuery;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        static getWidgetName(type: Function): string;
-        /**
-         * @deprecated Prefer WidgetType.createDefaultElement
-         */
-        static elementFor(editorType: typeof Widget): JQuery;
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getFieldElement(): HTMLElement;
-        getGridField(): JQuery;
-        change(handler: (e: Event) => void): void;
-        changeSelect2(handler: (e: Event) => void): void;
-        protected static defaultTagName: string;
-        static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
-        private setElementProps;
-        protected internalInit(): void;
-        init(): this;
-        /**
-         * Returns the main element for this widget or the document fragment.
-         * As widgets may get their elements from props unlike regular JSX widgets,
-         * this method should not be overridden. Override renderContents() instead.
-         */
-        render(): HTMLElement | DocumentFragment;
-        protected internalRenderContents(): void;
-        protected renderContents(): any | void;
-        get props(): WidgetProps<P>;
-        protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
-    }
-    class EditorWidget<P> extends Widget<EditorProps<P>> {
-        constructor(props: EditorProps<P>);
     }
 
     interface ToolButton {
