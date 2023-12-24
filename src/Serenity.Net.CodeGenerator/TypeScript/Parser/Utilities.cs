@@ -139,7 +139,7 @@ public class Utilities
             foreach (var modifier in node.Modifiers)
                 flags |= ModifierToFlag(modifier.Kind);
         if ((node.Flags & NodeFlags.NestedNamespace) != 0 || node.Kind == SyntaxKind.Identifier &&
-            ((Identifier) node).IsInJsDocNamespace)
+            ((Identifier)node).IsInJsDocNamespace)
             flags |= ModifierFlags.Export;
 
 
@@ -148,6 +148,18 @@ public class Utilities
         return flags;
     }
 
+    public static ModifierFlags ModifiersToFlags(IEnumerable<Modifier> modifiers)
+    {
+        var flags = ModifierFlags.None;
+        if (modifiers != null)
+        {
+            foreach (var modifier in modifiers)
+            {
+                flags |= ModifierToFlag(modifier.Kind);
+            }
+        }
+        return flags;
+    }
 
     public static ModifierFlags ModifierToFlag(SyntaxKind token)
     {

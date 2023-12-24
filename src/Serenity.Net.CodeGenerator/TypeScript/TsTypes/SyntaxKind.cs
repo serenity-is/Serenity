@@ -8,26 +8,26 @@ public enum SyntaxKind
     MultiLineCommentTrivia,
     NewLineTrivia,
     WhitespaceTrivia,
-
     // We detect and preserve #! on the first line
     ShebangTrivia,
-
     // We detect and provide better error recovery when we encounter a git merge marker.  This
     // allows us to edit files with git-conflict markers in them in a much more pleasant manner.
     ConflictMarkerTrivia,
-
+    // If a file is actually binary, with any luck, we'll get U+FFFD REPLACEMENT CHARACTER
+    // in position zero and can just skip what is surely a doomed parse.
+    NonTextFileMarkerTrivia,
     // Literals
     NumericLiteral,
+    BigIntLiteral,
     StringLiteral,
     JsxText,
+    JsxTextAllWhiteSpaces,
     RegularExpressionLiteral,
     NoSubstitutionTemplateLiteral,
-
     // Pseudo-literals
     TemplateHead,
     TemplateMiddle,
     TemplateTail,
-
     // Punctuation
     OpenBraceToken,
     CloseBraceToken,
@@ -39,6 +39,7 @@ public enum SyntaxKind
     DotDotDotToken,
     SemicolonToken,
     CommaToken,
+    QuestionDotToken,
     LessThanToken,
     LessThanSlashToken,
     GreaterThanToken,
@@ -70,7 +71,11 @@ public enum SyntaxKind
     QuestionToken,
     ColonToken,
     AtToken,
-
+    QuestionQuestionToken,
+    /** Only the JSDoc scanner produces BacktickToken. The normal scanner produces NoSubstitutionTemplateLiteral and related kinds. */
+    BacktickToken,
+    /** Only the JSDoc scanner produces HashToken. The normal scanner produces PrivateIdentifier. */
+    HashToken,
     // Assignments
     EqualsToken,
     PlusEqualsToken,
@@ -84,11 +89,18 @@ public enum SyntaxKind
     GreaterThanGreaterThanGreaterThanEqualsToken,
     AmpersandEqualsToken,
     BarEqualsToken,
+    BarBarEqualsToken,
+    AmpersandAmpersandEqualsToken,
+    QuestionQuestionEqualsToken,
     CaretEqualsToken,
-
-    // Identifiers
+    // Identifiers and PrivateIdentifiers
     Identifier,
-
+    PrivateIdentifier,
+    /**
+     * Only the special JSDoc comment text scanner produces JSDocCommentTextTokes. One of these tokens spans all text after a tag comment's start and before the next @
+     * @internal
+     */
+    JSDocCommentTextToken,
     // Reserved words
     BreakKeyword,
     CaseKeyword,
@@ -126,7 +138,6 @@ public enum SyntaxKind
     VoidKeyword,
     WhileKeyword,
     WithKeyword,
-
     // Strict mode reserved words
     ImplementsKeyword,
     InterfaceKeyword,
@@ -137,10 +148,12 @@ public enum SyntaxKind
     PublicKeyword,
     StaticKeyword,
     YieldKeyword,
-
     // Contextual keywords
     AbstractKeyword,
+    AccessorKeyword,
     AsKeyword,
+    AssertsKeyword,
+    AssertKeyword,
     AnyKeyword,
     AsyncKeyword,
     AwaitKeyword,
@@ -148,47 +161,54 @@ public enum SyntaxKind
     ConstructorKeyword,
     DeclareKeyword,
     GetKeyword,
+    InferKeyword,
+    IntrinsicKeyword,
     IsKeyword,
     KeyOfKeyword,
     ModuleKeyword,
     NamespaceKeyword,
     NeverKeyword,
+    OutKeyword,
     ReadonlyKeyword,
     RequireKeyword,
     NumberKeyword,
     ObjectKeyword,
+    SatisfiesKeyword,
     SetKeyword,
     StringKeyword,
     SymbolKeyword,
     TypeKeyword,
     UndefinedKeyword,
+    UniqueKeyword,
+    UnknownKeyword,
+    UsingKeyword,
     FromKeyword,
     GlobalKeyword,
-    OfKeyword, // LastKeyword and LastToken
+    BigIntKeyword,
+    OverrideKeyword,
+    OfKeyword, // LastKeyword and LastToken and LastContextualKeyword
 
     // Parse tree nodes
 
     // Names
     QualifiedName,
     ComputedPropertyName,
-
     // Signature elements
     TypeParameter,
     Parameter,
     Decorator,
-
     // TypeMember
     PropertySignature,
     PropertyDeclaration,
     MethodSignature,
     MethodDeclaration,
+    ClassStaticBlockDeclaration,
     Constructor,
     GetAccessor,
     SetAccessor,
     CallSignature,
     ConstructSignature,
     IndexSignature,
-
     // Type
     TypePredicate,
     TypeReference,
@@ -198,20 +218,26 @@ public enum SyntaxKind
     TypeLiteral,
     ArrayType,
     TupleType,
+    OptionalType,
+    RestType,
     UnionType,
     IntersectionType,
+    ConditionalType,
+    InferType,
     ParenthesizedType,
     ThisType,
     TypeOperator,
     IndexedAccessType,
     MappedType,
     LiteralType,
-
+    NamedTupleMember,
+    TemplateLiteralType,
+    TemplateLiteralTypeSpan,
+    ImportType,
     // Binding patterns
     ObjectBindingPattern,
     ArrayBindingPattern,
     BindingElement,
-
     // Expression
     ArrayLiteralExpression,
     ObjectLiteralExpression,
@@ -241,15 +267,16 @@ public enum SyntaxKind
     AsExpression,
     NonNullExpression,
     MetaProperty,
+    SyntheticExpression,
+    SatisfiesExpression,
 
     // Misc
     TemplateSpan,
     SemicolonClassElement,
-
     // Element
     Block,
-    VariableStatement,
     EmptyStatement,
+    VariableStatement,
     ExpressionStatement,
     IfStatement,
     DoStatement,
@@ -286,6 +313,7 @@ public enum SyntaxKind
     ExportAssignment,
     ExportDeclaration,
     NamedExports,
+    NamespaceExport,
     ExportSpecifier,
     MissingDeclaration,
 
@@ -297,16 +325,29 @@ public enum SyntaxKind
     JsxSelfClosingElement,
     JsxOpeningElement,
     JsxClosingElement,
+    JsxFragment,
+    JsxOpeningFragment,
+    JsxClosingFragment,
     JsxAttribute,
     JsxAttributes,
     JsxSpreadAttribute,
     JsxExpression,
+    JsxNamespacedName,
 
     // Clauses
     CaseClause,
     DefaultClause,
     HeritageClause,
     CatchClause,
+
+    ImportAttributes,
+    ImportAttribute,
+    /** @deprecated */
+    AssertClause = ImportAttributes,
+    /** @deprecated */
+    AssertEntry = ImportAttribute,
+    /** @deprecated */
+    ImportTypeAssertionContainer,
 
     // Property assignments
     PropertyAssignment,
@@ -315,43 +356,71 @@ public enum SyntaxKind
 
     // Enum
     EnumMember,
+    // Unparsed
+    /** @deprecated */
+    UnparsedPrologue,
+    /** @deprecated */
+    UnparsedPrepend,
+    /** @deprecated */
+    UnparsedText,
+    /** @deprecated */
+    UnparsedInternalText,
+    /** @deprecated */
+    UnparsedSyntheticReference,
 
     // Top-level nodes
     SourceFile,
     Bundle,
+    /** @deprecated */
+    UnparsedSource,
+    /** @deprecated */
+    InputFiles,
 
     // JSDoc nodes
-    JsDocTypeExpression,
-
-    // The * type
-    JsDocAllType,
-
-    // The ? type
-    JsDocUnknownType,
-    JsDocArrayType,
-    JsDocUnionType,
-    JsDocTupleType,
-    JsDocNullableType,
-    JsDocNonNullableType,
-    JsDocRecordType,
-    JsDocRecordMember,
-    JsDocTypeReference,
-    JsDocOptionalType,
-    JsDocFunctionType,
-    JsDocVariadicType,
-    JsDocConstructorType,
-    JsDocThisType,
-    JsDocComment,
-    JsDocTag,
-    JsDocAugmentsTag,
-    JsDocParameterTag,
-    JsDocReturnTag,
-    JsDocTypeTag,
-    JsDocTemplateTag,
-    JsDocTypedefTag,
-    JsDocPropertyTag,
-    JsDocTypeLiteral,
-    JsDocLiteralType,
+    JSDocTypeExpression,
+    JSDocNameReference,
+    JSDocMemberName, // C#p
+    JSDocAllType, // The * type
+    JSDocUnknownType, // The ? type
+    JSDocNullableType,
+    JSDocNonNullableType,
+    JSDocOptionalType,
+    JSDocFunctionType,
+    JSDocVariadicType,
+    JSDocNamepathType, // https://jsdoc.app/about-namepaths.html
+    JSDoc,
+    /** @deprecated Use SyntaxKind.JSDoc */
+    JSDocComment = JSDoc,
+    JSDocText,
+    JSDocTypeLiteral,
+    JSDocSignature,
+    JSDocLink,
+    JSDocLinkCode,
+    JSDocLinkPlain,
+    JSDocTag,
+    JSDocAugmentsTag,
+    JSDocImplementsTag,
+    JSDocAuthorTag,
+    JSDocDeprecatedTag,
+    JSDocClassTag,
+    JSDocPublicTag,
+    JSDocPrivateTag,
+    JSDocProtectedTag,
+    JSDocReadonlyTag,
+    JSDocOverrideTag,
+    JSDocCallbackTag,
+    JSDocOverloadTag,
+    JSDocEnumTag,
+    JSDocParameterTag,
+    JSDocReturnTag,
+    JSDocThisTag,
+    JSDocTypeTag,
+    JSDocTemplateTag,
+    JSDocTypedefTag,
+    JSDocSeeTag,
+    JSDocPropertyTag,
+    JSDocThrowsTag,
+    JSDocSatisfiesTag,
 
     // Synthesized list
     SyntaxList,
@@ -359,8 +428,8 @@ public enum SyntaxKind
     // Transformation nodes
     NotEmittedStatement,
     PartiallyEmittedExpression,
-    MergeDeclarationMarker,
-    EndOfDeclarationMarker,
+    CommaListExpression,
+    SyntheticReferenceExpression,
 
     // Enum value count
     Count,
@@ -377,10 +446,11 @@ public enum SyntaxKind
     FirstFutureReservedWord = ImplementsKeyword,
     LastFutureReservedWord = YieldKeyword,
     FirstTypeNode = TypePredicate,
-    LastTypeNode = LiteralType,
+    LastTypeNode = ImportType,
     FirstPunctuation = OpenBraceToken,
     LastPunctuation = CaretEqualsToken,
     FirstToken = Unknown,
+    LastToken = LastKeyword,
     FirstTriviaToken = SingleLineCommentTrivia,
     LastTriviaToken = ConflictMarkerTrivia,
     FirstLiteralToken = NumericLiteral,
@@ -389,9 +459,15 @@ public enum SyntaxKind
     LastTemplateToken = TemplateTail,
     FirstBinaryOperator = LessThanToken,
     LastBinaryOperator = CaretEqualsToken,
+    FirstStatement = VariableStatement,
+    LastStatement = DebuggerStatement,
     FirstNode = QualifiedName,
-    FirstJsDocNode = JsDocTypeExpression,
-    LastJsDocNode = JsDocLiteralType,
-    FirstJsDocTagNode = JsDocComment,
-    LastJsDocTagNode = JsDocLiteralType
+    FirstJSDocNode = JSDocTypeExpression,
+    LastJSDocNode = JSDocSatisfiesTag,
+    FirstJSDocTagNode = JSDocTag,
+    LastJSDocTagNode = JSDocSatisfiesTag,
+    /** @internal */
+    FirstContextualKeyword = AbstractKeyword,
+    /** @internal */
+    LastContextualKeyword = OfKeyword,
 }

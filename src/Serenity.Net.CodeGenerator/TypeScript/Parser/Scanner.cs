@@ -127,6 +127,7 @@ public partial class Scanner
         { "type", SyntaxKind.TypeKeyword },
         { "typeof", SyntaxKind.TypeOfKeyword },
         { "undefined", SyntaxKind.UndefinedKeyword },
+        { "unique", SyntaxKind.UniqueKeyword },
         { "var", SyntaxKind.VarKeyword },
         { "void", SyntaxKind.VoidKeyword },
         { "while", SyntaxKind.WhileKeyword },

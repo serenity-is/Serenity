@@ -836,6 +836,22 @@ public class KeywordTypeNode : TypeNode, IKeywordTypeNode
 {
 }
 
+public interface IInferTypeNode : ITypeNode
+{
+    TypeParameterDeclaration TypeParameter { get; set; }
+    TransformFlags TransformFlags { get; set; }
+}
+
+public class InferTypeNode : TypeNode, IInferTypeNode
+{
+    public InferTypeNode()
+    {
+        Kind = SyntaxKind.InferType;
+    }
+    public TypeParameterDeclaration TypeParameter { get; set; }
+    public TransformFlags TransformFlags { get; set; }
+}
+
 public class ThisTypeNode : TypeNode
 {
     public ThisTypeNode()
@@ -900,6 +916,7 @@ public class TypeQueryNode : TypeNode
     }
 
     public IEntityName ExprName { get; set; }
+    public NodeArray<ITypeNode> TypeArguments { get; set; }
 }
 
 public class TypeLiteralNode : Node, ITypeNode, IDeclaration
@@ -1642,22 +1659,6 @@ public class NotEmittedStatement : Statement
     }
 }
 
-public class EndOfDeclarationMarker : Statement
-{
-    public EndOfDeclarationMarker()
-    {
-        Kind = SyntaxKind.EndOfDeclarationMarker;
-    }
-}
-
-public class MergeDeclarationMarker : Statement
-{
-    public MergeDeclarationMarker()
-    {
-        Kind = SyntaxKind.MergeDeclarationMarker;
-    }
-}
-
 public class EmptyStatement : Statement
 {
     public EmptyStatement()
@@ -2202,7 +2203,7 @@ public class JsDocTypeExpression : Node
 {
     public JsDocTypeExpression()
     {
-        Kind = SyntaxKind.JsDocTypeExpression;
+        Kind = SyntaxKind.JSDocTypeExpression;
     }
 
     public IJsDocType Type { get; set; }
@@ -2220,7 +2221,7 @@ public class JsDocAllType : JsDocType
 {
     public JsDocAllType()
     {
-        Kind = SyntaxKind.JsDocAllType;
+        Kind = SyntaxKind.JSDocAllType;
     }
 }
 
@@ -2228,86 +2229,37 @@ public class JsDocUnknownType : JsDocType
 {
     public JsDocUnknownType()
     {
-        Kind = SyntaxKind.JsDocUnknownType;
+        Kind = SyntaxKind.JSDocUnknownType;
     }
-}
-
-public class JsDocArrayType : JsDocType
-{
-    public JsDocArrayType()
-    {
-        Kind = SyntaxKind.JsDocArrayType;
-    }
-
-    public IJsDocType ElementType { get; set; }
-}
-
-public class JsDocUnionType : JsDocType
-{
-    public JsDocUnionType()
-    {
-        Kind = SyntaxKind.JsDocUnionType;
-    }
-
-    public NodeArray<IJsDocType> Types { get; set; }
-}
-
-public class JsDocTupleType : JsDocType
-{
-    public JsDocTupleType()
-    {
-        Kind = SyntaxKind.JsDocTupleType;
-    }
-
-    public NodeArray<IJsDocType> Types { get; set; }
 }
 
 public class JsDocNonNullableType : JsDocType
 {
     public JsDocNonNullableType()
     {
-        Kind = SyntaxKind.JsDocNonNullableType;
+        Kind = SyntaxKind.JSDocNonNullableType;
     }
 
-    public IJsDocType Type { get; set; }
+    public ITypeNode Type { get; set; }
+    public bool Postfix { get; set; }
 }
 
 public class JsDocNullableType : JsDocType
 {
     public JsDocNullableType()
     {
-        Kind = SyntaxKind.JsDocNullableType;
+        Kind = SyntaxKind.JSDocNullableType;
     }
 
-    public IJsDocType Type { get; set; }
-}
-
-public class JsDocRecordType : JsDocType
-{
-    public JsDocRecordType()
-    {
-        Kind = SyntaxKind.JsDocRecordType;
-    }
-
-    public TypeLiteralNode Literal { get; set; }
-}
-
-public class JsDocTypeReference : JsDocType
-{
-    public JsDocTypeReference()
-    {
-        Kind = SyntaxKind.JsDocTypeReference;
-    }
-
-    public IEntityName Name { get; set; }
-    public NodeArray<IJsDocType> TypeArguments { get; set; }
+    public ITypeNode Type { get; set; }
+    public bool Postfix { get; set; }
 }
 
 public class JsDocOptionalType : JsDocType
 {
     public JsDocOptionalType()
     {
-        Kind = SyntaxKind.JsDocOptionalType;
+        Kind = SyntaxKind.JSDocOptionalType;
     }
 
     public IJsDocType Type { get; set; }
@@ -2317,7 +2269,7 @@ public class JsDocFunctionType : Node, IJsDocType, ISignatureDeclaration
 {
     public JsDocFunctionType()
     {
-        Kind = SyntaxKind.JsDocFunctionType;
+        Kind = SyntaxKind.JSDocFunctionType;
     }
 
     public INode Name { get; set; }
@@ -2330,48 +2282,10 @@ public class JsDocVariadicType : JsDocType
 {
     public JsDocVariadicType()
     {
-        Kind = SyntaxKind.JsDocVariadicType;
+        Kind = SyntaxKind.JSDocVariadicType;
     }
 
     public IJsDocType Type { get; set; }
-}
-
-public class JsDocConstructorType : JsDocType
-{
-    public JsDocConstructorType()
-    {
-        Kind = SyntaxKind.JsDocConstructorType;
-    }
-
-    public IJsDocType Type { get; set; }
-}
-
-public class JsDocThisType : JsDocType
-{
-    public JsDocThisType()
-    {
-        Kind = SyntaxKind.JsDocThisType;
-    }
-
-    public IJsDocType Type { get; set; }
-}
-
-public class JsDocLiteralType : JsDocType
-{
-    public JsDocLiteralType()
-    {
-        Kind = SyntaxKind.JsDocLiteralType;
-    }
-
-    public LiteralTypeNode Literal { get; set; }
-}
-
-public class JsDocRecordMember : PropertySignature
-{
-    public JsDocRecordMember()
-    {
-        Kind = SyntaxKind.JsDocRecordMember;
-    }
 }
 
 public class JsDoc : Node
@@ -2391,7 +2305,7 @@ public class JsDocTag : Node, IJsDocTag
 {
     public JsDocTag()
     {
-        Kind = SyntaxKind.JsDocTag;
+        Kind = SyntaxKind.JSDocTag;
     }
 
     public AtToken AtToken { get; set; }
@@ -2407,7 +2321,7 @@ public class JsDocAugmentsTag : JsDocTag
 {
     public JsDocAugmentsTag()
     {
-        Kind = SyntaxKind.JsDocAugmentsTag;
+        Kind = SyntaxKind.JSDocAugmentsTag;
     }
 
     public JsDocTypeExpression TypeExpression { get; set; }
@@ -2417,7 +2331,7 @@ public class JsDocTemplateTag : JsDocTag
 {
     public JsDocTemplateTag()
     {
-        Kind = SyntaxKind.JsDocTemplateTag;
+        Kind = SyntaxKind.JSDocTemplateTag;
     }
 
     public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
@@ -2427,7 +2341,7 @@ public class JsDocReturnTag : JsDocTag
 {
     public JsDocReturnTag()
     {
-        Kind = SyntaxKind.JsDocReturnTag;
+        Kind = SyntaxKind.JSDocReturnTag;
     }
 
     public JsDocTypeExpression TypeExpression { get; set; }
@@ -2437,7 +2351,7 @@ public class JsDocTypeTag : JsDocTag
 {
     public JsDocTypeTag()
     {
-        Kind = SyntaxKind.JsDocTypeTag;
+        Kind = SyntaxKind.JSDocTypeTag;
     }
 
     public JsDocTypeExpression TypeExpression { get; set; }
@@ -2447,7 +2361,7 @@ public class JsDocTypedefTag : Node, IJsDocTag, IDeclaration
 {
     public JsDocTypedefTag()
     {
-        Kind = SyntaxKind.JsDocTypedefTag;
+        Kind = SyntaxKind.JSDocTypedefTag;
     }
 
     public INode FullName { get; set; } // JSDocNamespaceDeclaration | Identifier
@@ -2463,7 +2377,7 @@ public class JsDocPropertyTag : Node, IJsDocTag, ITypeElement
 {
     public JsDocPropertyTag()
     {
-        Kind = SyntaxKind.JsDocPropertyTag;
+        Kind = SyntaxKind.JSDocPropertyTag;
     }
 
     public JsDocTypeExpression TypeExpression { get; set; }
@@ -2478,7 +2392,7 @@ public class JsDocTypeLiteral : JsDocType
 {
     public JsDocTypeLiteral()
     {
-        Kind = SyntaxKind.JsDocTypeLiteral;
+        Kind = SyntaxKind.JSDocTypeLiteral;
     }
 
     public NodeArray<JsDocPropertyTag> JsDocPropertyTags { get; set; }
@@ -2489,7 +2403,7 @@ public class JsDocParameterTag : JsDocTag
 {
     public JsDocParameterTag()
     {
-        Kind = SyntaxKind.JsDocParameterTag;
+        Kind = SyntaxKind.JSDocParameterTag;
     }
 
     public Identifier PreParameterName { get; set; }
