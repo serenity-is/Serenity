@@ -361,14 +361,6 @@ public class Map
     public int Size { get; set; }
 }
 
-public class Iterator
-{
-}
-
-public class FileMap
-{
-}
-
 public interface ITextRange
 {
     int? Pos { get; set; }
@@ -2178,16 +2170,6 @@ public class ExportAssignment : DeclarationStatement
     public IExpression Expression { get; set; }
 }
 
-public class FileReference : TextRange
-{
-    public string FileName { get; set; }
-}
-
-public class CheckJsDirective : TextRange
-{
-    public bool Enabled { get; set; }
-}
-
 public class CommentRange : TextRange
 {
     public bool HasTrailingNewLine { get; set; }
@@ -2500,7 +2482,6 @@ public class AmdDependency
 public interface ISourceFileLike
 {
     string Text { get; set; }
-    int[] LineMap { get; set; }
 }
 
 public class SourceFile : Declaration, ISourceFileLike
@@ -3223,7 +3204,6 @@ public class DiscoverTypingsInfo
     public Map<string> PackageNameToTypingLocation { get; set; }
     public TypeAcquisition TypeAcquisition { get; set; }
     public CompilerOptions CompilerOptions { get; set; }
-    public ReadonlyArray<string> UnresolvedImports { get; set; }
 }
 
 public class LineAndCharacter

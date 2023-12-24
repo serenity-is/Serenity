@@ -2994,7 +2994,7 @@ public class Parser
         var simpleUnaryExpression = ParseSimpleUnaryExpression();
         if (Token() == SyntaxKind.AsteriskAsteriskToken)
         {
-            var start = Scanner.SkipTriviaM(SourceText, simpleUnaryExpression.Pos ?? 0);
+            var start = Scanner.SkipTrivia(SourceText, simpleUnaryExpression.Pos ?? 0);
             if (simpleUnaryExpression.Kind == SyntaxKind.TypeAssertionExpression)
             {
                 ParseErrorAtPosition(start, (simpleUnaryExpression.End ?? 0) - start, DiagnosticMessage.A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses);

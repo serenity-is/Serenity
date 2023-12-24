@@ -636,31 +636,7 @@ public enum WatchDirectoryFlags
     Recursive = 1 << 0
 }
 
-public enum CharacterCodes
-{
-    MaxAsciiCharacter = 0x7F,
-    LineSeparator = 0x2028,
-    ParagraphSeparator = 0x2029,
-    NextLine = 0x0085,
-    NonBreakingSpace = 0x00A0,
-    EnQuad = 0x2000,
-    EmQuad = 0x2001,
-    EnSpace = 0x2002,
-    EmSpace = 0x2003,
-    ThreePerEmSpace = 0x2004,
-    FourPerEmSpace = 0x2005,
-    SixPerEmSpace = 0x2006,
-    FigureSpace = 0x2007,
-    PunctuationSpace = 0x2008,
-    ThinSpace = 0x2009,
-    HairSpace = 0x200A,
-    ZeroWidthSpace = 0x200B,
-    NarrowNoBreakSpace = 0x202F,
-    IdeographicSpace = 0x3000,
-    MathematicalSpace = 0x205F,
-    Ogham = 0x1680,
-    ByteOrderMark = 0xFEFF,
-}
+
 
 public enum Extension
 {

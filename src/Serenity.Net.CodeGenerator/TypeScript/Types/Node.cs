@@ -41,7 +41,7 @@ public class Node : TextRange, INode
                 return null;
             var n = (Node)node;
             n.SourceStr = sourceStr;
-            if (n.Pos != null) n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
+            if (n.Pos != null) n.NodeStart = Scanner.SkipTrivia(SourceStr, (int)n.Pos);
             Children.Add(n);
             n.MakeChildren(sourceStr);
             return null;
@@ -59,7 +59,7 @@ public class Node : TextRange, INode
             n.SourceStr = sourceStr;
             n.Parent = this;
             if (n.Pos != null) 
-                n.NodeStart = Scanner.SkipTriviaM(SourceStr, (int)n.Pos);
+                n.NodeStart = Scanner.SkipTrivia(SourceStr, (int)n.Pos);
             n.MakeChildrenOptimized(sourceStr);
         });
     }

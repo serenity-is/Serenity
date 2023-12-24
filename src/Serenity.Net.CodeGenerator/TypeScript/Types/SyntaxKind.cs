@@ -466,8 +466,8 @@ public enum SyntaxKind
     LastJSDocNode = JSDocSatisfiesTag,
     FirstJSDocTagNode = JSDocTag,
     LastJSDocTagNode = JSDocSatisfiesTag,
-    /** @internal */
+    // @internal
     FirstContextualKeyword = AbstractKeyword,
-    /** @internal */
-    LastContextualKeyword = OfKeyword,
+    // @internal
+    LastContextualKeyword = OfKeyword
 }

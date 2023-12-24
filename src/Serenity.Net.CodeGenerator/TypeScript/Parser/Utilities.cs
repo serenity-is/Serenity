@@ -51,7 +51,7 @@ public class Utilities
         if (NodeIsMissing(node))
             return "";
 
-        var start = SkipTriviaM(sourceText, node.Pos ?? 0);
+        var start = SkipTrivia(sourceText, node.Pos ?? 0);
 
         if (node.End == null)
             return sourceText[start..];
@@ -79,7 +79,6 @@ public class Utilities
                 text[(comment.Pos ?? 0) + 3] != '/')
             .ToList();
     }
-
 
     public static bool IsKeyword(SyntaxKind token)
     {

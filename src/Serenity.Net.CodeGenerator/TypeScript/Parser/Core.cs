@@ -4,12 +4,6 @@ namespace Serenity.TypeScript.TsParser;
 
 public static class Core
 {
-    public static bool PositionIsSynthesized(int pos)
-    {
-        // This is a fast way of testing the following conditions:
-        //  pos == null || pos == null || isNaN(pos) || pos < 0;
-        return !(pos >= 0);
-    }
 
     public static ScriptKind EnsureScriptKind(string fileName, ScriptKind scriptKind)
     {
