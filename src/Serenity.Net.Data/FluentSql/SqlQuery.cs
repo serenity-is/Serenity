@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// SQL query string builder
@@ -26,7 +26,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     private int take;
     private StringBuilder where;
     private int intoIndex = -1;
-    private List<object> into = new List<object>();
+    private List<object> into = [];
     private SqlQuery unionQuery;
     private SqlUnionType unionType;
 
@@ -35,7 +35,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// </summary>
     public SqlQuery()
     {
-        columns = new List<Column>();
+        columns = [];
         from = new StringBuilder();
     }
 
@@ -245,8 +245,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        if (orderBy == null)
-            orderBy = new List<string>();
+        orderBy ??= [];
 
         orderBy.Add(expression);
 
@@ -294,8 +293,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        if (orderBy == null)
-            orderBy = new List<string>();
+        orderBy ??= [];
 
         string search = (expression ?? "").Trim();
         orderBy.RemoveAll(x => string.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
@@ -524,7 +522,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         unionQuery.parameters = null;
 
         this.unionType = unionType;
-        columns = new List<Column>();
+        columns = [];
         from = new StringBuilder();
         aliasExpressions = null;
         aliasWithJoins = null;
@@ -538,7 +536,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         take = 0;
         where = null;
         intoIndex = -1;
-        into = new List<object>();
+        into = [];
         return this;
     }
 
@@ -631,8 +629,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         get
         {
-            if (aliasWithJoins == null)
-                aliasWithJoins = new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
+            aliasWithJoins ??= new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
 
             return aliasWithJoins;
         }
@@ -642,8 +639,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         get
         {
-            if (aliasExpressions == null)
-                aliasExpressions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            aliasExpressions ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             return aliasExpressions;
         }
@@ -673,31 +669,23 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <summary>
     /// Holds information about a column in SELECT clause.
     /// </summary>
-    public class Column
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="Column"/> class.
+    /// </remarks>
+    /// <param name="expression">The expression.</param>
+    /// <param name="columnName">Name of the column.</param>
+    /// <param name="intoRow">The select into row index.</param>
+    /// <param name="intoField">The select into field.</param>
+    public class Column(string expression, string columnName, int intoRow, object intoField)
     {
         /// <summary>Field or expression</summary>
-        public readonly string Expression;
+        public readonly string Expression = expression;
         /// <summary>Column name</summary>
-        public readonly string ColumnName;
+        public readonly string ColumnName = columnName;
         /// <summary>Used by entity system when more than one entity is used as a target</summary>
-        public readonly int IntoRowIndex;
+        public readonly int IntoRowIndex = intoRow;
         /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
-        public readonly object IntoField;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Column"/> class.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="columnName">Name of the column.</param>
-        /// <param name="intoRow">The select into row index.</param>
-        /// <param name="intoField">The select into field.</param>
-        public Column(string expression, string columnName, int intoRow, object intoField)
-        {
-            Expression = expression;
-            ColumnName = columnName;
-            IntoRowIndex = intoRow;
-            IntoField = intoField;
-        }
+        public readonly object IntoField = intoField;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Column"/> class.

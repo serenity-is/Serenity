@@ -704,9 +704,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 			element.delay( options.delay );
 		}
 
-		if ( hasOptions && $.effects && $.effects.effect[ effectName ] ) {
-			element[ method ]( options );
-		} else if ( effectName !== method && element[ effectName ] ) {
+		if ( effectName !== method && element[ effectName ] ) {
 			element[ effectName ]( options.duration, options.easing, callback );
 		} else {
 			element.queue( function( next ) {
@@ -1564,7 +1562,7 @@ $.widget( "ui.mouse", {
 } );
 
 // $.ui.plugin is deprecated. Use $.widget() extensions instead.
-var plugin = $.ui.plugin = {
+$.ui.plugin = {
 	add: function( module, option, set ) {
 		var i,
 			proto = $.ui[ module ].prototype;
@@ -1592,33 +1590,6 @@ var plugin = $.ui.plugin = {
 			}
 		}
 	}
-};
-$.ui.safeActiveElement = function( document ) {
-	var activeElement;
-
-	// Support: IE 9 only
-	// IE9 throws an "Unspecified error" accessing document.activeElement from an <iframe>
-	try {
-		activeElement = document.activeElement;
-	} catch ( error ) {
-		activeElement = document.body;
-	}
-
-	// Support: IE 9 - 11 only
-	// IE may return null instead of an element
-	// Interestingly, this only seems to occur when NOT in an iframe
-	if ( !activeElement ) {
-		activeElement = document.body;
-	}
-
-	// Support: IE 11 only
-	// IE11 returns a seemingly empty object in some cases when accessing
-	// document.activeElement from an <iframe>
-	if ( !activeElement.nodeName ) {
-		activeElement = document.body;
-	}
-
-	return activeElement;
 };
 
 $.ui.safeBlur = function( element ) {
@@ -1740,7 +1711,7 @@ $.widget( "ui.draggable", $.ui.mouse, {
 	},
 
 	_blurActiveElement: function( event ) {
-		var activeElement = $.ui.safeActiveElement( this.document[ 0 ] ),
+		var activeElement = this.document[0].activeElement,
 			target = $( event.target );
 
 		// Don't blur if the event occurred on an element that is within
@@ -5555,7 +5526,7 @@ $.widget( "ui.menu", {
 			},
 			"click .ui-menu-item": function( event ) {
 				var target = $( event.target );
-				var active = $( $.ui.safeActiveElement( this.document[ 0 ] ) );
+				var active = $(this.document[0].activeElement);
 				if ( !this.mouseHandled && target.not( ".ui-state-disabled" ).length ) {
 					this.select( event );
 
@@ -5620,7 +5591,7 @@ $.widget( "ui.menu", {
 				this._delay( function() {
 					var notContained = !$.contains(
 						this.element[ 0 ],
-						$.ui.safeActiveElement( this.document[ 0 ] )
+						this.document[0].activeElement
 					);
 					if ( notContained ) {
 						this.collapseAll( event );
@@ -6351,7 +6322,7 @@ $.widget( "ui.autocomplete", {
 					// and ignored the blur event because of the cancelBlur flag set above. So
 					// we restore focus to ensure that the menu closes properly based on the user's
 					// next actions.
-					if ( this.element[ 0 ] !== $.ui.safeActiveElement( this.document[ 0 ] ) ) {
+					if ( this.element[ 0 ] !== this.document[0].activeElement ) {
 						this.element.trigger( "focus" );
 					}
 				} );
@@ -6395,7 +6366,7 @@ $.widget( "ui.autocomplete", {
 					previous = this.previous;
 
 				// Only trigger when focus was lost (click on menu)
-				if ( this.element[ 0 ] !== $.ui.safeActiveElement( this.document[ 0 ] ) ) {
+				if ( this.element[ 0 ] !== this.document[0].activeElement) {
 					this.element.trigger( "focus" );
 					this.previous = previous;
 
@@ -7806,12 +7777,7 @@ $.extend( Datepicker.prototype, {
 			duration = $.datepicker._get( inst, "duration" );
 			inst.dpDiv.css( "z-index", datepicker_getZindex( $( input ) ) + 1 );
 			$.datepicker._datepickerShowing = true;
-
-			if ( $.effects && $.effects.effect[ showAnim ] ) {
-				inst.dpDiv.show( showAnim, $.datepicker._get( inst, "showOptions" ), duration );
-			} else {
-				inst.dpDiv[ showAnim || "show" ]( showAnim ? duration : null );
-			}
+			inst.dpDiv[ showAnim || "show" ]( showAnim ? duration : null );
 
 			if ( $.datepicker._shouldFocusInput( inst ) ) {
 				inst.input.trigger( "focus" );
@@ -7926,13 +7892,8 @@ $.extend( Datepicker.prototype, {
 				$.datepicker._tidyDialog( inst );
 			};
 
-			// DEPRECATED: after BC for 1.8.x $.effects[ showAnim ] is not needed
-			if ( $.effects && ( $.effects.effect[ showAnim ] || $.effects[ showAnim ] ) ) {
-				inst.dpDiv.hide( showAnim, $.datepicker._get( inst, "showOptions" ), duration, postProcess );
-			} else {
-				inst.dpDiv[ ( showAnim === "slideDown" ? "slideUp" :
-					( showAnim === "fadeIn" ? "fadeOut" : "hide" ) ) ]( ( showAnim ? duration : null ), postProcess );
-			}
+			inst.dpDiv[ ( showAnim === "slideDown" ? "slideUp" :
+				( showAnim === "fadeIn" ? "fadeOut" : "hide" ) ) ]( ( showAnim ? duration : null ), postProcess );
 
 			if ( !showAnim ) {
 				postProcess();
@@ -9299,7 +9260,7 @@ $.widget( "ui.dialog", {
 			// Hiding a focused element doesn't trigger blur in WebKit
 			// so in case we have nothing to focus on, explicitly blur the active element
 			// https://bugs.webkit.org/show_bug.cgi?id=47182
-			$.ui.safeBlur( $.ui.safeActiveElement( this.document[ 0 ] ) );
+			$.ui.safeBlur(this.document[0].activeElement);
 		}
 
 		this._hide( this.uiDialog, this.options.hide, function() {
@@ -9343,7 +9304,7 @@ $.widget( "ui.dialog", {
 		}
 
 		this._isOpen = true;
-		this.opener = $( $.ui.safeActiveElement( this.document[ 0 ] ) );
+		this.opener = $(this.document[0].activeElement);
 
 		this._size();
 		this._position();
@@ -9400,7 +9361,7 @@ $.widget( "ui.dialog", {
 
 	_keepFocus: function( event ) {
 		function checkFocus() {
-			var activeElement = $.ui.safeActiveElement( this.document[ 0 ] ),
+			var activeElement = this.document[0].activeElement,
 				isActive = this.uiDialog[ 0 ] === activeElement ||
 					$.contains( this.uiDialog[ 0 ], activeElement );
 			if ( !isActive ) {
@@ -10737,7 +10698,7 @@ $.widget( "ui.tabs", {
 	},
 
 	_tabKeydown: function( event ) {
-		var focusedTab = $( $.ui.safeActiveElement( this.document[ 0 ] ) ).closest( "li" ),
+		var focusedTab = $( this.document[0].activeElement).closest( "li" ),
 			selectedIndex = this.tabs.index( focusedTab ),
 			goingForward = true;
 
@@ -10933,8 +10894,8 @@ $.widget( "ui.tabs", {
 			"aria-expanded": "false",
 			tabIndex: -1
 		} );
-		this.panels.not( this._getPanelForTab( this.active ) )
-			.hide()
+        this.panels.not(this._getPanelForTab(this.active))
+            .removeClass('ui-tabs-panel-active')
 			.attr( {
 				"aria-hidden": "true"
 			} );
@@ -10951,7 +10912,7 @@ $.widget( "ui.tabs", {
 				} );
 			this._addClass( this.active, "ui-tabs-active", "ui-state-active" );
 			this._getPanelForTab( this.active )
-				.show()
+				.addClass('ui-tabs-panel-active')
 				.attr( {
 					"aria-hidden": "false"
 				} );
@@ -11226,7 +11187,7 @@ $.widget( "ui.tabs", {
 			if ( toShow.length && that.options.show ) {
 				that._show( toShow, that.options.show, complete );
 			} else {
-				toShow.show();
+                toShow.addClass('ui-tabs-panel-active');
 				complete();
 			}
 		}
@@ -11241,7 +11202,7 @@ $.widget( "ui.tabs", {
 		} else {
 			this._removeClass( eventData.oldTab.closest( "li" ),
 				"ui-tabs-active", "ui-state-active" );
-			toHide.hide();
+            toHide.removeClass('ui-tabs-panel-active');
 			show();
 		}
 

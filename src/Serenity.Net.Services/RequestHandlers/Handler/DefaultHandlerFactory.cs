@@ -3,31 +3,24 @@
 /// <summary>
 /// Default implementation for the <see cref="IDefaultHandlerFactory"/>
 /// </summary>
-public class DefaultHandlerFactory : IDefaultHandlerFactory
+/// <remarks>
+/// Creates an instance of the class.
+/// </remarks>
+/// <param name="registry">Default handler registry</param>
+/// <param name="activator">Handler activator</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerActivator activator) : IDefaultHandlerFactory
 {
-    private readonly IDefaultHandlerRegistry registry;
-    private readonly IHandlerActivator activator;
-    private readonly ConcurrentDictionary<(Type rowType, Type handlerInterface), Type> cache;
-
-    /// <summary>
-    /// Creates an instance of the class.
-    /// </summary>
-    /// <param name="registry">Default handler registry</param>
-    /// <param name="activator">Handler activator</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerActivator activator)
-    {
-        cache = new ConcurrentDictionary<(Type rowType, Type handlerInterface), Type>();
-        this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
-        this.activator = activator ?? throw new ArgumentNullException(nameof(activator));
-    }
+    private readonly IDefaultHandlerRegistry registry = registry ?? throw new ArgumentNullException(nameof(registry));
+    private readonly IHandlerActivator activator = activator ?? throw new ArgumentNullException(nameof(activator));
+    private readonly ConcurrentDictionary<(Type rowType, Type handlerInterface), Type> cache = new();
 
     private Type GetHandlerType((Type rowType, Type handlerInterface) args)
     {
         var requestHandler = typeof(IRequestHandler<>).MakeGenericType(args.rowType);
 
         var handlers = registry.GetTypes(args.handlerInterface)
-            .Where(type => requestHandler.IsAssignableFrom(type))
+            .Where(requestHandler.IsAssignableFrom)
             .ToArray();
 
         if (handlers.Length == 1)
@@ -35,10 +28,7 @@ public class DefaultHandlerFactory : IDefaultHandlerFactory
 
         if (handlers.Length == 0)
         {
-            var attr = args.handlerInterface.GetAttribute<GenericHandlerTypeAttribute>(true);
-            if (attr == null)
-                throw new InvalidProgramException($"{args.handlerInterface.FullName} does not have a GenericHandlerTypeAttribute!");
-
+            var attr = args.handlerInterface.GetAttribute<GenericHandlerTypeAttribute>(true) ?? throw new InvalidProgramException($"{args.handlerInterface.FullName} does not have a GenericHandlerTypeAttribute!");
             return attr.Value.MakeGenericType(args.rowType);
         }
 

@@ -22,9 +22,8 @@ internal class RetrieveHandlerProxy<TRow, TRetrieveRequest, TRetrieveResponse>
     }
 }
 
-internal class RetrieveHandlerProxy<TRow>
-    : RetrieveHandlerProxy<TRow, RetrieveRequest, RetrieveResponse<TRow>>, IRetrieveHandler<TRow>
+internal class RetrieveHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : RetrieveHandlerProxy<TRow, RetrieveRequest, RetrieveResponse<TRow>>(factory), IRetrieveHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public RetrieveHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

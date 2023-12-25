@@ -1,11 +1,12 @@
 ﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull } from "../../q";
+import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
-export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
-    constructor(hidden: JQuery, opt?: SelectEditorOptions) {
-        super(hidden, opt);
+export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
+    constructor(props: EditorProps<P>) {
+        super(props);
+
         this.updateItems();
     }
 
@@ -14,7 +15,7 @@ export class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item
     }
 
     protected emptyItemText() {
-        if (!isEmptyOrNull(this.options.emptyOptionText)) {
+        if (this.options.emptyOptionText) {
             return this.options.emptyOptionText;
         }
         return super.emptyItemText();

@@ -10,7 +10,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Contains Serenity related helper methods that can be used in Razor CSHTML files
 /// </summary>
-public static class HtmlScriptExtensions
+public static partial class HtmlScriptExtensions
 {
     /// <summary>
     /// Renders a CSS stylesheet link element. If bundling is enabled, it may contain
@@ -22,11 +22,9 @@ public static class HtmlScriptExtensions
     /// <exception cref="ArgumentNullException">HTML helper or cssUrl is null</exception>
     public static HtmlString Stylesheet(this IHtmlHelper helper, string cssUrl)
     {
-        if (helper == null)
-            throw new ArgumentNullException(nameof(helper));
+        ArgumentNullException.ThrowIfNull(helper);
 
-        if (cssUrl == null)
-            throw new ArgumentNullException(nameof(cssUrl));
+        ArgumentNullException.ThrowIfNull(cssUrl);
 
         if (cssUrl.EndsWith(".js"))
             cssUrl = cssUrl[..^3] + ".css";
@@ -55,8 +53,7 @@ public static class HtmlScriptExtensions
     /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
     public static HtmlString StyleBundle(this IHtmlHelper helper, string bundleKey)
     {
-        if (helper == null)
-            throw new ArgumentNullException(nameof(helper));
+        ArgumentNullException.ThrowIfNull(helper);
 
         if (string.IsNullOrEmpty(bundleKey))
             throw new ArgumentNullException(nameof(bundleKey));
@@ -108,8 +105,7 @@ public static class HtmlScriptExtensions
     /// <exception cref="ArgumentNullException">Helper or contentUrl is null</exception>
     public static HtmlString ResolveWithHash(this IHtmlHelper helper, string contentUrl)
     {
-        if (helper == null)
-            throw new ArgumentNullException(nameof(helper));
+        ArgumentNullException.ThrowIfNull(helper);
 
         if (string.IsNullOrEmpty(contentUrl))
             throw new ArgumentNullException(nameof(contentUrl));
@@ -130,8 +126,7 @@ public static class HtmlScriptExtensions
     /// <exception cref="ArgumentNullException">HTML helper or includeJS is null</exception>
     public static HtmlString Script(this IHtmlHelper helper, string includeJS)
     {
-        if (helper == null)
-            throw new ArgumentNullException(nameof(helper));
+        ArgumentNullException.ThrowIfNull(helper);
 
         if (string.IsNullOrEmpty(includeJS))
             throw new ArgumentNullException(nameof(includeJS));
@@ -159,8 +154,7 @@ public static class HtmlScriptExtensions
     /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
     public static HtmlString ScriptBundle(this IHtmlHelper helper, string bundleKey)
     {
-        if (helper == null)
-            throw new ArgumentNullException(nameof(helper));
+        ArgumentNullException.ThrowIfNull(helper);
 
         if (string.IsNullOrEmpty(bundleKey))
             throw new ArgumentNullException(nameof(bundleKey));
@@ -205,7 +199,11 @@ public static class HtmlScriptExtensions
     }
 
     const string IncludedScriptsAndCssKey = "HtmlScriptExtensions:IncludedScriptsAndCss";
-    static readonly Regex EndingWithVersionRegex = new(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled);
+
+    static readonly Regex EndingWithVersionRegex = EndingWithVersionRegexGen();
+
+    [GeneratedRegex(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled)]
+    private static partial Regex EndingWithVersionRegexGen();
 
     private static bool IsAlreadyIncluded(IDictionary<object, object> contextItems, string url)
     {

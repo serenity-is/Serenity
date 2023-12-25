@@ -1,17 +1,7 @@
 namespace Serenity.Tests;
 
-public class MockTemporaryFileSystem : MockFileSystem, ITemporaryFileSystem
+public class MockTemporaryFileSystem(string currentDirectory = "") : MockFileSystem(currentDirectory), ITemporaryFileSystem
 {
-    public MockTemporaryFileSystem(string currentDirectory = "")
-        : base(currentDirectory)
-    {
-    }
-
-    public DateTime GetLastWriteTimeUtc(string path)
-    {
-        return File.GetLastWriteTimeUtc(path);
-    }
-
     public TemporaryFileInfo[] GetTemporaryFileInfos(string path)
     {
         return DirectoryInfo.New(path).GetFiles().Select(x => new TemporaryFileInfo

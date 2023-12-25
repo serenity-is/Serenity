@@ -15,7 +15,7 @@ public static class DateHelper
     public static string ISODateTimeFormatLocal =
         "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff";
 
-    private static readonly string[] _isoDateTimeFormats = {
+    private static readonly string[] _isoDateTimeFormats = [
        "yyyy'-'MM'-'dd",
        "yyyy'-'MM'-'dd'T'HH':'mm",
        "yyyy'-'MM'-'dd'T'HH':'mmK",
@@ -26,7 +26,7 @@ public static class DateHelper
        "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff",
        "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",
        "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"
-   };
+   ];
 
     /// <summary>
     ///   Tries to parse an ISO 8601 date-time string.</summary>
@@ -65,23 +65,23 @@ public static class DateHelper
         return DateElementOrder.DayMonthYear;
     }
 
-    private static readonly string[] _dateOrderString = new string[] {
+    private static readonly string[] _dateOrderString = [
        "dmy",
        "mdy",
        "ymd"
-   };
+   ];
 
-    private static readonly string[] _defaultDateFormat = new string[] {
+    private static readonly string[] _defaultDateFormat = [
        "dd/MM/yyyy",
        "MM/dd/yyyy",
        "yyyy/MM/dd"
-   };
+   ];
 
-    private static readonly string[] _defaultDateTimeFormat = new string[] {
+    private static readonly string[] _defaultDateTimeFormat = [
        "dd/MM/yyyy HH:mm:ss",
        "MM/dd/yyyy HH:mm:ss",
        "yyyy/MM/dd HH:mm:ss"
-   };
+   ];
 
     /// <summary>
     ///   Gets date order string (one of "dmy", "ymd", "mdy") for a specified order.</summary>

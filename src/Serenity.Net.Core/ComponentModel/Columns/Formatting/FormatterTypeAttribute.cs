@@ -4,16 +4,12 @@
 /// Sets formatter type.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class FormatterTypeAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="FormatterTypeAttribute"/> class.
+/// </remarks>
+/// <param name="type">The type.</param>
+public class FormatterTypeAttribute(string type) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FormatterTypeAttribute"/> class.
-    /// </summary>
-    /// <param name="type">The type.</param>
-    public FormatterTypeAttribute(string type)
-    {
-        FormatterType = type;
-    }
 
     /// <summary>
     /// Sets the formatter parameters.
@@ -29,5 +25,5 @@ public class FormatterTypeAttribute : Attribute
     /// <value>
     /// The type of the formatter.
     /// </value>
-    public string FormatterType { get; private set; }
+    public string FormatterType { get; private set; } = type;
 }

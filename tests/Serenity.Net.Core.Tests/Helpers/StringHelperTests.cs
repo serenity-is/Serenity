@@ -592,15 +592,10 @@ public class StringHelperTests
         Assert.Equal(string.Empty, nullableInt.ToStringDefault(null, null, null));
     }
 
-    class Obj<T> : IFormattable
+    class Obj<T>(T value) : IFormattable
         where T: struct, IFormattable
     {
-        public Obj(T value) 
-        {
-            Value = value;
-        }
-
-        public T Value { get; set; }
+        public T Value { get; set; } = value;
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
@@ -721,7 +716,9 @@ public class StringHelperTests
     [Fact]
     public void JoinNonEmpty_Enumerable_NonEmptyValues_ReturnsJoinedString()
     {
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.Equal("hello-world", StringHelper.JoinNonEmpty("-", (IEnumerable<string>)new string[] { "hello", "world" }));
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
 
 

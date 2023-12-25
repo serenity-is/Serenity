@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Adds AND OR operator support to any IPermissionService implementation
@@ -10,21 +10,16 @@
 /// registrar.RegisterInstance&lt;IPermissionService&gt;(new LogicOperatorPermissionService(new MyPermissionService()))
 /// </code>
 /// </remarks>
-public class LogicOperatorPermissionService : IPermissionService
+/// <remarks>
+/// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
+/// </remarks>
+/// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
+public class LogicOperatorPermissionService(IPermissionService permissionService) : IPermissionService
 {
-    private static readonly char[] chars = new char[] { '|', '&', '!', '(', ')' };
-    private readonly IPermissionService permissionService;
-    private readonly ConcurrentDictionary<string, string[]> cache = new();
-
-    /// <summary>
-    /// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
-    /// </summary>
-    /// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
-    public LogicOperatorPermissionService(IPermissionService permissionService)
-    {
-        this.permissionService = permissionService ??
+    private static readonly char[] chars = ['|', '&', '!', '(', ')'];
+    private readonly IPermissionService permissionService = permissionService ??
             throw new ArgumentNullException(nameof(permissionService));
-    }
+    private readonly ConcurrentDictionary<string, string[]> cache = new();
 
     /// <summary>
     /// Returns true if user has specified permission

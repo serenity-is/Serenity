@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Dynamic script that contains remote data
@@ -47,6 +47,7 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     public override string GetScript()
     {
         var data = getData();
-        return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), data.ToJson());
+        return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), 
+            JSON.Stringify(data, writeNulls: false));
     }
 }

@@ -5,25 +5,19 @@ namespace Serenity.Data;
 /// <summary>
 /// Default connection string source
 /// </summary>
-public class DefaultConnectionStrings : IConnectionStrings
+/// <remarks>
+/// Creates a new instance of DefaultConnectionStringSource
+/// </remarks>
+/// <param name="options">Connection string options</param>
+/// <param name="sqlDialectMapper">Sql Dialect Mapper</param>
+public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper sqlDialectMapper = null) : IConnectionStrings
 {
     /// <summary>Options</summary>
-    protected readonly IOptions<ConnectionStringOptions> options;
+    protected readonly IOptions<ConnectionStringOptions> options = options ?? throw new ArgumentNullException(nameof(options));
     /// <summary>Sql dialect mapper</summary>
-    protected readonly ISqlDialectMapper sqlDialectMapper;
+    protected readonly ISqlDialectMapper sqlDialectMapper = sqlDialectMapper ?? new DefaultSqlDialectMapper();
     /// <summary>Cached dictionary of connection string infos</summary>
     protected readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new();
-
-    /// <summary>
-    /// Creates a new instance of DefaultConnectionStringSource
-    /// </summary>
-    /// <param name="options">Connection string options</param>
-    /// <param name="sqlDialectMapper">Sql Dialect Mapper</param>
-    public DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper sqlDialectMapper = null)
-    {
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
-        this.sqlDialectMapper = sqlDialectMapper ?? new DefaultSqlDialectMapper();
-    }
 
     /// <summary>
     /// Determines dialect for a connection
@@ -71,6 +65,6 @@ public class DefaultConnectionStrings : IConnectionStrings
     /// <returns>List of all registered connections</returns>
     public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
-        return options.Value.Keys.Select(x => TryGetConnectionString(x));
+        return options.Value.Keys.Select(TryGetConnectionString);
     }
 }

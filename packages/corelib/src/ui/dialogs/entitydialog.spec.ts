@@ -1,6 +1,6 @@
 import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { PropertyItemsData } from "../../q/propertyitem";
-import { addAttribute } from "../../q/system";
+import { PropertyItemsData } from "@serenity-is/base";
+import { addAttribute } from "../../q/system-compat";
 import { EntityDialog } from "./entitydialog";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {

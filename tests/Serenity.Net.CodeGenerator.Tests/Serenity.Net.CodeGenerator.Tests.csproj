@@ -1,7 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <LangVersion>11.0</LangVersion>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
     <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
@@ -10,4 +7,4 @@
   <ItemGroup>
     <PackageReference Include="CSharpMinifier" Version="1.2.1" />
   </ItemGroup>
-</Project> 
+</Project>

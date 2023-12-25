@@ -4,22 +4,16 @@
 /// Defines a master detail relation (1-N) between this row and another
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="MasterDetailRelationAttribute"/> class.
+/// </remarks>
+/// <param name="foreignKey">The property name of the FK field in the detail 
+/// table which matches the PK (id) of the master table. For example, if the two 
+/// tables are 'Order(Id, Date, ...)' and 'OrderDetail(DetailId, OrderId, Qty, ...)' 
+/// it should be 'OrderId'.</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public sealed class MasterDetailRelationAttribute : Attribute
+public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MasterDetailRelationAttribute"/> class.
-    /// </summary>
-    /// <param name="foreignKey">The property name of the FK field in the detail 
-    /// table which matches the PK (id) of the master table. For example, if the two 
-    /// tables are 'Order(Id, Date, ...)' and 'OrderDetail(DetailId, OrderId, Qty, ...)' 
-    /// it should be 'OrderId'.</param>
-    public MasterDetailRelationAttribute(string foreignKey)
-    {
-        ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
-        CheckChangesOnUpdate = true;
-        ColumnSelection = ColumnSelection.List;
-    }
 
     /// <summary>
     /// Gets the foreign key.
@@ -27,7 +21,7 @@ public sealed class MasterDetailRelationAttribute : Attribute
     /// <value>
     /// The foreign key.
     /// </value>
-    public string ForeignKey { get; private set; }
+    public string ForeignKey { get; private set; } = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
 
     /// <summary>
     /// Gets or sets a value indicating whether to check changes on update.
@@ -36,7 +30,7 @@ public sealed class MasterDetailRelationAttribute : Attribute
     /// <value>
     ///   <c>true</c> if to check changes on update; otherwise, <c>false</c>.
     /// </value>
-    public bool CheckChangesOnUpdate { get; set; }
+    public bool CheckChangesOnUpdate { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the column selection.
@@ -44,7 +38,7 @@ public sealed class MasterDetailRelationAttribute : Attribute
     /// <value>
     /// The column selection.
     /// </value>
-    public ColumnSelection ColumnSelection { get; set; }
+    public ColumnSelection ColumnSelection { get; set; } = ColumnSelection.List;
 
     /// <summary>
     /// Gets or sets the columns type with properties to include in column selection

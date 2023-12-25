@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 
 namespace Serenity.Web;
@@ -6,7 +6,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Abstract base class for <see cref="ColumnsScript"/> and <see cref="FormScript"/>
 /// </summary>
-public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
+public abstract partial class PropertyItemsScript : INamedDynamicScript, IGetScriptData
 {
     private readonly string scriptName;
     private readonly Type type;
@@ -21,13 +21,13 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     /// <param name="type">Columns or form type</param>
     /// <param name="propertyProvider">Property item provider</param>
     /// <param name="serviceProvider">Service provider</param>
-    protected PropertyItemsScript(string scriptName, Type type, 
+    protected PropertyItemsScript(string scriptName, Type type,
         IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {
         this.type = type ?? throw new ArgumentNullException(nameof(type));
-        this.serviceProvider = serviceProvider ?? 
+        this.serviceProvider = serviceProvider ??
             throw new ArgumentNullException(nameof(serviceProvider));
-        this.propertyProvider = propertyProvider ?? 
+        this.propertyProvider = propertyProvider ??
             throw new ArgumentNullException(nameof(PropertyItemsScript.propertyProvider));
         this.scriptName = scriptName;
     }
@@ -70,8 +70,9 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
     public string GetScript()
     {
         var data = GetScriptData();
-        return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});", 
-            scriptName.ToSingleQuoted(), data.ToJson());
+        return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});",
+            scriptName.ToSingleQuoted(),
+            JSON.Stringify(data, writeNulls: false));
     }
 
     /// <inheritdoc/>
@@ -80,7 +81,7 @@ public abstract class PropertyItemsScript : INamedDynamicScript, IGetScriptData
         var data = new PropertyItemsData
         {
             Items = propertyProvider.GetPropertyItemsFor(type).ToList(),
-            AdditionalItems = new()
+            AdditionalItems = []
         };
 
         if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))

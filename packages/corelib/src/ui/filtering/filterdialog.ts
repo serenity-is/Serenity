@@ -1,17 +1,18 @@
-﻿import { Decorators } from "../../decorators";
-import { notifyError, localText } from "../../q";
+﻿import { DialogTexts, localText, notifyError } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { FilterPanel } from "./filterpanel";
+import { WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass('Serenity.FilterDialog')
-export class FilterDialog extends TemplatedDialog<any> {
+export class FilterDialog<P = {}> extends TemplatedDialog<P> {
 
     private filterPanel: FilterPanel;
 
-    constructor() {
-        super();
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
-        this.filterPanel = new FilterPanel(this.byId('FilterPanel'));
+        this.filterPanel = new FilterPanel({ element: this.byId('FilterPanel') });
         this.filterPanel.set_showInitialLine(true);
         this.filterPanel.set_showSearchButton(false);
         this.filterPanel.set_updateStoreOnReset(false);
@@ -30,7 +31,7 @@ export class FilterDialog extends TemplatedDialog<any> {
     protected getDialogButtons() {
         return [
             {
-                text: localText('Dialogs.OkButton'),
+                text: DialogTexts.OkButton,
                 click: () => {
                     this.filterPanel.search();
                     if (this.filterPanel.get_hasErrors()) {
@@ -42,7 +43,7 @@ export class FilterDialog extends TemplatedDialog<any> {
                 }
             },
             {
-                text: localText('Dialogs.CancelButton'),
+                text: DialogTexts.CancelButton,
                 click: () => this.dialogClose()
             }
         ];

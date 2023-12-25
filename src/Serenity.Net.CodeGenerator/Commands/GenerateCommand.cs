@@ -1,42 +1,42 @@
 using Serenity.Data.Schema;
-using Spectre.Console;
 
 namespace Serenity.CodeGenerator;
 
-public partial class GenerateCommand : BaseFileSystemCommand
+public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole console)
+    : BaseGeneratorCommand(project, console)
 {
-    private readonly IAnsiConsole ansiConsole;
+    public IArgumentReader Arguments { get; set; }
 
-    public GenerateCommand(IGeneratorFileSystem fileSystem, IAnsiConsole ansiConsole)
-        : base(fileSystem)
+    public override ExitCodes Run()
     {
-        this.ansiConsole = ansiConsole ?? throw new ArgumentNullException(nameof(ansiConsole));
-    }
+        ArgumentNullException.ThrowIfNull(Arguments);
 
-    public ExitCodes Run(string csproj, string[] args)
-    {
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
+        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var config = FileSystem.LoadGeneratorConfig(projectDir);
 
-        var connectionStrings = ParseConnectionStrings(fileSystem, csproj, config);
+        var connectionStrings = ParseConnectionStrings(FileSystem, ProjectFile, config);
         if (connectionStrings.Count == 0)
         {
             Error("No connections in appsettings files or sergen.json!");
             return ExitCodes.NoConnectionString;
         }
 
-        var argsConnectionKey = GetOption(args, "c").TrimToNull();
-        var argsModule = GetOption(args, "m").TrimToNull();
-        var argsIdentifier = GetOption(args, "i").TrimToNull();
-        var argsPermissionKey = GetOption(args, "p").TrimToNull();
+        var argsConnectionKey = Arguments.GetString(
+            ["cnk", "connkey", "connectionkey", "connection-key"]);
+        var argsModule = Arguments.GetString(["mod", "module"], required: false);
+        var argsIdentifier = Arguments.GetString(["cls", "idn", "identifier"]);
+        var argsPermissionKey = Arguments.GetString(
+            ["pms", "permission", "permissionkey", "permission-key"], required: false);
+        var argsTable = Arguments.GetString(["tbl", "table"]);
+        var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]);
+
+        Arguments.ThrowIfRemaining();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
-            Templates.TemplatePath = fileSystem.Combine(projectDir, config.CustomTemplates);
+            Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
 
-        WriteHeading("Table Code Generation");
-
-        var argsTable = GetOption(args, "t").TrimToNull();
-        var what = GetOption(args, "w").TrimToNull();
+        Console.WriteLine("Table Code Generation", ConsoleColor.DarkGreen);
+        Console.WriteLine();
 
         var connectionKey = argsConnectionKey ?? SelectConnection(connectionStrings);
 
@@ -67,8 +67,8 @@ public partial class GenerateCommand : BaseFileSystemCommand
         var confConnection = config.Connections.FirstOrDefault(x =>
             string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
-        var selectedTableNames = !string.IsNullOrEmpty(argsTable) ? new[] { argsTable } : SelectTables(allTableNames);
-        if (!selectedTableNames.Any())
+        List<string> selectedTableNames = !string.IsNullOrEmpty(argsTable) ? [argsTable] : SelectTables(allTableNames);
+        if (selectedTableNames.Count == 0)
         {
             Error("No tables selected!");
             return ExitCodes.NoTablesSelected;
@@ -95,14 +95,14 @@ public partial class GenerateCommand : BaseFileSystemCommand
 
             if (string.IsNullOrEmpty(module))
                 module = confTable?.Module?.TrimToNull() is null ?
-                    EntityModelGenerator.IdentifierForTable(connectionKey) : confTable.Module;
+                    EntityModelFactory.IdentifierForTable(connectionKey) : confTable.Module;
 
             module = argsModule ?? SelectModule(tableName, module);
 
             var defaultIdentifier = confTable?.Identifier?.IsTrimmedEmpty() != false ?
-                EntityModelGenerator.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
+                EntityModelFactory.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
 
-            var identifier = (selectedTableNames.Count() == 1 ? 
+            var identifier = (selectedTableNames.Count == 1 ? 
                 argsIdentifier : null) ?? SelectIdentifier(tableName, defaultIdentifier);
 
             permissionKey = argsPermissionKey ?? SelectPermissionKey(tableName, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);
@@ -119,12 +119,12 @@ public partial class GenerateCommand : BaseFileSystemCommand
             });
         }
 
-        if (what != null)
+        if (argsWhat != null)
         {
-            config.GenerateRow = what == "*" || what.Contains('R', StringComparison.OrdinalIgnoreCase);
-            config.GenerateService = what == "*" || what.Contains('S', StringComparison.OrdinalIgnoreCase);
-            config.GenerateUI = what == "*" || what.Contains('U', StringComparison.OrdinalIgnoreCase);
-            config.GenerateCustom = what == "*" || what.Contains('C', StringComparison.OrdinalIgnoreCase);
+            config.GenerateRow = argsWhat == "*" || argsWhat.Contains('R', StringComparison.OrdinalIgnoreCase);
+            config.GenerateService = argsWhat == "*" || argsWhat.Contains('S', StringComparison.OrdinalIgnoreCase);
+            config.GenerateUI = argsWhat == "*" || argsWhat.Contains('U', StringComparison.OrdinalIgnoreCase);
+            config.GenerateCustom = argsWhat == "*" || argsWhat.Contains('C', StringComparison.OrdinalIgnoreCase);
         }
         else
         {
@@ -135,13 +135,30 @@ public partial class GenerateCommand : BaseFileSystemCommand
             config.GenerateCustom = whatToGenerate.Contains("Custom", StringComparer.Ordinal);
         }
 
+        var modelFactory = new EntityModelFactory();
+
+        EntityModel createModel(EntityModelInputs inputs)
+        {
+            using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
+            connection.EnsureOpen();
+
+            var csprojContent = FileSystem.ReadAllText(Project.ProjectFile);
+            inputs.Net5Plus = !Net5PlusRegex().IsMatch(csprojContent);
+
+            inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
+                StringComparison.OrdinalIgnoreCase);
+
+            inputs.DataSchema = new EntityDataSchema(connection);
+            return modelFactory.Create(inputs);
+        }
+
         ApplicationMetadata application = null;
         try
         {
-            var assemblyFiles = ServerTypingsCommand.DetermineAssemblyFiles(fileSystem, csproj, config, (error) => { });
+            var assemblyFiles = Project.GetAssemblyList(config.ServerTypings?.Assemblies);
             if (assemblyFiles != null && assemblyFiles.Length > 0)
             {
-                application = new ApplicationMetadata(fileSystem, assemblyFiles)
+                application = new ApplicationMetadata(FileSystem, assemblyFiles)
                 {
                     DefaultSchema = schemaProvider.DefaultSchema
                 };
@@ -151,8 +168,8 @@ public partial class GenerateCommand : BaseFileSystemCommand
                     inputs.SkipForeignKeys = true;
                     try
                     {
-                        var entityModel = CreateEntityModel(inputs, new EntityModelGenerator(), csproj, fileSystem, sqlConnections);
-                        application.EntityModels.Add(entityModel);
+                        var model = createModel(inputs);
+                        application.EntityModels.Add(model);
                     }
                     finally
                     {
@@ -163,20 +180,18 @@ public partial class GenerateCommand : BaseFileSystemCommand
         }
         catch { }
 
+        var writer = new GeneratedFileWriter(Project.FileSystem, Console);
         foreach (var inputs in inputsList)
         {
             UpdateConfigTableFor(inputs, confConnection);
-
             inputs.Application = application;
-
-            var generator = CreateCodeGenerator(inputs, new EntityModelGenerator(),
-                csproj, fileSystem, sqlConnections, interactive: true);
-
+            var model = createModel(inputs);
+            var generator = new EntityCodeGenerator(Project, model, inputs.Config, writer);
             generator.Run();
         }
 
         if (config.SaveGeneratedTables != false)
-            fileSystem.WriteAllText(fileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
+            FileSystem.WriteAllText(FileSystem.Combine(projectDir, "sergen.json"), config.SaveToJson());
 
         return ExitCodes.Success;
     }

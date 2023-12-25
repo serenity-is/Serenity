@@ -8,31 +8,27 @@ namespace SerenityIs.Administration;
 /// <summary>
 /// Local text data script to access local texts from an external app like mobile
 /// </summary>
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="localTextRegistry">Local text registry</param>
+/// <param name="localTextPackages">Package list</param>
+/// <param name="httpContextAccessor">HTTP context accessor</param>
+/// <exception cref="ArgumentNullException">One of arguments is null</exception>
 [DataScript("LocalText", CacheDuration = 3600)]
-public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICacheSuffix
+public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages, IHttpContextAccessor httpContextAccessor) : DataScript<IDictionary<string, string>>, ICacheSuffix
 {
-    private readonly ILocalTextRegistry localTextRegistry;
-    private readonly IOptions<LocalTextPackages> localTextPackages;
-    private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly ILocalTextRegistry localTextRegistry = localTextRegistry ?? throw new ArgumentNullException(nameof(localTextRegistry));
+    private readonly IOptions<LocalTextPackages> localTextPackages = localTextPackages ?? throw new ArgumentNullException(nameof(localTextPackages));
+    private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="localTextRegistry">Local text registry</param>
-    /// <param name="localTextPackages">Package list</param>
-    /// <param name="httpContextAccessor">HTTP context accessor</param>
-    /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-    public LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages, IHttpContextAccessor httpContextAccessor)
-    {
-        this.localTextRegistry = localTextRegistry ?? throw new ArgumentNullException(nameof(localTextRegistry));
-        this.localTextPackages = localTextPackages ?? throw new ArgumentNullException(nameof(localTextPackages));
-        this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    }
-    
     /// <inheritdoc/>
     public string CacheSuffix => GetLanguageId(out string packageId) + ":" + packageId;
 
-    private static readonly Regex LanguageIDRegex = new(@"^[a-z]{2}(-[A-Z]{2})?$");
+    private static readonly Regex LanguageIDRegex = LanguageIDRegexGen();
+
+    [GeneratedRegex(@"^[a-z]{2}(-[A-Z]{2})?$")]
+    private static partial Regex LanguageIDRegexGen();
 
     private string GetLanguageId(out string packageId)
     {
@@ -63,8 +59,7 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
         string includes, string languageId, bool isPending, string packageId = null)
     {
-        if (registry == null)
-            throw new ArgumentNullException(nameof(registry));
+        ArgumentNullException.ThrowIfNull(registry);
 
         var result = new Dictionary<string, string>();
 
@@ -73,7 +68,7 @@ public class LocalTextDataScript : DataScript<IDictionary<string, string>>, ICac
 
         var regex = new Regex(includes, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         var texts = registry is LocalTextRegistry ltr ? 
-            ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : new Dictionary<string, string>();
+            ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : [];
 
         foreach (var pair in texts)
             if (regex.IsMatch(pair.Key) ||

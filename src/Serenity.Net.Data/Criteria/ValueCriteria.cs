@@ -6,18 +6,13 @@ namespace Serenity.Data;
 /// Criteria object with one value
 /// </summary>
 /// <seealso cref="BaseCriteria" />
-public class ValueCriteria : BaseCriteria
+/// <remarks>
+/// Initializes a new instance of the <see cref="ValueCriteria"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class ValueCriteria(object value) : BaseCriteria
 {
-    private readonly object value;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public ValueCriteria(object value)
-    {
-        this.value = value;
-    }
+    private readonly object value = value;
 
     /// <summary>
     /// Gets the value.

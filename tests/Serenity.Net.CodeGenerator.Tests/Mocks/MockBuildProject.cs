@@ -7,13 +7,11 @@ public class MockBuildProject : IBuildProject
 {
     private readonly XElement project;
 
-    public MockBuildProject(IGeneratorFileSystem fileSystem, string path)
+    public MockBuildProject(IFileSystem fileSystem, string path)
     {
-        if (fileSystem == null)
-            throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(fileSystem);
 
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
 
         project = XElement.Load(fileSystem.ReadAllText(path));
     }

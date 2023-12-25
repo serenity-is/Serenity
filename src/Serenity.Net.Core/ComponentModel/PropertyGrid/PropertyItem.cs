@@ -1,4 +1,3 @@
-﻿using Newtonsoft.Json.Linq;
 
 namespace Serenity.ComponentModel;
 
@@ -14,7 +13,8 @@ public class PropertyItem
     /// <value>
     /// The name.
     /// </value>
-    [JsonProperty("name")]
+    [Newtonsoft.Json.JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
@@ -24,7 +24,8 @@ public class PropertyItem
     /// <value>
     /// The title.
     /// </value>
-    [JsonProperty("title")]
+    [Newtonsoft.Json.JsonProperty("title")]
+    [JsonPropertyName("title")]
     public string? Title { get; set; }
 
 
@@ -35,7 +36,8 @@ public class PropertyItem
     /// <value>
     /// The hint.
     /// </value>
-    [JsonProperty("hint")]
+    [Newtonsoft.Json.JsonProperty("hint")]
+    [JsonPropertyName("hint")]
     public string? Hint { get; set; }
 
 
@@ -46,7 +48,8 @@ public class PropertyItem
     /// <value>
     /// The placeholder.
     /// </value>
-    [JsonProperty("placeholder")]
+    [Newtonsoft.Json.JsonProperty("placeholder")]
+    [JsonPropertyName("placeholder")]
     public string? Placeholder { get; set; }
 
 
@@ -56,7 +59,8 @@ public class PropertyItem
     /// <value>
     /// The type of the editor.
     /// </value>
-    [JsonProperty("editorType")]
+    [Newtonsoft.Json.JsonProperty("editorType")]
+    [JsonPropertyName("editorType")]
     public string? EditorType { get; set; }
 
 
@@ -68,7 +72,8 @@ public class PropertyItem
     /// <value>
     /// The editor parameters.
     /// </value>
-    [JsonProperty("editorParams")]
+    [Newtonsoft.Json.JsonProperty("editorParams")]
+    [JsonPropertyName("editorParams")]
     public Dictionary<string, object>? EditorParams { get; set; }
 
     /// <summary>
@@ -78,7 +83,8 @@ public class PropertyItem
     /// <value>
     /// The category.
     /// </value>
-    [JsonProperty("category")]
+    [Newtonsoft.Json.JsonProperty("category")]
+    [JsonPropertyName("category")]
     public string? Category { get; set; }
 
 
@@ -89,7 +95,8 @@ public class PropertyItem
     /// <value>
     /// The collapsible.
     /// </value>
-    [JsonProperty("collapsible")]
+    [Newtonsoft.Json.JsonProperty("collapsible")]
+    [JsonPropertyName("collapsible")]
     public bool? Collapsible { get; set; }
 
     /// <summary>
@@ -98,7 +105,8 @@ public class PropertyItem
     /// <value>
     /// The collapsed.
     /// </value>
-    [JsonProperty("collapsed")]
+    [Newtonsoft.Json.JsonProperty("collapsed")]
+    [JsonPropertyName("collapsed")]
     public bool? Collapsed { get; set; }
 
     /// <summary>
@@ -107,7 +115,8 @@ public class PropertyItem
     /// <value>
     /// The tab.
     /// </value>
-    [JsonProperty("tab")]
+    [Newtonsoft.Json.JsonProperty("tab")]
+    [JsonPropertyName("tab")]
     public string? Tab { get; set; }
 
     /// <summary>
@@ -117,7 +126,8 @@ public class PropertyItem
     /// <value>
     /// The CSS class.
     /// </value>
-    [JsonProperty("cssClass")]
+    [Newtonsoft.Json.JsonProperty("cssClass")]
+    [JsonPropertyName("cssClass")]
     public string? CssClass { get; set; }
 
     /// <summary>
@@ -127,7 +137,8 @@ public class PropertyItem
     /// <value>
     /// The header CSS class.
     /// </value>
-    [JsonProperty("headerCssClass")]
+    [Newtonsoft.Json.JsonProperty("headerCssClass")]
+    [JsonPropertyName("headerCssClass")]
     public string? HeaderCssClass { get; set; }
 
     /// <summary>
@@ -138,7 +149,8 @@ public class PropertyItem
     /// <value>
     /// The form CSS class.
     /// </value>
-    [JsonProperty("formCssClass")]
+    [Newtonsoft.Json.JsonProperty("formCssClass")]
+    [JsonPropertyName("formCssClass")]
     public string? FormCssClass { get; set; }
 
     /// <summary>
@@ -147,7 +159,8 @@ public class PropertyItem
     /// <value>
     /// The maximum length.
     /// </value>
-    [JsonProperty("maxLength")]
+    [Newtonsoft.Json.JsonProperty("maxLength")]
+    [JsonPropertyName("maxLength")]
     public int? MaxLength { get; set; }
 
     /// <summary>
@@ -156,7 +169,8 @@ public class PropertyItem
     /// <value>
     /// The required.
     /// </value>
-    [JsonProperty("required")]
+    [Newtonsoft.Json.JsonProperty("required")]
+    [JsonPropertyName("required")]
     public bool? Required { get; set; }
 
     /// <summary>
@@ -165,7 +179,8 @@ public class PropertyItem
     /// <value>
     /// The read only.
     /// </value>
-    [JsonProperty("readOnly")]
+    [Newtonsoft.Json.JsonProperty("readOnly")]
+    [JsonPropertyName("readOnly")]
     public bool? ReadOnly { get; set; }
 
     /// <summary>
@@ -175,7 +190,8 @@ public class PropertyItem
     /// <value>
     /// The read permission.
     /// </value>
-    [JsonProperty("readPermission")]
+    [Newtonsoft.Json.JsonProperty("readPermission")]
+    [JsonPropertyName("readPermission")]
     public string? ReadPermission { get; set; }
 
     /// <summary>
@@ -186,7 +202,8 @@ public class PropertyItem
     /// <value>
     /// The insertable.
     /// </value>
-    [JsonProperty("insertable")]
+    [Newtonsoft.Json.JsonProperty("insertable")]
+    [JsonPropertyName("insertable")]
     public bool? Insertable { get; set; }
 
     /// <summary>
@@ -197,7 +214,8 @@ public class PropertyItem
     /// <value>
     /// The insert permission.
     /// </value>
-    [JsonProperty("insertPermission")]
+    [Newtonsoft.Json.JsonProperty("insertPermission")]
+    [JsonPropertyName("insertPermission")]
     public string? InsertPermission { get; set; }
 
     /// <summary>
@@ -207,7 +225,8 @@ public class PropertyItem
     /// <value>
     /// The hide on insert flag.
     /// </value>
-    [JsonProperty("hideOnInsert")]
+    [Newtonsoft.Json.JsonProperty("hideOnInsert")]
+    [JsonPropertyName("hideOnInsert")]
     public bool? HideOnInsert { get; set; }
 
 
@@ -219,7 +238,8 @@ public class PropertyItem
     /// <value>
     /// The updatable.
     /// </value>
-    [JsonProperty("updatable")]
+    [Newtonsoft.Json.JsonProperty("updatable")]
+    [JsonPropertyName("updatable")]
     public bool? Updatable { get; set; }
 
     /// <summary>
@@ -230,7 +250,8 @@ public class PropertyItem
     /// <value>
     /// The update permission.
     /// </value>
-    [JsonProperty("updatePermission")]
+    [Newtonsoft.Json.JsonProperty("updatePermission")]
+    [JsonPropertyName("updatePermission")]
     public string? UpdatePermission { get; set; }
 
     /// <summary>
@@ -240,7 +261,8 @@ public class PropertyItem
     /// <value>
     /// The hide on insert flag.
     /// </value>
-    [JsonProperty("hideOnUpdate")]
+    [Newtonsoft.Json.JsonProperty("hideOnUpdate")]
+    [JsonPropertyName("hideOnUpdate")]
     public bool? HideOnUpdate { get; set; }
 
     /// <summary>
@@ -250,7 +272,8 @@ public class PropertyItem
     /// <value>
     /// The one way.
     /// </value>
-    [JsonProperty("oneWay")]
+    [Newtonsoft.Json.JsonProperty("oneWay")]
+    [JsonPropertyName("oneWay")]
     public bool? OneWay { get; set; }
 
     /// <summary>
@@ -260,7 +283,8 @@ public class PropertyItem
     /// <value>
     /// The default value.
     /// </value>
-    [JsonProperty("defaultValue")]
+    [Newtonsoft.Json.JsonProperty("defaultValue")]
+    [JsonPropertyName("defaultValue")]
     public object? DefaultValue { get; set; }
 
     /// <summary>
@@ -271,7 +295,8 @@ public class PropertyItem
     /// <value>
     /// The localizable.
     /// </value>
-    [JsonProperty("localizable")]
+    [Newtonsoft.Json.JsonProperty("localizable")]
+    [JsonPropertyName("localizable")]
     public bool? Localizable { get; set; }
 
 
@@ -281,7 +306,8 @@ public class PropertyItem
     /// <value>
     /// The visible.
     /// </value>
-    [JsonProperty("visible")]
+    [Newtonsoft.Json.JsonProperty("visible")]
+    [JsonPropertyName("visible")]
     public bool? Visible { get; set; }
 
 
@@ -291,7 +317,8 @@ public class PropertyItem
     /// <value>
     /// The allow hide.
     /// </value>
-    [JsonProperty("allowHide")]
+    [Newtonsoft.Json.JsonProperty("allowHide")]
+    [JsonPropertyName("allowHide")]
     public bool? AllowHide { get; set; }
 
     /// <summary>
@@ -300,7 +327,8 @@ public class PropertyItem
     /// <value>
     /// The type of the formatter.
     /// </value>
-    [JsonProperty("formatterType")]
+    [Newtonsoft.Json.JsonProperty("formatterType")]
+    [JsonPropertyName("formatterType")]
     public string? FormatterType { get; set; }
 
     /// <summary>
@@ -309,7 +337,8 @@ public class PropertyItem
     /// <value>
     /// The formatter parameters.
     /// </value>
-    [JsonProperty("formatterParams")]
+    [Newtonsoft.Json.JsonProperty("formatterParams")]
+    [JsonPropertyName("formatterParams")]
     public Dictionary<string, object>? FormatterParams { get; set; }
 
     /// <summary>
@@ -320,7 +349,8 @@ public class PropertyItem
     /// <value>
     /// The display format.
     /// </value>
-    [JsonProperty("displayFormat")]
+    [Newtonsoft.Json.JsonProperty("displayFormat")]
+    [JsonPropertyName("displayFormat")]
     public string? DisplayFormat { get; set; }
 
     /// <summary>
@@ -330,7 +360,8 @@ public class PropertyItem
     /// <value>
     /// The alignment.
     /// </value>
-    [JsonProperty("alignment")]
+    [Newtonsoft.Json.JsonProperty("alignment")]
+    [JsonPropertyName("alignment")]
     public string? Alignment { get; set; }
 
     /// <summary>
@@ -340,7 +371,8 @@ public class PropertyItem
     /// <value>
     /// The width.
     /// </value>
-    [JsonProperty("width")]
+    [Newtonsoft.Json.JsonProperty("width")]
+    [JsonPropertyName("width")]
     public int? Width { get; set; }
 
     /// <summary>
@@ -353,7 +385,8 @@ public class PropertyItem
     /// <value>
     /// The width set.
     /// </value>
-    [JsonProperty("widthSet")]
+    [Newtonsoft.Json.JsonProperty("widthSet")]
+    [JsonPropertyName("widthSet")]
     public bool? WidthSet { get; set; }
 
     /// <summary>
@@ -362,7 +395,8 @@ public class PropertyItem
     /// <value>
     /// The minimum width.
     /// </value>
-    [JsonProperty("minWidth")]
+    [Newtonsoft.Json.JsonProperty("minWidth")]
+    [JsonPropertyName("minWidth")]
     public int? MinWidth { get; set; }
 
     /// <summary>
@@ -371,7 +405,8 @@ public class PropertyItem
     /// <value>
     /// The maximum width.
     /// </value>
-    [JsonProperty("maxWidth")]
+    [Newtonsoft.Json.JsonProperty("maxWidth")]
+    [JsonPropertyName("maxWidth")]
     public int? MaxWidth { get; set; }
 
     /// <summary>
@@ -380,7 +415,8 @@ public class PropertyItem
     /// <value>
     /// The width of the label.
     /// </value>
-    [JsonProperty("labelWidth")]
+    [Newtonsoft.Json.JsonProperty("labelWidth")]
+    [JsonPropertyName("labelWidth")]
     public string? LabelWidth { get; set; }
 
     /// <summary>
@@ -389,7 +425,8 @@ public class PropertyItem
     /// <value>
     /// The resizable.
     /// </value>
-    [JsonProperty("resizable")]
+    [Newtonsoft.Json.JsonProperty("resizable")]
+    [JsonPropertyName("resizable")]
     public bool? Resizable { get; set; }
 
     /// <summary>
@@ -398,7 +435,8 @@ public class PropertyItem
     /// <value>
     /// The sortable.
     /// </value>
-    [JsonProperty("sortable")]
+    [Newtonsoft.Json.JsonProperty("sortable")]
+    [JsonPropertyName("sortable")]
     public bool? Sortable { get; set; }
 
     /// <summary>
@@ -409,7 +447,8 @@ public class PropertyItem
     /// <value>
     /// The sort order.
     /// </value>
-    [JsonProperty("sortOrder")]
+    [Newtonsoft.Json.JsonProperty("sortOrder")]
+    [JsonPropertyName("sortOrder")]
     public int? SortOrder { get; set; }
 
     /// <summary>
@@ -420,7 +459,8 @@ public class PropertyItem
     /// <value>
     /// The sort order.
     /// </value>
-    [JsonProperty("groupOrder")]
+    [Newtonsoft.Json.JsonProperty("groupOrder")]
+    [JsonPropertyName("groupOrder")]
     public int? GroupOrder { get; set; }
 
 
@@ -430,7 +470,8 @@ public class PropertyItem
     /// <value>
     /// The type of the summary.
     /// </value>
-    [JsonProperty("summaryType")]
+    [Newtonsoft.Json.JsonProperty("summaryType")]
+    [JsonPropertyName("summaryType")]
     public SummaryType? SummaryType { get; set; }
 
     /// <summary>
@@ -440,7 +481,8 @@ public class PropertyItem
     /// <value>
     /// The edit link.
     /// </value>
-    [JsonProperty("editLink")]
+    [Newtonsoft.Json.JsonProperty("editLink")]
+    [JsonPropertyName("editLink")]
     public bool? EditLink { get; set; }
 
     /// <summary>
@@ -450,7 +492,8 @@ public class PropertyItem
     /// <value>
     /// The type of the edit link item.
     /// </value>
-    [JsonProperty("editLinkItemType")]
+    [Newtonsoft.Json.JsonProperty("editLinkItemType")]
+    [JsonPropertyName("editLinkItemType")]
     public string? EditLinkItemType { get; set; }
 
     /// <summary>
@@ -461,7 +504,8 @@ public class PropertyItem
     /// <value>
     /// The edit link identifier field.
     /// </value>
-    [JsonProperty("editLinkIdField")]
+    [Newtonsoft.Json.JsonProperty("editLinkIdField")]
+    [JsonPropertyName("editLinkIdField")]
     public string? EditLinkIdField { get; set; }
 
     /// <summary>
@@ -470,7 +514,8 @@ public class PropertyItem
     /// <value>
     /// The edit link CSS class.
     /// </value>
-    [JsonProperty("editLinkCssClass")]
+    [Newtonsoft.Json.JsonProperty("editLinkCssClass")]
+    [JsonPropertyName("editLinkCssClass")]
     public string? EditLinkCssClass { get; set; }
 
     /// <summary>
@@ -479,7 +524,8 @@ public class PropertyItem
     /// <value>
     /// The type of the filtering.
     /// </value>
-    [JsonProperty("filteringType")]
+    [Newtonsoft.Json.JsonProperty("filteringType")]
+    [JsonPropertyName("filteringType")]
     public string? FilteringType { get; set; }
 
 
@@ -489,7 +535,8 @@ public class PropertyItem
     /// <value>
     /// The filtering parameters.
     /// </value>
-    [JsonProperty("filteringParams")]
+    [Newtonsoft.Json.JsonProperty("filteringParams")]
+    [JsonPropertyName("filteringParams")]
     public Dictionary<string, object>? FilteringParams { get; set; }
 
     /// <summary>
@@ -500,7 +547,8 @@ public class PropertyItem
     /// <value>
     /// The filtering identifier field.
     /// </value>
-    [JsonProperty("filteringIdField")]
+    [Newtonsoft.Json.JsonProperty("filteringIdField")]
+    [JsonPropertyName("filteringIdField")]
     public string? FilteringIdField { get; set; }
 
     /// <summary>
@@ -511,7 +559,8 @@ public class PropertyItem
     /// <value>
     /// The filter only.
     /// </value>
-    [JsonProperty("filterOnly")]
+    [Newtonsoft.Json.JsonProperty("filterOnly")]
+    [JsonPropertyName("filterOnly")]
     public bool? FilterOnly { get; set; }
 
     /// <summary>
@@ -521,7 +570,8 @@ public class PropertyItem
     /// <value>
     /// The not filterable.
     /// </value>
-    [JsonProperty("notFilterable")]
+    [Newtonsoft.Json.JsonProperty("notFilterable")]
+    [JsonPropertyName("notFilterable")]
     public bool? NotFilterable { get; set; }
 
     /// <summary>
@@ -531,7 +581,8 @@ public class PropertyItem
     /// <value>
     /// The quick filter.
     /// </value>
-    [JsonProperty("quickFilter")]
+    [Newtonsoft.Json.JsonProperty("quickFilter")]
+    [JsonPropertyName("quickFilter")]
     public bool? QuickFilter { get; set; }
 
     /// <summary>
@@ -540,7 +591,8 @@ public class PropertyItem
     /// <value>
     /// The quick filter parameters.
     /// </value>
-    [JsonProperty("quickFilterParams")]
+    [Newtonsoft.Json.JsonProperty("quickFilterParams")]
+    [JsonPropertyName("quickFilterParams")]
     public Dictionary<string, object>? QuickFilterParams { get; set; }
 
     /// <summary>
@@ -549,7 +601,8 @@ public class PropertyItem
     /// <value>
     /// The quick filter separator.
     /// </value>
-    [JsonProperty("quickFilterSeparator")]
+    [Newtonsoft.Json.JsonProperty("quickFilterSeparator")]
+    [JsonPropertyName("quickFilterSeparator")]
     public bool? QuickFilterSeparator { get; set; }
 
     /// <summary>
@@ -558,7 +611,8 @@ public class PropertyItem
     /// <value>
     /// The quick filter CSS class.
     /// </value>
-    [JsonProperty("quickFilterCssClass")]
+    [Newtonsoft.Json.JsonProperty("quickFilterCssClass")]
+    [JsonPropertyName("quickFilterCssClass")]
     public string? QuickFilterCssClass { get; set; }
 
     /// <summary>
@@ -569,7 +623,8 @@ public class PropertyItem
     /// The extension data.
     /// </value>
     [JsonExtensionData]
-    public IDictionary<string, JToken>? ExtensionData { get; set; }
+    [Newtonsoft.Json.JsonExtensionData]
+    public Dictionary<string, object>? ExtensionData { get; set; }
 
     /// <summary>
     /// Should the EditorType property be serialized by JSON.NET, used to reduce JSON size.
@@ -624,10 +679,10 @@ public class PropertyItem
     /// </summary>
     public PropertyItem()
     {
-        EditorParams = new Dictionary<string, object>();
-        FormatterParams = new Dictionary<string, object>();
-        FilteringParams = new Dictionary<string, object>();
-        QuickFilterParams = new Dictionary<string, object>();
-        ExtensionData = new Dictionary<string, JToken>();
+        EditorParams = [];
+        FormatterParams = [];
+        FilteringParams = [];
+        QuickFilterParams = [];
+        ExtensionData = [];
     }
 }

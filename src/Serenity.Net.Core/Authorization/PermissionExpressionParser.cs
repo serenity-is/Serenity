@@ -59,7 +59,7 @@ public static class PermissionExpressionParser
         }
     }
 
-    static readonly string[] operators = new string[] { "!", "&", "|" };
+    static readonly string[] operators = ["!", "&", "|"];
     const string openParen = "(";
     const string closeParen = ")";
 

@@ -1,16 +1,17 @@
 ﻿import { Decorators } from "../../decorators";
 import { TemplatedWidget } from "../widgets/templatedwidget";
+import { WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
 @Decorators.registerClass('Serenity.FilterWidgetBase')
-export class FilterWidgetBase<TOptions> extends TemplatedWidget<TOptions> {
+export class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
     private store: FilterStore;
 
     private onFilterStoreChanged: () => void;
 
-    constructor(div: JQuery, opt?: TOptions) {
-        super(div, opt);
-
+    constructor(props: WidgetProps<P>) {
+        super(props);
+        
         this.store = new FilterStore([]);
         this.onFilterStoreChanged = () => this.filterStoreChanged();
         this.store.add_changed(this.onFilterStoreChanged);

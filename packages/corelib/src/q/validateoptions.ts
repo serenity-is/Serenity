@@ -1,8 +1,6 @@
-﻿import { extend } from "./system";
-import { notifyError } from "./notify";
-import { localText } from "./localtext";
+﻿import { isBS3, localText, notifyError } from "@serenity-is/base";
+import { extend } from "./system-compat";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
-import { isBS3 } from "./dialogs";
 
 let oldShowLabel: (e: HTMLElement, message: string) => void;
 
@@ -96,21 +94,22 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
                 .children('.category-title')
                 .each((i, x) => {
                     $(x).click();
-                    return true;
                 });
 
             if (validator.errorList.length)
             {
                 var el = validator.errorList[0].element;
                 if (el) {
-                    var bsPane = $(el).closest('.tab-pane');
-                    if (!bsPane.hasClass("active") &&
-                        bsPane.parent().hasClass('tab-content')) {
-                        var bsPaneId = bsPane.attr('id');
-                        if (bsPaneId) {
-                            $('a[href="#' + bsPaneId + '"]').click();
-                        }
+                    var bsPaneId = $(el).closest('.tab-content>.tab-pane[id]:not(.active)').attr('id');
+                    if (bsPaneId) {
+                        let selector = 'a[href="#' + bsPaneId + '"]';
+                        $(selector).click(); // bs3/bs4
+                        (document.querySelector(selector) as HTMLAnchorElement)?.click(); // bs5+
                     }
+
+                    var uiPaneId = $(el).closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)').attr('id');
+                    if (uiPaneId)
+                        $('a[href="#' + uiPaneId + '"]').click();
 
                     if (($.fn as any).tooltip) {
                         var $el: any;

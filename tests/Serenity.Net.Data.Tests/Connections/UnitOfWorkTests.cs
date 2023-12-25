@@ -429,7 +429,7 @@ public class UnitOfWorkTests
         Assert.Null(connection.BeginTransactionLevel);
         connection.Transaction.ThrowOnDispose = true;
         connection.Transaction.ThrowOnRollback = true;
-        Assert.Throws<NotImplementedException>(() => uow.Dispose());
+        Assert.Throws<NotImplementedException>(uow.Dispose);
         Assert.Equal(1, rollbackCalls);
         Assert.Equal(1, connection.Transaction.DisposeCalls);
         Assert.Equal(0, connection.Transaction.CommitCalls);
@@ -445,7 +445,7 @@ public class UnitOfWorkTests
         var uow = new UnitOfWork(connection);
         uow.Commit();
         Assert.Equal(1, connection.Transaction?.CommitCalls);
-        Assert.Throws<InvalidOperationException>(() => uow.Commit());
+        Assert.Throws<InvalidOperationException>(uow.Commit);
         Assert.Equal(1, connection.Transaction?.CommitCalls);
     }
 
@@ -489,7 +489,7 @@ public class UnitOfWorkTests
         Assert.NotNull(connection.Transaction);
         Assert.Null(connection.BeginTransactionLevel);
         connection.Transaction.ThrowOnCommit = true;
-        Assert.Throws<NotImplementedException>(() => uow.Commit());
+        Assert.Throws<NotImplementedException>(uow.Commit);
         Assert.Equal(0, commitCalls);
         Assert.Equal(0, rollbackCalls);
         Assert.Equal(1, connection.Transaction.CommitCalls);
@@ -514,7 +514,7 @@ public class UnitOfWorkTests
         Assert.Equal(1, connection.OpenCalls);
         Assert.NotNull(connection.Transaction);
         Assert.Null(connection.BeginTransactionLevel);
-        Assert.Throws<NotImplementedException>(() => uow.Commit());
+        Assert.Throws<NotImplementedException>(uow.Commit);
         Assert.Equal(0, rollbackCalls);
         Assert.Equal(1, connection.Transaction.CommitCalls);
         Assert.Equal(0, connection.Transaction.DisposeCalls);

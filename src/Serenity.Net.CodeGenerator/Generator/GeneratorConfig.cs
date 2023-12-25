@@ -1,5 +1,3 @@
-using Newtonsoft.Json.Linq;
-
 namespace Serenity.CodeGenerator;
 
 /// <summary>
@@ -132,8 +130,8 @@ public class GeneratorConfig
     public bool ShouldSerializeMVC() => MVC != null &&
         (!string.IsNullOrEmpty(MVC.OutDir) ||
          MVC.UseRootNamespace != null ||
-         MVC.SearchViewPaths?.Any() == true ||
-         MVC.StripViewPaths?.Any() == true ||
+         MVC.SearchViewPaths?.Length > 0 ||
+         MVC.StripViewPaths?.Length > 0 ||
          MVC.SourceGenerator == false);
 
     /// <summary>
@@ -172,28 +170,13 @@ public class GeneratorConfig
     public bool ShouldSerializeConnections() => Connections != null && Connections.Count > 0;
    
     /// <summary>
-    /// Full path of KDIFF3. This is no longer used.
-    /// </summary>
-    public string KDiff3Path { get; set; }
-    /// <summary>Used for Newtonsoft.JSON</summary>
-    public bool ShouldSerializeKDiff3Path() => !string.IsNullOrEmpty(KDiff3Path);
-
-    /// <summary>
-    /// Full path to TypeScript compiler. It is assumed to be in path
-    /// if not specified.
-    /// </summary>
-    public string TSCPath { get; set; }
-    /// <summary>Used for Newtonsoft.JSON</summary>
-    public bool ShouldSerializeTSCPath() => !string.IsNullOrEmpty(TSCPath);
-
-    /// <summary>
     /// List of base row classes to be used instead of Row.
     /// They are matched by list of base properties.
     /// </summary>
     public List<BaseRowClass> BaseRowClasses { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeBaseRowClasses() =>
-        BaseRowClasses != null && BaseRowClasses.Any();
+        BaseRowClasses != null && BaseRowClasses.Count > 0;
 
     /// <summary>
     /// The set of foreign fields to generate, default is All
@@ -210,7 +193,7 @@ public class GeneratorConfig
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeIncludeForeignFields() =>
-        IncludeForeignFields != null && IncludeForeignFields.Any();
+        IncludeForeignFields != null && IncludeForeignFields.Count > 0;
 
     /// <summary>
     /// A list of foreign fields to omit from generated code.
@@ -223,7 +206,7 @@ public class GeneratorConfig
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
-        RemoveForeignFields != null && RemoveForeignFields.Any();
+        RemoveForeignFields != null && RemoveForeignFields.Count > 0;
 
     /// <summary>
     /// The location of custom templates folder. The files in this folder
@@ -242,7 +225,7 @@ public class GeneratorConfig
     public Dictionary<string, string> CustomGenerate { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomGenerate() =>
-        CustomGenerate != null && CustomGenerate.Any();
+        CustomGenerate != null && CustomGenerate.Count > 0;
 
     /// <summary>
     /// Custom settings to be passed to and used in custom templates
@@ -250,7 +233,7 @@ public class GeneratorConfig
     public Dictionary<string, object> CustomSettings { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomSettings() =>
-        CustomSettings != null && CustomSettings.Any();
+        CustomSettings != null && CustomSettings.Count > 0;
 
     /// <summary>
     /// List of appsettings.json files in order.
@@ -259,27 +242,39 @@ public class GeneratorConfig
     public string[] AppSettingFiles { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeAppSettingFiles() =>
-        AppSettingFiles != null && AppSettingFiles.Any();
+        AppSettingFiles != null && AppSettingFiles.Length > 0;
 
     /// <summary>
     /// Generate row class
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateRow { get; set; }
     /// <summary>
     /// Generate service classes like repository, endpoint, service.ts etc.
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateService { get; set; }
     /// <summary>
     /// Generate UI related classes like Grid/Dialog
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateUI { get; set; }
     /// <summary>
     /// Generate custom code (user defined templates at CustomTemplates path)
     /// </summary>
+#if !ISSOURCEGENERATOR
     [JsonIgnore]
+#endif
+    [Newtonsoft.Json.JsonIgnore]
     public bool GenerateCustom { get; set; }
 
     /// <summary>
@@ -291,15 +286,18 @@ public class GeneratorConfig
     /// <summary>
     /// Holds extension data if any
     /// </summary>
+    [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
     [JsonExtensionData]
-    public IDictionary<string, JToken> ExtensionData { get; set; }
+#endif
+    public IDictionary<string, object> ExtensionData { get; set; }
 
     public GeneratorConfig()
     {
-        Connections = new List<Connection>();
-        BaseRowClasses = new List<BaseRowClass>();
-        CustomSettings = new Dictionary<string, object>();
-        CustomGenerate = new Dictionary<string, string>();
+        Connections = [];
+        BaseRowClasses = [];
+        CustomSettings = [];
+        CustomGenerate = [];
         GenerateRow = true;
         GenerateService = true;
         GenerateUI = true;
@@ -337,7 +335,7 @@ public class GeneratorConfig
         /// </summary>
         public Connection()
         {
-            Tables = new List<Table>();
+            Tables = [];
         }
 
         /// <summary>
@@ -402,9 +400,10 @@ public class GeneratorConfig
         public bool ShouldSerializeAssemblies() => Assemblies != null && Assemblies.Length > 0;
 
         /// <summary>
-        /// Output directory for server typings generated files
+        /// Output directory for server typings generated files. Not used for modules.
         /// </summary>
         public string OutDir { get; set; }
+
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
 
@@ -560,8 +559,11 @@ public class GeneratorConfig
         /// <summary>
         /// Extension data for upgrades
         /// </summary>
+        [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
         [JsonExtensionData]
-        public IDictionary<string, JToken> ExtensionData { get; set; }
+#endif
+        public IDictionary<string, object> ExtensionData { get; set; }
     }
 
     public class TSBuildConfig
@@ -579,7 +581,10 @@ public class GeneratorConfig
         /// <summary>
         /// Extension data for TSBuild
         /// </summary>
+        [Newtonsoft.Json.JsonExtensionData]
+#if !ISSOURCEGENERATOR
         [JsonExtensionData]
-        public IDictionary<string, JToken> ExtensionData { get; set; }
+#endif
+        public IDictionary<string, object> ExtensionData { get; set; }
     }
 }

@@ -133,11 +133,8 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
         var rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(rowInstance.EnumerateTableFields(), x => x.Name);
         var logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRow.EnumerateTableFields(), x => x.Name);
         var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.IdField.Name;
-        var mappedIdField = logRow.FindField(mappedIdFieldName);
-        if (mappedIdField is null)
-            throw new InvalidOperationException($"Can't locate capture log table " +
+        var mappedIdField = logRow.FindField(mappedIdFieldName) ?? throw new InvalidOperationException($"Can't locate capture log table " +
                 $"mapped ID field for {logRow.Table}!");
-
         logRow.TrackAssignments = true;
         logRow.ChangingUserIdField.AsObject(logRow, userId == null ? null :
         logRow.ChangingUserIdField.ConvertValue(userId, CultureInfo.InvariantCulture));
@@ -167,11 +164,8 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
                 else
                 {
                     var name = logField.Name[logFieldPrefixLength..];
-                    name = rowInstance.IdField.Name.Substring(0, rowFieldPrefixLength) + name;
-                    var match = rowInstance.FindField(name);
-                    if (match is null)
-                        throw new InvalidOperationException($"Can't find match in the row for log table field {name}!");
-
+                    name = rowInstance.IdField.Name[..rowFieldPrefixLength] + name;
+                    var match = rowInstance.FindField(name) ?? throw new InvalidOperationException($"Can't find match in the row for log table field {name}!");
                     yield return new Tuple<Field, Field>(logField, match);
                 }
             }

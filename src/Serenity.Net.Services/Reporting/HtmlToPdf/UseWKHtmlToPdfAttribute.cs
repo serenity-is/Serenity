@@ -5,19 +5,15 @@
 /// of another converter, e.g. Puppeeteer etc. (only if configured
 /// in service provider).
 /// </summary>
-public class UseWKHtmlToPdfAttribute : Attribute
+/// <remarks>
+/// Creates a new instance of the attribute
+/// </remarks>
+/// <param name="value"></param>
+public class UseWKHtmlToPdfAttribute(bool value = true) : Attribute
 {
-    /// <summary>
-    /// Creates a new instance of the attribute
-    /// </summary>
-    /// <param name="value"></param>
-    public UseWKHtmlToPdfAttribute(bool value = true)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the value
     /// </summary>
-    public bool Value { get; private set; }
+    public bool Value { get; private set; } = value;
 }

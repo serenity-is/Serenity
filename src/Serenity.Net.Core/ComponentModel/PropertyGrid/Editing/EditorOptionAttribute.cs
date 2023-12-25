@@ -6,19 +6,14 @@
 /// are not checked.
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="EditorOptionAttribute"/> class.
+/// </remarks>
+/// <param name="key">The key.</param>
+/// <param name="value">The value.</param>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
-public class EditorOptionAttribute : Attribute
+public class EditorOptionAttribute(string key, object? value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EditorOptionAttribute"/> class.
-    /// </summary>
-    /// <param name="key">The key.</param>
-    /// <param name="value">The value.</param>
-    public EditorOptionAttribute(string key, object? value)
-    {
-        Key = key;
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the key.
@@ -26,7 +21,7 @@ public class EditorOptionAttribute : Attribute
     /// <value>
     /// The key.
     /// </value>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = key;
 
     /// <summary>
     /// Gets the value.
@@ -34,5 +29,5 @@ public class EditorOptionAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public object? Value { get; private set; }
+    public object? Value { get; private set; } = value;
 }

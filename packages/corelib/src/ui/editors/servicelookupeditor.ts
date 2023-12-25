@@ -1,5 +1,7 @@
-﻿import { Decorators } from "../../decorators";
-import { ColumnSelection, Criteria, isEmptyOrNull, ListRequest, ListResponse, resolveUrl, serviceCall, ServiceOptions, startsWith } from "../../q";
+﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { ServiceOptions, serviceCall } from "../../q";
+import { EditorProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -19,11 +21,7 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
-export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
-
-    constructor(input: JQuery, opt?: TOptions) {
-        super(input, opt);
-    }
+export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
 
     protected getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
@@ -31,11 +29,11 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
             return dialogTypeKey;
 
         var service = this.getService();
-        if (startsWith(service, "~/Services/"))
-            service = service.substr("~/Services/".length);
+        if (service.startsWith("~/Services/"))
+            service = service.substring("~/Services/".length);
 
         if (service.split('/').length == 3)
-            service = service.substr(0, service.lastIndexOf('/'));
+            service = service.substring(0, service.lastIndexOf('/'));
 
         return service.replace("/", ".");
     }
@@ -49,13 +47,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
         if (url == null)
             throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
 
-        if (!startsWith(url, "~") && !startsWith(url, "/") && url.indexOf('://') < 0)
-            url = "~/Services/" + url;
-
-        if (startsWith(url, "~"))
-            url = resolveUrl(url);
-
-        return url;
+        return resolveServiceUrl(url);
     }
 
     protected getIncludeColumns() {
@@ -82,7 +74,7 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 
         if (val == null || val === '') {
 
-            if (!isEmptyOrNull(this.get_cascadeField())) {
+            if (this.get_cascadeField()) {
                 return ['0', '=', '1'];
             }
 
@@ -172,13 +164,13 @@ export abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdit
 
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
         var opt = this.getServiceCallOptions(query, results);
-        return serviceCall(opt);
+        return serviceCall(opt) as Select2SearchPromise;
     }
 }
 
 @Decorators.registerEditor('Serenity.ServiceLookupEditor')
-export class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions) {
-        super(hidden, opt);
+export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    constructor(props: EditorProps<P>) {
+        super(props);
     }
 }

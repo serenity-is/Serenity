@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Helper class to find differences between to lists for updating
@@ -33,19 +33,16 @@ public class DeltaLister<TItem>
         _newItems = newList ?? throw new ArgumentNullException("newList");
         _getItemId = getItemId ?? throw new ArgumentNullException("getItemId");
 
-        _oldById = new Dictionary<long, TItem>();
-        _newById = new HashSet<long>();
+        _oldById = [];
+        _newById = [];
 
         foreach (var item in oldList)
         {
             if (item == null)
                 throw new ArgumentNullException("oldItem");
 
-            var id = getItemId(item);
-            if (id == null)
-                throw new ArgumentNullException("oldItemId");
-
-            _oldById.Add(id.Value, item);
+            var id = getItemId(item) ?? throw new ArgumentNullException("oldItemId");
+            _oldById.Add(id, item);
         }
 
         foreach (var item in newList)

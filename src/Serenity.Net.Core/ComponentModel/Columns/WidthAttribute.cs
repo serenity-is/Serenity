@@ -4,16 +4,12 @@
 /// Sets column width
 /// </summary>
 /// <seealso cref="Attribute" />
-public class WidthAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="WidthAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class WidthAttribute(int value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="WidthAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public WidthAttribute(int value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the column width.
@@ -21,7 +17,7 @@ public class WidthAttribute : Attribute
     /// <value>
     /// The column width.
     /// </value>
-    public int Value { get; private set; }
+    public int Value { get; private set; } = value;
 
     /// <summary>
     /// Gets or sets the minimum width.

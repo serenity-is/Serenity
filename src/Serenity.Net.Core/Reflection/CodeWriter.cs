@@ -4,11 +4,16 @@ namespace Serenity.Reflection;
 /// <summary>
 /// Used to write formatted code to a string builder.
 /// </summary>
-public class CodeWriter
+/// <remarks>
+/// Initializes a new instance of the <see cref="CodeWriter"/> class.
+/// </remarks>
+/// <param name="sb">The sb.</param>
+/// <param name="tabSize">Number of spaces.</param>
+public class CodeWriter(StringBuilder sb, int tabSize)
 {
-    private readonly StringBuilder sb;
-    private readonly string tab;
-    private string indent;
+    private readonly StringBuilder sb = sb ?? throw new ArgumentNullException(nameof(sb));
+    private readonly string tab = new(' ', tabSize);
+    private string indent = "";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CodeWriter"/> class.
@@ -28,18 +33,6 @@ public class CodeWriter
     public CodeWriter(int tabSize = 4)
         : this(new StringBuilder(), tabSize)
     {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CodeWriter"/> class.
-    /// </summary>
-    /// <param name="sb">The sb.</param>
-    /// <param name="tabSize">Number of spaces.</param>
-    public CodeWriter(StringBuilder sb, int tabSize)
-    {
-        this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
-        tab = new string(' ', tabSize);
-        indent = "";
     }
 
     /// <summary>
@@ -282,7 +275,7 @@ public class CodeWriter
 
         if (force || AllowUsing is null || AllowUsing(ns))
         {
-            LocalUsings ??= new();
+            LocalUsings ??= [];
             LocalUsings.Add(ns);
             return true;
         }
@@ -532,8 +525,8 @@ public class CodeWriter
     /// List of usings that can be safely used during code generation
     /// without causing type name clashes
     /// </summary>
-    public static readonly HashSet<string> SafeSetOfUsings = new()
-    {
+    public static readonly HashSet<string> SafeSetOfUsings =
+    [
         "Serenity",
         "Serenity.Abstractions",
         "Serenity.ComponentModel",
@@ -551,7 +544,5 @@ public class CodeWriter
         "System.IO",
         "System.ComponentModel",
         "System.Collections.Generic"
-    };
-
-
+    ];
 }

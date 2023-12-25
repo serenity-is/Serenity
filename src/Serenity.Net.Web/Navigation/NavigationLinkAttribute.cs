@@ -72,22 +72,17 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <exception cref="InvalidOperationException">Route attribute is not found</exception>
     public static string GetUrlFromController(Type controller, string action)
     {
-        if (controller == null)
-            throw new ArgumentNullException(nameof(controller));
+        ArgumentNullException.ThrowIfNull(controller);
 
         if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));
 
         var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(x => x.Name == action)
-            .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null);
-
-        if (actionMethod == null)
-            throw new ArgumentOutOfRangeException(nameof(action),
+            .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null) ?? throw new ArgumentOutOfRangeException(nameof(action),
                 string.Format(CultureInfo.CurrentCulture,
                     "Controller {1} doesn't have an action with name {0}!",
                     action, controller.FullName));
-
         var routeController = controller.GetCustomAttributes<RouteAttribute>()
             .FirstOrDefault();
         var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>()
@@ -103,7 +98,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         static bool isRooted(string url)
         {
             return url.StartsWith("~/", StringComparison.Ordinal) ||
-                url.StartsWith("/", StringComparison.Ordinal);
+                url.StartsWith('/');
         }
 
         if (routeAction != null &&
@@ -135,7 +130,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
             if (idx1 <= 0)
                 break;
 
-            var idx2 = url.IndexOf("}", idx1 + 1, StringComparison.Ordinal);
+            var idx2 = url.IndexOf('}', idx1 + 1);
             if (idx2 <= 0)
                 break;
 
@@ -154,8 +149,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
     public static string GetPermissionFromController(Type controller, string action)
     {
-        if (controller == null)
-            throw new ArgumentNullException(nameof(controller));
+        ArgumentNullException.ThrowIfNull(controller);
 
         if (string.IsNullOrEmpty(action))
             throw new ArgumentNullException(nameof(action));

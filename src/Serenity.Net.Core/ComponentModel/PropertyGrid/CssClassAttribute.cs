@@ -6,16 +6,12 @@
 /// For columns, it sets cssClass property of SlickColumn, which adds this class to slick cells for all rows.
 /// Slick column headers are not affected by this attribute, use HeaderCssClass for that.
 /// </summary>
-public class CssClassAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="CssClassAttribute"/> class.
+/// </remarks>
+/// <param name="cssClass">The CSS class.</param>
+public class CssClassAttribute(string? cssClass) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CssClassAttribute"/> class.
-    /// </summary>
-    /// <param name="cssClass">The CSS class.</param>
-    public CssClassAttribute(string? cssClass)
-    {
-        CssClass = cssClass;
-    }
 
     /// <summary>
     /// Gets the CSS class.
@@ -23,5 +19,5 @@ public class CssClassAttribute : Attribute
     /// <value>
     /// The CSS class.
     /// </value>
-    public string? CssClass { get; private set; }
+    public string? CssClass { get; private set; } = cssClass;
 }

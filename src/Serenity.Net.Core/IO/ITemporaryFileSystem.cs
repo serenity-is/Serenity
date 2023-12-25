@@ -12,10 +12,4 @@ public interface ITemporaryFileSystem : IFileSystem
     /// <param name="path">Path</param>
     /// <returns>Array of temporary file info objects</returns>
     TemporaryFileInfo[] GetTemporaryFileInfos(string path);
-
-    /// <summary>
-    /// Gets last write time for file at path
-    /// </summary>
-    /// <param name="path">File path</param>
-    DateTime GetLastWriteTimeUtc(string path);
 }

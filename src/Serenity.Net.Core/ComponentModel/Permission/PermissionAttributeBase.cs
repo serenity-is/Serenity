@@ -4,16 +4,12 @@
 /// An abstract base attribute that all permission related attributes derive from.
 /// </summary>
 /// <seealso cref="Attribute" />
-public abstract class PermissionAttributeBase : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="PermissionAttributeBase"/> class.
+/// </remarks>
+/// <param name="permission">The permission.</param>
+public abstract class PermissionAttributeBase(object? permission) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PermissionAttributeBase"/> class.
-    /// </summary>
-    /// <param name="permission">The permission.</param>
-    public PermissionAttributeBase(object? permission)
-    {
-        Permission = permission?.ToString();
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PermissionAttributeBase"/> class.
@@ -44,5 +40,5 @@ public abstract class PermissionAttributeBase : Attribute
     /// <value>
     /// The permission.
     /// </value>
-    public string? Permission { get; private set; }
+    public string? Permission { get; private set; } = permission?.ToString();
 }

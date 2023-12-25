@@ -2,7 +2,7 @@
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    private string GetEnumKeyFor(TypeDefinition enumType)
+    private static string GetEnumKeyFor(TypeDefinition enumType)
     {
         string enumKey = enumType.FullNameOf();
         var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");

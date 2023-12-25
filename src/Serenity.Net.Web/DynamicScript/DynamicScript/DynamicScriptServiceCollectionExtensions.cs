@@ -20,8 +20,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddDynamicScriptManager(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.AddCaching();
         collection.AddTextRegistry();
@@ -49,8 +48,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddFileWatcherFactory(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.TryAddSingleton<IFileWatcherFactory, DefaultFileWatcherFactory>();
         return collection;
@@ -62,8 +60,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     public static IServiceCollection AddContentHashCache(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         AddFileWatcherFactory(collection);
         collection.AddOptions();
@@ -79,8 +76,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Collection is null</exception>
     public static void AddCssBundling(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
@@ -98,11 +94,9 @@ public static class DynamicScriptServiceCollectionExtensions
     public static void AddCssBundling(this IServiceCollection collection,
         Action<CssBundlingOptions> setupAction)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
-        if (setupAction == null)
-            throw new ArgumentNullException(nameof(setupAction));
+        ArgumentNullException.ThrowIfNull(setupAction);
 
         collection.AddCssBundling();
         collection.Configure(setupAction);
@@ -116,8 +110,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Collection is null</exception>
     public static void AddScriptBundling(this IServiceCollection collection)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
@@ -135,11 +128,9 @@ public static class DynamicScriptServiceCollectionExtensions
     public static void AddScriptBundling(this IServiceCollection collection, 
         Action<ScriptBundlingOptions> setupAction)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
-        if (setupAction == null)
-            throw new ArgumentNullException(nameof(setupAction));
+        ArgumentNullException.ThrowIfNull(setupAction);
 
         collection.AddScriptBundling();
         collection.Configure(setupAction);
@@ -162,8 +153,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <param name="builder">Application builder</param>
     public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         UseDynamicScriptTypes(builder.ApplicationServices);
         UseCssWatching(builder.ApplicationServices);
@@ -194,17 +184,17 @@ public static class DynamicScriptServiceCollectionExtensions
         DistinctValuesRegistration.RegisterDistinctValueScripts(scriptManager,
             typeSource, serviceProvider);
 
-        ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager,
+        var columnScripts = ColumnsScriptRegistration.RegisterColumnsScripts(scriptManager,
             typeSource, propertyProvider, serviceProvider);
 
-        FormScriptRegistration.RegisterFormScripts(scriptManager,
+        var formScripts = FormScriptRegistration.RegisterFormScripts(scriptManager,
             typeSource, propertyProvider, serviceProvider);
 
         scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
             new Func<string>[]
             {
-                () => scriptManager.GetScriptText("ColumnsBundle"),
-                () => scriptManager.GetScriptText("FormBundle")
+                () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
+                    .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
             }));
 
         return serviceProvider;
@@ -232,8 +222,7 @@ public static class DynamicScriptServiceCollectionExtensions
     public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider,
         params string[] cssPaths)
     {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         if (cssPaths == null || cssPaths.Length == 0)
             throw new ArgumentNullException(nameof(cssPaths));
@@ -287,8 +276,7 @@ public static class DynamicScriptServiceCollectionExtensions
     public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider,
         params string[] scriptPaths)
     {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         if (scriptPaths == null || scriptPaths.Length == 0)
             throw new ArgumentNullException(nameof(scriptPaths));
@@ -345,8 +333,7 @@ public static class DynamicScriptServiceCollectionExtensions
     public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider, 
         params string[] templateRoots)
     {
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         if (templateRoots == null || templateRoots.Length == 0)
             throw new ArgumentNullException(nameof(templateRoots));

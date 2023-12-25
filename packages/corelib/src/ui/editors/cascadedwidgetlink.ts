@@ -1,5 +1,6 @@
-﻿import { Decorators } from "../../decorators";
-import { findElementWithRelativeId, isEmptyOrNull, notifyError } from "../../q";
+﻿import { notifyError } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { findElementWithRelativeId } from "../../q";
 import { Widget } from "../widgets/widget";
 
 @Decorators.registerClass('Serenity.CascadedWidgetLink')
@@ -20,12 +21,11 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
 
     bind() {
 
-        if (isEmptyOrNull(this._parentID)) {
+        if (!this._parentID) {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID)
-            .tryGetWidget(this.parentType);
+        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
 
         if (parent != null) {
             parent.element.bind('change.' + (this.widget as any).uniqueName, () => {
@@ -41,7 +41,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
 
     unbind() {
 
-        if (isEmptyOrNull(this._parentID)) {
+        if (!this._parentID) {
             return null;
         }
 

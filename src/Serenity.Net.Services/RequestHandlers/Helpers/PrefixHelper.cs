@@ -21,7 +21,7 @@ public static class PrefixHelper
         int length = str1.IndexOf('_');
         if (length <= 0)
             return 0;
-        string str2 = str1.Substring(0, length);
+        string str2 = str1[..length];
         foreach (T obj in list)
         {
             if (!getName(obj).StartsWith(str2))

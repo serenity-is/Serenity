@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.IO;
 
 namespace Serenity;
@@ -13,7 +13,7 @@ public class PhysicalFileSystem : IFileSystem
     {
         Directory.CreateDirectory(path);
     }
-    
+
     /// <inheritdoc/>
     public Stream CreateFile(string path, bool overwrite = true)
     {
@@ -72,10 +72,16 @@ public class PhysicalFileSystem : IFileSystem
     }
 
     /// <inheritdoc/>
-    public virtual string GetRelativePath(string relativeTo, string path)
+    public DateTime GetLastWriteTimeUtc(string path)
+    {
+        return File.GetLastWriteTimeUtc(path);
+    }
+
+    /// <inheritdoc/>
+    public string GetRelativePath(string relativeTo, string path)
     {
 #if ISSOURCEGENERATOR
-        throw new NotImplementedException();
+        return CodeGenerator.PathHelper.GetRelativePath(relativeTo, path);
 #else
         return Path.GetRelativePath(relativeTo, path);
 #endif
@@ -118,4 +124,5 @@ public class PhysicalFileSystem : IFileSystem
 
         File.WriteAllText(path, content);
     }
+
 }

@@ -1,17 +1,15 @@
-﻿namespace Serenity.Tests.Web.Mvc;
+namespace Serenity.Tests.Web.Mvc;
 
 public class ServiceAuthorizeAttributeTests
 {
     private const string NotLoggedInErrorCode = "NotLoggedIn";
     private const string AccessDeniedErrorCode = "AccessDenied";
+    private static readonly string[] testPermissionArray = ["Test:Permission"];
 
     [Fact]
     public void Passes_If_Permission_Is_Null_And_Context_Is_Logged_In()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute((string) null)
-            },
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
             isLoggedIn: true);
 
         Assert.Null(sutResult);
@@ -20,11 +18,8 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_Permission_Is_Not_Null_And_Context_Has_That_Permission()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute("Test:Permission")
-            },
-            permissions: new[] {"Test:Permission"});
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute("Test:Permission")],
+            permissions: testPermissionArray);
 
         Assert.Null(sutResult);
     }
@@ -32,11 +27,8 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_OrPermission_Is_Not_Null_And_Context_Has_That_Permission()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new OrPermissionSetAttribute("Test:DoesntHave", "Test:Permission")
-            },
-            permissions: new[] {"Test:Permission"});
+        var sutResult = TestResourceFilters([new OrPermissionSetAttribute("Test:DoesntHave", "Test:Permission")],
+            permissions: testPermissionArray);
 
         Assert.Null(sutResult);
     }
@@ -44,12 +36,12 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_There_Is_Any_ServiceAuthorizeAttribute_With_Override_True_After_This()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
+        var sutResult = TestResourceFilters(
+            [
                 new ServiceAuthorizeAttribute("Test:DoesntHave"),
                 new ServiceAuthorizeAttribute("Test:Permission")
-            },
-            permissions: new[] {"Test:Permission"});
+            ],
+            permissions: testPermissionArray);
 
         Assert.Null(sutResult);
     }
@@ -57,12 +49,12 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_There_Is_Any_ServiceAuthorizeAttribute_With_Or_Permission_And_Override_True_After_This()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
+        var sutResult = TestResourceFilters(
+            [
                 new ServiceAuthorizeAttribute("Test:DoesntHave"),
                 new OrPermissionSetAttribute("Test:DoesntHave2", "Test:Permission")
-            },
-            permissions: new[] {"Test:Permission"});
+            ],
+            permissions: testPermissionArray);
 
         Assert.Null(sutResult);
     }
@@ -70,12 +62,12 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_If_There_Is_Any_ServiceAuthorizeAttribute_With_Override_False_After_This()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
+        var sutResult = TestResourceFilters(
+            [
                 new ServiceAuthorizeAttribute("Test:DoesntHave"),
                 new OrPermissionSetAttribute("Test:DoesntHave2", "Test:Permission", setOverride: false)
-            },
-            permissions: new[] {"Test:Permission"});
+            ],
+            permissions: testPermissionArray);
 
         Assert.Equal(AccessDeniedErrorCode, sutResult.Error.Code);
     }
@@ -83,11 +75,11 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_If_Users_Have_No_Permission_Even_On_Overrides()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-        {
+        var sutResult = TestResourceFilters(
+        [
             new OrPermissionSetAttribute("Test:DoesntHave2", "Test:DoesntHave3"),
             new ServiceAuthorizeAttribute("Test:DoesntHave"),
-        });
+        ]);
 
         Assert.Equal(AccessDeniedErrorCode, sutResult.Error.Code);
     }
@@ -95,10 +87,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_If_Permission_Is_Null_And_User_Is_Not_Logged_In_And_Have_No_Permissions()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute((string) null),
-            },
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
             isLoggedIn: false);
 
         Assert.Equal(NotLoggedInErrorCode, sutResult.Error.Code);
@@ -107,22 +96,16 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Passes_If_Permission_Is_Null_And_User_Is_Logged_In_And_Have_No_Permissions()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute((string) null),
-            },
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
             isLoggedIn: true);
-        
+
         Assert.Null(sutResult);
     }
 
     [Fact]
     public void Fails_With_AccessDenied_If_User_Is_Logged_In()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute("Test:Permission")
-            },
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute("Test:Permission")],
             isLoggedIn: true);
 
         Assert.Equal(AccessDeniedErrorCode, sutResult.Error.Code);
@@ -131,10 +114,7 @@ public class ServiceAuthorizeAttributeTests
     [Fact]
     public void Fails_With_NotLoggedIn_If_User_Is_Not_Logged_In()
     {
-        var sutResult = TestResourceFilters(new IResourceFilter[]
-            {
-                new ServiceAuthorizeAttribute("Test:Permission")
-            },
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute("Test:Permission")],
             isLoggedIn: false);
 
         Assert.Equal(NotLoggedInErrorCode, sutResult.Error.Code);
@@ -213,7 +193,7 @@ public class ServiceAuthorizeAttributeTests
     public void Constructor_With_Two_Object_Parameters_Joins_Params()
     {
         var attr = new ServiceAuthorizeAttribute("Test", "Permission");
-        
+
         Assert.Equal("Test:Permission", attr.Permission);
     }
 
@@ -221,10 +201,10 @@ public class ServiceAuthorizeAttributeTests
     public void Constructor_With_Three_Object_Parameters_Joins_Params()
     {
         var attr = new ServiceAuthorizeAttribute("Test", "Permission", "LastPart");
-        
+
         Assert.Equal("Test:Permission:LastPart", attr.Permission);
     }
-    
+
     /// <summary>
     /// Runs all the <see cref="IResourceFilter"/>'s on a newly created <see cref="HttpContext"/>.
     /// </summary>
@@ -232,7 +212,7 @@ public class ServiceAuthorizeAttributeTests
     /// <param name="isLoggedIn">Sets if the user is logged in.</param>
     /// <param name="permissions">Sets the permissions to grant.</param>
     /// <returns>Returns <see cref="ResourceExecutingContext"/>'s result casted as <see cref="ServiceResponse"/>.</returns>
-    private ServiceResponse TestResourceFilters(IResourceFilter[] testFilters, bool isLoggedIn = true, IEnumerable<string> permissions = null)
+    private static ServiceResponse TestResourceFilters(IResourceFilter[] testFilters, bool isLoggedIn = true, IEnumerable<string> permissions = null)
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<ITextLocalizer, MockTextLocalizer>();
@@ -270,11 +250,8 @@ public class ServiceAuthorizeAttributeTests
         }
     }
 
-    private class CallConstructorWithTypeAndParamsTypeAttribute : ServiceAuthorizeAttribute
+    private class CallConstructorWithTypeAndParamsTypeAttribute(Type sourceType, params Type[] attributeTypes)
+        : ServiceAuthorizeAttribute(sourceType, attributeTypes)
     {
-        public CallConstructorWithTypeAndParamsTypeAttribute(Type sourceType, params Type[] attributeTypes)
-            : base(sourceType, attributeTypes)
-        {
-        }
     }
 }

@@ -1,14 +1,15 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { trimToNull } from "../../q";
+import { EditorProps } from "../widgets/widget";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
-export class URLEditor extends StringEditor {
+export class URLEditor<P = {}> extends StringEditor<P> {
 
-    constructor(input: JQuery) {
-        super(input);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
+        let input = this.element;
         input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
         input.on("blur." + this.uniqueName, e => {
@@ -19,7 +20,7 @@ export class URLEditor extends StringEditor {
             if (!input.hasClass("error"))
                 return;
 
-            var value = trimToNull(input.val());
+            var value = (input.val() as string)?.trim();
             if (!value)
                 return;
 

@@ -5,13 +5,18 @@ namespace Serenity.Services;
 /// <summary>
 /// Behavior class that handles <see cref="MasterDetailRelationAttribute"/>
 /// </summary>
-public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior,
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="handlerFactory">Default handler factory</param>
+/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior,
     IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field Target { get; set; }
 
-    private readonly IDefaultHandlerFactory handlerFactory;
+    private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
     private MasterDetailRelationAttribute attr;
     private Func<IList> rowListFactory;
     private Func<IRow> rowFactory;
@@ -25,16 +30,6 @@ public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior,
     private BaseCriteria queryCriteria;
     private HashSet<string> includeColumns;
 
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="handlerFactory">Default handler factory</param>
-    /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
-    public MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
-    {
-        this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-    }
-    
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
     {
@@ -123,7 +118,7 @@ public class MasterDetailRelationBehavior : BaseSaveDeleteBehavior,
 
         queryCriteria &= ServiceQueryHelper.GetNotDeletedCriteria(detailRow);
 
-        includeColumns = new HashSet<string>();
+        includeColumns = [];
 
         if (!string.IsNullOrEmpty(attr.IncludeColumns))
             foreach (var s in attr.IncludeColumns.Split(','))

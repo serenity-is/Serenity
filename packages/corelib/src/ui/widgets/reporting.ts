@@ -1,9 +1,10 @@
-﻿import { Decorators } from "../../decorators";
-import { postToService, PropertyItem, serviceCall, ServiceRequest, ServiceResponse, trimToNull } from "../../q";
+﻿import { PropertyItem, ServiceRequest, ServiceResponse } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { postToService, serviceCall } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { PropertyGrid } from "./propertygrid";
-import { Widget } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 export namespace Reporting {
     export interface ReportDialogOptions {
@@ -11,12 +12,12 @@ export namespace Reporting {
     }
 
     @Decorators.registerClass('Serenity.Reporting.ReportDialog')
-    export class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
-        constructor(opt: ReportDialogOptions) {
-            super(opt);
+    export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends TemplatedDialog<P> {
+        constructor(props: WidgetProps<P>) {
+            super(props);
 
-            if (opt.reportKey) {
-                this.loadReport(opt.reportKey);
+            if (this.options.reportKey) {
+                this.loadReport(this.options.reportKey);
             }
         }
 
@@ -29,11 +30,12 @@ export namespace Reporting {
                 this.byId('PropertyGrid').html('').attr('class', '');
                 this.propertyGrid = null;
             }
-            this.propertyGrid = (new PropertyGrid(this.byId('PropertyGrid'), {
+            this.propertyGrid = (new PropertyGrid({
+                element: this.byId('PropertyGrid'),
                 idPrefix: this.idPrefix,
                 useCategories: true,
-                items: this.propertyItems
-            })).init(null);
+                items: this.propertyItems,
+            })).init();
         }
 
         loadReport(reportKey: string): void {
@@ -109,14 +111,15 @@ export namespace Reporting {
     }
 
     @Decorators.registerClass('Serenity.Reporting.ReportPage')
-    export class ReportPage extends Widget<any> {
-        constructor(div: JQuery) {
-            super(div);
+    export class ReportPage<P = {}> extends Widget<P> {
+        constructor(props: WidgetProps<P>) {
+            super(props);
 
-            $('.report-link').click((e) => this.reportLinkClick(e));
-            $('div.line').click((e) => this.categoryClick(e));
+            $('.report-link').click((e) => this.reportLinkClick(e as any));
+            $('div.line').click((e) => this.categoryClick(e as any));
             var self = this;
-            new QuickSearchInput($('#QuickSearchInput'), {
+            new QuickSearchInput({
+                element: "#QuickSearchInput",
                 onSearch: function (field, text, done) {
                     self.updateMatchFlags(text);
                     done(true);
@@ -126,7 +129,7 @@ export namespace Reporting {
 
         protected updateMatchFlags(text: string) {
             var liList = $('#ReportList').find('li').removeClass('non-match');
-            text = trimToNull(text);
+            text = text?.trim() || null;
             if (text == null) {
                 liList.children('ul').hide();
                 liList.show().removeClass('expanded');
@@ -134,7 +137,7 @@ export namespace Reporting {
             }
             var parts = text.replace(',', ' ').split(' ');
             for (var i = 0; i < parts.length; i++) {
-                parts[i] = trimToNull(Select2.util.stripDiacritics(parts[i]).toUpperCase());
+                parts[i] = Select2.util.stripDiacritics(parts[i]).toUpperCase()?.trim() || null;
             }
             var reportItems = liList.filter('.report-item');
             reportItems.each(function (i1, e) {
@@ -159,7 +162,7 @@ export namespace Reporting {
             }
         }
 
-        protected categoryClick(e: JQueryEventObject) {
+        protected categoryClick(e: Event) {
             var li = $(e.target).closest('li');
             if (li.hasClass('expanded')) {
                 li.find('ul').hide('fast');
@@ -175,7 +178,7 @@ export namespace Reporting {
             }
         }
 
-        protected reportLinkClick(e: JQueryEventObject) {
+        protected reportLinkClick(e: Event) {
             e.preventDefault();
             var dialog = new ReportDialog({ reportKey: $(e.target).data('key') });
         }

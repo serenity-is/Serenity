@@ -1,4 +1,5 @@
-import { alertDialog, htmlEncode, blockUI, blockUndo, endsWith, format, iframeDialog, isEmptyOrNull, notifyError, replaceAll, resolveUrl, round, startsWith, localText, ServiceResponse } from "../../q";
+import { ServiceResponse, alertDialog, blockUI, blockUndo, htmlEncode, iframeDialog, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { replaceAll } from "../../q";
 
 export namespace UploadHelper {
 
@@ -28,7 +29,7 @@ export namespace UploadHelper {
             dataType: 'json',
             dropZone: options.zone,
             pasteZone: options.zone,
-            done: function (e: JQueryEventObject, data: any) {
+            done: function (e: Event, data: any) {
                 var response = data.result;
                 if (response.Error) {
                     notifyError(response.Error.Message);
@@ -39,7 +40,7 @@ export namespace UploadHelper {
                     options.fileDone(response, data.files[0].name, data);
                 }
             },
-            fail: function(e: JQueryEventObject, opt: any) {
+            fail: function(e: Event, opt: any) {
                 var xhr = opt?._response?.jqXHR;
                 if (!xhr) {
                     notifyError('An error occurred during file upload.');
@@ -86,7 +87,7 @@ export namespace UploadHelper {
                     options.progress.hide();
                 }
             },
-            progress: function (e1: JQueryEventObject, data1: any) {
+            progress: function (e: Event, data1: any) {
                 if (options.progress != null) {
                     var percent = data1.loaded / data1.total * 100;
                     options.progress.children().css('width', percent.toString() + '%');
@@ -104,12 +105,12 @@ export namespace UploadHelper {
             return false;
         }
         if (opt.minSize > 0 && file.Size < opt.minSize) {
-            alertDialog(format(localText('Controls.ImageUpload.UploadFileTooSmall'),
+            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooSmall'),
                 fileSizeDisplay(opt.minSize)));
             return false;
         }
         if (opt.maxSize > 0 && file.Size > opt.maxSize) {
-            alertDialog(format(localText('Controls.ImageUpload.UploadFileTooBig'),
+            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooBig'),
                 fileSizeDisplay(opt.maxSize)));
             return false;
         }
@@ -117,19 +118,19 @@ export namespace UploadHelper {
             return true;
         }
         if (opt.minWidth > 0 && file.Width < opt.minWidth) {
-            alertDialog(format(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
             return false;
         }
         if (opt.maxWidth > 0 && file.Width > opt.maxWidth) {
-            alertDialog(format(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
             return false;
         }
         if (opt.minHeight > 0 && file.Height < opt.minHeight) {
-            alertDialog(format(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
             return false;
         }
         if (opt.maxHeight > 0 && file.Height > opt.maxHeight) {
-            alertDialog(format(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
+            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
             return false;
         }
         return true;
@@ -158,12 +159,13 @@ export namespace UploadHelper {
     }
 
     export function hasImageExtension(filename: string): boolean {
-        if (isEmptyOrNull(filename)) {
+        if (!filename) {
             return false;
         }
         filename = filename.toLowerCase();
-        return endsWith(filename, '.jpg') || endsWith(filename, '.jpeg') ||
-            endsWith(filename, '.gif') || endsWith(filename, '.png');
+        return filename.endsWith('.jpg') || filename.endsWith('.jpeg') ||
+            filename.endsWith('.gif') || filename.endsWith('.png') || 
+            filename.endsWith('.webp');
     }
 
     export function thumbFileName(filename: string): string {
@@ -209,13 +211,13 @@ export namespace UploadHelper {
             var originalName = item.OriginalName ?? '';
             var fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
-                !startsWith(fileName, 'temporary/')) {
+                !fileName.startsWith('temporary/')) {
                 fileName = urlPrefix + fileName;
             }
 
             thumb.attr('href', dbFileUrl(fileName));
             thumb.attr('target', '_blank');
-            if (!isEmptyOrNull(originalName)) {
+            if (originalName) {
                 thumb.attr('title', originalName);
             }
 

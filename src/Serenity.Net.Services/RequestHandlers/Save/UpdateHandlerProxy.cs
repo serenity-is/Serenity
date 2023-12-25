@@ -22,9 +22,8 @@ internal class UpdateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
     }
 }
 
-internal class UpdateHandlerProxy<TRow>
-    : UpdateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>, IUpdateHandler<TRow>
+internal class UpdateHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : UpdateHandlerProxy<TRow, SaveRequest<TRow>, SaveResponse>(factory), IUpdateHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public UpdateHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

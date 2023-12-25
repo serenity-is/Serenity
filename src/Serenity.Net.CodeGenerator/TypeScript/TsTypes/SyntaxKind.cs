@@ -381,7 +381,6 @@ public enum SyntaxKind
     FirstPunctuation = OpenBraceToken,
     LastPunctuation = CaretEqualsToken,
     FirstToken = Unknown,
-    LastToken = LastKeyword,
     FirstTriviaToken = SingleLineCommentTrivia,
     LastTriviaToken = ConflictMarkerTrivia,
     FirstLiteralToken = NumericLiteral,

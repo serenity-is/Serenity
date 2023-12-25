@@ -2,11 +2,11 @@
 export namespace {{ServiceClassName}} {
     export const baseUrl = '{{ServiceBaseUrl}}';
 
-    export declare function Create(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
-    export declare function Update(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
-    export declare function Delete(request: {{SERENITYIMPORT "DeleteRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "DeleteResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
-    export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
-    export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): JQueryXHR;
+    export declare function Create(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "SaveResponse"}}>;
+    export declare function Update(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "SaveResponse"}}>;
+    export declare function Delete(request: {{SERENITYIMPORT "DeleteRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "DeleteResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "DeleteResponse"}}>;
+    export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "RetrieveResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
+    export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
 
     export const Methods = {
         Create: "{{ServiceBaseUrl}}/Create",

@@ -1,13 +1,8 @@
 namespace Serenity.CodeGenerator;
 
-public class RawCode
+public class RawCode(string code)
 {
-    public string Code { get; }
-
-    public RawCode(string code)
-    {
-        Code = code ?? throw new ArgumentNullException(nameof(code));
-    }
+    public string Code { get; } = code ?? throw new ArgumentNullException(nameof(code));
 
     public override string ToString()
     {

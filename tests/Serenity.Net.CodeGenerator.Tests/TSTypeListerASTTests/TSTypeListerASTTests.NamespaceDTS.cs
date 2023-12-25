@@ -7,19 +7,19 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void NamespaceDTS_Extracts_StringEditor_Without_Decorators()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("Serenity.CoreLib.d.ts", @"
 declare namespace Serenity {
     class Widget<TOptions = any> {
     }
 
     interface Widget<TOptions> {
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
+        change(handler: (e: Event) => void): void;
+        changeSelect2(handler: (e: Event) => void): void;
     }
 
     class StringEditor extends Widget<any> {
-        constructor(input: JQuery);
+        constructor(props?: any);
         get value(): string;
         protected get_value(): string;
         set value(value: string);

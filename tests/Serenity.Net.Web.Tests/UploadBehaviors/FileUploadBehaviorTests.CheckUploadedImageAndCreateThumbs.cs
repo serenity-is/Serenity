@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
@@ -89,7 +89,6 @@ public partial class FileUploadBehaviorTests
             foreach (var testFileName in testFileNames)
             {
                 var fileName = testFileName;
-                mockFileSystem.AddFile(testFileName, string.Empty);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
                     imageProcessor: new DefaultImageProcessor(),

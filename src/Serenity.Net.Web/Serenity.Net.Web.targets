@@ -1,22 +1,136 @@
 <Project>
+  <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <FolderNames ParameterType="System.String" />
+      <PatchDependencies ParameterType="System.String" />
+    </ParameterGroup>    
+    <Task>
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+<![CDATA[
+try
+{
+    var newDeps = new Dictionary<string, string>();
+    foreach (var folderName in (FolderNames ?? "").Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+    {
+        var pkgPath = Path.Combine("node_modules", ".dotnet", folderName);
+        Directory.CreateDirectory(pkgPath);
+        var pkgId = folderName.ToLowerInvariant();
+        var idx = pkgId.IndexOf('.');
+        if (idx > 0)
+        {
+            var company = pkgId.Substring(0, idx);
+            if (company == "serenity")
+                company = "serenity-is";
+            pkgId = "@" + company + "/" + pkgId.Substring(idx + 1);
+        }
+        var pkgJson = Path.Combine(pkgPath, "package.json");
+        var expectedContent = @"{
+  ""name"": """ + pkgId.Replace("\"", "\\\"") + @""",
+  ""exports"": {
+    ""."": {
+      ""types"": ""./dist/index.d.ts"",
+      ""import"": ""./dist/index.js""
+    }
+  },
+  ""main"": ""dist/index.js"",
+  ""import"": ""dist/index.js"",
+  ""types"": ""dist/index.d.ts""
+}".Replace("\r", "");
+
+        if (!File.Exists(pkgJson) || File.ReadAllText(pkgJson) != expectedContent)
+            File.WriteAllText(pkgJson, expectedContent);
+
+        newDeps[pkgId] = "./node_modules/.dotnet/" + folderName.Replace("\"", "\\\"");
+    }
+
+    var packageJson = "package.json";
+    if (PatchDependencies != "false")
+    {
+        if (!File.Exists(packageJson))
+        {
+            Log.LogWarning("Can't find package.json");
+            return Success;
+        }
+        var oldJson = File.ReadAllText(packageJson).Replace("\r", "").Trim();
+
+        var newJson = new Regex(@"(\s*""dependencies""\s*:\s*\{\s*)([^}]+)(\s*\})").Replace(oldJson, group =>
+        {
+            var depsText = new Regex("\"\\s*:\\s*\\s*\"").Replace(group.Groups[2].Value, "\":\"");
+
+            foreach (var line in depsText.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim()))
+            {
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                var parts = line.Split(new string[] { "\":\"" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+                if (parts.Length != 2 || !parts[0].StartsWith("\"") || !parts[1].EndsWith("\""))
+                {
+                    newDeps[line] = null;
+                    continue;
+                }
+
+                var name = parts[0].Substring(1);
+                var value = parts[1].Substring(0, parts[1].Length - 1);
+                if (!value.StartsWith("file:./node_modules/.dotnet/") &&
+                    !value.StartsWith("./node_modules/.dotnet/"))
+                {
+                    newDeps[name] = value;
+                    continue;
+                }
+            }
+
+            var newDepsJson = string.Join(",\n    ",
+                newDeps.Select(x => x.Value == null ? x.Key : ('"' + x.Key + "\": " + '"' + x.Value + '"'))
+                    .OrderBy(x => x, StringComparer.Ordinal));
+
+            return group.Groups[1].Value +
+                newDepsJson + "\n  " +
+                group.Groups[3].Value;
+        }, 1).Replace("\r", "");
+
+        if (oldJson != newJson)
+            File.WriteAllBytes(packageJson, Encoding.UTF8.GetBytes(newJson));
+    }
+}
+catch (Exception ex)
+{
+    Log.LogWarning("Error during RestoreNodeTypesTask: " + ex.ToString());
+}
+]]>
+      </Code>
+    </Task>
+  </UsingTask>    
+
   <PropertyGroup>
-    <CompileTypeScriptDependsOn>
-      RestoreTypings;
-      $(CompileTypeScriptDependsOn)
-    </CompileTypeScriptDependsOn>
+    <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">true</RestoreNodeTypes>
+    <CompileTypeScriptDependsOn Condition="'$(RestoreNodeTypes)' != 'false'">RestoreNodeTypes;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
+    <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
+    <CompileTypeScriptDependsOn Condition="'$(RestoreTypings)' != 'false'">RestoreTypings;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="texts\resources\**\*.json" />
     <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
-  </ItemGroup>  
+  </ItemGroup>
+  <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
+    <ItemGroup>
+      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
+        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
+      </_NodeTypeToRestore>
+      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
+        <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
+      </_NodeTypeToRestore>
+      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct())" />
+    </ItemGroup>
+    <Delete Files="@(_NodeTypeDeleteFiles)" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
+  </Target>
   <Target Name="RestoreTypings"
-          BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
-          DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences"
-          Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
-    <PropertyGroup>
-      <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
-      <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And Exists('$(MSBuildProjectDirectory)\tsbuild.js')">true</RestoreNodeTypes>
-    </PropertyGroup>
+        BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+        DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences;RestoreNodeTypes"
+        Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
     <ItemGroup>
       <!--project reference typing, serenity.scripts -->
       <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts"
@@ -39,34 +153,6 @@
                         Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/'))">
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
         <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules mock types from project reference dist\index.d.ts files -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
-                        And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.d.ts')
-                        And !Exists(@(ProjectReference->'node_modules\%(Filename)\package.json'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant()))">
-        <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules index.js script from project reference dist\index.js files -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.js"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' 
-                        And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)dist\index.js')
-                        And !Exists(@(ProjectReference->'node_modules\%(Filename)\package.json'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant()))">
-        <TargetFile>node_modules\@(ProjectReference->'%(Filename)'->Replace('Serenity.', '@serenity-is/')->ToLowerInvariant())\dist\index.js</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules mock types from package reference dist\index.d.ts files -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.d.ts"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
-                        And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.d.ts')
-                        And !Exists($([System.String]::Copy('node_modules\%(StaticWebAsset.SourceId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- node modules index.js script from package reference dist\index.js files -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\dist\index.js"
-                        Condition="'$(RestoreNodeTypes)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/')) 
-                        And Exists('%(StaticWebAsset.RootDir)%(StaticWebAsset.Directory)..\dist\index.js')
-                        And !Exists($([System.String]::Copy('node_modules\%(StaticWebAsset.SourceId)\package.json').Replace('Serenity.', '@serenity-is\').ToLowerInvariant()))">
-        <TargetFile>node_modules\$([System.String]::Copy('%(StaticWebAsset.SourceId)').Replace('Serenity.', '@serenity-is\').ToLowerInvariant())\dist\index.js</TargetFile>
       </_TypingToRestore>
     </ItemGroup>
     <Copy SourceFiles="@(_TypingToRestore)" DestinationFiles="@(_TypingToRestore->'%(TargetFile)'->ToLowerInvariant())" SkipUnchangedFiles="true" />

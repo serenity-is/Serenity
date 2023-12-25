@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -63,7 +63,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         var nameField = Row.NameField;
         if (nameField is not null)
-            return new SortBy[] { new SortBy(nameField.Name, false) };
+            return [new SortBy(nameField.Name, false)];
 
         return null;
     }
@@ -369,11 +369,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     {
         var attr = field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
         var searchType = attr == null ? SearchType.Auto : attr.SearchType;
-        var numericOnly = attr?.NumericOnly;
-
-        if (numericOnly == null)
-            numericOnly = field is Int32Field || field is Int16Field || field is Int64Field;
-
+        var numericOnly = (attr?.NumericOnly) ?? field is Int32Field || field is Int16Field || field is Int64Field;
         if (searchType == SearchType.Auto)
         {
             if (field is Int32Field || field is Int16Field || field is Int64Field)
@@ -382,7 +378,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
                 searchType = SearchType.Contains;
         }
 
-        AddFieldContainsCriteria(field, containsText, id, searchType, numericOnly ?? false,
+        AddFieldContainsCriteria(field, containsText, id, searchType, numericOnly,
             ref criteria, ref orFalse);
     }
 
@@ -573,11 +569,8 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             if (IsEmptyEqualityFilterValue(pair.Value))
                 continue;
 
-            var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
-            if (field is null)
-                throw new ArgumentOutOfRangeException(pair.Key,
+            var field = (Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key)) ?? throw new ArgumentOutOfRangeException(pair.Key,
                     string.Format("Can't find field {0} in row for equality filter.", pair.Key));
-
             ApplyFieldEqualityFilter(query, field, pair.Value);
         }
     }
@@ -589,7 +582,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <param name="field"></param>
     public void IgnoreEqualityFilter(string field)
     {
-        ignoredEqualityFilters ??= new HashSet<string>();
+        ignoredEqualityFilters ??= [];
         ignoredEqualityFilters.Add(field);
     }
 
@@ -712,6 +705,9 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
             var result = Request.DistinctFields.Select(x =>
             {
+                if (x == null || string.IsNullOrEmpty(x.Field))
+                    return null;
+
                 var field = Row.FindFieldByPropertyName(x.Field) ??
                     Row.FindField(x.Field);
 
@@ -750,7 +746,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         Response = new TListResponse
         {
-            Entities = new List<TRow>()
+            Entities = []
         };
 
         Row = new TRow();
@@ -760,7 +756,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         DistinctFields = GetDistinctFields();
         if (DistinctFields != null)
-            Response.Values = new List<object>();
+            Response.Values = [];
 
         PrepareQuery(query);
 

@@ -4,16 +4,12 @@
 /// Sets filtering type for the field
 /// </summary>
 /// <seealso cref="Attribute" />
-public class FilteringTypeAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="FilteringTypeAttribute"/> class.
+/// </remarks>
+/// <param name="type">The type.</param>
+public class FilteringTypeAttribute(string type) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilteringTypeAttribute"/> class.
-    /// </summary>
-    /// <param name="type">The type.</param>
-    public FilteringTypeAttribute(string type)
-    {
-        FilteringType = type;
-    }
 
     /// <summary>
     /// Sets the parameters. This is called by filtering system to pass
@@ -30,5 +26,5 @@ public class FilteringTypeAttribute : Attribute
     /// <value>
     /// The type of the filtering.
     /// </value>
-    public string FilteringType { get; private set; }
+    public string FilteringType { get; private set; } = type;
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System.IO;
 
@@ -24,13 +24,8 @@ public class DefaultUploadStorage : IUploadStorage
         IDiskUploadFileSystem fileSystem = null)
     {
         var opt = (options ?? throw new ArgumentNullException(nameof(options))).Value;
-        if (string.IsNullOrEmpty(opt.Path))
-            throw new ArgumentOutOfRangeException(nameof(opt.Path), 
-                "Please set UploadSettings.Path in appsettings.json!");
-
-        if (string.IsNullOrEmpty(opt.Url))
-            throw new ArgumentOutOfRangeException(nameof(opt.Url),
-                "Please set UploadSettings.Url in appsettings.json!");
+        ArgumentException.ThrowIfNullOrEmpty(opt.Path, "UploadSettings.Path!");
+        ArgumentException.ThrowIfNullOrEmpty(opt.Url, "UploadSettings.Url!");
 
         var path = opt.Path;
         if (path.StartsWith("~/", StringComparison.OrdinalIgnoreCase))

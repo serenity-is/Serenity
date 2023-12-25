@@ -3,16 +3,11 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class ModularTSImporter
+public class ModularTSImporter(string currentModule)
 {
-    private readonly List<ModuleImport> moduleImports = new();
-    private readonly HashSet<string> moduleImportAliases = new();
-    private readonly string currentModule;
-
-    public ModularTSImporter(string currentModule)
-    {
-        this.currentModule = currentModule;
-    }
+    private readonly List<ModuleImport> moduleImports = [];
+    private readonly HashSet<string> moduleImportAliases = [];
+    private readonly string currentModule = currentModule;
 
     protected string ImportFromTypes(string name)
     {
@@ -36,11 +31,9 @@ public class ModularTSImporter
 
     protected string AddModuleImport(string from, string name, bool external = false)
     {
-        if (name is null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
-        if (from is null)
-            throw new ArgumentNullException(nameof(from));
+        ArgumentNullException.ThrowIfNull(from);
 
         var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
         if (existing != null)
@@ -73,14 +66,14 @@ public class ModularTSImporter
             .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
     }
 
-    private string FromOrderKey(string from)
+    private static string FromOrderKey(string from)
     {
         if (from == null)
             return null;
 
         /// local imports ordered last
-        return (from.StartsWith(".", StringComparison.Ordinal) ||
-            from.StartsWith("/", StringComparison.Ordinal)) ?
+        return (from.StartsWith('.') ||
+            from.StartsWith('/')) ?
             char.MaxValue + from : from;
     }
 
@@ -108,20 +101,11 @@ public class ModularTSImporter
             }
         }));
 
-        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromCorelib(import);
-        }));
+        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
 
-        scriptObject.Import("QIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromQ(import);
-        }));
+        scriptObject.Import("QIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromQ));
 
-        scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate((import) =>
-        {
-            return modularTSImporter.ImportFromTypes(import);
-        }));
+        scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromTypes));
 
         scriptObject.Import("GETEDITORVARIABLEINDEX", new EditorVariableIndexDelegate((editor, editors) =>
         {

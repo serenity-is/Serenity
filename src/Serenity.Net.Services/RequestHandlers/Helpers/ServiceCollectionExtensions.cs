@@ -131,7 +131,7 @@ public static class ServiceCollectionExtensions
                 if (interfacesToAdd.TryGetValue(intf, out var list))
                     list.Add(type);
                 else
-                    interfacesToAdd[intf] = new List<Type> { type };
+                    interfacesToAdd[intf] = [type];
             }
         }
 
@@ -315,7 +315,7 @@ public static class ServiceCollectionExtensions
             string json = sr.ReadToEnd().TrimToNull();
             if (json is null)
                 continue;
-            var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            var texts = JSON.Parse<Dictionary<string, object>>(json);
 
             JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
         }

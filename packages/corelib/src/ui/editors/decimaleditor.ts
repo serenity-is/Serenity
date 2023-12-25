@@ -1,7 +1,8 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { Culture, formatNumber, parseDecimal } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
-import { Culture, extend, formatNumber, parseDecimal } from "../../q";
-import { Widget } from "../widgets/widget";
+import { extend } from "../../q";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface DecimalEditorOptions {
     minValue?: string;
@@ -13,11 +14,12 @@ export interface DecimalEditorOptions {
 
 @Decorators.registerEditor('Serenity.DecimalEditor', [IDoubleValue])
 @Decorators.element('<input type="text"/>')
-export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
+export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
-    constructor(input: JQuery, opt?: DecimalEditorOptions) {
-        super(input, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
+        let input = this.element;
         input.addClass('decimalQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(), {
             vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00')),
@@ -37,8 +39,9 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
     }
 
     get_value(): number {
+        var val;
         if (($.fn as any).autoNumeric) {
-            var val = (this.element as any).autoNumeric('get');
+            val = (this.element as any).autoNumeric('get');
 
             if (!!(val == null || val === ''))
                 return null;
@@ -46,7 +49,7 @@ export class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoub
             return parseFloat(val);
         }
 
-        var val = this.element.val();
+        val = this.element.val() as any;
         return parseDecimal(val);
     }
 

@@ -1,7 +1,8 @@
-﻿import { Culture, Enum, format, formatDate, formatNumber, getAttributes, getTypeFullName, htmlEncode, isEmptyOrNull, ISlickFormatter, parseDecimal, parseISODateTime, replaceAll, resolveUrl, safeCast, startsWith, tryGetText } from "../../q";
-import { Formatter } from "../../slick";
+﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
+import { ISlickFormatter, getAttributes, replaceAll } from "../../q";
+import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export interface IInitializeColumn {
@@ -16,31 +17,13 @@ export class IInitializeColumn {
 export class BooleanFormatter implements Formatter {
     format(ctx: FormatterContext) {
 
-        if (ctx.value == null) {
+        if (ctx.value == null)
             return '';
-        }
 
-        var text;
-        if (!!ctx.value) {
-            text = tryGetText(this.trueText);
-            if (text == null) {
-                text = this.trueText;
-                if (text == null) {
-                    text = tryGetText('Dialogs.YesButton') ?? 'Yes';
-                }
-            }
-        }
-        else {
-            text = tryGetText(this.falseText);
-            if (text == null) {
-                text = this.falseText;
-                if (text == null) {
-                    text = tryGetText('Dialogs.NoButton') ?? 'No';
-                }
-            }
-        }
+        if (!!ctx.value)
+            return ctx.escape(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
 
-        return htmlEncode(text);
+        return ctx.escape(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
     }
 
     @Decorators.option()
@@ -126,9 +109,8 @@ export class EnumFormatter implements Formatter {
     }
 
     static getText(enumKey: string, name: string) {
-        if (isEmptyOrNull(name)) {
+        if (!name)
             return '';
-        }
 
         return htmlEncode(tryGetText('Enums.' + enumKey + '.' + name) ?? name);
     }
@@ -145,23 +127,19 @@ export class EnumFormatter implements Formatter {
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
-        var dbFile = safeCast(ctx.value, String);
-        if (isEmptyOrNull(dbFile)) {
+        var dbFile = ctx.value as string;
+        if (!dbFile)
             return '';
-        }
 
         var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
-        var originalName = (!isEmptyOrNull(this.originalNameProperty) ?
-            safeCast(ctx.item[this.originalNameProperty], String) : null);
+        var originalName = this.originalNameProperty ?
+            ctx.item[this.originalNameProperty] as string : null;
 
         originalName = (originalName ?? '');
-        var text = format((this.displayFormat ?? '{0}'),
+        var text = stringFormat((this.displayFormat ?? '{0}'),
             originalName, dbFile, downloadUrl);
 
-        var iconClass = this.iconClass ?? "fa fa-download";
-
-        if (iconClass.startsWith("fa-"))
-            iconClass = "fa " + iconClass;
+        var iconClass = iconClassName(this.iconClass ?? faIcon("download"));
 
         return "<a class='file-download-link' target='_blank' href='" +
             htmlEncode(downloadUrl) + "'><i class='" + iconClass + "'></i> " + htmlEncode(text) + '</a>';
@@ -174,7 +152,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     initializeColumn(column: Column): void {
         column.referencedFields = column.referencedFields || [];
-        if (!isEmptyOrNull(this.originalNameProperty)) {
+        if (this.originalNameProperty) {
             column.referencedFields.push(this.originalNameProperty);
             return;
         }
@@ -215,7 +193,7 @@ export class MinuteFormatter implements Formatter {
         else
             minuteStr = minute.toString();
 
-        return format('{0}:{1}', hourStr, minuteStr);
+        return stringFormat('{0}:{1}', hourStr, minuteStr);
     }
 }
 
@@ -252,28 +230,27 @@ export class NumberFormatter {
 export class UrlFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
-        var url = (!isEmptyOrNull(this.urlProperty) ?
+        var url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 
-        if (isEmptyOrNull(url))
+        if (!url)
             return '';
 
-        if (!isEmptyOrNull(this.urlFormat))
-            url = format(this.urlFormat, url);
+        if (this.urlFormat)
+            url = stringFormat(this.urlFormat, url);
 
-        if (url != null && startsWith(url, '~/'))
-            url = resolveUrl(url);
+        url = resolveUrl(url);
 
-        var display = (!isEmptyOrNull(this.displayProperty) ?
+        var display = (this.displayProperty ?
             (ctx.item[this.displayProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 
-        if (!isEmptyOrNull(this.displayFormat))
-            display = format(this.displayFormat, display);
+        if (this.displayFormat)
+            display = stringFormat(this.displayFormat, display);
 
         var s = "<a href='" + htmlEncode(url) + "'";
-        if (!isEmptyOrNull(this.target))
+        if (this.target)
             s += " target='" + this.target + "'";
 
         s += '>' + htmlEncode(display) + '</a>';
@@ -284,11 +261,11 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
     initializeColumn(column: Column): void {
         column.referencedFields = column.referencedFields || [];
 
-        if (!isEmptyOrNull(this.displayProperty)) {
+        if (this.displayProperty) {
             column.referencedFields.push(this.displayProperty);
         }
 
-        if (!isEmptyOrNull(this.urlProperty)) {
+        if (this.urlProperty) {
             column.referencedFields.push(this.urlProperty);
         }
     }

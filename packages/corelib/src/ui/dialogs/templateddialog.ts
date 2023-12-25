@@ -1,26 +1,34 @@
-﻿import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
+﻿import validator from "@optionaldeps/jquery.validation";
+import { Config, DialogButton, bsModalMarkup, closePanel, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
+import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { bsModalMarkup, closePanel, Config, DialogButton, dialogButtonToBS, dialogButtonToUI, endsWith, getAttributes, getInstanceType, isEmptyOrNull, isMobileView, layoutFillHeight, newBodyDiv, openPanel, parseInteger, positionToastContainer, validateOptions } from "../../q";
+import { getAttributes, isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { WidgetProps } from "../widgets/widget";
 import { DialogExtensions } from "./dialogextensions";
-import validator from "@optionaldeps/jquery.validation";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
-export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected tabs: JQuery;
     protected toolbar: Toolbar;
     protected validator: JQueryValidation.Validator;
 
-    constructor(options?: TOptions) {
-        super(newBodyDiv().addClass('s-TemplatedDialog hidden'), options);
+    constructor(props?: WidgetProps<P>) {
+        super(props);
 
-        this.element.attr("id", this.uniqueName);
-
+        this.domNode.classList.add("s-TemplatedDialog");
+        this.domNode.setAttribute("id", this.domNode.getAttribute("id") || this.uniqueName);
         this.initValidator();
         this.initTabs();
         this.initToolbar();
+    }
+
+    static override createDefaultElement() {
+        var div = document.body.appendChild(document.createElement("div"));
+        div.classList.add("hidden");
+        return div;
     }
 
     private get isMarkedAsPanel() {
@@ -40,11 +48,11 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             return null;
         }
 
-        if (!endsWith(cssSize, 'px')) {
+        if (!cssSize.endsWith('px')) {
             return null;
         }
 
-        cssSize = cssSize.substr(0, cssSize.length - 2);
+        cssSize = cssSize.substring(0, cssSize.length - 2);
         let i = parseInteger(cssSize);
         if (i == null || isNaN(i) || i == 0)
             return null;
@@ -57,7 +65,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         let dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
         try {
             var sizeHelper = $('<div/>').addClass('size').appendTo(dialog);
-            size = TemplatedDialog.getCssSize(sizeHelper, 'minWidth'); 
+            size = TemplatedDialog.getCssSize(sizeHelper, 'minWidth');
             if (size != null)
                 opt.minWidth = size;
 
@@ -96,7 +104,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             this.element && this.element.removeClass('modal-body');
             window.setTimeout(() => modal.remove(), 0);
         }
-        
+
         $(window).unbind('.' + this.uniqueName);
         super.destroy();
     }
@@ -128,7 +136,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             DialogExtensions["dialogFlexify"](this.element);
             DialogExtensions.dialogResizable(this.element);
         }
-        
+
         if (getAttributes(type, MaximizableAttribute, true).length > 0) {
             DialogExtensions.dialogMaximizable(this.element);
         }
@@ -162,12 +170,12 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     protected initModal(): void {
         if (this.element.hasClass('modal-body'))
             return;
-        
+
         var title = this.element.data('dialogtitle') ?? this.getDialogTitle() ?? '';
         var opt = this.getModalOptions();
         (opt as any)["show"] = false;
         var modalClass = "s-Modal";
-        
+
         if (opt.modalClass)
             modalClass += ' ' + opt.modalClass;
 
@@ -189,7 +197,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         var buttons = this.getDialogButtons();
         if (buttons != null) {
             for (var x of buttons) {
-                $(dialogButtonToBS(x)).appendTo(footer).click(x.click);
+                $(dialogButtonToBS(x)).appendTo(footer).click(x.click as any);
             }
         }
         else
@@ -213,8 +221,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                 hotkeyContext = this.element;
         }
 
-        var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
-        this.toolbar = new Toolbar(toolbarDiv, opt);
+        this.toolbar = new Toolbar({ element:toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
     }
 
     protected getToolbarButtons(): ToolButton[] {
@@ -277,7 +284,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         return openPanel(element, uniqueName);
     }
 
-    public static closePanel(element: JQuery, e?: JQueryEventObject) {
+    public static closePanel(element: JQuery, e?: Event) {
         return closePanel(element, e);
     }
 
@@ -308,7 +315,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
             var element = this.element;
             this.destroy();
             element.remove();
-            positionToastContainer(false, null);
+            positionToastContainer(defaultNotifyOptions, false);
         }, 0);
     }
 
@@ -370,7 +377,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         var value = this.dialogTitle ?? this.getDialogTitle();
         var pt = this.element.children('.panel-titlebar');
 
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             pt.remove();
         }
         else {
@@ -385,7 +392,7 @@ export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
                     $('<button class="panel-titlebar-close">&nbsp;</button>')
                         .prependTo(pt)
                         .click(e => {
-                            TemplatedDialog.closePanel(this.element, e);
+                            TemplatedDialog.closePanel(this.element, e as any);
                         });
                 }
             }

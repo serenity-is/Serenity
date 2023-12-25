@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +18,11 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     private IRequestContext context;
 
     /// <inheritdoc />
-    public void Dispose() => Dispose(disposing: true);
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Releases all resources currently used by this <see cref="Controller"/> instance.
@@ -52,9 +56,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         {
             var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
             if (connectionKey == null)
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(connectionKey));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+                ArgumentNullException.ThrowIfNull(connectionKey);
 
             connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
 
@@ -82,9 +84,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         {
             var connectionKey = GetType().GetCustomAttribute<ConnectionKeyAttribute>();
             if (connectionKey == null)
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-                throw new ArgumentNullException(nameof(connectionKey));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+                ArgumentNullException.ThrowIfNull(connectionKey);
 
             connection = HttpContext.RequestServices.GetRequiredService<ISqlConnections>().NewByKey(connectionKey.Value);
             context.ActionArguments[cnnParam.Name] = connection;
@@ -138,15 +138,9 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         ActionExecutingContext context,
         ActionExecutionDelegate next)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
-        if (next == null)
-        {
-            throw new ArgumentNullException(nameof(next));
-        }
+        ArgumentNullException.ThrowIfNull(next);
 
         OnActionExecuting(context);
         if (context.Result == null)

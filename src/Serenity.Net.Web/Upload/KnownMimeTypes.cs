@@ -8,7 +8,7 @@ namespace Serenity.Web;
 /// </summary>
 public static class KnownMimeTypes
 {
-    private static readonly IContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
+    private static readonly FileExtensionContentTypeProvider contentTypeProvider = new();
 
     /// <summary>
     ///   (extension -> mime type) pairs for known mime types.</summary>
@@ -38,8 +38,7 @@ public static class KnownMimeTypes
     ///   Determined mime type for given file. "application/octet-stream" otherwise.</returns>
     public static string TryGet(string path)
     {
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
 
         string ext = Path.GetExtension(path);
         if (knownMimeTypes.TryGetValue(ext, out string mimeType))

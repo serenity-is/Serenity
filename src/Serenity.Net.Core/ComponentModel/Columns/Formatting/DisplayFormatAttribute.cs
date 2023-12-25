@@ -40,16 +40,12 @@
 ///     public Decimal ShowTwoZerosAfterDecimalNoGrouping { get; set; }
 /// }
 /// </remarks>
-public class DisplayFormatAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="DisplayFormatAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class DisplayFormatAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DisplayFormatAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public DisplayFormatAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the display format value.
@@ -57,5 +53,5 @@ public class DisplayFormatAttribute : Attribute
     /// <value>
     /// The display format value.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

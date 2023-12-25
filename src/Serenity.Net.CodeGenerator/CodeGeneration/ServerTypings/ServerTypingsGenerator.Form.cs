@@ -104,7 +104,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         return -1;
     }
 
-    private IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute editorTypeAttr)
+    private static IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute editorTypeAttr)
     {
         if (editorTypeAttr != null)
         {
@@ -158,7 +158,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 return type;
         }
 
-        if (type is null && key.IndexOfAny(new char[] { '.', ':' }) >= 0)
+        if (type is null && key.IndexOfAny(['.', ':']) >= 0)
             type = TryFindModuleType(key, containingAssembly);
 
         return type;
@@ -180,14 +180,14 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         basedOnByName = null;
         if (basedOnRowAttr != null)
         {
-            basedOnByName = EnumerateProperties(basedOnRow).Where(x => TypingsUtils.IsPublicInstanceProperty(x))
+            basedOnByName = EnumerateProperties(basedOnRow).Where(TypingsUtils.IsPublicInstanceProperty)
                 .ToLookup(x => x.Name);
         }
 
         return basedOnRow;
     }
 
-    private CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
+    private static CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
                 IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
     {
         var attr = TypingsUtils.FindAttr(item.GetAttributes(), ns, name);
@@ -434,7 +434,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             }
         });
 
-        if (module && referencedTypeAliases.Any())
+        if (module && referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
             sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");

@@ -5,17 +5,13 @@
 /// Used with form, columns etc. types to map their properties to
 /// corresponding property in a row, so that they inherit attributes.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="BasedOnRowAttribute"/> class.
+/// </remarks>
+/// <param name="rowType">Type of the row.</param>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public sealed class BasedOnRowAttribute : Attribute
+public sealed class BasedOnRowAttribute(Type rowType) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BasedOnRowAttribute"/> class.
-    /// </summary>
-    /// <param name="rowType">Type of the row.</param>
-    public BasedOnRowAttribute(Type rowType)
-    {
-        RowType = rowType;
-    }
 
     /// <summary>
     /// Gets the type of the row.
@@ -23,7 +19,7 @@ public sealed class BasedOnRowAttribute : Attribute
     /// <value>
     /// The type of the row.
     /// </value>
-    public Type RowType { get; private set; }
+    public Type RowType { get; private set; } = rowType;
 
     /// <summary>
     /// Gets or sets a value indicating whether to check names.

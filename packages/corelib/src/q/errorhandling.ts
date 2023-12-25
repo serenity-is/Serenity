@@ -1,7 +1,4 @@
-﻿import { alertDialog } from "./dialogs";
-import { htmlEncode } from "./html";
-import { notifyError } from "./notify";
-import { ServiceError } from "./servicetypes";
+﻿import { ServiceError, alertDialog, htmlEncode, notifyError } from "@serenity-is/base";
 
 export namespace ErrorHandling {
 

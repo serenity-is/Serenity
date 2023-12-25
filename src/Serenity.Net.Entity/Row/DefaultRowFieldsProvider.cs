@@ -8,25 +8,18 @@ namespace Serenity.Data;
 /// using ActivatorUtilities.CreateInstance through a IServiceProvider.
 /// </summary>
 /// <seealso cref="IRowFieldsProvider" />
-public class DefaultRowFieldsProvider : IRowFieldsProvider
+/// <remarks>
+/// Initializes a new instance of the <see cref="DefaultRowFieldsProvider"/> class.
+/// </remarks>
+/// <param name="serviceProvider">The service provider.</param>
+/// <exception cref="ArgumentNullException">serviceProvider</exception>
+public class DefaultRowFieldsProvider(IServiceProvider serviceProvider) : IRowFieldsProvider
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly ConcurrentDictionary<Type, RowFieldsBase> byType;
-    private readonly ConcurrentDictionary<(Type type, string alias), 
-        RowFieldsBase> byTypeAndAlias;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultRowFieldsProvider"/> class.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider.</param>
-    /// <exception cref="ArgumentNullException">serviceProvider</exception>
-    public DefaultRowFieldsProvider(IServiceProvider serviceProvider)
-    {
-        byType = new ConcurrentDictionary<Type, RowFieldsBase>();
-        byTypeAndAlias = new ConcurrentDictionary<(Type, string), RowFieldsBase>();
-        this.serviceProvider = serviceProvider ?? 
+    private readonly IServiceProvider serviceProvider = serviceProvider ??
             throw new ArgumentNullException(nameof(serviceProvider));
-    }
+    private readonly ConcurrentDictionary<Type, RowFieldsBase> byType = new();
+    private readonly ConcurrentDictionary<(Type type, string alias), 
+        RowFieldsBase> byTypeAndAlias = new();
 
     /// <summary>
     /// Resolves the specified fields type.

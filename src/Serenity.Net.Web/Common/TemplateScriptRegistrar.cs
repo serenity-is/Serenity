@@ -8,7 +8,7 @@ namespace Serenity.Web;
 /// </summary>
 public class TemplateScriptRegistrar
 {
-    private static readonly string[] TemplateSuffixes = new[] { ".Template.html", ".ts.html" };
+    private static readonly string[] TemplateSuffixes = [".Template.html", ".ts.html"];
 
     private ConcatenatedScript bundle;
     private readonly Dictionary<string, TemplateScript> scriptByKey = new(StringComparer.OrdinalIgnoreCase);
@@ -21,7 +21,7 @@ public class TemplateScriptRegistrar
         foreach (var suffix in TemplateSuffixes)
             if (key.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
             {
-                key = key.Substring(0, key.Length - suffix.Length);
+                key = key[..^suffix.Length];
 
                 if (isModulesFolder && filename.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
                 {
@@ -30,7 +30,7 @@ public class TemplateScriptRegistrar
                     var moduleEnd = filename.IndexOf(Path.DirectorySeparatorChar, StringComparison.Ordinal);
                     if (moduleEnd >= 0)
                     {
-                        var module = filename.Substring(0, moduleEnd);
+                        var module = filename[..moduleEnd];
                         if (!key.StartsWith(module + ".", StringComparison.OrdinalIgnoreCase))
                             return module + "." + key;
                     }

@@ -7,7 +7,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void Resolves_Namespace_DecoratorRefs_InSerenityNamespace()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.WriteAllText("a.ts", @"
 declare namespace Serenity {
     export class Widget {

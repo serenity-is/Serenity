@@ -7,52 +7,52 @@ public class Alias : IAlias
     /// <summary>
     /// Static t0 alias
     /// </summary>
-    public static readonly Alias T0 = new Alias(0);
+    public static readonly Alias T0 = new(0);
 
     /// <summary>
     /// Static t1 alias
     /// </summary>
-    public static readonly Alias T1 = new Alias(1);
+    public static readonly Alias T1 = new(1);
 
     /// <summary>
     /// Static t2 alias
     /// </summary>
-    public static readonly Alias T2 = new Alias(2);
+    public static readonly Alias T2 = new(2);
 
     /// <summary>
     /// Static t3 alias
     /// </summary>
-    public static readonly Alias T3 = new Alias(3);
+    public static readonly Alias T3 = new(3);
 
     /// <summary>
     /// Static t4 alias
     /// </summary>
-    public static readonly Alias T4 = new Alias(4);
+    public static readonly Alias T4 = new(4);
 
     /// <summary>
     /// Static t5 alias
     /// </summary>
-    public static readonly Alias T5 = new Alias(5);
+    public static readonly Alias T5 = new(5);
 
     /// <summary>
     /// Static t6 alias
     /// </summary>
-    public static readonly Alias T6 = new Alias(6);
+    public static readonly Alias T6 = new(6);
 
     /// <summary>
     /// Static t7 alias
     /// </summary>
-    public static readonly Alias T7 = new Alias(7);
+    public static readonly Alias T7 = new(7);
 
     /// <summary>
     /// Static t8 alias
     /// </summary>
-    public static readonly Alias T8 = new Alias(8);
+    public static readonly Alias T8 = new(8);
 
     /// <summary>
     /// Static t9 alias
     /// </summary>
-    public static readonly Alias T9 = new Alias(9);
+    public static readonly Alias T9 = new(9);
 
     private readonly string alias;
     private readonly string aliasDot;

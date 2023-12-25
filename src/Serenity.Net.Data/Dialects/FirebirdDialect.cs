@@ -9,9 +9,9 @@ public class FirebirdDialect : ISqlDialect
     /// <summary>
     /// The shared instance of FirebirdDialect.
     /// </summary>
-    public static readonly FirebirdDialect Instance = new FirebirdDialect();
+    public static readonly FirebirdDialect Instance = new();
 
-    private static readonly HashSet<string> keywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> keywords = new(StringComparer.OrdinalIgnoreCase)
     {
         "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
         "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY",

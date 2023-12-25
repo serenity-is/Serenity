@@ -27,12 +27,9 @@ public class ConnectionKeyAttribute : Attribute
         if (sourceType == null)
             throw new ArgumentNullException("sourceType");
 
-        var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true);
-        if (attr == null)
-            throw new ArgumentOutOfRangeException("sourceType",
+        var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true) ?? throw new ArgumentOutOfRangeException("sourceType",
                 "ConnectionKeyAttribute is created with source type " + sourceType.Name +
                 ", but that class has no ConnectionKey attribute");
-
         Value = attr.Value;
         SourceType = sourceType;
     }

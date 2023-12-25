@@ -1,11 +1,7 @@
-﻿import { extend } from "./system";
-import { Config } from "./config";
-import { Exception } from "./system";
-import { tryGetText } from "./localtext";
-import { parseDate, parseHourAndMin, parseDayHourAndMin, parseDecimal, parseInteger } from "./formatting";
-import { isBS3 } from "./dialogs";
-import { htmlEncode } from "./html";
-import validator from "@optionaldeps/jquery.validation";
+﻿import validator from "@optionaldeps/jquery.validation";
+import { Config, htmlEncode, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
+import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
+import { Exception, extend } from "./system-compat";
 
 if (validator && validator.methods && validator.addMethod) {
 
@@ -157,7 +153,7 @@ export function getHighlightTarget(el: HTMLElement) {
 export function baseValidateOptions(): JQueryValidation.ValidationOptions {
     return <any>{
         errorClass: 'error',
-        ignore: ':hidden, .no-validate',
+        ignore: '[style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
         ignoreTitle: true,
         normalizer: function (value: any) {
             return $.trim(value);

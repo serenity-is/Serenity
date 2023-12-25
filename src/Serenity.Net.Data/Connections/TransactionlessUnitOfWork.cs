@@ -7,22 +7,17 @@
 /// </summary>
 /// <seealso cref="IDisposable" />
 /// <seealso cref="IUnitOfWork" />
-public class TransactionlessUnitOfWork : IDisposable, IUnitOfWork
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="connection">The connection.</param>
+/// <exception cref="ArgumentNullException">connection</exception>
+public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, IUnitOfWork
 {
-    private readonly IDbConnection connection;
+    private readonly IDbConnection connection = connection ?? throw new ArgumentNullException(nameof(connection));
     private Action onCommit;
     private Action onRollback;
     private bool commitCalled;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <exception cref="ArgumentNullException">connection</exception>
-    public TransactionlessUnitOfWork(IDbConnection connection)
-    {
-        this.connection = connection ?? throw new ArgumentNullException(nameof(connection));
-    }
 
     /// <summary>
     /// Gets the connection.

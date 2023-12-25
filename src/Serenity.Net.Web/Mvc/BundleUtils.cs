@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders;
 
 namespace Serenity.Web;
 
@@ -18,11 +18,9 @@ internal static class BundleUtils
 
     public static string GetLatestVersion(IFileProvider fileProvider, string path, string pattern)
     {
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
 
-        if (pattern == null)
-            throw new ArgumentNullException(nameof(pattern));
+        ArgumentNullException.ThrowIfNull(pattern);
 
         var regex = new Regex(pattern);
 
@@ -60,8 +58,7 @@ internal static class BundleUtils
         if (expandVersion.TryGetValue(scriptUrl, out string result))
             return result;
 
-        var before = scriptUrl.Substring(0, idx);
-        var after = scriptUrl[(idx + tpl.Length)..];
+        var before = scriptUrl[..idx];
         var extension = System.IO.Path.GetExtension(scriptUrl);
 
         var path = before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before;
@@ -105,7 +102,7 @@ internal static class BundleUtils
                 continue;
             }
 
-            bool falsey = key.StartsWith("!", StringComparison.Ordinal);
+            bool falsey = key.StartsWith('!');
             if (falsey)
                 key = key[1..];
 
@@ -143,7 +140,7 @@ internal static class BundleUtils
                     replace = value.ToString();
             }
 
-            scriptUrl = scriptUrl.Substring(0, idx) + replace + scriptUrl[(end + 1)..];
+            scriptUrl = scriptUrl[..idx] + replace + scriptUrl[(end + 1)..];
             idx = end + 1 + (replace.Length - key.Length - (falsey ? 1 : 0));
         }
         while (idx < scriptUrl.Length - 1);

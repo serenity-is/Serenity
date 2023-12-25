@@ -1,16 +1,18 @@
-﻿import { Decorators, FormKeyAttribute } from "../../decorators";
-import { endsWith, getAttributes, getForm, getInstanceType, getTypeFullName, PropertyItem } from "../../q";
+﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
+import { Decorators, FormKeyAttribute } from "../../decorators";
+import { getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
+import { WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')
-export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 
     private _entity: TItem;
     private _entityId: any;
 
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.initPropertyGrid();
         this.loadInitialEntity();
@@ -34,7 +36,7 @@ export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
-        this.propertyGrid = (new PropertyGrid(pgDiv, pgOptions)).init(null);
+        this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
         if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }
@@ -58,11 +60,8 @@ export class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
         if (px >= 0) {
             name = name.substring(px + 1);
         }
-        if (endsWith(name, 'Panel')) {
-            name = name.substr(0, name.length - 6);
-        }
-        else if (endsWith(name, 'Panel')) {
-            name = name.substr(0, name.length - 5);
+        else if (name.endsWith('Panel')) {
+            name = name.substring(0, name.length - 5);
         }
         return name;
     }

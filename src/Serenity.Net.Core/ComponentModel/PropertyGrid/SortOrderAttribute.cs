@@ -5,16 +5,12 @@
 /// Negative values means descending sort. Applies only to columns.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class SortOrderAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="SortOrderAttribute"/> class.
+/// </remarks>
+/// <param name="sortOrder">The sort order.</param>
+public class SortOrderAttribute(int sortOrder) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SortOrderAttribute"/> class.
-    /// </summary>
-    /// <param name="sortOrder">The sort order.</param>
-    public SortOrderAttribute(int sortOrder)
-    {
-        SortOrder = sortOrder;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SortOrderAttribute"/> class.
@@ -32,7 +28,7 @@ public class SortOrderAttribute : Attribute
     /// <value>
     /// The sort order.
     /// </value>
-    public int SortOrder { get; private set; }
+    public int SortOrder { get; private set; } = sortOrder;
 
     /// <summary>
     /// Gets a value indicating whether sort is descending.

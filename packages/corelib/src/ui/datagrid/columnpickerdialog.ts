@@ -1,15 +1,17 @@
-﻿import { Column } from "@serenity-is/sleekgrid";
+﻿import { Culture, DialogTexts, faIcon, htmlEncode, localText } from "@serenity-is/base";
+import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, centerDialog, Culture, htmlEncode, Router, localText, trimToNull } from "../../q";
+import { Authorization, Router, centerDialog } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
+import { WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 
 @Decorators.registerClass('Serenity.ColumnPickerDialog')
 @Decorators.resizable()
 @Decorators.responsive()
-export class ColumnPickerDialog extends TemplatedDialog<any> {
+export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
     private ulVisible: JQuery;
     private ulHidden: JQuery;
@@ -20,15 +22,13 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
     public defaultColumns: string[];
     public done: () => void;
 
-    constructor() {
-        super();
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
-        new QuickSearchInput(this.byId("Search"), {
+        new QuickSearchInput({
+            element: this.byId("Search"),
             onSearch: (fld, txt, done) => {
-                txt = trimToNull(txt);
-                if (txt != null)
-                    txt = Select2.util.stripDiacritics(txt.toLowerCase());
-
+                txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
                 this.element.find('li').each((x, e) => {
                     $(e).toggle(!txt || Select2.util.stripDiacritics(
                         $(e).text().toLowerCase()).indexOf(txt) >= 0);
@@ -44,7 +44,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
 
     public static createToolButton(grid: IDataGrid): ToolButton {
         function onClick() {
-            var picker = new ColumnPickerDialog();
+            var picker = new ColumnPickerDialog({});
             picker.allColumns = (grid as any).allColumns;
             if ((grid as any).initialSettings) {
                 var initialSettings = (grid as any).initialSettings;
@@ -73,7 +73,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
             hint: localText("Controls.ColumnPickerDialog.Title"),
             action: 'column-picker',
             cssClass: "column-picker-button",
-            icon: 'fa-th-list text-blue',
+            icon: faIcon("th-list", "blue"),
             onClick: onClick
         }
     }
@@ -112,7 +112,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
                 }
             },
             {
-                text: localText("Dialogs.OkButton"),
+                text: DialogTexts.OkButton,
                 click: () => {
                     let newColumns: Column[] = [];
 
@@ -138,7 +138,7 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
                 }
             },
             {
-                text: localText("Dialogs.CancelButton"),
+                text: DialogTexts.CancelButton,
                 click: () => {
                     this.dialogClose()
                 }
@@ -168,9 +168,9 @@ export class ColumnPickerDialog extends TemplatedDialog<any> {
         return $(`
 <li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
 <span class="drag-handle">☰</span>
-${ htmlEncode(this.getTitle(col)) }
-${ allowHide ? `<i class="js-hide fa fa-eye-slash" title="${htmlEncode(localText("Controls.ColumnPickerDialog.HideHint"))}"></i>` : '' }
-<i class="js-show fa fa-eye" title="${ htmlEncode(localText("Controls.ColumnPickerDialog.ShowHint")) }"></i>
+${htmlEncode(this.getTitle(col))}
+${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(localText("Controls.ColumnPickerDialog.HideHint"))}"></i>` : ''}
+<i class="js-show ${faIcon("eye")} title="${htmlEncode(localText("Controls.ColumnPickerDialog.ShowHint"))}"></i>
 </li>`);
     }
 
@@ -269,15 +269,14 @@ ${ allowHide ? `<i class="js-hide fa fa-eye-slash" title="${htmlEncode(localText
     }
 
     protected getTemplate() {
-        return `
-<div class="search"><input id="~_Search" type="text" disabled /></div>
+        return `<div class="search"><input id="~_Search" type="text" disabled /></div>
 <div class="columns-container">
 <div class="column-list visible-list bg-success">
-<h5><i class="fa fa-eye"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.VisibleColumns"))}</h5>
+<h5><i class="${faIcon("eye")}"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.VisibleColumns"))}</h5>
 <ul id="~_VisibleCols"></ul>
 </div>
 <div class="column-list hidden-list bg-info">
-<h5><i class="fa fa-eye-slash"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.HiddenColumns"))}</h5>
+<h5><i class="${faIcon("eye-slash")}"></i> ${htmlEncode(localText("Controls.ColumnPickerDialog.HiddenColumns"))}</h5>
 <ul id="~_HiddenCols"></ul>
 </div>
 </div>`;

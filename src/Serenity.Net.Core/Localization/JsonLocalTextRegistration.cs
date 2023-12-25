@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Serenity.Localization;
 
@@ -46,8 +46,15 @@ public static class JsonLocalTextRegistration
             var o = k.Value;
             if (o is IDictionary<string, object> dictionary)
                 ProcessNestedDictionary(dictionary, actual + ".", target);
-            else if (o is JObject obj)
+            else if (o is Newtonsoft.Json.Linq.JObject obj)
                 ProcessNestedDictionary(obj, actual + ".", target);
+            else if (o is JsonElement jn)
+            {
+                if (jn.ValueKind == JsonValueKind.String)
+                    target[actual] = jn.GetString()!;
+                else if (jn.ValueKind == JsonValueKind.Object)
+                    ProcessNestedDictionary(JsonSerializer.Deserialize<Dictionary<string, object>>(jn)!, actual + ".", target);
+            }
             else if (o != null)
                 target[actual] = o.ToString();
         }
@@ -82,8 +89,8 @@ public static class JsonLocalTextRegistration
             if (langID is null)
                 continue;
 
-            var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(
-                fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? new();
+            var texts = JSON.Parse<Dictionary<string, object>>(
+                fileSystem.ReadAllText(file).TrimToNull() ?? "{}") ?? [];
 
             AddFromNestedDictionary(texts, "", langID, registry);
         }
@@ -142,7 +149,7 @@ public static class JsonLocalTextRegistration
                 string? json = sr.ReadToEnd().TrimToNull();
                 if (json is null)
                     continue;
-                var texts = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                var texts = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                 if (texts is not null)
                     AddFromNestedDictionary(texts, "", langID, registry);
             }

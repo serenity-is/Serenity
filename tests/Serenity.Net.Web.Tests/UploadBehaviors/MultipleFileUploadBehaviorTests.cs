@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
@@ -548,8 +548,9 @@ public partial class MultipleFileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.AllFiles.Select(x => mockFileSystem.Path.GetFileName(x)).ToList();
-        var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor).Select(x => mockFileSystem.Path.GetFileName(x.Filename));
+        var newFile = mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName).ToList();
+        var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor)
+            .Select(x => mockFileSystem.Path.GetFileName(x.Filename));
 
         if (!isUpdate)
         {

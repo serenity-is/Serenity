@@ -13,11 +13,11 @@ public class EntityModel
     public string Title { get; set; }
     public string IdField { get; set; }
     public string RowBaseClass { get; set; } = "Serenity.Data.Row";
-    public List<EntityField> RowBaseFields { get; } = new();
+    public List<EntityField> RowBaseFields { get; } = [];
     public string FieldsBaseClass { get; set; } = "Serenity.Data.RowFieldsBase";
     public string ServiceLookupPermission { get; set; }
-    public List<EntityField> Fields { get; } = new();
-    public List<EntityJoin> Joins { get; } = new();
+    public List<EntityField> Fields { get; } = [];
+    public List<EntityJoin> Joins { get; } = [];
     public string NameField { get; set; }
     public string FieldPrefix { get; set; }
     public bool AspNetCore { get; set; } = true;
@@ -27,7 +27,7 @@ public class EntityModel
     public bool EnableRowTemplates { get; set; }
     public bool FileScopedNamespaces { get; set; }
     public bool GenerateListExcel { get; set; }
-    public HashSet<string> GlobalUsings { get; } = new();
+    public HashSet<string> GlobalUsings { get; } = [];
 
     public string Identity => IdField;
     public Dictionary<string, object> CustomSettings { get; set; }

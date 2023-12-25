@@ -107,7 +107,7 @@ Slick._ = (() => {
       return super.validate();
     }
   };
-  var _FloatEditor = class extends TextEditor {
+  var _FloatEditor = class _FloatEditor extends TextEditor {
     getDecimalPlaces() {
       var rtn = this._args.column.editorFixedDecimalPlaces;
       if (typeof rtn === "undefined") {
@@ -149,9 +149,9 @@ Slick._ = (() => {
       return super.validate();
     }
   };
+  _FloatEditor.AllowEmptyValue = false;
+  _FloatEditor.DefaultDecimalPlaces = null;
   var FloatEditor = _FloatEditor;
-  FloatEditor.AllowEmptyValue = false;
-  FloatEditor.DefaultDecimalPlaces = null;
   var DateEditor = class extends TextEditor {
     constructor() {
       super(...arguments);

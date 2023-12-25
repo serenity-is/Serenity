@@ -1,4 +1,6 @@
-﻿using CompressionLevel = System.IO.Compression.CompressionLevel;
+using System.IO;
+using System.Text.Json;
+using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 namespace Serenity.Web;
 
@@ -43,8 +45,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <inheritdoc/>
     public void Changed(string name)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         scriptLastChange[name] = DateTime.UtcNow;
         scriptChanged?.Invoke(name);
@@ -65,8 +66,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <inheritdoc/>
     public void Register(string name, IDynamicScript script)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
         registeredScripts[name] = script ?? throw new ArgumentNullException(nameof(script));
     }
 
@@ -99,8 +99,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <exception cref="ArgumentNullException">name is null</exception>
     public string PeekScriptHash(string name, IDynamicScript script)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var cacheKey = "DynamicScript:" + name;
         if (script is ICacheSuffix ics)
@@ -137,10 +136,9 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         return hash;
     }
 
-    private IScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
+    private ScriptContent EnsureScriptContent(string name, IDynamicScript script, bool json)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var cacheKey = (json ? "DynamicData:" : "DynamicScript:") + name;
         if (script is ICacheSuffix ics)
@@ -154,7 +152,12 @@ public partial class DynamicScriptManager : IDynamicScriptManager
             {
                 if (script is IGetScriptData scriptData)
                 {
-                    content = utf8Encoding.GetBytes(scriptData.GetScriptData().ToJson()); 
+                    using var ms = new MemoryStream();
+                    using var jsonWriter = new Utf8JsonWriter(ms);
+                    JsonSerializer.Serialize(jsonWriter, scriptData.GetScriptData(),
+                        JSON.Defaults.Strict);
+                    jsonWriter.Flush();
+                    content = ms.ToArray();
                 }
                 else
                 {

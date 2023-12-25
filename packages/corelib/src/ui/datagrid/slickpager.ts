@@ -1,18 +1,18 @@
-﻿import { htmlEncode, extend, localText } from "../../q";
-import { PagerOptions } from "../../slick";
+﻿import { htmlEncode, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { Widget } from "../widgets/widget";
+import { PagerOptions } from "../../slick";
+import { Widget, WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass("Serenity.SlickPager")
-export class SlickPager extends Widget<PagerOptions> {
+export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
 
-    constructor(div: JQuery, o: PagerOptions) {
-        super(div, extend({
-            showRowsPerPage: true,
-            rowsPerPageOptions: [20, 100, 500, 2000]
-        } as any, o));
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
-        o = this.options;
+        let o = this.options;
+        o.showRowsPerPage ??= true;
+        o.rowsPerPageOptions ??= [20, 100, 500, 2000];
+
         var v = o.view;
 
         if (!v)
@@ -98,7 +98,7 @@ export class SlickPager extends Widget<PagerOptions> {
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt($('input.slick-pg-current', this.element).val());
+                var nv = parseInt($('input.slick-pg-current', this.element).val() as string);
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)

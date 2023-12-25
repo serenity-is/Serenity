@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <Description>NuGet version of @serenity-is/corelib NPM package</Description>
+    <IdxDist>dist\index.</IdxDist>
+    <IdxGlob>wwwroot\index.global.</IdxGlob>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
+    <TypingsToPackage Include="wwwroot\index.global.d.ts" PackagePath="typings\serenity.corelib\index.d.ts" />
+    <TSBuildInputs Include="..\*\src\**\*.ts;..\*\tsconfig.json;..\*\build\build.js;..\*\rollup.config.js;..\*\package.json" />
+  </ItemGroup>
+  <Target Name="TSBuild" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(TSBuildInputs)" DependsOnTargets="NpmInstall" Outputs="$(IdxDist)d.ts;$(IdxDist)js;$(IdxDist)js.map;$(IdxGlob)d.ts;$(IdxGlob)js;$(IdxGlob)js.map;$(IdxGlob)min.js;$(IdxGlob)min.js.map">
+    <Exec Command="pnpm -r build" WorkingDirectory="..\..\packages" />
+  </Target>
+</Project>

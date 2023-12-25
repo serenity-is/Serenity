@@ -3,20 +3,16 @@
 /// <summary>
 /// Marks a class as Report
 /// </summary>
-public class ReportAttribute : Attribute
+/// <remarks>
+/// Creates an instance of the attribute
+/// </remarks>
+/// <param name="reportKey">The report key. If not passed
+/// it is calculated from the class name.</param>
+public class ReportAttribute(string reportKey = null) : Attribute
 {
-    /// <summary>
-    /// Creates an instance of the attribute
-    /// </summary>
-    /// <param name="reportKey">The report key. If not passed
-    /// it is calculated from the class name.</param>
-    public ReportAttribute(string reportKey = null)
-    {
-        ReportKey = reportKey;
-    }
 
     /// <summary>
     /// The report key.
     /// </summary>
-    public string ReportKey { get; private set; }
+    public string ReportKey { get; private set; } = reportKey;
 }

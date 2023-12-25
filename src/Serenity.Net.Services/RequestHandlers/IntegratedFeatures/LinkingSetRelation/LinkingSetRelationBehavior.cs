@@ -5,13 +5,18 @@ namespace Serenity.Services;
 /// <summary>
 /// Behavior class that handles <see cref="LinkingSetRelationAttribute"/>
 /// </summary>
-public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="handlerFactory">Default handler factory</param>
+/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior,
     IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field Target { get; set; }
 
-    private readonly IDefaultHandlerFactory handlerFactory;
+    private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
     private LinkingSetRelationAttribute attr;
     private Type rowType;
     private Field thisKeyField;
@@ -23,16 +28,6 @@ public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
     private BaseCriteria queryCriteria;
     private Func<IRow> rowFactory;
     private Func<IList> listFactory;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="handlerFactory">Default handler factory</param>
-    /// <exception cref="ArgumentNullException">handlerFactory is null</exception>
-    public LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory)
-    {
-        this.handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-    }
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -207,10 +202,10 @@ public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
         var listRequest = listHandler.CreateRequest();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
-        listRequest.IncludeColumns = new HashSet<string>
-        {
+        listRequest.IncludeColumns =
+        [
                 itemKeyField.PropertyName ?? itemKeyField.Name
-        };
+        ];
         listRequest.Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria;
 
         IListResponse response = listHandler.Process(handler.Connection, listRequest);
@@ -236,11 +231,11 @@ public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
         var listRequest = listHandler.CreateRequest();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
-        listRequest.IncludeColumns = new HashSet<string>
-        {
+        listRequest.IncludeColumns =
+        [
             itemKeyField.PropertyName ?? itemKeyField.Name,
             thisKeyField.PropertyName ?? thisKeyField.Name
-        };
+        ];
 
         var enumerator = handler.Response.Entities.Cast<IRow>();
         while (true)
@@ -252,7 +247,7 @@ public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
             enumerator = enumerator.Skip(1000);
 
             listRequest.Criteria = thisKeyCriteria.In(
-                part.Select(x => idField.AsObject(x))) & filterCriteria;
+                part.Select(idField.AsObject)) & filterCriteria;
 
             IListResponse response = listHandler.Process(
                 handler.Connection, listRequest);
@@ -338,7 +333,7 @@ public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior,
                 }
 
                 oldRows = new List<IRow>();
-                oldByItemKey = new Dictionary<string, IRow>();
+                oldByItemKey = [];
             }
         }
 

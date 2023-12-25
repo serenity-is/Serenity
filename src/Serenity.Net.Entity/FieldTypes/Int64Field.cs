@@ -1,25 +1,23 @@
-﻿namespace Serenity.Data;
+using System.Text.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with Int64 value
 /// </summary>
-public sealed class Int64Field : GenericValueField<long>
+/// <remarks>
+/// Initializes a new instance of the <see cref="Int64Field"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public sealed class Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, long?> getValue = null, Action<IRow, long?> setValue = null) : GenericValueField<long>(collection, FieldType.Int64, name, caption, size, flags, getValue, setValue)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Int64Field"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public Int64Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, long?> getValue = null, Action<IRow, long?> setValue = null)
-        : base(collection, FieldType.Int64, name, caption, size, flags, getValue, setValue)
-    {
-    }
 
     /// <summary>
     /// Static factory for field, for backward compatibility, avoid using.
@@ -64,7 +62,7 @@ public sealed class Int64Field : GenericValueField<long>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    public override void ValueToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    public override void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         var value = _getValue(row);
         if (value == null)
@@ -87,27 +85,27 @@ public sealed class Int64Field : GenericValueField<long>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     /// <exception cref="ArgumentNullException">reader</exception>
-    public override void ValueFromJson(JsonReader reader, IRow row, JsonSerializer serializer)
+    public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         if (reader == null)
             throw new ArgumentNullException("reader");
 
         switch (reader.TokenType)
         {
-            case JsonToken.Null:
-            case JsonToken.Undefined:
+            case Newtonsoft.Json.JsonToken.Null:
+            case Newtonsoft.Json.JsonToken.Undefined:
                 _setValue(row, null);
                 break;
-            case JsonToken.Integer:
-            case JsonToken.Float:
-            case JsonToken.Boolean:
+            case Newtonsoft.Json.JsonToken.Integer:
+            case Newtonsoft.Json.JsonToken.Float:
+            case Newtonsoft.Json.JsonToken.Boolean:
                 var v = Convert.ToInt64(reader.Value, CultureInfo.InvariantCulture);
                 if (EnumType == null)
                     _setValue(row, v);
                 else
                     _setValue(row, Int32Field.ConvertEnumFromInt(EnumType, v));
                 break;
-            case JsonToken.String:
+            case Newtonsoft.Json.JsonToken.String:
                 string s = ((string)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
@@ -121,5 +119,53 @@ public sealed class Int64Field : GenericValueField<long>
         }
 
         row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueFromJson(ref Utf8JsonReader reader, IRow row, JsonSerializerOptions options)
+    {
+        long v;
+
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Null:
+                _setValue(row, null);
+                break;
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+            case JsonTokenType.Number:
+                if (reader.TokenType == JsonTokenType.Number)
+                    v = reader.GetInt64();
+                else
+                    v = reader.TokenType == JsonTokenType.True ? 1L : 0L;
+                if (EnumType == null)
+                    _setValue(row, v);
+                else
+                    _setValue(row, Int32Field.ConvertEnumFromInt(EnumType, v));
+                break;
+            case JsonTokenType.String:
+                string s = reader.GetString().TrimToNull();
+                if (s == null)
+                    _setValue(row, null);
+                else if (EnumType == null)
+                    _setValue(row, Convert.ToInt64(s, CultureInfo.InvariantCulture));
+                else
+                    _setValue(row, Int32Field.ConvertEnumFromString(EnumType, s));
+                break;
+            default:
+                throw UnexpectedJsonToken(ref reader);
+        }
+
+        row.FieldAssignedValue(this);
+    }
+
+    /// <inheritdoc/>
+    public override void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
+    {
+        var value = _getValue(row);
+        if (value == null)
+            writer.WriteNullValue();
+        else
+            JsonSerializer.Serialize(writer, value.Value, options);
     }
 }

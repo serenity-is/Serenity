@@ -23,7 +23,7 @@ Slick._ = (() => {
   __export(autotooltips_exports, {
     AutoTooltips: () => AutoTooltips
   });
-  var _AutoTooltips = class {
+  var _AutoTooltips = class _AutoTooltips {
     constructor(options) {
       this.handleMouseEnter = (e) => {
         var _a, _b;
@@ -71,13 +71,13 @@ Slick._ = (() => {
         this.grid.onHeaderMouseEnter.unsubscribe(this.handleHeaderMouseEnter);
     }
   };
-  var AutoTooltips = _AutoTooltips;
-  AutoTooltips.defaults = {
+  _AutoTooltips.defaults = {
     enableForCells: true,
     enableForHeaderCells: false,
     maxToolTipLength: null,
     replaceExisting: true
   };
+  var AutoTooltips = _AutoTooltips;
   return __toCommonJS(autotooltips_exports);
 })();
 ["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;

@@ -1,4 +1,4 @@
-﻿using Serenity.Tests.Entities;
+using Serenity.Tests.Entities;
 
 namespace Serenity.Tests.Entity;
 
@@ -51,8 +51,8 @@ public partial class SqlQuery_Entity_Tests
         var query = new SqlQuery().From(entity).Select("x1");
         Assert.Equal(0, ((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex);
         query.Into(null).Select("x2");
-        Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex, -1);
-        Assert.Equal(1, ((ISqlQueryExtensible)query).IntoRows.Count);
+        Assert.Equal(-1, ((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex);
+        Assert.Single(((ISqlQueryExtensible)query).IntoRows);
         Assert.Equal(entity, ((ISqlQueryExtensible)query).IntoRows[0]);
     }
 

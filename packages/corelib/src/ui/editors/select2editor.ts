@@ -1,11 +1,12 @@
 ﻿import Select2 from "@optionaldeps/select2";
-import { Authorization, PropertyItem, any, isEmptyOrNull, isTrimmedEmpty, localText, startsWith, trimToEmpty, trimToNull } from "../../q";
+import { PropertyItem, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
+import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { Widget } from "../widgets/widget";
+import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
@@ -34,7 +35,7 @@ export interface Select2InplaceAddOptions {
 export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
 }
 
-export interface Select2SearchPromise {
+export interface Select2SearchPromise extends PromiseLike<any> {
     abort?(): void;
     catch?(callback: () => void): void;
     fail?(callback: () => void): void;
@@ -56,15 +57,17 @@ export interface Select2SearchResult<TItem> {
 @Decorators.registerClass('Serenity.Select2Editor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
 @Decorators.element("<input type=\"hidden\"/>")
-export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
+export class Select2Editor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
     private _items: Select2Item[];
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
-    constructor(hidden: JQuery, opt?: any) {
-        super(hidden, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
+
+        let hidden = this.element;
 
         this._items = [];
         this._itemById = {};
@@ -79,7 +82,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         // for jquery validate to work
         hidden.on('change.' + this.uniqueName, (e: any, valueSet) => {
             if (valueSet !== true && hidden.closest('form').data('validator'))
-                    hidden.valid();
+                hidden.valid();
         });
 
         this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
@@ -185,7 +188,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         var emptyItemText = this.emptyItemText();
         var opt: Select2Options = {
             multiple: this.isMultiple(),
-            placeHolder: (!isEmptyOrNull(emptyItemText) ? emptyItemText : null),
+            placeHolder: emptyItemText || null,
             allowClear: this.allowClear(),
             createSearchChoicePosition: 'bottom'
         }
@@ -194,7 +197,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             opt.query = query => {
                 var pageSize = this.getPageSize();
                 var searchQuery: Select2SearchQuery = {
-                    searchTerm: trimToNull(query.term),
+                    searchTerm: query.term?.trim() || null,
                     skip: (query.page - 1) * pageSize,
                     take: pageSize,
                     checkMore: true
@@ -231,7 +234,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 }
 
                 var isMultiple = this.isMultiple();
-                var idList = isMultiple ? val.split(',') : [val]; 
+                var idList = isMultiple ? (val as string).split(',') : [val as string];
                 var searchQuery = {
                     idList: idList
                 }
@@ -247,7 +250,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                         if (this.isAutoComplete &&
                             items.length != idList.length) {
                             for (var v of idList) {
-                                if (!any(items, z => z.id == v)) {
+                                if (!items.some(z => z.id == v)) {
                                     items.push({
                                         id: v,
                                         text: v
@@ -290,11 +293,11 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                 });
             }
             opt.initSelection = (element, callback) => {
-                var val = element.val();
+                var val = element.val() as string;
                 var isAutoComplete = this.isAutoComplete();
                 if (this.isMultiple()) {
                     var list = [];
-                    for (var z of val.split(',')) {
+                    for (var z of (val as string).split(',')) {
                         var item2 = this._itemById[z];
                         if (item2 == null && isAutoComplete) {
                             item2 = { id: z, text: z };
@@ -393,13 +396,13 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             .addClass('inplace-button inplace-create')
             .attr('title', addTitle)
             .insertAfter(this.element).click(function (e) {
-                self.inplaceCreateClick(e);
+                self.inplaceCreateClick(e as any);
             });
 
         this.get_select2Container().add(this.element).addClass('has-inplace-button');
 
         this.element.change(() => {
-            var isNew = this.isMultiple() || isEmptyOrNull(this.get_value());
+            var isNew = this.isMultiple() || !this.get_value();
             inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
         });
 
@@ -420,7 +423,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         });
 
         if (this.isMultiple()) {
-            this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: JQueryEventObject) => {
+            this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
                 var q = $(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
@@ -459,13 +462,13 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
             var isAsyncSource = false;
 
-            if (any(this._items || [], (x: Select2Item) => {
-                    var text = getName ? getName(x.source) : x.text;
-                    return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
+            if ((this._items || []).some((x: Select2Item) => {
+                var text = getName ? getName(x.source) : x.text;
+                return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
 
-            if (!any(this._items || [], x1 => {
+            if (!(this._items || []).some(x1 => {
                 return (Select2.util.stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
             })) {
                 if (this.isAutoComplete()) {
@@ -497,7 +500,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
-        if(Array.isArray(val)) {
+        if (Array.isArray(val)) {
             this.set_values(val);
         }
         else {
@@ -538,7 +541,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
             if (text == null || !text.length)
                 return false;
             text = Select2.util.stripDiacritics(text).toUpperCase();
-            if (startsWith(text, term))
+            if (text.startsWith(term))
                 return true;
             if (text.indexOf(term) >= 0)
                 contains.push(item);
@@ -570,9 +573,9 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
         if (value != this.get_value()) {
             var val: any = value;
-            if (!isEmptyOrNull(value) && this.isMultiple()) {
+            if (value && this.isMultiple()) {
                 val = value.split(String.fromCharCode(44)).map(function (x) {
-                    return trimToNull(x);
+                    return x?.trim() || null;
                 }).filter(function (x1) {
                     return x1 != null;
                 });
@@ -632,7 +635,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
         }
 
         var str = val;
-        if (isEmptyOrNull(str)) {
+        if (!str) {
             return [];
         }
 
@@ -666,7 +669,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     }
 
     get_readOnly(): boolean {
-        return !isEmptyOrNull(this.element.attr('readonly'));
+        return !!this.element.attr('readonly');
     }
 
     get readOnly(): boolean {
@@ -702,7 +705,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected setCascadeFrom(value: string) {
 
-        if (isEmptyOrNull(value)) {
+        if (!value) {
             if (this.cascadeLink != null) {
                 this.cascadeLink.set_parentID(null);
                 this.cascadeLink = null;
@@ -816,7 +819,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
         if (val == null || val === '') {
 
-            if (!isEmptyOrNull(this.get_cascadeField())) {
+            if (this.get_cascadeField()) {
                 return [];
             }
 
@@ -861,21 +864,19 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     protected createEditDialog(callback: (dlg: IEditDialog) => void) {
         var dialogTypeKey = this.getDialogTypeKey();
-        var dialogType = DialogTypeRegistry.get(dialogTypeKey);
-        Widget.create({
-            type: dialogType,
-            init: x => callback(x as any)
-        });
+        var dialogType = DialogTypeRegistry.get(dialogTypeKey) as typeof Widget<{}>;
+        var dialog = new dialogType({}).init();
+        callback?.(dialog as unknown as IEditDialog);
     }
 
     public onInitNewEntity: (entity: TItem) => void;
 
     protected initNewEntity(entity: TItem) {
-        if (!isEmptyOrNull(this.get_cascadeField())) {
+        if (this.get_cascadeField()) {
             (entity as any)[this.get_cascadeField()] = this.get_cascadeValue();
         }
 
-        if (!isEmptyOrNull(this.get_filterField())) {
+        if (this.get_filterField()) {
             (entity as any)[this.get_filterField()] = this.get_filterValue();
         }
 
@@ -898,7 +899,7 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected setTermOnNewEntity(entity: TItem, term: string) {
     }
 
-    protected inplaceCreateClick(e: JQueryEventObject) {
+    protected inplaceCreateClick(e: Event) {
 
         if (this.get_readOnly() &&
             ((this.isMultiple() && !(e as any)['editItem']) || !this.value))
@@ -953,9 +954,9 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
                 }, null);
             }
-            else if (this.isMultiple() || isEmptyOrNull(this.get_value())) {
+            else if (this.isMultiple() || !this.get_value()) {
                 var entity: TItem = {} as any;
-                this.setTermOnNewEntity(entity, trimToEmpty(this.lastCreateTerm));
+                this.setTermOnNewEntity(entity, this.lastCreateTerm?.trim() ?? '');
                 this.initNewEntity(entity);
                 dialog.load(entity, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
@@ -971,3 +972,28 @@ export class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
 
     public openDialogAsPanel: boolean;
 }
+
+export function select2LocaleInitialization() {
+    if (typeof $ === "undefined" || !$.fn || !$.fn.select2)
+        return false;
+
+    const txt = (s: string) => localText("Controls.SelectEditor." + s);
+    const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
+
+    ($.fn.select2 as any).locales['current'] = {
+        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
+        formatNoMatches: () => txt("NoMatches"),
+        formatAjaxError: () => txt("AjaxError"),
+        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
+        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
+        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
+        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
+        formatSearching: () => txt("Searching")
+    };
+    $.extend(($.fn.select2 as any).defaults, ($.fn.select2 as any).locales['current']);
+    return true;
+}
+
+if (!select2LocaleInitialization() &&
+    typeof document !== "undefined")
+    document.addEventListener?.('DOMContentLoaded', select2LocaleInitialization);

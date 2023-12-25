@@ -1,12 +1,13 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { localText, resolveUrl } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { endsWith, isEmptyOrNull, isTrimmedEmpty, resolveUrl, localText, trimToNull } from "../../q";
+import { isTrimmedEmpty } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { Widget } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
-    cols?: any;
-    rows?: any;
+    cols?: number;
+    rows?: number;
 }
 
 export interface CKEditorConfig {
@@ -14,14 +15,15 @@ export interface CKEditorConfig {
 
 @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
 @Decorators.element('<textarea/>')
-export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
+export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
 
     private _instanceReady: boolean;
 
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt)
+    constructor(props: EditorProps<P>) {
+        super(props);
 
+        let textArea = this.element;
         this._instanceReady = false;
         HtmlContentEditor.includeCKEditor();
 
@@ -39,8 +41,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         this.addValidationRule(this.uniqueName, e => {
             if (e.hasClass('required')) {
-                var value = trimToNull(this.get_value());
-                if (value == null)
+                if (!this.get_value()?.trim())
                     return localText('Validation.Required');
             }
 
@@ -69,7 +70,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 
         var CKEDITOR = (window as any)['CKEDITOR'];
 
-        var lang = (trimToNull($('html').attr('lang')) ?? 'en');
+        var lang = $('html').attr('lang')?.trim() || 'en';
         if (!!CKEDITOR.lang.languages[lang]) {
             return lang;
         }
@@ -148,7 +149,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
             return instance.getData();
         }
         else {
-            return this.element.val();
+            return this.element.val() as string;
         }
     }
 
@@ -168,7 +169,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
     }
 
     get_readOnly(): boolean {
-        return !isEmptyOrNull(this.element.attr('disabled'));
+        return !!this.element.attr('disabled');
     }
 
     set_readOnly(value: boolean) {
@@ -187,7 +188,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
         }
     }
 
-    static CKEditorVer = "4.7.1";
+    static CKEditorVer = "4.22.1";
     static CKEditorBasePath: string;
 
     static getCKEditorBasePath(): string {
@@ -200,7 +201,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
             else
                 return "~/Serenity.Assets/Scripts/ckeditor/";
         }
-        if (endsWith(path, '/'))
+        if (path.endsWith('/'))
             return path;
         return path + '/';
     }
@@ -224,10 +225,7 @@ export class HtmlContentEditor extends Widget<HtmlContentEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.HtmlNoteContentEditor')
-export class HtmlNoteContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt);
-    }
+export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();
@@ -244,10 +242,7 @@ export class HtmlNoteContentEditor extends HtmlContentEditor {
 }
 
 @Decorators.registerEditor('Serenity.HtmlReportContentEditor')
-export class HtmlReportContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions) {
-        super(textArea, opt);
-    }
+export class HtmlReportContentEditor <P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();

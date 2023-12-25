@@ -7,18 +7,13 @@ namespace Serenity.Reporting;
 /// <summary>
 /// HTML to PDF converter class using WKHTMLToPdf
 /// </summary>
-public class WKHtmlToPdf : IHtmlToPdfOptions
+/// <remarks>
+/// WKHtmlToPdf converter class
+/// </remarks>
+/// <param name="options">List of options</param>
+public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
 {
-    private readonly IHtmlToPdfOptions options;
-
-    /// <summary>
-    /// WKHtmlToPdf converter class
-    /// </summary>
-    /// <param name="options">List of options</param>
-    public WKHtmlToPdf(IHtmlToPdfOptions options = null)
-    {
-        this.options = options ?? new HtmlToPdfOptions();
-    }
+    private readonly IHtmlToPdfOptions options = options ?? new HtmlToPdfOptions();
 
     /// <summary>
     /// Executes the converter process and returns the PDF bytes
@@ -162,7 +157,7 @@ public class WKHtmlToPdf : IHtmlToPdfOptions
         {
             args.Add(tempFile);
 
-            var commandLineArgs = CommandLineTools.EscapeArguments(args.ToArray());
+            var commandLineArgs = CommandLineTools.EscapeArguments([.. args]);
 
             var process = new Process 
             { 

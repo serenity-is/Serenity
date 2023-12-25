@@ -4,16 +4,12 @@
 /// Sets the maximum length of an editor attached to the target property.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class MaxLengthAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="MaxLengthAttribute"/> class.
+/// </remarks>
+/// <param name="maxLength">The maximum length.</param>
+public class MaxLengthAttribute(int maxLength) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MaxLengthAttribute"/> class.
-    /// </summary>
-    /// <param name="maxLength">The maximum length.</param>
-    public MaxLengthAttribute(int maxLength)
-    {
-        MaxLength = maxLength;
-    }
 
     /// <summary>
     /// Gets the maximum length.
@@ -21,5 +17,5 @@ public class MaxLengthAttribute : Attribute
     /// <value>
     /// The maximum length.
     /// </value>
-    public int MaxLength { get; private set; }
+    public int MaxLength { get; private set; } = maxLength;
 }

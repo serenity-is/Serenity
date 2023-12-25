@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Serenity.Services;
@@ -7,7 +7,12 @@ namespace Serenity.Services;
 /// An action result type containing a object with status code
 /// </summary>
 /// <typeparam name="TResponse">Response data type</typeparam>
-public class ResultWithStatus<TResponse> : StatusCodeResult
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="data">Data object</param>
+/// <param name="statusCode">Status code</param>
+public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : StatusCodeResult(statusCode)
 {
     /// <summary>
     /// Content encoding
@@ -22,49 +27,30 @@ public class ResultWithStatus<TResponse> : StatusCodeResult
     /// <summary>
     /// JSON serializer settings
     /// </summary>
-    public JsonSerializerSettings SerializerSettings { get; set; }
+    public JsonSerializerOptions SerializerOptions { get; set; } = JSON.Defaults.Strict;
 
     /// <summary>
     /// The data
     /// </summary>
-    public TResponse Data { get; set; }
-
-    /// <summary>
-    /// Formatting
-    /// </summary>
-    public Formatting Formatting { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="data">Data object</param>
-    /// <param name="statusCode">Status code</param>
-    public ResultWithStatus(int statusCode, TResponse data)
-        : base(statusCode)
-    {
-        Data = data;
-        SerializerSettings = JsonSettings.Strict;
-    }
+    public TResponse Data { get; set; } = data;
 
     /// <inheritdoc/>
     public override void ExecuteResult(ActionContext context)
     {
         base.ExecuteResult(context);
-        
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+
+        ArgumentNullException.ThrowIfNull(context);
 
         var response = context.HttpContext.Response;
         response.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/json";
 
         if (ContentEncoding != null)
-            response.Headers["Content-Encoding"] = ContentEncoding.WebName;
+            response.Headers.ContentEncoding = ContentEncoding.WebName;
  
         if (Data != null)
         {
-            JsonTextWriter writer = new(new StreamWriter(response.Body)) { Formatting = Formatting };
-            JsonSerializer serializer = JsonSerializer.Create(SerializerSettings);
-            serializer.Serialize(writer, Data);
+            using var writer = new Utf8JsonWriter(response.Body);
+            JsonSerializer.Serialize(writer, Data, SerializerOptions);
             writer.Flush();
         }
     }

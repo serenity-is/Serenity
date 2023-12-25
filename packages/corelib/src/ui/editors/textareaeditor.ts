@@ -1,6 +1,6 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { Widget } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface TextAreaEditorOptions {
     cols?: number;
@@ -9,11 +9,11 @@ export interface TextAreaEditorOptions {
 
 @Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
 @Decorators.element("<textarea />")
-export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
 
-    constructor(input: JQuery, opt?: TextAreaEditorOptions) {
-        super(input, opt);
-
+    constructor(props: EditorProps<P>) {
+        super(props);
+        let input = this.element;
         if (this.options.cols !== 0) {
             input.attr('cols', (this.options.cols ?? 80));
         }
@@ -23,7 +23,7 @@ export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
     }
 
     public get value(): string {
-        return this.element.val();
+        return this.element.val() as string;
     }
 
     protected get_value(): string {

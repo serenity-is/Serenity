@@ -1,6 +1,5 @@
-﻿import { localText } from "./localtext";
-import { notifyError } from "./notify";
-import { getRemoteData, getRemoteDataAsync } from "./scriptdata";
+﻿import { getRemoteDataAsync, localText, notifyError } from "@serenity-is/base";
+import { getRemoteData } from "./scriptdata-compat";
 import { UserDefinition } from "./userdefinition";
 
 const andOrRegex = /[|&]/;
@@ -202,14 +201,14 @@ export declare namespace Authorization {
 
 Object.defineProperty(Authorization, "isLoggedIn", {
     get: function () {
-        return !!(Authorization.userDefinition?.Username?.length);
+        return !!(Authorization.userDefinition?.Username);
     },
     configurable: true
 });
 
 Object.defineProperty(Authorization, "isLoggedInAsync", {
     get: async function () {
-        return !!((await Authorization.userDefinitionAsync)?.Username?.length);
+        return !!((await Authorization.userDefinitionAsync)?.Username);
     },
     configurable: true
 });

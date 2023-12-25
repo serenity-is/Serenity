@@ -9,18 +9,13 @@ namespace Serenity.Services;
 /// Append the anti forgery token as CSRF-TOKEN cookie to the response, 
 /// so that AJAX calls can read it client side and send as a header.
 /// </summary>
-public class AntiforgeryCookieResultFilterAttribute : ResultFilterAttribute
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="antiforgery">Antiforgery service</param>
+public class AntiforgeryCookieResultFilterAttribute(IAntiforgery antiforgery) : ResultFilterAttribute
 {
-    private readonly IAntiforgery antiforgery;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="antiforgery">Antiforgery service</param>
-    public AntiforgeryCookieResultFilterAttribute(IAntiforgery antiforgery)
-    {
-        this.antiforgery = antiforgery;
-    }
+    private readonly IAntiforgery antiforgery = antiforgery;
 
     /// <inheritdoc/>
     public override void OnResultExecuting(ResultExecutingContext context)

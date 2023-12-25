@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Email editor type with two inputs. Please prefer <see cref="EmailAddressEditorAttribute"/>
@@ -40,10 +40,8 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     /// <summary>
     /// Default email validation pattern
     /// </summary>
-    public static readonly Regex EmailPattern = 
-        new(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+" + 
-                @"@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-            RegexOptions.ECMAScript | RegexOptions.Compiled);
+    public static readonly Regex EmailPattern =
+        EmailPatternRegexGen();
 
     /// <summary>
     /// Validates the email address
@@ -61,4 +59,7 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
 
         return null;
     }
+
+    [GeneratedRegex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.ECMAScript)]
+    private static partial Regex EmailPatternRegexGen();
 }

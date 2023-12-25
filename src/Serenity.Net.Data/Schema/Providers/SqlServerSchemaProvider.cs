@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// SQL server metadata provider
@@ -124,11 +124,9 @@ public class SqlServerSchemaProvider : ISchemaProvider
 
     private class TableNameSource
     {
-#pragma warning disable IDE1006 // Naming Styles
         public string TABLE_SCHEMA { get; set; }
         public string TABLE_NAME { get; set; }
         public string TABLE_TYPE { get; set; }
-#pragma warning restore IDE1006 // Naming Styles
     }
 
     /// <summary>

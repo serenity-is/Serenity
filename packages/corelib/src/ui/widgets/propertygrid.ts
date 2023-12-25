@@ -1,20 +1,22 @@
-﻿import { Decorators, ElementAttribute, OptionsTypeAttribute } from "../../decorators";
-import { any, Authorization, Culture, extend, getAttributes, getTypeShortName, isBS3, isBS5Plus, isEmptyOrNull, PropertyItem, startsWith, localText, trimToEmpty, trimToNull, tryGetText } from "../../q";
+﻿import { Culture, faIcon, getTypeShortName, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Decorators, OptionsTypeAttribute } from "../../decorators";
+import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
-export class PropertyGrid extends Widget<PropertyGridOptions> {
+export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
     private editors: Widget<any>[];
     private items: PropertyItem[];
     declare public readonly idPrefix: string;
 
-    constructor(div: JQuery, opt: PropertyGridOptions) {
-        super(div, opt);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
+        let div = this.element;
         this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
 
         if (this.options.mode == null)
@@ -25,19 +27,17 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var items = this.options.items || [];
         this.items = [];
 
-        var useTabs = any(items, function (x) {
-            return !isEmptyOrNull(x.tab);
-        });
+        var useTabs = items.some(x => !!x.tab);
 
         if (useTabs) {
-            var itemsWithoutTab = items.filter(f => isEmptyOrNull(f.tab));
+            var itemsWithoutTab = items.filter(f => !f.tab);
             if (itemsWithoutTab.length > 0) {
                 this.createItems(this.element, itemsWithoutTab);
 
                 $("<div class='pad'></div>").appendTo(this.element);
             }
 
-            var itemsWithTab = items.filter(f => !isEmptyOrNull(f.tab));
+            var itemsWithTab = items.filter(f => f.tab);
 
             var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
                 .appendTo(this.element);
@@ -48,18 +48,18 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             var tabIndex = 0;
             var i = 0;
             while (i < itemsWithTab.length) {
-                var tab = { $: trimToEmpty(itemsWithTab[i].tab) };
+                var tab = { $: itemsWithTab[i].tab?.trim() ?? '' };
                 var tabItems = [];
 
                 var j = i;
                 do {
                     tabItems.push(itemsWithTab[j]);
                 } while (++j < itemsWithTab.length &&
-                    trimToEmpty(itemsWithTab[j].tab) === tab.$);
+                    (itemsWithTab[j].tab?.trim() ?? '') === tab.$);
                 i = j;
 
                 var li = $(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
-                        `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" :  ""}toggle="tab" role="tab"></a></li>`)
+                    `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" : ""}toggle="tab" role="tab"></a></li>`)
                     .appendTo(ul);
 
                 if (tabIndex === 0) {
@@ -104,8 +104,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             }
             this.editors = null;
         }
-        this.element.find('a.category-link').unbind('click',
-            this.categoryLinkClick).remove();
+        this.element.find('a.category-link').off('click',
+            this.categoryLinkClick as any).remove();
 
         Widget.prototype.destroy.call(this);
     }
@@ -114,9 +114,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var categoryIndexes = {};
         var categoriesDiv = container;
 
-        var useCategories = this.options.useCategories !== false && any(items, function (x) {
-            return !isEmptyOrNull(x.category);
-        });
+        var useCategories = this.options.useCategories !== false && items.some(x => !!x.category);
 
         if (useCategories) {
             var linkContainer = $('<div/>').addClass('category-links');
@@ -125,8 +123,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 linkContainer.appendTo(container);
             }
             else {
-                linkContainer.find('a.category-link').unbind('click',
-                    this.categoryLinkClick).remove();
+                linkContainer.find('a.category-link').off('click',
+                    this.categoryLinkClick as any).remove();
             }
         }
 
@@ -172,33 +170,32 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
 
         var title = $('<div/>').addClass('category-title')
             .append($('<a/>').addClass('category-anchor')
-            .text(this.determineText(category, function (prefix) {
-                return prefix + 'Categories.' + category;
-            }))
-            .attr('name', this.idPrefix + 
-                'Category' + categoryIndexes[category].toString()))
+                .text(this.determineText(category, function (prefix) {
+                    return prefix + 'Categories.' + category;
+                }))
+                .attr('name', this.idPrefix +
+                    'Category' + categoryIndexes[category].toString()))
             .appendTo(categoryDiv);
 
         if (collapsed != null) {
             categoryDiv.addClass(((collapsed === true) ?
                 'collapsible collapsed' : 'collapsible'));
 
-            var img = $('<i/>').addClass(((collapsed === true) ?
-                'fa fa-plus' : 'fa fa-minus')).appendTo(title);
+            var img = $('<i/>').addClass(faIcon((collapsed === true) ? "plus" : "minus")).appendTo(title);
 
             title.click(function (e) {
                 categoryDiv.toggleClass('collapsed');
-                img.toggleClass('fa-plus').toggleClass('fa-minus');
+                img.toggleClass(faIcon("plus")).toggleClass(faIcon("minus"));
             });
         }
 
         return categoryDiv;
     }
 
-    private categoryLinkClick = (e: JQueryEventObject) => {
+    private categoryLinkClick = (e: Event) => {
         e.preventDefault();
 
-        var title = $('a[name=' + e.target.getAttribute('href')
+        var title = $('a[name=' + (e.target as HTMLElement).getAttribute('href')
             .toString().substr(1) + ']');
 
         if (title.closest('.category').hasClass('collapsed'))
@@ -231,18 +228,18 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 
     private determineText(text: string, getKey: (s: string) => string) {
-        if (text != null && !startsWith(text, '`')) {
+        if (text != null && !text.startsWith('`')) {
             var local = tryGetText(text);
             if (local != null) {
                 return local;
             }
         }
 
-        if (text != null && startsWith(text, '`')) {
+        if (text != null && text.startsWith('`')) {
             text = text.substring(1);
         }
 
-        if (!isEmptyOrNull(this.options.localTextPrefix)) {
+        if (this.options.localTextPrefix) {
             var local1 = tryGetText(getKey(this.options.localTextPrefix));
             if (local1 != null) {
                 return local1;
@@ -256,11 +253,11 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         var fieldDiv = $('<div/>').addClass('field')
             .addClass(item.name).data('PropertyItem', item).appendTo(container);
 
-        if (!isEmptyOrNull(item.cssClass)) {
+        if (item.cssClass) {
             fieldDiv.addClass(item.cssClass);
         }
 
-        if (!isEmptyOrNull(item.formCssClass)) {
+        if (item.formCssClass) {
             fieldDiv.addClass(item.formCssClass);
             if (item.formCssClass.indexOf('line-break-') >= 0) {
                 var splitted = item.formCssClass.split(String.fromCharCode(32));
@@ -306,7 +303,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
             .text(title ?? '')
             .appendTo(fieldDiv);
 
-        if (!isEmptyOrNull(item.labelWidth)) {
+        if (item.labelWidth) {
             if (item.labelWidth === '0') {
                 label.hide();
             }
@@ -321,20 +318,8 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                 .prependTo(label);
         }
 
-        var editorType = EditorTypeRegistry
-            .get(item.editorType ?? 'String');
+        var editorType = EditorTypeRegistry.get(item.editorType ?? 'String') as typeof Widget<WidgetProps<P>>;
 
-        var element = Widget.elementFor(editorType as any)
-            .addClass('editor')
-            .attr('id', editorId).appendTo(fieldDiv);
-
-        if (element.is(':input')) {
-            element.attr('name', item.name ?? '');
-        }
-
-        if (!isEmptyOrNull(placeHolder)) {
-            element.attr('placeholder', placeHolder);
-        }
         var editorParams = item.editorParams;
         var optionsType = null;
         var optionsAttr = getAttributes(editorType,
@@ -343,17 +328,28 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
         if (optionsAttr != null && optionsAttr.length > 0) {
             optionsType = optionsAttr[0].optionsType;
         }
-        var editor;
         if (optionsType != null) {
             editorParams = extend(new optionsType(), item.editorParams);
-            editor = new (editorType as any)(element, editorParams);
         }
         else {
             editorParams = extend(new Object(), item.editorParams);
-            editor = new (editorType as any)(element, editorParams);
         }
 
-        editor.initialize();
+        let editor = new editorType({
+            ...editorParams,
+            id: editorId,
+            element: el => {
+                el.classList.add("editor");
+                
+                if (/^(?:input|select|textarea|button)$/i.test(el.nodeName))
+                    el.setAttribute("name", item.name ?? "");
+
+                if (placeHolder)
+                    el.setAttribute("placeholder", placeHolder);
+
+                fieldDiv.append(el);
+            }
+        }).init();
 
         if (getTypeShortName(editor) == "BooleanEditor" &&
             (item.editorParams == null || !!!item.editorParams['labelFor'])) {
@@ -382,11 +378,11 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     private getCategoryOrder(items: PropertyItem[]) {
         var order = 0;
         var result = {} as any;
-        var categoryOrder = trimToNull(this.options.categoryOrder);
+        var categoryOrder = this.options.categoryOrder?.trim() || null;
         if (categoryOrder != null) {
             var split = categoryOrder.split(';');
             for (var s of split) {
-                var x = trimToNull(s);
+                var x = s?.trim() || null;
                 if (x == null) {
                     continue;
                 }
@@ -471,7 +467,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
                     .attr('tabindex', '-1')
                     .attr('href', '#' + this.idPrefix +
                         'Category' + index.toString())
-                    .click(this.categoryLinkClick)
+                    .click(this.categoryLinkClick as any)
                     .prependTo(container);
             }
         }
@@ -497,7 +493,7 @@ export class PropertyGrid extends Widget<PropertyGridOptions> {
     }
 
     set_mode(value: PropertyGridMode) {
-        if(this.options.mode !== value) {
+        if (this.options.mode !== value) {
             this.options.mode = value;
             this.updateInterface();
         }
@@ -641,7 +637,7 @@ export enum PropertyGridMode {
 
 export interface PropertyGridOptions {
     idPrefix?: string;
-    items?: PropertyItem[];
+    items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
     defaultCategory?: string;

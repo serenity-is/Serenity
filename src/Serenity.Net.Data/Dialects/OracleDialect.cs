@@ -6,7 +6,7 @@
 /// <seealso cref="ISqlDialect" />
 public class OracleDialect : ISqlDialect
 {
-    private static readonly HashSet<string> keywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> keywords = new(StringComparer.OrdinalIgnoreCase)
     {
         "ACCESS", "ACCOUNT", "ACTIVATE", "ADD", "ADMIN", "ADVISE", "AFTER", "ALL", "ALL_ROWS", "ALLOCATE", "ALTER", "ANALYZE", "AND", "ANY", "ARCHIVE", "ARCHIVELOG", "ARRAY", "AS", "ASC", "AT", "AUDIT", "AUTHENTICATED", "AUTHORIZATION", "AUTOEXTEND", "AUTOMATIC",
         "BACKUP", "BECOME", "BEFORE", "BEGIN", "BETWEEN", "BFILE", "BITMAP", "BLOB", "BLOCK", "BODY", "BY",

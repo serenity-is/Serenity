@@ -4,19 +4,14 @@
 /// Default annotation type registry
 /// </summary>
 /// <seealso cref="IAnnotationTypeRegistry" />
-public class AnnotationTypeRegistry : IAnnotationTypeRegistry
+/// <remarks>
+/// Creates a new instance
+/// </remarks>
+/// <param name="typeSource">Type source</param>
+public class AnnotationTypeRegistry(ITypeSource typeSource) : IAnnotationTypeRegistry
 {
-    private readonly IEnumerable<Type> annotationTypes;
-
-    /// <summary>
-    /// Creates a new instance
-    /// </summary>
-    /// <param name="typeSource">Type source</param>
-    public AnnotationTypeRegistry(ITypeSource typeSource)
-    {
-        annotationTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+    private readonly IEnumerable<Type> annotationTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithAttribute(typeof(AnnotationTypeAttribute));
-    }
 
     /// <summary>
     /// Gets the annotation types for given type.

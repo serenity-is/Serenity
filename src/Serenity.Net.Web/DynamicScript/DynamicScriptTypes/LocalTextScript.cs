@@ -1,38 +1,29 @@
 using SerenityIs.Administration;
 using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Web;
 
 /// <summary>
 /// Local text dynamic script
 /// </summary>
-public class LocalTextScript : DynamicScript, INamedDynamicScript
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="registry">Text registry</param>
+/// <param name="package">Package key</param>
+/// <param name="includes">Includes regex</param>
+/// <param name="languageId">LanguageID</param>
+/// <param name="isPending">True to include pending texts</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending) : DynamicScript, INamedDynamicScript
 {
-    private readonly string scriptName;
-    private readonly string languageId;
-    private readonly string includes;
-    private readonly bool isPending;
-    private readonly ILocalTextRegistry registry;
-    private readonly string package;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="registry">Text registry</param>
-    /// <param name="package">Package key</param>
-    /// <param name="includes">Includes regex</param>
-    /// <param name="languageId">LanguageID</param>
-    /// <param name="isPending">True to include pending texts</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending)
-    {
-        this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
-        this.package = package ?? throw new ArgumentNullException(nameof(package));
-        this.includes = includes;
-        this.languageId = languageId;
-        this.isPending = isPending;
-        scriptName = GetScriptName(package, languageId, isPending);
-    }
+    private readonly string scriptName = GetScriptName(package, languageId, isPending);
+    private readonly string languageId = languageId;
+    private readonly string includes = includes;
+    private readonly bool isPending = isPending;
+    private readonly ILocalTextRegistry registry = registry ?? throw new ArgumentNullException(nameof(registry));
+    private readonly string package = package ?? throw new ArgumentNullException(nameof(package));
 
     /// <inheritdoc/>
     public string ScriptName => scriptName;
@@ -61,11 +52,9 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
         LocalTextPackages packages, string package, string languageId, bool isPending)
     {
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
+        ArgumentNullException.ThrowIfNull(package);
 
-        if (packages == null)
-            throw new ArgumentNullException(nameof(packages));
+        ArgumentNullException.ThrowIfNull(packages);
 
         if (!packages.TryGetValue(package, out string includes))
             includes = null;
@@ -88,11 +77,10 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
         var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
-        StringBuilder jwBuilder = new("Q.LT.add(");
-        JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
-            
+        var ms = new MemoryStream();
+        var jw = new Utf8JsonWriter(ms);
         jw.WriteStartObject();
-        List<string> stack = new();
+        List<string> stack = [];
         int stackCount = 0;
         for (int i = 0; i < list.Count; i++)
         {
@@ -155,21 +143,21 @@ public class LocalTextScript : DynamicScript, INamedDynamicScript
                     jw.WritePropertyName(part);
                     jw.WriteStartObject();
                     jw.WritePropertyName("");
-                    jw.WriteValue(pair.Value);
+                    jw.WriteStringValue(pair.Value);
                 }
                 else
                 {
                     jw.WritePropertyName(part);
-                    jw.WriteValue(pair.Value);
+                    jw.WriteStringValue(pair.Value);
                 }
             }
         }
         for (int i = 0; i < stackCount; i++)
             jw.WriteEndObject();
         jw.WriteEndObject();
-        jwBuilder.Append(");");
+        jw.Flush();
 
-        return jwBuilder.ToString();
+        return "(Serenity.addLocalText || Q.LT.add)(" + Encoding.UTF8.GetString(ms.ToArray()) + ");";
     }
 
     /// <inheritdoc/>

@@ -1,8 +1,9 @@
-﻿import { Decorators, EnumKeyAttribute } from "../../decorators";
+﻿import { Enum, tryGetText } from "@serenity-is/base";
+import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Enum, getAttributes, getLookup, isEmptyOrNull, tryGetText } from "../../q";
+import { getAttributes, getLookup } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { Widget } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface RadioButtonEditorOptions {
     enumKey?: string;
@@ -12,19 +13,19 @@ export interface RadioButtonEditorOptions {
 
 @Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
 @Decorators.element('<div/>')
-export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
+export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P>
     implements IReadOnly {
 
-    constructor(input: JQuery, opt: RadioButtonEditorOptions) {
-        super(input, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
-        if (isEmptyOrNull(this.options.enumKey) &&
+        if (!this.options.enumKey &&
             this.options.enumType == null &&
-            isEmptyOrNull(this.options.lookupKey)) {
+            !this.options.lookupKey) {
             return;
         }
 
-        if (!isEmptyOrNull(this.options.lookupKey)) {
+        if (this.options.lookupKey) {
             var lookup = getLookup(this.options.lookupKey);
             for (var item of lookup.items) {
                 var textValue = (item as any)[lookup.textField];
@@ -62,7 +63,7 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
     }
 
     get_value(): string {
-        return this.element.find('input:checked').first().val();
+        return this.element.find('input:checked').first().val() as string;
     }
 
     get value(): string {
@@ -76,7 +77,7 @@ export class RadioButtonEditor extends Widget<RadioButtonEditorOptions>
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
             }
-            if (!isEmptyOrNull(value)) {
+            if (value) {
                 checks = inputs.filter('[value=' + value + ']');
                 if (checks.length > 0) {
                     (checks[0] as HTMLInputElement).checked = true;

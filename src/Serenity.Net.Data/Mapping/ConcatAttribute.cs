@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Concat expression attribute
@@ -19,22 +19,26 @@ public class ConcatAttribute : BaseExpressionAttribute
 
         if (rest.Length > 0)
         {
-            Expressions = new[] {
+            Expressions = [
                 expression1 ?? throw new ArgumentNullException(nameof(expression1)),
                 expression2 ?? throw new ArgumentNullException(nameof(expression2)),
                 rest[0] ?? throw new ArgumentNullException(nameof(rest))
-            };
+            ];
 
             if (rest.Length > 1)
-                Expressions = Expressions.Concat(rest.Skip(1).Select(
-                    x => x ?? throw new ArgumentNullException(nameof(rest)))).ToArray();
+                Expressions =
+                [
+                    .. Expressions,
+                    .. rest.Skip(1).Select(
+                        x => x ?? throw new ArgumentNullException(nameof(rest))),
+                ];
         }
         else
         {
-            Expressions = new[] {
+            Expressions = [
                 expression1 ?? throw new ArgumentNullException(nameof(expression1)),
                 expression2 ?? throw new ArgumentNullException(nameof(expression2))
-            };
+            ];
         }
     }
 
@@ -63,7 +67,7 @@ public class ConcatAttribute : BaseExpressionAttribute
                 case nameof(ServerType.Oracle):
                     // Oracle accepts only two arguments in CONCAT function 
                     // and it only returns null when both arguments are null
-                    var result = coalesce("CONCAT(" + expressions[0] + ", " 
+                    var result = coalesce("CONCAT(" + expressions[0] + ", "
                         + expressions[1] + ")");
 
                     for (var i = 2; i < expressions.Length; i++)
@@ -103,12 +107,8 @@ public class ConcatAttribute : BaseExpressionAttribute
 /// <summary>
 /// Please use <see cref="ConcatAttribute" />
 /// </summary>
+/// <inheritdoc/>
 [Obsolete("Use ConcatAttribute")]
-public class ConcatExpressionAttribute : ConcatAttribute
+public class ConcatExpressionAttribute(string expression1, string expression2, params object[] rest) : ConcatAttribute(expression1, expression2, rest)
 {
-    /// <inheritdoc/>
-    public ConcatExpressionAttribute(string expression1, string expression2, params object[] rest)
-        : base(expression1, expression2, rest)
-    {
-    }
 }

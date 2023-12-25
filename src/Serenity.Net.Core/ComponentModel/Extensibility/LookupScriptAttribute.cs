@@ -86,12 +86,9 @@ public sealed class LookupScriptAttribute : Attribute
         if (lookupType == null)
             throw new ArgumentNullException("lookupType");
 
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>();
-        if (attr == null)
-            throw new ArgumentOutOfRangeException("lookupType", string.Format(
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>() ?? throw new ArgumentOutOfRangeException("lookupType", string.Format(
                 "Type {0} is specified as lookup type in a LookupScript attribute, " +
                 "but it has not LookupScript attribute itself.", lookupType.FullName));
-
         Key = attr.Key ?? AutoLookupKeyFor(lookupType);
         LookupType = lookupType;
     }

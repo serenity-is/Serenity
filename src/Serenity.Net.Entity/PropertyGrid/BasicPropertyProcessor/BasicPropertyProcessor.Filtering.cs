@@ -209,14 +209,14 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
     }
 
-    private static readonly string[] lookupCopyToFilterParams = new string[]
-    {
+    private static readonly string[] lookupCopyToFilterParams =
+    [
         "lookupKey",
         "async"
-    };
+    ];
 
-    private static readonly string[] serviceLookupCopyToFilterParams = new string[]
-    {
+    private static readonly string[] serviceLookupCopyToFilterParams =
+    [
         "service",
         "idField",
         "textField",
@@ -226,9 +226,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         "includeColumns",
         "excludeColumns",
         "includeDeleted"
-    };
+    ];
 
-    private static readonly HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> standardFilteringEditors = new(StringComparer.OrdinalIgnoreCase)
     {
         "Date",
         "Serenity.Date",

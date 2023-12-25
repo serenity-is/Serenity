@@ -175,8 +175,7 @@ public class TabularDataReport : IDataOnlyReport
             }
         }
 
-        if (exportColumns == null)
-            exportColumns = propertyItems.Select(x => x.Name).ToList();
+        exportColumns ??= propertyItems.Select(x => x.Name).ToList();
 
         foreach (var columnName in exportColumns)
         {

@@ -9,7 +9,7 @@
  * {
  *   "dependencies": {
  *     // ...
- *     "@serenity-is/corelib": "6.9.0"
+ *     "@serenity-is/corelib": "latest"
  *   }
  * }
  * ```
@@ -21,6 +21,7 @@
  * @packageDocumentation
  */
 
+export * from "@serenity-is/base";
 export * from "./q";
 export * from "./slick";
 export * from "./globals/select2-globals"

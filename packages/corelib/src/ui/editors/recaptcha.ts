@@ -1,7 +1,8 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { localText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { addValidationRule, isEmptyOrNull, localText } from "../../q";
-import { Widget } from "../widgets/widget";
+import { addValidationRule } from "../../q";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface RecaptchaOptions {
     siteKey?: string;
@@ -10,9 +11,9 @@ export interface RecaptchaOptions {
 
 @Decorators.registerEditor('Serenity.Recaptcha', [IStringValue])
 @Decorators.element("<div/>")
-export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
-    constructor(div: JQuery, opt: RecaptchaOptions) {
-        super(div, opt);
+export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
+    constructor(props: EditorProps<P>) {
+        super(props);
 
         this.element.addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
         if (!!((window as any)['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
@@ -38,7 +39,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
         var self = this;
 
         addValidationRule(input, this.uniqueName, e => {
-            if (isEmptyOrNull(this.get_value())) {
+            if (!this.get_value()) {
                 return localText('Validation.Required');
             }
             return null;
@@ -46,7 +47,7 @@ export class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue 
     }
 
     get_value(): string {
-        return this.element.find('.g-recaptcha-response').val();
+        return this.element.find('.g-recaptcha-response').val() as string;
     }
 
     set_value(value: string): void {

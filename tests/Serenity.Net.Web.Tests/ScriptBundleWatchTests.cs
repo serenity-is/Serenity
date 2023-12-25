@@ -16,10 +16,10 @@ public class ScriptBundleWatchTests
         container.AddScriptBundling(options =>
         {
             options.Enabled = true;
-            options.Bundles["Test"] = new string[]
-            {
+            options.Bundles["Test"] =
+            [
                 "~/" + env.Path.GetFileName(testFile)
-            };
+            ];
         });
         var services = container.BuildServiceProvider();
         services.UseScriptWatching(env.Path.GetDirectoryName(testFile));

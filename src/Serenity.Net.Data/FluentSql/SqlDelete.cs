@@ -93,7 +93,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
-        StringBuilder sb = new StringBuilder("DELETE FROM ", 24 + where.Length);
+        StringBuilder sb = new("DELETE FROM ", 24 + where.Length);
         sb.Append(SqlSyntax.AutoBracketValid(tableName));
 
         if (!string.IsNullOrEmpty(where))

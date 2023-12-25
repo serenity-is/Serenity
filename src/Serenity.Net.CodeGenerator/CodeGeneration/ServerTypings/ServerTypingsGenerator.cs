@@ -1,31 +1,33 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
+#if ISSOURCEGENERATOR
+public partial class ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation,
+    System.Threading.CancellationToken cancellationToken)
+    : TypingsGeneratorBase(compilation, cancellationToken)
+{
+#else
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
+    public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
+        : base(fileSystem, assemblies)
+    {
+    }
+
+    public ServerTypingsGenerator(IFileSystem fileSystem, params string[] assemblyLocations)
+        : base(fileSystem, assemblyLocations)
+    {
+    }
+#endif
+
     public bool LocalTexts { get; set; }
     public bool ModuleReExports { get; set; } = true;
     public bool ModuleTypings { get; set; } = false;
     public bool NamespaceTypings { get; set; } = true;
 
-    public readonly HashSet<string> LocalTextFilters = new();
+    public readonly HashSet<string> LocalTextFilters = [];
 
-#if ISSOURCEGENERATOR
-    public ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation, 
-        System.Threading.CancellationToken cancellationToken)
-        : base(compilation, cancellationToken)
-    {
-    }
-#else
-    public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params Assembly[] assemblies)
-        : base(fileSystem, assemblies)
-    {
-    }
-
-    public ServerTypingsGenerator(IGeneratorFileSystem fileSystem, params string[] assemblyLocations)
-        : base(fileSystem, assemblyLocations)
-    {
-    }
-#endif
+    protected HashSet<string> localTextKeys = [];
+    protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
 
     protected override void GenerateAll()
     {
@@ -36,6 +38,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (LocalTexts && ModuleTypings)
             GenerateTexts(module: true);
+
+        if (ModuleTypings)
+            GenerateScriptDataKeys(module: true);
 
         if (ModuleTypings && ModuleReExports)
             GenerateModuleReExports();
@@ -95,7 +100,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             EnqueueTypeMembers(type);
 
             if (isServiceRequest)
-                add((t, m) => GenerateBasicType(t, m));
+                add(GenerateBasicType);
 
             return;
         }
@@ -130,5 +135,79 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         }
 
         add(GenerateBasicType);
+    }
+
+    public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentExceptionHelper.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
+
+        if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
+            return;
+
+        try
+        {
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(fileSystem.ReadAllText(appSettingsFile));
+            if ((obj["LocalTextPackages"] ?? ((obj["AppSettings"] 
+                as Newtonsoft.Json.Linq.JObject)?["LocalTextPackages"])) is 
+                Newtonsoft.Json.Linq.JObject packages)
+            {
+                foreach (var p in packages.PropertyValues())
+                    foreach (var x in p.Values<string>())
+                        LocalTextFilters.Add(x);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    protected override void PreVisitType(TypeDefinition type)
+    {
+        base.PreVisitType(type);
+        PreVisitTypeForTexts(type);
+        PreVisitTypeForScriptData(type);
+    }
+
+    protected override void Reset()
+    {
+        base.Reset();
+
+        localTextKeys.Clear();
+        scriptDataKeys.Clear();
+
+    }
+
+    public string DetermineModulesRoot(IFileSystem fileSystem, string projectFile,
+        string rootNamespace)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentExceptionHelper.ThrowIfNull(projectFile, nameof(projectFile));
+
+        var projectDir = fileSystem.GetDirectoryName(projectFile);
+        var modulesDir = fileSystem.Combine(projectDir, "Modules");
+
+        if (!fileSystem.DirectoryExists(modulesDir) ||
+            fileSystem.GetFiles(modulesDir, "*.*").Length == 0)
+        {
+            var rootNsDir = fileSystem.Combine(projectDir, 
+                fileSystem.GetFileName(projectFile));
+            if (fileSystem.DirectoryExists(rootNsDir))
+            {
+                modulesDir = rootNsDir;
+                ModulesPathFolder = fileSystem.GetFileName(projectFile);
+            }
+            else
+            {
+                rootNsDir = fileSystem.Combine(projectDir, rootNamespace);
+                if (fileSystem.DirectoryExists(rootNsDir))
+                {
+                    modulesDir = rootNsDir;
+                    ModulesPathFolder = rootNamespace;
+                }
+            }
+        }
+
+        return modulesDir;
     }
 }

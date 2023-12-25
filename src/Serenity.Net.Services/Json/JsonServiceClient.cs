@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -7,7 +7,11 @@ namespace Serenity.Services;
 /// <summary>
 /// A JSON service client implementation
 /// </summary>
-public class JsonServiceClient
+/// <remarks>
+/// Creates an instance of JsonServiceClient for the passed baseUrl
+/// </remarks>
+/// <param name="baseUrl">The base url</param>
+public class JsonServiceClient(string baseUrl)
 {
     /// <summary>
     /// Cookie container
@@ -15,19 +19,9 @@ public class JsonServiceClient
     protected CookieContainer cookies = new();
 
     /// <summary>
-    /// Creates an instance of JsonServiceClient for the passed baseUrl
-    /// </summary>
-    /// <param name="baseUrl">The base url</param>
-    public JsonServiceClient(string baseUrl)
-    {
-        BaseUrl = baseUrl;
-        cookies = new CookieContainer();
-    }
-
-    /// <summary>
     /// Base url for the client
     /// </summary>
-    protected string BaseUrl { get; set; }
+    protected string BaseUrl { get; set; } = baseUrl;
 
     /// <summary>
     /// Post to JSON service
@@ -56,20 +50,20 @@ public class JsonServiceClient
     {
         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(UriHelper.Combine(BaseUrl, relativeUrl));
         wr.Method = "POST";
-        var r = JsonConvert.SerializeObject(request, Formatting.None, JsonSettings.Strict);
+        var r = JSON.Stringify(request, writeNulls: true);
         wr.ContentType = "application/json";
-        var rb = System.Text.Encoding.UTF8.GetBytes(r);
+        var rb = Encoding.UTF8.GetBytes(r);
 
         wr.CookieContainer = cookies;
         wr.ContinueTimeout = 10 * 60 * 1000;
-        using (var requestStream = Task.Run(() => wr.GetRequestStreamAsync()).Result)
+        using (var requestStream = Task.Run(wr.GetRequestStreamAsync).Result)
             requestStream.Write(rb, 0, rb.Length);
 
-        using var response = Task.Run(() => wr.GetResponseAsync()).Result;
+        using var response = Task.Run(wr.GetResponseAsync).Result;
         using var rs = response.GetResponseStream();
         using var sr = new StreamReader(rs);
         var rt = sr.ReadToEnd();
-        var resp = JsonConvert.DeserializeObject<TResponse>(rt, JsonSettings.Tolerant);
+        var resp = JSON.ParseTolerant<TResponse>(rt);
 
         if (resp is ServiceResponse serviceResponse &&
             serviceResponse.Error != null)

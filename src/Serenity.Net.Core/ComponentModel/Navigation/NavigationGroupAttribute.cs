@@ -3,19 +3,15 @@ namespace Serenity.Navigation;
 /// <summary>
 /// Defines a navigation group, which are usually the icons on the sidebar band
 /// </summary>
+/// <remarks>
+/// Creates a new instance of the attribute
+/// </remarks>
+/// <param name="order">Order</param>
+/// <param name="title">Title</param>
+/// <param name="icon">Icon class</param>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-public class NavigationGroupAttribute : NavigationItemAttribute
+public class NavigationGroupAttribute(int order, string title, string? icon = null) : NavigationItemAttribute(order, title, null, null, icon)
 {
-    /// <summary>
-    /// Creates a new instance of the attribute
-    /// </summary>
-    /// <param name="order">Order</param>
-    /// <param name="title">Title</param>
-    /// <param name="icon">Icon class</param>
-    public NavigationGroupAttribute(int order, string title, string? icon = null)
-        : base(order, title, null, null, icon)
-    {
-    }
 
     /// <summary>
     /// Creates a new instance of the attribute

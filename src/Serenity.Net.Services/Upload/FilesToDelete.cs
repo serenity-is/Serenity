@@ -5,21 +5,15 @@
 /// the upload related operation is successful. If it is not, the old
 /// files will be kept while the new files will be deleted.
 /// </summary>
-public class FilesToDelete : List<string>, IDisposable, IFilesToDelete
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="storage">Upload storage</param>
+/// <exception cref="ArgumentNullException">storage is null</exception>
+public class FilesToDelete(IUploadStorage storage) : List<string>, IDisposable, IFilesToDelete
 {
-    private readonly IUploadStorage storage;
-    private readonly List<string> OldFiles;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="storage">Upload storage</param>
-    /// <exception cref="ArgumentNullException">storage is null</exception>
-    public FilesToDelete(IUploadStorage storage)
-    {
-        OldFiles = new List<string>();
-        this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
-    }
+    private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
+    private readonly List<string> OldFiles = [];
 
     /// <summary>
     /// Deletes the new files if <see cref="KeepNewFiles"/> is not called.

@@ -1,13 +1,14 @@
-﻿import { Column, FormatterContext, Grid, IPlugin } from "@serenity-is/sleekgrid";
+﻿import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, Culture, htmlEncode, isEmptyOrNull, PropertyItem, replaceAll, safeCast, SaveRequest, serviceCall, startsWith, localText, tryGetText, tryFirst } from "../../q";
+import { Authorization, clearKeys, replaceAll, safeCast, serviceCall } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
+import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
-import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
@@ -17,7 +18,7 @@ export interface GridRowSelectionMixinOptions {
 export class GridRowSelectionMixin {
 
     private idField: string;
-    private include: { [key: string]: boolean}
+    private include: { [key: string]: boolean }
     private grid: IDataGrid;
     private options: GridRowSelectionMixinOptions;
 
@@ -50,7 +51,7 @@ export class GridRowSelectionMixin {
         });
 
         grid.getGrid().onHeaderClick.subscribe((e1, u) => {
-            if (e1.isDefaultPrevented())
+            if ((e1 as any).isDefaultPrevented?.() || e1.defaultPrevented)
                 return;
             if ($(e1.target).hasClass('select-all-items')) {
                 e1.preventDefault();
@@ -362,9 +363,9 @@ export namespace GridUtils {
             return true;
         };
 
-        if (hint == null) 
+        if (hint == null)
             hint = localText('Controls.EntityGrid.IncludeDeletedToggle');
-        
+
         addToggleButton(toolDiv, 's-IncludeDeletedToggle',
             function (pressed) {
                 includeDeleted = pressed;
@@ -400,9 +401,9 @@ export namespace GridUtils {
                 }
             }
 
-            if (oldSubmit != null) 
+            if (oldSubmit != null)
                 return oldSubmit(v);
-            
+
             return true;
         };
 
@@ -435,16 +436,17 @@ export namespace GridUtils {
             div.addClass('has-quick-search-fields');
         }
 
-        return new QuickSearchInput(div.children(), {
+        return new QuickSearchInput({
+            element: div.children(),
             fields: fields,
             onSearch: onSearch as any
         });
     }
 
     export function makeOrderable(grid: Grid,
-        handleMove: (p1: any, p2: number) => void): void {
+        handleMove: (rows: number[], insertBefore: number) => void): void {
 
-        var moveRowsPlugin = new Slick.RowMoveManager({ cancelEditOnDrag: true });
+        var moveRowsPlugin = new RowMoveManager({ cancelEditOnDrag: true });
         moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
             for (var i = 0; !!(i < data.rows.length); i++) {
                 if (!!(data.rows[i] === data.insertBefore ||
@@ -457,20 +459,20 @@ export namespace GridUtils {
             return true;
         });
 
-        moveRowsPlugin.onMoveRows.subscribe(function (e1, data1) {
-            handleMove(data1.rows, data1.insertBefore);
+        moveRowsPlugin.onMoveRows.subscribe(function (_, data) {
+            handleMove(data.rows, data.insertBefore);
             try {
                 grid.setSelectedRows([]);
             }
-            catch ($t1) {
+            catch {
             }
         });
         grid.registerPlugin(moveRowsPlugin);
     }
 
-    export function makeOrderableWithUpdateRequest(grid: IDataGrid,
-        getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string,
-        getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void {
+    export function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid,
+        getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string,
+        getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void {
 
         makeOrderable(grid.getGrid(), function (rows, insertBefore) {
             if (rows.length === 0) {
@@ -505,7 +507,7 @@ export namespace GridUtils {
                     service: service,
                     request: getUpdateRequest(getId(
                         grid.getGrid().getDataItem(rows[i])), order++),
-                    onSuccess: function (response) {
+                    onSuccess: function () {
                         i++;
                         if (i < rows.length) {
                             next();
@@ -557,7 +559,7 @@ export namespace PropertyItemSlickConverter {
         result.name = name;
 
         if (item.alignment != null && item.alignment.length > 0) {
-            if (!isEmptyOrNull(result.cssClass)) {
+            if (result.cssClass) {
                 result.cssClass += ' align-' + item.alignment;
             }
             else {
@@ -663,7 +665,7 @@ export namespace SlickFormatting {
             htmlEncode(itemType) + '"' + ' data-item-id="' +
             htmlEncode(id) + '"' + ' class="s-EditLink s-' +
             replaceAll(itemType, '.', '-') + 'Link' +
-            (isEmptyOrNull(extraClass) ? '' : (' ' + extraClass)) + '">' +
+            (!extraClass ? '' : (' ' + extraClass)) + '">' +
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
@@ -693,8 +695,8 @@ export namespace SlickHelper {
             col.id = id;
 
             if (localTextPrefix != null && col.id != null &&
-                (col.name == null || startsWith(col.name, '~'))) {
-                var key = (col.name != null ? col.name.substr(1) : col.id);
+                (col.name == null || col.name.startsWith('~'))) {
+                var key = (col.name != null ? col.name.substring(1) : col.id);
                 col.name = localText(localTextPrefix + key);
             }
         }
@@ -774,7 +776,7 @@ export namespace SlickTreeHelper {
         }
     }
 
-    export function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number,
+    export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: RemoteView<TItem>, getId: (x: TItem) => any): void {
         var target = $(e.target);
         if (!target.hasClass('s-TreeToggle')) {
@@ -791,7 +793,7 @@ export namespace SlickTreeHelper {
                 }
                 view.updateItem(getId(item), item);
             }
-            if (e.shiftKey) {
+            if ((e as any).shiftKey) {
                 view.beginUpdate();
                 try {
                     setCollapsed(view.getItems(), !!item._collapsed);

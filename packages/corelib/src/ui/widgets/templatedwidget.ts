@@ -1,14 +1,18 @@
-﻿import { Decorators } from "../../decorators";
-import { canLoadScriptData, Config, format, getBaseType, getInstanceType, getTemplate, getTypeFullName, getTypeShortName, replaceAll, startsWith, localText } from "../../q";
+import sQuery from "@optionaldeps/squery";
+import { Config, getBaseType, getInstanceType, getTypeFullName, getTypeShortName, localText, stringFormat } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { canLoadScriptData, getTemplate, replaceAll } from "../../q";
 import { Widget } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedWidget")
-export class TemplatedWidget<TOptions> extends Widget<TOptions> {
+export class TemplatedWidget<P> extends Widget<P> {
+
+    static override defaultTagName = "div";
 
     private static templateNames: { [key: string]: string } = {};
 
     protected byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id, this.element);
+        return $('#' + this.idPrefix + id, this.domNode);
     }
 
     private byID<TWidget>(id: string, type: { new(...args: any[]): TWidget }) {
@@ -44,8 +48,8 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
             var name = TemplatedWidget.noGeneric(getTypeFullName(type));
 
             for (let k of Config.rootNamespaces) {
-                if (startsWith(name, k + '.')) {
-                    name = name.substr(k.length + 1);
+                if (name.startsWith(k + '.')) {
+                    name = name.substring(k.length + 1);
                     break;
                 }
             }
@@ -99,7 +103,7 @@ export class TemplatedWidget<TOptions> extends Widget<TOptions> {
         template = getTemplate(templateName);
 
         if (template == null) {
-            throw new Error(format(
+            throw new Error(stringFormat(
                 "Can't locate template for widget '{0}' with name '{1}'!",
                 getTypeFullName(getInstanceType(this)), templateName));
         }

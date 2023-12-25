@@ -14,8 +14,8 @@ public class JsonSafeCriteriaConverter : JsonCriteriaConverter
     /// <returns>
     /// The object value.
     /// </returns>
-    public override object ReadJson(JsonReader reader, Type objectType,
-        object existingValue, JsonSerializer serializer)
+    public override object ReadJson(Newtonsoft.Json.JsonReader reader, Type objectType,
+        object existingValue, Newtonsoft.Json.JsonSerializer serializer)
     {
         var value = (BaseCriteria)base.ReadJson(reader, objectType, existingValue, serializer);
 

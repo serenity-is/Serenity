@@ -1029,11 +1029,11 @@ Slick._ = (() => {
         this.startPostProcessing();
         this._scrollTopRendered = this._scrollTop;
         this._scrollLeftRendered = this._scrollLeft;
-        this._lastRenderTime = new Date().getTime();
+        this._lastRenderTime = (/* @__PURE__ */ new Date()).getTime();
         this._hRender = null;
       };
       this.handleHeaderRowScroll = (e) => {
-        if (this._ignoreScrollUntil >= new Date().getTime())
+        if (this._ignoreScrollUntil >= (/* @__PURE__ */ new Date()).getTime())
           return;
         var scrollLeft = e.target.scrollLeft;
         if (scrollLeft != this._layout.getScrollContainerX().scrollLeft) {
@@ -1041,7 +1041,7 @@ Slick._ = (() => {
         }
       };
       this.handleFooterRowScroll = (e) => {
-        if (this._ignoreScrollUntil >= new Date().getTime())
+        if (this._ignoreScrollUntil >= (/* @__PURE__ */ new Date()).getTime())
           return;
         var scrollLeft = e.target.scrollLeft;
         if (scrollLeft != this._layout.getScrollContainerX().scrollLeft) {
@@ -2986,7 +2986,7 @@ Slick._ = (() => {
       var vScrollDist = Math.abs(this._scrollTop - this._scrollTopPrev);
       var hScrollDist = Math.abs(this._scrollLeft - this._scrollLeftPrev);
       if (hScrollDist || vScrollDist)
-        this._ignoreScrollUntil = new Date().getTime() + 100;
+        this._ignoreScrollUntil = (/* @__PURE__ */ new Date()).getTime() + 100;
       if (hScrollDist) {
         this._scrollLeftPrev = this._scrollLeft;
         this._layout.getScrollContainerX().scrollLeft = this._scrollLeft;
@@ -3020,7 +3020,7 @@ Slick._ = (() => {
           clearTimeout(this._hRender);
         }
         if (Math.abs(this._scrollTopRendered - this._scrollTop) > 20 || Math.abs(this._scrollLeftRendered - this._scrollLeft) > 20) {
-          if (this._options.forceSyncScrolling || this._options.forceSyncScrollInterval && this._lastRenderTime < new Date().getTime() - this._options.forceSyncScrollInterval) {
+          if (this._options.forceSyncScrolling || this._options.forceSyncScrollInterval && this._lastRenderTime < (/* @__PURE__ */ new Date()).getTime() - this._options.forceSyncScrollInterval) {
             this.render();
           } else {
             this._hRender = setTimeout(this.render, 50);

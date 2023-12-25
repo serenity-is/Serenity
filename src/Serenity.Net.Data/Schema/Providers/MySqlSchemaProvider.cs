@@ -48,7 +48,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                 {
                     var dxend = dataType.IndexOf(')', dx);
                     var strlen = dataType.Substring(dx + 1, dxend - dx - 1);
-                    dataType = dataType.Substring(0, dx);
+                    dataType = dataType[..dx];
                     var lower = dataType.ToLowerInvariant();
                     if (lower == "char" || lower == "varchar")
                         fi.Size = int.Parse(strlen);

@@ -46,7 +46,7 @@ public static class EntityFieldExtensions
     ///   A dictionary of table fields in which field objects are keys.</returns>
     public static HashSet<Field> GetTableFields(this IRow row)
     {
-        HashSet<Field> tableFields = new HashSet<Field>();
+        HashSet<Field> tableFields = [];
         var fields = row.Fields;
 
         for (int i = 0; i < fields.Count; i++)

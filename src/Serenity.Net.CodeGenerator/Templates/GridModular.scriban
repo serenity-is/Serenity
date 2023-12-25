@@ -1,12 +1,8 @@
 ﻿
 @{{SERENITYIMPORT "Decorators"}}.registerClass('{{GridFullName}}')
-export class {{GridClassName}} extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}, any> {
+export class {{GridClassName}} extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}> {
     protected getColumnsKey() { return {{SERVERTYPEIMPORT ColumnsClassName}}.columnsKey; }
     protected getDialogType() { return {{IMPORTFROM "./" + DialogClassName DialogClassName}}; }
     protected getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
     protected getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
-
-    constructor(container: JQuery) {
-        super(container);
-    }
 }

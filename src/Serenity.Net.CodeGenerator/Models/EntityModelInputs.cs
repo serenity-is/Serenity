@@ -7,7 +7,7 @@ public class EntityModelInputs : IEntityModelInputs
     public string ConnectionKey { get; set; }
     public IEntityDataSchema DataSchema { get; set; }
     public string Identifier { get; set; }
-    public HashSet<string> GlobalUsings { get; } = new();
+    public HashSet<string> GlobalUsings { get; } = [];
     public string Module { get; set; }
     public bool Net5Plus { get; set; } = true;
     public bool SchemaIsDatabase { get; set; }

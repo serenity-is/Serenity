@@ -21,10 +21,7 @@ public static class EntityConnectionExtensions
     public static TRow ById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
-        var row = TryById<TRow>(connection, id);
-        if (row == null)
-            throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
-
+        var row = TryById<TRow>(connection, id) ?? throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
         return row;
     }
 
@@ -65,10 +62,7 @@ public static class EntityConnectionExtensions
     public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
-        var row = TryById<TRow>(connection, id, editQuery);
-        if (row == null)
-            throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
-
+        var row = TryById<TRow>(connection, id, editQuery) ?? throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
         return row;
     }
 
@@ -112,11 +106,7 @@ public static class EntityConnectionExtensions
     public static TRow Single<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
-        var row = TrySingle<TRow>(connection, where);
-
-        if (row == null)
-            throw new ValidationError("RecordNotFound", "Query returned no results!");
-
+        var row = TrySingle<TRow>(connection, where) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
 
@@ -157,11 +147,7 @@ public static class EntityConnectionExtensions
     public static TRow Single<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
-        var row = TrySingle<TRow>(connection, editQuery);
-
-        if (row == null)
-            throw new ValidationError("RecordNotFound", "Query returned no results!");
-
+        var row = TrySingle<TRow>(connection, editQuery) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
 
@@ -199,11 +185,7 @@ public static class EntityConnectionExtensions
     public static TRow First<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
-        var row = TryFirst<TRow>(connection, where);
-
-        if (row == null)
-            throw new ValidationError("RecordNotFound", "Query returned no results!");
-
+        var row = TryFirst<TRow>(connection, where) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
 
@@ -239,11 +221,7 @@ public static class EntityConnectionExtensions
     public static TRow First<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
-        var row = TryFirst<TRow>(connection, editQuery);
-
-        if (row == null)
-            throw new ValidationError("RecordNotFound", "Query returned no results!");
-
+        var row = TryFirst<TRow>(connection, editQuery) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
 

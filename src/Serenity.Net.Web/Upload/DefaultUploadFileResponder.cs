@@ -6,19 +6,14 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation for upload file responder
 /// </summary>
-public class DefaultUploadFileResponder : IUploadFileResponder
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="uploadStorage">Upload storage</param>
+/// <exception cref="ArgumentNullException">One of arguments is null</exception>
+public class DefaultUploadFileResponder(IUploadStorage uploadStorage) : IUploadFileResponder
 {
-    private readonly IUploadStorage uploadStorage;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="uploadStorage">Upload storage</param>
-    /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-    public DefaultUploadFileResponder(IUploadStorage uploadStorage)
-    {
-        this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
-    }
+    private readonly IUploadStorage uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
 
     /// <inheritdoc />
     public IActionResult Read(string pathInfo, IHeaderDictionary responseHeaders)
@@ -31,7 +26,7 @@ public class DefaultUploadFileResponder : IUploadFileResponder
         var mimeType = KnownMimeTypes.Get(pathInfo);
 
         var stream = uploadStorage.OpenFile(pathInfo);
-        responseHeaders.Add("X-Content-Type-Options", "nosniff");
+        responseHeaders.Append("X-Content-Type-Options", "nosniff");
 
         if (mimeType == "application/pdf" ||
             mimeType == "text/plain" ||
@@ -46,7 +41,7 @@ public class DefaultUploadFileResponder : IUploadFileResponder
             Inline = false
         };
 
-        responseHeaders.Add("Content-Disposition", cd.ToString());
+        responseHeaders.Append("Content-Disposition", cd.ToString());
 
         return new FileStreamResult(stream, "application/octet-stream");
     }

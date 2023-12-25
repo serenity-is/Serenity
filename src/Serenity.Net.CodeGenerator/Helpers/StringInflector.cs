@@ -1,6 +1,6 @@
-﻿namespace Inflector;
+namespace Inflector;
 
-public static class Inflector
+public static partial class Inflector
 {
     #region Default Rules
 
@@ -71,16 +71,10 @@ public static class Inflector
 
     #endregion
 
-    private class Rule
+    private class Rule(string pattern, string replacement)
     {
-        private readonly Regex _regex;
-        private readonly string _replacement;
-
-        public Rule(string pattern, string replacement)
-        {
-            _regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            _replacement = replacement;
-        }
+        private readonly Regex _regex = new(pattern, RegexOptions.IgnoreCase);
+        private readonly string _replacement = replacement;
 
         public string Apply(string word)
         {
@@ -114,9 +108,9 @@ public static class Inflector
         _singulars.Add(new Rule(rule, replacement));
     }
 
-    private static readonly List<Rule> _plurals = new();
-    private static readonly List<Rule> _singulars = new();
-    private static readonly List<string> _uncountables = new();
+    private static readonly List<Rule> _plurals = [];
+    private static readonly List<Rule> _singulars = [];
+    private static readonly List<string> _uncountables = [];
 
     public static string Pluralize(this string word)
     {
@@ -146,24 +140,31 @@ public static class Inflector
         return result;
     }
 
+    [GeneratedRegex(@"\b([a-z])")]
+    private static partial Regex TitleizeRegexGen();
+
     public static string Titleize(this string word)
     {
-        return Regex.Replace(Humanize(Underscore(word)), @"\b([a-z])",
-                             delegate(Match match)
-                             {
-                                 return match.Captures[0].Value.ToUpperInvariant();
-                             });
+        return TitleizeRegexGen().Replace(Humanize(Underscore(word)), delegate (Match match)
+        {
+            return match.Captures[0].Value.ToUpperInvariant();
+        });
     }
+
+    [GeneratedRegex(@"_")]
+    private static partial Regex HumanizeRegexGen();
 
     public static string Humanize(this string lowercaseAndUnderscoredWord)
     {
-        return Capitalize(Regex.Replace(lowercaseAndUnderscoredWord, @"_", " "));
+        return Capitalize(HumanizeRegexGen().Replace(lowercaseAndUnderscoredWord, " "));
     }
+
+    [GeneratedRegex("(?:^|_)(.)")]
+    private static partial Regex PascalizeRegexGen();
 
     public static string Pascalize(this string lowercaseAndUnderscoredWord)
     {
-        return Regex.Replace(lowercaseAndUnderscoredWord, "(?:^|_)(.)",
-                             delegate(Match match)
+        return PascalizeRegexGen().Replace(lowercaseAndUnderscoredWord, delegate (Match match)
                              {
                                  return match.Groups[1].Value.ToUpperInvariant();
                              });
@@ -174,22 +175,30 @@ public static class Inflector
         return Uncapitalize(Pascalize(lowercaseAndUnderscoredWord));
     }
 
+    [GeneratedRegex(@"([A-Z]+)([A-Z][a-z])")]
+    private static partial Regex UnderscoreRegexGen1();
+
+    [GeneratedRegex(@"([a-z\d])([A-Z])")]
+    private static partial Regex UnderscoreRegexGen2();
+
+    [GeneratedRegex(@"[-\s]")]
+    private static partial Regex UnderscoreRegexGen3();
+
     public static string Underscore(this string pascalCasedWord)
     {
-        return Regex.Replace(
-            Regex.Replace(
-                Regex.Replace(pascalCasedWord, @"([A-Z]+)([A-Z][a-z])", "$1_$2"), @"([a-z\d])([A-Z])",
-                "$1_$2"), @"[-\s]", "_").ToLowerInvariant();
+        return UnderscoreRegexGen3().Replace(
+            UnderscoreRegexGen2().Replace(
+                UnderscoreRegexGen1().Replace(pascalCasedWord, "$1_$2"), "$1_$2"), "_").ToLowerInvariant();
     }
 
     public static string Capitalize(this string word)
     {
-        return word.Substring(0, 1).ToUpperInvariant() + word[1..].ToLowerInvariant();
+        return word[..1].ToUpperInvariant() + word[1..].ToLowerInvariant();
     }
 
     public static string Uncapitalize(this string word)
     {
-        return word.Substring(0, 1).ToLowerInvariant() + word[1..];
+        return word[..1].ToLowerInvariant() + word[1..];
     }
 
     public static string Ordinalize(this string numberString)
@@ -225,4 +234,5 @@ public static class Inflector
     {
         return underscoredWord.Replace('_', '-');
     }
+
 }

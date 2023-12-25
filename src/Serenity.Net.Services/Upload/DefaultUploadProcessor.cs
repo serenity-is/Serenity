@@ -7,33 +7,24 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation for <see cref="IUploadProcessor"/>
 /// </summary>
-public class DefaultUploadProcessor : IUploadProcessor
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="imageProcessor">Image processor</param>
+/// <param name="uploadStorage">Upload storage</param>
+/// <param name="uploadValidator">Upload validator</param>
+/// <param name="logger">Logger</param>
+/// <param name="avScanner">Optional antivirus scanner</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
+    ILogger<DefaultUploadProcessor> logger = null,
+    IUploadAVScanner avScanner = null) : IUploadProcessor
 {
-    private readonly IImageProcessor imageProcessor;
-    private readonly IUploadStorage uploadStorage;
-    private readonly IUploadValidator uploadValidator;
-    private readonly ILogger<DefaultUploadProcessor> logger;
-    private readonly IUploadAVScanner avScanner;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="imageProcessor">Image processor</param>
-    /// <param name="uploadStorage">Upload storage</param>
-    /// <param name="uploadValidator">Upload validator</param>
-    /// <param name="logger">Logger</param>
-    /// <param name="avScanner">Optional antivirus scanner</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
-        ILogger<DefaultUploadProcessor> logger = null,
-        IUploadAVScanner avScanner = null)
-    {
-        this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
-        this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
-        this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-        this.logger = logger;
-        this.avScanner = avScanner;
-    }
+    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+    private readonly IUploadStorage uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
+    private readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
+    private readonly ILogger<DefaultUploadProcessor> logger = logger;
+    private readonly IUploadAVScanner avScanner = avScanner;
 
     /// <inheritdoc/>
     public ProcessedUploadInfo Process(Stream stream, string filename, IUploadOptions options)

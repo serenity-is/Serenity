@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Serenity;
@@ -156,7 +156,7 @@ public static class TwoLevelCacheExtensions
                 return groupGeneration.Value;
 
             var bytes = distributedCache.Get(groupKey);
-            groupGeneration = (bytes == null || bytes.Length != 8) ? (ulong?)null : BitConverter.ToUInt64(bytes);
+            groupGeneration = (bytes == null || bytes.Length != 8) ? null : BitConverter.ToUInt64(bytes);
             if (groupGeneration == null || groupGeneration == 0)
             {
                 groupGeneration = RandomGeneration();

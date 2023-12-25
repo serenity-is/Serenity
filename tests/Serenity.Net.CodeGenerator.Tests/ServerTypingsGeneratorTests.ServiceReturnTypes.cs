@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using ServerTypingsTest.ServiceReturnTypes;
 
@@ -181,6 +181,7 @@ namespace ServerTypingsTest.ServiceReturnTypes
 
     }
 
+#pragma warning disable IDE1006 // Naming Styles
     public interface C : IActionResult
     {
 
@@ -190,4 +191,5 @@ namespace ServerTypingsTest.ServiceReturnTypes
     {
 
     }
+#pragma warning restore IDE1006 // Naming Styles
 }

@@ -5,7 +5,7 @@ export namespace SubDialogHelper {
     export function bindToDataChange(dialog: any, owner: Widget<any>,
         dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any {
         var widgetName = (owner as any).widgetName;
-        dialog.element.bind('ondatachange.' + widgetName, function (e: JQueryEventObject, dci: any) {
+        dialog.element.bind('ondatachange.' + widgetName, function (e: Event, dci: any) {
             if (useTimeout) {
                 window.setTimeout(function () {
                     dataChange(e, dci);
@@ -37,7 +37,7 @@ export namespace SubDialogHelper {
     }
 
     export function cascade(cascadedDialog: any, ofElement: JQuery): any {
-        cascadedDialog.element.one('dialogopen', function (e: JQueryEventObject) {
+        cascadedDialog.element.one('dialogopen', function (e: Event) {
             cascadedDialog.element.dialog().dialog('option', 'position', cascadedDialogOffset(ofElement));
         });
         return cascadedDialog;

@@ -2,13 +2,32 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    protected override void AddNestedLocalTexts(TypeDefinition type, string prefix)
+    protected void PreVisitTypeForTexts(TypeDefinition fromType)
+    {
+        var nestedLocalTexts = TypingsUtils.GetAttr(fromType, "Serenity.Extensibility",
+            "NestedLocalTextsAttribute", emptyTypes) ??
+            TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel",
+                "NestedLocalTextsAttribute", emptyTypes);
+        if (nestedLocalTexts == null)
+            return;
+        string prefix = null;
+#if ISSOURCEGENERATOR
+        prefix = nestedLocalTexts.NamedArguments.FirstOrDefault(x => x.Key == "Prefix").Value.Value as string;
+#else
+        if (nestedLocalTexts.HasProperties)
+            prefix = nestedLocalTexts.Properties.FirstOrDefault(x => x.Name == "Prefix").Argument.Value as string;
+#endif
+
+        AddNestedLocalTexts(fromType, prefix ?? "");
+    }
+
+    protected void AddNestedLocalTexts(TypeDefinition type, string prefix)
     {
         if (TypingsUtils.FindAttr(type.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
             return;
 
         foreach (var fi in type.FieldsOf().Where(x =>
-            x.IsPublic() && x.IsStatic && 
+            x.IsPublic() && x.IsStatic &&
             x.DeclaringType().FullNameOf() == type.FullNameOf() &&
             x.FieldType().FullNameOf() == "Serenity.LocalText" &&
             TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
@@ -26,7 +45,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
         {
             var name = nested.Name;
-            if (name.EndsWith("_", StringComparison.Ordinal))
+            if (name.EndsWith('_'))
                 name = name[0..^1];
 
             AddNestedLocalTexts(nested, prefix + name + ".");
@@ -82,19 +101,14 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
             var jwBuilder = new StringBuilder();
-#if ISSOURCEGENERATOR
-            var jw = new Newtonsoft.Json.JsonTextWriter(
-                new System.IO.StringWriter(jwBuilder))
-#else
-            var jw = new JsonTextWriter(new System.IO.StringWriter(jwBuilder))
-#endif
+            var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
             {
                 QuoteName = false,
-                Formatting = Formatting.Indented,
+                Formatting = Newtonsoft.Json.Formatting.Indented,
                 Indentation = 4
             };
             jw.WriteStartObject();
-            List<string> stack = new();
+            List<string> stack = [];
             int stackCount = 0;
             for (int i = 0; i < list.Count; i++)
             {

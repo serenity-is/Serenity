@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System.Net;
@@ -9,20 +9,15 @@ namespace Serenity.Web.Middleware;
 /// <summary>
 /// Dynamic script middleware that handles "/DynJS.axd/" and "/DynamicData/" paths.
 /// </summary>
-public class DynamicScriptMiddleware
+/// <remarks>
+/// Creates a new instance of the middleware
+/// </remarks>
+/// <param name="next">Next request delegate</param>
+public class DynamicScriptMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
+    private readonly RequestDelegate next = next;
     const string dynJSPath = "/DynJS.axd/";
     const string dynamicDataPath = "/DynamicData/";
-
-    /// <summary>
-    /// Creates a new instance of the middleware
-    /// </summary>
-    /// <param name="next">Next request delegate</param>
-    public DynamicScriptMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
 
     /// <summary>
     /// Invokes the middleware in the context
@@ -113,20 +108,20 @@ public class DynamicScriptMiddleware
         responseHeaders.CacheControl = cacheControl;
 
         var supportsBrotli = scriptContent.CanCompress &&
-            context.Request.Headers["Accept-Encoding"].Any(x => x.Contains("br", StringComparison.Ordinal));
+            context.Request.Headers.AcceptEncoding.Any(x => x.Contains("br", StringComparison.Ordinal));
 
         var supportsGzip = !supportsBrotli && scriptContent.CanCompress && 
-            context.Request.Headers["Accept-Encoding"].Any(x => x.Contains("gzip", StringComparison.Ordinal));
+            context.Request.Headers.AcceptEncoding.Any(x => x.Contains("gzip", StringComparison.Ordinal));
 
         byte[] contentBytes;
         if (supportsBrotli)
         {
-            context.Response.Headers["Content-Encoding"] = "br";
+            context.Response.Headers.ContentEncoding = "br";
             contentBytes = scriptContent.BrotliContent;
         }
         else if (supportsGzip)
         {
-            context.Response.Headers["Content-Encoding"] = "gzip";
+            context.Response.Headers.ContentEncoding = "gzip";
             contentBytes = scriptContent.CompressedContent;
         }
         else
@@ -145,10 +140,9 @@ public class DynamicScriptMiddleware
     /// <exception cref="ArgumentNullException">Context is null</exception>
     public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
-        string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
+        string ifModifiedSince = context.Request.Headers.IfModifiedSince;
         if (ifModifiedSince != null && ifModifiedSince.Length > 0)
         {
             if (DateTime.TryParseExact(ifModifiedSince, "R", Invariants.DateTimeFormat, DateTimeStyles.None,

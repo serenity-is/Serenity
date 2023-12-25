@@ -1,15 +1,12 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 using static Serenity.TypeScript.TsParser.Scanner;
+using Debug = System.Diagnostics.Debug;
 
 namespace Serenity.TypeScript.TsParser;
 
-public class JsDocParser
+public class JsDocParser(Parser parser)
 {
-    public Parser Parser { get; set; }
-    public JsDocParser(Parser parser)
-    {
-        this.Parser = parser;
-    }
+    public Parser Parser { get; set; } = parser;
 
     private Scanner Scanner => Parser.Scanner;
     private string SourceText => Parser.SourceText;
@@ -21,15 +18,15 @@ public class JsDocParser
     private void ClearState() => Parser.ClearState();
     private void FixupParentReferences(INode rootNode) => Parser.FixupParentReferences(rootNode);
     private void ParseErrorAtCurrentToken(DiagnosticMessage message, object arg0 = null) => Parser.ParseErrorAtCurrentToken(message, arg0);
-    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object arg0 = null) => Parser.ParseErrorAtPosition(start, length, message, arg0);
+    private void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object argument = null) => Parser.ParseErrorAtPosition(start, length, message, argument);
     private SyntaxKind Token() => Parser.Token();
     private SyntaxKind NextToken() => Parser.NextToken();
     private T TryParse<T>(Func<T> callback) => Parser.TryParse<T>(callback);
-    private bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = null, bool shouldAdvance = true) => Parser.ParseExpected(kind, diagnosticMessage, shouldAdvance);
+    private bool ParseExpected(SyntaxKind kind) => Parser.ParseExpected(kind, default, true);
     private bool ParseOptional(SyntaxKind t) => Parser.ParseOptional(t);
-    private INode ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
+    private Node ParseOptionalToken<T>(SyntaxKind t) where T : Node, new() => Parser.ParseOptionalToken<T>(t);
     private T ParseTokenNode<T>() where T : Node, new() => Parser.ParseTokenNode<T>(Token());
-    private NodeArray<T> CreateList<T>(T[] elements = null, int? pos = null)      => Parser.CreateList<T>(elements, pos);
+    private NodeArray<T> CreateList<T>(T[] elements = null, int? pos = null) => Parser.CreateList<T>(elements, pos);
     private T FinishNode<T>(T node, int? end = null) where T : Node => Parser.FinishNode<T>(node, end);
     private Identifier ParseIdentifierName() => Parser.ParseIdentifierName();
     private NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool? considerSemicolonAsDelimiter = null) where T : INode => Parser.ParseDelimitedList<T>(kind, parseElement, considerSemicolonAsDelimiter);
@@ -45,27 +42,6 @@ public class JsDocParser
             _ => TokenIsIdentifierOrKeyword(Token()),
         };
     }
-
-
-    public static (JsDocTypeExpression res, List<Diagnostic> diagnostics) ParseJsDocTypeExpressionForTests(string content, int? start, int? length)
-    {
-        var dp = new JsDocParser(new Parser());
-        dp.Parser.InitializeState(content, null, ScriptKind.Js);
-
-        var sourceFile = dp.Parser.CreateSourceFile("file.js", ScriptKind.Js);
-
-        dp.Parser.Scanner.SetText(content, start, length);
-
-        var currentToken = dp.Parser.Scanner.Scan();
-        var jsDocTypeExpression = dp.ParseJsDocTypeExpression();
-        var diagnostics = dp.Parser.ParseDiagnostics;
-
-        dp.Parser.ClearState();
-
-
-        return (jsDocTypeExpression, diagnostics);         
-    }
-
 
     public JsDocTypeExpression ParseJsDocTypeExpression()
     {
@@ -90,7 +66,7 @@ public class JsDocParser
         var type = ParseJsDocType();
         if (Token() == SyntaxKind.BarToken)
         {
-            var unionType = new JsDocUnionType {Types = ParseJsDocTypeList(type)};
+            var unionType = new JsDocUnionType { Types = ParseJsDocTypeList(type) };
 
 
             type = FinishNode(unionType);
@@ -118,7 +94,7 @@ public class JsDocParser
         {
             if (Token() == SyntaxKind.OpenBracketToken)
             {
-                var arrayType = new JsDocArrayType {ElementType = type};
+                var arrayType = new JsDocArrayType { ElementType = type };
 
 
 
@@ -132,7 +108,7 @@ public class JsDocParser
             else
         if (Token() == SyntaxKind.QuestionToken)
             {
-                var nullableType = new JsDocNullableType {Type = type};
+                var nullableType = new JsDocNullableType { Type = type };
 
 
 
@@ -143,7 +119,7 @@ public class JsDocParser
             else
         if (Token() == SyntaxKind.ExclamationToken)
             {
-                var nonNullableType = new JsDocNonNullableType {Type = type};
+                var nonNullableType = new JsDocNonNullableType { Type = type };
 
 
 
@@ -253,12 +229,12 @@ public class JsDocParser
 
     public ParameterDeclaration ParseJsDocParameter()
     {
-        var parameter = new ParameterDeclaration {Type = ParseJsDocType()};
+        var parameter = new ParameterDeclaration { Type = ParseJsDocType() };
 
         if (ParseOptional(SyntaxKind.EqualsToken))
         {
 
-            parameter.QuestionToken = new QuestionToken { }; 
+            parameter.QuestionToken = new QuestionToken { };
         }
 
         return FinishNode(parameter);
@@ -267,7 +243,7 @@ public class JsDocParser
 
     public JsDocTypeReference ParseJsDocTypeReference()
     {
-        var result = new JsDocTypeReference {Name = Parser.ParseSimplePropertyName() as Identifier};
+        var result = new JsDocTypeReference { Name = Parser.ParseSimplePropertyName() as Identifier };
 
         if (Token() == SyntaxKind.LessThanToken)
         {
@@ -318,12 +294,12 @@ public class JsDocParser
 
     public void CheckForEmptyTypeArgumentList<T>(NodeArray<T> typeArguments)
     {
-        if (!ParseDiagnostics.Any() && typeArguments != null && !typeArguments.Any())
+        if (ParseDiagnostics.Count == 0 && typeArguments != null && !typeArguments.Any())
         {
             var start = (typeArguments.Pos ?? 0) - "<".Length;
             var end = SkipTriviaM(SourceText, (int)typeArguments.End) + ">".Length;
 
-            ParseErrorAtPosition(start, end - start, Diagnostics.Type_argument_list_cannot_be_empty);
+            ParseErrorAtPosition(start, end - start, DiagnosticMessage.Type_argument_list_cannot_be_empty);
         }
     }
 
@@ -345,7 +321,7 @@ public class JsDocParser
 
     public JsDocRecordType ParseJsDocRecordType()
     {
-        var result = new JsDocRecordType {Literal = ParseTypeLiteral()};
+        var result = new JsDocRecordType { Literal = ParseTypeLiteral() };
 
 
         return FinishNode(result);
@@ -387,7 +363,7 @@ public class JsDocParser
         {
             var start = list.End - ",".Length;
 
-            Parser.ParseErrorAtPosition((int)start, ",".Length, Diagnostics.Trailing_comma_not_allowed);
+            Parser.ParseErrorAtPosition((int)start, ",".Length, DiagnosticMessage.Trailing_comma_not_allowed);
         }
     }
 
@@ -411,7 +387,7 @@ public class JsDocParser
     public NodeArray<IJsDocType> ParseJsDocTypeList(IJsDocType firstType)
     {
 
-        var types = Parser.CreateList<IJsDocType>();  
+        var types = Parser.CreateList<IJsDocType>();
         types.Add(firstType);
         types.Pos = firstType.Pos;
         while (ParseOptional(SyntaxKind.BarToken))
@@ -439,17 +415,13 @@ public class JsDocParser
 
     public JsDocLiteralType ParseJsDocLiteralType()
     {
-        var result = new JsDocLiteralType {Literal = Parser.ParseLiteralTypeNode()};
-
-
+        var result = new JsDocLiteralType { Literal = Parser.ParseLiteralTypeNode() };
         return FinishNode(result);
     }
 
 
-    public   JsDocType ParseJsDocUnknownOrNullableType()
+    public JsDocType ParseJsDocUnknownOrNullableType()
     {
-        var pos = Scanner.StartPos;
-
         NextToken();
         if (Token() == SyntaxKind.CommaToken ||
                             Token() == SyntaxKind.CloseBraceToken ||
@@ -464,29 +436,12 @@ public class JsDocParser
         }
         else
         {
-            var result = new JsDocNullableType {Type = ParseJsDocType()};
+            var result = new JsDocNullableType { Type = ParseJsDocType() };
 
 
             return FinishNode(result);
         }
     }
-
-
-    public Tuple<JsDoc, List<Diagnostic>> ParseIsolatedJsDocComment(string content, int start, int length)
-    {
-        Parser ??= new Parser();
-        Parser.InitializeState(content, null, ScriptKind.Js);
-
-        Parser.SourceFile = new SourceFile { LanguageVariant = LanguageVariant.Standard, Text = content };
-        var jsDoc = ParseJsDocCommentWorker(start, length);
-        var diagnostics = ParseDiagnostics;
-
-        ClearState();
-
-
-        return jsDoc != null ? Tuple.Create(jsDoc, diagnostics) : null;
-    }
-
 
     public JsDoc ParseJsDocComment(INode parent, int? start, int? length)
     {
@@ -516,7 +471,7 @@ public class JsDocParser
     {
         var content = Parser.SourceText;
 
-        start = start ?? 0;
+        start ??= 0;
         var end = length == null ? content.Length : start + length;
 
         length = end - start;
@@ -527,8 +482,8 @@ public class JsDocParser
         Debug.Assert(start <= end);
 
         Debug.Assert(end <= content.Length);
-        NodeArray<IJsDocTag> tags = new NodeArray<IJsDocTag>();
-        List<string> comments = new List<string>();
+        NodeArray<IJsDocTag> tags = [];
+        List<string> comments = [];
         JsDoc result = null;
         if (!IsJsDocStart(content, (int)start))
         {
@@ -632,7 +587,7 @@ public class JsDocParser
                        if (margin != null && (indent ?? 0) + whitespace.Length > margin)
                        {
 
-                           comments.Add(whitespace.Slice((int)margin - (indent ?? 0) - 1));
+                           comments.Add(TsExtensions.Slice(whitespace, (int)margin - (indent ?? 0) - 1));
                        }
 
                        indent += whitespace.Length;
@@ -687,20 +642,19 @@ public class JsDocParser
 
         void RemoveLeadingNewlines(List<string> comments3)
         {
-            while (comments3.Any() && (comments3[0] == "\n" || comments3[0] == "\r"))
+            while (comments3.Count != 0 && (comments3[0] == "\n" || comments3[0] == "\r"))
             {
 
-                comments3 = comments3.Skip(1).ToList();  
+                comments3 = comments3.Skip(1).ToList();
             }
         }
 
 
         void RemoveTrailingNewlines(List<string> comments2)
         {
-            while (comments2.Any() && (comments2[comments2.Count() - 1] == "\n" || comments2[comments2.Count() - 1] == "\r"))
+            while (comments2.Count != 0 && (comments2[^1] == "\n" || comments2[^1] == "\r"))
             {
-
-                comments2.Pop();
+                comments2.RemoveAt(0);
             }
         }
 
@@ -720,7 +674,7 @@ public class JsDocParser
             var result2 = new JsDoc
             {
                 Tags = tags,
-                Comment = comments.Any() ? string.Join("", comments) : null
+                Comment = comments.Count != 0 ? string.Join("", comments) : null
             };
 
 
@@ -743,7 +697,7 @@ public class JsDocParser
         {
 
             Debug.Assert(Token() == SyntaxKind.AtToken);
-            var atToken = new AtToken {End = Scanner.TextPos};
+            var atToken = new AtToken { End = Scanner.TextPos };
 
 
             NextJsDocToken();
@@ -786,7 +740,7 @@ public class JsDocParser
 
         List<string> ParseTagComments(int indent)
         {
-            List<string> comments2 = new List<string>();
+            List<string> comments2 = [];
             var state = JSDocState.SawAsterisk;
             int? margin = null;
             while (Token() != SyntaxKind.AtToken && Token() != SyntaxKind.EndOfFileToken)
@@ -820,7 +774,7 @@ public class JsDocParser
                             if (margin != null && indent + whitespace.Length > margin)
                             {
 
-                                comments2.Add(whitespace.Slice((int)margin - indent - 1));
+                                comments2.Add(TsExtensions.Slice(whitespace, ((int)margin - indent - 1)));
                             }
 
                             indent += whitespace.Length;
@@ -840,7 +794,7 @@ public class JsDocParser
                         goto caseLabel5;
                     default:
 
-                        caseLabel5: state = JSDocState.SavingComments;
+                    caseLabel5: state = JSDocState.SavingComments;
                         PushComment(Scanner.TokenText);
 
                         break;
@@ -958,7 +912,7 @@ public class JsDocParser
             if (name == null)
             {
 
-                ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
+                ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                 return null;
             }
@@ -1002,7 +956,7 @@ public class JsDocParser
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocReturnTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var result5 = new JsDocReturnTag
             {
@@ -1023,7 +977,7 @@ public class JsDocParser
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocTypeTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var result6 = new JsDocTypeTag
             {
@@ -1050,7 +1004,7 @@ public class JsDocParser
             if (name == null)
             {
 
-                ParseErrorAtPosition(Scanner.StartPos,  0, Diagnostics.Identifier_expected);
+                ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                 return null;
             }
@@ -1106,10 +1060,10 @@ public class JsDocParser
                 var rightNode = typedefTag.FullName;
                 while (true)
                 {
-                    if ((SyntaxKind)rightNode.Kind == SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body == null)
+                    if (rightNode.Kind == SyntaxKind.Identifier || (rightNode as JsDocNamespaceDeclaration)?.Body == null)
                     {
 
-                        typedefTag.Name = (SyntaxKind)rightNode.Kind == SyntaxKind.Identifier ? rightNode : (rightNode as JsDocTypedefTag)?.Name;
+                        typedefTag.Name = rightNode.Kind == SyntaxKind.Identifier ? rightNode : (rightNode as JsDocTypedefTag)?.Name;
 
                         break;
                     }
@@ -1123,10 +1077,10 @@ public class JsDocParser
             SkipWhitespace();
             if (typeExpression != null)
             {
-                if ((SyntaxKind)typeExpression.Type.Kind == SyntaxKind.JsDocTypeReference)
+                if (typeExpression.Type.Kind == SyntaxKind.JsDocTypeReference)
                 {
                     var jsDocTypeReference = (JsDocTypeReference)typeExpression.Type;
-                    if ((SyntaxKind)jsDocTypeReference.Name.Kind == SyntaxKind.Identifier)
+                    if (jsDocTypeReference.Name.Kind == SyntaxKind.Identifier)
                     {
                         Identifier name = jsDocTypeReference.Name as Identifier;
                         if (name?.Text == "Object")
@@ -1201,7 +1155,7 @@ public class JsDocParser
                         canParseTag = false;
                         goto caseLabel5;
                     case SyntaxKind.EndOfFileToken:
-                        caseLabel5:
+                    caseLabel5:
                         break;
                 }
             }
@@ -1242,7 +1196,7 @@ public class JsDocParser
         {
 
             Debug.Assert(Token() == SyntaxKind.AtToken);
-            var atToken = new AtToken {End = Scanner.TextPos};
+            var atToken = new AtToken { End = Scanner.TextPos };
 
 
             NextJsDocToken();
@@ -1271,7 +1225,7 @@ public class JsDocParser
                     var propertyTag = ParsePropertyTag(atToken, tagName);
                     if (propertyTag != null)
                     {
-                        parentTag.JsDocPropertyTags ??= new NodeArray<JsDocPropertyTag>();
+                        parentTag.JsDocPropertyTags ??= [];
 
                         parentTag.JsDocPropertyTags.Add(propertyTag);
 
@@ -1290,7 +1244,7 @@ public class JsDocParser
             if (tags.Any(t => t.Kind == SyntaxKind.JsDocTemplateTag))
             {
 
-                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), Diagnostics._0_tag_already_specified, tagName.Text);
+                ParseErrorAtPosition(tagName.Pos ?? 0, Scanner.TokenPos - (tagName.Pos ?? 0), DiagnosticMessage._0_tag_already_specified, tagName.Text);
             }
             var typeParameters = CreateList<TypeParameterDeclaration>();
             while (true)
@@ -1301,11 +1255,11 @@ public class JsDocParser
                 if (name == null)
                 {
 
-                    ParseErrorAtPosition(Scanner.StartPos, 0, Diagnostics.Identifier_expected);
+                    ParseErrorAtPosition(Scanner.StartPos, 0, DiagnosticMessage.Identifier_expected);
 
                     return null;
                 }
-                var typeParameter = new TypeParameterDeclaration {Name = name};
+                var typeParameter = new TypeParameterDeclaration { Name = name };
 
 
                 FinishNode(typeParameter);
@@ -1362,7 +1316,7 @@ public class JsDocParser
             if (!isIdentifier)
             {
 
-                ParseErrorAtCurrentToken(Diagnostics.Identifier_expected);
+                ParseErrorAtCurrentToken(DiagnosticMessage.Identifier_expected);
 
                 return null;
             }

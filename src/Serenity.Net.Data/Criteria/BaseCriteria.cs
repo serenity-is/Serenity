@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
 
 namespace Serenity.Data;
@@ -8,11 +8,12 @@ namespace Serenity.Data;
 /// </summary>
 /// <seealso cref="ICriteria" />
 [DebuggerDisplay("{ToStringIgnoreParams()}")]
-[JsonConverter(typeof(JsonCriteriaConverter))]
+[JsonConverter(typeof(JsonConverters.CriteriaJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(JsonCriteriaConverter))]
 public abstract class BaseCriteria : ICriteria
 {
-    private static readonly NoParamsChecker noParamsChecker = new NoParamsChecker();
-    private static readonly IgnoreParams ignoreParams = new IgnoreParams();
+    private static readonly NoParamsChecker noParamsChecker = new();
+    private static readonly IgnoreParams ignoreParams = new();
 
     /// <summary>
     /// Gets a value indicating whether this criteria instance is empty.

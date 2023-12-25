@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
 
 namespace Serenity.Data;
 
@@ -153,10 +155,8 @@ public class JsonCriteriaConverter : JsonConverter
             if (array[0] is not JValue jValue || jValue.Value is not string)
                 throw new JsonSerializationException(string.Format("Couldn't deserialize string criteria: {0}", array.ToString()));
 
-            var value = (string)((JValue)array[0]).Value;
-            if (value == null)
+            var value = (string)((JValue)array[0]).Value ?? 
                 throw new JsonSerializationException(string.Format("Null Criteria expression: {0}", array.ToString()));
-
             if (value.StartsWith("@"))
                 return new ParamCriteria(value);
 
@@ -222,7 +222,7 @@ public class JsonCriteriaConverter : JsonConverter
     public override bool CanWrite => true;
 
     private static readonly string[] OperatorToKey =
-    {
+    [
         "()", // Paren
         "not", // Not
         "is null", // IsNull
@@ -241,7 +241,7 @@ public class JsonCriteriaConverter : JsonConverter
         "not in", // NOT IN
         "like", // LIKE
         "not like" // NOT LIKE
-    };
+    ];
 
     private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;
 }

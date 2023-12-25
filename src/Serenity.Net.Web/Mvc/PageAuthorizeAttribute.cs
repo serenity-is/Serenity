@@ -20,14 +20,9 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
         Arguments = new[] { this };
     }
 
-    private class PageAuthorizeFilter : IResourceFilter
+    private class PageAuthorizeFilter(PageAuthorizeAttribute attr) : IResourceFilter
     {
-        readonly PageAuthorizeAttribute attr;
-
-        public PageAuthorizeFilter(PageAuthorizeAttribute attr)
-        {
-            this.attr = attr;
-        }
+        readonly PageAuthorizeAttribute attr = attr;
 
         public void OnResourceExecuted(ResourceExecutedContext context)
         {
@@ -59,8 +54,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     protected PageAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
         : this()
     {
-        if (sourceType == null)
-            throw new ArgumentNullException(nameof(sourceType));
+        ArgumentNullException.ThrowIfNull(sourceType);
 
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));

@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -22,24 +22,24 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             cw.IndentedLine("{");
             cw.IndentedLine("}");
 
-            GenerateOptionMembers(type, skip: null, isWidget: false);
+            GenerateOptionMembers(type, skip: null);
         });
     }
 
-    static readonly string[] FormatterAttributeNames = new[]
-    {
+    static readonly string[] FormatterAttributeNames =
+    [
         "Serenity.Decorators.registerFormatter",
         "@serenity-is/corelib:Decorators.registerFormatter",
         "Decorators.registerFormatter",
         "registerFormatter"
-    };
+    ];
 
     private bool IsFormatterType(ExternalType type)
     {
         if (type.IsAbstract == true)
             return false;
 
-        if (type.GenericParameters?.Count > 0)
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
             return false;
 
         if (GetAttribute(type, inherited: true, attributeNames: FormatterAttributeNames) != null)

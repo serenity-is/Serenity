@@ -1,29 +1,21 @@
-﻿<Project>
+<Project>
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)..\build\Package.Build.props')" />
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>10.0</LangVersion>
-    <Company>Serenity</Company>
-    <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
+    <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <Authors>Volkan Ceylan</Authors>
-    <PackageIcon>package-icon.png</PackageIcon>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/serenity-is/Serenity</PackageProjectUrl>
-    <PackageTags>Serenity</PackageTags>
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
-    <Terser>$(MSBuildProjectDirectory)\node_modules\.bin\terser</Terser>
     <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;libman.json</DefaultItemExcludes>
-  </PropertyGroup>
-  <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="$(MSBuildProjectDirectory)\*.json" />
@@ -32,18 +24,11 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <Pack>false</Pack>
     </Content>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-icon.png" Pack="true" PackagePath="">
-        <Link>Properties\package-icon.png</Link>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)..\build\assets\package-readme.md" Pack="true" PackagePath="\README.md">
-        <Link>Properties\README.md</Link>
-    </None>
     <Content Remove="texts\**\*.json" />
     <EmbeddedResource Include="texts\**\*.json" WithCulture="false" Culture="" />
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
   <ItemGroup>
-    <Using Include="Newtonsoft.Json" />
     <Using Include="Serenity" />
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
@@ -60,6 +45,7 @@
     <Using Include="System.Reflection" />
     <Using Include="System.Security.Claims" />
     <Using Include="System.Text" />
+    <Using Include="System.Text.Json.Serialization" />
     <Using Include="System.Text.RegularExpressions" />
   </ItemGroup>
 </Project>

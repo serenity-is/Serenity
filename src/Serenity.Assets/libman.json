@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "bootstrap@5.2.3",
+      "library": "bootstrap@5.3.2",
       "destination": "wwwroot/bootstrap/",
       "files": [
         "js/bootstrap.bundle.js",
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "library": "bootstrap-icons@1.10.5",
+      "library": "bootstrap-icons@1.11.1",
       "destination": "wwwroot/bootstrap-icons/",
       "files": [
         "font/bootstrap-icons.css",
@@ -27,13 +27,11 @@
       ]
     },
     {
-      "library": "jquery@3.6.1",
+      "library": "jquery@3.7.1",
       "destination": "wwwroot/jquery",
       "files": [
         "jquery.js",
-        "jquery.min.js",
-        "jquery.slim.js",
-        "jquery.slim.min.js"
+        "jquery.min.js"
       ]
     },
     {

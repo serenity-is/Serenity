@@ -1,4 +1,4 @@
-﻿using ServerTypingsTest.RowLookupKeyModule.Entities;
+using ServerTypingsTest.RowLookupKeyModule.Entities;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -96,11 +96,8 @@ namespace ServerTypingsTest.RowLookupKeyModule.Entities
     }
 
     [LookupScript("AModule.ExternalLookupKey")]
-    public class ExternalLookupWithExplicitKey : RowLookupScript<RowWithExternalLookupWithExplicitKeyRow>
+    public class ExternalLookupWithExplicitKey(ISqlConnections connections) : RowLookupScript<RowWithExternalLookupWithExplicitKeyRow>(connections)
     {
-        public ExternalLookupWithExplicitKey(ISqlConnections connections) : base(connections)
-        {
-        }
     }
 
     [LookupScript(typeof(ExternalWithAutoKeyLookup))]
@@ -112,11 +109,8 @@ namespace ServerTypingsTest.RowLookupKeyModule.Entities
     }
 
     [LookupScript]
-    public class ExternalWithAutoKeyLookup : RowLookupScript<RowWithExternalLookupWithExplicitKeyRow>
+    public class ExternalWithAutoKeyLookup(ISqlConnections connections) : RowLookupScript<RowWithExternalLookupWithExplicitKeyRow>(connections)
     {
-        public ExternalWithAutoKeyLookup(ISqlConnections connections) : base(connections)
-        {
-        }
     }
 
     [LookupScript, Module("AnotherModule")]

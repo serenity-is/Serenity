@@ -18,6 +18,7 @@ export function checkIfTrigger() {
 }
 
 export const importAsGlobalsMapping = {
+    "@serenity-is/base": "Serenity",
     "@serenity-is/corelib": "Serenity",
     "@serenity-is/corelib/q": "Q",
     "@serenity-is/corelib/slick": "Slick",
@@ -119,13 +120,13 @@ export const esbuildOptions = (opt) => {
         plugins,
         sourcemap: true,
         splitting: splitting,
-        target: 'es6',
+        target: 'es2017',
         watch: process.argv.slice(2).some(x => x == "--watch"),
     }, opt);
 }
 
 export const build = async (opt) => {
-    var opt = esbuildOptions(opt);
+    opt = esbuildOptions(opt);
 
     if (opt.watch) {
         // this somehow resolves the issue that when debugging is stopped
@@ -133,9 +134,15 @@ export const build = async (opt) => {
         setInterval(() => {
             process.stdout.write("");
         }, 5000);
-    }
 
-    await esbuild.build(esbuildOptions(opt));
+        delete opt.watch;
+        const context = await esbuild.context(opt);
+        await context.watch();
+    }
+    else {
+        delete opt.watch;
+        await esbuild.build(opt);
+    }
 };
 
 function scanDir(dir, org) {

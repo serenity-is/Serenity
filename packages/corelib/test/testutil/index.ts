@@ -5,7 +5,7 @@ import { join, resolve } from "path";
 
 const root = resolve('./');
 
-const nscorelibPath = "~/out/Serenity.CoreLib.js";
+const nscorelibPath = "~/out/index.global.js";
 
 export function loadNSCorelib(window) {
     loadExternalScripts(window, nscorelibPath);

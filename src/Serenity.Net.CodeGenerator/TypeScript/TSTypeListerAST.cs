@@ -1,4 +1,4 @@
-﻿#if ISSOURCEGENERATOR
+#if ISSOURCEGENERATOR
 using System.Collections.Concurrent;
 #else
 using Serenity.CodeGeneration;
@@ -11,14 +11,14 @@ namespace Serenity.CodeGenerator;
 
 public class TSTypeListerAST
 {
-    private readonly List<string> fileNames = new();
-    private readonly HashSet<string> exportedTypeNames = new();
-    private readonly IGeneratorFileSystem fileSystem;
+    private readonly List<string> fileNames = [];
+    private readonly HashSet<string> exportedTypeNames = [];
+    private readonly IFileSystem fileSystem;
     private readonly ConcurrentDictionary<string, SourceFile> astCache;
     private readonly TSModuleResolver moduleResolver;
     private readonly CancellationToken cancellationToken;
 
-    public TSTypeListerAST(IGeneratorFileSystem fileSystem, string tsConfigDir,
+    public TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
         TSConfig tsConfig, ConcurrentDictionary<string, SourceFile> astCache = null, 
         CancellationToken cancellationToken = default)
     {
@@ -108,7 +108,7 @@ public class TSTypeListerAST
             if (args.Count == 1)
                 return text + "<" + GetText(args[0]) + ">";
             else
-                return text + "<" + string.Join(",", args.Select(x => GetText(x)) + ">");
+                return text + "<" + string.Join(",", args.Select(GetText) + ">");
         }
 
         return text;
@@ -157,11 +157,23 @@ public class TSTypeListerAST
         }
         else if (node is Declaration de && de.Name != null)
             return GetText(de.Name);
+        else if (node is TypeLiteralNode tln)
+        {
+            var text = tln.GetText();
+            return string.IsNullOrEmpty(text) ? "{}" : text;
+        }
         return node?.GetText();
     }
 
     string GetTypeReferenceExpression(INode node, bool isDecorator = false)
     {
+        return GetTypeReferenceExpression(node, out _, isDecorator);
+    }
+
+    string GetTypeReferenceExpression(INode node, out string genericArgs, bool isDecorator = false)
+    {
+        genericArgs = null;
+
         if (node == null)
             return string.Empty;
 
@@ -174,14 +186,16 @@ public class TSTypeListerAST
             text.Contains('|'))
             return null;
 
-
         if (text == "number" || text == "string" || text == "boolean")
             return text;
 
         var noGeneric = text;
         var lt = noGeneric.IndexOf('<');
         if (lt >= 0 && noGeneric[^1] == '>')
+        {
+            genericArgs = text[(lt + 1)..^1];
             noGeneric = noGeneric[..lt];
+        }
 
         string functionSuffix = string.Empty;
         if (isDecorator)
@@ -237,7 +251,7 @@ public class TSTypeListerAST
                             {
                                 var module = id.Text;
                                 if (module.StartsWith(".", StringComparison.OrdinalIgnoreCase))
-                                    module = ResolveModule(id.Text, sourceFile.FileName, false).moduleName ?? module;
+                                    module = ResolveModule(id.Text, sourceFile.FileName, false)?.ModuleName ?? module;
 
                                 return module + ":" + nameIdentifier.Text + functionSuffix;
                             }
@@ -328,7 +342,7 @@ public class TSTypeListerAST
             }
         }
 
-        return result.Any() ? result : null;
+        return result.Count != 0 ? result : null;
     }
 
     List<string> GetBaseInterfaces(InterfaceDeclaration node)
@@ -350,14 +364,16 @@ public class TSTypeListerAST
         return result.Count == 0 ? null : result;
     }
 
-    static List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p) 
+    List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p) 
     {
         if (p == null || p.Count == 0)
             return null;
 
         return p.Select(k => new ExternalGenericParameter
         {
-            Name = GetText(k)
+            Name = GetText(k.Name),
+            Default = GetTypeReferenceExpression(k.Default) ?? GetText(k.Default),
+            Extends = k.Constraint is TypeReferenceNode trn ? (GetTypeReferenceExpression(trn.TypeName) ?? GetText(trn.TypeName)) : null
         }).ToList();
     }
 
@@ -391,7 +407,7 @@ public class TSTypeListerAST
 
             if (ce.Arguments != null &&
                 ce.Arguments.Count > 0)
-                result.Arguments ??= new();
+                result.Arguments ??= [];
 
             foreach (var arg in ce.Arguments)
             {
@@ -470,38 +486,26 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = (member as MethodDeclaration);
                 if (md.Type != null)
                     externalMember.Type = GetTypeReferenceExpression(md.Type);
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else if (member.Kind == SyntaxKind.Constructor)
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new(),
+                    Arguments = [],
                     IsConstructor = true
                 };
                 var md = member as ConstructorDeclaration;
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else
                 continue;
@@ -550,21 +554,14 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = member as MethodSignature;
                 if (md.Type != null)
                     externalMember.Type = GetTypeReferenceExpression(md.Type);
 
                 foreach (var arg in md.Parameters)
-                {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = (arg.Name as ILiteralLikeNode)?.Text ??
-                            (arg.Name as Identifier).Text,
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
-                }
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
             }
             else
                 continue;
@@ -578,7 +575,7 @@ public class TSTypeListerAST
         return result;
     }
 
-    ExternalType EnumToExternalType(EnumDeclaration enumDec)
+    static ExternalType EnumToExternalType(EnumDeclaration enumDec)
     {
         var result = new ExternalType
         {
@@ -641,6 +638,17 @@ public class TSTypeListerAST
         return result;
     }
 
+    private ExternalArgument MapMethodParam(ParameterDeclaration arg)
+    {
+        var type = GetTypeReferenceExpression(arg.Type, out string genericArguments);
+        return new()
+        {
+            Name = GetText(arg.Name),
+            Type = type,
+            GenericArguments = genericArguments
+        };
+    }
+
     List<ExternalMember> GetModuleMembers(ModuleDeclaration node)
     {
         var result = new List<ExternalMember>();
@@ -673,7 +681,7 @@ public class TSTypeListerAST
             {
                 externalMember = new ExternalMethod
                 {
-                    Arguments = new()
+                    Arguments = []
                 };
                 var md = member as MethodDeclaration;
                 if (md.Type != null)
@@ -681,11 +689,7 @@ public class TSTypeListerAST
 
                 foreach (var arg in md.Parameters)
                 {
-                    (externalMember as ExternalMethod).Arguments.Add(new()
-                    {
-                        Name = GetText(arg.Name),
-                        Type = GetTypeReferenceExpression(arg.Type)
-                    });
+                    (externalMember as ExternalMethod).Arguments.Add(MapMethodParam(arg));
                 }
             }
             else
@@ -751,13 +755,13 @@ public class TSTypeListerAST
                 if (string.IsNullOrEmpty(identifier))
                     continue;
 
-                var resolvedSub = ResolveModule(identifier, sourceFile.FileName, false);
-                if (resolvedSub.fullPath is null ||
-                    visited.Contains(resolvedSub.fullPath))
+                var resolveResult = ResolveModule(identifier, sourceFile.FileName, false);
+                if (resolveResult?.FullPath is null ||
+                    visited.Contains(resolveResult.FullPath))
                     continue;
 
-                visited.Add(resolvedSub.fullPath);
-                var subFile = ParseFile(resolvedSub.fullPath, sourceFileInfo?.ModuleName, true);
+                visited.Add(resolveResult.FullPath);
+                var subFile = ParseFile(resolveResult.ActualPath ?? resolveResult.FullPath, sourceFileInfo?.ModuleName, true);
                 if (subFile is null)
                     continue;
 
@@ -769,12 +773,12 @@ public class TSTypeListerAST
                     type.Namespace = null;
 
                     if (sourceFileInfo?.ModuleName != null &&
-                        !sourceFileInfo.ModuleName.StartsWith("/") &&
-                        !sourceFileInfo.ModuleName.StartsWith("."))
+                        !sourceFileInfo.ModuleName.StartsWith('/') &&
+                        !sourceFileInfo.ModuleName.StartsWith('.'))
                     {
                         if (type.BaseType != null &&
                             type.BaseType.Contains(':') &&
-                            type.BaseType.StartsWith("."))
+                            type.BaseType.StartsWith('.'))
                             type.BaseType = sourceFileInfo.ModuleName + ":" + type.BaseType.Split(':').Last();
 
                         if (type.Attributes != null)
@@ -782,8 +786,8 @@ public class TSTypeListerAST
                             foreach (var attr in type.Attributes)
                             {
                                 if (attr.Type != null &&
-                                    attr.Type.Contains(":", StringComparison.Ordinal) &&
-                                    attr.Type.StartsWith(".", StringComparison.Ordinal))
+                                    attr.Type.Contains(':', StringComparison.Ordinal) &&
+                                    attr.Type.StartsWith('.'))
                                     attr.Type = sourceFileInfo.ModuleName + ":" + attr.Type.Split(':').Last();
                             }
                         }
@@ -912,15 +916,14 @@ public class TSTypeListerAST
         }
     }
 
-    readonly ConcurrentQueue<(string fullPath, string moduleName)> processFileQueue = new();
+    readonly ConcurrentQueue<ResolveResult> processFileQueue = new();
     readonly ConcurrentDictionary<string, Lazy<string>> processByFullPath = new();
-    readonly ConcurrentDictionary<string, (string fullPath, string moduleName)> resolvedExternals = new();
+    readonly ConcurrentDictionary<string, ResolveResult> resolvedExternals = new();
     readonly ConcurrentDictionary<string, SourceFile> parsedFiles = new();
 
     private class SourceFileInfo
     {
         public string ModuleName { get; set; }
-        public Dictionary<string, ResolvedModuleFull> ResolvedModules { get; set; }
     }
 
     private readonly ConcurrentDictionary<SourceFile, SourceFileInfo> sourceFileInfos = new();
@@ -945,7 +948,6 @@ public class TSTypeListerAST
             {
                 var sourceFileInfo = sourceFileInfos.GetOrAdd(sourceFile, static (s) => new SourceFileInfo());
                 sourceFileInfo.ModuleName = moduleName;
-                sourceFileInfo.ResolvedModules ??= new();
 
                 foreach (var node in sourceFile.Statements)
                 {
@@ -958,19 +960,7 @@ public class TSTypeListerAST
                         node is ImportDeclaration id &&
                         id.ModuleSpecifier is StringLiteral sl)
                     {
-                        var resolved = ResolveModule(sl.Text, fileFullPath,
-                            enqueue: !extractExportsOnly);
-
-                        if (!string.IsNullOrEmpty(resolved.fullPath) &&
-                            !sourceFileInfo.ResolvedModules.ContainsKey(sl.Text))
-                        {
-                            sourceFileInfo.ResolvedModules[sl.Text] = new ResolvedModuleFull
-                            {
-                                ResolvedFileName = resolved.fullPath,
-                                IsExternalLibraryImport = !resolved.moduleName.StartsWith("/",
-                                    StringComparison.Ordinal)
-                            };
-                        }
+                        ResolveModule(sl.Text, fileFullPath, enqueue: !extractExportsOnly);
                     }
                 }
             }
@@ -979,43 +969,41 @@ public class TSTypeListerAST
         });
     }
 
-    (string moduleName, string fullPath) ResolveModule(string fileNameOrModule, string referencedFrom, bool enqueue)
+    ResolveResult ResolveModule(string fileNameOrModule, string referencedFrom, bool enqueue)
     {
-        string resolvedModuleName;
-        string resolvedFullPath;
-
         bool nonRelative = fileNameOrModule is not null &&
             fileNameOrModule.Length > 0 &&
             fileNameOrModule[0] != '.';
 
         if (nonRelative &&
-            resolvedExternals.TryGetValue(fileNameOrModule, out var resolved))
+            resolvedExternals.TryGetValue(fileNameOrModule, out ResolveResult resolveResult))
         {
-            resolvedModuleName = resolved.moduleName;
-            resolvedFullPath = resolved.fullPath;
         }
         else
         {
-            resolvedFullPath = moduleResolver.Resolve(fileNameOrModule, referencedFrom,
-                out resolvedModuleName);
+            resolveResult = moduleResolver.Resolve(fileNameOrModule, referencedFrom);
 
-            if (resolvedFullPath is not null && nonRelative)
-                resolvedExternals.TryAdd(fileNameOrModule, (resolvedFullPath, resolvedModuleName));
+            if (resolveResult is not null && nonRelative)
+                resolvedExternals.TryAdd(fileNameOrModule, resolveResult);
         }
 
-        if (resolvedFullPath is null)
-            return (null, null);
+        if (resolveResult is null)
+            return null;
 
         if (enqueue)
         {
-            return (processByFullPath.GetOrAdd(resolvedFullPath, x => new Lazy<string>(() =>
+            return new ResolveResult
             {
-                processFileQueue.Enqueue((resolvedFullPath, resolvedModuleName));
-                return resolvedModuleName;
-            })).Value, resolvedFullPath);
+                ModuleName = processByFullPath.GetOrAdd(resolveResult.FullPath, x => new Lazy<string>(() =>
+                {
+                    processFileQueue.Enqueue(resolveResult);
+                    return resolveResult.ModuleName;
+                })).Value,
+                FullPath = resolveResult.FullPath
+            };
         }
         else
-            return (resolvedModuleName, resolvedFullPath);
+            return resolveResult;
     }
 
     public List<ExternalType> ExtractTypes()
@@ -1024,16 +1012,19 @@ public class TSTypeListerAST
             .Select(x => ResolveModule(x, referencedFrom: null, enqueue: true))
             .ToArray();
 
-        SourceFile[] sourceFiles = Array.Empty<SourceFile>();
+        SourceFile[] sourceFiles = [];
         while (!processFileQueue.IsEmpty)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var currentQueue = processFileQueue.ToArray();
             while (!processFileQueue.IsEmpty)
                 processFileQueue.TryDequeue(out _);
-            sourceFiles = sourceFiles.Concat(currentQueue.AsParallel()
-                .Select(x => ParseFile(x.fullPath, x.moduleName, extractExportsOnly: false)))
-                .ToArray();
+            sourceFiles =
+            [
+                .. sourceFiles,
+                .. currentQueue.AsParallel()
+                    .Select(x => ParseFile(x.ActualPath ?? x.FullPath, x.ModuleName, extractExportsOnly: false)),
+            ];
         }
 
         exportedTypeNames.Clear();
@@ -1055,7 +1046,7 @@ public class TSTypeListerAST
         foreach (var types in sourceFiles.AsParallel().Select(sourceFile =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var result = ExtractTypes(sourceFile, new HashSet<string>());
+            var result = ExtractTypes(sourceFile, []);
             foreach (var r in result)
             {
                 r.SourceFile = sourceFile.FileName;
@@ -1067,14 +1058,9 @@ public class TSTypeListerAST
             foreach (var k in types)
             {
                 if (resultIndex.TryGetValue(k.FullName, out int index))
-                {
                     continue;
-                }
-                else
-                {
-                    resultIndex[k.FullName] = result.Count;
-                    result.Add(k);
-                }
+                resultIndex[k.FullName] = result.Count;
+                result.Add(k);
             }
         }
 

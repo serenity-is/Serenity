@@ -1,7 +1,11 @@
-**/bin/Debug/*
-**/bin/Release/*
+.nupkg/
 .swc/
+.vs/
+artifacts/
+bin/
+node_modules/
 obj/
+TestResults/
 *.bak
 *.orig
 *.pdb
@@ -11,13 +15,5 @@ obj/
 Thumbs.db
 ErrorLog.db
 StyleCop.Cache
-TestResults/
-.nupkg/
-.vs/
-node_modules/
 /build/tools/Addins/
-/src/Serenity.Scripts/dist/
-/src/Serenity.Scripts/wwwroot/**/*.js
-/src/Serenity.Scripts/wwwroot/**/*.map
-/src/Serenity.Net.CodeGenerator/bin/
 package-lock.json

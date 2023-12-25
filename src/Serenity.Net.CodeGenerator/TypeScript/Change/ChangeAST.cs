@@ -1,15 +1,10 @@
-﻿using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript.TsTypes;
 
 namespace Serenity.TypeScript.Change;
 
-public class ChangeAST
+public class ChangeAST(ICollection<NodeChangeItem> changeItems = null)
 {
-    private readonly ICollection<NodeChangeItem> _nodeChangeItems;
-
-    public ChangeAST(ICollection<NodeChangeItem> changeItems = null)
-    {
-        _nodeChangeItems = changeItems ?? new List<NodeChangeItem>();
-    }
+    private readonly ICollection<NodeChangeItem> _nodeChangeItems = changeItems ?? new List<NodeChangeItem>();
 
     public static string Change(string source, IEnumerable<NodeChangeItem> changeItems)
     {
@@ -42,7 +37,7 @@ public class ChangeAST
                     if (ch.Node.End != null) pos = (int) ch.Node.End;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(changeItems));
             }
         }
         if (pos < source.Length) sb.Append(source[pos..]);

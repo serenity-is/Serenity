@@ -1,6 +1,7 @@
-﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { htmlEncode, ListResponse, toGrouping, tryFirst } from "../../q";
-import { SlickFormatting, SlickHelper, SlickTreeHelper } from "../helpers/slickhelpers";
+﻿import { ListResponse, htmlEncode } from "@serenity-is/base";
+import { Column, FormatterContext } from "@serenity-is/sleekgrid";
+import { toGrouping } from "../../q";
+import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { DataGrid } from "./datagrid";
 
 /**
@@ -21,7 +22,7 @@ export class TreeGridMixin<TItem> {
                 var src = dg.slickGrid.getCellFromEvent(e);
                 if (src.cell >= 0 &&
                     src.row >= 0) {
-                    SlickTreeHelper.toggleClick<TItem>(e, src.row, src.row, dg.view, getId);
+                    SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.row, dg.view, getId);
                 }
             }
         });
@@ -45,7 +46,7 @@ export class TreeGridMixin<TItem> {
         };
 
         if (options.toggleField) {
-            var col = tryFirst(dg['allColumns'] || dg.slickGrid.getColumns() || [], x => x.field == options.toggleField) as Column<TItem>;
+            var col = (dg['allColumns'] || dg.slickGrid.getColumns())?.find(x => x.field == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
                     col.format || ((ctx: FormatterContext<TItem>) => htmlEncode(ctx.value)));

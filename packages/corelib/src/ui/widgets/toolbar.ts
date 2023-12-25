@@ -1,13 +1,13 @@
-﻿import { Decorators } from "../../decorators";
-import { htmlEncode, isEmptyOrNull, startsWith } from "../../q";
-import { Widget } from "./widget";
+﻿import { IconClassName, htmlEncode, iconClassName } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { Widget, WidgetProps } from "./widget";
 
 export interface ToolButton {
     action?: string;
     title?: string;
     hint?: string;
     cssClass?: string;
-    icon?: string;
+    icon?: IconClassName;
     onClick?: any;
     htmlEncode?: any;
     hotkey?: string;
@@ -26,10 +26,11 @@ export interface PopupMenuButtonOptions {
 }
 
 @Decorators.registerEditor('Serenity.PopupMenuButton')
-export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-    constructor(div: JQuery, opt: PopupMenuButtonOptions) {
-        super(div, opt);
+export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
+        let div = this.element;
         div.addClass('s-PopupMenuButton');
         div.click(e => {
             e.preventDefault();
@@ -56,7 +57,7 @@ export class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
     }
 
     destroy() {
-        if (this.options.menu != null) { 
+        if (this.options.menu != null) {
             this.options.menu.remove();
             this.options.menu = null;
         }
@@ -70,12 +71,12 @@ export interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 }
 
 @Decorators.registerEditor('Serenity.PopupToolButton')
-export class PopupToolButton extends PopupMenuButton {
-    constructor(div: JQuery, opt: PopupToolButtonOptions) {
-        super(div, opt);
+export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
-        div.addClass('s-PopupToolButton');
-        $('<b/>').appendTo(div.children('.button-outer').children('span'));
+        this.element.addClass('s-PopupToolButton');
+        $('<b/>').appendTo(this.element.children('.button-outer').children('span'));
     }
 }
 
@@ -85,9 +86,10 @@ export interface ToolbarOptions {
 }
 
 @Decorators.registerClass('Serenity.Toolbar')
-export class Toolbar extends Widget<ToolbarOptions> {
-    constructor(div: JQuery, options: ToolbarOptions) {
-        super(div, options);
+@Decorators.element("<div/>")
+export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.element.addClass('s-Toolbar clearfix')
             .html('<div class="tool-buttons"><div class="buttons-outer">' +
@@ -115,7 +117,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
 
     protected createButtons() {
         var container: JQuery = $('div.buttons-inner', this.element).last();
-        var buttons = this.options.buttons;
+        var buttons = this.options.buttons || [];
         var currentCount = 0;
         for (var i = 0; i < buttons.length; i++) {
             var button = buttons[i];
@@ -146,7 +148,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
             btn.addClass(cssClass);
         }
 
-        if (!isEmptyOrNull(b.hint)) {
+        if (b.hint) {
             btn.attr('title', b.hint);
         }
 
@@ -162,16 +164,9 @@ export class Toolbar extends Widget<ToolbarOptions> {
             text = htmlEncode(b.title);
         }
 
-        if (!isEmptyOrNull(b.icon)) {
+        if (b.icon) {
             btn.addClass('icon-tool-button');
-            var klass = b.icon;
-            if (startsWith(klass, 'fa-')) {
-                klass = 'fa ' + klass;
-            }
-            else if (startsWith(klass, 'glyphicon-')) {
-                klass = 'glyphicon ' + klass;
-            }
-            text = "<i class='" + htmlEncode(klass) + "'></i> " + text;
+            text = "<i class='" + htmlEncode(iconClassName(b.icon)) + "'></i> " + text;
         }
         if (text == null || text.length === 0) {
             btn.addClass('no-text');
@@ -196,11 +191,11 @@ export class Toolbar extends Widget<ToolbarOptions> {
             });
         }
 
-        if (!!(!isEmptyOrNull(b.hotkey) && window['Mousetrap' as any] != null)) {
+        if (b.hotkey && window['Mousetrap' as any] != null) {
             this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
                 b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
-            this.mouseTrap.bind(b.hotkey, function (e1: BaseJQueryEventObject, action: any) {
+            this.mouseTrap.bind(b.hotkey, function () {
                 if (btn.is(':visible')) {
                     btn.triggerHandler('click');
                 }
@@ -210,7 +205,7 @@ export class Toolbar extends Widget<ToolbarOptions> {
     }
 
     findButton(className: string): JQuery {
-        if (className != null && startsWith(className, '.')) {
+        if (className != null && className.startsWith('.')) {
             className = className.substr(1);
         }
         return $('div.tool-button.' + className, this.element);

@@ -1,7 +1,7 @@
-﻿import { Decorators } from "../../decorators";
-import { isEmptyOrNull, isValue, localText, trim } from "../../q";
+﻿import { localText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { PopupMenuButton } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
     name: string;
@@ -17,18 +17,19 @@ export interface QuickSearchInputOptions {
 }
 
 @Decorators.registerClass('Serenity.QuickSearchInput')
-export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
+export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
     private lastValue: string;
     private field: QuickSearchField;
     private fieldChanged: boolean;
     private timer: number;
 
-    constructor(input: JQuery, opt: QuickSearchInputOptions) {
-        super(input, opt);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
+        let input = this.element;
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
-        this.lastValue = trim(input.val() ?? '');
+        this.lastValue = ((input.val() ?? '') as string).trim();
 
         var self = this;
         this.element.bind('keyup.' + this.uniqueName, function () {
@@ -42,7 +43,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         $('<span><i></i></span>').addClass('quick-search-icon')
             .insertBefore(input);
 
-        if (isValue(this.options.fields) && this.options.fields.length > 0) {
+        if (this.options.fields?.length > 0) {
             var a = $('<a/>').addClass('quick-search-field').attr('title',
                 localText('Controls.QuickSearch.FieldSelection')).insertBefore(input);
 
@@ -63,10 +64,11 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
                     }));
             }
 
-            new PopupMenuButton(a, {
+            new PopupMenuButton({
                 positionMy: 'right top',
                 positionAt: 'right bottom',
-                menu: menu
+                menu: menu,
+                element: a[0]
             });
 
             this.field = this.options.fields[0];
@@ -77,7 +79,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
             if (!!this.timer) {
                 window.clearTimeout(this.timer);
             }
-            this.searchNow(trim(this.element.val() ?? ''));
+            this.searchNow((this.element.val() as string ?? '').trim());
         });
     }
 
@@ -87,7 +89,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         }
 
         var value = this.get_value();
-        if (value == this.lastValue && (!this.fieldChanged || isEmptyOrNull(value))) {
+        if (value == this.lastValue && (!this.fieldChanged || !value)) {
             this.fieldChanged = false;
             return;
         }
@@ -106,8 +108,8 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         this.lastValue = value;
     }
 
-    get_value() {
-        return trim(this.element.val() ?? '');
+    get_value(): string {
+        return (this.element.val() as string ?? '').trim();
     }
 
     get_field(): QuickSearchField {
@@ -136,7 +138,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
     public restoreState(value: string, field: QuickSearchField) {
         this.fieldChanged = false;
         this.field = field;
-        var value = trim(value ?? '');
+        var value = (value ?? '').trim();
         this.element.val(value);
         this.lastValue = value;
         if (!!this.timer) {
@@ -168,8 +170,7 @@ export class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         };
 
         if (this.options.onSearch != null) {
-            this.options.onSearch(((this.field != null &&
-                !isEmptyOrNull(this.field.name)) ? this.field.name : null), value, done);
+            this.options.onSearch(this.field?.name, value, done);
         }
         else {
             done(true);

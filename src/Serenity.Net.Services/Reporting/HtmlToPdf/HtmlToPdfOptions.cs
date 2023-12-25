@@ -10,10 +10,10 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     /// </summary>
     public HtmlToPdfOptions()
     {
-        AdditionalUrls = new List<string>();
-        Cookies = new Dictionary<string, string>();
-        CustomArgs = new List<string>();
-        FooterHeaderReplace = new Dictionary<string, string>();
+        AdditionalUrls = [];
+        Cookies = [];
+        CustomArgs = [];
+        FooterHeaderReplace = [];
         TimeoutSeconds = 300;
         UsePrintMediaType = true;
         PrintBackground = true;
@@ -96,7 +96,7 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public bool DisableLocalFileAccess { get; set; } = true;
 
     /// <inheritdoc/>
-    public List<string> AllowedLocalPaths { get; private set; } = new();
+    public List<string> AllowedLocalPaths { get; private set; } = [];
 
     /// <inheritdoc/>
     public List<string> CustomArgs { get; private set; }

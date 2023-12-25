@@ -3,18 +3,13 @@
 /// <summary>
 /// Parameter struct
 /// </summary>
-public struct Parameter
+/// <remarks>
+/// Initializes a new instance of the <see cref="Parameter"/> struct.
+/// </remarks>
+/// <param name="name">The name.</param>
+public readonly struct Parameter(string name)
 {
-    private readonly string name;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Parameter"/> struct.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    public Parameter(string name)
-    {
-        this.name = name;
-    }
+    private readonly string name = name;
 
     /// <summary>
     /// Gets the name.
@@ -22,5 +17,5 @@ public struct Parameter
     /// <value>
     /// The name.
     /// </value>
-    public string Name => name;
+    public readonly string Name => name;
 }

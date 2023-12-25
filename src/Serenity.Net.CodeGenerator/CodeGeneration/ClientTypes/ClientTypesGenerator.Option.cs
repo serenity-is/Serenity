@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -31,13 +31,12 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         return typeName;
     }
 
-    private void GenerateOptionMembers(ExternalType type,
-        HashSet<string> skip, bool isWidget)
+    private void GenerateOptionMembers(ExternalType type, HashSet<string> skip)
     {
         bool preserveMemberCase = type.Attributes != null && type.Attributes.Any(x =>
             x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
-        var options = GetOptionMembers(type, isWidget);
+        var options = GetOptionMembers(type);
 
         foreach (var option in options.Values)
         {
@@ -98,7 +97,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     private static void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
         ExternalType type, bool isOptions)
     {
-        List<ExternalMember> members = new();
+        List<ExternalMember> members = [];
 
         if (type.Fields != null)
             members.AddRange(type.Fields);
@@ -134,26 +133,101 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         }
     }
 
-    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type,
-        bool isWidget)
+    private static readonly HashSet<string> PossibleNodeArguments = [
+        "jQueryApi.jQueryObject",
+        "JQuery",
+        "HTMLElement",
+        "JQuery | HTMLElement",
+        "WidgetNode",
+        "jQueryLike",
+        "jQueryInstance"
+    ];
+
+
+    private ExternalType GetOptionsTypeFor(ExternalType type)
     {
-        var result = new SortedDictionary<string, ExternalMember>();
+        if (type is null)
+            return null;
+        var constructors = type.Methods?.Where(x => x.IsConstructor == true) ?? [];
+        var argument = constructors.Where(x => x.Arguments != null)
+            .SelectMany(x => x.Arguments.Where(x => !PossibleNodeArguments.Contains(x.Type)))
+            .FirstOrDefault();
 
-        var constructor = type.Methods?.FirstOrDefault(x => x.IsConstructor == true && 
-            x.Arguments?.Count == (isWidget ? 2 : 1));
-
-        if (constructor != null)
+        ExternalType optionsType = null;
+        if (argument != null)
         {
-            if (!isWidget ||
-                (constructor.Arguments[0].Type == "jQueryApi.jQueryObject" ||
-                 constructor.Arguments[0].Type == "JQuery"))
+            optionsType = GetScriptTypeFrom(type, argument.Type);
+            if (!string.IsNullOrEmpty(argument.GenericArguments) &&
+                (argument.Type == "@serenity-is/corelib:WidgetProps" ||
+                 argument.Type == "Serenity.WidgetProps" ||
+                 argument.Type == "@serenity-is/corelib:EditorProps" ||
+                 argument.Type == "Serenity.EditorProps" ||
+                 (optionsType == null && 
+                  (argument.Type == "WidgetProps" || 
+                   argument.Type == "EditorProps"))))
             {
-                var optionsType = GetScriptTypeFrom(type, constructor.Arguments[isWidget ? 1 : 0].Type);
-                if (optionsType != null)
-                    AddOptionMembers(result, optionsType, isOptions: true);
+                var genericParam = type.GenericParameters?.FirstOrDefault(x => x.Name == argument.GenericArguments);
+                if (genericParam != null)
+                {
+                    if (!string.IsNullOrEmpty(genericParam.Default))
+                        optionsType = GetScriptTypeFrom(type, genericParam.Default);
+                    if (optionsType != null)
+                        return optionsType;
+                    return !string.IsNullOrEmpty(genericParam.Extends) ?
+                        GetScriptTypeFrom(type, genericParam.Extends) : null;
+                }
+                else
+                {
+                    optionsType = GetScriptTypeFrom(optionsType ?? type, argument.GenericArguments) ??
+                        GetScriptTypeFrom(type, argument.GenericArguments) ??
+                        optionsType;
+                }
             }
+
+            return optionsType;
         }
 
+        if (!constructors.Any())
+        {
+            var genericParams = type.GenericParameters?.Where(x => !string.IsNullOrEmpty(x.Default) ||
+                !string.IsNullOrEmpty(x.Extends))?.ToArray();
+            if (genericParams != null && genericParams.Length > 0)
+            {
+                ExternalGenericParameter genericParam = null;
+                foreach (var candidate in PropsParamCandidates)
+                {
+                    if ((genericParam = genericParams.FirstOrDefault(x => x.Name == candidate)) != null)
+                        break;
+                }
+                genericParam ??= genericParams.FirstOrDefault(x => x.Name != "TItem");
+
+                if (genericParam != null)
+                {
+                    if (!string.IsNullOrEmpty(genericParam.Default))
+                        optionsType = GetScriptTypeFrom(type, genericParam.Default);
+                    if (optionsType != null)
+                        return optionsType;
+                    return !string.IsNullOrEmpty(genericParam.Extends) ?
+                        GetScriptTypeFrom(type, genericParam.Extends) : null;
+                }
+            }
+
+            if ((type = GetBaseType(type)) != null)
+                return GetOptionsTypeFor(type);
+        }
+
+        return null;
+    }
+
+    static readonly string[] PropsParamCandidates = ["P", "Props", "TProps", "TOptions", "TParams"];
+
+    private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
+    {
+        var result = new SortedDictionary<string, ExternalMember>();
+        var optionsType = GetOptionsTypeFor(type);
+        if (optionsType != null)
+            AddOptionMembers(result, optionsType, isOptions: true);
+        
         int loop = 0;
         do
         {

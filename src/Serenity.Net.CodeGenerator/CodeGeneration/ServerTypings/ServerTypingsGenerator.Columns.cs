@@ -109,7 +109,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             }
         });
 
-        if (module && referencedTypeAliases.Any())
+        if (module && referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
             sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");

@@ -1,10 +1,10 @@
 ﻿import { Decorators } from "../../decorators";
 import { IBooleanValue } from "../../interfaces";
-import { Widget } from "../widgets/widget";
+import { EditorWidget } from "../widgets/widget";
 
 @Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
 @Decorators.element('<input type="checkbox"/>')
-export class BooleanEditor extends Widget<any> {
+export class BooleanEditor<P = {}> extends EditorWidget<P> {
 
     public get value(): boolean {
         return this.element.is(":checked");

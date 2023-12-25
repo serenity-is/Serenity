@@ -1,16 +1,12 @@
-﻿using Stream = System.IO.Stream;
+using Stream = System.IO.Stream;
 using IOException = System.IO.IOException;
 using SearchOption = System.IO.SearchOption;
 
 namespace Serenity.Tests;
 
-public class MockFileSystem : System.IO.Abstractions.TestingHelpers.MockFileSystem, IFileSystem
+public class MockFileSystem(string currentDirectory = "") : 
+    System.IO.Abstractions.TestingHelpers.MockFileSystem(null, currentDirectory), IFileSystem
 {
-    public MockFileSystem(string currentDirectory = "")
-        : base(null, currentDirectory)
-    {
-    }
-
     /// <inheritdoc/>
     public void CreateDirectory(string path)
     {
@@ -116,5 +112,10 @@ public class MockFileSystem : System.IO.Abstractions.TestingHelpers.MockFileSyst
         }
 
         File.WriteAllText(path, content);
+    }
+
+    public DateTime GetLastWriteTimeUtc(string path)
+    {
+        return File.GetLastWriteTimeUtc(path);
     }
 }

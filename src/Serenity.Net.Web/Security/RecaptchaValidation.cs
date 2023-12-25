@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -35,10 +35,10 @@ public static class RecaptchaValidation
         webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString(CultureInfo.InvariantCulture);
 
         webRequest.Method = "POST";
-        using (var requestStream = Task.Run(() => webRequest.GetRequestStreamAsync()).Result)
+        using (var requestStream = Task.Run(webRequest.GetRequestStreamAsync).Result)
             requestStream.Write(postDataBuffer, 0, postDataBuffer.Length);
 
-        using var webResponse = Task.Run(() => webRequest.GetResponseAsync()).Result;
+        using var webResponse = Task.Run(webRequest.GetResponseAsync).Result;
         string responseJson;
         using (var sr = new StreamReader(webResponse.GetResponseStream()))
             responseJson = sr.ReadToEnd();
@@ -55,7 +55,8 @@ public static class RecaptchaValidation
     private class RecaptchaResponse
     {
         public bool Success { get; set; }
-        [JsonProperty("error-codes")]
+        [JsonPropertyName("error-codes")]
+        [Newtonsoft.Json.JsonProperty("error-codes")]
         public string[] ErrorCodes { get; set; }
     }
 }

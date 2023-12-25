@@ -1,15 +1,16 @@
 ﻿import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { Widget } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
 @Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
 @Decorators.element("<input type=\"text\"/>")
-export class MaskedEditor extends Widget<MaskedEditorOptions> {
+export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
-    constructor(input: JQuery, opt?: MaskedEditorOptions) {
-        super(input, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
+        let input = this.element;
         (input as any).mask(this.options.mask || '', {
             placeholder: (this.options.placeholder ?? '_')
         });
@@ -17,7 +18,7 @@ export class MaskedEditor extends Widget<MaskedEditorOptions> {
 
     public get value(): string {
         this.element.triggerHandler("blur.mask");
-        return this.element.val();
+        return this.element.val() as string;
     }
 
     protected get_value(): string {

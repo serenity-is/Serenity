@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
@@ -33,13 +33,12 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
             GenerateOptionMembers(type, 
                 skip: isLookupEditor ? lookupEditorBaseOptions : 
-                    (isServiceLookupEditor ? serviceLookupEditorBaseOptions : null),
-                isWidget: true);
+                    (isServiceLookupEditor ? serviceLookupEditorBaseOptions : null));
         });
     }
 
-    static readonly string[] EditorAttributeNames = new[]
-    {
+    static readonly string[] EditorAttributeNames =
+    [
         "Serenity.EditorAttribute",
         "@serenity-is/corelib:EditorAttribute",
         "Serenity.ElementAttribute",
@@ -51,10 +50,10 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         "Serenity.Decorators.element",
         "@serenity-is/corelib:Decorators.element",
         "Decorators.element"
-    };
+    ];
 
-    public static readonly string[] EditorBaseClasses = new[]
-    {
+    public static readonly string[] EditorBaseClasses =
+    [
         "Serenity.Extensions.GridEditorBase",
         "GridEditorBase",
         "@serenity-is/extensions:GridEditorBase",
@@ -67,7 +66,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         "@serenity-is/corelib:ServiceLookupEditor",
         "ServiceLookupEditorBase",
         "@serenity-is/corelib:ServiceLookupEditorBase",
-    };
+    ];
 
     //static readonly string[] widgetBaseClasses = new[]
     //{
@@ -82,7 +81,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         if (type.IsAbstract == true)
             return false;
 
-        if (type.GenericParameters?.Count > 0)
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
             return false;
 
         if (HasBaseType(type, EditorBaseClasses))

@@ -5,19 +5,14 @@ namespace Serenity.Services;
 /// <summary>
 /// Default implementation for IUserClaimCreator
 /// </summary>
-public class DefaultUserClaimCreator : IUserClaimCreator
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="userRetrieveService"></param>
+/// <exception cref="ArgumentNullException"></exception>
+public class DefaultUserClaimCreator(IUserRetrieveService userRetrieveService) : IUserClaimCreator
 {
-    private readonly IUserRetrieveService userRetrieveService;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="userRetrieveService"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public DefaultUserClaimCreator(IUserRetrieveService userRetrieveService)
-    {
-        this.userRetrieveService = userRetrieveService ?? throw new ArgumentNullException(nameof(userRetrieveService));
-    }
+    private readonly IUserRetrieveService userRetrieveService = userRetrieveService ?? throw new ArgumentNullException(nameof(userRetrieveService));
 
     /// <summary>
     /// Add User Claims To Identity

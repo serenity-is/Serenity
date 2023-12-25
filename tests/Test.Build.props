@@ -1,0 +1,59 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ReferenceSelenium>false</ReferenceSelenium>
+    <ReferenceTestSdk>true</ReferenceTestSdk>
+    <UsingSerenity>true</UsingSerenity>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.6.1" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Data" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.RegularExpressions" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsingSerenity)' != 'false'">
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Serenity" />
+    <Using Include="Serenity.Abstractions" />
+    <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.Data" />
+    <Using Include="Serenity.Data.Mapping" Condition="'$(ProjectName)' != 'Serenity.Net.Core.Tests'" />
+    <Using Include="Serenity.Extensions.DependencyInjection" />
+    <Using Include="Serenity.Services" />
+    <Using Include="Serenity.Web" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(ReferenceTestSdk)' != 'false'">
+    <None Remove="testsettings*.json;testsettings.machine.json" />
+    <Content Include="testsettings.machine.json" Condition="Exists('testsettings.machine.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="19.2.69" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
+    <PackageReference Include="Selenium.WebDriver" Version="4.15.0" />
+    <PackageReference Include="WebDriverManager" Version="2.17.1" />
+    <Using Include="OpenQA.Selenium" />
+  </ItemGroup>
+</Project>

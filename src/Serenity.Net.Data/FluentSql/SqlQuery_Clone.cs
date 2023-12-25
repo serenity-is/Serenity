@@ -44,7 +44,7 @@ public partial class SqlQuery
 
         if (orderBy != null)
         {
-            clone.orderBy = new List<string>();
+            clone.orderBy = [];
             clone.orderBy.AddRange(orderBy);
         }
 

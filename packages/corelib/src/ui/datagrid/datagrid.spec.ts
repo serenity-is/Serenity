@@ -1,7 +1,7 @@
 ﻿import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { DataGrid } from "./datagrid";
-import $ from "@optionaldeps/jquery";
-import { addAttribute } from "../../q/system";
+import sQuery from "@optionaldeps/squery";
+import { addAttribute } from "../../q/system-compat";
 
 function getIdProperty(grid: DataGrid<any, any>): string {
     return grid["getIdProperty"]();
@@ -12,7 +12,7 @@ describe('DataGrid.getIdProperty', () => {
         class DefaultGrid extends DataGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid(sQuery('<div/>'));
         expect(getIdProperty(grid)).toBe("ID");
     });
 
@@ -21,7 +21,7 @@ describe('DataGrid.getIdProperty', () => {
             getIdProperty() { return "subClassId" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid(sQuery('<div/>'));
         expect(getIdProperty(grid)).toBe("subClassId");
     });
 
@@ -30,7 +30,7 @@ describe('DataGrid.getIdProperty', () => {
         }
         addAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid(sQuery('<div/>'));
         expect(getIdProperty(grid)).toBe("attrId");
     });
 
@@ -43,7 +43,7 @@ describe('DataGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getIdProperty(grid)).toBe("idForTestRow");
     });
 
@@ -56,7 +56,7 @@ describe('DataGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getIdProperty(grid)).toBe("");
     });
 });
@@ -70,7 +70,7 @@ describe('DataGrid.getIsActiveProperty', () => {
         class DefaultGrid extends DataGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid(sQuery('<div/>'));
         expect(getIsActiveProperty(grid)).toBe("");
     });
 
@@ -79,7 +79,7 @@ describe('DataGrid.getIsActiveProperty', () => {
             getIsActiveProperty() { return "subClassIsActive" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid(sQuery('<div/>'));
         expect(getIsActiveProperty(grid)).toBe("subClassIsActive");
     });
 
@@ -88,7 +88,7 @@ describe('DataGrid.getIsActiveProperty', () => {
         }
         addAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid(sQuery('<div/>'));
         expect(getIsActiveProperty(grid)).toBe("attrIsActive");
     });
 
@@ -101,7 +101,7 @@ describe('DataGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getIsActiveProperty(grid)).toBe("activeForTestRow");
     });
 
@@ -114,7 +114,7 @@ describe('DataGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getIsActiveProperty(grid)).toBe("");
     });
 });
@@ -128,7 +128,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
         class DefaultGrid extends DataGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("");
     });
 
@@ -137,7 +137,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
             getLocalTextDbPrefix() { return "My.Prefix." };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("My.Prefix.");
     });
 
@@ -146,7 +146,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
             getLocalTextPrefix() { return "MySubClassPrefix" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MySubClassPrefix.");
     });
 
@@ -155,7 +155,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
         }
         addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
     });
 
@@ -168,7 +168,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("Db.prefixForTestRow.");
     });
 
@@ -181,7 +181,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getLocalTextDbPrefix(grid)).toBe("");
     });
 });
@@ -195,7 +195,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
         class DefaultGrid extends DataGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid(sQuery('<div/>'));
         expect(getLocalTextPrefix(grid)).toBeUndefined();
     });
 
@@ -204,7 +204,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
             getLocalTextPrefix() { return "subClassPrefix" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid(sQuery('<div/>'));
         expect(getLocalTextPrefix(grid)).toBe("subClassPrefix");
     });
 
@@ -213,7 +213,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
         }
         addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid(sQuery('<div/>'));
         expect(getLocalTextPrefix(grid)).toBe("attrPrefix");
     });
 
@@ -226,7 +226,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getLocalTextPrefix(grid)).toBe("prefixForTestRow");
     });
 
@@ -239,7 +239,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid(sQuery('<div/>'));
         expect(getLocalTextPrefix(grid)).toBeUndefined();
     });
 });

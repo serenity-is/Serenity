@@ -7,18 +7,13 @@ namespace Serenity.ComponentModel;
 /// derives from.
 /// </summary>
 /// <seealso cref="EditorTypeAttribute" />
-public abstract class CustomEditorAttribute : EditorTypeAttribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="CustomEditorAttribute"/> class.
+/// </remarks>
+/// <param name="editorType">Type of the editor.</param>
+public abstract class CustomEditorAttribute(string editorType) : EditorTypeAttribute(editorType)
 {
     private Dictionary<string, object?>? options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomEditorAttribute"/> class.
-    /// </summary>
-    /// <param name="editorType">Type of the editor.</param>
-    public CustomEditorAttribute(string editorType)
-        : base(editorType)
-    {
-    }
 
     /// <summary>
     /// Sets the parameters for each pair in the editorParams dictionary.

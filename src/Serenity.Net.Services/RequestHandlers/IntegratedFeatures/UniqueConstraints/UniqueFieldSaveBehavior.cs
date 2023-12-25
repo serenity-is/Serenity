@@ -1,25 +1,20 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields
 /// </summary>
-public class UniqueFieldSaveBehavior : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="localizer">Text localizer</param>
+public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field Target { get; set; }
 
-    private readonly ITextLocalizer localizer;
+    private readonly ITextLocalizer localizer = localizer;
 
     private UniqueAttribute attr;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="localizer">Text localizer</param>
-    public UniqueFieldSaveBehavior(ITextLocalizer localizer)
-    {
-        this.localizer = localizer;
-    }
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -41,6 +36,10 @@ public class UniqueFieldSaveBehavior : BaseSaveBehavior, IImplicitBehavior, IFie
     /// <inheritdoc/>
     public override void OnBeforeSave(ISaveRequestHandler handler)
     {
+        if (attr?.IgnoreNulls == true &&
+            Target.IsNull(handler.Row))
+            return;
+
         ValidateUniqueConstraint(handler, new Field[] { Target }, localizer,
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);

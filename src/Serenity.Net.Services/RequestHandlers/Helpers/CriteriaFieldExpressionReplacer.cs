@@ -6,31 +6,24 @@ namespace Serenity.Data;
 /// Converts field names in a criteria to their 
 /// corresponding SQL field expressions.
 /// </summary>
-public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="row">The row instance</param>
+/// <param name="permissions">Permission service</param>
+/// <param name="lookupAccessMode">Use lookup access mode.
+/// In the lookup access mode only the lookup fields can be
+/// used in the filter. Default is false.</param>
+/// <exception cref="ArgumentNullException">row or permissions is null</exception>
+public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions, bool lookupAccessMode = false) : SafeCriteriaValidator
 {
-    private readonly IPermissionService permissions;
-    private readonly bool lookupAccessMode;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="row">The row instance</param>
-    /// <param name="permissions">Permission service</param>
-    /// <param name="lookupAccessMode">Use lookup access mode.
-    /// In the lookup access mode only the lookup fields can be
-    /// used in the filter. Default is false.</param>
-    /// <exception cref="ArgumentNullException">row or permissions is null</exception>
-    public CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions, bool lookupAccessMode = false)
-    {
-        Row = row ?? throw new ArgumentNullException(nameof(row));
-        this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
-        this.lookupAccessMode = lookupAccessMode;
-    }
+    private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+    private readonly bool lookupAccessMode = lookupAccessMode;
 
     /// <summary>
     /// The row instance
     /// </summary>
-    protected IRow Row { get; private set; }
+    protected IRow Row { get; private set; } = row ?? throw new ArgumentNullException(nameof(row));
 
     /// <summary>
     /// Visits the criteria for conversion and returns
@@ -86,13 +79,8 @@ public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
 
         if (criteria is not null)
         {
-            var field = FindField(criteria.Expression);
-            if (field is null)
-            {
-                throw new ValidationError("InvalidCriteriaField", criteria.Expression,
+            var field = FindField(criteria.Expression) ?? throw new ValidationError("InvalidCriteriaField", criteria.Expression,
                     string.Format("'{0}' criteria field is not found!", criteria.Expression));
-            }
-
             if (!CanFilterField(field))
             {
                 throw new ValidationError("CantFilterField", criteria.Expression,

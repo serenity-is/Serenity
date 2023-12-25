@@ -9,9 +9,9 @@ public static partial class WebTexts
         public static readonly LocalText DateInvalid = "Please enter a valid date.";
         public static readonly LocalText Decimal = "Please enter a valid decimal value.";
         public static readonly LocalText Digits = "Please only use digits 0-9.";
-        public static readonly LocalText Email = "Please enter a valid e-mail address.";
-        public static readonly LocalText EmailMultiple = "Please enter a valid e-mail address (if more than one, use ';' as separator)";
-        public static readonly LocalText EmailExists = "There is another user registered with this e-mail address. If you don't remember your password, use the forgot my password form.";
+        public static readonly LocalText Email = "Please enter a valid email address.";
+        public static readonly LocalText EmailMultiple = "Please enter a valid email address (if more than one, use ';' as separator)";
+        public static readonly LocalText EmailExists = "There is another user registered with this email address. If you don't remember your password, use the forgot my password form.";
         public static readonly LocalText HourAndMin = "Please enter a valid time (e.g. 15:30)";
         public static readonly LocalText IncorrectPassword = "Incorrect password. Please check.";
         public static readonly LocalText Integer = "Please enter a valid integer value.";

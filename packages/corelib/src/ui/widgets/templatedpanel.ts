@@ -1,13 +1,14 @@
-﻿import { validateOptions } from "../../q";
-import { Decorators } from "../../decorators";
+﻿import { Decorators } from "../../decorators";
+import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
+import { WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
-export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
-    constructor(container: JQuery, options?: TOptions) {
-        super(container, options);
-
+export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
+        
         this.initValidator();
         this.initTabs();
         this.initToolbar();
@@ -62,11 +63,9 @@ export class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
 
     protected initToolbar(): void {
         var toolbarDiv = this.byId('Toolbar');
-        if (toolbarDiv.length === 0) {
+        if (!toolbarDiv.length)
             return;
-        }
-        var opt = { buttons: this.getToolbarButtons() };
-        this.toolbar = new Toolbar(toolbarDiv, opt);
+        this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv });
     }
 
     protected initValidator(): void {

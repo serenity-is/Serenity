@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Sql Dialect mapper
@@ -6,7 +6,7 @@
 public class DefaultSqlDialectMapper : ISqlDialectMapper
 {
     private static Dictionary<string, ISqlDialect> DialectByProviderName =>
-       new Dictionary<string, ISqlDialect>(StringComparer.OrdinalIgnoreCase)
+       new(StringComparer.OrdinalIgnoreCase)
        {
             { "System.Data.SqlClient", SqlServer2012Dialect.Instance },
             { "Microsoft.Data.SqlClient", SqlServer2012Dialect.Instance },

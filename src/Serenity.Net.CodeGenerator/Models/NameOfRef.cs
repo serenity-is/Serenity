@@ -1,15 +1,9 @@
 namespace Serenity.CodeGenerator;
 
-public class NameOfRef
+public class NameOfRef(string typeName, string propertyName)
 {
-    public string PropertyName { get; }
-    public string TypeName { get; }
-
-    public NameOfRef(string typeName, string propertyName)
-    {
-        TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
-        PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
-    }
+    public string PropertyName { get; } = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+    public string TypeName { get; } = typeName ?? throw new ArgumentNullException(nameof(typeName));
 
     public string ToString(CodeWriter cw)
     {

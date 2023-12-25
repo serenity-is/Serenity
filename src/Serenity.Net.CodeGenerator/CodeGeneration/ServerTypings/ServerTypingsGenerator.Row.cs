@@ -23,6 +23,13 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         });
     }
 
+    private static readonly string[] nameRowInterface = ["Serenity.Data.INameRow"];
+    private static readonly string[] idRowInterface = ["Serenity.Data.IIdRow"];
+    private static readonly string[] isActiveDeletedRowInterfaces = [
+        "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow"
+    ];
+    private static readonly string[] isDeletedRowInterfaces = ["Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow"];
+
     private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
     {
         foreach (var property in EnumerateFieldProperties(rowType))
@@ -69,7 +76,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #else
                 rowType.HasGenericParameters)
             {
-                var gp = rowType.GenericParameters.FirstOrDefault(x => 
+                var gp = rowType.GenericParameters.FirstOrDefault(x =>
                     x.HasConstraints &&
                     x.Constraints.Any(c => TypingsUtils.IsSubclassOf(c.ConstraintType, "Serenity.Data", "RowFieldsBase")));
                 if (gp != null)
@@ -95,7 +102,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 }
             }
         }
-        while ((rowType = (rowType.BaseType?.Resolve())) != null && 
+        while ((rowType = (rowType.BaseType?.Resolve())) != null &&
             rowType.FullNameOf() != "Serenity.Data.Row" &&
             rowType.FullNameOf() != "Serenity.Data.Row`1");
     }
@@ -104,8 +111,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         do
         {
-            foreach (var property in rowType.PropertiesOf().Where(x =>
-                TypingsUtils.IsPublicInstanceProperty(x)))
+            foreach (var property in rowType.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty))
                 yield return property;
         }
         while ((rowType = (rowType.BaseType?.Resolve())) != null &&
@@ -113,7 +119,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 not "Serenity.Data.Row`1");
     }
 
-    private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
+    private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes,
         string propertyType, string propertyName, string getMethodFullName)
     {
         do
@@ -152,7 +158,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                             if (memberAccess.Expression is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameLeft)
                                 continue;
 
-                            if (idNameLeft.Identifier.Text != "fields")
+                            if (idNameLeft.Identifier.Text != "fields" &&
+                                idNameLeft.Identifier.Text != "Fields")
                                 continue;
 
                             if (memberAccess.Name is not Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax idNameRight)
@@ -178,7 +185,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
             }
         }
-        while ((rowType = (rowType.BaseType?.Resolve())) != null && 
+        while ((rowType = (rowType.BaseType?.Resolve())) != null &&
             rowType.FullNameOf() != "Serenity.Data.Row" &&
             rowType.FullNameOf() != "Serenity.Data.Row`1");
 
@@ -196,7 +203,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         if (ns.EndsWith(".Entities", StringComparison.Ordinal))
             ns = ns[0..^9];
 
-        var idx = ns.IndexOf(".", StringComparison.Ordinal);
+        var idx = ns.IndexOf('.');
         if (idx >= 0)
             ns = ns[(idx + 1)..];
 
@@ -210,7 +217,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             name = name[0..^3];
 
         var moduleIdentifier = DetermineModuleIdentifier(rowType);
-        return string.IsNullOrEmpty(moduleIdentifier) ? name : 
+        return string.IsNullOrEmpty(moduleIdentifier) ? name :
             moduleIdentifier + "." + name;
     }
 
@@ -295,7 +302,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             .Select(x => x.Value as string));
 
 #else
-        return string.Join(":", permissionAttr.ConstructorArguments.Where(x => (x.Value as string) != null || 
+        return string.Join(":", permissionAttr.ConstructorArguments.Where(x => (x.Value as string) != null ||
             (x.Value is Mono.Cecil.CustomAttributeArgument))
             .Select(x => (x.Value as string) ?? (((Mono.Cecil.CustomAttributeArgument)x.Value).Value.ToString())));
 #endif
@@ -325,7 +332,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             else if (module.EndsWith(".Lookups", StringComparison.Ordinal))
                 module = module[0..^8];
 
-            var idx = module.IndexOf(".", StringComparison.Ordinal);
+            var idx = module.IndexOf('.');
             if (idx >= 0)
                 module = module[(idx + 1)..];
         }
@@ -342,7 +349,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     public string DetermineLookupKey(TypeDefinition rowType)
     {
-        var lookupAttr = TypingsUtils.GetAttr(rowType, 
+        var lookupAttr = TypingsUtils.GetAttr(rowType,
             "Serenity.ComponentModel", "LookupScriptAttribute");
 
         TypeDefinition autoFrom = rowType;
@@ -371,7 +378,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             lookupAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
         {
             autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve();
-            lookupAttr = TypingsUtils.GetAttr(autoFrom, 
+            lookupAttr = TypingsUtils.GetAttr(autoFrom,
                 "Serenity.ComponentModel", "LookupScriptAttribute");
         }
 
@@ -420,7 +427,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         var metadata = new RowMetadata
         {
-            IdProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" },
+            IdProperty = ExtractInterfacePropertyFromRow(rowType, idRowInterface,
                 "Serenity.Data.IIdField", "IdField",
                 "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()")
         };
@@ -450,7 +457,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             }
         }
 
-        metadata.NameProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.INameRow" },
+        metadata.NameProperty = ExtractInterfacePropertyFromRow(rowType, nameRowInterface,
                 "Serenity.Data.StringField", "NameField",
                 "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
 
@@ -459,12 +466,12 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
 
         metadata.IsActiveProperty = ExtractInterfacePropertyFromRow(rowType,
-            new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },
+            isActiveDeletedRowInterfaces,
             "Serenity.Data.Int16Field", "IsActiveField",
             "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
 
         metadata.IsDeletedProperty = ExtractInterfacePropertyFromRow(rowType,
-            new[] { "Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow" },
+            isDeletedRowInterfaces,
             "Serenity.Data.BooleanField", "IsDeletedField",
             "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
 
@@ -476,14 +483,14 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         metadata.UpdatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
         metadata.LocalTextPrefix = DetermineLocalTextPrefix(rowType);
 
-        AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(metadata.LocalTextPrefix) ? "" : 
+        AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(metadata.LocalTextPrefix) ? "" :
             (metadata.LocalTextPrefix + ".")));
 
         return metadata;
     }
 
     protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata meta, bool module)
-    { 
+    {
         sb.AppendLine();
         cw.Indented($"export {(module ? "abstract class " : "namespace ")}");
         sb.Append(rowType.Name);

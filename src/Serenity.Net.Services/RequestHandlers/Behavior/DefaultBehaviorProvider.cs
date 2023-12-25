@@ -5,26 +5,19 @@ namespace Serenity.Services;
 /// <summary>
 /// Default implementation for <see cref="IBehaviorProvider"/>
 /// </summary>
-public class DefaultBehaviorProvider : IBehaviorProvider
+/// <remarks>
+/// Creates an instance of the class.
+/// </remarks>
+/// <param name="implicitBehaviors">Registry for implict behaviors.</param>
+/// <param name="behaviorFactory">Behavior factory</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
+    IBehaviorFactory behaviorFactory) : IBehaviorProvider
 {
-    private readonly IImplicitBehaviorRegistry implicitBehaviors;
-    private readonly IBehaviorFactory behaviorFactory;
-
-    /// <summary>
-    /// Creates an instance of the class.
-    /// </summary>
-    /// <param name="implicitBehaviors">Registry for implict behaviors.</param>
-    /// <param name="behaviorFactory">Behavior factory</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
-        IBehaviorFactory behaviorFactory)
-    {
-        this.implicitBehaviors = implicitBehaviors ??
+    private readonly IImplicitBehaviorRegistry implicitBehaviors = implicitBehaviors ??
             throw new ArgumentNullException(nameof(implicitBehaviors));
-
-        this.behaviorFactory = behaviorFactory ??
+    private readonly IBehaviorFactory behaviorFactory = behaviorFactory ??
             throw new ArgumentNullException(nameof(behaviorFactory));
-    }
 
     /// <inheritdoc/>
     public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)

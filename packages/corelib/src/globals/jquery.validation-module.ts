@@ -1,4 +1,4 @@
 ﻿/// <reference types="jquery.validation" />
-import $ from "@optionaldeps/jquery"
+import jQuery from "@optionaldeps/jquery"
 
-export default $?.validator;
+export default jQuery?.validator;

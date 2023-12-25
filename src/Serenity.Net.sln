@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30711.63
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core", "Serenity.Net.Core\Serenity.Net.Core.csproj", "{6F13B7F5-3F1E-4A7F-962D-59EBD3118E83}"
 EndProject
@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web", "Serenit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator", "Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj", "{7B2CED35-AD39-42D5-AF64-5AC73D11EEF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Scripts", "Serenity.Scripts\Serenity.Scripts.csproj", "{2ACB06BE-7058-4E19-A0B1-0171D15870E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Corelib", "..\packages\corelib\Serenity.Corelib.csproj", "{2ACB06BE-7058-4E19-A0B1-0171D15870E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core.Tests", "..\tests\Serenity.Net.Core.Tests\Serenity.Net.Core.Tests.csproj", "{1EE57748-665F-4CFA-83DA-21F09BCBED7B}"
 EndProject
@@ -30,6 +30,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web.Tests", "..\tests\Serenity.Net.Web.Tests\Serenity.Net.Web.Tests.csproj", "{D1554BF1-54A7-4196-92DB-0BF9A1BD1248}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator.Tests", "..\tests\Serenity.Net.CodeGenerator.Tests\Serenity.Net.CodeGenerator.Tests.csproj", "{444D2958-2275-4338-A0B6-382E0451AA97}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.SleekGrid", "..\packages\sleekgrid\Serenity.SleekGrid.csproj", "{6FAF5ED7-017D-46CD-B351-2F9640C08655}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +145,14 @@ Global
 		{444D2958-2275-4338-A0B6-382E0451AA97}.Release|Any CPU.Build.0 = Release|Any CPU
 		{444D2958-2275-4338-A0B6-382E0451AA97}.Release|x86.ActiveCfg = Release|Any CPU
 		{444D2958-2275-4338-A0B6-382E0451AA97}.Release|x86.Build.0 = Release|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Debug|x86.Build.0 = Debug|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|x86.ActiveCfg = Release|Any CPU
+		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

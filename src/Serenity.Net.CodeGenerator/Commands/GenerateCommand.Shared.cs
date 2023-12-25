@@ -1,4 +1,3 @@
-using Spectre.Console;
 using System.Data.Common;
 
 namespace Serenity.CodeGenerator;
@@ -40,45 +39,6 @@ public partial class GenerateCommand
             confTable.Module = inputs.Module;
             confTable.PermissionKey = inputs.PermissionKey;
         }
-    }
-
-    private static EntityModel CreateEntityModel(EntityModelInputs inputs, 
-        IEntityModelGenerator modelGenerator,
-        string csproj,
-        IGeneratorFileSystem fileSystem,
-        ISqlConnections sqlConnections)
-    {
-        using var connection = sqlConnections.NewByKey(inputs.ConnectionKey);
-        connection.EnsureOpen();
-
-        var csprojContent = fileSystem.ReadAllText(csproj);
-        inputs.Net5Plus = !new Regex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>",
-            RegexOptions.Multiline | RegexOptions.Compiled).IsMatch(csprojContent);
-
-        inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
-            StringComparison.OrdinalIgnoreCase);
-
-        inputs.DataSchema = new EntityDataSchema(connection);
-        return modelGenerator.GenerateModel(inputs);
-    }
-
-    private static EntityCodeGenerator CreateCodeGenerator(EntityModelInputs inputs, 
-        IEntityModelGenerator modelGenerator,
-        string csproj, 
-        IGeneratorFileSystem fileSystem,
-        ISqlConnections sqlConnections, 
-        bool interactive = true)
-    {
-        var entityModel = CreateEntityModel(inputs, modelGenerator, csproj, fileSystem, sqlConnections);
-
-        var codeFileHelper = new CodeFileHelper(fileSystem)
-        {
-            NoUserInteraction = !interactive,
-            Kdiff3Path = new[] { inputs.Config.KDiff3Path }.FirstOrDefault(fileSystem.FileExists),
-            TSCPath = inputs.Config.TSCPath ?? "tsc"
-        };
-
-        return new EntityCodeGenerator(fileSystem, codeFileHelper, entityModel, inputs.Config, csproj);
     }
 
     private static void RegisterSqlProviders()
@@ -139,11 +99,11 @@ public partial class GenerateCommand
 
     private class AppSettingsFormat
     {
-        public ConnectionStringOptions Data { get; }
+        public ConnectionStringOptions Data { get; set; }
 
         public AppSettingsFormat()
         {
-            Data = new ConnectionStringOptions();
+            Data = [];
         }
 
         public class ConnectionInfo
@@ -153,39 +113,12 @@ public partial class GenerateCommand
         }
     }
 
-    private static string GetOption(string[] args, string opt)
-    {
-        var dash = "-" + opt;
-        var val = args.FirstOrDefault(x => x.StartsWith(dash + ":", StringComparison.Ordinal));
-        if (val != null)
-            return val[(dash.Length + 1)..];
-
-        var idx = Array.IndexOf(args, dash);
-        if (idx >= 0 && idx < args.Length - 1)
-        {
-            val = args[idx + 1];
-            if (val.StartsWith("\"", StringComparison.Ordinal) &&
-                val.EndsWith("\"", StringComparison.Ordinal))
-                return val[1..^1];
-            else
-                return val;
-        }
-
-        return null;
-    }
-
     private void Error(string error)
     {
-        ansiConsole.Write(new Markup($"[bold red]{error}[/]"));
-        ansiConsole.WriteLine();
+        Console.Error(error);
+        Console.WriteLine();
     }
 
-    private void WriteHeading(string text)
-    {
-        ansiConsole.WriteLine();
-        ansiConsole.Write(new Spectre.Console.Rule($"[bold springgreen3_1]{text}[/]")
-        {
-            Justification = Justify.Left
-        });
-    }
+    [GeneratedRegex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
+    private static partial Regex Net5PlusRegex();
 }

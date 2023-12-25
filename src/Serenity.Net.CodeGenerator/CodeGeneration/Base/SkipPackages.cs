@@ -2,8 +2,8 @@
 
 public static class SkipPackages
 {
-    private static readonly string[] NotReferencingSerenity = new[]
-    {
+    private static readonly string[] NotReferencingSerenity =
+    [
         "AspNetCore",
         "Azure",
         "AutoMapper",
@@ -27,7 +27,7 @@ public static class SkipPackages
         "System.",
         "X.PagedList",
         "Yaml"
-    };
+    ];
 
     public static bool ForRestore(string packageId)
     {
@@ -40,6 +40,7 @@ public static class SkipPackages
         return NotReferencingSerenity.Any(x => packageId.StartsWith(x, StringComparison.OrdinalIgnoreCase)) ||
             packageId.StartsWith("Serenity.Net.", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(packageId, "Serenity.Assets", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(packageId, "Serenity.Scripts");
+            string.Equals(packageId, "Serenity.Scripts") ||
+            string.Equals(packageId, "Serenity.Corelib");
     }
 }

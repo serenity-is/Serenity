@@ -3,37 +3,28 @@
 /// <summary>
 /// Default implementation for a <see cref="IRequestContext"/>
 /// </summary>
-public class DefaultRequestContext : IRequestContext
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="behaviors">Behavior provider</param>
+/// <param name="cache">Two level cache</param>
+/// <param name="localizer">Text localizer</param>
+/// <param name="permissions">Permissions</param>
+/// <param name="userAccessor">User access</param>
+/// <exception cref="ArgumentNullException">Any of the arguments is null</exception>
+public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache cache, ITextLocalizer localizer,
+    IPermissionService permissions, IUserAccessor userAccessor) : IRequestContext
 {
-    private readonly IUserAccessor userAccessor;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="behaviors">Behavior provider</param>
-    /// <param name="cache">Two level cache</param>
-    /// <param name="localizer">Text localizer</param>
-    /// <param name="permissions">Permissions</param>
-    /// <param name="userAccessor">User access</param>
-    /// <exception cref="ArgumentNullException">Any of the arguments is null</exception>
-    public DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache cache, ITextLocalizer localizer, 
-        IPermissionService permissions, IUserAccessor userAccessor)
-    {
-        Behaviors = behaviors ?? throw new ArgumentNullException(nameof(behaviors));
-        Cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        Localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
-        Permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
-        this.userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
-    }
+    private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
 
     /// <inheritdoc/>
-    public IBehaviorProvider Behaviors { get; private set; }
+    public IBehaviorProvider Behaviors { get; private set; } = behaviors ?? throw new ArgumentNullException(nameof(behaviors));
     /// <inheritdoc/>
-    public ITwoLevelCache Cache { get; private set; }
+    public ITwoLevelCache Cache { get; private set; } = cache ?? throw new ArgumentNullException(nameof(cache));
     /// <inheritdoc/>
-    public ITextLocalizer Localizer { get; private set; }
+    public ITextLocalizer Localizer { get; private set; } = localizer ?? throw new ArgumentNullException(nameof(localizer));
     /// <inheritdoc/>
-    public IPermissionService Permissions { get; private set; }
+    public IPermissionService Permissions { get; private set; } = permissions ?? throw new ArgumentNullException(nameof(permissions));
     /// <inheritdoc/>
     public ClaimsPrincipal User => userAccessor.User;
 }

@@ -1,5 +1,5 @@
+import { Config } from "@serenity-is/base";
 import { Widget } from "./widget";
-import { Config } from "../../q/config";
 
 test('Serenity Widget must return class name without root namespace', function() {
     var oldNamespaces = Config.rootNamespaces;

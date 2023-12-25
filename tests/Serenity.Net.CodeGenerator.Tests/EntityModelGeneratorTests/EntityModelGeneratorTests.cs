@@ -8,7 +8,7 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Throws_ArgumentNull_If_Inputs_Is_Null()
     {
-        Assert.Throws<ArgumentNullException>(() => new EntityModelGenerator().GenerateModel(inputs: null));
+        Assert.Throws<ArgumentNullException>(() => new EntityModelFactory().Create(inputs: null));
     }
 
     private string AttrName<TAttr>()
@@ -23,9 +23,9 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_Defaults()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
         var inputs = new CustomerEntityInputs();
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
         Assert.Equal(Customer, model.ClassName);
         Assert.Equal(TestConnection, model.ConnectionKey);
         Assert.Equal(TestModule, model.Module);
@@ -160,10 +160,10 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_DeclareJoinConstants_False_Configuration()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
         var inputs = new CustomerEntityInputs();
         inputs.Config.DeclareJoinConstants = false;
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
         Assert.False(model.DeclareJoinConstants);
         
         var joinAttr = model.Fields.FirstOrDefault(x => x.PropertyName == CityId)?
@@ -188,10 +188,10 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_DeclareJoinConstants_True_Configuration()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
         var inputs = new CustomerEntityInputs();
         inputs.Config.DeclareJoinConstants = true;
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
         Assert.True(model.DeclareJoinConstants);
 
         var joinAttr = model.Fields.FirstOrDefault(x => x.PropertyName == CityId)?
@@ -218,14 +218,14 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_ForeignFieldSelection_None_No_Include_No_Remove()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
 
         var inputs = new CustomerEntityInputs();
         inputs.Config.ForeignFieldSelection = GeneratorConfig.FieldSelection.None;
         inputs.Config.IncludeForeignFields = null;
         inputs.Config.RemoveForeignFields = null;
 
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
 
         Assert.Collection(model.Joins, x =>
         {
@@ -236,14 +236,14 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_ForeignFieldSelection_None_No_Include_Manual_Exclude()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
 
         var inputs = new CustomerEntityInputs();
         inputs.Config.ForeignFieldSelection = GeneratorConfig.FieldSelection.None;
         inputs.Config.IncludeForeignFields = null;
-        inputs.Config.RemoveForeignFields = new() { CountryId };
+        inputs.Config.RemoveForeignFields = [CountryId];
 
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
 
         Assert.Collection(model.Joins, x =>
         {
@@ -254,14 +254,14 @@ public partial class EntiyModelGeneratorTests
     [Fact]
     public void Customer_ForeignFieldSelection_None_Manual_Include()
     {
-        var generator = new EntityModelGenerator();
+        var generator = new EntityModelFactory();
 
         var inputs = new CustomerEntityInputs();
         inputs.Config.ForeignFieldSelection = GeneratorConfig.FieldSelection.None;
-        inputs.Config.IncludeForeignFields = new() { CountryId };
+        inputs.Config.IncludeForeignFields = [CountryId];
         inputs.Config.RemoveForeignFields = null;
 
-        var model = generator.GenerateModel(inputs);
+        var model = generator.Create(inputs);
 
         Assert.Collection(model.Joins, join =>
         {

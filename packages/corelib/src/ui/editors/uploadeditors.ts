@@ -1,9 +1,10 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { PropertyItem, localText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { endsWith, extend, isEmptyOrNull, isInstanceOfType, isTrimmedEmpty, PropertyItem, replaceAll, startsWith, localText, trimToNull } from "../../q";
-import { FileUploadConstraints, UploadedFile, UploadHelper, UploadInputOptions } from "../helpers/uploadhelper";
-import { Toolbar, ToolButton } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { extend, isTrimmedEmpty, replaceAll } from "../../q";
+import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
+import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { EditorProps, EditorWidget, WidgetProps } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
@@ -17,22 +18,24 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 
 @Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class FileUploadEditor extends Widget<FileUploadEditorOptions>
+export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
-    constructor(div: JQuery, opt: FileUploadEditorOptions) {
-        super(div, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
-        if (!opt || opt.allowNonImage == null)
+        if (!this.options || this.options.allowNonImage == null)
             this.options.allowNonImage = true;
 
+        let div = this.element;
         div.addClass('s-FileUploadEditor');
-        
-        if (isEmptyOrNull(this.options.originalNameProperty))
+
+        if (!this.options.originalNameProperty)
             div.addClass('hide-original-name');
 
-        this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
-            buttons: this.getToolButtons()
+        this.toolbar = new Toolbar({
+            buttons: this.getToolButtons(),
+            element: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -41,6 +44,8 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
 
         var uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
+        if (this.options.readOnly)
+            this.set_readOnly(true);
 
         this.fileSymbols = $('<ul/>').appendTo(this.element);
 
@@ -130,7 +135,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
                 this.options.urlPrefix);
         }
 
-        this.hiddenInput.val(trimToNull((this.get_value() || {}).Filename));
+        this.hiddenInput.val(((this.get_value() || {}).Filename)?.trim() || null);
     }
 
     protected updateInterface(): void {
@@ -142,7 +147,7 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     get_readOnly(): boolean {
-        return this.uploadInput.attr('disabled') != null;
+        return this.uploadInput?.attr('disabled') != null;
     }
 
     set_readOnly(value: boolean): void {
@@ -187,10 +192,9 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     set_value(value: UploadedFile): void {
-        var stringValue = value as string;
-        if (typeof stringValue === "string") {
-            var stringValue = trimToNull(stringValue);
-            if (value != null) {
+        if (typeof value === "string") {
+            var stringValue = (value as string).trim();
+            if (stringValue) {
                 var idx = stringValue.indexOf('/');
                 if (idx < 0)
                     idx = stringValue.indexOf('\\');
@@ -199,8 +203,10 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
                     OriginalName: stringValue.substring(idx + 1)
                 }
             }
+            else
+                value = null;
         }
-        else if (value != null && isTrimmedEmpty(value.Filename))
+        else if (!value?.Filename?.trim())
             value = null;
 
         if (value != null) {
@@ -229,14 +235,13 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
     }
 
     getEditValue(property: PropertyItem, target: any) {
-        target[property.name] = this.entity == null ? null :
-            trimToNull(this.entity.Filename);
+        target[property.name] = this.entity?.Filename?.trim() || null;
     }
 
     setEditValue(source: any, property: PropertyItem) {
         var value: UploadedFile = {};
         value.Filename = source[property.name];
-        if (isEmptyOrNull(this.options.originalNameProperty)) {
+        if (!this.options.originalNameProperty) {
 
             if (this.options.displayFileName) {
                 var s = (value.Filename ?? '');
@@ -265,20 +270,20 @@ export class FileUploadEditor extends Widget<FileUploadEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
-export class ImageUploadEditor extends FileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
+export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+    constructor(props: EditorProps<P>) {
+        super(props);
 
-        if (opt && opt.allowNonImage == null)
+        if (this.options.allowNonImage == null)
             this.options.allowNonImage = false;
 
-        div.addClass('s-ImageUploadEditor');
+        this.element.addClass('s-ImageUploadEditor');
     }
 }
 
 @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 @Decorators.element('<div/>')
-export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
+export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
     private entities: UploadedFile[];
@@ -288,14 +293,15 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
     protected progress: JQuery;
     protected hiddenInput: JQuery;
 
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
         this.entities = [];
+        let div = this.element;
         div.addClass('s-MultipleFileUploadEditor');
-        var self = this;
-        this.toolbar = new Toolbar($('<div/>').appendTo(this.element), {
-            buttons: this.getToolButtons()
+        this.toolbar = new Toolbar({
+            buttons: this.getToolButtons(),
+            element: el => this.element.append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -377,7 +383,7 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
                 });
         });
 
-        this.hiddenInput.val(trimToNull((this.get_value()[0] || {}).Filename));
+        this.hiddenInput.val(this.get_value()[0]?.Filename || null);
     }
 
     protected updateInterface(): void {
@@ -452,9 +458,9 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
 
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
-        if (isInstanceOfType(val, String)) {
-            var json = trimToNull(val) ?? '[]';
-            if (startsWith(json, '[') && endsWith(json, ']')) {
+        if (typeof val == "string") {
+            var json = val.trim();
+            if (json.startsWith('[') && json.endsWith(']')) {
                 this.set_value($.parseJSON(json));
             }
             else {
@@ -474,10 +480,9 @@ export class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions>
 }
 
 @Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
-export class MultipleImageUploadEditor extends MultipleFileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions) {
-        super(div, opt);
-
-        div.addClass('s-MultipleImageUploadEditor');
+export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+    constructor(props: EditorProps<P>) {
+        super(props);
+        this.element.addClass('s-MultipleImageUploadEditor');
     }
 }

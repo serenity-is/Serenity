@@ -1,0 +1,48 @@
+{
+  "name": "@serenity-is/base",
+  "version": "8.0.9",
+  "author": "Serenity (https://serenity.is)",
+  "bugs": "https://github.com/serenity-is/serenity/issues",
+  "description": "Serenity Base library with types and functions shared between corelib, ui, and others",
+  "dependencies": {
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tsconfig.json": "./tsconfig.json",
+    "./tsconfig.base.json": "./tsconfig.base.json"
+  },
+  "main": "dist/index.js",
+  "import": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*.css",
+    "dist/**/*.d.ts",
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "css/**/*.css",
+    "src/**/*.ts",
+    "src/**/*.css",
+    "tsconfig.base.json",
+    "tsconfig.json"
+  ],
+  "homepage": "https://github.com/serenity-is/serenity/#readme",
+  "keywords": [
+    "serenity",
+    "business",
+    "application",
+    "framework"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/serenity-is/serenity/packages/base",
+  "scripts": {
+    "build": "rollup -c && node build/build",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/base --json ./out/typedoc.json src",
+    "jest": "jest",
+    "tsc": "tsc",    
+    "test": "pnpm build && jest --coverage"
+  },
+  "type": "module"
+}

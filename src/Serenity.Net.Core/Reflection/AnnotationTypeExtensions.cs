@@ -23,14 +23,14 @@ public static class AnnotationTypeExtensions
 
         public AnnotatedType(IEnumerable<Type> annotationTypes)
         {
-            annotationsByName = new Dictionary<string, List<PropertyInfo>>();
+            annotationsByName = [];
 
             foreach (var annotationType in annotationTypes)
             {
                 foreach (var annotationProperty in annotationType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (!annotationsByName.TryGetValue(annotationProperty.Name, out List<PropertyInfo> list))
-                        annotationsByName[annotationProperty.Name] = list = new List<PropertyInfo>();
+                        annotationsByName[annotationProperty.Name] = list = [];
 
                     list.Add(annotationProperty);
                 }
@@ -46,16 +46,10 @@ public static class AnnotationTypeExtensions
         }
     }
 
-    private class AnnotatedProperty : IPropertyInfo
+    private class AnnotatedProperty(PropertyInfo property, IEnumerable<PropertyInfo> annotations) : IPropertyInfo
     {
-        private readonly PropertyInfo property;
-        private readonly IEnumerable<PropertyInfo> annotations;
-
-        public AnnotatedProperty(PropertyInfo property, IEnumerable<PropertyInfo> annotations)
-        {
-            this.property = property;
-            this.annotations = annotations;
-        }
+        private readonly PropertyInfo property = property;
+        private readonly IEnumerable<PropertyInfo> annotations = annotations;
 
         public string Name => property.Name;
 

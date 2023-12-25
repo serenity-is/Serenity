@@ -1,4 +1,4 @@
-﻿namespace Serenity.Localization;
+namespace Serenity.Localization;
 
 /// <summary>
 /// Contains helper methods for registration of permission keys in nested static classes.
@@ -32,7 +32,7 @@ public static class NestedPermissionKeyRegistration
         return permissions;
     }
 
-    private static readonly char[] splitChar = new char[] { '|', '&' };
+    private static readonly char[] splitChar = ['|', '&'];
 
     private static void AddKeysFrom(HashSet<string> permissions, ILocalTextRegistry? registry, 
         Type type, string languageID)
@@ -89,6 +89,6 @@ public static class NestedPermissionKeyRegistration
         }
 
         foreach (var nested in type.GetNestedTypes(BindingFlags.Public | BindingFlags.DeclaredOnly))
-            AddKeysFrom(permissions, registry, nested, languageID);
+            AddKeysFrom(permissions!, registry, nested, languageID);
     }
 }

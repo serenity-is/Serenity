@@ -1,25 +1,31 @@
-﻿import { Decorators } from "../../decorators";
-import { cast, isEmptyOrNull, PropertyItem, localText, tryGetText } from "../../q";
+﻿import { PropertyItem, localText, tryGetText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { cast } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
+import { WidgetProps } from "../widgets/widget";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
 import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
-@Decorators.registerClass('Serenity.FilterFieldSelect')
-class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
-    constructor(hidden: JQuery, fields: PropertyItem[]) {
-        super(hidden);
+export interface FilterFieldSelectOptions {
+    fields: PropertyItem[];
+}
 
-        for (var field of fields) {
+@Decorators.registerClass('Serenity.FilterFieldSelect')
+class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends Select2Editor<P, PropertyItem> {
+    constructor(props: WidgetProps<P>) {
+        super(props);
+
+        for (var field of this.options.fields) {
             this.addOption(field.name, (tryGetText(field.title) ??
                 field.title ?? field.name), field);
         }
     }
 
     emptyItemText() {
-        if (isEmptyOrNull(this.value)) {
+        if (!this.value) {
             return localText('Controls.FilterPanel.SelectField');
         }
 
@@ -35,17 +41,17 @@ class FilterFieldSelect extends Select2Editor<any, PropertyItem> {
 
 @Decorators.registerClass('Serenity.FilterOperatorSelect')
 class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
-    constructor(hidden: JQuery, source: FilterOperator[]) {
-        super(hidden);
+    constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
+        super(props);
 
-        for (var op of source) {
+        for (var op of this.options.source) {
             var title = (op.title ?? (
                 tryGetText("Controls.FilterPanel.OperatorNames." + op.key) ?? op.key));
             this.addOption(op.key, title, op);
         }
 
-        if (source.length && source[0])
-            this.value = source[0].key;
+        if (this.options.source.length && this.options.source[0])
+            this.value = this.options.source[0].key;
     }
 
     emptyItemText(): string {
@@ -60,12 +66,12 @@ class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
 }
 
 @Decorators.registerClass("Serenity.FilterPanel")
-export class FilterPanel extends FilterWidgetBase<any> {
+export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     private rowsDiv: JQuery;
 
-    constructor(div: JQuery) {
-        super(div);
+    constructor(props: WidgetProps<P>) {
+        super(props);
 
         this.element.addClass('s-FilterPanel');
         this.rowsDiv = this.byId('Rows');
@@ -173,16 +179,16 @@ export class FilterPanel extends FilterWidgetBase<any> {
 
     protected initButtons(): void {
         this.byId('AddButton').text(localText('Controls.FilterPanel.AddFilter'))
-            .click((e) => this.addButtonClick(e));
+            .click((e) => this.addButtonClick(e as any));
 
         this.byId('SearchButton').text(localText('Controls.FilterPanel.SearchButton'))
-            .click((e) => this.searchButtonClick(e));
+            .click((e) => this.searchButtonClick(e as any));
 
         this.byId('ResetButton').text(localText('Controls.FilterPanel.ResetButton'))
-            .click((e) => this.resetButtonClick(e));
+            .click((e) => this.resetButtonClick(e as any));
     }
 
-    protected searchButtonClick(e: JQueryEventObject) {
+    protected searchButtonClick(e: Event) {
         e.preventDefault();
         this.search();
     }
@@ -253,12 +259,12 @@ export class FilterPanel extends FilterWidgetBase<any> {
         this.get_store().raiseChanged();
     }
 
-    protected addButtonClick(e: JQueryEventObject) {
+    protected addButtonClick(e: Event) {
         this.addEmptyRow(true);
         e.preventDefault();
     }
 
-    protected resetButtonClick(e: JQueryEventObject) {
+    protected resetButtonClick(e: Event) {
         e.preventDefault();
 
         if (this.get_updateStoreOnReset()) {
@@ -281,15 +287,13 @@ export class FilterPanel extends FilterWidgetBase<any> {
         this.rowsDiv.children().each(function (index, row) {
             var fieldInput = $(row).children('div.f')
                 .children('input.field-select').first();
-            if (fieldInput.length === 0) {
-                return true;
-            }
-            var val = fieldInput.val();
+            if (fieldInput.length === 0)
+                return;
+            var val = fieldInput.val() as string;
             if (val == null || val.length === 0) {
                 result = $(row);
                 return false;
             }
-            return true;
         });
 
         return result;
@@ -328,7 +332,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var parenDiv = row.children('div.l').hide();
 
         parenDiv.children('a.leftparen, a.rightparen')
-            .click((e) => this.leftRightParenClick(e));
+            .click((e) => this.leftRightParenClick(e as any));
 
         var andor = parenDiv.children('a.andor').attr('title', localText('Controls.FilterPanel.ChangeAndOr'));
         if (isLastRowOr) {
@@ -338,15 +342,16 @@ export class FilterPanel extends FilterWidgetBase<any> {
             andor.text(localText('Controls.FilterPanel.And'));
         }
 
-        andor.click((e) => this.andOrClick(e));
+        andor.click((e) => this.andOrClick(e as any));
 
         row.children('a.delete')
             .attr('title', localText('Controls.FilterPanel.RemoveField'))
-            .click((e) => this.deleteRowClick(e));
+            .click((e) => this.deleteRowClick(e as any));
 
-        var fieldSel = new FilterFieldSelect(row.children('div.f')
-            .children('input'), this.get_store().get_fields())
-            .changeSelect2(e => this.onRowFieldChange(e));
+        new FilterFieldSelect({
+            fields: this.get_store().get_fields(),
+            element: row.children('div.f').children('input')[0]
+        }).changeSelect2(e => this.onRowFieldChange(e));
 
         this.updateParens();
         this.updateButtons();
@@ -360,9 +365,9 @@ export class FilterPanel extends FilterWidgetBase<any> {
         return row;
     }
 
-    protected onRowFieldChange(e: JQueryEventObject) {
+    protected onRowFieldChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
-        this.rowFieldChange(row);
+        this.rowFieldChange(row as any);
         var opSelect = row.children('div.o').find('input.op-select');
         opSelect.select2('focus');
     }
@@ -372,7 +377,6 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var select = row.children('div.f').find('input.field-select')
             .getWidget(FilterFieldSelect);
         var fieldName = select.get_value();
-        var isEmpty = fieldName == null || fieldName === '';
         this.removeFiltering(row);
         this.populateOperatorList(row);
         this.rowOperatorChange(row);
@@ -396,7 +400,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
             .children().attr('type', 'hidden').addClass('op-select');
 
         var operators = filtering.getOperators();
-        var opSelect = new FilterOperatorSelect(hidden, operators);
+        var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
         opSelect.changeSelect2(e => this.onRowOperatorChange(e));
     }
 
@@ -407,7 +411,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var select = row.children('div.f').find('input.field-select')
             .getWidget(FilterFieldSelect);
 
-        if (isEmptyOrNull(select.value)) {
+        if (!select.value) {
             return null;
         }
 
@@ -437,9 +441,9 @@ export class FilterPanel extends FilterWidgetBase<any> {
         return filtering;
     }
 
-    protected onRowOperatorChange(e: JQueryEventObject) {
+    protected onRowOperatorChange(e: Event) {
         var row = $(e.target).closest('div.filter-line');
-        this.rowOperatorChange(row);
+        this.rowOperatorChange(row as any);
         var firstInput = row.children('div.v').find(':input:visible').first();
         try {
             firstInput.focus();
@@ -459,13 +463,13 @@ export class FilterPanel extends FilterWidgetBase<any> {
         var filtering = this.getFilteringFor(row);
         if (filtering == null)
             return;
-        
+
         var operatorSelect = row.children('div.o').find('input.op-select')
             .getWidget(FilterOperatorSelect);
 
-        if (isEmptyOrNull(operatorSelect.get_value()))
+        if (!operatorSelect.get_value())
             return;
-        
+
         var ops = filtering.getOperators().filter(function (x) {
             return x.key === operatorSelect.value;
         });
@@ -478,7 +482,7 @@ export class FilterPanel extends FilterWidgetBase<any> {
         filtering.createEditor();
     }
 
-    protected deleteRowClick(e: JQueryEventObject): void {
+    protected deleteRowClick(e: Event): void {
         e.preventDefault();
         var row = $(e.target).closest('div.filter-line');
         row.remove();
@@ -498,14 +502,14 @@ export class FilterPanel extends FilterWidgetBase<any> {
             this.rowsDiv.children().length >= 1);
     }
 
-    protected andOrClick(e: JQueryEventObject): void {
+    protected andOrClick(e: Event): void {
         e.preventDefault();
         var andor = $(e.target).toggleClass('or');
         andor.text(localText('Controls.FilterPanel.' +
             (andor.hasClass('or') ? 'Or' : 'And')));
     }
 
-    protected leftRightParenClick(e: JQueryEventObject): void {
+    protected leftRightParenClick(e: Event): void {
         e.preventDefault();
         $(e.target).toggleClass('active');
         this.updateParens();

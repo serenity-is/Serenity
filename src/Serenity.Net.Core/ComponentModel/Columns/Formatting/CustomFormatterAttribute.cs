@@ -6,18 +6,13 @@ namespace Serenity.ComponentModel;
 /// Base class for custom formatter type attributes
 /// </summary>
 /// <seealso cref="FormatterTypeAttribute" />
-public abstract class CustomFormatterAttribute : FormatterTypeAttribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="CustomFormatterAttribute"/> class.
+/// </remarks>
+/// <param name="formatterType">Type of the formatter.</param>
+public abstract class CustomFormatterAttribute(string formatterType) : FormatterTypeAttribute(formatterType)
 {
     private Dictionary<string, object?>? options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomFormatterAttribute"/> class.
-    /// </summary>
-    /// <param name="formatterType">Type of the formatter.</param>
-    public CustomFormatterAttribute(string formatterType)
-        : base(formatterType)
-    {
-    }
 
     /// <summary>
     /// Sets the parameters for formatter.

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System.Data.Common;
 
 namespace Serenity.Data;
@@ -7,14 +7,18 @@ namespace Serenity.Data;
 /// Wraps a connection to add current transaction and dialect support.
 /// </summary>
 /// <seealso cref="IDbConnection" />
-public class WrappedConnection : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
+/// <remarks>
+/// Initializes a new instance of the <see cref="WrappedConnection"/> class.
+/// </remarks>
+/// <param name="connection">The actual connection.</param>
+/// <param name="dialect">The dialect.</param>
+/// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
+public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, ILogger logger = null) : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
     IHasCurrentTransaction, IHasDialect, IHasLogger, IHasOpenedOnce, IHasConnectionStateChange
 {
-    private readonly IDbConnection actualConnection;
+    private readonly IDbConnection actualConnection = connection ?? throw new ArgumentNullException(nameof(connection));
     private bool openedOnce;
     private WrappedTransaction currentTransaction;
-    private ISqlDialect dialect;
-    private readonly ILogger logger;
 
     /// <summary>
     /// Implements state change event by proxying it to the actual connection
@@ -39,19 +43,6 @@ public class WrappedConnection : IDbConnection, IHasActualConnection, IHasComman
             else
                 throw new NotImplementedException();
         }
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="WrappedConnection"/> class.
-    /// </summary>
-    /// <param name="actualConnection">The actual connection.</param>
-    /// <param name="dialect">The dialect.</param>
-    /// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
-    public WrappedConnection(IDbConnection actualConnection, ISqlDialect dialect, ILogger logger = null)
-    {
-        this.actualConnection = actualConnection;
-        this.dialect = dialect;
-        this.logger = logger;
     }
 
     /// <summary>

@@ -19,8 +19,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
     public AutoValidateAntiforgeryIgnoreBearerFilter(IAntiforgery antiforgery, ILoggerFactory loggerFactory)
     {
-        if (antiforgery == null)
-            throw new ArgumentNullException(nameof(antiforgery));
+        ArgumentNullException.ThrowIfNull(antiforgery);
 
         this.antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
         logger = loggerFactory.CreateLogger(GetType());
@@ -28,10 +27,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!context.IsEffectivePolicy<IAntiforgeryPolicy>(this))
         {
@@ -55,10 +51,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
     protected virtual bool ShouldValidate(AuthorizationFilterContext context)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         var method = context.HttpContext.Request.Method;
         if (HttpMethods.IsGet(method) ||

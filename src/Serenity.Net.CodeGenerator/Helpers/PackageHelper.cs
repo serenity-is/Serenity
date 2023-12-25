@@ -1,8 +1,8 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public class PackageHelper
 {
-    public static string DeterminePackagesPath(IGeneratorFileSystem fileSystem)
+    public static string DeterminePackagesPath(IFileSystem fileSystem, IGeneratorConsole console)
     {
         string userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
         if (string.IsNullOrEmpty(userHomeDirectory))
@@ -12,7 +12,7 @@ public class PackageHelper
 
         if (!fileSystem.DirectoryExists(packagesDir))
         {
-            Console.Error.WriteLine("Can't determine NuGet packages directory!");
+            console.Error("Can't determine NuGet packages directory!");
             return null;
         }
 

@@ -5,35 +5,28 @@
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="Field" />
-public abstract class GenericField<TValue> : Field
+/// <remarks>
+/// Initializes a new instance of the <see cref="GenericField{TValue}"/> class.
+/// </remarks>
+/// <param name="collection">The collection.</param>
+/// <param name="type">The type.</param>
+/// <param name="name">The name.</param>
+/// <param name="caption">The caption.</param>
+/// <param name="size">The size.</param>
+/// <param name="flags">The flags.</param>
+/// <param name="getValue">The get value.</param>
+/// <param name="setValue">The set value.</param>
+public abstract class GenericField<TValue>(ICollection<Field> collection, FieldType type, string name, string caption, int size, FieldFlags flags,
+    Func<IRow, TValue> getValue, Action<IRow, TValue> setValue) : Field(collection, type, name, caption, size, flags)
 {
     /// <summary>
     /// The get value
     /// </summary>
-    protected internal Func<IRow, TValue> _getValue;
+    protected internal Func<IRow, TValue> _getValue = getValue;
     /// <summary>
     /// The set value
     /// </summary>
-    protected internal Action<IRow, TValue> _setValue;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GenericField{TValue}"/> class.
-    /// </summary>
-    /// <param name="collection">The collection.</param>
-    /// <param name="type">The type.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="size">The size.</param>
-    /// <param name="flags">The flags.</param>
-    /// <param name="getValue">The get value.</param>
-    /// <param name="setValue">The set value.</param>
-    public GenericField(ICollection<Field> collection, FieldType type, string name, string caption, int size, FieldFlags flags,
-        Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
-        : base(collection, type, name, caption, size, flags)
-    {
-        _getValue = getValue;
-        _setValue = setValue;
-    }
+    protected internal Action<IRow, TValue> _setValue = setValue;
 
     /// <summary>
     /// Copies the specified source.

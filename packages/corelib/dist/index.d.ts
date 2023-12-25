@@ -1,6 +1,988 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
-import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, IPlugin, SelectionModel, Range, GridOptions } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, GridOptions } from '@serenity-is/sleekgrid';
+
+/**
+ * Tries to block the page
+ */
+declare function blockUI(options?: {
+    zIndex?: number;
+    useTimeout?: boolean;
+}): void;
+/**
+ * Unblocks the page.
+ */
+declare function blockUndo(): void;
+
+declare var Config: {
+    /**
+     * This is the root path of your application. If your application resides under http://localhost/mysite/,
+     * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
+     * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
+     */
+    applicationPath: string;
+    /**
+     * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+     */
+    emailAllowOnlyAscii: boolean;
+    /**
+     * @Obsolete defaulted to false before for backward compatibility, now it is true by default
+     */
+    responsiveDialogs: boolean;
+    /**
+     * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
+     */
+    bootstrapMessages: boolean;
+    /**
+     * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
+     * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
+     * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
+     *
+     * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
+     */
+    rootNamespaces: string[];
+    /**
+     * This is an optional method for handling when user is not logged in. If a users session is expired
+     * and when a NotAuthorized response is received from a service call, Serenity will call this handler, so
+     * you may intercept it and notify user about this situation and ask if she wants to login again...
+     */
+    notLoggedInHandler: Function;
+};
+
+/**
+ * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+ */
+declare class CriteriaBuilder extends Array {
+    /**
+     * Creates a between criteria.
+     * @param fromInclusive from value
+     * @param toInclusive to value
+     */
+    bw(fromInclusive: any, toInclusive: any): Array<any>;
+    /**
+     * Creates a contains criteria
+     * @param value contains value
+     */
+    contains(value: string): Array<any>;
+    /**
+     * Creates a endsWith criteria
+     * @param value endsWith value
+     */
+    endsWith(value: string): Array<any>;
+    /**
+     * Creates an equal (=) criteria
+     * @param value equal value
+     */
+    eq(value: any): Array<any>;
+    /**
+     * Creates a greater than criteria
+     * @param value greater than value
+     */
+    gt(value: any): Array<any>;
+    /**
+     * Creates a greater than or equal criteria
+     * @param value greater than or equal value
+     */
+    ge(value: any): Array<any>;
+    /**
+     * Creates a in criteria
+     * @param values in values
+     */
+    in(values: any[]): Array<any>;
+    /**
+     * Creates a IS NULL criteria
+     */
+    isNull(): Array<any>;
+    /**
+     * Creates a IS NOT NULL criteria
+     */
+    isNotNull(): Array<any>;
+    /**
+     * Creates a less than or equal to criteria
+     * @param value less than or equal to value
+     */
+    le(value: any): Array<any>;
+    /**
+     * Creates a less than criteria
+     * @param value less than value
+     */
+    lt(value: any): Array<any>;
+    /**
+     * Creates a not equal criteria
+     * @param value not equal value
+     */
+    ne(value: any): Array<any>;
+    /**
+     * Creates a LIKE criteria
+     * @param value like value
+     */
+    like(value: any): Array<any>;
+    /**
+     * Creates a STARTS WITH criteria
+     * @param value startsWith value
+     */
+    startsWith(value: string): Array<any>;
+    /**
+     * Creates a NOT IN criteria
+     * @param values array of NOT IN values
+     */
+    notIn(values: any[]): Array<any>;
+    /**
+     * Creates a NOT LIKE criteria
+     * @param value not like value
+     */
+    notLike(value: any): Array<any>;
+}
+/**
+ * Parses a criteria expression to Serenity Criteria array format.
+ * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
+ * @param expression The criteria expression.
+ * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+ * @example
+ * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ */
+declare function parseCriteria(expression: string, params?: any): any[];
+/**
+ * Parses a criteria expression to Serenity Criteria array format.
+ * The expression may contain parameter placeholders like `A >= ${p1}`
+ * where p1 is a variable in the scope.
+ * @param strings The string fragments.
+ * @param values The tagged template arguments.
+ * @example
+ * var a = 5, b = 4;
+ * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ */
+declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+/**
+ * Enumeration of Criteria operator keys.
+ */
+declare enum CriteriaOperator {
+    paren = "()",
+    not = "not",
+    isNull = "is null",
+    isNotNull = "is not null",
+    exists = "exists",
+    and = "and",
+    or = "or",
+    xor = "xor",
+    eq = "=",
+    ne = "!=",
+    gt = ">",
+    ge = ">=",
+    lt = "<",
+    le = "<=",
+    in = "in",
+    notIn = "not in",
+    like = "like",
+    notLike = "not like"
+}
+/**
+ * Creates a new criteria builder containg the passed field name.
+ * @param field The field name.
+ */
+declare function Criteria(field: string): CriteriaBuilder;
+declare namespace Criteria {
+    var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var Operator: typeof CriteriaOperator;
+    var isEmpty: (c: any[]) => boolean;
+    var join: (c1: any[], op: string, c2: any[]) => any[];
+    var not: (c: any[]) => (string | any[])[];
+    var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+    var paren: (c: any[]) => any[];
+    var parse: typeof parseCriteria;
+}
+
+interface DebouncedFunction<T extends (...args: any[]) => any> {
+    /**
+     * Call the original function, but applying the debounce rules.
+     *
+     * If the debounced function can be run immediately, this calls it and returns its return
+     * value.
+     *
+     * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
+     * function was not invoked yet.
+     */
+    (...args: Parameters<T>): ReturnType<T> | undefined;
+    /**
+     * Throw away any pending invocation of the debounced function.
+     */
+    clear(): void;
+    /**
+     * If there is a pending invocation of the debounced function, invoke it immediately and return
+     * its return value.
+     *
+     * Otherwise, return the value from the last invocation, or undefined if the debounced function
+     * was never invoked.
+     */
+    flush(): ReturnType<T> | undefined;
+}
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function also has a property 'clear' that can be used
+ * to clear the timer to prevent previously scheduled executions, and flush method
+ * to invoke scheduled executions now if any.
+ * @param wait The function will be called after it stops being called for
+ * N milliseconds.
+ * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
+ *
+ * @source underscore.js
+ */
+declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+
+type UtilityColor = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "muted" | "white";
+type TextColor = UtilityColor | "aqua" | "blue" | "fuschia" | "gray" | "green" | "light-blue" | "lime" | "maroon" | "navy" | "olive" | "orange" | "purple" | "red" | "teal" | "yellow";
+declare function bgColor(color: UtilityColor): string;
+declare function textColor(color: TextColor): string;
+declare function faIcon(key: faIconKey, color?: TextColor): string;
+declare function fabIcon(key: fabIconKey, color?: TextColor): string;
+type KnownIconClass = `fa fa-${faIconKey}` | `fab fa-${fabIconKey}`;
+type AnyIconClass = KnownIconClass | (string & {});
+type IconClassName = AnyIconClass | (AnyIconClass[]);
+declare function iconClassName(icon: IconClassName): string;
+type faIconKey = "ad" | "address-book" | "address-card" | "adjust" | "air-freshener" | "align-center" | "align-justify" | "align-left" | "align-right" | "allergies" | "ambulance" | "american-sign-language-interpreting" | "anchor" | "angle-double-down" | "angle-double-left" | "angle-double-right" | "angle-double-up" | "angle-down" | "angle-left" | "angle-right" | "angle-up" | "angry" | "ankh" | "apple-alt" | "archive" | "archway" | "arrow-alt-circle-down" | "arrow-alt-circle-left" | "arrow-alt-circle-right" | "arrow-alt-circle-up" | "arrow-circle-down" | "arrow-circle-left" | "arrow-circle-right" | "arrow-circle-up" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "arrows-alt" | "arrows-alt-h" | "arrows-alt-v" | "assistive-listening-systems" | "asterisk" | "at" | "atlas" | "atom" | "audio-description" | "award" | "baby" | "baby-carriage" | "backspace" | "backward" | "bacon" | "balance-scale" | "balance-scale-left" | "balance-scale-right" | "ban" | "band-aid" | "barcode" | "bars" | "baseball-ball" | "basketball-ball" | "bath" | "battery-empty" | "battery-full" | "battery-half" | "battery-quarter" | "battery-three-quarters" | "bed" | "beer" | "bell" | "bell-o" | "bell-slash" | "bezier-curve" | "bible" | "bicycle" | "biking" | "binoculars" | "biohazard" | "birthday-cake" | "blender" | "blender-phone" | "blind" | "blog" | "bold" | "bolt" | "bomb" | "bone" | "bong" | "book" | "book-dead" | "book-medical" | "book-open" | "book-reader" | "bookmark" | "border-all" | "border-none" | "border-style" | "bowling-ball" | "box" | "box-open" | "boxes" | "braille" | "brain" | "bread-slice" | "briefcase" | "briefcase-medical" | "broadcast-tower" | "broom" | "brush" | "bug" | "building" | "bullhorn" | "bullseye" | "burn" | "bus" | "bus-alt" | "business-time" | "calculator" | "calendar" | "calendar-alt" | "calendar-check" | "calendar-day" | "calendar-minus" | "calendar-plus" | "calendar-times" | "calendar-week" | "camera" | "camera-retro" | "campground" | "candy-cane" | "cannabis" | "capsules" | "car" | "car-alt" | "car-battery" | "car-crash" | "car-side" | "caret-down" | "caret-left" | "caret-right" | "caret-square-down" | "caret-square-left" | "caret-square-right" | "caret-square-up" | "caret-up" | "carrot" | "cart-arrow-down" | "cart-plus" | "cash-register" | "cat" | "certificate" | "chair" | "chalkboard" | "chalkboard-teacher" | "charging-station" | "chart-area" | "chart-bar" | "chart-line" | "chart-pie" | "check" | "check-circle" | "check-double" | "check-square" | "cheese" | "chess" | "chess-bishop" | "chess-board" | "chess-king" | "chess-knight" | "chess-pawn" | "chess-queen" | "chess-rook" | "chevron-circle-down" | "chevron-circle-left" | "chevron-circle-right" | "chevron-circle-up" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "child" | "church" | "circle" | "circle-notch" | "city" | "clinic-medical" | "clipboard" | "clipboard-check" | "clipboard-list" | "clock" | "clock-o" | "clone" | "closed-captioning" | "cloud" | "cloud-download-alt" | "cloud-meatball" | "cloud-moon" | "cloud-moon-rain" | "cloud-rain" | "cloud-showers-heavy" | "cloud-sun" | "cloud-sun-rain" | "cloud-upload-alt" | "cocktail" | "code" | "code-branch" | "coffee" | "cog" | "cogs" | "coins" | "columns" | "comment" | "comment-alt" | "comment-dollar" | "comment-dots" | "comment-medical" | "comment-slash" | "comments" | "comments-dollar" | "compact-disc" | "compass" | "compress" | "compress-arrows-alt" | "concierge-bell" | "cookie" | "cookie-bite" | "copy" | "copyright" | "couch" | "credit-card" | "crop" | "crop-alt" | "cross" | "crosshairs" | "crow" | "crown" | "crutch" | "cube" | "cubes" | "cut" | "database" | "deaf" | "democrat" | "desktop" | "dharmachakra" | "diagnoses" | "dice" | "dice-d20" | "dice-d6" | "dice-five" | "dice-four" | "dice-one" | "dice-six" | "dice-three" | "dice-two" | "digital-tachograph" | "directions" | "divide" | "dizzy" | "dna" | "dog" | "dollar-sign" | "dolly" | "dolly-flatbed" | "donate" | "door-closed" | "door-open" | "dot-circle" | "dove" | "download" | "drafting-compass" | "dragon" | "draw-polygon" | "drum" | "drum-steelpan" | "drumstick-bite" | "dumbbell" | "dumpster" | "dumpster-fire" | "dungeon" | "edit" | "egg" | "eject" | "ellipsis-h" | "ellipsis-v" | "envelope" | "envelope-o" | "envelope-open" | "envelope-open-text" | "envelope-square" | "equals" | "eraser" | "ethernet" | "euro-sign" | "exchange-alt" | "exclamation" | "exclamation-circle" | "exclamation-triangle" | "expand" | "expand-arrows-alt" | "external-link-alt" | "external-link-square-alt" | "eye" | "eye-dropper" | "eye-slash" | "fan" | "fast-backward" | "fast-forward" | "fax" | "feather" | "feather-alt" | "female" | "fighter-jet" | "file" | "file-alt" | "file-archive" | "file-audio" | "file-code" | "file-contract" | "file-csv" | "file-download" | "file-excel" | "file-excel-o" | "file-export" | "file-image" | "file-import" | "file-invoice" | "file-invoice-dollar" | "file-medical" | "file-medical-alt" | "file-pdf" | "file-pdf-o" | "file-powerpoint" | "file-prescription" | "file-signature" | "file-upload" | "file-text" | "file-text-o" | "file-video" | "file-word" | "fill" | "fill-drip" | "film" | "filter" | "fingerprint" | "fire" | "floppy-o" | "fire-alt" | "fire-extinguisher" | "first-aid" | "fish" | "fist-raised" | "flag" | "flag-checkered" | "flag-usa" | "flask" | "flushed" | "folder" | "folder-minus" | "folder-open" | "folder-open-o" | "folder-plus" | "font" | "football-ball" | "forward" | "frog" | "frown" | "frown-open" | "funnel-dollar" | "futbol" | "gamepad" | "gas-pump" | "gavel" | "gem" | "genderless" | "ghost" | "gift" | "gifts" | "glass-cheers" | "glass-martini" | "glass-martini-alt" | "glass-whiskey" | "glasses" | "globe" | "globe-africa" | "globe-americas" | "globe-asia" | "globe-europe" | "golf-ball" | "gopuram" | "graduation-cap" | "greater-than" | "greater-than-equal" | "grimace" | "grin" | "grin-alt" | "grin-beam" | "grin-beam-sweat" | "grin-hearts" | "grin-squint" | "grin-squint-tears" | "grin-stars" | "grin-tears" | "grin-tongue" | "grin-tongue-squint" | "grin-tongue-wink" | "grin-wink" | "grip-horizontal" | "grip-lines" | "grip-lines-vertical" | "grip-vertical" | "guitar" | "h-square" | "hamburger" | "hammer" | "hamsa" | "hand-holding" | "hand-holding-heart" | "hand-holding-usd" | "hand-lizard" | "hand-middle-finger" | "hand-paper" | "hand-peace" | "hand-point-down" | "hand-point-left" | "hand-point-right" | "hand-point-up" | "hand-pointer" | "hand-rock" | "hand-scissors" | "hand-spock" | "hands" | "hands-helping" | "handshake" | "hanukiah" | "hard-hat" | "hashtag" | "hat-cowboy" | "hat-cowboy-side" | "hat-wizard" | "haykal" | "hdd" | "heading" | "headphones" | "headphones-alt" | "headset" | "heart" | "heart-broken" | "heartbeat" | "helicopter" | "highlighter" | "hiking" | "hippo" | "history" | "hockey-puck" | "holly-berry" | "home" | "horse" | "horse-head" | "hospital" | "hospital-alt" | "hospital-symbol" | "hot-tub" | "hotdog" | "hotel" | "hourglass" | "hourglass-end" | "hourglass-half" | "hourglass-start" | "house-damage" | "hryvnia" | "i-cursor" | "ice-cream" | "icicles" | "icons" | "id-badge" | "id-card" | "id-card-alt" | "igloo" | "image" | "images" | "inbox" | "indent" | "industry" | "infinity" | "info" | "info-circle" | "italic" | "jedi" | "joint" | "journal-whills" | "kaaba" | "key" | "keyboard" | "khanda" | "kiss" | "kiss-beam" | "kiss-wink-heart" | "kiwi-bird" | "landmark" | "language" | "laptop" | "laptop-code" | "laptop-medical" | "laugh" | "laugh-beam" | "laugh-squint" | "laugh-wink" | "layer-group" | "leaf" | "lemon" | "less-than" | "less-than-equal" | "level-down-alt" | "level-up-alt" | "life-ring" | "lightbulb" | "link" | "lira-sign" | "list" | "list-alt" | "list-ol" | "list-ul" | "location-arrow" | "lock" | "lock-open" | "long-arrow-alt-down" | "long-arrow-alt-left" | "long-arrow-alt-right" | "long-arrow-alt-up" | "low-vision" | "luggage-cart" | "magic" | "magnet" | "mail-bulk" | "mail-forward" | "mail-reply" | "male" | "map" | "map-marked" | "map-marked-alt" | "map-marker" | "map-marker-alt" | "map-pin" | "map-signs" | "marker" | "mars" | "mars-double" | "mars-stroke" | "mars-stroke-h" | "mars-stroke-v" | "mask" | "medal" | "medkit" | "meh" | "meh-blank" | "meh-rolling-eyes" | "memory" | "menorah" | "mercury" | "meteor" | "microchip" | "microphone" | "microphone-alt" | "microphone-alt-slash" | "microphone-slash" | "microscope" | "minus" | "minus-circle" | "minus-square" | "mitten" | "mobile" | "mobile-alt" | "money-bill" | "money-bill-alt" | "money-bill-wave" | "money-bill-wave-alt" | "money-check" | "money-check-alt" | "monument" | "moon" | "mortar-pestle" | "mosque" | "motorcycle" | "mountain" | "mouse" | "mouse-pointer" | "mug-hot" | "music" | "network-wired" | "neuter" | "newspaper" | "not-equal" | "notes-medical" | "object-group" | "object-ungroup" | "oil-can" | "om" | "otter" | "outdent" | "pager" | "paint-brush" | "paint-roller" | "palette" | "pallet" | "paper-plane" | "paperclip" | "parachute-box" | "paragraph" | "parking" | "passport" | "pastafarianism" | "paste" | "pause" | "pause-circle" | "paw" | "peace" | "pen" | "pen-alt" | "pen-fancy" | "pen-nib" | "pen-square" | "pencil-alt" | "pencil-ruler" | "pencil-square-o" | "people-carry" | "pepper-hot" | "percent" | "percentage" | "person-booth" | "phone" | "phone-alt" | "phone-slash" | "phone-square" | "phone-square-alt" | "phone-volume" | "photo-video" | "piggy-bank" | "pills" | "pizza-slice" | "place-of-worship" | "plane" | "plane-arrival" | "plane-departure" | "play" | "play-circle" | "plug" | "plus" | "plus-circle" | "plus-square" | "podcast" | "poll" | "poll-h" | "poo" | "poo-storm" | "poop" | "portrait" | "pound-sign" | "power-off" | "pray" | "praying-hands" | "prescription" | "prescription-bottle" | "prescription-bottle-alt" | "print" | "procedures" | "project-diagram" | "puzzle-piece" | "qrcode" | "question" | "question-circle" | "quidditch" | "quote-left" | "quote-right" | "quran" | "radiation" | "radiation-alt" | "rainbow" | "random" | "receipt" | "record-vinyl" | "recycle" | "redo" | "refresh" | "redo-alt" | "registered" | "remove-format" | "reply" | "reply-all" | "republican" | "restroom" | "retweet" | "ribbon" | "ring" | "road" | "robot" | "rocket" | "route" | "rss" | "rss-square" | "ruble-sign" | "ruler" | "ruler-combined" | "ruler-horizontal" | "ruler-vertical" | "running" | "rupee-sign" | "sad-cry" | "sad-tear" | "satellite" | "satellite-dish" | "save" | "school" | "screwdriver" | "scroll" | "sd-card" | "search" | "search-dollar" | "search-location" | "search-minus" | "search-plus" | "seedling" | "server" | "shapes" | "share" | "share-alt" | "share-alt-square" | "share-square" | "shekel-sign" | "shield-alt" | "ship" | "shipping-fast" | "shoe-prints" | "shopping-bag" | "shopping-basket" | "shopping-cart" | "shower" | "shuttle-van" | "sign" | "sign-in-alt" | "sign-language" | "sign-out" | "sign-out-alt" | "signal" | "signature" | "sim-card" | "sitemap" | "skating" | "skiing" | "skiing-nordic" | "skull" | "skull-crossbones" | "slash" | "sleigh" | "sliders-h" | "smile" | "smile-beam" | "smile-wink" | "smog" | "smoking" | "smoking-ban" | "sms" | "snowboarding" | "snowflake" | "snowman" | "snowplow" | "socks" | "solar-panel" | "sort" | "sort-alpha-down" | "sort-alpha-down-alt" | "sort-alpha-up" | "sort-alpha-up-alt" | "sort-amount-down" | "sort-amount-down-alt" | "sort-amount-up" | "sort-amount-up-alt" | "sort-down" | "sort-numeric-down" | "sort-numeric-down-alt" | "sort-numeric-up" | "sort-numeric-up-alt" | "sort-up" | "spa" | "space-shuttle" | "spell-check" | "spider" | "spinner" | "splotch" | "spray-can" | "square" | "square-full" | "square-root-alt" | "stamp" | "star" | "star-and-crescent" | "star-half" | "star-half-alt" | "star-o" | "star-of-david" | "star-of-life" | "step-backward" | "step-forward" | "stethoscope" | "sticky-note" | "stop" | "stop-circle" | "stopwatch" | "store" | "store-alt" | "stream" | "street-view" | "strikethrough" | "stroopwafel" | "subscript" | "subway" | "suitcase" | "suitcase-rolling" | "sun" | "superscript" | "surprise" | "swatchbook" | "swimmer" | "swimming-pool" | "synagogue" | "sync" | "sync-alt" | "syringe" | "table" | "table-tennis" | "tablet" | "tablet-alt" | "tablets" | "tachometer-alt" | "tag" | "tags" | "tape" | "tasks" | "taxi" | "teeth" | "teeth-open" | "temperature-high" | "temperature-low" | "tenge" | "terminal" | "text-height" | "text-width" | "th" | "th-large" | "th-list" | "theater-masks" | "thermometer" | "thermometer-empty" | "thermometer-full" | "thermometer-half" | "thermometer-quarter" | "thermometer-three-quarters" | "thumbs-down" | "thumbs-up" | "thumbtack" | "ticket-alt" | "times" | "times-circle" | "tint" | "tint-slash" | "tired" | "toggle-off" | "toggle-on" | "toilet" | "toilet-paper" | "toolbox" | "tools" | "tooth" | "torah" | "torii-gate" | "tractor" | "trademark" | "traffic-light" | "train" | "tram" | "transgender" | "transgender-alt" | "trash" | "trash-alt" | "trash-o" | "trash-restore" | "trash-restore-alt" | "tree" | "trophy" | "truck" | "truck-loading" | "truck-monster" | "truck-moving" | "truck-pickup" | "tshirt" | "tty" | "tv" | "umbrella" | "umbrella-beach" | "underline" | "undo" | "undo-alt" | "universal-access" | "university" | "unlink" | "unlock" | "unlock-alt" | "upload" | "user" | "user-alt" | "user-alt-slash" | "user-astronaut" | "user-check" | "user-circle" | "user-clock" | "user-cog" | "user-edit" | "user-friends" | "user-graduate" | "user-injured" | "user-lock" | "user-md" | "user-minus" | "user-ninja" | "user-nurse" | "user-plus" | "user-secret" | "user-shield" | "user-slash" | "user-tag" | "user-tie" | "user-times" | "users" | "users-cog" | "utensil-spoon" | "utensils" | "vector-square" | "venus" | "venus-double" | "venus-mars" | "vial" | "vials" | "video" | "video-slash" | "vihara" | "voicemail" | "volleyball-ball" | "volume-down" | "volume-mute" | "volume-off" | "volume-up" | "vote-yea" | "vr-cardboard" | "walking" | "wallet" | "warehouse" | "water" | "wave-square" | "weight" | "weight-hanging" | "wheelchair" | "wifi" | "wind" | "window-close" | "window-maximize" | "window-minimize" | "window-restore" | "wine-bottle" | "wine-glass" | "wine-glass-alt" | "won-sign" | "wrench" | "x-ray" | "yen-sign" | "yin-yang";
+type fabIconKey = "500px" | "accessible-icon" | "accusoft" | "acquisitions-incorporated" | "adn" | "adobe" | "adversal" | "affiliatetheme" | "airbnb" | "algolia" | "alipay" | "amazon" | "amazon-pay" | "amilia" | "android" | "angellist" | "angrycreative" | "angular" | "app-store" | "app-store-ios" | "apper" | "apple" | "apple-pay" | "artstation" | "asymmetrik" | "atlassian" | "audible" | "autoprefixer" | "avianex" | "aviato" | "aws" | "bandcamp" | "battle-net" | "behance" | "behance-square" | "bimobject" | "bitbucket" | "bitcoin" | "bity" | "black-tie" | "blackberry" | "blogger" | "blogger-b" | "bluetooth" | "bluetooth-b" | "bootstrap" | "btc" | "buffer" | "buromobelexperte" | "buy-n-large" | "buysellads" | "canadian-maple-leaf" | "cc-amazon-pay" | "cc-amex" | "cc-apple-pay" | "cc-diners-club" | "cc-discover" | "cc-jcb" | "cc-mastercard" | "cc-paypal" | "cc-stripe" | "cc-visa" | "centercode" | "centos" | "chrome" | "chromecast" | "cloudscale" | "cloudsmith" | "cloudversify" | "codepen" | "codiepie" | "confluence" | "connectdevelop" | "contao" | "cotton-bureau" | "cpanel" | "creative-commons" | "creative-commons-by" | "creative-commons-nc" | "creative-commons-nc-eu" | "creative-commons-nc-jp" | "creative-commons-nd" | "creative-commons-pd" | "creative-commons-pd-alt" | "creative-commons-remix" | "creative-commons-sa" | "creative-commons-sampling" | "creative-commons-sampling-plus" | "creative-commons-share" | "creative-commons-zero" | "critical-role" | "css3" | "css3-alt" | "cuttlefish" | "d-and-d" | "d-and-d-beyond" | "dashcube" | "delicious" | "deploydog" | "deskpro" | "dev" | "deviantart" | "dhl" | "diaspora" | "digg" | "digital-ocean" | "discord" | "discourse" | "dochub" | "docker" | "draft2digital" | "dribbble" | "dribbble-square" | "dropbox" | "drupal" | "dyalog" | "earlybirds" | "ebay" | "edge" | "elementor" | "ello" | "ember" | "empire" | "envira" | "erlang" | "ethereum" | "etsy" | "evernote" | "expeditedssl" | "facebook" | "facebook-f" | "facebook-messenger" | "facebook-square" | "fantasy-flight-games" | "fedex" | "fedora" | "figma" | "firefox" | "first-order" | "first-order-alt" | "firstdraft" | "flickr" | "flipboard" | "fly" | "font-awesome" | "font-awesome-alt" | "font-awesome-flag" | "fonticons" | "fonticons-fi" | "fort-awesome" | "fort-awesome-alt" | "forumbee" | "foursquare" | "free-code-camp" | "freebsd" | "fulcrum" | "galactic-republic" | "galactic-senate" | "get-pocket" | "gg" | "gg-circle" | "git" | "git-alt" | "git-square" | "github" | "github-alt" | "github-square" | "gitkraken" | "gitlab" | "gitter" | "glide" | "glide-g" | "gofore" | "goodreads" | "goodreads-g" | "google" | "google-drive" | "google-play" | "google-plus" | "google-plus-g" | "google-plus-square" | "google-wallet" | "gratipay" | "grav" | "gripfire" | "grunt" | "gulp" | "hacker-news" | "hacker-news-square" | "hackerrank" | "hips" | "hire-a-helper" | "hooli" | "hornbill" | "hotjar" | "houzz" | "html5" | "hubspot" | "imdb" | "instagram" | "intercom" | "internet-explorer" | "invision" | "ioxhost" | "itch-io" | "itunes" | "itunes-note" | "java" | "jedi-order" | "jenkins" | "jira" | "joget" | "joomla" | "js" | "js-square" | "jsfiddle" | "kaggle" | "keybase" | "keycdn" | "kickstarter" | "kickstarter-k" | "korvue" | "laravel" | "lastfm" | "lastfm-square" | "leanpub" | "less" | "line" | "linkedin" | "linkedin-in" | "linode" | "linux" | "lyft" | "magento" | "mailchimp" | "mandalorian" | "markdown" | "mastodon" | "maxcdn" | "mdb" | "medapps" | "medium" | "medium-m" | "medrt" | "meetup" | "megaport" | "mendeley" | "microsoft" | "mix" | "mixcloud" | "mizuni" | "modx" | "monero" | "napster" | "neos" | "nimblr" | "node" | "node-js" | "npm" | "ns8" | "nutritionix" | "odnoklassniki" | "odnoklassniki-square" | "old-republic" | "opencart" | "openid" | "opera" | "optin-monster" | "orcid" | "osi" | "page4" | "pagelines" | "palfed" | "patreon" | "paypal" | "penny-arcade" | "periscope" | "phabricator" | "phoenix-framework" | "phoenix-squadron" | "php" | "pied-piper" | "pied-piper-alt" | "pied-piper-hat" | "pied-piper-pp" | "pinterest" | "pinterest-p" | "pinterest-square" | "playstation" | "product-hunt" | "pushed" | "python" | "qq" | "quinscape" | "quora" | "r-project" | "raspberry-pi" | "ravelry" | "react" | "reacteurope" | "readme" | "rebel" | "red-river" | "reddit" | "reddit-alien" | "reddit-square" | "redhat" | "renren" | "replyd" | "researchgate" | "resolving" | "rev" | "rocketchat" | "rockrms" | "safari" | "salesforce" | "sass" | "schlix" | "scribd" | "searchengin" | "sellcast" | "sellsy" | "servicestack" | "shirtsinbulk" | "shopware" | "simplybuilt" | "sistrix" | "sith" | "sketch" | "skyatlas" | "skype" | "slack" | "slack-hash" | "slideshare" | "snapchat" | "snapchat-ghost" | "snapchat-square" | "soundcloud" | "sourcetree" | "speakap" | "speaker-deck" | "spotify" | "squarespace" | "stack-exchange" | "stack-overflow" | "stackpath" | "staylinked" | "steam" | "steam-square" | "steam-symbol" | "sticker-mule" | "strava" | "stripe" | "stripe-s" | "studiovinari" | "stumbleupon" | "stumbleupon-circle" | "superpowers" | "supple" | "suse" | "swift" | "symfony" | "teamspeak" | "telegram" | "telegram-plane" | "tencent-weibo" | "the-red-yeti" | "themeco" | "themeisle" | "think-peaks" | "trade-federation" | "trello" | "tripadvisor" | "tumblr" | "tumblr-square" | "twitch" | "twitter" | "twitter-square" | "typo3" | "uber" | "ubuntu" | "uikit" | "umbraco" | "uniregistry" | "untappd" | "ups" | "usb" | "usps" | "ussunnah" | "vaadin" | "viacoin" | "viadeo" | "viadeo-square" | "viber" | "vimeo" | "vimeo-square" | "vimeo-v" | "vine" | "vk" | "vnv" | "vuejs" | "waze" | "weebly" | "weibo" | "weixin" | "whatsapp" | "whatsapp-square" | "whmcs" | "wikipedia-w" | "windows" | "wix" | "wizards-of-the-coast" | "wolf-pack-battalion" | "wordpress" | "wordpress-simple" | "wpbeginner" | "wpexplorer" | "wpforms" | "wpressr" | "xbox" | "xing" | "xing-square" | "y-combinator" | "yahoo" | "yammer" | "yandex" | "yandex-international" | "yarn" | "yelp" | "yoast" | "youtube" | "youtube-square" | "zhihu";
+
+/**
+ * Options for a message dialog button
+ */
+interface DialogButton {
+    /** Button text */
+    text?: string;
+    /** Button hint */
+    hint?: string;
+    /** Button icon */
+    icon?: IconClassName;
+    /** Click handler */
+    click?: (e: MouseEvent) => void;
+    /** CSS class for button */
+    cssClass?: string;
+    /** HTML encode button text. Default is true. */
+    htmlEncode?: boolean;
+    /** The code that is returned from message dialog function when this button is clicked */
+    result?: string;
+}
+/**
+ * Options that apply to all message dialog types
+ */
+interface CommonDialogOptions {
+    /** Event handler that is called when dialog is opened */
+    onOpen?: () => void;
+    /** Event handler that is called when dialog is closed */
+    onClose?: (result: string) => void;
+    /** Dialog title */
+    title?: string;
+    /** HTML encode the message, default is true */
+    htmlEncode?: boolean;
+    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
+    preWrap?: boolean;
+    /** Dialog css class. Default is based on the message dialog type */
+    dialogClass?: string;
+    /** List of buttons to show on the dialog */
+    buttons?: DialogButton[];
+    /** Class to use for the modal element for Bootstrap dialogs */
+    modalClass?: string;
+    /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
+    bootstrap?: boolean;
+    /** The result code of the button used to close the dialog is returned via this variable in the options object */
+    result?: string;
+}
+/** Returns true if Bootstrap 3 is loaded */
+declare function isBS3(): boolean;
+/** Returns true if Bootstrap 5+ is loaded */
+declare function isBS5Plus(): boolean;
+declare namespace DialogTexts {
+    const AlertTitle: string;
+    const CancelButton: string;
+    const CloseButton: string;
+    const ConfirmationTitle: string;
+    const InformationTitle: string;
+    const MaximizeHint: string;
+    const NoButton: string;
+    const OkButton: string;
+    const RestoreHint: string;
+    const SuccessTitle: string;
+    const WarningTitle: string;
+    const YesButton: string;
+}
+/**
+ * Builds HTML DIV element for a Bootstrap modal dialog
+ * @param title Modal title
+ * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
+ * @param modalClass Optional class to add to the modal element
+ * @param escapeHtml True to html encode body, default is true
+ * @returns
+ */
+declare function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
+/** Converts a `DialogButton` declaration to Bootstrap button element
+ * @param x Dialog button declaration
+ * @returns Bootstrap button element
+*/
+declare function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
+/** Converts a `DialogButton` declaration to jQuery UI button type
+ * @param x Dialog button declaration
+ * @returns jQuery UI button type
+ */
+declare function dialogButtonToUI(x: DialogButton): any;
+/**
+ * Additional options for Alert dialogs
+ */
+interface AlertOptions extends CommonDialogOptions {
+    /** The title of OK button, or false to hide the OK button */
+    okButton?: string | boolean;
+    /** CSS class for OK button */
+    okButtonClass?: string;
+}
+/**
+ * Displays an alert dialog
+ * @param message The message to display
+ * @param options Additional options.
+ * @see AlertOptions
+ * @example
+ * alertDialog("An error occured!"); }
+ */
+declare function alertDialog(message: string, options?: AlertOptions): void;
+/** Additional options for confirm dialog */
+interface ConfirmOptions extends CommonDialogOptions {
+    /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
+    yesButton?: string | boolean;
+    /** CSS class for the Yes button. */
+    yesButtonClass?: string;
+    /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
+    noButton?: string | boolean;
+    /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
+    cancelButton?: string | boolean;
+    /** Event handler for cancel button click */
+    onCancel?: () => void;
+    /** Event handler for no button click */
+    onNo?: () => void;
+}
+/**
+ * Display a confirmation dialog
+ * @param message The message to display
+ * @param onYes Callback for Yes button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * confirmDialog("Are you sure you want to delete?", () => {
+ *     // do something when yes is clicked
+ * }
+ */
+declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
+/**
+ * Display an information dialog
+ * @param message The message to display
+ * @param onOk Callback for OK button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * informationDialog("Operation complete", () => {
+ *     // do something when OK is clicked
+ * }
+ */
+declare function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+/**
+ * Display a success dialog
+ * @param message The message to display
+ * @param onOk Callback for OK button click
+ * @param options Additional options.
+ * @see ConfirmOptions
+ * @example
+ * successDialog("Operation complete", () => {
+ *     // do something when OK is clicked
+ * }
+ */
+declare function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
+/**
+ * Display a warning dialog
+ * @param message The message to display
+ * @param options Additional options.
+ * @see AlertOptions
+ * @example
+ * warningDialog("Something is odd!");
+ */
+declare function warningDialog(message: string, options?: AlertOptions): void;
+/** Options for `iframeDialog` **/
+interface IFrameDialogOptions {
+    html?: string;
+}
+/** Options for `iframeDialog` **/
+interface IFrameDialogOptions {
+    html?: string;
+}
+/**
+ * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
+ * @param options The options
+ */
+declare function iframeDialog(options: IFrameDialogOptions): void;
+/**
+ * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
+ * If the panelbeforeclose prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param e  The event triggering the close
+ */
+declare function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event): void;
+/**
+ * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
+ * and panelopening and panelopened events on the window.
+ * If the panelbeforeopen prevents the default, the operation is cancelled.
+ * @param element The panel element
+ * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
+ * @param e The event triggering the open
+ */
+declare function openPanel(element: (HTMLElement | {
+    jquery: string;
+    get: ((index: number) => HTMLElement);
+}), uniqueName?: string): void;
+
+interface LookupOptions<TItem> {
+    idField?: string;
+    parentIdField?: string;
+    textField?: string;
+}
+interface Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+}
+declare class Lookup<TItem> {
+    items: TItem[];
+    itemById: {
+        [key: string]: TItem;
+    };
+    idField: string;
+    parentIdField: string;
+    textField: string;
+    constructor(options: LookupOptions<TItem>, items?: TItem[]);
+    update?(value: TItem[]): void;
+}
+
+declare enum SummaryType {
+    Disabled = -1,
+    None = 0,
+    Sum = 1,
+    Avg = 2,
+    Min = 3,
+    Max = 4
+}
+interface PropertyItem {
+    name?: string;
+    title?: string;
+    hint?: string;
+    placeholder?: string;
+    editorType?: string;
+    editorParams?: any;
+    category?: string;
+    collapsible?: boolean;
+    collapsed?: boolean;
+    tab?: string;
+    cssClass?: string;
+    headerCssClass?: string;
+    formCssClass?: string;
+    maxLength?: number;
+    required?: boolean;
+    insertable?: boolean;
+    insertPermission?: string;
+    hideOnInsert?: boolean;
+    updatable?: boolean;
+    updatePermission?: string;
+    hideOnUpdate?: boolean;
+    readOnly?: boolean;
+    readPermission?: string;
+    oneWay?: boolean;
+    defaultValue?: any;
+    localizable?: boolean;
+    visible?: boolean;
+    allowHide?: boolean;
+    formatterType?: string;
+    formatterParams?: any;
+    displayFormat?: string;
+    alignment?: string;
+    width?: number;
+    widthSet?: boolean;
+    minWidth?: number;
+    maxWidth?: number;
+    labelWidth?: string;
+    resizable?: boolean;
+    sortable?: boolean;
+    sortOrder?: number;
+    groupOrder?: number;
+    summaryType?: SummaryType;
+    editLink?: boolean;
+    editLinkItemType?: string;
+    editLinkIdField?: string;
+    editLinkCssClass?: string;
+    filteringType?: string;
+    filteringParams?: any;
+    filteringIdField?: string;
+    notFilterable?: boolean;
+    filterOnly?: boolean;
+    quickFilter?: boolean;
+    quickFilterParams?: any;
+    quickFilterSeparator?: boolean;
+    quickFilterCssClass?: string;
+}
+interface PropertyItemsData {
+    items: PropertyItem[];
+    additionalItems: PropertyItem[];
+}
+
+/**
+ * Gets the known hash value for a given dynamic script name. They are usually
+ * registered server-side via dynamic script manager and their latest known
+ * hashes are passed to the client-side via a script element named RegisteredScripts.
+ * @param name The dynamic script name
+ * @param reload True to force resetting the script hash client side, e.g. for loading
+ * lookups etc.
+ * @returns The hash or null if no such known registration
+ */
+declare function getScriptDataHash(name: string, reload?: boolean): string;
+/**
+ * Fetches a script data with given name via ~/DynamicData endpoint
+ * @param name Dynamic script name
+ * @returns A promise that will return data if successfull
+ */
+declare function fetchScriptData<TData>(name: string): Promise<TData>;
+/**
+ * Returns the script data from cache if available, or via a fetch
+ * request to ~/DynamicData endpoint
+ * @param name
+ * @param reload Clear cache and force reload
+ * @returns
+ */
+declare function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData>;
+/**
+ * Gets or loads a [ColumnsScript] data
+ * @param key Form key
+ * @returns A property items data object containing items and additionalItems properties
+ */
+declare function getColumnsScript(key: string): Promise<PropertyItemsData>;
+/**
+ * Gets or loads a [FormScript] data
+ * @param key Form key
+ * @returns A property items data object containing items and additionalItems properties
+ */
+declare function getFormScript(key: string): Promise<PropertyItemsData>;
+/**
+ * Gets or loads a Lookup
+ * @param key Lookup key
+ */
+declare function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
+/**
+ * Gets or loads a [RemoteData]
+ * @param key Remote data key
+ */
+declare function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
+/**
+ * Shows a suitable error message for errors occured during loading of
+ * a dynamic script data.
+ * @param name Name of the dynamic script
+ * @param status HTTP status returned if available
+ * @param statusText HTTP status text returned if available
+ */
+declare function handleScriptDataError(name: string, status?: number, statusText?: string): void;
+declare function peekScriptData(name: string): any;
+/**
+ * Forces reload of a lookup from the server. Note that only the
+ * client side cache is cleared. This does not force reloading in the server-side.
+ * @param key Lookup key
+ * @returns Lookup
+ */
+declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+declare function setScriptData(name: string, value: any): void;
+
+/**
+ * Interface for number formatting, similar to .NET's NumberFormatInfo
+ */
+interface NumberFormat {
+    /** Decimal separator */
+    decimalSeparator: string;
+    /** Group separator */
+    groupSeparator?: string;
+    /** Number of digits after decimal separator */
+    decimalDigits?: number;
+    /** Positive sign */
+    positiveSign?: string;
+    /** Negative sign */
+    negativeSign?: string;
+    /** Zero symbol */
+    nanSymbol?: string;
+    /** Percentage symbol */
+    percentSymbol?: string;
+    /** Currency symbol */
+    currencySymbol?: string;
+}
+/** Interface for date formatting, similar to .NET's DateFormatInfo */
+interface DateFormat {
+    /** Date separator */
+    dateSeparator?: string;
+    /** Default date format string */
+    dateFormat?: string;
+    /** Date order, like dmy, or ymd */
+    dateOrder?: string;
+    /** Default date time format string */
+    dateTimeFormat?: string;
+    /** AM designator */
+    amDesignator?: string;
+    /** PM designator */
+    pmDesignator?: string;
+    /** Time separator */
+    timeSeparator?: string;
+    /** First day of week, 0 = Sunday, 1 = Monday */
+    firstDayOfWeek?: number;
+    /** Array of day names */
+    dayNames?: string[];
+    /** Array of short day names */
+    shortDayNames?: string[];
+    /** Array of two letter day names */
+    minimizedDayNames?: string[];
+    /** Array of month names */
+    monthNames?: string[];
+    /** Array of short month names */
+    shortMonthNames?: string[];
+}
+/** Interface for a locale, similar to .NET's CultureInfo */
+interface Locale extends NumberFormat, DateFormat {
+    /** Locale string comparison function, similar to .NET's StringComparer */
+    stringCompare?: (a: string, b: string) => number;
+    /** Locale string to upper case function */
+    toUpper?: (a: string) => string;
+}
+/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
+declare let Invariant: Locale;
+/**
+ * Factory for a function that compares two strings, based on a character order
+ * passed in the `order` argument.
+ */
+declare function compareStringFactory(order: string): ((a: string, b: string) => number);
+/**
+ * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
+ * settings passed from a `<script>` element in the page with id `ScriptCulture`
+ * containing a JSON object if available. This element is generally created in
+ * the _LayoutHead.cshtml file for Serenity applications, so that the culture
+ * settings determined server, can be passed to the client.
+ */
+declare let Culture: Locale;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using current `Culture` locale settings.
+ */
+declare function stringFormat(format: string, ...prm: any[]): string;
+/**
+ * Formats a string with parameters similar to .NET's String.Format function
+ * using the locale passed as the first argument.
+ */
+declare function stringFormatLocale(l: Locale, format: string, ...prm: any[]): string;
+/**
+ * Rounds a number to specified digits or an integer number if digits are not specified.
+ * @param n the number to round
+ * @param d the number of digits to round to. default is zero.
+ * @param rounding whether to use banker's rounding
+ * @returns the rounded number
+ */
+declare let round: (n: number, d?: number, rounding?: boolean) => number;
+/**
+ * Truncates a number to an integer number.
+ */
+declare let trunc: (n: number) => number;
+/**
+ * Formats a number using the current `Culture` locale (or the passed locale) settings.
+ * It supports format specifiers similar to .NET numeric formatting strings.
+ * @param num the number to format
+ * @param format the format specifier. default is 'g'.
+ * See .NET numeric formatting strings documentation for more information.
+ */
+declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
+/**
+ * Converts a string to an integer. The difference between parseInt and parseInteger
+ * is that parseInteger will return null if the string is empty or null, whereas
+ * parseInt will return NaN and parseInteger will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
+declare function parseInteger(s: string): number;
+/**
+ * Converts a string to a decimal. The difference between parseFloat and parseDecimal
+ * is that parseDecimal will return null if the string is empty or null, whereas
+ * parseFloat will return NaN and parseDecimal will use the current culture's group
+ * and decimal separators.
+ * @param s the string to parse
+ */
+declare function parseDecimal(s: string): number;
+/**
+ * Converts a string to an ID. If the string is a number, it is returned as-is.
+ * If the string is empty, null or whitespace, null is returned.
+ * Otherwise, it is converted to a number if possible. If the string is not a
+ * valid number or longer than 14 digits, the trimmed string is returned as-is.
+ * @param id the string to convert to an ID
+ */
+declare function toId(id: any): any;
+/**
+ * Formats a date using the specified format string and optional culture.
+ * Supports .NET style format strings including custom formats.
+ * See .NET documentation for supported formats.
+ * @param d the date to format. If null, it returns empty string.
+ * @param format the format string to use. If null, it uses the current culture's default format.
+ * 'G' uses the culture's datetime format.
+ * 'g' uses the culture's datetime format with secs removed.
+ * 'd' uses the culture's date format.
+ * 't' uses the culture's time format.
+ * 'u' uses the sortable ISO format with UTC time.
+ * 'U' uses the culture's date format with UTC time.
+ * @param locale the locale to use
+ * @returns the formatted date
+ * @example
+ * // returns "2019-01-01"
+ * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
+ * @example
+ * // returns "2019-01-01 12:00:00"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
+ * @example
+ * // returns "2019-01-01 12:00:00.000"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
+ * @example
+ * // returns "2019-01-01 12:00:00.000 AM"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+ */
+declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+/**
+ * Formats a date as the ISO 8601 UTC date/time format.
+ * @param n The number of minutes.
+ */
+declare function formatISODateTimeUTC(d: Date): string;
+/**
+ * Parses a string in the ISO 8601 UTC date/time format.
+ * @param s The string to parse.
+ */
+declare function parseISODateTime(s: string): Date;
+/**
+ * Parses a string to a date. If the string is empty or whitespace, returns null.
+ * Returns a NaN Date if the string is not a valid date.
+ * @param s The string to parse.
+ * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
+  */
+declare function parseDate(s: string, dateOrder?: string): Date;
+/**
+ * Splits a date string into an array of strings, each containing a single date part.
+ * It can handle separators "/", ".", "-" and "\".
+ * @param s The string to split.
+ */
+declare function splitDateString(s: string): string[];
+
+/**
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+ * @param s String (or number etc.) to be HTML encoded
+ */
+declare function htmlEncode(s: any): string;
+/**
+ * Toggles the class on the element handling spaces like addClass does.
+ * @param el the element
+ * @param cls the class to toggle
+ * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ */
+declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+
+declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
+declare function localText(key: string, defaultText?: string): string;
+declare function tryGetText(key: string): string;
+declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
+
+type ToastContainerOptions = {
+    containerId?: string;
+    positionClass?: string;
+    target?: string;
+};
+type ToastrOptions = ToastContainerOptions & {
+    tapToDismiss?: boolean;
+    toastClass?: string;
+    showDuration?: number;
+    onShown?: () => void;
+    hideDuration?: number;
+    onHidden?: () => void;
+    closeMethod?: boolean;
+    closeDuration?: number | false;
+    closeEasing?: boolean;
+    closeOnHover?: boolean;
+    extendedTimeOut?: number;
+    iconClass?: string;
+    positionClass?: string;
+    timeOut?: number;
+    titleClass?: string;
+    messageClass?: string;
+    escapeHtml?: boolean;
+    target?: string;
+    closeHtml?: string;
+    closeClass?: string;
+    newestOnTop?: boolean;
+    preventDuplicates?: boolean;
+    onclick?: (event: MouseEvent) => void;
+    onCloseClick?: (event: Event) => void;
+    closeButton?: boolean;
+    rtl?: boolean;
+};
+type NotifyMap = {
+    type: string;
+    iconClass: string;
+    title?: string;
+    message?: string;
+};
+declare class Toastr {
+    private listener;
+    private toastId;
+    private previousToast;
+    options: ToastrOptions;
+    constructor(options?: ToastrOptions);
+    getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
+    error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+    warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+    success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+    info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+    subscribe(callback: (response: Toastr) => void): void;
+    publish(args: Toastr): void;
+    private removeContainerIfEmpty;
+    removeToast(toastElement: HTMLElement, options?: ToastContainerOptions): void;
+    clear(options?: ToastContainerOptions): void;
+    private notify;
+}
+
+declare let defaultNotifyOptions: ToastrOptions;
+declare function positionToastContainer(options?: ToastrOptions, create?: boolean): void;
+declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
+declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
+
+declare function resolveUrl(url: string): string;
+declare function resolveServiceUrl(url: string): string;
+
+interface ServiceError {
+    Code?: string;
+    Arguments?: string;
+    Message?: string;
+    Details?: string;
+    ErrorId?: string;
+}
+interface ServiceResponse {
+    Error?: ServiceError;
+}
+interface ServiceRequest {
+}
+interface SaveRequest<TEntity> extends ServiceRequest {
+    EntityId?: any;
+    Entity?: TEntity;
+    Localizations?: any;
+}
+interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+    Attachments?: any[];
+}
+interface SaveResponse extends ServiceResponse {
+    EntityId?: any;
+}
+interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+    Localizations?: {
+        [key: string]: TEntity;
+    };
+}
+interface DeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface DeleteResponse extends ServiceResponse {
+}
+interface UndeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface UndeleteResponse extends ServiceResponse {
+}
+declare enum ColumnSelection {
+    List = 0,
+    KeyOnly = 1,
+    Details = 2,
+    None = 3,
+    IdOnly = 4,
+    Lookup = 5
+}
+declare enum RetrieveColumnSelection {
+    details = 0,
+    keyOnly = 1,
+    list = 2,
+    none = 3,
+    idOnly = 4,
+    lookup = 5
+}
+interface ListRequest extends ServiceRequest {
+    Skip?: number;
+    Take?: number;
+    Sort?: string[];
+    ContainsText?: string;
+    ContainsField?: string;
+    Criteria?: any[];
+    EqualityFilter?: any;
+    IncludeDeleted?: boolean;
+    ExcludeTotalCount?: boolean;
+    ColumnSelection?: ColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+    ExportColumns?: string[];
+    DistinctFields?: string[];
+}
+interface ListResponse<TEntity> extends ServiceResponse {
+    Entities?: TEntity[];
+    Values?: any[];
+    TotalCount?: number;
+    Skip?: number;
+    Take?: number;
+}
+interface RetrieveRequest extends ServiceRequest {
+    EntityId?: any;
+    ColumnSelection?: RetrieveColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+}
+interface RetrieveResponse<TEntity> extends ServiceResponse {
+    Entity?: TEntity;
+}
+interface RetrieveLocalizationRequest extends RetrieveRequest {
+}
+interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+    Entities?: {
+        [key: string]: TEntity;
+    };
+}
+
+declare function getGlobalObject(): any;
+declare function getStateStore(key?: string): any;
+declare function getTypeStore(): any;
+interface TypeMetadata {
+    enumFlags?: boolean;
+    attr?: any[];
+}
+type Type = Function | Object;
+declare function ensureMetadata(target: Type): TypeMetadata;
+declare function getNested(from: any, name: string): any;
+declare function getType(name: string, target?: any): Type;
+declare function getTypeNameProp(type: Type): string;
+declare function setTypeNameProp(type: Type, value: string): void;
+declare function getTypeFullName(type: Type): string;
+declare function getTypeShortName(type: Type): string;
+declare function getInstanceType(instance: any): any;
+declare function isAssignableFrom(target: any, type: Type): boolean;
+declare function isInstanceOfType(instance: any, type: Type): boolean;
+declare function getBaseType(type: any): any;
+declare function registerClass(type: any, name: string, intf?: any[]): void;
+declare function registerEnum(type: any, name: string, enumKey?: string): void;
+declare function registerInterface(type: any, name: string, intf?: any[]): void;
+declare namespace Enum {
+    let toString: (enumType: any, value: number) => string;
+    let getValues: (enumType: any) => any[];
+}
+declare let isEnum: (type: any) => boolean;
+declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+declare function isArrayLike(obj: any): obj is ArrayLike<any>;
+declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
 
 /**
  * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
@@ -247,378 +1229,16 @@ declare namespace Authorization {
     let userDefinitionAsync: Promise<UserDefinition>;
 }
 
-/** Options for the BlockUI plugin. */
-interface JQBlockUIOptions {
-    useTimeout?: boolean;
-}
-/**
- * Uses jQuery BlockUI plugin to block access to whole page (default) or
- * a part of it, by using a transparent overlay covering the whole area.
- * @param options Parameters for the BlockUI plugin
- * @remarks If options are not specified, this function blocks
- * whole page with a transparent overlay. Default z-order of the overlay
- * div is 2000, so a higher z-order shouldn't be used in page.
- */
-declare function blockUI(options: JQBlockUIOptions): void;
-/**
- * Unblocks the page.
- */
-declare function blockUndo(): void;
-
-declare var Config: {
-    /**
-     * This is the root path of your application. If your application resides under http://localhost/mysite/,
-     * your root path is "mysite/". This variable is automatically initialized by reading from a <link> element
-     * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
-     */
-    applicationPath: string;
-    /**
-     * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
-     */
-    emailAllowOnlyAscii: boolean;
-    /**
-     * @Obsolete defaulted to false before for backward compatibility, now it is true by default
-     */
-    responsiveDialogs: boolean;
-    /**
-     * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
-     */
-    bootstrapMessages: boolean;
-    /**
-     * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
-     * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
-     * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
-     *
-     * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
-     */
-    rootNamespaces: string[];
-    /**
-     * This is an optional method for handling when user is not logged in. If a users session is expired
-     * and when a NotAuthorized response is received from a service call, Serenity will call this handler, so
-     * you may intercept it and notify user about this situation and ask if she wants to login again...
-     */
-    notLoggedInHandler: Function;
-};
-
-interface DebouncedFunction<T extends (...args: any[]) => any> {
-    /**
-     * Call the original function, but applying the debounce rules.
-     *
-     * If the debounced function can be run immediately, this calls it and returns its return
-     * value.
-     *
-     * Otherwise, it returns the return value of the last invocation, or undefined if the debounced
-     * function was not invoked yet.
-     */
-    (...args: Parameters<T>): ReturnType<T> | undefined;
-    /**
-     * Throw away any pending invocation of the debounced function.
-     */
-    clear(): void;
-    /**
-     * If there is a pending invocation of the debounced function, invoke it immediately and return
-     * its return value.
-     *
-     * Otherwise, return the value from the last invocation, or undefined if the debounced function
-     * was never invoked.
-     */
-    flush(): ReturnType<T> | undefined;
-}
-/**
- * Returns a function, that, as long as it continues to be invoked, will not
- * be triggered. The function also has a property 'clear' that can be used
- * to clear the timer to prevent previously scheduled executions, and flush method
- * to invoke scheduled executions now if any.
- * @param wait The function will be called after it stops being called for
- * N milliseconds.
- * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
- *
- * @source underscore.js
- */
-declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
-
-/**
- * Options for a message dialog button
- */
-interface DialogButton {
-    /** Button text */
-    text?: string;
-    /** Button hint */
-    hint?: string;
-    /** Button icon */
-    icon?: string;
-    /** Click handler */
-    click?: (e: MouseEvent) => void;
-    /** CSS class for button */
-    cssClass?: string;
-    /** HTML encode button text. Default is true. */
-    htmlEncode?: boolean;
-    /** The code that is returned from message dialog function when this button is clicked */
-    result?: string;
-}
-/**
- * Options that apply to all message dialog types
- */
-interface CommonDialogOptions {
-    /** Event handler that is called when dialog is opened */
-    onOpen?: () => void;
-    /** Event handler that is called when dialog is closed */
-    onClose?: (result: string) => void;
-    /** Dialog title */
-    title?: string;
-    /** HTML encode the message, default is true */
-    htmlEncode?: boolean;
-    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
-    preWrap?: boolean;
-    /** Dialog css class. Default is based on the message dialog type */
-    dialogClass?: string;
-    /** List of buttons to show on the dialog */
-    buttons?: DialogButton[];
-    /** Class to use for the modal element for Bootstrap dialogs */
-    modalClass?: string;
-    /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
-    bootstrap?: boolean;
-    /** The result code of the button used to close the dialog is returned via this variable in the options object */
-    result?: string;
-}
-/** Returns true if Bootstrap 3 is loaded */
-declare function isBS3(): boolean;
-/** Returns true if Bootstrap 5+ is loaded */
-declare function isBS5Plus(): boolean;
-/**
- * Builds HTML DIV element for a Bootstrap modal dialog
- * @param title Modal title
- * @param body Modal body, it will not be HTML encoded, so make sure it is encoded
- * @param modalClass Optional class to add to the modal element
- * @param escapeHtml True to html encode body, default is true
- * @returns
- */
-declare function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml?: boolean): HTMLDivElement;
-/** Converts a `DialogButton` declaration to Bootstrap button element
- * @param x Dialog button declaration
- * @returns Bootstrap button element
-*/
-declare function dialogButtonToBS(x: DialogButton): HTMLButtonElement;
-/** Converts a `DialogButton` declaration to jQuery UI button type
- * @param x Dialog button declaration
- * @returns jQuery UI button type
- */
-declare function dialogButtonToUI(x: DialogButton): any;
-/**
- * Additional options for Alert dialogs
- */
-interface AlertOptions extends CommonDialogOptions {
-    /** The title of OK button, or false to hide the OK button */
-    okButton?: string | boolean;
-    /** CSS class for OK button */
-    okButtonClass?: string;
-}
-/**
- * Displays an alert dialog
- * @param message The message to display
- * @param options Additional options.
- * @see AlertOptions
- * @example
- * alertDialog("An error occured!"); }
- */
-declare function alertDialog(message: string, options?: AlertOptions): void;
-/** @obsolete use alertDialog */
+/** @deprecated use alertDialog */
 declare const alert: typeof alertDialog;
-/** Additional options for confirm dialog */
-interface ConfirmOptions extends CommonDialogOptions {
-    /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
-    yesButton?: string | boolean;
-    /** CSS class for the Yes button. */
-    yesButtonClass?: string;
-    /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
-    noButton?: string | boolean;
-    /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
-    cancelButton?: string | boolean;
-    /** Event handler for cancel button click */
-    onCancel?: () => void;
-    /** Event handler for no button click */
-    onNo?: () => void;
-}
-/**
- * Display a confirmation dialog
- * @param message The message to display
- * @param onYes Callback for Yes button click
- * @param options Additional options.
- * @see ConfirmOptions
- * @example
- * confirmDialog("Are you sure you want to delete?", () => {
- *     // do something when yes is clicked
- * }
- */
-declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void;
-/** @obsolete use confirmDialog */
+/** @deprecated use confirmDialog */
 declare const confirm: typeof confirmDialog;
-/** Options for `iframeDialog` **/
-interface IFrameDialogOptions {
-    html?: string;
-}
-/**
- * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
- * @param options The options
- */
-declare function iframeDialog(options: IFrameDialogOptions): void;
-/**
- * Display an information dialog
- * @param message The message to display
- * @param onOk Callback for OK button click
- * @param options Additional options.
- * @see ConfirmOptions
- * @example
- * informationDialog("Operation complete", () => {
- *     // do something when OK is clicked
- * }
- */
-declare function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
-/** @obsolete use informationDialog */
+/** @deprecated use informationDialog */
 declare const information: typeof informationDialog;
-/**
- * Display a success dialog
- * @param message The message to display
- * @param onOk Callback for OK button click
- * @param options Additional options.
- * @see ConfirmOptions
- * @example
- * successDialog("Operation complete", () => {
- *     // do something when OK is clicked
- * }
- */
-declare function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions): void;
-/** @obsolete use successDialog */
+/** @deprecated use successDialog */
 declare const success: typeof successDialog;
-/**
- * Display a warning dialog
- * @param message The message to display
- * @param options Additional options.
- * @see AlertOptions
- * @example
- * warningDialog("Something is odd!");
- */
-declare function warningDialog(message: string, options?: AlertOptions): void;
-/** @obsolete use warningDialog */
+/** @deprecated use warningDialog */
 declare const warning: typeof warningDialog;
-/**
- * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
- * If the panelbeforeclose prevents the default, the operation is cancelled.
- * @param element The panel element
- * @param e  The event triggering the close
- */
-declare function closePanel(element: JQuery | HTMLElement, e?: Event): void;
-/**
- * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
- * and panelopening and panelopened events on the window.
- * If the panelbeforeopen prevents the default, the operation is cancelled.
- * @param element The panel element
- * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
- * @param e The event triggering the open
- */
-declare function openPanel(element: JQuery | HTMLElement, uniqueName?: string): void;
-
-interface ServiceError {
-    Code?: string;
-    Arguments?: string;
-    Message?: string;
-    Details?: string;
-    ErrorId?: string;
-}
-interface ServiceResponse {
-    Error?: ServiceError;
-}
-interface ServiceRequest {
-}
-interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-    request?: any;
-    service?: string;
-    blockUI?: boolean;
-    onError?(response: TResponse): void;
-    onSuccess?(response: TResponse): void;
-    onCleanup?(): void;
-}
-interface SaveRequest<TEntity> extends ServiceRequest {
-    EntityId?: any;
-    Entity?: TEntity;
-    Localizations?: any;
-}
-interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-    Attachments?: any[];
-}
-interface SaveResponse extends ServiceResponse {
-    EntityId?: any;
-}
-interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-    Localizations?: {
-        [key: string]: TEntity;
-    };
-}
-interface DeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface DeleteResponse extends ServiceResponse {
-}
-interface UndeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface UndeleteResponse extends ServiceResponse {
-}
-declare enum ColumnSelection {
-    List = 0,
-    KeyOnly = 1,
-    Details = 2,
-    None = 3,
-    IdOnly = 4,
-    Lookup = 5
-}
-declare enum RetrieveColumnSelection {
-    details = 0,
-    keyOnly = 1,
-    list = 2,
-    none = 3,
-    idOnly = 4,
-    lookup = 5
-}
-interface ListRequest extends ServiceRequest {
-    Skip?: number;
-    Take?: number;
-    Sort?: string[];
-    ContainsText?: string;
-    ContainsField?: string;
-    Criteria?: any[];
-    EqualityFilter?: any;
-    IncludeDeleted?: boolean;
-    ExcludeTotalCount?: boolean;
-    ColumnSelection?: ColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-    ExportColumns?: string[];
-    DistinctFields?: string[];
-}
-interface ListResponse<TEntity> extends ServiceResponse {
-    Entities?: TEntity[];
-    Values?: any[];
-    TotalCount?: number;
-    Skip?: number;
-    Take?: number;
-}
-interface RetrieveRequest extends ServiceRequest {
-    EntityId?: any;
-    ColumnSelection?: RetrieveColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-}
-interface RetrieveResponse<TEntity> extends ServiceResponse {
-    Entity?: TEntity;
-}
-interface RetrieveLocalizationRequest extends RetrieveRequest {
-}
-interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-    Entities?: {
-        [key: string]: TEntity;
-    };
-}
 
 declare namespace ErrorHandling {
     /**
@@ -646,78 +1266,6 @@ declare namespace ErrorHandling {
 }
 
 /**
- * Interface for number formatting, similar to .NET's NumberFormatInfo
- */
-interface NumberFormat {
-    /** Decimal separator */
-    decimalSeparator: string;
-    /** Group separator */
-    groupSeparator?: string;
-    /** Number of digits after decimal separator */
-    decimalDigits?: number;
-    /** Positive sign */
-    positiveSign?: string;
-    /** Negative sign */
-    negativeSign?: string;
-    /** Zero symbol */
-    nanSymbol?: string;
-    /** Percentage symbol */
-    percentSymbol?: string;
-    /** Currency symbol */
-    currencySymbol?: string;
-}
-/** Interface for date formatting, similar to .NET's DateFormatInfo */
-interface DateFormat {
-    /** Date separator */
-    dateSeparator?: string;
-    /** Default date format string */
-    dateFormat?: string;
-    /** Date order, like dmy, or ymd */
-    dateOrder?: string;
-    /** Default date time format string */
-    dateTimeFormat?: string;
-    /** AM designator */
-    amDesignator?: string;
-    /** PM designator */
-    pmDesignator?: string;
-    /** Time separator */
-    timeSeparator?: string;
-    /** First day of week, 0 = Sunday, 1 = Monday */
-    firstDayOfWeek?: number;
-    /** Array of day names */
-    dayNames?: string[];
-    /** Array of short day names */
-    shortDayNames?: string[];
-    /** Array of two letter day names */
-    minimizedDayNames?: string[];
-    /** Array of month names */
-    monthNames?: string[];
-    /** Array of short month names */
-    shortMonthNames?: string[];
-}
-/** Interface for a locale, similar to .NET's CultureInfo */
-interface Locale extends NumberFormat, DateFormat {
-    /** Locale string comparison function, similar to .NET's StringComparer */
-    stringCompare?: (a: string, b: string) => number;
-    /** Locale string to upper case function */
-    toUpper?: (a: string) => string;
-}
-/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
-declare let Invariant: Locale;
-/**
- * Factory for a function that compares two strings, based on a character order
- * passed in the `order` argument.
- */
-declare function compareStringFactory(order: string): ((a: string, b: string) => number);
-/**
- * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
- * settings passed from a `<script>` element in the page with id `ScriptCulture`
- * containing a JSON object if available. This element is generally created in
- * the _LayoutHead.cshtml file for Serenity applications, so that the culture
- * settings determined server, can be passed to the client.
- */
-declare let Culture: Locale;
-/**
  * A string to lowercase function that handles special Turkish
  * characters like 'ı'. Left in for compatibility reasons.
  */
@@ -731,103 +1279,15 @@ declare function turkishLocaleToUpper(a: string): string;
  * This is an alias for Culture.stringCompare, left in for compatibility reasons.
  */
 declare let turkishLocaleCompare: (a: string, b: string) => number;
-/**
- * Formats a string with parameters similar to .NET's String.Format function
- * using current `Culture` locale settings.
- */
-declare function format(format: string, ...prm: any[]): string;
-/**
- * Formats a string with parameters similar to .NET's String.Format function
- * using the locale passed as the first argument.
- */
-declare function localeFormat(l: Locale, format: string, ...prm: any[]): string;
-/**
- * Rounds a number to specified digits or an integer number if digits are not specified.
- * @param n the number to round
- * @param d the number of digits to round to. default is zero.
- * @param rounding whether to use banker's rounding
- * @returns the rounded number
- */
-declare let round: (n: number, d?: number, rounding?: boolean) => number;
-/**
- * Truncates a number to an integer number.
- */
-declare let trunc: (n: number) => number;
-/**
- * Formats a number using the current `Culture` locale (or the passed locale) settings.
- * It supports format specifiers similar to .NET numeric formatting strings.
- * @param num the number to format
- * @param format the format specifier. default is 'g'.
- * See .NET numeric formatting strings documentation for more information.
- */
-declare function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string;
-/**
- * Converts a string to an integer. The difference between parseInt and parseInteger
- * is that parseInteger will return null if the string is empty or null, whereas
- * parseInt will return NaN and parseInteger will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseInteger(s: string): number;
-/**
- * Converts a string to a decimal. The difference between parseFloat and parseDecimal
- * is that parseDecimal will return null if the string is empty or null, whereas
- * parseFloat will return NaN and parseDecimal will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
- */
-declare function parseDecimal(s: string): number;
-/**
- * Converts a string to an ID. If the string is a number, it is returned as-is.
- * If the string is empty, null or whitespace, null is returned.
- * Otherwise, it is converted to a number if possible. If the string is not a
- * valid number or longer than 14 digits, the trimmed string is returned as-is.
- * @param id the string to convert to an ID
- */
-declare function toId(id: any): any;
-/**
- * Formats a date using the specified format string and optional culture.
- * Supports .NET style format strings including custom formats.
- * See .NET documentation for supported formats.
- * @param d the date to format. If null, it returns empty string.
- * @param format the format string to use. If null, it uses the current culture's default format.
- * 'G' uses the culture's datetime format.
- * 'g' uses the culture's datetime format with secs removed.
- * 'd' uses the culture's date format.
- * 't' uses the culture's time format.
- * 'u' uses the sortable ISO format with UTC time.
- * 'U' uses the culture's date format with UTC time.
- * @param locale the locale to use
- * @returns the formatted date
- * @example
- * // returns "2019-01-01"
- * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
- * @example
- * // returns "2019-01-01 12:00:00"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
- * @example
- * // returns "2019-01-01 12:00:00.000"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
- * @example
- * // returns "2019-01-01 12:00:00.000 AM"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
- */
-declare function formatDate(d: Date | string, format?: string, locale?: Locale): string;
+/** @deprecated Use stringFormat */
+declare let format: typeof stringFormat;
+/** @deprecated Use stringFormatLocale */
+declare let localeFormat: typeof stringFormatLocale;
 /**
  * Formats a number containing number of minutes into a string in the format "d.hh:mm".
  * @param n The number of minutes.
  */
 declare function formatDayHourAndMin(n: number): string;
-/**
- * Formats a date as the ISO 8601 UTC date/time format.
- * @param n The number of minutes.
- */
-declare function formatISODateTimeUTC(d: Date): string;
-/**
- * Parses a string in the ISO 8601 UTC date/time format.
- * @param s The string to parse.
- */
-declare function parseISODateTime(s: string): Date;
 /**
  * Parses a time string in the format "hh:mm" into a number containing number of minutes.
  * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
@@ -840,33 +1300,21 @@ declare function parseHourAndMin(value: string): number;
  * Returns NULL if the string is empty or whitespace.
  */
 declare function parseDayHourAndMin(s: string): number;
-/**
- * Parses a string to a date. If the string is empty or whitespace, returns null.
- * Returns a NaN Date if the string is not a valid date.
- * @param s The string to parse.
- * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
-  */
-declare function parseDate(s: string, dateOrder?: string): Date;
-/**
- * Splits a date string into an array of strings, each containing a single date part.
- * It can handle separators "/", ".", "-" and "\".
- * @param s The string to split.
- */
-declare function splitDateString(s: string): string[];
 
+declare function isJQueryReal(val: any): val is JQuery;
 /**
  * Adds an empty option to the select.
  * @param select the select element
  */
-declare function addEmptyOption(select: JQuery | HTMLSelectElement): void;
+declare function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement): void;
 /**
  * Adds an option to the select.
  */
-declare function addOption(select: JQuery | HTMLSelectElement, key: string, text: string): void;
-/** @obsolete use htmlEncode as it also encodes quotes */
+declare function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string): void;
+/** @deprecated use htmlEncode as it also encodes quotes */
 declare const attrEncode: typeof htmlEncode;
 /** Clears the options in the select element */
-declare function clearOptions(select: JQuery): void;
+declare function clearOptions(select: ArrayLike<HTMLElement>): void;
 /**
  * Finds the first element with the given relative id to the source element.
  * It can handle underscores in the source element id.
@@ -875,7 +1323,7 @@ declare function clearOptions(select: JQuery): void;
  * @param context the context element (optional)
  * @returns the element with the given relative id to the source element.
  */
-declare function findElementWithRelativeId(element: JQuery, relativeId: string, context?: HTMLElement): JQuery;
+declare function findElementWithRelativeId(element: ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery;
 /**
  * Finds the first element with the given relative id to the source element.
  * It can handle underscores in the source element id.
@@ -886,11 +1334,6 @@ declare function findElementWithRelativeId(element: JQuery, relativeId: string, 
  */
 declare function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
 /**
- * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
- * @param s String (or number etc.) to be HTML encoded
- */
-declare function htmlEncode(s: any): string;
-/**
  * Creates a new DIV and appends it to the body.
  * @returns the new DIV element.
  */
@@ -898,16 +1341,105 @@ declare function newBodyDiv(): JQuery;
 /**
  * Returns the outer HTML of the element.
  */
-declare function outerHtml(element: JQuery): string;
+declare function outerHtml(element: ArrayLike<HTMLElement>): string;
 /**
- * Toggles the class on the element handling spaces like jQuery addClass does.
- * @param el the element
- * @param cls the class to toggle
- * @param remove if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ * Appends child at first argument to given node at second argument.
+ * From https://github.com/alex-kinokon/jsx-dom.
+ * @param child Child element or elements
+ * @param node Target parent element
  */
-declare function toggleClass(el: Element, cls: string, remove?: boolean): void;
+declare function appendChild(child: any, node: HTMLElement): void;
 
-declare function initFullHeightGridPage(gridDiv: JQuery | HTMLElement, opt?: {
+type NoInfer<T> = [T][T extends any ? 0 : never];
+type WidgetProps<P> = {
+    id?: string;
+    class?: string;
+    element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
+} & NoInfer<P>;
+type EditorProps<T> = WidgetProps<T> & {
+    initialValue?: any;
+    maxLength?: number;
+    name?: string;
+    placeholder?: string;
+    required?: boolean;
+    readOnly?: boolean;
+};
+interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+    type?: {
+        new (options?: P): TWidget;
+        prototype: TWidget;
+    };
+    options?: P & WidgetProps<{}>;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
+    element?: (e: JQuery) => void;
+    init?: (w: TWidget) => void;
+}
+declare class Widget<P = {}> {
+    private static nextWidgetNumber;
+    protected readonly options: WidgetProps<P>;
+    protected readonly widgetName: string;
+    protected readonly uniqueName: string;
+    readonly idPrefix: string;
+    readonly domNode: HTMLElement;
+    constructor(props: WidgetProps<P>);
+    destroy(): void;
+    static createDefaultElement(): HTMLElement;
+    /**
+     * @deprecated
+     * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+     */
+    get element(): JQuery;
+    protected addCssClass(): void;
+    protected getCssClass(): string;
+    static getWidgetName(type: Function): string;
+    /**
+     * @deprecated Prefer WidgetType.createDefaultElement
+     */
+    static elementFor(editorType: typeof Widget): JQuery;
+    addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+    getFieldElement(): HTMLElement;
+    getGridField(): JQuery;
+    change(handler: (e: Event) => void): void;
+    changeSelect2(handler: (e: Event) => void): void;
+    protected static defaultTagName: string;
+    static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
+    private setElementProps;
+    protected internalInit(): void;
+    init(): this;
+    /**
+     * Returns the main element for this widget or the document fragment.
+     * As widgets may get their elements from props unlike regular JSX widgets,
+     * this method should not be overridden. Override renderContents() instead.
+     */
+    render(): HTMLElement | DocumentFragment;
+    protected internalRenderContents(): void;
+    protected renderContents(): any | void;
+    get props(): WidgetProps<P>;
+    protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
+}
+declare class EditorWidget<P> extends Widget<EditorProps<P>> {
+    constructor(props: EditorProps<P>);
+}
+
+declare function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
+    type: CreateWidgetParams<TGrid, P>["type"];
+    props?: WidgetProps<P>;
+}): HTMLElement;
+declare function PanelPageInit<TPanel extends Widget<P>, P>({ type, props }: {
+    type: CreateWidgetParams<TPanel, P>["type"];
+    props?: WidgetProps<P>;
+}): HTMLElement;
+declare function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & {
+    domNode: HTMLElement;
+}): TGrid;
+declare function gridPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
+declare function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & {
+    domNode: HTMLElement;
+}): TGrid;
+declare function panelPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
+declare function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | {
+    domNode: HTMLElement;
+}, opt?: {
     noRoute?: boolean;
     setHeight?: boolean;
 }): void;
@@ -926,195 +1458,19 @@ declare namespace LayoutTimer {
     function onShown(element: () => HTMLElement, handler: () => void): number;
     function off(key: number): number;
 }
-declare function executeOnceWhenVisible(element: JQuery, callback: Function): void;
-declare function executeEverytimeWhenVisible(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void;
+declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void;
 
-declare function localText(key: string): string;
-/** @obsolete prefer localText for better discoverability */
+/** @deprecated prefer localText for better discoverability */
 declare const text: typeof localText;
 declare function dbText(prefix: string): ((key: string) => string);
 declare function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
-declare function tryGetText(key: string): string;
 declare function dbTryText(prefix: string): ((key: string) => string);
-declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
-declare class LT {
-    private key;
-    static empty: LT;
-    constructor(key: string);
-    static add(key: string, value: string): void;
-    get(): string;
-    toString(): string;
-    static initializeTextClass: (type: any, prefix: string) => void;
-    static getDefault: (key: string, defaultText: string) => string;
-}
-
-interface LookupOptions<TItem> {
-    idField?: string;
-    parentIdField?: string;
-    textField?: string;
-    textFormatter?(item: TItem): string;
-}
-interface Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-    textFormatter: (item: TItem) => string;
-}
-declare class Lookup<TItem> {
-    items: TItem[];
-    itemById: {
-        [key: string]: TItem;
-    };
-    idField: string;
-    parentIdField: string;
-    textField: string;
-    textFormatter: (item: TItem) => string;
-    constructor(options: LookupOptions<TItem>, items?: TItem[]);
-    update?(value: TItem[]): void;
-}
-
-type ToastContainerOptions = {
-    containerId?: string;
-    positionClass?: string;
-    target?: string;
-};
-type ToastrOptions = ToastContainerOptions & {
-    tapToDismiss?: boolean;
-    toastClass?: string;
-    showDuration?: number;
-    onShown?: () => void;
-    hideDuration?: number;
-    onHidden?: () => void;
-    closeMethod?: boolean;
-    closeDuration?: number | false;
-    closeEasing?: boolean;
-    closeOnHover?: boolean;
-    extendedTimeOut?: number;
-    iconClass?: string;
-    positionClass?: string;
-    timeOut?: number;
-    titleClass?: string;
-    messageClass?: string;
-    escapeHtml?: boolean;
-    target?: string;
-    closeHtml?: string;
-    closeClass?: string;
-    newestOnTop?: boolean;
-    preventDuplicates?: boolean;
-    onclick?: (event: MouseEvent) => void;
-    onCloseClick?: (event: Event) => void;
-    closeButton?: boolean;
-    rtl?: boolean;
-};
-type NotifyMap = {
-    type: string;
-    iconClass: string;
-    title?: string;
-    message?: string;
-};
-declare class Toastr {
-    private listener;
-    private toastId;
-    private previousToast;
-    options: ToastrOptions;
-    constructor(options?: ToastrOptions);
-    private createContainer;
-    getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
-    error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-    warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-    success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-    info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-    subscribe(callback: (response: Toastr) => void): void;
-    publish(args: Toastr): void;
-    clear(toastElement?: HTMLElement | null, clearOptions?: {
-        force?: boolean;
-    }): void;
-    remove(toastElement?: HTMLElement | null): void;
-    removeToast(toastElement: HTMLElement, options?: ToastrOptions): void;
-    private clearContainer;
-    private clearToast;
-    private notify;
-}
-
-declare let defaultNotifyOptions: ToastrOptions;
-declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
-declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
-declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
-declare function positionToastContainer(create: boolean, options?: ToastrOptions): void;
-
-interface PropertyItem {
-    name?: string;
-    title?: string;
-    hint?: string;
-    placeholder?: string;
-    editorType?: string;
-    editorParams?: any;
-    category?: string;
-    collapsible?: boolean;
-    collapsed?: boolean;
-    tab?: string;
-    cssClass?: string;
-    headerCssClass?: string;
-    formCssClass?: string;
-    maxLength?: number;
-    required?: boolean;
-    insertable?: boolean;
-    insertPermission?: string;
-    hideOnInsert?: boolean;
-    updatable?: boolean;
-    updatePermission?: string;
-    hideOnUpdate?: boolean;
-    readOnly?: boolean;
-    readPermission?: string;
-    oneWay?: boolean;
-    defaultValue?: any;
-    localizable?: boolean;
-    visible?: boolean;
-    allowHide?: boolean;
-    formatterType?: string;
-    formatterParams?: any;
-    displayFormat?: string;
-    alignment?: string;
-    width?: number;
-    widthSet?: boolean;
-    minWidth?: number;
-    maxWidth?: number;
-    labelWidth?: string;
-    resizable?: boolean;
-    sortable?: boolean;
-    sortOrder?: number;
-    groupOrder?: number;
-    summaryType?: SummaryType;
-    editLink?: boolean;
-    editLinkItemType?: string;
-    editLinkIdField?: string;
-    editLinkCssClass?: string;
-    filteringType?: string;
-    filteringParams?: any;
-    filteringIdField?: string;
-    notFilterable?: boolean;
-    filterOnly?: boolean;
-    quickFilter?: boolean;
-    quickFilterParams?: any;
-    quickFilterSeparator?: boolean;
-    quickFilterCssClass?: string;
-}
-interface PropertyItemsData {
-    items: PropertyItem[];
-    additionalItems: PropertyItem[];
-}
-declare enum SummaryType {
-    Disabled = -1,
-    None = 0,
-    Sum = 1,
-    Avg = 2,
-    Min = 3,
-    Max = 4
+declare namespace LT {
+    /** @deprecated Use addLocalText */
+    const add: typeof addLocalText;
+    /** @deprecated Use localText */
+    const getDefault: typeof localText;
 }
 
 interface HandleRouteEventArgs {
@@ -1133,38 +1489,45 @@ declare namespace Router {
 }
 
 declare namespace ScriptData {
-    function bindToChange(name: string, regClass: string, onChange: () => void): void;
-    function triggerChange(name: string): void;
-    function unbindFromChange(regClass: string): void;
-    function ensure<TData = any>(name: string): TData;
-    function ensureAsync<TData = any>(name: string): Promise<TData>;
-    function reload<TData = any>(name: string): TData;
+    function bindToChange(name: string, onChange: () => void): void | (() => void);
+    const canLoad: typeof canLoadScriptData;
+    function ensure<TData = any>(name: string, dynJS?: boolean): TData;
+    function reload<TData = any>(name: string, dynJS?: boolean): TData;
     function reloadAsync<TData = any>(name: string): Promise<TData>;
-    function canLoad(name: string): boolean;
     function setRegisteredScripts(scripts: any[]): void;
-    function set(name: string, value: any): void;
+    const set: typeof setScriptData;
 }
-declare function getRemoteData<TData = any>(key: string): TData;
-declare function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
-declare function getLookup<TItem>(key: string): Lookup<TItem>;
-declare function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
-declare function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
-declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
-declare function getColumns(key: string): PropertyItem[];
-declare function getColumnsData(key: string): PropertyItemsData;
-declare function getColumnsAsync(key: string): Promise<PropertyItem[]>;
-declare function getColumnsDataAsync(key: string): Promise<PropertyItemsData>;
-declare function getForm(key: string): PropertyItem[];
-declare function getFormData(key: string): PropertyItemsData;
-declare function getFormAsync(key: string): Promise<PropertyItem[]>;
-declare function getFormDataAsync(key: string): Promise<PropertyItemsData>;
-declare function getTemplate(key: string): string;
-declare function getTemplateAsync(key: string): Promise<string>;
+/**
+ * Check if a dynamic script with provided name is available in the cache
+ * or it is a registered script name
+ * @param name Dynamic script name
+ * @returns True if already available or registered
+ */
 declare function canLoadScriptData(name: string): boolean;
+declare function getRemoteData<TData = any>(key: string): TData;
+declare function getLookup<TItem>(key: string): Lookup<TItem>;
+declare function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
+declare function getColumns(key: string): PropertyItem[];
+declare function getColumnsAsync(key: string): Promise<PropertyItem[]>;
+declare function getColumnsData(key: string): PropertyItemsData;
+declare const getColumnsDataAsync: typeof getColumnsScript;
+declare function getForm(key: string): PropertyItem[];
+declare function getFormAsync(key: string): Promise<PropertyItem[]>;
+declare function getFormData(key: string): PropertyItemsData;
+declare const getFormDataAsync: typeof getFormScript;
+declare function getTemplate(key: string): string;
 
 declare function getCookie(name: string): any;
-declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): JQueryXHR;
-declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): JQueryXHR;
+interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
+    request?: any;
+    service?: string;
+    blockUI?: boolean;
+    onError?(response: TResponse): void;
+    onSuccess?(response: TResponse): void;
+    onCleanup?(): void;
+}
+declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
+declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 declare function setEquality(request: ListRequest, field: string, value: any): void;
 interface PostToServiceOptions {
     url?: string;
@@ -1180,23 +1543,23 @@ interface PostToUrlOptions {
 declare function parseQueryString(s?: string): {};
 declare function postToService(options: PostToServiceOptions): void;
 declare function postToUrl(options: PostToUrlOptions): void;
-declare function resolveUrl(url: string): string;
 
 /**
  * Checks if the string ends with the specified substring.
+ * @deprecated Use .endsWith method of String directly
  * @param s String to check.
  * @param suffix Suffix to check.
  * @returns True if the string ends with the specified substring.
- */
+  */
 declare function endsWith(s: string, suffix: string): boolean;
 /**
- * Checks if the string is empty or null.
+ * Checks if the string is empty or null. Prefer (!s) instead.
  * @param s String to check.
  * @returns True if the string is empty or null.
  */
 declare function isEmptyOrNull(s: string): boolean;
 /**
- * Checks if the string is empty or null or whitespace.
+ * Checks if the string is empty or null or whitespace. Prefer !s?.Trim() instead.
  * @param s String to check.
  * @returns True if the string is empty or null or whitespace.
  */
@@ -1211,6 +1574,7 @@ declare function isTrimmedEmpty(s: string): boolean;
 declare function padLeft(s: string | number, len: number, ch?: string): any;
 /**
  * Checks if the string starts with the prefix
+ * @deprecated Use .startsWith method of String directly
  * @param s String to check.
  * @param prefix Prefix to check.
  * @returns True if the string starts with the prefix.
@@ -1262,12 +1626,13 @@ declare function zeroPad(n: number, len: number): string;
 type Dictionary<TItem> = {
     [key: string]: TItem;
 };
+/** @deprecated Use ?? operator */
 declare function coalesce(a: any, b: any): any;
+/** @deprecated Use a != null */
 declare function isValue(a: any): boolean;
 declare let today: () => Date;
 declare function extend<T = any>(a: T, b: T): T;
 declare function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
-type Type = Function | Object;
 interface TypeMember {
     name: string;
     type: MemberType;
@@ -1275,19 +1640,6 @@ interface TypeMember {
     getter?: string;
     setter?: string;
 }
-declare function getNested(from: any, name: string): any;
-declare function getGlobalThis(): any;
-declare function getType(name: string, target?: any): Type;
-declare function getTypeNameProp(type: Type): string;
-declare function setTypeNameProp(type: Type, value: string): void;
-declare function getTypeFullName(type: Type): string;
-declare function getTypeShortName(type: Type): string;
-declare function getInstanceType(instance: any): any;
-declare function isAssignableFrom(target: any, type: Type): boolean;
-declare function isInstanceOfType(instance: any, type: Type): boolean;
-declare function safeCast(instance: any, type: Type): any;
-declare function cast(instance: any, type: Type): any;
-declare function getBaseType(type: any): any;
 declare function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
 declare enum MemberType {
     field = 4,
@@ -1297,27 +1649,16 @@ declare function getMembers(type: any, memberTypes: MemberType): TypeMember[];
 declare function addTypeMember(type: any, member: TypeMember): TypeMember;
 declare function getTypes(from?: any): any[];
 declare function clearKeys(d: any): void;
-declare function delegateCombine(delegate1: any, delegate2: any): any;
-declare function getStateStore(key?: string): any;
-declare namespace Enum {
-    let toString: (enumType: any, value: number) => string;
-    let getValues: (enumType: any) => any[];
-}
-declare let delegateRemove: (delegate1: any, delegate2: any) => any;
-declare let isEnum: (type: any) => boolean;
-declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function prop(type: any, name: string, getter?: string, setter?: string): void;
-declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function keyOf<T>(prop: keyof T): keyof T;
-declare function registerClass(type: any, name: string, intf?: any[]): void;
 declare function registerEditor(type: any, name: string, intf?: any[]): void;
-declare function registerEnum(type: any, name: string, enumKey?: string): void;
-declare function registerInterface(type: any, name: string, intf?: any[]): void;
 declare function addAttribute(type: any, attr: any): void;
 declare class ISlickFormatter {
 }
 declare class EditorAttribute {
 }
+declare function cast(instance: any, type: Type): any;
+declare function safeCast(instance: any, type: Type): any;
 declare function initializeTypes(root: any, pre: string, limit: number): void;
 declare class Exception extends Error {
     constructor(message: string);
@@ -1338,149 +1679,6 @@ declare function baseValidateOptions(): JQueryValidation.ValidationOptions;
 declare function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
 declare function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
 declare function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-
-/**
- * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
- */
-declare class CriteriaBuilder extends Array {
-    /**
-     * Creates a between criteria.
-     * @param fromInclusive from value
-     * @param toInclusive to value
-     */
-    bw(fromInclusive: any, toInclusive: any): Array<any>;
-    /**
-     * Creates a contains criteria
-     * @param value contains value
-     */
-    contains(value: string): Array<any>;
-    /**
-     * Creates a endsWith criteria
-     * @param value endsWith value
-     */
-    endsWith(value: string): Array<any>;
-    /**
-     * Creates an equal (=) criteria
-     * @param value equal value
-     */
-    eq(value: any): Array<any>;
-    /**
-     * Creates a greater than criteria
-     * @param value greater than value
-     */
-    gt(value: any): Array<any>;
-    /**
-     * Creates a greater than or equal criteria
-     * @param value greater than or equal value
-     */
-    ge(value: any): Array<any>;
-    /**
-     * Creates a in criteria
-     * @param values in values
-     */
-    in(values: any[]): Array<any>;
-    /**
-     * Creates a IS NULL criteria
-     */
-    isNull(): Array<any>;
-    /**
-     * Creates a IS NOT NULL criteria
-     */
-    isNotNull(): Array<any>;
-    /**
-     * Creates a less than or equal to criteria
-     * @param value less than or equal to value
-     */
-    le(value: any): Array<any>;
-    /**
-     * Creates a less than criteria
-     * @param value less than value
-     */
-    lt(value: any): Array<any>;
-    /**
-     * Creates a not equal criteria
-     * @param value not equal value
-     */
-    ne(value: any): Array<any>;
-    /**
-     * Creates a LIKE criteria
-     * @param value like value
-     */
-    like(value: any): Array<any>;
-    /**
-     * Creates a STARTS WITH criteria
-     * @param value startsWith value
-     */
-    startsWith(value: string): Array<any>;
-    /**
-     * Creates a NOT IN criteria
-     * @param values array of NOT IN values
-     */
-    notIn(values: any[]): Array<any>;
-    /**
-     * Creates a NOT LIKE criteria
-     * @param value not like value
-     */
-    notLike(value: any): Array<any>;
-}
-/**
- * Parses a criteria expression to Serenity Criteria array format.
- * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
- * @param expression The criteria expression.
- * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
- * @example
- * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
- */
-declare function parseCriteria(expression: string, params?: any): any[];
-/**
- * Parses a criteria expression to Serenity Criteria array format.
- * The expression may contain parameter placeholders like `A >= ${p1}`
- * where p1 is a variable in the scope.
- * @param strings The string fragments.
- * @param values The tagged template arguments.
- * @example
- * var a = 5, b = 4;
- * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
- */
-declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
-/**
- * Enumeration of Criteria operator keys.
- */
-declare enum CriteriaOperator {
-    paren = "()",
-    not = "not",
-    isNull = "is null",
-    isNotNull = "is not null",
-    exists = "exists",
-    and = "and",
-    or = "or",
-    xor = "xor",
-    eq = "=",
-    ne = "!=",
-    gt = ">",
-    ge = ">=",
-    lt = "<",
-    le = "<=",
-    in = "in",
-    notIn = "not in",
-    like = "like",
-    notLike = "not like"
-}
-/**
- * Creates a new criteria builder containg the passed field name.
- * @param field The field name.
- */
-declare function Criteria(field: string): CriteriaBuilder;
-declare namespace Criteria {
-    var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-    var Operator: typeof CriteriaOperator;
-    var isEmpty: (c: any[]) => boolean;
-    var join: (c1: any[], op: string, c2: any[]) => any[];
-    var not: (c: any[]) => (string | any[])[];
-    var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-    var paren: (c: any[]) => any[];
-    var parse: typeof parseCriteria;
-}
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -2037,72 +2235,12 @@ declare class PrefixedContext {
     }): TWidget;
 }
 
-interface WidgetClass<TOptions = object> {
-    new (element: JQuery, options?: TOptions): Widget<TOptions>;
-    element: JQuery;
-}
-interface WidgetDialogClass<TOptions = object> {
-    new (options?: TOptions): Widget<TOptions> & IDialog;
-    element: JQuery;
-}
-type AnyWidgetClass<TOptions = object> = WidgetClass<TOptions> | WidgetDialogClass<TOptions>;
-declare function reactPatch(): void;
-interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
-    type?: new (element: JQuery, options?: TOptions) => TWidget;
-    options?: TOptions;
-    container?: JQuery;
-    element?: (e: JQuery) => void;
-    init?: (w: TWidget) => void;
-}
-interface WidgetComponentProps<W extends Widget<any>> {
-    id?: string;
-    name?: string;
-    className?: string;
-    maxLength?: number;
-    placeholder?: string;
-    setOptions?: any;
-    required?: boolean;
-    readOnly?: boolean;
-    oneWay?: boolean;
-    onChange?: (e: JQueryEventObject) => void;
-    onChangeSelect2?: (e: JQueryEventObject) => void;
-    value?: any;
-    defaultValue?: any;
-}
-declare class Widget<TOptions = any> {
-    private static nextWidgetNumber;
-    element: JQuery;
-    protected options: TOptions;
-    protected widgetName: string;
-    protected uniqueName: string;
-    readonly idPrefix: string;
-    constructor(element: JQuery, options?: TOptions);
-    destroy(): void;
-    protected addCssClass(): void;
-    protected getCssClass(): string;
-    static getWidgetName(type: Function): string;
-    static elementFor<TWidget>(editorType: {
-        new (...args: any[]): TWidget;
-    }): JQuery;
-    addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-    getGridField(): JQuery;
-    static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
-    initialize(): void;
-    init(action?: (widget: any) => void): this;
-    protected renderContents(): void;
-    private static __isWidgetType;
-}
-declare interface Widget<TOptions> {
-    change(handler: (e: JQueryEventObject) => void): void;
-    changeSelect2(handler: (e: JQueryEventObject) => void): void;
-}
-
 declare global {
     interface JQuery {
         getWidget<TWidget>(widgetType: {
             new (...args: any[]): TWidget;
         }): TWidget;
-        tryGetWidget<TWidget>(widgetType: {
+        tryGetWidget<TWidget>(widgetType?: {
             new (...args: any[]): TWidget;
         }): TWidget;
         flexHeightOnly(flexY?: number): JQuery;
@@ -2118,7 +2256,7 @@ interface ToolButton {
     title?: string;
     hint?: string;
     cssClass?: string;
-    icon?: string;
+    icon?: IconClassName;
     onClick?: any;
     htmlEncode?: any;
     hotkey?: string;
@@ -2134,21 +2272,21 @@ interface PopupMenuButtonOptions {
     positionMy?: string;
     positionAt?: string;
 }
-declare class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-    constructor(div: JQuery, opt: PopupMenuButtonOptions);
+declare class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>);
     destroy(): void;
 }
 interface PopupToolButtonOptions extends PopupMenuButtonOptions {
 }
-declare class PopupToolButton extends PopupMenuButton {
-    constructor(div: JQuery, opt: PopupToolButtonOptions);
+declare class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
+    constructor(props: WidgetProps<P>);
 }
 interface ToolbarOptions {
     buttons?: ToolButton[];
     hotkeyContext?: any;
 }
-declare class Toolbar extends Widget<ToolbarOptions> {
-    constructor(div: JQuery, options: ToolbarOptions);
+declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected mouseTrap: any;
     protected createButtons(): void;
@@ -2157,7 +2295,8 @@ declare class Toolbar extends Widget<ToolbarOptions> {
     updateInterface(): void;
 }
 
-declare class TemplatedWidget<TOptions> extends Widget<TOptions> {
+declare class TemplatedWidget<P> extends Widget<P> {
+    static defaultTagName: string;
     private static templateNames;
     protected byId(id: string): JQuery;
     private byID;
@@ -2178,11 +2317,12 @@ type IdPrefixType = {
 };
 declare function useIdPrefix(prefix: string): IdPrefixType;
 
-declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected tabs: JQuery;
     protected toolbar: Toolbar;
     protected validator: JQueryValidation.Validator;
-    constructor(options?: TOptions);
+    constructor(props?: WidgetProps<P>);
+    static createDefaultElement(): HTMLDivElement;
     private get isMarkedAsPanel();
     private get isResponsive();
     private static getCssSize;
@@ -2201,7 +2341,7 @@ declare class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
     private useBSModal;
     static bootstrapModal: boolean;
     static openPanel(element: JQuery, uniqueName: string): void;
-    static closePanel(element: JQuery, e?: JQueryEventObject): void;
+    static closePanel(element: JQuery, e?: Event): void;
     protected onDialogOpen(): void;
     arrange(): void;
     protected onDialogClose(): void;
@@ -2224,8 +2364,8 @@ interface ModalOptions {
     modalClass?: string;
 }
 
-declare class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
-    constructor(container: JQuery, options?: TOptions);
+declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected tabs: JQuery;
     protected toolbar: Toolbar;
@@ -2279,11 +2419,11 @@ declare namespace ReflectionOptionsSetter {
     function set(target: any, options: any): void;
 }
 
-declare class PropertyGrid extends Widget<PropertyGridOptions> {
+declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
     private editors;
     private items;
     readonly idPrefix: string;
-    constructor(div: JQuery, opt: PropertyGridOptions);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     private createItems;
     private createCategoryDiv;
@@ -2317,7 +2457,7 @@ declare enum PropertyGridMode {
 }
 interface PropertyGridOptions {
     idPrefix?: string;
-    items?: PropertyItem[];
+    items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
     defaultCategory?: string;
@@ -2325,10 +2465,10 @@ interface PropertyGridOptions {
     mode?: PropertyGridMode;
 }
 
-declare class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     private _entity;
     private _entityId;
-    constructor(container: JQuery, options?: TOptions);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected initPropertyGrid(): void;
     protected loadInitialEntity(): void;
@@ -2359,14 +2499,12 @@ declare namespace DialogExtensions {
     function dialogFlexify(dialog: JQuery): JQuery;
 }
 
-declare class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+declare class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
-    constructor(opt?: TOptions);
-    internalInit(): void;
-    protected initSync(): void;
-    protected initAsync(): Promise<void>;
+    constructor(props?: WidgetProps<P>);
+    protected propertyItemsReady(itemsData: PropertyItemsData): void;
     protected afterInit(): void;
     protected useAsync(): boolean;
     destroy(): void;
@@ -2405,31 +2543,29 @@ declare namespace EditorUtils {
     function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
 }
 
-declare class StringEditor extends Widget<any> {
-    constructor(input: JQuery);
+declare class StringEditor<P = {}> extends EditorWidget<P> {
     get value(): string;
     protected get_value(): string;
     set value(value: string);
     protected set_value(value: string): void;
 }
 
-declare class PasswordEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
 }
 
 interface TextAreaEditorOptions {
     cols?: number;
     rows?: number;
 }
-declare class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-    constructor(input: JQuery, opt?: TextAreaEditorOptions);
+declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+    constructor(props: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
     protected set_value(value: string): void;
 }
 
-declare class BooleanEditor extends Widget<any> {
+declare class BooleanEditor<P = {}> extends EditorWidget<P> {
     get value(): boolean;
     protected get_value(): boolean;
     set value(value: boolean);
@@ -2443,8 +2579,8 @@ interface DecimalEditorOptions {
     padDecimals?: any;
     allowNegatives?: boolean;
 }
-declare class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
-    constructor(input: JQuery, opt?: DecimalEditorOptions);
+declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+    constructor(props: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2458,8 +2594,8 @@ interface IntegerEditorOptions {
     maxValue?: number;
     allowNegatives?: boolean;
 }
-declare class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
-    constructor(input: JQuery, opt?: IntegerEditorOptions);
+declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+    constructor(props: EditorProps<P>);
     get_value(): number;
     get value(): number;
     set_value(value: number): void;
@@ -2467,18 +2603,16 @@ declare class IntegerEditor extends Widget<IntegerEditorOptions> implements IDou
     get_isValid(): boolean;
 }
 
-declare let datePickerIconSvg: string;
-declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
+declare const datePickerIconSvg: string;
+interface DateEditorOptions {
+    yearRange?: string;
+    minValue?: string;
+    sqlMinMax?: boolean;
+}
+declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
-    constructor(input: JQuery);
-    static useFlatpickr: boolean;
-    static flatPickrOptions(input: JQuery): {
-        clickOpens: boolean;
-        allowInput: boolean;
-        dateFormat: string;
-        onChange: () => void;
-    };
+    constructor(props: EditorProps<P>);
     get_value(): string;
     get value(): string;
     set_value(value: string): void;
@@ -2500,19 +2634,26 @@ declare class DateEditor extends Widget<any> implements IStringValue, IReadOnly 
     set_maxDate(value: Date): void;
     get_sqlMinMax(): boolean;
     set_sqlMinMax(value: boolean): void;
-    static dateInputChange: (e: JQueryEventObject) => void;
+    static dateInputChange: (e: Event) => void;
+    static dateInputKeyup(e: KeyboardEvent): void;
+    static useFlatpickr: boolean;
+    static flatPickrOptions(input: JQuery): {
+        clickOpens: boolean;
+        allowInput: boolean;
+        dateFormat: string;
+        onChange: () => void;
+    };
     static flatPickrTrigger(input: JQuery): JQuery;
-    static dateInputKeyup(e: JQueryEventObject): void;
     static uiPickerZIndexWorkaround(input: JQuery): void;
 }
 
-declare class DateTimeEditor extends Widget<DateTimeEditorOptions> implements IStringValue, IReadOnly {
+declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private minValue;
     private maxValue;
     private time;
     private lastSetValue;
     private lastSetValueGet;
-    constructor(input: JQuery, opt?: DateTimeEditorOptions);
+    constructor(props: EditorProps<P>);
     getFlatpickrOptions(): any;
     get_value(): string;
     get value(): string;
@@ -2555,9 +2696,9 @@ interface TimeEditorOptions {
     endHour?: any;
     intervalMinutes?: any;
 }
-declare class TimeEditor extends Widget<TimeEditorOptions> {
+declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
     private minutes;
-    constructor(input: JQuery, opt?: TimeEditorOptions);
+    constructor(props: EditorProps<P>);
     get value(): number;
     protected get_value(): number;
     set value(value: number);
@@ -2570,8 +2711,8 @@ interface EmailEditorOptions {
     domain?: string;
     readOnlyDomain?: boolean;
 }
-declare class EmailEditor extends Widget<EmailEditorOptions> {
-    constructor(input: JQuery, opt: EmailEditorOptions);
+declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+    constructor(props: EditorProps<P>);
     static registerValidationMethods(): void;
     get_value(): string;
     get value(): string;
@@ -2581,12 +2722,12 @@ declare class EmailEditor extends Widget<EmailEditorOptions> {
     set_readOnly(value: boolean): void;
 }
 
-declare class EmailAddressEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class EmailAddressEditor<P = {}> extends StringEditor<P> {
+    constructor(props: EditorProps<P>);
 }
 
-declare class URLEditor extends StringEditor {
-    constructor(input: JQuery);
+declare class URLEditor<P = {}> extends StringEditor<P> {
+    constructor(props: EditorProps<P>);
 }
 
 interface RadioButtonEditorOptions {
@@ -2594,8 +2735,8 @@ interface RadioButtonEditorOptions {
     enumType?: any;
     lookupKey?: string;
 }
-declare class RadioButtonEditor extends Widget<RadioButtonEditorOptions> implements IReadOnly {
-    constructor(input: JQuery, opt: RadioButtonEditorOptions);
+declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
+    constructor(props: EditorProps<P>);
     protected addRadio(value: string, text: string): void;
     get_value(): string;
     get value(): string;
@@ -2626,7 +2767,7 @@ interface Select2InplaceAddOptions {
 }
 interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
 }
-interface Select2SearchPromise {
+interface Select2SearchPromise extends PromiseLike<any> {
     abort?(): void;
     catch?(callback: () => void): void;
     fail?(callback: () => void): void;
@@ -2642,11 +2783,11 @@ interface Select2SearchResult<TItem> {
     items: TItem[];
     more: boolean;
 }
-declare class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+declare class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
     private _items;
     private _itemById;
     protected lastCreateTerm: string;
-    constructor(hidden: JQuery, opt?: any);
+    constructor(props: EditorProps<P>);
     destroy(): void;
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
@@ -2744,12 +2885,13 @@ declare class Select2Editor<TOptions, TItem> extends Widget<TOptions> implements
     protected setEditDialogReadOnly(dialog: any): void;
     protected editDialogDataChange(): void;
     protected setTermOnNewEntity(entity: TItem, term: string): void;
-    protected inplaceCreateClick(e: JQueryEventObject): void;
+    protected inplaceCreateClick(e: Event): void;
     openDialogAsPanel: boolean;
 }
+declare function select2LocaleInitialization(): boolean;
 
-declare class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
-    constructor(hidden: JQuery, opt?: SelectEditorOptions);
+declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
+    constructor(props: EditorProps<P>);
     getItems(): any[];
     protected emptyItemText(): string;
     updateItems(): void;
@@ -2759,8 +2901,8 @@ interface SelectEditorOptions extends Select2CommonOptions {
     emptyOptionText?: string;
 }
 
-declare class DateYearEditor extends SelectEditor {
-    constructor(hidden: JQuery, opt: DateYearEditorOptions);
+declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
+    constructor(props: EditorProps<P>);
     getItems(): any[];
 }
 interface DateYearEditorOptions extends SelectEditorOptions {
@@ -2773,8 +2915,8 @@ interface EnumEditorOptions extends Select2CommonOptions {
     enumKey?: string;
     enumType?: any;
 }
-declare class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
-    constructor(hidden: JQuery, opt: EnumEditorOptions);
+declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
+    constructor(props: EditorProps<P>);
     protected updateItems(): void;
     protected allowClear(): boolean;
 }
@@ -2783,8 +2925,9 @@ interface LookupEditorOptions extends Select2EditorOptions {
     lookupKey?: string;
     async?: boolean;
 }
-declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
-    constructor(input: JQuery, opt?: TOptions);
+declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+    private lookupChangeUnbind;
+    constructor(props: EditorProps<P>);
     hasAsyncSource(): boolean;
     destroy(): void;
     protected getLookupKey(): string;
@@ -2802,8 +2945,8 @@ declare abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TI
     protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
     protected editDialogDataChange(): void;
 }
-declare class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: LookupEditorOptions);
+declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
+    constructor(props: EditorProps<P>);
 }
 
 interface ServiceLookupEditorOptions extends Select2EditorOptions {
@@ -2821,8 +2964,7 @@ interface ServiceLookupEditorOptions extends Select2EditorOptions {
     equalityFilter?: any;
     criteria?: any[];
 }
-declare abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
-    constructor(input: JQuery, opt?: TOptions);
+declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
     protected getDialogTypeKey(): string;
     protected getService(): string;
     protected getServiceUrl(): string;
@@ -2837,19 +2979,19 @@ declare abstract class ServiceLookupEditorBase<TOptions extends ServiceLookupEdi
     protected hasAsyncSource(): boolean;
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
 }
-declare class ServiceLookupEditor extends ServiceLookupEditorBase<ServiceLookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: ServiceLookupEditorOptions);
+declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    constructor(props: EditorProps<P>);
 }
 
 interface HtmlContentEditorOptions {
-    cols?: any;
-    rows?: any;
+    cols?: number;
+    rows?: number;
 }
 interface CKEditorConfig {
 }
-declare class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     private _instanceReady;
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+    constructor(props: EditorProps<P>);
     protected instanceReady(x: any): void;
     protected getLanguage(): string;
     protected getConfig(): CKEditorConfig;
@@ -2866,17 +3008,15 @@ declare class HtmlContentEditor extends Widget<HtmlContentEditorOptions> impleme
     static getCKEditorBasePath(): string;
     static includeCKEditor(): void;
 }
-declare class HtmlNoteContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     protected getConfig(): CKEditorConfig;
 }
-declare class HtmlReportContentEditor extends HtmlContentEditor {
-    constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     protected getConfig(): CKEditorConfig;
 }
 
-declare class MaskedEditor extends Widget<MaskedEditorOptions> {
-    constructor(input: JQuery, opt?: MaskedEditorOptions);
+declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
+    constructor(props: EditorProps<P>);
     get value(): string;
     protected get_value(): string;
     set value(value: string);
@@ -2891,8 +3031,8 @@ interface RecaptchaOptions {
     siteKey?: string;
     language?: string;
 }
-declare class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
-    constructor(div: JQuery, opt: RecaptchaOptions);
+declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
+    constructor(props: EditorProps<P>);
     get_value(): string;
     set_value(value: string): void;
 }
@@ -2948,8 +3088,8 @@ interface FileUploadEditorOptions extends FileUploadConstraints {
 }
 interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
-declare class FileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-    constructor(div: JQuery, opt: FileUploadEditorOptions);
+declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    constructor(props: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -2972,17 +3112,17 @@ declare class FileUploadEditor extends Widget<FileUploadEditorOptions> implement
     protected uploadInput: JQuery;
     protected hiddenInput: JQuery;
 }
-declare class ImageUploadEditor extends FileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+    constructor(props: EditorProps<P>);
 }
-declare class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     private entities;
     private toolbar;
     private fileSymbols;
     private uploadInput;
     protected progress: JQuery;
     protected hiddenInput: JQuery;
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+    constructor(props: EditorProps<P>);
     protected getUploadInputOptions(): UploadInputOptions;
     protected addFileButtonText(): string;
     protected getToolButtons(): ToolButton[];
@@ -3000,8 +3140,8 @@ declare class MultipleFileUploadEditor extends Widget<FileUploadEditorOptions> i
     setEditValue(source: any, property: PropertyItem): void;
     jsonEncodeValue: boolean;
 }
-declare class MultipleImageUploadEditor extends MultipleFileUploadEditor {
-    constructor(div: JQuery, opt: ImageUploadEditorOptions);
+declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+    constructor(props: EditorProps<P>);
 }
 
 interface QuickFilterArgs<TWidget> {
@@ -3013,12 +3153,15 @@ interface QuickFilterArgs<TWidget> {
     active?: boolean;
     handled?: boolean;
 }
-interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+interface QuickFilter<TWidget extends Widget<P>, P> {
     field?: string;
-    type?: new (element: JQuery, options: TOptions) => TWidget;
+    type?: {
+        new (options?: P): TWidget;
+        prototype: TWidget;
+    };
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     title?: string;
-    options?: TOptions;
+    options?: P & WidgetProps<{}>;
     element?: (e: JQuery) => void;
     init?: (w: TWidget) => void;
     separator?: boolean;
@@ -3033,17 +3176,17 @@ interface QuickFilterBarOptions {
     getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
     idPrefix?: string;
 }
-declare class QuickFilterBar extends Widget<QuickFilterBarOptions> {
-    constructor(container: JQuery, options?: QuickFilterBarOptions);
+declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>);
     addSeparator(): void;
     add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
     addDateRange(field: string, title?: string): DateEditor;
     static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-    addDateTimeRange(field: string, title?: string): DateTimeEditor;
+    addDateTimeRange(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
     static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
     addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
-    onChange: (e: JQueryEventObject) => void;
+    onChange: (e: Event) => void;
     private submitHandlers;
     destroy(): void;
     onSubmit(request: ListRequest): void;
@@ -3069,12 +3212,12 @@ interface QuickSearchInputOptions {
     onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
     fields?: QuickSearchField[];
 }
-declare class QuickSearchInput extends Widget<QuickSearchInputOptions> {
+declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
     private lastValue;
     private field;
     private fieldChanged;
     private timer;
-    constructor(input: JQuery, opt: QuickSearchInputOptions);
+    constructor(props: WidgetProps<P>);
     protected checkIfValueChanged(): void;
     get_value(): string;
     get_field(): QuickSearchField;
@@ -3136,11 +3279,14 @@ declare class FilterStore {
     };
     get_items(): FilterLine[];
     raiseChanged(): void;
-    add_changed(value: (e: JQueryEventObject, a: any) => void): void;
-    remove_changed(value: (e: JQueryEventObject, a: any) => void): void;
+    add_changed(value: (e: Event, a: any) => void): void;
+    remove_changed(value: (e: Event, a: any) => void): void;
     get_activeCriteria(): any[];
     get_displayText(): string;
 }
+declare function delegateCombine(delegate1: any, delegate2: any): any;
+declare function delegateRemove(delegate1: any, delegate2: any): any;
+declare function delegateContains(targets: any[], object: any, method: any): boolean;
 
 interface IFiltering {
     createEditor(): void;
@@ -3187,11 +3333,11 @@ declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     protected getCriteriaField(): string;
     getCriteria(): CriteriaWithText;
     loadState(state: any): void;
-    saveState(): any;
+    saveState(): string;
     protected argumentNull(): Error;
     validateEditorValue(value: string): string;
     getEditorValue(): string;
-    getEditorText(): any;
+    getEditorText(): string;
     initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
@@ -3266,19 +3412,22 @@ declare namespace FilteringTypeRegistry {
     function get(key: string): Function;
 }
 
-declare class FilterWidgetBase<TOptions> extends TemplatedWidget<TOptions> {
+declare class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
     private store;
     private onFilterStoreChanged;
-    constructor(div: JQuery, opt?: TOptions);
+    constructor(props: WidgetProps<P>);
     destroy(): void;
     protected filterStoreChanged(): void;
     get_store(): FilterStore;
     set_store(value: FilterStore): void;
 }
 
-declare class FilterPanel extends FilterWidgetBase<any> {
+interface FilterFieldSelectOptions {
+    fields: PropertyItem[];
+}
+declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     private rowsDiv;
-    constructor(div: JQuery);
+    constructor(props: WidgetProps<P>);
     private showInitialLine;
     get_showInitialLine(): boolean;
     set_showInitialLine(value: boolean): void;
@@ -3292,31 +3441,31 @@ declare class FilterPanel extends FilterWidgetBase<any> {
     set_updateStoreOnReset(value: boolean): void;
     protected getTemplate(): string;
     protected initButtons(): void;
-    protected searchButtonClick(e: JQueryEventObject): void;
+    protected searchButtonClick(e: Event): void;
     get_hasErrors(): boolean;
     search(): void;
-    protected addButtonClick(e: JQueryEventObject): void;
-    protected resetButtonClick(e: JQueryEventObject): void;
+    protected addButtonClick(e: Event): void;
+    protected resetButtonClick(e: Event): void;
     protected findEmptyRow(): JQuery;
     protected addEmptyRow(popupField: boolean): JQuery;
-    protected onRowFieldChange(e: JQueryEventObject): void;
+    protected onRowFieldChange(e: Event): void;
     protected rowFieldChange(row: JQuery): void;
     protected removeFiltering(row: JQuery): void;
     protected populateOperatorList(row: JQuery): void;
     protected getFieldFor(row: JQuery): PropertyItem;
     protected getFilteringFor(row: JQuery): IFiltering;
-    protected onRowOperatorChange(e: JQueryEventObject): void;
+    protected onRowOperatorChange(e: Event): void;
     protected rowOperatorChange(row: JQuery): void;
-    protected deleteRowClick(e: JQueryEventObject): void;
+    protected deleteRowClick(e: Event): void;
     protected updateButtons(): void;
-    protected andOrClick(e: JQueryEventObject): void;
-    protected leftRightParenClick(e: JQueryEventObject): void;
+    protected andOrClick(e: Event): void;
+    protected leftRightParenClick(e: Event): void;
     protected updateParens(): void;
 }
 
-declare class FilterDialog extends TemplatedDialog<any> {
+declare class FilterDialog<P = {}> extends TemplatedDialog<P> {
     private filterPanel;
-    constructor();
+    constructor(props: WidgetProps<P>);
     get_filterPanel(): FilterPanel;
     protected getTemplate(): string;
     protected getDialogButtons(): {
@@ -3325,14 +3474,14 @@ declare class FilterDialog extends TemplatedDialog<any> {
     }[];
 }
 
-declare class FilterDisplayBar extends FilterWidgetBase<any> {
-    constructor(div: JQuery);
+declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
+    constructor(props: WidgetProps<P>);
     protected filterStoreChanged(): void;
     protected getTemplate(): string;
 }
 
-declare class SlickPager extends Widget<PagerOptions> {
-    constructor(div: JQuery, o: PagerOptions);
+declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
+    constructor(props: WidgetProps<P>);
     _changePage(ctype: string): boolean;
     _updatePager(): void;
 }
@@ -3391,8 +3540,8 @@ declare namespace GridUtils {
     function addIncludeDeletedToggle(toolDiv: JQuery, view: RemoteView<any>, hint?: string, initial?: boolean): void;
     function addQuickSearchInput(toolDiv: JQuery, view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
     function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
-    function makeOrderable(grid: Grid, handleMove: (p1: any, p2: number) => void): void;
-    function makeOrderableWithUpdateRequest(grid: IDataGrid, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+    function makeOrderable(grid: Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
+    function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }
 declare namespace PropertyItemSlickConverter {
     function toSlickColumns(items: PropertyItem[]): Column[];
@@ -3419,7 +3568,7 @@ declare namespace SlickTreeHelper {
     function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
     function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
     function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-    function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
+    function toggleClick<TItem>(e: Event, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
 }
 declare class ColumnsBase<TRow = any> {
     constructor(items: Column<TRow>[]);
@@ -3488,31 +3637,6 @@ declare namespace FormatterTypeRegistry {
     function tryGet(key: string): any;
 }
 
-type GroupItemMetadataProviderType = typeof GroupItemMetadataProvider;
-declare global {
-    namespace Slick {
-        namespace Data {
-            /** @obsolete use the type exported from @serenity-is/sleekgrid */
-            const GroupItemMetadataProvider: GroupItemMetadataProviderType;
-        }
-        interface RowMoveManagerOptions {
-            cancelEditOnDrag: boolean;
-        }
-        class RowMoveManager implements IPlugin {
-            constructor(options: RowMoveManagerOptions);
-            init(): void;
-            onBeforeMoveRows: EventEmitter;
-            onMoveRows: EventEmitter;
-        }
-        class RowSelectionModel implements SelectionModel {
-            init(grid: Grid): void;
-            destroy?: () => void;
-            setSelectedRanges(ranges: Range[]): void;
-            onSelectedRangesChanged: EventEmitter<Range[]>;
-            refreshSelections?(): void;
-        }
-    }
-}
 interface SettingStorage {
     getItem(key: string): string | Promise<string>;
     setItem(key: string, value: string): void | Promise<void>;
@@ -3544,7 +3668,7 @@ interface GridPersistanceFlags {
     quickSearch?: boolean;
     includeDeleted?: boolean;
 }
-declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid, IReadOnly {
+declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
     private _isDisabled;
     private _layoutTimer;
     private _slickGridOnSort;
@@ -3567,10 +3691,8 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     static defaultPersistanceStorage: SettingStorage;
     static defaultColumnWidthScale: number;
     static defaultColumnWidthDelta: number;
-    constructor(container: JQuery, options?: TOptions);
-    protected internalInit(): void;
-    protected initSync(): void;
-    protected initAsync(): Promise<void>;
+    constructor(props: WidgetProps<P>);
+    protected propertyItemsReady(itemsData: PropertyItemsData): void;
     protected afterInit(): void;
     protected useAsync(): boolean;
     protected useLayoutTimer(): boolean;
@@ -3613,7 +3735,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected getButtons(): ToolButton[];
     protected editItem(entityOrId: any): void;
     protected editItemOfType(itemType: string, entityOrId: any): void;
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void;
+    protected onClick(e: Event, row: number, cell: number): void;
     protected viewDataChanged(e: any, rows: TItem[]): void;
     protected bindToViewEvents(): void;
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
@@ -3675,15 +3797,15 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     protected subDialogDataChange(): void;
     protected addFilterSeparator(): void;
     protected determineText(getKey: (prefix: string) => string): string;
-    protected addQuickFilter<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+    protected addQuickFilter<TWidget extends Widget<any>, P>(opt: QuickFilter<TWidget, P>): TWidget;
     protected addDateRangeFilter(field: string, title?: string): DateEditor;
-    protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-    protected addDateTimeRangeFilter(field: string, title?: string): DateTimeEditor;
-    protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
+    protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor<DateEditorOptions>, DateTimeEditorOptions>;
+    protected addDateTimeRangeFilter(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
+    protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor<DateTimeEditorOptions>, DateTimeEditorOptions>;
     protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor;
-    protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
+    protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor<SelectEditorOptions>, SelectEditorOptions>;
     protected invokeSubmitHandlers(): void;
-    protected quickFilterChange(e: JQueryEventObject): void;
+    protected quickFilterChange(e: Event): void;
     protected getPersistanceStorage(): SettingStorage;
     protected getPersistanceKey(): string;
     protected gridPersistanceFlags(): GridPersistanceFlags;
@@ -3699,7 +3821,7 @@ declare class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDat
     getFilterStore(): FilterStore;
 }
 
-declare class ColumnPickerDialog extends TemplatedDialog<any> {
+declare class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     private ulVisible;
     private ulHidden;
     private colById;
@@ -3707,7 +3829,7 @@ declare class ColumnPickerDialog extends TemplatedDialog<any> {
     visibleColumns: string[];
     defaultColumns: string[];
     done: () => void;
-    constructor();
+    constructor(props: WidgetProps<P>);
     static createToolButton(grid: IDataGrid): ToolButton;
     protected getDialogButtons(): {
         text: string;
@@ -3763,9 +3885,9 @@ interface CheckTreeItem<TSource> {
     children?: CheckTreeItem<TSource>[];
     source?: TSource;
 }
-declare class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extends DataGrid<TItem, TOptions> implements IGetEditValue, ISetEditValue, IReadOnly {
+declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
     private byId;
-    constructor(div: JQuery, opt?: TOptions);
+    constructor(props: EditorProps<P>);
     protected getIdProperty(): string;
     protected getTreeItems(): TItem[];
     protected updateItems(): void;
@@ -3779,7 +3901,7 @@ declare class CheckTreeEditor<TItem extends CheckTreeItem<any>, TOptions> extend
     protected onViewFilter(item: TItem): boolean;
     protected getInitialCollapse(): boolean;
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
-    protected onClick(e: JQueryEventObject, row: number, cell: number): void;
+    protected onClick(e: Event, row: number, cell: number): void;
     protected updateSelectAll(): void;
     protected updateFlags(): void;
     protected getDescendantsSelected(item: TItem): boolean;
@@ -3813,10 +3935,12 @@ interface CheckLookupEditorOptions {
     filterField?: string;
     filterValue?: any;
 }
-declare class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+declare class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
     private searchText;
     private enableUpdateItems;
-    constructor(div: JQuery, options: CheckLookupEditorOptions);
+    private lookupChangeUnbind;
+    constructor(props: EditorProps<P>);
+    destroy(): void;
     protected updateItems(): void;
     protected getLookupKey(): string;
     protected getButtons(): ToolButton[];
@@ -3853,8 +3977,8 @@ declare class CheckLookupEditor<TItem = any> extends CheckTreeEditor<CheckTreeIt
     set filterValue(value: any);
 }
 
-declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-    constructor(container: JQuery, options?: TOptions);
+declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
+    constructor(props: WidgetProps<P>);
     protected handleRoute(args: HandleRouteEventArgs): void;
     protected usePager(): boolean;
     protected createToolbarExtensions(): void;
@@ -3894,7 +4018,7 @@ declare class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
     };
 }
 
-declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog, IReadOnly {
+declare class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
@@ -3911,10 +4035,8 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     protected localizationPendingValue: any;
     protected localizationLastValue: any;
     static defaultLanguageList: () => string[][];
-    constructor(opt?: TOptions);
-    internalInit(): void;
-    protected initSync(): void;
-    protected initAsync(): Promise<void>;
+    constructor(props?: WidgetProps<P>);
+    protected propertyItemsReady(itemsData: PropertyItemsData): void;
     protected afterInit(): void;
     protected useAsync(): boolean;
     destroy(): void;
@@ -4020,14 +4142,14 @@ declare class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> im
     protected getFallbackTemplate(): string;
 }
 
-type JsxDomWidgetProps<P> = P & WidgetComponentProps<any> & {
+type JsxDomWidgetProps<P> = EditorProps<P> & {
     children?: any | undefined;
     class?: string;
 };
 interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
     (props: JsxDomWidgetProps<P>, context?: any): TElement | null;
 }
-declare function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: new (element: JQuery, options?: TOptions) => TWidget): JsxDomWidget<TOptions & {
+declare function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: (new (element: ArrayLike<HTMLElement>, options?: TOptions) => Widget<TOptions>) | (new (options?: TOptions) => TWidget)): JsxDomWidget<TOptions & {
     ref?: (r: TWidget) => void;
 }>;
 
@@ -4035,8 +4157,8 @@ declare namespace Reporting {
     interface ReportDialogOptions {
         reportKey?: string;
     }
-    class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
-        constructor(opt: ReportDialogOptions);
+    class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends TemplatedDialog<P> {
+        constructor(props: WidgetProps<P>);
         protected propertyGrid: PropertyGrid;
         protected propertyItems: PropertyItem[];
         protected reportKey: string;
@@ -4055,11 +4177,11 @@ declare namespace Reporting {
         DesignId?: string;
         Parameters?: any;
     }
-    class ReportPage extends Widget<any> {
-        constructor(div: JQuery);
+    class ReportPage<P = {}> extends Widget<P> {
+        constructor(props: WidgetProps<P>);
         protected updateMatchFlags(text: string): void;
-        protected categoryClick(e: JQueryEventObject): void;
-        protected reportLinkClick(e: JQueryEventObject): void;
+        protected categoryClick(e: Event): void;
+        protected reportLinkClick(e: Event): void;
     }
     interface ReportRetrieveRequest extends ServiceRequest {
         ReportKey?: string;
@@ -4116,23 +4238,23 @@ interface GoogleMapOptions {
     markerLatitude?: any;
     markerLongitude?: any;
 }
-declare class GoogleMap extends Widget<GoogleMapOptions> {
+declare class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorWidget<P> {
     private map;
-    constructor(container: JQuery, opt: GoogleMapOptions);
+    constructor(props: EditorProps<P>);
     get_map(): any;
 }
 
-declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+declare class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number;
-    constructor(hidden: JQuery, opt: TOptions);
+    constructor(props: EditorProps<P>);
     protected emptyItemText(): string;
     protected getService(): string;
-    protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-    protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+    protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void;
+    protected executeQuery(options: ServiceOptions<ListResponse<TItem>>): void;
     protected queryByKey(key: string, callback: (p1: any) => void): void;
-    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
-    protected getItemKey(item: any): string;
-    protected getItemText(item: any): string;
+    protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<TItem>>): void;
+    protected getItemKey(item: TItem): string;
+    protected getItemText(item: TItem): string;
     protected getTypeDelay(): number;
     protected getSelect2Options(): Select2Options;
     protected addInplaceCreate(title: string): void;
@@ -4155,7 +4277,7 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
  * {
  *   "dependencies": {
  *     // ...
- *     "@serenity-is/corelib": "6.9.0"
+ *     "@serenity-is/corelib": "latest"
  *   }
  * }
  * ```
@@ -4169,4 +4291,4 @@ declare class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implem
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, AlertOptions, AnyWidgetClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, CKEditorConfig, CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, CheckLookupEditorOptions, CheckTreeEditor, CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, CommonDialogOptions, Config, ConfirmOptions, Constructor, CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, CriteriaWithText, CssClassAttribute, Culture, DataChangeInfo, DataGrid, DateEditor, DateFiltering, DateFormat, DateFormatter, DateTimeEditor, DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, DateYearEditorOptions, DebouncedFunction, DecimalEditor, DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, DeleteRequest, DeleteResponse, DialogButton, DialogExtensions, DialogTypeAttribute, DialogTypeRegistry, Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, ElementAttribute, EmailAddressEditor, EmailEditor, EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, FileUploadConstraints, FileUploadEditor, FileUploadEditorOptions, FilterDialog, FilterDisplayBar, FilterLine, FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, FlexifyOptions, FormKeyAttribute, Format, Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, GoogleMapOptions, GridPersistanceFlags, GridRadioSelectionMixin, GridRadioSelectionMixinOptions, GridRowSelectionMixin, GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, GroupByElement, GroupByResult, GroupInfo, Grouping, HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, IdPropertyAttribute, ImageUploadEditor, ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, JQBlockUIOptions, JsxDomWidget, LT, LayoutTimer, LazyLoadHelper, ListRequest, ListResponse, LocalTextPrefixAttribute, Locale, Lookup, LookupEditor, LookupEditorBase, LookupEditorOptions, LookupFiltering, LookupOptions, MaskedEditor, MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, NotifyMap, NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, PagerOptions, PagingInfo, PagingOptions, PanelAttribute, PasswordEditor, PersistedGridColumn, PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, PopupMenuButtonOptions, PopupToolButton, PopupToolButtonOptions, PostToServiceOptions, PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, PropertyGridOptions, PropertyItem, PropertyItemSlickConverter, PropertyItemsData, PropertyPanel, QuickFilter, QuickFilterArgs, QuickFilterBar, QuickFilterBarOptions, QuickSearchField, QuickSearchInput, QuickSearchInputOptions, RadioButtonEditor, RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewOptions, RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, RetrieveLocalizationRequest, RetrieveLocalizationResponse, RetrieveRequest, RetrieveResponse, Router, SaveRequest, SaveRequestWithAttachment, SaveResponse, SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, Select2CommonOptions, Select2Editor, Select2EditorOptions, Select2FilterOptions, Select2InplaceAddOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult, SelectEditor, SelectEditorOptions, ServiceAttribute, ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, ServiceLookupEditorOptions, ServiceLookupFiltering, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, TextAreaEditorOptions, TimeEditor, TimeEditorOptions, ToastContainerOptions, Toastr, ToastrOptions, ToolButton, Toolbar, ToolbarOptions, TreeGridMixin, TreeGridMixinOptions, Type, TypeMember, URLEditor, UndeleteRequest, UndeleteResponse, UpdatableAttribute, UploadHelper, UploadInputOptions, UploadResponse, UploadedFile, UrlFormatter, UserDefinition, VX, ValidationHelper, WX, Widget, WidgetClass, WidgetComponentProps, WidgetDialogClass, addAttribute, addEmptyOption, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, attrEncode, baseValidateOptions, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getGlobalThis, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getStateStore, getTemplate, getTemplateAsync, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypes, groupBy, htmlEncode, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, reactPatch, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveUrl, round, safeCast, serviceCall, serviceRequest, setEquality, setTypeNameProp, single, splitDateString, startsWith, success, successDialog, text, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };
+export { AggregateFormatting, Aggregators, type AlertOptions, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, type CommonDialogOptions, Config, type ConfirmOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, type DialogButton, DialogExtensions, DialogTexts, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, Flexify, FlexifyAttribute, type FlexifyOptions, FormKeyAttribute, type Format, type Formatter, FormatterTypeRegistry, GeneratedCodeAttribute, GoogleMap, type GoogleMapOptions, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, type HandleRouteEventArgs, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IAsyncInit, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type JsxDomWidget, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, MinuteFormatter, type ModalOptions, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, Reporting, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptContext, ScriptData, Select2AjaxEditor, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, Toolbar, type ToolbarOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, UrlFormatter, type UserDefinition, type UtilityColor, VX, ValidationHelper, WX, Widget, type WidgetProps, addAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, bsModalMarkup, canLoadScriptData, cast, centerDialog, clearKeys, clearOptions, closePanel, coalesce, compareStringFactory, confirm, confirmDialog, count, datePickerIconSvg, dbText, dbTryText, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, dialogButtonToBS, dialogButtonToUI, endsWith, ensureMetadata, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, getAttributes, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getTypes, gridPageInit, groupBy, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isJQueryReal, isMobileView, isPromiseLike, isTrimmedEmpty, isValue, jsxDomWidget, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, notifyError, notifyInfo, notifySuccess, notifyWarning, openPanel, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, prop, proxyTexts, registerClass, registerEditor, registerEnum, registerInterface, reloadLookup, reloadLookupAsync, removeValidationRule, replaceAll, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, zeroPad };

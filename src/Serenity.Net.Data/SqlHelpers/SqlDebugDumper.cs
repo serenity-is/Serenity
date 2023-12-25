@@ -80,7 +80,7 @@ public class SqlDebugDumper
 
         if (value is byte[] data)
         {
-            StringBuilder sb = new StringBuilder("0x");
+            StringBuilder sb = new("0x");
             for (int i = 0; i < data.Length; i++)
                 sb.Append(data[i].ToString("h2"));
             return sb.ToString();

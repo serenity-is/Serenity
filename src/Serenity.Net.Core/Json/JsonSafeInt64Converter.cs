@@ -1,4 +1,7 @@
-﻿namespace Serenity.Data;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
+using Newtonsoft.Json;
+
+namespace Serenity.Data;
 
 /// <summary>
 ///   Serialize/deserialize a row</summary>

@@ -7,7 +7,17 @@ namespace Serenity.Services;
 /// Behavior class that handles <see cref="FileUploadEditorAttribute"/> and
 /// <see cref="ImageUploadEditorAttribute"/>.
 /// </summary>
-public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
+/// <remarks>
+/// Creates a new instance of the class.
+/// </remarks>
+/// <param name="uploadValidator">Upload validator</param>
+/// <param name="imageProcessor">Image processor</param>
+/// <param name="storage">Upload storage</param>
+/// <param name="formatSanitizer">Filename format sanitizer</param>
+/// <exception cref="ArgumentNullException">One of the arguments is null</exception>
+public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
+    IUploadStorage storage,
+    IFilenameFormatSanitizer formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field Target { get; set; }
@@ -15,30 +25,12 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
     private IUploadEditor editorAttr;
     private string fileNameFormat;
     private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
-    private readonly IUploadValidator uploadValidator;
-    private readonly IImageProcessor imageProcessor;
-    private readonly IUploadStorage storage;
-    private readonly IFilenameFormatSanitizer formatSanitizer;
+    private readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
+    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
+    private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
+    private readonly IFilenameFormatSanitizer formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
     private StringField originalNameField;
     private Dictionary<string, Field> replaceFields;
-
-    /// <summary>
-    /// Creates a new instance of the class.
-    /// </summary>
-    /// <param name="uploadValidator">Upload validator</param>
-    /// <param name="imageProcessor">Image processor</param>
-    /// <param name="storage">Upload storage</param>
-    /// <param name="formatSanitizer">Filename format sanitizer</param>
-    /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
-    public FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-        IUploadStorage storage, 
-        IFilenameFormatSanitizer formatSanitizer = null)
-    {
-        this.uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-        this.imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
-        this.storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        this.formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
-    }
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -109,23 +101,17 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
 
             var fieldName = fileNameFormat.Substring(start + 1, end - start - 1);
             var actualName = fieldName;
-            var colon = fieldName.IndexOf(":", StringComparison.Ordinal);
+            var colon = fieldName.IndexOf(':');
             if (colon >= 0)
                 actualName = fieldName[..colon];
 
-            var replaceField = row.FindFieldByPropertyName(actualName) ??
-                row.FindField(actualName);
-
-            if (replaceField is null)
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+            var replaceField = (row.FindFieldByPropertyName(actualName) ??
+                row.FindField(actualName)) ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
                     "references field '{2}', but no such field is found!'",
                         target.PropertyName ?? target.Name,
                         row.GetType().FullName,
                         actualName));
-            }
-
             replaceFields['|' + fieldName + '|'] = replaceField;
 
             start = end + 1;
@@ -144,8 +130,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         if (replaceFields == null)
             return result;
 
-        if (formatSanitizer is null)
-            throw new ArgumentNullException(nameof(formatSanitizer));
+        ArgumentNullException.ThrowIfNull(formatSanitizer);
 
         var row = handler.Row;
 
@@ -179,7 +164,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
             string value;
 
             string key = p.Key;
-            var colon = key.IndexOf(":", StringComparison.Ordinal);
+            var colon = key.IndexOf(':');
             if (colon >= 0)
             {
                 key = key[1..colon];
@@ -236,7 +221,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         }
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
 
         if (newFilename == null)
         {
@@ -294,7 +279,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
         DeleteOldFile(storage, filesToDelete, oldFilename, 
-            copyToHistory: (editorAttr as IUploadFileOptions)?.CopyToHistory == true);
+            copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
     }
 
     private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete filesToDelete)
@@ -360,8 +345,7 @@ public class FileUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFi
         IUploadOptions uploadOptions, IUploadValidator validator, IImageProcessor imageProcessor,
         IUploadStorage storage, ref string temporaryFile)
     {
-        if (storage == null)
-            throw new ArgumentNullException(nameof(storage));
+        ArgumentNullException.ThrowIfNull(storage);
 
         UploadPathHelper.CheckFileNameSecurity(temporaryFile);
 

@@ -8,32 +8,25 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation for <see cref="IScriptContent"/>
 /// </summary>
-public class ScriptContent : IScriptContent
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="content">Content</param>
+/// <param name="time">Time</param>
+/// <param name="compressionLevel">Suggested compression level</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class ScriptContent(byte[] content, DateTime time, CompressionLevel compressionLevel) : IScriptContent
 {
-    private readonly CompressionLevel compressionLevel;
+    private readonly CompressionLevel compressionLevel = compressionLevel;
     private string hash;
-    private readonly byte[] content;
+    private readonly byte[] content = content ?? throw new ArgumentNullException(nameof(content));
     private byte[] gzipContent;
     private byte[] brotliContent;
 
     /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="content">Content</param>
-    /// <param name="time">Time</param>
-    /// <param name="compressionLevel">Suggested compression level</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public ScriptContent(byte[] content, DateTime time, CompressionLevel compressionLevel)
-    {
-        this.content = content ?? throw new ArgumentNullException(nameof(content));
-        this.compressionLevel = compressionLevel;
-        Time = time;
-    }
-
-    /// <summary>
     /// Gets script generated time
     /// </summary>
-    public DateTime Time { get; private set; }
+    public DateTime Time { get; private set; } = time;
 
     /// <summary>
     /// Gets script hash
@@ -44,8 +37,7 @@ public class ScriptContent : IScriptContent
         {
             if (hash == null)
             {
-                var md5 = MD5.Create();
-                byte[] result = md5.ComputeHash(content);
+                byte[] result = MD5.HashData(content);
                 hash = WebEncoders.Base64UrlEncode(result);
             }
 

@@ -8,16 +8,12 @@
 /// determines in which order they are grouped by.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class GroupOrderAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="GroupOrderAttribute"/> class.
+/// </remarks>
+/// <param name="groupOrder">The group order.</param>
+public class GroupOrderAttribute(int groupOrder) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GroupOrderAttribute"/> class.
-    /// </summary>
-    /// <param name="groupOrder">The group order.</param>
-    public GroupOrderAttribute(int groupOrder)
-    {
-        GroupOrder = groupOrder;
-    }
 
     /// <summary>
     /// Gets the group order.
@@ -25,5 +21,5 @@ public class GroupOrderAttribute : Attribute
     /// <value>
     /// The group order.
     /// </value>
-    public int GroupOrder { get; private set; }
+    public int GroupOrder { get; private set; } = groupOrder;
 }

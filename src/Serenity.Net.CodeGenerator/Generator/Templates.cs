@@ -9,7 +9,7 @@ public static class Templates
 
     private static readonly ConcurrentDictionary<string, Template> templateCache = new();
 
-    private static Template GetTemplate(IGeneratorFileSystem fileSystem, string templateKey)
+    private static Template GetTemplate(IFileSystem fileSystem, string templateKey)
     {
         if (templateCache.TryGetValue(templateKey, out Template t))
             return t;
@@ -39,7 +39,7 @@ public static class Templates
     }
 
 
-    public static string Render(IGeneratorFileSystem fileSystem, string templateKey, object model,
+    public static string Render(IFileSystem fileSystem, string templateKey, object model,
         Action<CodeWriter> initWriter = null)
     {
         var template = GetTemplate(fileSystem, templateKey);

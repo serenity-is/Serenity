@@ -1,11 +1,11 @@
-﻿namespace Serenity.Tests.Localization;
+namespace Serenity.Tests.Localization;
 
 public class LocalTextTests
 {
     [Fact]
     public void InvariantLanguageID_IsEmptyString()
     {
-        Assert.Equal(string.Empty, LocalText.InvariantLanguageID);
+        Assert.Equal(LocalText.InvariantLanguageID, string.Empty);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class LocalTextTests
     [Fact]
     public void ToString_ReturnsEmpty_If_Key_IsEmpty()
     {
-        LocalText text2 = new LocalText(string.Empty);
+        LocalText text2 = new(string.Empty);
         string actual2 = text2.ToString(localizer: null);
         Assert.Equal(string.Empty, actual2);
     }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Web;
 
@@ -21,7 +21,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// </summary>
     protected LookupScript()
     {
-        lookupParams = new Dictionary<string, object>();
+        lookupParams = [];
     }
 
     /// <inheritdoc/>
@@ -39,7 +39,9 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
         IEnumerable items = GetItems();
 
         return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
-            ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
+            ("Lookup." + LookupKey).ToSingleQuoted(), 
+                JSON.Stringify(LookupParams, writeNulls: false), 
+                JSON.Stringify(items, writeNulls: false));
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-import { LT } from "../../q/localtext";
+import { addLocalText } from "@serenity-is/base";
 import { PropertyItemSlickConverter } from "./slickhelpers";
 
 describe('SlickHelpers.toSlickColumn', () => {
@@ -9,7 +9,7 @@ describe('SlickHelpers.toSlickColumn', () => {
         
         expect(converted.name).toBe('Test.Local.Text.Key');
 
-        LT.add('Test.Local.Text.Key', 'translated');
+        addLocalText('Test.Local.Text.Key', 'translated');
 
         var converted2 = PropertyItemSlickConverter.toSlickColumn({
             title: 'Test.Local.Text.Key'

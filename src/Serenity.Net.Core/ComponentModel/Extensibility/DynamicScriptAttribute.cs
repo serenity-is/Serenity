@@ -5,17 +5,13 @@
 /// Dynamic scripts contain dynamic data, but they are not parameterized.
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="DynamicScriptAttribute"/> class.
+/// </remarks>
+/// <param name="key">The key.</param>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public abstract class DynamicScriptAttribute : Attribute
+public abstract class DynamicScriptAttribute(string key) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DynamicScriptAttribute"/> class.
-    /// </summary>
-    /// <param name="key">The key.</param>
-    public DynamicScriptAttribute(string key)
-    {
-        Key = key;
-    }
 
     /// <summary>
     /// Gets the key.
@@ -23,7 +19,7 @@ public abstract class DynamicScriptAttribute : Attribute
     /// <value>
     /// The key.
     /// </value>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = key;
 
     /// <summary>
     /// Gets or sets the duration of the caching.

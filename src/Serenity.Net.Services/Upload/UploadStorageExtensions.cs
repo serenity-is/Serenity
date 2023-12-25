@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
@@ -278,18 +278,16 @@ public static class UploadStorageExtensions
 
         var baseFile = Path.ChangeExtension(temporaryFile, null);
 
-        foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split(new[] { ',' }))
+        foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split([',']))
         {
-            var dims = sizeStr.ToUpperInvariant().Split(new[] { 'X' });
+            var dims = sizeStr.ToUpperInvariant().Split(['X']);
             if (dims.Length != 2 ||
                 !int.TryParse(dims[0], out int w) ||
                 !int.TryParse(dims[1], out int h) ||
                 w < 0 ||
                 h < 0 ||
                 (w == 0 && h == 0))
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentOutOfRangeException(nameof(thumbSizes));
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
             var thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
 

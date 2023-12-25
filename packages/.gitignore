@@ -1,4 +1,7 @@
+artifacts/
 coverage/
-/corelib/out/
-/corelib/dist/**/*.js
-/corelib/dist/**/*.map
+out/
+/*/dist/**/*.js
+/*/dist/**/*.map
+/*/wwwroot/**/*.js
+/*/wwwroot/**/*.map

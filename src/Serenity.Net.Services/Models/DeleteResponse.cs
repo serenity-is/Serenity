@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -12,5 +12,5 @@ public class DeleteResponse : ServiceResponse
     /// services may return this information, while 
     /// others may raise a record not found exception.
     /// </summary>
-    public bool WasAlreadyDeleted;
+    public bool WasAlreadyDeleted { get; set; }
 }

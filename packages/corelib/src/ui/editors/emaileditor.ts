@@ -1,7 +1,7 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { tryGetText } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { isEmptyOrNull, trimToNull, tryGetText } from "../../q";
-import { Widget } from "../widgets/widget";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export interface EmailEditorOptions {
     domain?: string;
@@ -10,11 +10,11 @@ export interface EmailEditorOptions {
 
 @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
 @Decorators.element('<input type="text"/>')
-export class EmailEditor extends Widget<EmailEditorOptions> {
+export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
-    constructor(input: JQuery, opt: EmailEditorOptions) {
-        super(input, opt);
-
+    constructor(props: EditorProps<P>) {
+        super(props);
+        let input = this.element;
         EmailEditor.registerValidationMethods();
 
         input.addClass('emailuser');
@@ -22,14 +22,14 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         var spanAt = $('<span/>').text('@').addClass('emailat').insertAfter(input);
 
         var domain = $('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
-        domain.bind('blur.' + this.uniqueName, function () {
+        domain.on('blur.' + this.uniqueName, function () {
             var validator = domain.closest('form').data('validator');
             if (validator != null) {
                 validator.element(input[0]);
             }
         });
 
-        if (!isEmptyOrNull(this.options.domain)) {
+        if (this.options.domain) {
             domain.val(this.options.domain);
         }
 
@@ -54,7 +54,7 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         });
 
         if (!this.options.readOnlyDomain) {
-            input.change(e2 => this.set_value(input.val()));
+            input.change(e2 => this.set_value(input.val() as string));
         }
     }
 
@@ -83,8 +83,8 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
         var domain = this.element.nextAll('.emaildomain');
         var value = this.element.val();
         var domainValue = domain.val();
-        if (isEmptyOrNull(value)) {
-            if (this.options.readOnlyDomain || isEmptyOrNull(domainValue)) {
+        if (!value) {
+            if (this.options.readOnlyDomain || !domainValue) {
                 return '';
             }
             return '@' + domainValue;
@@ -98,8 +98,8 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
 
     set_value(value: string): void {
         var domain = this.element.nextAll('.emaildomain');
-        value = trimToNull(value);
-        if (value == null) {
+        value = value?.trim();
+        if (!value) {
             if (!this.options.readOnlyDomain)
                 domain.val('');
             this.element.val('');
@@ -111,13 +111,13 @@ export class EmailEditor extends Widget<EmailEditorOptions> {
                     domain.val(parts[1]);
                     this.element.val(parts[0]);
                 }
-                else if (!isEmptyOrNull(this.options.domain)) {
+                else if (this.options.domain) {
                     if (parts[1] !== this.options.domain)
                         this.element.val(value);
-                    else 
+                    else
                         this.element.val(parts[0]);
                 }
-                else 
+                else
                     this.element.val(parts[0]);
             }
             else

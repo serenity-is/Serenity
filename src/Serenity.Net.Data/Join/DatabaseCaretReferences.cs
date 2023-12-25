@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Helper class for replacing database caret references in format [^ConnectionKey] in SQL expressions.
@@ -24,7 +24,7 @@ public class DatabaseCaretReferences
             string connectionKey = null;
 
             if (idx != 0)
-                connectionKey = contents.Substring(0, idx);
+                connectionKey = contents[..idx];
 
             string databaseName;
 

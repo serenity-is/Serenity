@@ -1,21 +1,16 @@
-﻿using System.Data.Common;
+using System.Data.Common;
 
 namespace Serenity.Tests;
 
-public class MockDbCommand : IDbCommand
+public class MockDbCommand(IDbConnection connection = null) : IDbCommand
 {
     public string CommandText { get; set; }
     public int CommandTimeout { get; set; }
     public CommandType CommandType { get; set; }
-    public IDbConnection Connection { get; set; }
+    public IDbConnection Connection { get; set; } = connection;
     public IDataParameterCollection Parameters { get; init; } = new MockDbParameterCollection();
     public IDbTransaction Transaction { get; set; }
     public UpdateRowSource UpdatedRowSource { get; set; }
-
-    public MockDbCommand(IDbConnection connection = null)
-    {
-        Connection = connection;
-    }
 
     public void Cancel()
     {
@@ -28,6 +23,7 @@ public class MockDbCommand : IDbCommand
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
     }
 
     public MockDbCommand OnExecuteNonQuery(Func<MockDbCommand, int> func)

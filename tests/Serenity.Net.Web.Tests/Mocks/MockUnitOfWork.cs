@@ -15,8 +15,8 @@ public class MockUnitOfWork : IUnitOfWork
         OnRollback = onRollback;
     }
     
-    public IEnumerable<Delegate> OnCommitInvocationList => OnCommit?.GetInvocationList() ?? Array.Empty<Delegate>();
-    public IEnumerable<Delegate> OnRollbackInvocationList => OnRollback?.GetInvocationList() ?? Array.Empty<Delegate>();
+    public IEnumerable<Delegate> OnCommitInvocationList => OnCommit?.GetInvocationList() ?? [];
+    public IEnumerable<Delegate> OnRollbackInvocationList => OnRollback?.GetInvocationList() ?? [];
     
     public void Commit()
     {

@@ -4,19 +4,14 @@
 /// Add an option to the quick filtering.
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="QuickFilterOptionAttribute"/> class.
+/// </remarks>
+/// <param name="key">The key.</param>
+/// <param name="value">The value.</param>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
-public class QuickFilterOptionAttribute : Attribute
+public class QuickFilterOptionAttribute(string key, object value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="QuickFilterOptionAttribute"/> class.
-    /// </summary>
-    /// <param name="key">The key.</param>
-    /// <param name="value">The value.</param>
-    public QuickFilterOptionAttribute(string key, object value)
-    {
-        Key = key;
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the key of the quick filter option.
@@ -24,7 +19,7 @@ public class QuickFilterOptionAttribute : Attribute
     /// <value>
     /// The key.
     /// </value>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = key;
 
     /// <summary>
     /// Gets the value of the quick filter option.
@@ -32,5 +27,5 @@ public class QuickFilterOptionAttribute : Attribute
     /// <value>
     /// The value.
     /// </value>
-    public object? Value { get; private set; }
+    public object? Value { get; private set; } = value;
 }

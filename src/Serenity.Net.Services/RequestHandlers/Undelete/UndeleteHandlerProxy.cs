@@ -22,9 +22,8 @@ internal class UndeleteHandlerProxy<TRow, TUndeleteRequest, TUndeleteResponse>
     }
 }
 
-internal class UndeleteHandlerProxy<TRow>
-    : UndeleteHandlerProxy<TRow, UndeleteRequest, UndeleteResponse>, IUndeleteHandler<TRow>
+internal class UndeleteHandlerProxy<TRow>(IDefaultHandlerFactory factory)
+    : UndeleteHandlerProxy<TRow, UndeleteRequest, UndeleteResponse>(factory), IUndeleteHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
-    public UndeleteHandlerProxy(IDefaultHandlerFactory factory) : base(factory) { }
 }

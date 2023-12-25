@@ -3,18 +3,13 @@
 /// <summary>
 /// A class that basically implements IPropertyInfo for PropertyInfo objects
 /// </summary>
-public class WrappedProperty : IPropertyInfo
+/// <remarks>
+/// Initializes a new instance of the <see cref="WrappedProperty"/> class.
+/// </remarks>
+/// <param name="property">The property.</param>
+public class WrappedProperty(PropertyInfo property) : IPropertyInfo
 {
-    private readonly PropertyInfo property;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="WrappedProperty"/> class.
-    /// </summary>
-    /// <param name="property">The property.</param>
-    public WrappedProperty(PropertyInfo property)
-    {
-        this.property = property;
-    }
+    private readonly PropertyInfo property = property;
 
     /// <summary>
     /// Gets the name.

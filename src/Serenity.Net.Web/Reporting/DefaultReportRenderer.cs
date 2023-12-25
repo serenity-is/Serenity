@@ -6,45 +6,37 @@ namespace Serenity.Reporting;
 /// <summary>
 /// Default implementation for <see cref="IReportRenderer" />
 /// </summary>
-public class DefaultReportRenderer : IReportRenderer
+/// <remarks>
+/// Creates an instance of the class
+/// </remarks>
+/// <param name="excelRenderer">Excel renderer</param>
+/// <param name="htmlReportPdfRenderer">HTML report pdf renderer</param>
+/// <param name="serviceProvider">Service provider</param>
+/// <param name="httpContextAccessor">Http context accessor</param>
+public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
+    IHtmlReportPdfRenderer htmlReportPdfRenderer,
+    IServiceProvider serviceProvider,
+    IHttpContextAccessor httpContextAccessor = null) : IReportRenderer
 {
     /// <summary>
     /// Excel renderer
     /// </summary>
-    protected readonly IDataReportExcelRenderer excelRenderer;
+    protected readonly IDataReportExcelRenderer excelRenderer = excelRenderer ?? throw new ArgumentNullException(nameof(excelRenderer));
 
     /// <summary>
     /// Html report pdf renderer
     /// </summary>
-    protected readonly IHtmlReportPdfRenderer htmlReportPdfRenderer;
+    protected readonly IHtmlReportPdfRenderer htmlReportPdfRenderer = htmlReportPdfRenderer ?? throw new ArgumentNullException(nameof(htmlReportPdfRenderer));
 
     /// <summary>
     /// Http context accessor
     /// </summary>
-    protected readonly IHttpContextAccessor httpContextAccessor;
+    protected readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
 
     /// <summary>
     /// Service provider
     /// </summary>
-    protected readonly IServiceProvider serviceProvider;
-
-    /// <summary>
-    /// Creates an instance of the class
-    /// </summary>
-    /// <param name="excelRenderer">Excel renderer</param>
-    /// <param name="htmlReportPdfRenderer">HTML report pdf renderer</param>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="httpContextAccessor">Http context accessor</param>
-    public DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
-        IHtmlReportPdfRenderer htmlReportPdfRenderer,
-        IServiceProvider serviceProvider,
-        IHttpContextAccessor httpContextAccessor = null)
-    {
-        this.excelRenderer = excelRenderer ?? throw new ArgumentNullException(nameof(excelRenderer));
-        this.htmlReportPdfRenderer = htmlReportPdfRenderer ?? throw new ArgumentNullException(nameof(htmlReportPdfRenderer));
-        this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        this.httpContextAccessor = httpContextAccessor;
-    }
+    protected readonly IServiceProvider serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     /// <summary>
     /// Renders a data only report
@@ -184,11 +176,9 @@ public class DefaultReportRenderer : IReportRenderer
     /// <inheritdoc />
     public ReportRenderResult Render(IReport report, ReportRenderOptions options)
     {
-        if (report is null)
-            throw new ArgumentNullException(nameof(report));
+        ArgumentNullException.ThrowIfNull(report);
 
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
 
         if (report is IDataOnlyReport dataOnlyReport)
             return RenderDataOnlyReport(dataOnlyReport, options);

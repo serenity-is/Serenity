@@ -1,7 +1,8 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { formatNumber, parseInteger } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
-import { extend, formatNumber, isTrimmedEmpty, parseInteger, trimToNull } from "../../q";
-import { Widget } from "../widgets/widget";
+import { extend, isTrimmedEmpty } from "../../q";
+import { EditorWidget, EditorProps } from "../widgets/widget";
 import { DecimalEditor } from "./decimaleditor";
 
 export interface IntegerEditorOptions {
@@ -12,11 +13,12 @@ export interface IntegerEditorOptions {
 
 @Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
 @Decorators.element('<input type="text"/>')
-export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
-    constructor(input: JQuery, opt?: IntegerEditorOptions) {
-        super(input, opt);
+    constructor(props: EditorProps<P>) {
+        super(props);
 
+        let input = this.element;
         input.addClass('integerQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
             {
@@ -30,16 +32,17 @@ export class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoub
     }
 
     get_value(): number {
+        var val: string;
         if (($.fn as any).autoNumeric) {
-            var val = (this.element as any).autoNumeric('get') as string;
-            if (!!isTrimmedEmpty(val))
+            val = (this.element as any).autoNumeric('get') as string;
+            if (isTrimmedEmpty(val))
                 return null;
-            else 
+            else
                 return parseInt(val, 10);
-        } 
+        }
         else {
-            var val = trimToNull(this.element.val());
-            if (val == null)
+            val = (this.element.val() as string)?.trim();
+            if (!val)
                 return null;
             return parseInteger(val)
         }

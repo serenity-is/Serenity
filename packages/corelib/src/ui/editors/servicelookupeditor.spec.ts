@@ -1,5 +1,6 @@
+import { ListResponse, ServiceResponse } from "@serenity-is/base";
+import { ServiceOptions } from "../../q";
 import { ServiceLookupEditor } from "./servicelookupeditor";
-import { type ListResponse, type ServiceOptions, type ServiceResponse } from "../../q/servicetypes";
 
 let oldWindowAlert: any;
 beforeAll(() => {
@@ -18,16 +19,13 @@ afterEach(() => {
 });
 
 test('ServiceLookupEditor loads items from service', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
-
-    new ServiceLookupEditor(editorInput, {
+    new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
-    });
+        element: el => document.body.appendChild(el)
+    })
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
@@ -56,15 +54,13 @@ test('ServiceLookupEditor loads items from service', () => {
 });
 
 test('ServiceLookupEditor sets active and searching without search correctly', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
 
-    new ServiceLookupEditor(editorInput, {
+    new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -90,15 +86,12 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
 });
 
 test('ServiceLookupEditor can search items', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
-
-    new ServiceLookupEditor(editorInput, {
+    new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)        
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -130,15 +123,12 @@ test('ServiceLookupEditor can search items', () => {
 });
 
 test('ServiceLookupEditor sets active and searching without search correctly while searching', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
-
-    new ServiceLookupEditor(editorInput, {
+    new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)
     });
 
     jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
@@ -171,15 +161,13 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
 });
 
 test('ServiceLookupEditor aborts previous requests', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
 
-    const editor = new ServiceLookupEditor(editorInput, {
+    const editor = new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();
@@ -228,15 +216,12 @@ test('ServiceLookupEditor aborts previous requests', () => {
 });
 
 test('ServiceLookupEditor aborts and set active and searching correctly', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
-
-    const editor = new ServiceLookupEditor(editorInput, {
+    const editor = new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)        
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();
@@ -307,15 +292,13 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
 });
 
 test('ServiceLookupEditor aborts while request is pending', () => {
-    const select2Container = $(`<div class="select2-container"><input /></div>`);
-    document.body.appendChild(select2Container[0]);
-    const editorInput = select2Container.find("input");
 
-    const editor = new ServiceLookupEditor(editorInput, {
+    const editor = new ServiceLookupEditor({
         idField: "id",
         textField: "text",
         sort: ["text"],
         service: "Test/List",
+        element: el => document.body.appendChild(el)
     });
 
     const debounceDelay = editor["getTypeDelay"]?.();

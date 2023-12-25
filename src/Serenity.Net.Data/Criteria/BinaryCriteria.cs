@@ -75,7 +75,7 @@ public class BinaryCriteria : BaseCriteria
     }
 
     private static readonly string[] opText =
-    {
+    [
         " AND ",
         " OR ",
         " XOR ",
@@ -87,7 +87,7 @@ public class BinaryCriteria : BaseCriteria
         " <= ",
         " IN ",
         " NOT IN "
-    };
+    ];
 
     /// <summary>
     /// Gets the operator.

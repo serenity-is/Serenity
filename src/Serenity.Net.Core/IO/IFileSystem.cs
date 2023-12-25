@@ -1,5 +1,9 @@
-﻿#nullable enable
+#nullable enable
+#if ISSOURCEGENERATOR
+namespace Serenity.CodeGeneration;
+#else
 namespace Serenity;
+#endif
 
 /// <summary>
 /// Base file system for abstracting physical disk access
@@ -76,6 +80,12 @@ public interface IFileSystem
     /// <param name="path">File path</param>
     /// <returns>Absolute path</returns>
     string GetFullPath(string path);
+
+    /// <summary>
+    /// Gets last write time in UTC for file at path
+    /// </summary>
+    /// <param name="path">File path</param>
+    DateTime GetLastWriteTimeUtc(string path);
 
     /// <summary>
     /// Returns the absolute path for the specified path string.

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Serenity.Tests.CodeGenerator;
 
@@ -11,9 +11,11 @@ public partial class RowTemplateTests
         model.GlobalUsings.Add("Serenity.ComponentModel");
         model.GlobalUsings.Add("System.ComponentModel");
         var actual = RenderTemplate(model);
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
         var expected = Regex.Replace(Customer_Expected_Defaults, 
             @"^using (Serenity|System)\.ComponentModel\s*;\r?\n", "", 
             RegexOptions.Multiline);
+#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
         AssertEqual(expected, actual);
         foreach (var ns in model.GlobalUsings)
@@ -29,9 +31,11 @@ public partial class RowTemplateTests
         model.GlobalUsings.Add("Serenity.Data.Mapping");
         model.GlobalUsings.Add("System.ComponentModel");
         var actual = RenderTemplate(model);
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
         var expected = Regex.Replace(Customer_Expected_Defaults,
             @"^using.*;\r?\n", "",
             RegexOptions.Multiline).TrimStart();
+#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
         AssertEqual(expected, actual);
         foreach (var ns in model.GlobalUsings)

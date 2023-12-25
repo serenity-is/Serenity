@@ -2,16 +2,10 @@
 
 namespace Serenity.CodeGenerator;
 
-public class EntityDataSchema : IEntityDataSchema
+public class EntityDataSchema(IDbConnection connection) : IEntityDataSchema
 {
-    private readonly IDbConnection connection;
-    private readonly ISchemaProvider schemaProvider;
-
-    public EntityDataSchema(IDbConnection connection)
-    {
-        this.connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
-    }
+    private readonly IDbConnection connection = connection ?? throw new ArgumentNullException(nameof(connection));
+    private readonly ISchemaProvider schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
 
     public string DefaultSchema => schemaProvider.DefaultSchema;
 

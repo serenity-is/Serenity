@@ -2,7 +2,7 @@
 
 internal class BracketRemoverDialect : ISqlDialect
 {
-    public static readonly BracketRemoverDialect Instance = new BracketRemoverDialect();
+    public static readonly BracketRemoverDialect Instance = new();
 
     public bool CanUseOffsetFetch => throw new NotImplementedException();
 

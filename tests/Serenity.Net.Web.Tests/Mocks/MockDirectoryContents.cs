@@ -1,19 +1,13 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Tests;
 
-public class MockDirectoryContents : IDirectoryContents
+public class MockDirectoryContents(System.IO.Abstractions.IFileSystem fileSystem, string path) : IDirectoryContents
 {
-    public MockDirectoryContents(System.IO.Abstractions.IFileSystem fileSystem, string path)
-    {
-        FileSystem = fileSystem;
-        Path = path;
-    }
-
     public bool Exists => FileSystem.Directory.Exists(Path);
 
-    public System.IO.Abstractions.IFileSystem FileSystem { get; }
-    public string Path { get; }
+    public System.IO.Abstractions.IFileSystem FileSystem { get; } = fileSystem;
+    public string Path { get; } = path;
 
     public IEnumerator<Microsoft.Extensions.FileProviders.IFileInfo> GetEnumerator()
     {

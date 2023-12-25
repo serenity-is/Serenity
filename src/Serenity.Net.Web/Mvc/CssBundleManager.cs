@@ -8,7 +8,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Default implementation for <see cref="ICssBundleManager"/>
 /// </summary>
-public class CssBundleManager : ICssBundleManager
+public partial class CssBundleManager : ICssBundleManager
 {
     private readonly object sync = new();
 
@@ -77,13 +77,13 @@ public class CssBundleManager : ICssBundleManager
         {
             isEnabled = false;
             var settings = options.Value;
-            var bundles = settings.Bundles ?? new Dictionary<string, string[]>();
+            var bundles = settings.Bundles ?? [];
 
             foreach (var key in bundles.Keys.ToArray())
             {
                 var parts = bundles[key];
                 if (parts != null &&
-                    !bundles.Keys.Contains(key + ".rtl") &&
+                    !bundles.ContainsKey(key + ".rtl") &&
                     parts.Any(x => x != null &&
                         x.Contains("{.rtl}", StringComparison.OrdinalIgnoreCase)))
                 {
@@ -95,7 +95,7 @@ public class CssBundleManager : ICssBundleManager
             }
 
             bundles = bundles.Keys.ToDictionary(k => k,
-                k => (bundles[k] ?? Array.Empty<string>())
+                k => (bundles[k] ?? [])
                     .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
                     .Where(u => !string.IsNullOrEmpty(u))
                     .ToArray());
@@ -143,7 +143,7 @@ public class CssBundleManager : ICssBundleManager
                     if (!bundleKeysBySourceUrl.TryGetValue(appRelativeUrl, out HashSet<string> bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        bundleKeysBySourceUrl[appRelativeUrl] = new HashSet<string>();
+                        bundleKeysBySourceUrl[appRelativeUrl] = [];
                     }
 
                     bundleKeys.Add(bundleKey);
@@ -268,7 +268,7 @@ public class CssBundleManager : ICssBundleManager
                             code = sr.ReadToEnd();
                         }
 
-                        code = new Regex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline)
+                        code = SourceMappingRegex()
                             .Replace(code, "");
 
                         code = RewriteUrls(sourceUrl, code, bundleRewriteRoot);
@@ -393,13 +393,13 @@ public class CssBundleManager : ICssBundleManager
         if (string.IsNullOrWhiteSpace(contentPath))
             return content;
 
-        if (contentPath.StartsWith("~", StringComparison.Ordinal))
+        if (contentPath.StartsWith('~'))
             contentPath = contentPath[1..];
 
         if (!contentPath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
             contentPath += "/";
 
-        var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
+        var regex = CssUrlRegex();
         return regex.Replace(content, (Match match) => "url(" +
             match.Groups["prefix"].Value +
             RewriteUrl(contentPath, match.Groups["url"].Value, rootPrefix) +
@@ -430,7 +430,7 @@ public class CssBundleManager : ICssBundleManager
         else
         {
             cssUrl = BundleUtils.ExpandVersionVariable(hostEnvironment.WebRootFileProvider, cssUrl);
-            if (cssUrl.StartsWith("/", StringComparison.Ordinal))
+            if (cssUrl.StartsWith('/'))
             {
                 var rootUrl = VirtualPathUtility.ToAbsolute(contextAccessor, "~/");
                 if (cssUrl.StartsWith(rootUrl))
@@ -447,4 +447,9 @@ public class CssBundleManager : ICssBundleManager
         string include = scriptManager.GetScriptInclude("CssBundle." + bundleKey, ".css");
         return VirtualPathUtility.ToAbsolute(contextAccessor, "~/DynJS.axd/" + include);
     }
+
+    [GeneratedRegex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline)]
+    private static partial Regex SourceMappingRegex();
+    [GeneratedRegex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)")]
+    private static partial Regex CssUrlRegex();
 }

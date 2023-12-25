@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Specifies that this property is a foreign key to another field in a primary key table.
@@ -50,12 +50,9 @@ public class ForeignKeyAttribute : Attribute
     {
         RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
-        var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
-        if (attr == null)
-            throw new ArgumentOutOfRangeException(nameof(rowType),
+        var attr = rowType.GetCustomAttribute<TableNameAttribute>(true) ?? throw new ArgumentOutOfRangeException(nameof(rowType),
                 string.Format("Type '{0}' is specified for a ForeignKey attribute " +
                     "but it has no [TableName] attribute", rowType.FullName));
-
         if (string.IsNullOrEmpty(field))
         {
             var identityOrPrimaryKey = rowType.GetProperties()

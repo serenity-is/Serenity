@@ -5,19 +5,15 @@
 /// for the assembly
 /// </summary>
 /// <seealso cref="Attribute" />
+/// <remarks>
+/// Initializes a new instance of the <see cref="JsonLocalTextAssetsAttribute"/> class.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-public sealed class JsonLocalTextAssetsAttribute : Attribute
+public sealed class JsonLocalTextAssetsAttribute(string path) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="JsonLocalTextAssetsAttribute"/> class.
-    /// </summary>
-    public JsonLocalTextAssetsAttribute(string path)
-    {
-        Path = path ?? throw new ArgumentNullException(nameof(path));
-    }
 
     /// <summary>
     /// The path for static web assets folder with json local text files
     /// </summary>
-    public string Path { get; }
+    public string Path { get; } = path ?? throw new ArgumentNullException(nameof(path));
 }

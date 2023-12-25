@@ -3,27 +3,20 @@
 /// <summary>
 /// Contains a connection string, its key and provider name.
 /// </summary>
-public class ConnectionStringInfo : IConnectionString
+/// <remarks>
+/// Initializes a new instance of the <see cref="ConnectionStringInfo"/> class.
+/// </remarks>
+/// <param name="connectionKey">The connection key.</param>
+/// <param name="connectionString">The connection string.</param>
+/// <param name="providerName">Name of the provider.</param>
+/// <param name="dialect">Dialect</param>
+public class ConnectionStringInfo(string connectionKey, string connectionString, string providerName, ISqlDialect dialect) : IConnectionString
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConnectionStringInfo"/> class.
-    /// </summary>
-    /// <param name="connectionKey">The connection key.</param>
-    /// <param name="connectionString">The connection string.</param>
-    /// <param name="providerName">Name of the provider.</param>
-    /// <param name="dialect">Dialect</param>
-    public ConnectionStringInfo(string connectionKey, string connectionString, string providerName, ISqlDialect dialect)
-    {
-        ConnectionKey = connectionKey ?? throw new ArgumentNullException(nameof(connectionKey));
-        ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-        ProviderName = providerName ?? throw new ArgumentNullException(nameof(providerName));
-        Dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
-    }
 
     /// <summary>
     /// Gets the dialect.
     /// </summary>
-    public ISqlDialect Dialect { get; private set; }
+    public ISqlDialect Dialect { get; private set; } = dialect ?? throw new ArgumentNullException(nameof(dialect));
 
     /// <summary>
     /// Gets the connection key.
@@ -31,7 +24,7 @@ public class ConnectionStringInfo : IConnectionString
     /// <value>
     /// The connection key.
     /// </value>
-    public string ConnectionKey { get; private set; }
+    public string ConnectionKey { get; private set; } = connectionKey ?? throw new ArgumentNullException(nameof(connectionKey));
 
     /// <summary>
     /// Gets the connection string.
@@ -39,7 +32,7 @@ public class ConnectionStringInfo : IConnectionString
     /// <value>
     /// The connection string.
     /// </value>
-    public string ConnectionString { get; private set; }
+    public string ConnectionString { get; private set; } = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
     /// <summary>
     /// Gets the name of the provider.
@@ -47,5 +40,5 @@ public class ConnectionStringInfo : IConnectionString
     /// <value>
     /// The name of the provider.
     /// </value>
-    public string ProviderName { get; private set; }
+    public string ProviderName { get; private set; } = providerName ?? throw new ArgumentNullException(nameof(providerName));
 }

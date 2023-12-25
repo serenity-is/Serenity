@@ -1,5 +1,7 @@
-﻿import { Decorators } from "../../decorators";
-import { endsWith, getInstanceType, getLookup, getLookupAsync, getTypeFullName, Lookup, reloadLookup, ScriptData } from "../../q";
+﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
+import { getLookup, reloadLookup, ScriptData } from "../../q";
+import { EditorProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
 export interface LookupEditorOptions extends Select2EditorOptions {
@@ -8,18 +10,16 @@ export interface LookupEditorOptions extends Select2EditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.LookupEditorBase")
-export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
 
-    constructor(input: JQuery, opt?: TOptions) {
-        super(input, opt);
+    private lookupChangeUnbind: any; 
+
+    constructor(props: EditorProps<P>) {
+        super(props);
 
         if (!this.hasAsyncSource()) {
             this.updateItems();
-            var self = this;
-            ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, function () {
-                if (!self.hasAsyncSource())
-                    self.updateItems();
-            });
+            this.lookupChangeUnbind = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.updateItems.bind(this));
         }
     }
 
@@ -28,8 +28,10 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
     }
 
     destroy(): void {
-        if (!this.hasAsyncSource())
-            ScriptData.unbindFromChange(this.uniqueName);
+        if (this.lookupChangeUnbind) {
+            this.lookupChangeUnbind();
+            this.lookupChangeUnbind = null;
+        }
 
         super.destroy();
     }
@@ -46,8 +48,8 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
             key = key.substring(idx + 1);
         }
 
-        if (endsWith(key, 'Editor')) {
-            key = key.substr(0, key.length - 6);
+        if (key.endsWith('Editor')) {
+            key = key.substring(0, key.length - 6);
         }
 
         return key;
@@ -75,7 +77,7 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
         if (lookup == null)
             return super.itemText(item);
 
-        var textValue = lookup.textFormatter ? lookup.textFormatter(item) : (item as any)[lookup.textField];
+        var textValue = (item as any)[lookup.textField];
         return textValue == null ? '' : textValue.toString();
     }
 
@@ -144,8 +146,9 @@ export abstract class LookupEditorBase<TOptions extends LookupEditorOptions, TIt
 }
 
 @Decorators.registerEditor("Serenity.LookupEditor")
-export class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-    constructor(hidden: JQuery, opt?: LookupEditorOptions) {
-        super(hidden, opt);
+export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
+    
+    constructor(props: EditorProps<P>) {
+        super(props);
     }
 }

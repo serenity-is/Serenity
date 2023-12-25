@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 Siegfried Pammer
+// Copyright (c) 2018 Siegfried Pammer
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
@@ -41,16 +41,15 @@ public class UniversalAssemblyResolver : IAssemblyResolver
     readonly bool throwOnError;
     readonly string mainAssemblyFileName;
     readonly string baseDirectory;
-    readonly List<string> directories = new();
+    readonly List<string> directories = [];
     HashSet<string> targetFrameworkSearchPaths;
     readonly List<string> gac_paths = GetGacPaths();
-    readonly Dictionary<string, AssemblyDefinition> cache = new();
+    readonly Dictionary<string, AssemblyDefinition> cache = [];
 
     public void AddSearchDirectory(string directory)
     {
         directories.Add(directory);
-        if (dotNetCorePathFinder != null)
-            dotNetCorePathFinder.AddSearchDirectory(directory);
+        dotNetCorePathFinder?.AddSearchDirectory(directory);
     }
 
     public void RemoveSearchDirectory(string directory)
@@ -60,7 +59,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     public string[] GetSearchDirectories()
     {
-        return directories.ToArray();
+        return [.. directories];
     }
 
     public enum TargetFrameworkIdentifier
@@ -161,8 +160,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     AssemblyDefinition GetAssembly(string file, ReaderParameters parameters)
     {
-        if (parameters.AssemblyResolver == null)
-            parameters.AssemblyResolver = this;
+        parameters.AssemblyResolver ??= this;
 
         return ModuleDefinition.ReadModule(file, parameters).Assembly;
     }
@@ -181,10 +179,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
             case TargetFrameworkIdentifier.NETStandard:
                 if (IsZeroOrAllOnes(targetFrameworkVersion))
                     goto default;
-                if (dotNetCorePathFinder == null)
-                {
-                    dotNetCorePathFinder = new DotNetCorePathFinder(mainAssemblyFileName, targetFramework, targetFrameworkIdentifier, targetFrameworkVersion);
-                }
+                dotNetCorePathFinder ??= new DotNetCorePathFinder(mainAssemblyFileName, targetFramework, targetFrameworkIdentifier, targetFrameworkVersion);
                 file = dotNetCorePathFinder.TryResolveDotNetCore(name);
                 if (file != null)
                     return file;
@@ -252,10 +247,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     void AddTargetFrameworkSearchPathIfExists(string path)
     {
-        if (targetFrameworkSearchPaths == null)
-        {
-            targetFrameworkSearchPaths = new HashSet<string>();
-        }
+        targetFrameworkSearchPaths ??= [];
         if (Directory.Exists(path))
             targetFrameworkSearchPaths.Add(path);
     }
@@ -292,21 +284,20 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     string ResolveInternal(AssemblyNameReference name)
     {
-        if (name == null)
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var assembly = SearchDirectory(name, directories);
         if (assembly != null)
             return assembly;
 
-        var framework_dir = Path.GetDirectoryName(typeof(object).Module.FullyQualifiedName);
-        var framework_dirs = decompilerRuntime == DecompilerRuntime.Mono
-            ? new[] { framework_dir, Path.Combine(framework_dir, "Facades") }
-            : new[] { framework_dir };
+        var frameworkDir = Path.GetDirectoryName(typeof(object).Module.FullyQualifiedName);
+        string[] frameworkDirs = decompilerRuntime == DecompilerRuntime.Mono
+            ? [frameworkDir, Path.Combine(frameworkDir, "Facades")]
+            : [frameworkDir];
 
         if (IsSpecialVersionOrRetargetable(name))
         {
-            assembly = SearchDirectory(name, framework_dirs);
+            assembly = SearchDirectory(name, frameworkDirs);
             if (assembly != null)
                 return assembly;
         }
@@ -322,7 +313,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
         if (assembly != null)
             return assembly;
 
-        assembly = SearchDirectory(name, framework_dirs);
+        assembly = SearchDirectory(name, frameworkDirs);
         if (assembly != null)
             return assembly;
 
@@ -351,7 +342,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     static string SearchDirectory(AssemblyNameReference name, string directory)
     {
-        var extensions = name.IsWindowsRuntime ? new[] { ".winmd", ".dll" } : new[] { ".exe", ".dll" };
+        string[] extensions = name.IsWindowsRuntime ? [".winmd", ".dll"] : [".exe", ".dll"];
         foreach (var extension in extensions)
         {
             string file = Path.Combine(directory, name.Name + extension);
@@ -411,8 +402,7 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     public static string ToHexString(IEnumerable<byte> bytes, int estimatedLength)
     {
-        if (bytes == null)
-            throw new ArgumentNullException(nameof(bytes));
+        ArgumentNullException.ThrowIfNull(bytes);
 
         StringBuilder sb = new(estimatedLength * 2);
         foreach (var b in bytes)
@@ -435,10 +425,10 @@ public class UniversalAssemblyResolver : IAssemblyResolver
         else
         {
             string rootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Microsoft.NET");
-            string[] frameworkPaths = new[] {
+            string[] frameworkPaths = [
                 Path.Combine(rootPath, "Framework"),
                 Path.Combine(rootPath, "Framework64")
-            };
+            ];
 
             string folder = GetSubFolderForVersion();
 
@@ -645,15 +635,10 @@ public class UniversalAssemblyResolver : IAssemblyResolver
         return module;
     }
 
-    public class CachedMetadataResolver : MetadataResolver
+    public class CachedMetadataResolver(IAssemblyResolver assemblyResolver) : MetadataResolver(assemblyResolver)
     {
-        private readonly Dictionary<(string, string), TypeDefinition> typeCache = new();
-        private readonly Dictionary<(string, string), MethodDefinition> methodCache = new();
-
-        public CachedMetadataResolver(IAssemblyResolver assemblyResolver) 
-            : base(assemblyResolver)
-        {
-        }
+        private readonly Dictionary<(string, string), TypeDefinition> typeCache = [];
+        private readonly Dictionary<(string, string), MethodDefinition> methodCache = [];
 
         public override MethodDefinition Resolve(MethodReference method)
         {

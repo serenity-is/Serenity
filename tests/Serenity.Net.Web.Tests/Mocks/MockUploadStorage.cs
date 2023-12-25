@@ -1,15 +1,9 @@
-﻿namespace Serenity.Tests;
+namespace Serenity.Tests;
 
-public class MockUploadStorage : DiskUploadStorage
+public class MockUploadStorage(DiskUploadStorageOptions options,
+    MockDiskUploadFileSystem fileSystem) : DiskUploadStorage(options, fileSystem ?? throw new ArgumentNullException(nameof(fileSystem)))
 {
-    public MockDiskUploadFileSystem MockFileSystem { get; }
-    
-    public MockUploadStorage(DiskUploadStorageOptions options,
-        MockDiskUploadFileSystem fileSystem) :
-        base(options, fileSystem ?? throw new ArgumentNullException(nameof(fileSystem)))
-    {
-        MockFileSystem = fileSystem;
-    }
+    public MockDiskUploadFileSystem MockFileSystem { get; } = fileSystem;
 
     public static IUploadStorage Create()
     {

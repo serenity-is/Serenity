@@ -6,16 +6,12 @@
 /// so that values are filtered on ID not text value.
 /// </summary>
 /// <seealso cref="Attribute" />
-public class FilteringIdFieldAttribute : Attribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="FilteringIdFieldAttribute"/> class.
+/// </remarks>
+/// <param name="value">The value.</param>
+public class FilteringIdFieldAttribute(string value) : Attribute
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilteringIdFieldAttribute"/> class.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    public FilteringIdFieldAttribute(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the filtering ID value.
@@ -23,5 +19,5 @@ public class FilteringIdFieldAttribute : Attribute
     /// <value>
     /// The filtering ID value.
     /// </value>
-    public string Value { get; private set; }
+    public string Value { get; private set; } = value;
 }

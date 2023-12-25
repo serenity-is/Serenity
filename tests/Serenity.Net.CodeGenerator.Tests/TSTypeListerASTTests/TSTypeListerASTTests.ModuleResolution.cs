@@ -9,7 +9,7 @@ public partial class TSTypeListerASTTests
     [Fact]
     public void Resolves_Relative_Module_In_Same_Dir()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         fileSystem.WriteAllText(root + "a.d.ts", @"
 import { B1 } from './b';
@@ -31,7 +31,7 @@ export class B1 {
     [Fact]
     public void Resolves_Relative_Slash_Module_In_Same_Dir()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
@@ -57,7 +57,7 @@ export class B1 {
     [Fact]
     public void Resolves_Module_With_Aliased_Asterisk_Path()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
@@ -79,7 +79,7 @@ export class B1 {
                 BaseUrl = ".",
                 Paths = new()
                 {
-                    ["my/*"] = new[] { "./zzz/*" }
+                    ["my/*"] = [ "./zzz/*" ]
                 }
             }
         });
@@ -93,7 +93,7 @@ export class B1 {
     [Fact]
     public void Resolves_Module_With_Aliased_Asterisk_Path_Multiple()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
@@ -115,7 +115,7 @@ export class B1 {
                 BaseUrl = ".",
                 Paths = new()
                 {
-                    ["my/*"] = new[] { "./nnn", "./zzz/*" }
+                    ["my/*"] = [ "./nnn", "./zzz/*" ]
                 }
             }
         });
@@ -129,7 +129,7 @@ export class B1 {
     [Fact]
     public void Resolves_Node_Module_In_TsConfig_Dir()
     {
-        var fileSystem = new MockGeneratorFileSystem();
+        var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));

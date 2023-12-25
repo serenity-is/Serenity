@@ -1,35 +1,29 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using GlobFilter = Serenity.IO.GlobFilter;
 
 namespace Serenity.CodeGenerator;
 
-public class RestoreCommand : BaseFileSystemCommand
+public class RestoreCommand(IProjectFileInfo project, IGeneratorConsole console)
+    : BaseGeneratorCommand(project, console)
 {
-    protected IBuildProjectSystem ProjectSystem { get; }
-    public IEnumerable<string> ProjectReferences { get; }
+    public IEnumerable<string> ProjectReferences { get; set; }
+    public IBuildProjectSystem BuildSystem { get; set; }
 
-    public RestoreCommand(IGeneratorFileSystem fileSystem, IBuildProjectSystem projectSystem,
-        IEnumerable<string> projectReferences = null)
-        : base(fileSystem)
+    public bool Verbose { get; set; }
+
+    public override ExitCodes Run()
     {
-        ProjectSystem = projectSystem ?? throw new ArgumentNullException(nameof(projectSystem));
-        ProjectReferences = projectReferences;
-    }
+        ArgumentNullException.ThrowIfNull(BuildSystem);
 
-    public ExitCodes Run(string csproj, bool verbose = false)
-    {
-        if (csproj == null)
-            throw new ArgumentNullException(nameof(csproj));
-
-        if (!fileSystem.FileExists(csproj))
+        if (!FileSystem.FileExists(ProjectFile))
         {
-            if (verbose)
-                Console.Error.WriteLine($"Project file {csproj} is not found!");
+            if (Verbose)
+                Console.Error($"Project file {ProjectFile} is not found!");
             return ExitCodes.ProjectNotFound;
         }
 
-        var projectDir = fileSystem.GetDirectoryName(csproj);
-        var config = fileSystem.LoadGeneratorConfig(projectDir);
+        var projectDir = FileSystem.GetDirectoryName(ProjectFile);
+        var config = FileSystem.LoadGeneratorConfig(projectDir);
 
         if (config?.Restore?.Exclude?.Any(x => x == "**/*") == true)
             return ExitCodes.Success;
@@ -57,7 +51,7 @@ public class RestoreCommand : BaseFileSystemCommand
         if (config.Restore?.Exclude.IsEmptyOrNull() == false)
             exclude = new GlobFilter(config.Restore.Exclude);
 
-        var targetRoot = fileSystem.GetDirectoryName(csproj);
+        var targetRoot = FileSystem.GetDirectoryName(ProjectFile);
         var restoredFromProjectReference = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         void restoreFile(string file, string relative)
@@ -75,116 +69,112 @@ public class RestoreCommand : BaseFileSystemCommand
             if (restoredFromProjectReference.Contains(relative))
                 return;
 
-            var target = fileSystem.Combine(targetRoot, relative);
-            if (fileSystem.FileExists(target))
+            var target = FileSystem.Combine(targetRoot, relative);
+            if (FileSystem.FileExists(target))
             {
-                if (!fileSystem.ReadAllBytes(target)
-                    .SequenceEqual(fileSystem.ReadAllBytes(file)))
+                if (!FileSystem.ReadAllBytes(target)
+                    .SequenceEqual(FileSystem.ReadAllBytes(file)))
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Restoring: " + relative);
-                    Console.ResetColor();
-                    fileSystem.Copy(file, target, overwrite: true);
+                    Console.WriteLine("Restoring: " + relative, ConsoleColor.Green);
+                    FileSystem.Copy(file, target, overwrite: true);
                 }
             }
             else
             {
-                if (!fileSystem.DirectoryExists(target))
-                    fileSystem.CreateDirectory(fileSystem.GetDirectoryName(target));
+                if (!FileSystem.DirectoryExists(target))
+                    FileSystem.CreateDirectory(FileSystem.GetDirectoryName(target));
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Restoring: " + relative);
-                Console.ResetColor();
-                fileSystem.Copy(file, target, overwrite: false);
+                Console.WriteLine("Restoring: " + relative, ConsoleColor.Green);
+                FileSystem.Copy(file, target, overwrite: false);
             }
         }
 
         if (config?.Restore?.Typings != false)
-        try
-        {
-            var projectRefs = ProjectReferences?.Where(x => 
-                !IgnoreProjectRefs.Contains(fileSystem.GetFileNameWithoutExtension(x))) ?? 
-                    EnumerateProjectReferences(csproj, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-
-            foreach (var reference in projectRefs)
+            try
             {
-                if (verbose)
-                    Console.WriteLine("Project Reference: " + reference);
+                var projectRefs = ProjectReferences?.Where(x =>
+                    !IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(x))) ??
+                        EnumerateProjectReferences(ProjectFile, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 
-                IBuildProject project;
-                try
+                foreach (var reference in projectRefs)
                 {
-                    project = ProjectSystem.LoadProject(reference);
-                }
-                catch
-                {
-                    if (verbose)
-                        Console.WriteLine("Could not Load Project Reference!: " + reference);
+                    if (Verbose)
+                        Console.WriteLine("Project Reference: " + reference);
 
-                    continue;
-                }
-
-                foreach (var item in project.AllEvaluatedItems
-                    .Where(x =>
-                        string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
-                    .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts", 
-                        StringComparison.OrdinalIgnoreCase) == true))
-                {
-                    var sourceFile = PathHelper.ToPath(fileSystem.Combine(fileSystem.GetDirectoryName(reference),
-                        item.EvaluatedInclude));
-
-                    if (verbose)
-                        Console.WriteLine("Checking source file: " + sourceFile);
-
-                    if (!fileSystem.FileExists(sourceFile))
+                    IBuildProject project;
+                    try
                     {
-                        if (verbose)
-                            Console.WriteLine("Source file does NOT exist: " + sourceFile);
+                        project = BuildSystem.LoadProject(reference);
+                    }
+                    catch
+                    {
+                        if (Verbose)
+                            Console.WriteLine("Could not Load Project Reference!: " + reference);
+
                         continue;
                     }
 
-                    if (verbose)
-                        Console.WriteLine("Source file exists: " + sourceFile);
-
-                    if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
-                        item.GetMetadataValue("Pack") != "true")
-                        continue;
-
-                    var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
-                    if (!string.IsNullOrEmpty(packagePath))
+                    foreach (var item in project.AllEvaluatedItems
+                        .Where(x =>
+                            string.Equals(x.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "Content", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "None", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(x.ItemType, "TypeScriptCompile", StringComparison.OrdinalIgnoreCase))
+                        .Where(x => x.EvaluatedInclude?.EndsWith(".d.ts",
+                            StringComparison.OrdinalIgnoreCase) == true))
                     {
-                        foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                        var sourceFile = PathHelper.ToPath(FileSystem.Combine(FileSystem.GetDirectoryName(reference),
+                            item.EvaluatedInclude));
+
+                        if (Verbose)
+                            Console.WriteLine("Checking source file: " + sourceFile);
+
+                        if (!FileSystem.FileExists(sourceFile))
                         {
-                            if (verbose)
-                                Console.WriteLine("Checking project package path " + path);
+                            if (Verbose)
+                                Console.WriteLine("Source file does NOT exist: " + sourceFile);
+                            continue;
+                        }
 
-                            if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
-                                continue;
+                        if (Verbose)
+                            Console.WriteLine("Source file exists: " + sourceFile);
 
-                            restoreFile(sourceFile, path);
-                            restoredFromProjectReference.Add(path);
+                        if (!string.Equals(item.ItemType, "TypingsToPackage", StringComparison.OrdinalIgnoreCase) &&
+                            item.GetMetadataValue("Pack") != "true")
+                            continue;
+
+                        var packagePath = item.GetMetadataValue("PackagePath")?.Trim();
+                        if (!string.IsNullOrEmpty(packagePath))
+                        {
+                            foreach (var path in packagePath.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                if (Verbose)
+                                    Console.WriteLine("Checking project package path " + path);
+
+                                if (!PathHelper.ToUrl(path).StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
+                                    continue;
+
+                                restoreFile(sourceFile, path);
+                                restoredFromProjectReference.Add(path);
+                            }
                         }
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex.Message);
-        }
+            catch (Exception ex)
+            {
+                Console.Error(ex.Message);
+            }
 
-        var packagesDir = PackageHelper.DeterminePackagesPath(fileSystem);
+        var packagesDir = PackageHelper.DeterminePackagesPath(FileSystem, Console);
         if (packagesDir == null)
         {
-            Console.Error.WriteLine("Can't determine NuGet packages directory!");
+            Console.Error("Can't determine NuGet packages directory!");
             return ExitCodes.CantDeterminePackagesDir;
         }
 
         var queue = new Queue<(string ID, string Version)>();
-        foreach (var x in EnumeratePackageReferences(csproj))
+        foreach (var x in EnumeratePackageReferences(ProjectFile))
         {
             if (!skipPackage(x.Id) && !string.IsNullOrEmpty(x.Version))
                 queue.Enqueue(x);
@@ -198,49 +188,47 @@ public class RestoreCommand : BaseFileSystemCommand
             var ver = dep.Version.Trim();
             if (ver.EndsWith("-*", StringComparison.Ordinal))
                 ver = ver[0..^2];
-            else if (ver.StartsWith("[", StringComparison.Ordinal) && ver.EndsWith("]", StringComparison.Ordinal))
+            else if (ver.StartsWith('[') && ver.EndsWith(']'))
             {
                 ver = ver[1..^1].Trim();
             }
 
-            var packageFolder = fileSystem.Combine(fileSystem.Combine(packagesDir, id), ver);
-            if (!fileSystem.DirectoryExists(packageFolder))
+            var packageFolder = FileSystem.Combine(FileSystem.Combine(packagesDir, id), ver);
+            if (!FileSystem.DirectoryExists(packageFolder))
             {
-                packageFolder = fileSystem.Combine(fileSystem.Combine(packagesDir, id.ToLowerInvariant()), ver);
-                if (!fileSystem.DirectoryExists(packageFolder))
+                packageFolder = FileSystem.Combine(FileSystem.Combine(packagesDir, id.ToLowerInvariant()), ver);
+                if (!FileSystem.DirectoryExists(packageFolder))
                 {
-                    var myPackagesDir = fileSystem.Combine(packagesDir, "..", "my-packages");
-                    packageFolder = fileSystem.Combine(myPackagesDir, id, ver);
-                    if (!fileSystem.DirectoryExists(packageFolder))
-                        packageFolder = fileSystem.Combine(myPackagesDir, id.ToLowerInvariant(), ver);
+                    var myPackagesDir = FileSystem.Combine(packagesDir, "..", "my-packages");
+                    packageFolder = FileSystem.Combine(myPackagesDir, id, ver);
+                    if (!FileSystem.DirectoryExists(packageFolder))
+                        packageFolder = FileSystem.Combine(myPackagesDir, id.ToLowerInvariant(), ver);
                 }
             }
 
-            var nuspecFile = fileSystem.Combine(packageFolder, id + ".nuspec");
-            if (!fileSystem.FileExists(nuspecFile))
+            var nuspecFile = FileSystem.Combine(packageFolder, id + ".nuspec");
+            if (!FileSystem.FileExists(nuspecFile))
             {
-                nuspecFile = fileSystem.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
-                if (!fileSystem.FileExists(nuspecFile))
+                nuspecFile = FileSystem.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
+                if (!FileSystem.FileExists(nuspecFile))
                 {
-                    if (verbose)
+                    if (Verbose)
                         Console.WriteLine("Can't find nuspec file: " + nuspecFile);
                     continue;
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Processing: " + id);
-            Console.ResetColor();
+            Console.WriteLine("Processing: " + id, ConsoleColor.Cyan);
 
-            var contentRoot = fileSystem.Combine(packageFolder, "content");
-            if (!fileSystem.DirectoryExists(contentRoot))
-                contentRoot = fileSystem.Combine(packageFolder, "Content");
+            var contentRoot = FileSystem.Combine(packageFolder, "content");
+            if (!FileSystem.DirectoryExists(contentRoot))
+                contentRoot = FileSystem.Combine(packageFolder, "Content");
 
-            if (fileSystem.DirectoryExists(contentRoot))
+            if (FileSystem.DirectoryExists(contentRoot))
             {
-                foreach (var file in fileSystem.GetFiles(contentRoot, "*.*", recursive: true))
+                foreach (var file in FileSystem.GetFiles(contentRoot, "*.*", recursive: true))
                 {
-                    var extension = fileSystem.GetExtension(file);
+                    var extension = FileSystem.GetExtension(file);
                     if (string.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
                         continue;
 
@@ -254,9 +242,9 @@ public class RestoreCommand : BaseFileSystemCommand
                         if (config?.Restore.Typings != false)
                         {
                             relative = "typings/" + relative["Scripts/typings/".Length..];
-                            var tsconfig = fileSystem.Combine(projectDir, "tsconfig.json");
-                            if (!fileSystem.FileExists(tsconfig) ||
-                                !fileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
+                            var tsconfig = FileSystem.Combine(projectDir, "tsconfig.json");
+                            if (!FileSystem.FileExists(tsconfig) ||
+                                !FileSystem.ReadAllText(tsconfig).Contains(relative, StringComparison.OrdinalIgnoreCase))
                                 continue; // old typings only needed for users who didn't fix their tsconfig.json
                         }
                     }
@@ -269,35 +257,35 @@ public class RestoreCommand : BaseFileSystemCommand
                     if (!relative.StartsWith("typings/", StringComparison.OrdinalIgnoreCase))
                         relative = "wwwroot/" + relative;
 
-                    if (verbose)
+                    if (Verbose)
                         Console.WriteLine("Found a file to restore: " + relative);
                     restoreFile(file, relative);
                 }
             }
-            else if (verbose)
+            else if (Verbose)
             {
                 Console.WriteLine("Can't find package content directory: " + nuspecFile);
             }
 
-            var typingsRoot = fileSystem.Combine(packageFolder, "typings");
-            if (!fileSystem.DirectoryExists(typingsRoot))
-                typingsRoot = fileSystem.Combine(packageFolder, "Typings");
+            var typingsRoot = FileSystem.Combine(packageFolder, "typings");
+            if (!FileSystem.DirectoryExists(typingsRoot))
+                typingsRoot = FileSystem.Combine(packageFolder, "Typings");
 
-            if (fileSystem.DirectoryExists(typingsRoot))
+            if (FileSystem.DirectoryExists(typingsRoot))
             {
-                foreach (var file in fileSystem.GetFiles(typingsRoot, "*.ts", recursive: true))
+                foreach (var file in FileSystem.GetFiles(typingsRoot, "*.ts", recursive: true))
                 {
-                    if (verbose)
-                    { 
+                    if (Verbose)
+                    {
                         Console.WriteLine(typingsRoot);
                         Console.WriteLine(file);
-                    }   
+                    }
                     var relative = "typings/" + file[(typingsRoot.Length + 1)..];
                     restoreFile(file, relative);
                 }
             }
 
-            var nuspecContent = fileSystem.ReadAllText(nuspecFile);
+            var nuspecContent = FileSystem.ReadAllText(nuspecFile);
             var nuspec = XElement.Parse(nuspecContent);
             var meta = nuspec.Elements().Where(x => x.Name?.LocalName == "metadata").FirstOrDefault();
             if (meta == null)
@@ -354,14 +342,13 @@ public class RestoreCommand : BaseFileSystemCommand
         "Serenity.Net.Web"
     };
 
-    private IEnumerable<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, 
-        int depth = 0)
+    private List<string> EnumerateProjectReferences(string csproj, HashSet<string> visited, int depth = 0)
     {
         var allReferences = new List<string>();
         try
         {
-            csproj = fileSystem.GetFullPath(csproj);
-            var project = ProjectSystem.LoadProject(csproj);
+            csproj = FileSystem.GetFullPath(csproj);
+            var project = BuildSystem.LoadProject(csproj);
             visited?.Add(csproj);
 
             foreach (var item in project.AllEvaluatedItems)
@@ -372,14 +359,14 @@ public class RestoreCommand : BaseFileSystemCommand
                     if (string.IsNullOrEmpty(item.EvaluatedInclude))
                         continue;
 
-                    var path = fileSystem.Combine(fileSystem.GetDirectoryName(csproj), item.EvaluatedInclude);
-                    if (!fileSystem.FileExists(path) || visited?.Contains(path) == true)
+                    var path = FileSystem.Combine(FileSystem.GetDirectoryName(csproj), item.EvaluatedInclude);
+                    if (!FileSystem.FileExists(path) || visited?.Contains(path) == true)
                         continue;
 
-                    if (IgnoreProjectRefs.Contains(fileSystem.GetFileNameWithoutExtension(path)))
+                    if (IgnoreProjectRefs.Contains(FileSystem.GetFileNameWithoutExtension(path)))
                         continue;
 
-                    path = fileSystem.GetFullPath(path);
+                    path = FileSystem.GetFullPath(path);
                     allReferences.Add(path);
                     if (visited?.Contains(path) == true)
                         continue;
@@ -403,8 +390,8 @@ public class RestoreCommand : BaseFileSystemCommand
         IBuildProject project;
         try
         {
-            csproj = fileSystem.GetFullPath(csproj);
-            project = ProjectSystem.LoadProject(csproj);
+            csproj = FileSystem.GetFullPath(csproj);
+            project = BuildSystem.LoadProject(csproj);
         }
         catch
         {

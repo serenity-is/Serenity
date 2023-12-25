@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.IO;
 
 namespace Serenity.CodeGenerator;
 
@@ -12,14 +12,24 @@ public static class GeneratorConfigExtensions
     /// </summary>
     public static string SaveToJson(this GeneratorConfig config)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
 
         config.Connections.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
         foreach (var c in config.Connections)
             c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
-        return JSON.StringifyIndented(config, 2);
+        using var sw = new StringWriter();
+        using var jw = new Newtonsoft.Json.JsonTextWriter(sw)
+        {
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+            IndentChar = ' ',
+            Indentation = 2
+        };
+        var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSettings.Strict);
+
+        serializer.Serialize(jw, config);
+        jw.Flush();
+        return sw.ToString();
     }
 
     /// <summary>
@@ -27,18 +37,17 @@ public static class GeneratorConfigExtensions
     /// </summary>
     public static string[] GetAppSettingsFiles(this GeneratorConfig config)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
 
         if (config.AppSettingFiles != null &&
             config.AppSettingFiles.Length != 0)
             return config.AppSettingFiles;
 
-        return new string[]
-        {
+        return
+        [
             "appsettings.json",
             "appsettings.machine.json"
-        };
+        ];
     }
 
     /// <summary>
@@ -48,25 +57,16 @@ public static class GeneratorConfigExtensions
     /// <param name="csproj">CSProj file</param>
     /// <returns>Root namespace for given project</returns>
     /// <exception cref="ArgumentNullException">fileSystem is null</exception>
-    public static string GetRootNamespaceFor(this GeneratorConfig config, IGeneratorFileSystem fileSystem, string csproj)
+    public static string GetRootNamespaceFor(this GeneratorConfig config, IProjectFileInfo projectInfo)
     {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
-
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(projectInfo);
 
         if (!string.IsNullOrEmpty(config.RootNamespace))
             return config.RootNamespace;
 
-        string rootNamespace = null;
-
-        if (fileSystem.FileExists(csproj)) {
-             rootNamespace = ProjectFileHelper.ExtractPropertyFrom(fileSystem, csproj,
-                xe => xe.Descendants("RootNamespace").FirstOrDefault()?.Value.TrimToNull());
-        }
-
-        rootNamespace ??= fileSystem.ChangeExtension(fileSystem.GetFileName(csproj), null);
+        string rootNamespace = projectInfo.GetRootNamespace();
+        rootNamespace ??= projectInfo.FileSystem.GetFileNameWithoutExtension(projectInfo.ProjectFile);
 
         if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
             rootNamespace = rootNamespace[0..^4];
@@ -84,14 +84,11 @@ public static class GeneratorConfigExtensions
     public static GeneratorConfig LoadGeneratorConfig(this IFileSystem fileSystem,
         string path, string filename = "sergen.json")
     {
-        if (fileSystem is null)
-            throw new ArgumentNullException(nameof(fileSystem));
-
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(path);
 
         if (!string.IsNullOrEmpty(filename))
-            path = System.IO.Path.Combine(path, filename);
+            path = fileSystem.Combine(path, filename);
 
         GeneratorConfig config;
         if (!fileSystem.FileExists(path))
@@ -101,19 +98,12 @@ public static class GeneratorConfigExtensions
             config = ExtendsJsonReader.Read<GeneratorConfig>(
                 fileSystem, path,
                 extendsProp: nameof(GeneratorConfig.Extends),
-                options: new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters =
-                    {
-                        new JsonStringEnumConverter()
-                    }
-                },
+                options: JSON.Defaults.Tolerant,
                 getDefault: GeneratorDefaults.TryParse);
         }
 
-        config.Connections ??= new();
-        config.RemoveForeignFields ??= new List<string>();
+        config.Connections ??= [];
+        config.RemoveForeignFields ??= [];
         return config;
     }
 }

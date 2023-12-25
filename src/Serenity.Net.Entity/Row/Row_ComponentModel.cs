@@ -159,7 +159,7 @@ public abstract partial class Row<TFields> : IEditableRow
 
     void IEditableRow.AddValidationError(string propertyName, string error)
     {
-        validationErrors ??= new Dictionary<string, string>();
+        validationErrors ??= [];
         validationErrors[propertyName ?? string.Empty] = error;
     }
 

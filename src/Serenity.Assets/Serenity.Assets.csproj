@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>

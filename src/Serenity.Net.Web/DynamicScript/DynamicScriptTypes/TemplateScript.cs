@@ -3,22 +3,16 @@
 /// <summary>
 /// Dynamic script type for HTML templates
 /// </summary>
-public class TemplateScript : DynamicScript, INamedDynamicScript
+/// <remarks>
+/// Creates a new instance of the class
+/// </remarks>
+/// <param name="key">Template key</param>
+/// <param name="getTemplate">Get template callback</param>
+/// <exception cref="ArgumentNullException"></exception>
+public class TemplateScript(string key, Func<string> getTemplate) : DynamicScript, INamedDynamicScript
 {
-    private readonly string key;
-    private readonly Func<string> getTemplate;
-
-    /// <summary>
-    /// Creates a new instance of the class
-    /// </summary>
-    /// <param name="key">Template key</param>
-    /// <param name="getTemplate">Get template callback</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public TemplateScript(string key, Func<string> getTemplate)
-    {
-        this.getTemplate = getTemplate ?? throw new ArgumentNullException(nameof(getTemplate));
-        this.key = key ?? throw new ArgumentNullException(nameof(key));
-    }
+    private readonly string key = key ?? throw new ArgumentNullException(nameof(key));
+    private readonly Func<string> getTemplate = getTemplate ?? throw new ArgumentNullException(nameof(getTemplate));
 
     /// <inheritdoc/>
     public string ScriptName => "Template." + key;

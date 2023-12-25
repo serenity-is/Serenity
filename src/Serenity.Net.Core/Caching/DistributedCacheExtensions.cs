@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Serenity;
@@ -27,7 +27,7 @@ public static class DistributedCacheExtensions
         else if (value is byte[] b)
             cache.Set(key, b);
         else
-            cache.SetString(key, JSON.Stringify(value));
+            cache.SetString(key, JSON.Stringify(value, writeNulls: false));
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public static class DistributedCacheExtensions
         else if (value is byte[] b)
             cache.Set(key, b, options);
         else
-            cache.SetString(key, JSON.Stringify(value), options);
+            cache.SetString(key, JSON.Stringify(value, writeNulls: false), options);
     }
 
     /// <summary>

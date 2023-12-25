@@ -1,6 +1,5 @@
-﻿import { startsWith } from "./strings";
-import { closePanel } from "./dialogs";
-import $ from "@optionaldeps/jquery";
+﻿import sQuery from "@optionaldeps/squery";
+import { closePanel } from "@serenity-is/base";
 
 export interface HandleRouteEventArgs {
     handled: boolean,
@@ -78,8 +77,8 @@ export namespace Router {
     }
 
     function visibleDialogs() {
-        return $('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort((a, b) => {
-            return ($(a).data('qrouterorder') || 0) - ($(b).data('qrouterorder') || 0);
+        return sQuery('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort((a, b) => {
+            return (sQuery(a).data('qrouterorder') || 0) - (sQuery(b).data('qrouterorder') || 0);
         });
     }
 
@@ -96,7 +95,7 @@ export namespace Router {
             var index = dialogs.indexOf(dialog[0]);
 
             for (var i = 0; i <= index; i++) {
-                var q = $(dialogs[i]).data("qroute") as string;
+                var q = sQuery(dialogs[i]).data("qroute") as string;
                 if (q && q.length)
                     route.push(q);
             }
@@ -106,7 +105,7 @@ export namespace Router {
                 if (idPrefix) {
                     idPrefix += "_";
                     var id = owner.attr("id");
-                    if (id && startsWith(id, idPrefix))
+                    if (id?.startsWith(idPrefix))
                         value = id.substr(idPrefix.length) + '@' + value;
                 }
             }
@@ -114,7 +113,7 @@ export namespace Router {
         else {
             var id = owner.attr("id");
             if (id && (!owner.hasClass("route-handler") ||
-                $('.route-handler').first().attr("id") != id))
+                sQuery('.route-handler').first().attr("id") != id))
                 value = id + "@" + value;
         }
 
@@ -126,10 +125,10 @@ export namespace Router {
             element.data("qroute", null);
             element.unbind(".qrouter");
             var prhash = element.data("qprhash");
-            var tryBack = $(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
+            var tryBack = sQuery(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
                 ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
-                $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
-                $(e.originalEvent.target).hasClass("panel-titlebar-close")));
+                sQuery(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
+                sQuery(e.originalEvent.target).hasClass("panel-titlebar-close")));
             if (prhash != null)
                 replace(prhash, tryBack);
             else
@@ -158,7 +157,7 @@ export namespace Router {
 
             var dialogs = visibleDialogs();
             var newParts = hash.split("/+/");
-            var oldParts = dialogs.map(el => $(el).data('qroute') as string);
+            var oldParts = dialogs.map(el => sQuery(el).data('qroute') as string);
 
             var same = 0;
             while (same < dialogs.length &&
@@ -168,7 +167,7 @@ export namespace Router {
             }
 
             for (var i = same; i < dialogs.length; i++) {
-                var d = $(dialogs[i]);
+                var d = sQuery(dialogs[i]);
                 if (d.hasClass('ui-dialog-content'))
                     (d as any).dialog?.('close');
                 else if (d.hasClass('s-Panel'))
@@ -180,11 +179,11 @@ export namespace Router {
                 var routeParts = route.split('@');
                 var handler: JQuery;
                 if (routeParts.length == 2) {
-                    var dialog = i > 0 ? $(dialogs[i - 1]) : $([]);
+                    var dialog = i > 0 ? sQuery(dialogs[i - 1]) : sQuery([]);
                     if (dialog.length) {
                         var idPrefix = dialog.attr("id");
                         if (idPrefix) {
-                            handler = $('#' + idPrefix + "_" + routeParts[0]);
+                            handler = sQuery('#' + idPrefix + "_" + routeParts[0]);
                             if (handler.length) {
                                 route = routeParts[1];
                             }
@@ -192,7 +191,7 @@ export namespace Router {
                     }
 
                     if (!handler || !handler.length) {
-                        handler = $('#' + routeParts[0]);
+                        handler = sQuery('#' + routeParts[0]);
                         if (handler.length) {
                             route = routeParts[1];
                         }
@@ -200,8 +199,8 @@ export namespace Router {
                 }
 
                 if (!handler || !handler.length) {
-                    handler = i > 0 ? $(dialogs[i - 1]) :
-                        $('.route-handler').first();
+                    handler = i > 0 ? sQuery(dialogs[i - 1]) :
+                        sQuery('.route-handler').first();
                 }
 
                 handler.triggerHandler("handleroute", <HandleRouteEventArgs>{
@@ -239,21 +238,21 @@ export namespace Router {
 
     let routerOrder = 1;
 
-    typeof document !== "undefined" && typeof $ !== "undefined" &&
-        $.fn && $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
+    typeof document !== "undefined" && typeof sQuery !== "undefined" &&
+        sQuery.fn && sQuery(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
         if (!enabled)
             return;
 
-        var dlg = $(event.target);
+        var dlg = sQuery(event.target);
         dlg.data("qrouterorder", routerOrder++);
 
         if (dlg.data("qroute"))
             return;
 
         dlg.data("qprhash", window.location.hash);
-        var owner = $(visibleDialogs).not(dlg).last();
+        var owner = sQuery(visibleDialogs).not(dlg).last();
         if (!owner.length)
-            owner = $('html');
+            owner = sQuery('html');
 
         dialogOpen(owner, dlg, () => {
             return "!" + (++autoinc).toString(36);
