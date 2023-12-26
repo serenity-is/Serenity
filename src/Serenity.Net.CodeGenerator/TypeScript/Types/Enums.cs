@@ -1,4 +1,4 @@
-namespace Serenity.TypeScript.TsTypes;
+namespace Serenity.TypeScript;
 
 [Flags]
 public enum NodeFlags
@@ -78,37 +78,7 @@ public enum NodeFlags
     IdentifierIsInJSDocNamespace = HasAsyncFunctions, // Indicates whether the identifier is part of a JSDoc namespace
 }
 
-public enum ParsingContext
-{
-    SourceElements, // Elements in source file
-    BlockStatements, // Statements in block
-    SwitchClauses, // Clauses in switch statement
-    SwitchClauseStatements, // Statements in switch clause
-    TypeMembers, // Members in interface or type literal
-    ClassMembers, // Members in class declaration
-    EnumMembers, // Members in enum declaration
-    HeritageClauseElement, // Elements in a heritage clause
-    VariableDeclarations, // Variable declarations in variable statement
-    ObjectBindingElements, // Binding elements in object binding list
-    ArrayBindingElements, // Binding elements in array binding list
-    ArgumentExpressions, // Expressions in argument list
-    ObjectLiteralMembers, // Members in object literal
-    JsxAttributes, // Attributes in jsx element
-    JsxChildren, // Things between opening and closing JSX tags
-    ArrayLiteralMembers, // Members in array literal
-    Parameters, // Parameters in parameter list
-    RestProperties, // Property names in a rest type list
-    TypeParameters, // Type parameters in type parameter list
-    TypeArguments, // Type arguments in type argument list
-    TupleElementTypes, // Element types in tuple element type list
-    HeritageClauses, // Heritage clauses for a class or interface declaration.
-    ImportOrExportSpecifiers, // Named import clause's import specifier list
-    JSDocFunctionParameters,
-    JSDocTypeArguments,
-    JSDocRecordMembers,
-    JSDocTupleTypes,
-    Count // Number of parsing contexts
-}
+
 
 public enum Tristate
 {
@@ -395,58 +365,6 @@ public enum SymbolFlags
     Classifiable = Class | Enum | TypeAlias | Interface | TypeParameter | Module
 }
 
-public enum CheckFlags
-{
-    Instantiated = 1 << 0, // Instantiated symbol
-    SyntheticProperty = 1 << 1, // Property in union or intersection type
-    SyntheticMethod = 1 << 2, // Method in union or intersection type
-    Readonly = 1 << 3, // Readonly transient symbol
-    Partial = 1 << 4, // Synthetic property present in some but not all constituents
-    HasNonUniformType = 1 << 5, // Synthetic property with non-uniform type in constituents
-    ContainsPublic = 1 << 6, // Synthetic property with public constituent(s)
-    ContainsProtected = 1 << 7, // Synthetic property with protected constituent(s)
-    ContainsPrivate = 1 << 8, // Synthetic property with private constituent(s)
-    ContainsStatic = 1 << 9, // Synthetic property with static constituent(s)
-    Synthetic = SyntheticProperty | SyntheticMethod
-}
-
-public enum NodeCheckFlags
-{
-    TypeChecked = 0x00000001, // Node has been type checked
-    LexicalThis = 0x00000002, // Lexical 'this' reference
-    CaptureThis = 0x00000004, // Lexical 'this' used in body
-    CaptureNewTarget = 0x00000008, // Lexical 'new.target' used in body
-    SuperInstance = 0x00000100, // Instance 'super' reference
-    SuperStatic = 0x00000200, // Static 'super' reference
-    ContextChecked = 0x00000400, // Contextual types have been assigned
-    AsyncMethodWithSuper = 0x00000800, // An async method that reads a value from a member of 'super'.
-    AsyncMethodWithSuperBinding = 0x00001000, // An async method that assigns a value to a member of 'super'.
-    CaptureArguments = 0x00002000, // Lexical 'arguments' used in body (for async functions)
-
-    EnumValuesComputed =
-        0x00004000, // Values for enum members have been computed, and any errors have been reported for them.
-
-    LexicalModuleMergesWithClass =
-        0x00008000, // Instantiated lexical module declaration is merged with a previous class declaration.
-    LoopWithCapturedBlockScopedBinding = 0x00010000, // Loop that contains block scoped variable captured in closure
-    CapturedBlockScopedBinding = 0x00020000, // Block-scoped binding that is captured in some function
-
-    BlockScopedBindingInLoop =
-        0x00040000, // Block-scoped binding with declaration nested inside iteration statement
-
-    ClassWithBodyScopedClassBinding =
-        0x00080000, // Decorated class that contains a binding to itself inside of the class body.
-    BodyScopedClassBinding = 0x00100000, // Binding to a decorated class inside of the class's body.
-
-    NeedsLoopOutParameter =
-        0x00200000, // Block scoped binding whose value should be explicitly copied outside of the converted loop
-    AssignmentsMarked = 0x00400000, // Parameter assignments have been marked
-
-    ClassWithConstructorReference =
-        0x00800000, // Class that contains a binding to its constructor inside of the class body.
-    ConstructorReferenceInClass = 0x01000000 // Binding to a class constructor inside of the class's body.
-}
-
 public enum TypeFlags
 {
     Any = 1 << 0,
@@ -538,105 +456,11 @@ public enum ObjectFlags
     ClassOrInterface = Class | Interface
 }
 
-public enum SignatureKind
-{
-    Call,
-    Construct
-}
-
-public enum IndexKind
-{
-    String,
-    Number
-}
-
-public enum SpecialPropertyAssignmentKind
-{
-    None,
-
-    /// exports.name = expr
-    ExportsProperty,
-
-    /// module.exports = expr
-    ModuleExports,
-
-    /// className.prototype.name = expr
-    PrototypeProperty,
-
-    /// this.name = expr
-    ThisProperty,
-
-    // F.name = expr
-    Property
-}
-
-public enum DiagnosticCategory
-{
-    Warning,
-    Error,
-    Message,
-    Unknown
-}
-
 public enum ModuleResolutionKind
 {
     Classic = 1,
     NodeJs = 2
 }
-
-public enum ModuleKind
-{
-    None = 0,
-    CommonJs = 1,
-    Amd = 2,
-    Umd = 3,
-    System = 4,
-    Es2015 = 5
-}
-
-public enum JsxEmit
-{
-    None = 0,
-    Preserve = 1,
-    React = 2,
-    ReactNative = 3
-}
-
-public enum NewLineKind
-{
-    CarriageReturnLineFeed = 0,
-    LineFeed = 1
-}
-
-public enum ScriptKind
-{
-    Unknown = 0,
-    Js = 1,
-    Jsx = 2,
-    Ts = 3,
-    Tsx = 4,
-    External = 5
-}
-
-public enum LanguageVariant
-{
-    Standard,
-    Jsx
-}
-
-public enum DiagnosticStyle
-{
-    Simple,
-    Pretty
-}
-
-public enum WatchDirectoryFlags
-{
-    None = 0,
-    Recursive = 1 << 0
-}
-
-
 
 public enum Extension
 {
@@ -831,12 +655,5 @@ public enum SignatureFlags
     Type = 1 << 2,
     IgnoreMissingOpenBrace = 1 << 4,
     JSDoc = 1 << 5,
-}
-
-public enum SpeculationKind
-{
-    TryParse,
-    Lookahead,
-    Reparse,
 }
 

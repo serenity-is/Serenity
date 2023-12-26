@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using Serenity.CodeGeneration;
 #endif
 using Serenity.TypeScript;
-using Serenity.TypeScript.TsTypes;
 using System.Threading;
 
 namespace Serenity.CodeGenerator;

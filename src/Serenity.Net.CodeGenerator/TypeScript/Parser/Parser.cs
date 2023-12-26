@@ -1,15 +1,14 @@
-using Serenity.TypeScript.TsTypes;
-using static Serenity.TypeScript.TsParser.Core;
-using static Serenity.TypeScript.TsParser.Scanner;
-using static Serenity.TypeScript.TsParser.Ts;
-using static Serenity.TypeScript.TsParser.Utilities;
+using static Serenity.TypeScript.NodeVisitor;
+using static Serenity.TypeScript.Scanner;
+using static Serenity.TypeScript.Utilities;
 using Debug = System.Diagnostics.Debug;
 
-namespace Serenity.TypeScript.TsParser;
+namespace Serenity.TypeScript;
 
 public class Parser
 {
-    public Scanner Scanner = new(LanguageVariant.Standard, null);
+    private readonly Scanner scanner = new(ScriptTarget.Latest, skipTrivia: true, LanguageVariant.Standard);
+
     public NodeFlags DisallowInAndDecoratorContext = NodeFlags.DisallowInContext | NodeFlags.DecoratorContext;
 
     public NodeFlags ContextFlags;
@@ -17,9 +16,9 @@ public class Parser
     public SourceFile SourceFile;
     public List<Diagnostic> ParseDiagnostics;
 
-    public SyntaxKind CurrentToken;
+    private SyntaxKind currentToken;
     public string SourceText;
-    public int ParsingContext;
+    private int parsingContext;
 
     public Parser()
     {
@@ -39,27 +38,28 @@ public class Parser
     public static LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
     {
         // .tsx and .jsx files are treated as jsx language variant.
-        return scriptKind == ScriptKind.Tsx || scriptKind == ScriptKind.Jsx || scriptKind == ScriptKind.Js ? LanguageVariant.Jsx : LanguageVariant.Standard;
+        return scriptKind == ScriptKind.TSX || scriptKind == ScriptKind.JSX || scriptKind == ScriptKind.JS ? LanguageVariant.JSX : LanguageVariant.Standard;
     }
 
     public void InitializeState(string _sourceText, ScriptKind scriptKind)
     {
         SourceText = _sourceText;
         ParseDiagnostics = []; // [];
-        ParsingContext = 0;
-        ContextFlags = scriptKind == ScriptKind.Js || scriptKind == ScriptKind.Jsx ? NodeFlags.JavaScriptFile : NodeFlags.None;
+        parsingContext = 0;
+        ContextFlags = scriptKind == ScriptKind.JS || scriptKind == ScriptKind.JSX ? NodeFlags.JavaScriptFile : NodeFlags.None;
         ParseErrorBeforeNextFinishedNode = false;
         // Initialize and prime the scanner before parsing the source elements.
-        Scanner.SetText(SourceText);
-        Scanner.OnError += ScanError;
-        Scanner.SetLanguageVariant(GetLanguageVariant(scriptKind));
+        scanner.SetText(SourceText);
+        scanner.SetOnError(ScanError);
+        scanner.SetLanguageVariant(GetLanguageVariant(scriptKind));
+        scanner.SetJSDocParsingMode(JSDocParsingMode.ParseNone);
     }
 
     public void ClearState()
     {
         // Clear out the text the scanner is pointing at, so it doesn't keep anything alive unnecessarily.
-        Scanner.SetText("");
-        Scanner.SetOnError(null);
+        scanner.SetText("");
+        scanner.SetOnError(null);
         // Clear any data.  We don't want to accidentally hold onto it for too long.
         ParseDiagnostics = null;
         SourceFile = null;
@@ -75,7 +75,7 @@ public class Parser
         // Prime the scanner.
         NextToken();
 
-        SourceFile.Statements = ParseList2(TsTypes.ParsingContext.SourceElements, ParseStatement);
+        SourceFile.Statements = ParseList2(ParsingContext.SourceElements, ParseStatement);
 
         Debug.Assert(Token() == SyntaxKind.EndOfFileToken);
 
@@ -298,8 +298,8 @@ public class Parser
 
     public void ParseErrorAtCurrentToken(DiagnosticMessage message, object argument = null)
     {
-        var start = Scanner.TokenPos;
-        var length = Scanner.TextPos - start;
+        var start = scanner.GetTokenEnd();
+        var length = scanner.GetTokenStart() - start;
 
         ParseErrorAtPosition(start, length, message, argument);
     }
@@ -320,83 +320,83 @@ public class Parser
         ParseErrorBeforeNextFinishedNode = true;
     }
 
-    public void ScanError(DiagnosticMessage message, int? length = null)
+    public void ScanError(DiagnosticMessage message, int length, object arg0)
     {
-        ParseErrorAtPosition(Scanner.TextPos, length ?? 0, message);
+        ParseErrorAtPosition(scanner.GetTokenStart(), length, message, arg0);
     }
 
     public int GetNodePos()
     {
-        return Scanner.StartPos;
+        return scanner.GetTokenFullStart();
     }
 
     public int GetNodeEnd()
     {
-        return Scanner.StartPos;
+        return scanner.GetTokenFullStart();
     }
 
     public SyntaxKind Token()
     {
-        return CurrentToken;
+        return currentToken;
     }
 
     public SyntaxKind NextToken()
     {
-        CurrentToken = Scanner.Scan();
-        return CurrentToken;
+        currentToken = scanner.Scan();
+        return currentToken;
     }
 
     public SyntaxKind ReScanGreaterToken()
     {
-        CurrentToken = Scanner.ReScanGreaterToken();
-        return CurrentToken;
+        currentToken = scanner.ReScanGreaterToken();
+        return currentToken;
     }
 
     public SyntaxKind ReScanSlashToken()
     {
-        CurrentToken = Scanner.ReScanSlashToken();
-        return CurrentToken;
+        currentToken = scanner.ReScanSlashToken();
+        return currentToken;
     }
 
-    public SyntaxKind ReScanTemplateToken()
+    public SyntaxKind ReScanTemplateToken(bool isTaggedTemplate)
     {
-        CurrentToken = Scanner.ReScanTemplateToken();
-        return CurrentToken;
+        currentToken = scanner.ReScanTemplateToken(isTaggedTemplate);
+        return currentToken;
     }
 
     public SyntaxKind ScanJsxIdentifier()
     {
-        CurrentToken = Scanner.ScanJsxIdentifier();
-        return CurrentToken;
+        currentToken = scanner.ScanJsxIdentifier();
+        return currentToken;
     }
 
     public SyntaxKind ScanJsxText()
     {
-        CurrentToken = Scanner.ScanJsxToken();
-        return CurrentToken;
+        currentToken = scanner.ScanJsxToken();
+        return currentToken;
     }
 
     public SyntaxKind ScanJsxAttributeValue()
     {
-        CurrentToken = Scanner.ScanJsxAttributeValue();
-        return CurrentToken;
+        currentToken = scanner.ScanJsxAttributeValue();
+        return currentToken;
     }
 
     public T SpeculationHelper<T>(Func<T> callback, SpeculationKind speculationKind)
     {
-        var saveToken = CurrentToken;
+        var saveToken = currentToken;
         var saveParseDiagnosticsLength = ParseDiagnostics.Count;
         var saveParseErrorBeforeNextFinishedNode = ParseErrorBeforeNextFinishedNode;
         var saveContextFlags = ContextFlags;
         var result = speculationKind != SpeculationKind.TryParse
-            ? Scanner.LookAhead(callback)
-            : Scanner.TryScan(callback);
+            ? scanner.LookAhead(callback)
+            : scanner.TryScan(callback);
 
         Debug.Assert(saveContextFlags == ContextFlags);
         if (result == null || ((result is bool) && Convert.ToBoolean(result) == false) ||
             speculationKind != SpeculationKind.TryParse)
         {
-            CurrentToken = saveToken;
+            currentToken = saveToken;
             if (speculationKind != SpeculationKind.Reparse)
                 ParseDiagnostics = ParseDiagnostics.Take(saveParseDiagnosticsLength).ToList();
             ParseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
@@ -461,7 +461,7 @@ public class Parser
         }
         else
         {
-            ParseErrorAtCurrentToken(DiagnosticMessage._0_expected, TokenToString(kind));
+            ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(kind));
         }
 
         return false;
@@ -504,7 +504,7 @@ public class Parser
     {
         var node = new T
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Kind = sk
         };
 
@@ -521,7 +521,7 @@ public class Parser
         }
 
         // We can parse out an optional semicolon in ASI cases in the following cases.
-        return Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.EndOfFileToken || Scanner.HasPrecedingLineBreak;
+        return Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.EndOfFileToken || scanner.HasPrecedingLineBreak();
     }
 
     public bool ParseSemicolon()
@@ -560,7 +560,7 @@ public class Parser
 
     public T FinishNode<T>(T node, int? end = null) where T : INode
     {
-        node.End = end == null ? Scanner.StartPos : (int)end;
+        node.End = end == null ? scanner.GetTokenFullStart() : (int)end;
         if (ContextFlags != NodeFlags.None)
         {
             node.Flags |= ContextFlags;
@@ -578,7 +578,7 @@ public class Parser
     {
         if (reportAtCurrentPosition)
         {
-            ParseErrorAtPosition(Scanner.StartPos, 0, diagnosticMessage, argument);
+            ParseErrorAtPosition(scanner.GetTokenFullStart(), 0, diagnosticMessage, argument);
         }
         else
         {
@@ -587,7 +587,7 @@ public class Parser
         var result = new T
         {
             Kind = SyntaxKind.MissingDeclaration,
-            Pos = Scanner.StartPos
+            Pos = scanner.GetTokenFullStart()
         };
         return FinishNode(result);
     }
@@ -596,13 +596,13 @@ public class Parser
     {
         if (isIdentifier)
         {
-            var node = new Identifier { Pos = Scanner.StartPos };
+            var node = new Identifier { Pos = scanner.GetTokenFullStart() };
             if (Token() != SyntaxKind.Identifier)
             {
                 node.OriginalKeywordKind = Token();
             }
 
-            node.Text = Scanner.TokenValue;
+            node.Text = scanner.GetTokenValue();
 
             NextToken();
 
@@ -669,7 +669,7 @@ public class Parser
 
     public ComputedPropertyName ParseComputedPropertyName()
     {
-        var node = new ComputedPropertyName() { Pos = Scanner.StartPos };
+        var node = new ComputedPropertyName() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBracketToken);
 
@@ -691,7 +691,7 @@ public class Parser
     public bool NextTokenIsOnSameLineAndCanFollowModifier()
     {
         NextToken();
-        if (Scanner.HasPrecedingLineBreak)
+        if (scanner.HasPrecedingLineBreak())
         {
             return false;
         }
@@ -752,13 +752,13 @@ public class Parser
             (Token() == SyntaxKind.AsyncKeyword && LookAhead(NextTokenIsFunctionKeywordOnSameLine));
     }
 
-    public bool IsListElement(ParsingContext parsingContext, bool inErrorRecovery)
+    private bool IsListElement(ParsingContext parsingContext, bool inErrorRecovery)
     {
         switch (parsingContext)
         {
-            case TsTypes.ParsingContext.SourceElements:
-            case TsTypes.ParsingContext.BlockStatements:
-            case TsTypes.ParsingContext.SwitchClauseStatements:
+            case ParsingContext.SourceElements:
+            case ParsingContext.BlockStatements:
+            case ParsingContext.SwitchClauseStatements:
 
                 // If we're in error recovery, then we don't want to treat ';' as an empty statement.
                 // The problem is that ';' can show up in far too many contexts, and if we see one
@@ -767,34 +767,34 @@ public class Parser
                 // we really don't want to assume the class is over and we're on a statement in the
                 // outer module.  We just want to consume and move on.
                 return !(Token() == SyntaxKind.SemicolonToken && inErrorRecovery) && IsStartOfStatement();
-            case TsTypes.ParsingContext.SwitchClauses:
+            case ParsingContext.SwitchClauses:
 
                 return Token() == SyntaxKind.CaseKeyword || Token() == SyntaxKind.DefaultKeyword;
-            case TsTypes.ParsingContext.TypeMembers:
+            case ParsingContext.TypeMembers:
 
                 return LookAhead(IsTypeMemberStart);
-            case TsTypes.ParsingContext.ClassMembers:
+            case ParsingContext.ClassMembers:
 
                 // We allow semicolons as class elements (as specified by ES6) as long as we're
                 // not in error recovery.  If we're in error recovery, we don't want an errant
                 // semicolon to be treated as a class member (since they're almost always used
                 // for statements.
                 return LookAhead(IsClassMemberStart) || (Token() == SyntaxKind.SemicolonToken && !inErrorRecovery);
-            case TsTypes.ParsingContext.EnumMembers:
+            case ParsingContext.EnumMembers:
 
                 // Include open bracket computed properties. This technically also lets in indexers,
                 // which would be a candidate for improved error reporting.
                 return Token() == SyntaxKind.OpenBracketToken || IsLiteralPropertyName();
-            case TsTypes.ParsingContext.ObjectLiteralMembers:
+            case ParsingContext.ObjectLiteralMembers:
 
                 return Token() == SyntaxKind.OpenBracketToken || Token() == SyntaxKind.AsteriskToken || Token() == SyntaxKind.DotDotDotToken || IsLiteralPropertyName();
-            case TsTypes.ParsingContext.RestProperties:
+            case ParsingContext.RestProperties:
 
                 return IsLiteralPropertyName();
-            case TsTypes.ParsingContext.ObjectBindingElements:
+            case ParsingContext.ObjectBindingElements:
 
                 return Token() == SyntaxKind.OpenBracketToken || Token() == SyntaxKind.DotDotDotToken || IsLiteralPropertyName();
-            case TsTypes.ParsingContext.HeritageClauseElement:
+            case ParsingContext.HeritageClauseElement:
                 if (Token() == SyntaxKind.OpenBraceToken)
                 {
                     return LookAhead(IsValidHeritageClauseObjectLiteral);
@@ -811,44 +811,44 @@ public class Parser
                     return IsIdentifier() && !IsHeritageClauseExtendsOrImplementsKeyword();
                 }
             //goto caseLabel12;
-            case TsTypes.ParsingContext.VariableDeclarations:
+            case ParsingContext.VariableDeclarations:
                 //caseLabel12:
                 return IsIdentifierOrPattern();
-            case TsTypes.ParsingContext.ArrayBindingElements:
+            case ParsingContext.ArrayBindingElements:
 
                 return Token() == SyntaxKind.CommaToken || Token() == SyntaxKind.DotDotDotToken || IsIdentifierOrPattern();
-            case TsTypes.ParsingContext.TypeParameters:
+            case ParsingContext.TypeParameters:
 
                 return IsIdentifier();
-            case TsTypes.ParsingContext.ArgumentExpressions:
-            case TsTypes.ParsingContext.ArrayLiteralMembers:
+            case ParsingContext.ArgumentExpressions:
+            case ParsingContext.ArrayLiteralMembers:
 
                 return Token() == SyntaxKind.CommaToken || Token() == SyntaxKind.DotDotDotToken || IsStartOfExpression();
-            case TsTypes.ParsingContext.Parameters:
+            case ParsingContext.Parameters:
 
                 return IsStartOfParameter();
-            case TsTypes.ParsingContext.TypeArguments:
-            case TsTypes.ParsingContext.TupleElementTypes:
+            case ParsingContext.TypeArguments:
+            case ParsingContext.TupleElementTypes:
 
                 return Token() == SyntaxKind.CommaToken || IsStartOfType();
-            case TsTypes.ParsingContext.HeritageClauses:
+            case ParsingContext.HeritageClauses:
 
                 return IsHeritageClause();
-            case TsTypes.ParsingContext.ImportOrExportSpecifiers:
+            case ParsingContext.ImportOrExportSpecifiers:
 
                 return TokenIsIdentifierOrKeyword(Token());
-            case TsTypes.ParsingContext.JsxAttributes:
+            case ParsingContext.JsxAttributes:
 
                 return TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.OpenBraceToken;
-            case TsTypes.ParsingContext.JsxChildren:
+            case ParsingContext.JsxChildren:
 
                 return true;
-            case TsTypes.ParsingContext.JSDocFunctionParameters:
-            case TsTypes.ParsingContext.JSDocTypeArguments:
-            case TsTypes.ParsingContext.JSDocTupleTypes:
+            case ParsingContext.JSDocFunctionParameters:
+            case ParsingContext.JSDocTypeArguments:
+            case ParsingContext.JSDocTupleTypes:
 
                 return IsJsDocType();
-            case TsTypes.ParsingContext.JSDocRecordMembers:
+            case ParsingContext.JSDocRecordMembers:
 
                 return IsSimplePropertyName();
         }
@@ -917,7 +917,7 @@ public class Parser
         return IsStartOfExpression();
     }
 
-    public bool IsListTerminator(ParsingContext kind)
+    private bool IsListTerminator(ParsingContext kind)
     {
         if (Token() == SyntaxKind.EndOfFileToken)
         {
@@ -926,22 +926,22 @@ public class Parser
         }
         return kind switch
         {
-            TsTypes.ParsingContext.BlockStatements or TsTypes.ParsingContext.SwitchClauses or TsTypes.ParsingContext.TypeMembers or TsTypes.ParsingContext.ClassMembers or TsTypes.ParsingContext.EnumMembers or TsTypes.ParsingContext.ObjectLiteralMembers or TsTypes.ParsingContext.ObjectBindingElements or TsTypes.ParsingContext.ImportOrExportSpecifiers => Token() == SyntaxKind.CloseBraceToken,
-            TsTypes.ParsingContext.SwitchClauseStatements => Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.CaseKeyword || Token() == SyntaxKind.DefaultKeyword,
-            TsTypes.ParsingContext.HeritageClauseElement => Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.ExtendsKeyword || Token() == SyntaxKind.ImplementsKeyword,
-            TsTypes.ParsingContext.VariableDeclarations => IsVariableDeclaratorListTerminator(),
-            TsTypes.ParsingContext.TypeParameters => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.ExtendsKeyword || Token() == SyntaxKind.ImplementsKeyword,// Tokens other than '>' are here for better error recovery
-            TsTypes.ParsingContext.ArgumentExpressions => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.SemicolonToken,// Tokens other than ')' are here for better error recovery
-            TsTypes.ParsingContext.ArrayLiteralMembers or TsTypes.ParsingContext.TupleElementTypes or TsTypes.ParsingContext.ArrayBindingElements => Token() == SyntaxKind.CloseBracketToken,
-            TsTypes.ParsingContext.Parameters or TsTypes.ParsingContext.RestProperties => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.CloseBracketToken /*|| token == SyntaxKind.OpenBraceToken*/,// Tokens other than ')' and ']' (the latter for index signatures) are here for better error recovery
-            TsTypes.ParsingContext.TypeArguments => Token() != SyntaxKind.CommaToken,// All other tokens should cause the type-argument to terminate except comma token
-            TsTypes.ParsingContext.HeritageClauses => Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.CloseBraceToken,
-            TsTypes.ParsingContext.JsxAttributes => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.SlashToken,
-            TsTypes.ParsingContext.JsxChildren => Token() == SyntaxKind.LessThanToken && LookAhead(NextTokenIsSlash),
-            TsTypes.ParsingContext.JSDocFunctionParameters => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.ColonToken || Token() == SyntaxKind.CloseBraceToken,
-            TsTypes.ParsingContext.JSDocTypeArguments => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.CloseBraceToken,
-            TsTypes.ParsingContext.JSDocTupleTypes => Token() == SyntaxKind.CloseBracketToken || Token() == SyntaxKind.CloseBraceToken,
-            TsTypes.ParsingContext.JSDocRecordMembers => Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.BlockStatements or ParsingContext.SwitchClauses or ParsingContext.TypeMembers or ParsingContext.ClassMembers or ParsingContext.EnumMembers or ParsingContext.ObjectLiteralMembers or ParsingContext.ObjectBindingElements or ParsingContext.ImportOrExportSpecifiers => Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.SwitchClauseStatements => Token() == SyntaxKind.CloseBraceToken || Token() == SyntaxKind.CaseKeyword || Token() == SyntaxKind.DefaultKeyword,
+            ParsingContext.HeritageClauseElement => Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.ExtendsKeyword || Token() == SyntaxKind.ImplementsKeyword,
+            ParsingContext.VariableDeclarations => IsVariableDeclaratorListTerminator(),
+            ParsingContext.TypeParameters => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.ExtendsKeyword || Token() == SyntaxKind.ImplementsKeyword,// Tokens other than '>' are here for better error recovery
+            ParsingContext.ArgumentExpressions => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.SemicolonToken,// Tokens other than ')' are here for better error recovery
+            ParsingContext.ArrayLiteralMembers or ParsingContext.TupleElementTypes or ParsingContext.ArrayBindingElements => Token() == SyntaxKind.CloseBracketToken,
+            ParsingContext.Parameters or ParsingContext.RestProperties => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.CloseBracketToken /*|| token == SyntaxKind.OpenBraceToken*/,// Tokens other than ')' and ']' (the latter for index signatures) are here for better error recovery
+            ParsingContext.TypeArguments => Token() != SyntaxKind.CommaToken,// All other tokens should cause the type-argument to terminate except comma token
+            ParsingContext.HeritageClauses => Token() == SyntaxKind.OpenBraceToken || Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.JsxAttributes => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.SlashToken,
+            ParsingContext.JsxChildren => Token() == SyntaxKind.LessThanToken && LookAhead(NextTokenIsSlash),
+            ParsingContext.JSDocFunctionParameters => Token() == SyntaxKind.CloseParenToken || Token() == SyntaxKind.ColonToken || Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.JSDocTypeArguments => Token() == SyntaxKind.GreaterThanToken || Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.JSDocTupleTypes => Token() == SyntaxKind.CloseBracketToken || Token() == SyntaxKind.CloseBraceToken,
+            ParsingContext.JSDocRecordMembers => Token() == SyntaxKind.CloseBraceToken,
             _ => false,// ?
         };
     }
@@ -971,7 +971,7 @@ public class Parser
         //for (var kind = 0; kind < Enum.GetNames(typeof(ParsingContext)).Count(); kind++)
         foreach (ParsingContext kind in Enum.GetValues(typeof(ParsingContext)))
         {
-            if ((ParsingContext & (1 << (int)kind)) != 0)
+            if ((parsingContext & (1 << (int)kind)) != 0)
             {
                 if (IsListElement(kind, /*inErrorRecovery*/ true) || IsListTerminator(kind))
                 {
@@ -983,11 +983,11 @@ public class Parser
         return false;
     }
 
-    public NodeArray<T> ParseList<T>(ParsingContext kind, Func<T> parseElement) where T : INode
+    private NodeArray<T> ParseList<T>(ParsingContext kind, Func<T> parseElement) where T : INode
     {
-        var saveParsingContext = ParsingContext;
+        var saveParsingContext = parsingContext;
 
-        ParsingContext |= 1 << (int)kind;
+        parsingContext |= 1 << (int)kind;
         var result = CreateList<T>();
         while (!IsListTerminator(kind))
         {
@@ -1007,16 +1007,16 @@ public class Parser
 
         result.End = GetNodeEnd();
 
-        ParsingContext = saveParsingContext;
+        parsingContext = saveParsingContext;
 
         return result;
     }
 
-    public NodeArray<T> ParseList2<T>(ParsingContext kind, Func<T> parseElement) where T : INode
+    private NodeArray<T> ParseList2<T>(ParsingContext kind, Func<T> parseElement) where T : INode
     {
-        var saveParsingContext = ParsingContext;
+        var saveParsingContext = parsingContext;
 
-        ParsingContext |= 1 << (int)kind;
+        parsingContext |= 1 << (int)kind;
         var result = CreateList<T>();
         while (!IsListTerminator(kind))
         {
@@ -1036,20 +1036,20 @@ public class Parser
 
         result.End = GetNodeEnd();
 
-        ParsingContext = saveParsingContext;
+        parsingContext = saveParsingContext;
 
         return result;
     }
-    public static T ParseListElement<T>(ParsingContext _, Func<T> parseElement) where T : INode
+    private static T ParseListElement<T>(ParsingContext _, Func<T> parseElement) where T : INode
     {
         return parseElement();
     }
-    public static T ParseListElement2<T>(ParsingContext _, Func<T> parseElement) where T : INode
+    private static T ParseListElement2<T>(ParsingContext _, Func<T> parseElement) where T : INode
     {
         return parseElement();
     }
 
-    public bool AbortParsingListOrMoveToNextToken(ParsingContext kind)
+    private bool AbortParsingListOrMoveToNextToken(ParsingContext kind)
     {
         ParseErrorAtCurrentToken(ParsingContextErrors(kind));
         if (IsInSomeParsingContext())
@@ -1059,45 +1059,45 @@ public class Parser
         return false;
     }
 
-    public static DiagnosticMessage ParsingContextErrors(ParsingContext context)
+    private static DiagnosticMessage ParsingContextErrors(ParsingContext context)
     {
         return context switch
         {
-            TsTypes.ParsingContext.SourceElements => DiagnosticMessage.Declaration_or_statement_expected,
-            TsTypes.ParsingContext.BlockStatements => DiagnosticMessage.Declaration_or_statement_expected,
-            TsTypes.ParsingContext.SwitchClauses => DiagnosticMessage.case_or_default_expected,
-            TsTypes.ParsingContext.SwitchClauseStatements => DiagnosticMessage.Statement_expected,
-            TsTypes.ParsingContext.RestProperties or TsTypes.ParsingContext.TypeMembers => DiagnosticMessage.Property_or_signature_expected,
-            TsTypes.ParsingContext.ClassMembers => DiagnosticMessage.Unexpected_token_A_constructor_method_accessor_or_property_was_expected,
-            TsTypes.ParsingContext.EnumMembers => DiagnosticMessage.Enum_member_expected,
-            TsTypes.ParsingContext.HeritageClauseElement => DiagnosticMessage.Expression_expected,
-            TsTypes.ParsingContext.VariableDeclarations => DiagnosticMessage.Variable_declaration_expected,
-            TsTypes.ParsingContext.ObjectBindingElements => DiagnosticMessage.Property_destructuring_pattern_expected,
-            TsTypes.ParsingContext.ArrayBindingElements => DiagnosticMessage.Array_element_destructuring_pattern_expected,
-            TsTypes.ParsingContext.ArgumentExpressions => DiagnosticMessage.Argument_expression_expected,
-            TsTypes.ParsingContext.ObjectLiteralMembers => DiagnosticMessage.Property_assignment_expected,
-            TsTypes.ParsingContext.ArrayLiteralMembers => DiagnosticMessage.Expression_or_comma_expected,
-            TsTypes.ParsingContext.Parameters => DiagnosticMessage.Parameter_declaration_expected,
-            TsTypes.ParsingContext.TypeParameters => DiagnosticMessage.Type_parameter_declaration_expected,
-            TsTypes.ParsingContext.TypeArguments => DiagnosticMessage.Type_argument_expected,
-            TsTypes.ParsingContext.TupleElementTypes => DiagnosticMessage.Type_expected,
-            TsTypes.ParsingContext.HeritageClauses => DiagnosticMessage.Unexpected_token_expected,
-            TsTypes.ParsingContext.ImportOrExportSpecifiers => DiagnosticMessage.Identifier_expected,
-            TsTypes.ParsingContext.JsxAttributes => DiagnosticMessage.Identifier_expected,
-            TsTypes.ParsingContext.JsxChildren => DiagnosticMessage.Identifier_expected,
-            TsTypes.ParsingContext.JSDocFunctionParameters => DiagnosticMessage.Parameter_declaration_expected,
-            TsTypes.ParsingContext.JSDocTypeArguments => DiagnosticMessage.Type_argument_expected,
-            TsTypes.ParsingContext.JSDocTupleTypes => DiagnosticMessage.Type_expected,
-            TsTypes.ParsingContext.JSDocRecordMembers => DiagnosticMessage.Property_assignment_expected,
-            _ => DiagnosticMessage.Null,
+            ParsingContext.SourceElements => Diagnostics.Declaration_or_statement_expected,
+            ParsingContext.BlockStatements => Diagnostics.Declaration_or_statement_expected,
+            ParsingContext.SwitchClauses => Diagnostics.case_or_default_expected,
+            ParsingContext.SwitchClauseStatements => Diagnostics.Statement_expected,
+            ParsingContext.RestProperties or ParsingContext.TypeMembers => Diagnostics.Property_or_signature_expected,
+            ParsingContext.ClassMembers => Diagnostics.Unexpected_token_A_constructor_method_accessor_or_property_was_expected,
+            ParsingContext.EnumMembers => Diagnostics.Enum_member_expected,
+            ParsingContext.HeritageClauseElement => Diagnostics.Expression_expected,
+            ParsingContext.VariableDeclarations => Diagnostics.Variable_declaration_expected,
+            ParsingContext.ObjectBindingElements => Diagnostics.Property_destructuring_pattern_expected,
+            ParsingContext.ArrayBindingElements => Diagnostics.Array_element_destructuring_pattern_expected,
+            ParsingContext.ArgumentExpressions => Diagnostics.Argument_expression_expected,
+            ParsingContext.ObjectLiteralMembers => Diagnostics.Property_assignment_expected,
+            ParsingContext.ArrayLiteralMembers => Diagnostics.Expression_or_comma_expected,
+            ParsingContext.Parameters => Diagnostics.Parameter_declaration_expected,
+            ParsingContext.TypeParameters => Diagnostics.Type_parameter_declaration_expected,
+            ParsingContext.TypeArguments => Diagnostics.Type_argument_expected,
+            ParsingContext.TupleElementTypes => Diagnostics.Type_expected,
+            ParsingContext.HeritageClauses => Diagnostics.Unexpected_token_expected,
+            ParsingContext.ImportOrExportSpecifiers => Diagnostics.Identifier_expected,
+            ParsingContext.JsxAttributes => Diagnostics.Identifier_expected,
+            ParsingContext.JsxChildren => Diagnostics.Identifier_expected,
+            ParsingContext.JSDocFunctionParameters => Diagnostics.Parameter_declaration_expected,
+            ParsingContext.JSDocTypeArguments => Diagnostics.Type_argument_expected,
+            ParsingContext.JSDocTupleTypes => Diagnostics.Type_expected,
+            ParsingContext.JSDocRecordMembers => Diagnostics.Property_assignment_expected,
+            _ => null
         };
     }
 
-    public NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool? considerSemicolonAsDelimiter = null) where T : INode
+    private NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool? considerSemicolonAsDelimiter = null) where T : INode
     {
-        var saveParsingContext = ParsingContext;
+        var saveParsingContext = parsingContext;
 
-        ParsingContext |= 1 << (int)kind;
+        parsingContext |= 1 << (int)kind;
         var result = CreateList<T>();
         var commaStart = -1;
         while (true)
@@ -1106,7 +1106,7 @@ public class Parser
             {
                 result.Add(ParseListElement(kind, parseElement));
 
-                commaStart = Scanner.TokenPos;
+                commaStart = scanner.GetTokenEnd();
                 if (ParseOptional(SyntaxKind.CommaToken))
                 {
                     continue;
@@ -1120,7 +1120,7 @@ public class Parser
                 // out a comma so we give a good error message.
                 ParseExpected(SyntaxKind.CommaToken);
                 if (considerSemicolonAsDelimiter == true &&
-                    Token() == SyntaxKind.SemicolonToken && !Scanner.HasPrecedingLineBreak)
+                    Token() == SyntaxKind.SemicolonToken && !scanner.HasPrecedingLineBreak())
                 {
                     NextToken();
                 }
@@ -1139,7 +1139,7 @@ public class Parser
         }
 
         result.End = GetNodeEnd();
-        ParsingContext = saveParsingContext;
+        parsingContext = saveParsingContext;
         return result;
     }
 
@@ -1148,7 +1148,7 @@ public class Parser
         return CreateList<T>();
     }
 
-    public NodeArray<T> ParseBracketedList<T>(ParsingContext kind, Func<T> parseElement, SyntaxKind open, SyntaxKind close) where T : INode
+    private NodeArray<T> ParseBracketedList<T>(ParsingContext kind, Func<T> parseElement, SyntaxKind open, SyntaxKind close) where T : INode
     {
         if (ParseExpected(open))
         {
@@ -1187,7 +1187,7 @@ public class Parser
 
     public Identifier ParseRightSideOfDot(bool allowIdentifierNames)
     {
-        if (Scanner.HasPrecedingLineBreak && TokenIsIdentifierOrKeyword(Token()))
+        if (scanner.HasPrecedingLineBreak() && TokenIsIdentifierOrKeyword(Token()))
         {
             var matchesPattern = LookAhead(NextTokenIsIdentifierOrKeywordOnSameLine);
             if (matchesPattern)
@@ -1195,7 +1195,7 @@ public class Parser
                 // Report that we need an identifier.  However, report it right after the dot,
                 // and not on the next token.  This is because the next token might actually
                 // be an identifier and the error would be quite confusing.
-                return (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ true, DiagnosticMessage.Identifier_expected);
+                return (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ true, Diagnostics.Identifier_expected);
             }
         }
 
@@ -1212,7 +1212,7 @@ public class Parser
     {
         var template = new TemplateExpression
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Head = ParseTemplateHead()
         };
 
@@ -1221,7 +1221,7 @@ public class Parser
 
         do
         {
-            templateSpans.Add(ParseTemplateSpan());
+            templateSpans.Add(ParseTemplateSpan(false));
         }
         while (templateSpans.LastOrDefault()?.Literal.Kind == SyntaxKind.TemplateMiddle);
 
@@ -1230,22 +1230,22 @@ public class Parser
         return FinishNode(template);
     }
 
-    public TemplateSpan ParseTemplateSpan()
+    public TemplateSpan ParseTemplateSpan(bool isTaggedTemplate)
     {
         var span = new TemplateSpan
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Expression = AllowInAnd(ParseExpression)
         };
 
         if (Token() == SyntaxKind.CloseBraceToken)
         {
-            ReScanTemplateToken();
+            ReScanTemplateToken(isTaggedTemplate);
             span.Literal = ParseTemplateMiddleOrTemplateTail();
         }
         else
         {
-            span.Literal = (TemplateTail)ParseExpectedToken<TemplateTail>(SyntaxKind.TemplateTail, /*reportAtCurrentPosition*/ false, DiagnosticMessage._0_expected, TokenToString(SyntaxKind.CloseBraceToken));
+            span.Literal = (TemplateTail)ParseExpectedToken<TemplateTail>(SyntaxKind.TemplateTail, /*reportAtCurrentPosition*/ false, Diagnostics._0_expected, TokenToString(SyntaxKind.CloseBraceToken));
         }
 
         return FinishNode(span);
@@ -1297,16 +1297,16 @@ public class Parser
 
     public ILiteralLikeNode ParseLiteralLikeNode(/*SyntaxKind kind*/ILiteralLikeNode node, bool _)
     {
-        node.Pos = Scanner.StartPos;
+        node.Pos = scanner.GetTokenFullStart();
         //var node = new LiteralLikeNode { pos = scanner.getStartPos() }; // LiteralExpression();
-        var text = Scanner.TokenValue;
+        var text = scanner.GetTokenValue();
 
         node.Text = text;
-        if (Scanner.IsUnterminated)
+        if (scanner.IsUnterminated())
         {
             node.IsUnterminated = true;
         }
-        var tokenPos = Scanner.TokenPos;
+        var tokenPos = scanner.GetTokenEnd();
 
         NextToken();
 
@@ -1323,15 +1323,15 @@ public class Parser
 
     public TypeReferenceNode ParseTypeReference()
     {
-        var typeName = ParseEntityName(/*allowReservedWords*/ false, DiagnosticMessage.Type_expected);
+        var typeName = ParseEntityName(/*allowReservedWords*/ false, Diagnostics.Type_expected);
         var node = new TypeReferenceNode
         {
             Pos = typeName.Pos,
             TypeName = typeName
         };
-        if (!Scanner.HasPrecedingLineBreak && Token() == SyntaxKind.LessThanToken)
+        if (!scanner.HasPrecedingLineBreak() && Token() == SyntaxKind.LessThanToken)
         {
-            node.TypeArguments = ParseBracketedList(TsTypes.ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
+            node.TypeArguments = ParseBracketedList(ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
         }
 
         return FinishNode(node);
@@ -1353,7 +1353,7 @@ public class Parser
 
     public ThisTypeNode ParseThisTypeNode()
     {
-        var node = new ThisTypeNode { Pos = Scanner.StartPos };
+        var node = new ThisTypeNode { Pos = scanner.GetTokenFullStart() };
 
         NextToken();
 
@@ -1362,13 +1362,13 @@ public class Parser
 
     public TypeQueryNode ParseTypeQuery()
     {
-        var node = new TypeQueryNode() { Pos = Scanner.StartPos };
+        var node = new TypeQueryNode() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.TypeOfKeyword);
 
         node.ExprName = ParseEntityName(/*allowReservedWords*/ true);
         // Make sure we perform ASI to prevent parsing the next line's type arguments as part of an instantiation expression.
-        node.TypeArguments = !Scanner.HasPrecedingLineBreak ? TryParseTypeArguments() : null;
+        node.TypeArguments = !scanner.HasPrecedingLineBreak() ? TryParseTypeArguments() : null;
         return FinishNode(node);
     }
 
@@ -1376,7 +1376,7 @@ public class Parser
     {
         var node = new TypeParameterDeclaration
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParseIdentifier()
         };
         if (ParseOptional(SyntaxKind.ExtendsKeyword))
@@ -1409,7 +1409,7 @@ public class Parser
     {
         if (Token() == SyntaxKind.LessThanToken)
         {
-            return ParseBracketedList(TsTypes.ParsingContext.TypeParameters, ParseTypeParameter, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
+            return ParseBracketedList(ParsingContext.TypeParameters, ParseTypeParameter, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
         }
         return null;
     }
@@ -1431,7 +1431,7 @@ public class Parser
 
     public ParameterDeclaration ParseParameter()
     {
-        var node = new ParameterDeclaration() { Pos = Scanner.StartPos };
+        var node = new ParameterDeclaration() { Pos = scanner.GetTokenFullStart() };
         if (Token() == SyntaxKind.ThisKeyword)
         {
             node.Name = CreateIdentifier(/*isIdentifier*/true, default);
@@ -1518,7 +1518,7 @@ public class Parser
             SetYieldContext(yieldContext);
 
             SetAwaitContext(awaitContext);
-            var result = ParseDelimitedList(TsTypes.ParsingContext.Parameters, ParseParameter);
+            var result = ParseDelimitedList(ParsingContext.Parameters, ParseParameter);
 
             SetYieldContext(savedYieldContext);
 
@@ -1554,7 +1554,7 @@ public class Parser
     {
         if (kind == SyntaxKind.ConstructSignature)
         {
-            var node = new ConstructSignatureDeclaration { Pos = Scanner.StartPos };
+            var node = new ConstructSignatureDeclaration { Pos = scanner.GetTokenFullStart() };
             ParseExpected(SyntaxKind.NewKeyword);
             FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ false, /*awaitContext*/ false, /*requireCompleteParameterList*/ false, node);
 
@@ -1564,7 +1564,7 @@ public class Parser
         }
         else
         {
-            var node = new CallSignatureDeclaration { Pos = Scanner.StartPos };
+            var node = new CallSignatureDeclaration { Pos = scanner.GetTokenFullStart() };
             FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ false, /*awaitContext*/ false, /*requireCompleteParameterList*/ false, node);
 
             ParseTypeMemberSemicolon();
@@ -1648,7 +1648,7 @@ public class Parser
 
             Modifiers = modifiers,
 
-            Parameters = ParseBracketedList(TsTypes.ParsingContext.Parameters, ParseParameter, SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken),
+            Parameters = ParseBracketedList(ParsingContext.Parameters, ParseParameter, SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken),
 
             Type = ParseTypeAnnotation()
         };
@@ -1776,7 +1776,7 @@ public class Parser
     {
         var node = new TypeLiteralNode
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Members = ParseObjectTypeMembers()
         };
 
@@ -1788,7 +1788,7 @@ public class Parser
         NodeArray<ITypeElement> members = null;
         if (ParseExpected(SyntaxKind.OpenBraceToken))
         {
-            members = ParseList(TsTypes.ParsingContext.TypeMembers, ParseTypeMember);
+            members = ParseList(ParsingContext.TypeMembers, ParseTypeMember);
 
             ParseExpected(SyntaxKind.CloseBraceToken);
         }
@@ -1815,7 +1815,7 @@ public class Parser
     {
         var node = new TypeParameterDeclaration
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParseIdentifier()
         };
 
@@ -1828,7 +1828,7 @@ public class Parser
 
     public MappedTypeNode ParseMappedType()
     {
-        var node = new MappedTypeNode() { Pos = Scanner.StartPos };
+        var node = new MappedTypeNode() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -1855,8 +1855,8 @@ public class Parser
     {
         var node = new TupleTypeNode
         {
-            Pos = Scanner.StartPos,
-            ElementTypes = ParseBracketedList(TsTypes.ParsingContext.TupleElementTypes, ParseType, SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken)
+            Pos = scanner.GetTokenFullStart(),
+            ElementTypes = ParseBracketedList(ParsingContext.TupleElementTypes, ParseType, SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken)
         };
 
         return FinishNode(node);
@@ -1864,7 +1864,7 @@ public class Parser
 
     public ParenthesizedTypeNode ParseParenthesizedType()
     {
-        var node = new ParenthesizedTypeNode() { Pos = Scanner.StartPos };
+        var node = new ParenthesizedTypeNode() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenParenToken);
 
@@ -1882,7 +1882,7 @@ public class Parser
             kind == SyntaxKind.ConstructorType ?
             new ConstructorTypeNode { Kind = SyntaxKind.ConstructorType } :
             throw new NotSupportedException("parseFunctionOrConstructorType");
-        node.Pos = Scanner.StartPos;
+        node.Pos = scanner.GetTokenFullStart();
         //new FunctionOrConstructorTypeNode { kind = kind, pos = scanner.getStartPos() };
         if (kind == SyntaxKind.ConstructorType)
         {
@@ -1905,7 +1905,7 @@ public class Parser
     {
         var node = new LiteralTypeNode
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Literal = ParseSimpleUnaryExpression()
         };
 
@@ -1950,7 +1950,7 @@ public class Parser
             case SyntaxKind.ThisKeyword:
                 {
                     var thisKeyword = ParseThisTypeNode();
-                    if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak)
+                    if (Token() == SyntaxKind.IsKeyword && !scanner.HasPrecedingLineBreak())
                     {
                         return ParseThisTypePredicate(thisKeyword);
                     }
@@ -2000,7 +2000,7 @@ public class Parser
     public ITypeNode ParseArrayTypeOrHigher()
     {
         var type = ParseNonArrayType();
-        while (!Scanner.HasPrecedingLineBreak && ParseOptional(SyntaxKind.OpenBracketToken))
+        while (!scanner.HasPrecedingLineBreak() && ParseOptional(SyntaxKind.OpenBracketToken))
         {
             if (IsStartOfType())
             {
@@ -2035,9 +2035,9 @@ public class Parser
 
     ITypeNode ParsePostfixTypeOrHigher()
     {
-        var pos = Scanner.StartPos;
+        var pos = scanner.GetTokenFullStart();
         var type = ParseNonArrayType();
-        while (!Scanner.HasPrecedingLineBreak)
+        while (!scanner.HasPrecedingLineBreak())
         {
             switch (Token())
             {
@@ -2080,7 +2080,7 @@ public class Parser
 
     public /*MappedTypeNode*/TypeOperatorNode ParseTypeOperator(SyntaxKind/*.KeyOfKeyword*/ @operator)
     {
-        var node = new TypeOperatorNode() { Pos = Scanner.StartPos };
+        var node = new TypeOperatorNode() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(@operator);
 
@@ -2108,7 +2108,7 @@ public class Parser
     {
         var node = new TypeParameterDeclaration
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParseIdentifier(),
             Constraint = TryParse(TryParseConstraintOfInferType)
         };
@@ -2117,7 +2117,7 @@ public class Parser
 
     public IInferTypeNode ParseInferType()
     {
-        var node = new InferTypeNode() { Pos = Scanner.StartPos };
+        var node = new InferTypeNode() { Pos = scanner.GetTokenFullStart() };
         ParseExpected(SyntaxKind.InferKeyword);
         node.TypeParameter = ParseTypeParameterOfInferType();
         return FinishNode(node);
@@ -2267,7 +2267,7 @@ public class Parser
     public Identifier ParseTypePredicatePrefix()
     {
         var id = ParseIdentifier();
-        if (Token() == SyntaxKind.IsKeyword && !Scanner.HasPrecedingLineBreak)
+        if (Token() == SyntaxKind.IsKeyword && !scanner.HasPrecedingLineBreak())
         {
             NextToken();
 
@@ -2387,7 +2387,7 @@ public class Parser
     {
         if (Token() != SyntaxKind.EqualsToken)
         {
-            if (Scanner.HasPrecedingLineBreak || (inParameter && Token() == SyntaxKind.OpenBraceToken) || !IsStartOfExpression())
+            if (scanner.HasPrecedingLineBreak() || (inParameter && Token() == SyntaxKind.OpenBraceToken) || !IsStartOfExpression())
             {
                 // preceding line break, open brace in a parameter (likely a function body) or current token is not an expression -
                 // do not try to parse initializer
@@ -2461,19 +2461,19 @@ public class Parser
     {
         NextToken();
 
-        return !Scanner.HasPrecedingLineBreak && IsIdentifier();
+        return !scanner.HasPrecedingLineBreak() && IsIdentifier();
     }
 
     public YieldExpression ParseYieldExpression()
     {
-        var node = new YieldExpression() { Pos = Scanner.StartPos };
+        var node = new YieldExpression() { Pos = scanner.GetTokenFullStart() };
 
         // YieldExpression[In] :
         //      yield
         //      yield [no LineTerminator here] [Lexical goal InputElementRegExp]AssignmentExpression[?In, Yield]
         //      yield [no LineTerminator here] * [Lexical goal InputElementRegExp]AssignmentExpression[?In, Yield]
         NextToken();
-        if (!Scanner.HasPrecedingLineBreak &&
+        if (!scanner.HasPrecedingLineBreak() &&
                         (Token() == SyntaxKind.AsteriskToken || IsStartOfExpression()))
         {
             node.AsteriskToken = (AsteriskToken)ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken);
@@ -2520,7 +2520,7 @@ public class Parser
 
         node.Parameters.End = parameter.End;
 
-        node.EqualsGreaterThanToken = (EqualsGreaterThanToken)ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken, /*reportAtCurrentPosition*/ false, DiagnosticMessage._0_expected, "=>");
+        node.EqualsGreaterThanToken = (EqualsGreaterThanToken)ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken, /*reportAtCurrentPosition*/ false, Diagnostics._0_expected, "=>");
 
         node.Body = ParseArrowFunctionExpressionBody(/*isAsync*/ /*!!*/asyncModifier?.Any() == true);
 
@@ -2546,7 +2546,7 @@ public class Parser
         var isAsync = /*!!*/(GetModifierFlags(arrowFunction) & ModifierFlags.Async) != 0;
         var lastToken = Token();
 
-        arrowFunction.EqualsGreaterThanToken = (EqualsGreaterThanToken)ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken, /*reportAtCurrentPosition*/false, DiagnosticMessage._0_expected, "=>");
+        arrowFunction.EqualsGreaterThanToken = (EqualsGreaterThanToken)ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken, /*reportAtCurrentPosition*/false, Diagnostics._0_expected, "=>");
 
         arrowFunction.Body = (lastToken == SyntaxKind.EqualsGreaterThanToken || lastToken == SyntaxKind.OpenBraceToken)
             ? ParseArrowFunctionExpressionBody(isAsync)
@@ -2578,7 +2578,7 @@ public class Parser
         if (Token() == SyntaxKind.AsyncKeyword)
         {
             NextToken();
-            if (Scanner.HasPrecedingLineBreak)
+            if (scanner.HasPrecedingLineBreak())
             {
                 return Tristate.False;
             }
@@ -2628,7 +2628,7 @@ public class Parser
             {
                 return Tristate.False;
             }
-            if (SourceFile.LanguageVariant == LanguageVariant.Jsx)
+            if (SourceFile.LanguageVariant == LanguageVariant.JSX)
             {
                 var isArrowFunctionInJsx = LookAhead(() =>
                 {
@@ -2688,12 +2688,12 @@ public class Parser
         if (Token() == SyntaxKind.AsyncKeyword)
         {
             NextToken();
-            if (Scanner.HasPrecedingLineBreak || Token() == SyntaxKind.EqualsGreaterThanToken)
+            if (scanner.HasPrecedingLineBreak() || Token() == SyntaxKind.EqualsGreaterThanToken)
             {
                 return Tristate.False;
             }
             var expr = ParseBinaryExpressionOrHigher(/*precedence*/ 0);
-            if (!Scanner.HasPrecedingLineBreak && expr.Kind == SyntaxKind.Identifier && Token() == SyntaxKind.EqualsGreaterThanToken)
+            if (!scanner.HasPrecedingLineBreak() && expr.Kind == SyntaxKind.Identifier && Token() == SyntaxKind.EqualsGreaterThanToken)
             {
                 return Tristate.True;
             }
@@ -2706,7 +2706,7 @@ public class Parser
     {
         var node = new ArrowFunction
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Modifiers = ParseModifiersForArrowFunction()
         };
         var isAsync = /*!!*/(GetModifierFlags(node) & ModifierFlags.Async) != 0;
@@ -2783,7 +2783,7 @@ public class Parser
             WhenTrue = DoOutsideOfContext(DisallowInAndDecoratorContext, ParseAssignmentExpressionOrHigher),
 
             ColonToken = (ColonToken)ParseExpectedToken<ColonToken>(SyntaxKind.ColonToken, /*reportAtCurrentPosition*/ false,
-            DiagnosticMessage._0_expected, TokenToString(SyntaxKind.ColonToken)),
+            Diagnostics._0_expected, TokenToString(SyntaxKind.ColonToken)),
 
             WhenFalse = ParseAssignmentExpressionOrHigher()
         };
@@ -2825,7 +2825,7 @@ public class Parser
             }
             if (Token() == SyntaxKind.AsKeyword)
             {
-                if (Scanner.HasPrecedingLineBreak)
+                if (scanner.HasPrecedingLineBreak())
                 {
                     break;
                 }
@@ -2908,7 +2908,7 @@ public class Parser
     {
         var node = new PrefixUnaryExpression
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Operator = /*(PrefixUnaryOperator)*/Token()
         };
 
@@ -2921,7 +2921,7 @@ public class Parser
 
     public DeleteExpression ParseDeleteExpression()
     {
-        var node = new DeleteExpression() { Pos = Scanner.StartPos };
+        var node = new DeleteExpression() { Pos = scanner.GetTokenFullStart() };
 
         NextToken();
 
@@ -2932,7 +2932,7 @@ public class Parser
 
     public TypeOfExpression ParseTypeOfExpression()
     {
-        var node = new TypeOfExpression() { Pos = Scanner.StartPos };
+        var node = new TypeOfExpression() { Pos = scanner.GetTokenFullStart() };
 
         NextToken();
 
@@ -2943,7 +2943,7 @@ public class Parser
 
     public VoidExpression ParseVoidExpression()
     {
-        var node = new VoidExpression() { Pos = Scanner.StartPos };
+        var node = new VoidExpression() { Pos = scanner.GetTokenFullStart() };
 
         NextToken();
 
@@ -2970,7 +2970,7 @@ public class Parser
 
     public AwaitExpression ParseAwaitExpression()
     {
-        var node = new AwaitExpression() { Pos = Scanner.StartPos };
+        var node = new AwaitExpression() { Pos = scanner.GetTokenFullStart() };
 
         NextToken();
 
@@ -2997,11 +2997,11 @@ public class Parser
             var start = Scanner.SkipTrivia(SourceText, simpleUnaryExpression.Pos ?? 0);
             if (simpleUnaryExpression.Kind == SyntaxKind.TypeAssertionExpression)
             {
-                ParseErrorAtPosition(start, (simpleUnaryExpression.End ?? 0) - start, DiagnosticMessage.A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses);
+                ParseErrorAtPosition(start, (simpleUnaryExpression.End ?? 0) - start, Diagnostics.A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses);
             }
             else
             {
-                ParseErrorAtPosition(start, (simpleUnaryExpression.End ?? 0) - start, DiagnosticMessage.An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, TokenToString(unaryOperator));
+                ParseErrorAtPosition(start, (simpleUnaryExpression.End ?? 0) - start, Diagnostics.An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses, TokenToString(unaryOperator));
             }
         }
 
@@ -3061,7 +3061,7 @@ public class Parser
 
                 return false;
             case SyntaxKind.LessThanToken:
-                if (SourceFile.LanguageVariant != LanguageVariant.Jsx)
+                if (SourceFile.LanguageVariant != LanguageVariant.JSX)
                 {
                     return false;
                 }
@@ -3079,7 +3079,7 @@ public class Parser
         {
             var node = new PrefixUnaryExpression
             {
-                Pos = Scanner.StartPos,
+                Pos = scanner.GetTokenFullStart(),
                 Operator = /*(PrefixUnaryOperator)*/Token()
             };
 
@@ -3089,14 +3089,14 @@ public class Parser
 
             return FinishNode(node);
         }
-        else if (SourceFile.LanguageVariant == LanguageVariant.Jsx && Token() == SyntaxKind.LessThanToken && LookAhead(NextTokenIsIdentifierOrKeyword))
+        else if (SourceFile.LanguageVariant == LanguageVariant.JSX && Token() == SyntaxKind.LessThanToken && LookAhead(NextTokenIsIdentifierOrKeyword))
         {
             // JSXElement is part of primaryExpression
             return ParseJsxElementOrSelfClosingElement(/*inExpressionContext*/ true);
         }
         var expression = ParseLeftHandSideExpressionOrHigher();
 
-        if ((Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken) && !Scanner.HasPrecedingLineBreak)
+        if ((Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken) && !scanner.HasPrecedingLineBreak())
         {
             var node = new PostfixUnaryExpression
             {
@@ -3145,7 +3145,7 @@ public class Parser
             Expression = expression
         };
 
-        ParseExpectedToken<DotToken>(SyntaxKind.DotToken, /*reportAtCurrentPosition*/ false, DiagnosticMessage.super_must_be_followed_by_an_argument_list_or_member_access);
+        ParseExpectedToken<DotToken>(SyntaxKind.DotToken, /*reportAtCurrentPosition*/ false, Diagnostics.super_must_be_followed_by_an_argument_list_or_member_access);
 
         node.Name = ParseRightSideOfDot(allowIdentifierNames: true);
 
@@ -3194,7 +3194,7 @@ public class Parser
             // todo check     node.closingElement.tagName as JsxTagNameExpression
             if (!TagNamesAreEquivalent(tn, node.ClosingElement.TagName))
             {
-                ParseErrorAtPosition(node.ClosingElement.Pos ?? 0, (node.ClosingElement.End ?? 0) - (node.ClosingElement.Pos ?? 0), DiagnosticMessage.Expected_corresponding_JSX_closing_tag_for_0, GetTextOfNodeFromSourceText(SourceText, tn));
+                ParseErrorAtPosition(node.ClosingElement.Pos ?? 0, (node.ClosingElement.End ?? 0) - (node.ClosingElement.Pos ?? 0), Diagnostics.Expected_corresponding_JSX_closing_tag_for_0, GetTextOfNodeFromSourceText(SourceText, tn));
             }
 
             var result = FinishNode(node);
@@ -3204,7 +3204,7 @@ public class Parser
                 var invalidElement = TryParse(() => ParseJsxElementOrSelfClosingElement(/*inExpressionContext*/true));
                 if (invalidElement != null)
                 {
-                    ParseErrorAtCurrentToken(DiagnosticMessage.JSX_expressions_must_have_one_parent_element);
+                    ParseErrorAtCurrentToken(Diagnostics.JSX_expressions_must_have_one_parent_element);
                     var badNode = new BinaryExpression
                     {
                         Pos = result.Pos,
@@ -3237,7 +3237,7 @@ public class Parser
                 var invalidElement = TryParse(() => ParseJsxElementOrSelfClosingElement(/*inExpressionContext*/true));
                 if (invalidElement != null)
                 {
-                    ParseErrorAtCurrentToken(DiagnosticMessage.JSX_expressions_must_have_one_parent_element);
+                    ParseErrorAtCurrentToken(Diagnostics.JSX_expressions_must_have_one_parent_element);
                     var badNode = new BinaryExpression
                     {
                         Pos = result.Pos,
@@ -3263,9 +3263,9 @@ public class Parser
 
     public JsxText ParseJsxText()
     {
-        var node = new JsxText() { Pos = Scanner.StartPos };
+        var node = new JsxText() { Pos = scanner.GetTokenFullStart() };
 
-        CurrentToken = Scanner.ScanJsxToken();
+        currentToken = scanner.ScanJsxToken();
 
         return FinishNode(node);
     }
@@ -3292,12 +3292,12 @@ public class Parser
     public NodeArray<IJsxChild> ParseJsxChildren(/*LeftHandSide*/IExpression openingTagName)
     {
         var result = CreateList<IJsxChild>(); //List<IJsxChild>(); // 
-        var saveParsingContext = ParsingContext;
+        var saveParsingContext = parsingContext;
 
-        ParsingContext |= 1 << (int)TsTypes.ParsingContext.JsxChildren;
+        parsingContext |= 1 << (int)ParsingContext.JsxChildren;
         while (true)
         {
-            CurrentToken = Scanner.ReScanJsxToken();
+            currentToken = scanner.ReScanJsxToken();
             if (Token() == SyntaxKind.LessThanSlashToken)
             {
                 // Closing tag
@@ -3307,7 +3307,7 @@ public class Parser
             {
                 // If we hit EOF, issue the error at the tag that lacks the closing element
                 // rather than at the end of the file (which is useless)
-                ParseErrorAtPosition(openingTagName.Pos ?? 0, (openingTagName.End ?? 0) - (openingTagName.Pos ?? 0), DiagnosticMessage.JSX_element_0_has_no_corresponding_closing_tag, GetTextOfNodeFromSourceText(SourceText, openingTagName));
+                ParseErrorAtPosition(openingTagName.Pos ?? 0, (openingTagName.End ?? 0) - (openingTagName.Pos ?? 0), Diagnostics.JSX_element_0_has_no_corresponding_closing_tag, GetTextOfNodeFromSourceText(SourceText, openingTagName));
 
                 break;
             }
@@ -3319,9 +3319,9 @@ public class Parser
             result.Add(ParseJsxChild() as IJsxChild);
         }
 
-        result.End = Scanner.TokenPos;
+        result.End = scanner.GetTokenEnd();
 
-        ParsingContext = saveParsingContext;
+        parsingContext = saveParsingContext;
 
         return result;
     }
@@ -3330,8 +3330,8 @@ public class Parser
     {
         var jsxAttributes = new JsxAttributes
         {
-            Pos = Scanner.StartPos,
-            Properties = ParseList(TsTypes.ParsingContext.JsxAttributes, ParseJsxAttribute)
+            Pos = scanner.GetTokenFullStart(),
+            Properties = ParseList(ParsingContext.JsxAttributes, ParseJsxAttribute)
         };
 
         return FinishNode(jsxAttributes);
@@ -3340,7 +3340,7 @@ public class Parser
     //JsxOpeningElement | JsxSelfClosingElement
     public Expression ParseJsxOpeningOrSelfClosingElement(bool inExpressionContext)
     {
-        var fullStart = Scanner.StartPos;
+        var fullStart = scanner.GetTokenFullStart();
 
         ParseExpected(SyntaxKind.LessThanToken);
         var tagName = ParseJsxElementName();
@@ -3438,7 +3438,7 @@ public class Parser
 
     public JsxExpression ParseJsxExpression(bool inExpressionContext)
     {
-        var node = new JsxExpression() { Pos = Scanner.StartPos };
+        var node = new JsxExpression() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
         if (Token() != SyntaxKind.CloseBraceToken)
@@ -3472,7 +3472,7 @@ public class Parser
         ScanJsxIdentifier();
         var node = new JsxAttribute
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParseIdentifierName()
         };
         if (Token() == SyntaxKind.EqualsToken)
@@ -3489,7 +3489,7 @@ public class Parser
 
     public JsxSpreadAttribute ParseJsxSpreadAttribute()
     {
-        var node = new JsxSpreadAttribute() { Pos = Scanner.StartPos };
+        var node = new JsxSpreadAttribute() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
 
@@ -3504,7 +3504,7 @@ public class Parser
 
     public JsxClosingElement ParseJsxClosingElement(bool inExpressionContext)
     {
-        var node = new JsxClosingElement() { Pos = Scanner.StartPos };
+        var node = new JsxClosingElement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.LessThanSlashToken);
 
@@ -3525,7 +3525,7 @@ public class Parser
 
     public TypeAssertion ParseTypeAssertion()
     {
-        var node = new TypeAssertion() { Pos = Scanner.StartPos };
+        var node = new TypeAssertion() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.LessThanToken);
 
@@ -3557,7 +3557,7 @@ public class Parser
 
                 continue;
             }
-            if (Token() == SyntaxKind.ExclamationToken && !Scanner.HasPrecedingLineBreak)
+            if (Token() == SyntaxKind.ExclamationToken && !scanner.HasPrecedingLineBreak())
             {
                 NextToken();
                 var nonNullExpression = new NonNullExpression
@@ -3662,7 +3662,7 @@ public class Parser
     public NodeArray<IExpression> ParseArgumentList()
     {
         ParseExpected(SyntaxKind.OpenParenToken);
-        var result = ParseDelimitedList(TsTypes.ParsingContext.ArgumentExpressions, ParseArgumentExpression);
+        var result = ParseDelimitedList(ParsingContext.ArgumentExpressions, ParseArgumentExpression);
 
         ParseExpected(SyntaxKind.CloseParenToken);
 
@@ -3675,7 +3675,7 @@ public class Parser
         {
             return null;
         }
-        var typeArguments = ParseDelimitedList(TsTypes.ParsingContext.TypeArguments, ParseType);
+        var typeArguments = ParseDelimitedList(ParsingContext.TypeArguments, ParseType);
         if (!ParseExpected(SyntaxKind.GreaterThanToken))
         {
             // If it doesn't have the closing >  then it's definitely not an type argument list.
@@ -3755,12 +3755,12 @@ public class Parser
 
         }
 
-        return ParseIdentifier(DiagnosticMessage.Expression_expected);
+        return ParseIdentifier(Diagnostics.Expression_expected);
     }
 
     public ParenthesizedExpression ParseParenthesizedExpression()
     {
-        var node = new ParenthesizedExpression() { Pos = Scanner.StartPos };
+        var node = new ParenthesizedExpression() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenParenToken);
 
@@ -3773,7 +3773,7 @@ public class Parser
 
     public Expression ParseSpreadElement()
     {
-        var node = new SpreadElement() { Pos = Scanner.StartPos };
+        var node = new SpreadElement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.DotDotDotToken);
 
@@ -3785,7 +3785,7 @@ public class Parser
     public IExpression ParseArgumentOrArrayLiteralElement()
     {
         return Token() == SyntaxKind.DotDotDotToken ? ParseSpreadElement() :
-            Token() == SyntaxKind.CommaToken ? (new OmittedExpression() { Pos = Scanner.StartPos }) /*createNode(SyntaxKind.OmittedExpression)*/ :
+            Token() == SyntaxKind.CommaToken ? (new OmittedExpression() { Pos = scanner.GetTokenFullStart() }) /*createNode(SyntaxKind.OmittedExpression)*/ :
                 ParseAssignmentExpressionOrHigher();
     }
 
@@ -3796,15 +3796,15 @@ public class Parser
 
     public ArrayLiteralExpression ParseArrayLiteralExpression()
     {
-        var node = new ArrayLiteralExpression() { Pos = Scanner.StartPos };
+        var node = new ArrayLiteralExpression() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBracketToken);
-        if (Scanner.HasPrecedingLineBreak)
+        if (scanner.HasPrecedingLineBreak())
         {
             node.MultiLine = true;
         }
 
-        node.Elements = ParseDelimitedList(TsTypes.ParsingContext.ArrayLiteralMembers, ParseArgumentOrArrayLiteralElement);
+        node.Elements = ParseDelimitedList(ParsingContext.ArrayLiteralMembers, ParseArgumentOrArrayLiteralElement);
 
         ParseExpected(SyntaxKind.CloseBracketToken);
 
@@ -3827,7 +3827,7 @@ public class Parser
 
     public IObjectLiteralElementLike ParseObjectLiteralElement()
     {
-        var fullStart = Scanner.StartPos;
+        var fullStart = scanner.GetTokenFullStart();
         var dotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
         if (dotDotDotToken != null)
         {
@@ -3897,15 +3897,15 @@ public class Parser
 
     public ObjectLiteralExpression ParseObjectLiteralExpression()
     {
-        var node = new ObjectLiteralExpression() { Pos = Scanner.StartPos };
+        var node = new ObjectLiteralExpression() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
-        if (Scanner.HasPrecedingLineBreak)
+        if (scanner.HasPrecedingLineBreak())
         {
             node.MultiLine = true;
         }
 
-        node.Properties = ParseDelimitedList(TsTypes.ParsingContext.ObjectLiteralMembers, ParseObjectLiteralElement, /*considerSemicolonAsDelimiter*/ true);
+        node.Properties = ParseDelimitedList(ParsingContext.ObjectLiteralMembers, ParseObjectLiteralElement, /*considerSemicolonAsDelimiter*/ true);
 
         ParseExpected(SyntaxKind.CloseBraceToken);
 
@@ -3921,7 +3921,7 @@ public class Parser
         }
         var node = new FunctionExpression
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Modifiers = ParseModifiers()
         };
 
@@ -3955,7 +3955,7 @@ public class Parser
 
     public /*NewExpression | MetaProperty*/IPrimaryExpression ParseNewExpression()
     {
-        var fullStart = Scanner.StartPos;
+        var fullStart = scanner.GetTokenFullStart();
 
         ParseExpected(SyntaxKind.NewKeyword);
         if (ParseOptional(SyntaxKind.DotToken))
@@ -3990,15 +3990,15 @@ public class Parser
 
     public Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = default)
     {
-        var node = new Block() { Pos = Scanner.StartPos };
+        var node = new Block() { Pos = scanner.GetTokenFullStart() };
         if (ParseExpected(SyntaxKind.OpenBraceToken, diagnosticMessage) || ignoreMissingOpenBrace)
         {
-            if (Scanner.HasPrecedingLineBreak)
+            if (scanner.HasPrecedingLineBreak())
             {
                 node.MultiLine = true;
             }
 
-            node.Statements = ParseList2(TsTypes.ParsingContext.BlockStatements, ParseStatement);
+            node.Statements = ParseList2(ParsingContext.BlockStatements, ParseStatement);
 
             ParseExpected(SyntaxKind.CloseBraceToken);
         }
@@ -4027,7 +4027,7 @@ public class Parser
         Block block = null;
         if (Optimized && Token() == SyntaxKind.OpenBraceToken)
         {
-            var node = new Block() { Pos = Scanner.StartPos, Statements = [] };
+            var node = new Block() { Pos = scanner.GetTokenFullStart(), Statements = [] };
 
             SyntaxKind token;
             int openBraces = 1;
@@ -4084,7 +4084,7 @@ public class Parser
 
     public EmptyStatement ParseEmptyStatement()
     {
-        var node = new EmptyStatement() { Pos = Scanner.StartPos };
+        var node = new EmptyStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.SemicolonToken);
 
@@ -4093,7 +4093,7 @@ public class Parser
 
     public IfStatement ParseIfStatement()
     {
-        var node = new IfStatement() { Pos = Scanner.StartPos };
+        var node = new IfStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.IfKeyword);
 
@@ -4112,7 +4112,7 @@ public class Parser
 
     public DoStatement ParseDoStatement()
     {
-        var node = new DoStatement() { Pos = Scanner.StartPos };
+        var node = new DoStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.DoKeyword);
 
@@ -4137,7 +4137,7 @@ public class Parser
 
     public WhileStatement ParseWhileStatement()
     {
-        var node = new WhileStatement() { Pos = Scanner.StartPos };
+        var node = new WhileStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.WhileKeyword);
 
@@ -4236,7 +4236,7 @@ public class Parser
 
     public IBreakOrContinueStatement ParseBreakOrContinueStatement(SyntaxKind kind)
     {
-        var node = kind == SyntaxKind.ContinueStatement ? (IBreakOrContinueStatement)new ContinueStatement { Pos = Scanner.StartPos } : kind == SyntaxKind.BreakStatement ? new BreakStatement { Pos = Scanner.StartPos } : throw new NotSupportedException("parseBreakOrContinueStatement");
+        var node = kind == SyntaxKind.ContinueStatement ? (IBreakOrContinueStatement)new ContinueStatement { Pos = scanner.GetTokenFullStart() } : kind == SyntaxKind.BreakStatement ? new BreakStatement { Pos = scanner.GetTokenFullStart() } : throw new NotSupportedException("parseBreakOrContinueStatement");
 
         ParseExpected(kind == SyntaxKind.BreakStatement ? SyntaxKind.BreakKeyword : SyntaxKind.ContinueKeyword);
         if (!CanParseSemicolon())
@@ -4251,7 +4251,7 @@ public class Parser
 
     public ReturnStatement ParseReturnStatement()
     {
-        var node = new ReturnStatement() { Pos = Scanner.StartPos };
+        var node = new ReturnStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.ReturnKeyword);
         if (!CanParseSemicolon())
@@ -4266,7 +4266,7 @@ public class Parser
 
     public WithStatement ParseWithStatement()
     {
-        var node = new WithStatement() { Pos = Scanner.StartPos };
+        var node = new WithStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.WithKeyword);
 
@@ -4283,7 +4283,7 @@ public class Parser
 
     public CaseClause ParseCaseClause()
     {
-        var node = new CaseClause() { Pos = Scanner.StartPos };
+        var node = new CaseClause() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.CaseKeyword);
 
@@ -4291,20 +4291,20 @@ public class Parser
 
         ParseExpected(SyntaxKind.ColonToken);
 
-        node.Statements = ParseList2(TsTypes.ParsingContext.SwitchClauseStatements, ParseStatement);
+        node.Statements = ParseList2(ParsingContext.SwitchClauseStatements, ParseStatement);
 
         return FinishNode(node);
     }
 
     public DefaultClause ParseDefaultClause()
     {
-        var node = new DefaultClause() { Pos = Scanner.StartPos };
+        var node = new DefaultClause() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.DefaultKeyword);
 
         ParseExpected(SyntaxKind.ColonToken);
 
-        node.Statements = ParseList2(TsTypes.ParsingContext.SwitchClauseStatements, ParseStatement);
+        node.Statements = ParseList2(ParsingContext.SwitchClauseStatements, ParseStatement);
 
         return FinishNode(node);
     }
@@ -4316,7 +4316,7 @@ public class Parser
 
     public SwitchStatement ParseSwitchStatement()
     {
-        var node = new SwitchStatement() { Pos = Scanner.StartPos };
+        var node = new SwitchStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.SwitchKeyword);
 
@@ -4325,11 +4325,11 @@ public class Parser
         node.Expression = AllowInAnd(ParseExpression);
 
         ParseExpected(SyntaxKind.CloseParenToken);
-        var caseBlock = new CaseBlock() { Pos = Scanner.StartPos };
+        var caseBlock = new CaseBlock() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
 
-        caseBlock.Clauses = ParseList(TsTypes.ParsingContext.SwitchClauses, ParseCaseOrDefaultClause);
+        caseBlock.Clauses = ParseList(ParsingContext.SwitchClauses, ParseCaseOrDefaultClause);
 
         ParseExpected(SyntaxKind.CloseBraceToken);
 
@@ -4340,11 +4340,11 @@ public class Parser
 
     public ThrowStatement ParseThrowStatement()
     {
-        var node = new ThrowStatement() { Pos = Scanner.StartPos };
+        var node = new ThrowStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.ThrowKeyword);
 
-        node.Expression = Scanner.HasPrecedingLineBreak ? null : AllowInAnd(ParseExpression);
+        node.Expression = scanner.HasPrecedingLineBreak() ? null : AllowInAnd(ParseExpression);
 
         ParseSemicolon();
 
@@ -4353,7 +4353,7 @@ public class Parser
 
     public TryStatement ParseTryStatement()
     {
-        var node = new TryStatement() { Pos = Scanner.StartPos };
+        var node = new TryStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.TryKeyword);
 
@@ -4372,7 +4372,7 @@ public class Parser
 
     public CatchClause ParseCatchClause()
     {
-        var result = new CatchClause() { Pos = Scanner.StartPos };
+        var result = new CatchClause() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.CatchKeyword);
         if (ParseExpected(SyntaxKind.OpenParenToken))
@@ -4389,7 +4389,7 @@ public class Parser
 
     public DebuggerStatement ParseDebuggerStatement()
     {
-        var node = new DebuggerStatement() { Pos = Scanner.StartPos };
+        var node = new DebuggerStatement() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.DebuggerKeyword);
 
@@ -4400,7 +4400,7 @@ public class Parser
 
     public /*ExpressionStatement | LabeledStatement*/Statement ParseExpressionOrLabeledStatement()
     {
-        var fullStart = Scanner.StartPos;
+        var fullStart = scanner.GetTokenFullStart();
         var expression = AllowInAnd(ParseExpression);
         if (expression.Kind == SyntaxKind.Identifier && ParseOptional(SyntaxKind.ColonToken))
         {
@@ -4432,21 +4432,21 @@ public class Parser
     {
         NextToken();
 
-        return TokenIsIdentifierOrKeyword(Token()) && !Scanner.HasPrecedingLineBreak;
+        return TokenIsIdentifierOrKeyword(Token()) && !scanner.HasPrecedingLineBreak();
     }
 
     public bool NextTokenIsFunctionKeywordOnSameLine()
     {
         NextToken();
 
-        return Token() == SyntaxKind.FunctionKeyword && !Scanner.HasPrecedingLineBreak;
+        return Token() == SyntaxKind.FunctionKeyword && !scanner.HasPrecedingLineBreak();
     }
 
     public bool NextTokenIsIdentifierOrKeywordOrNumberOnSameLine()
     {
         NextToken();
 
-        return (TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.NumericLiteral) && !Scanner.HasPrecedingLineBreak;
+        return (TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.NumericLiteral) && !scanner.HasPrecedingLineBreak();
     }
 
     public bool IsDeclaration()
@@ -4480,7 +4480,7 @@ public class Parser
                 case SyntaxKind.ReadonlyKeyword:
 
                     NextToken();
-                    if (Scanner.HasPrecedingLineBreak)
+                    if (scanner.HasPrecedingLineBreak())
                     {
                         return false;
                     }
@@ -4564,20 +4564,20 @@ public class Parser
                 return ParseBlock(/*ignoreMissingOpenBrace*/ false);
             case SyntaxKind.VarKeyword:
 
-                return ParseVariableStatement(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
+                return ParseVariableStatement(scanner.GetTokenFullStart(), /*decorators*/ null, /*modifiers*/ null);
             case SyntaxKind.LetKeyword:
                 if (IsLetDeclaration())
                 {
-                    return ParseVariableStatement(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
+                    return ParseVariableStatement(scanner.GetTokenFullStart(), /*decorators*/ null, /*modifiers*/ null);
                 }
 
                 break;
             case SyntaxKind.FunctionKeyword:
 
-                return ParseFunctionDeclaration(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
+                return ParseFunctionDeclaration(scanner.GetTokenFullStart(), /*decorators*/ null, /*modifiers*/ null);
             case SyntaxKind.ClassKeyword:
 
-                return ParseClassDeclaration(Scanner.StartPos, /*decorators*/ null, /*modifiers*/ null);
+                return ParseClassDeclaration(scanner.GetTokenFullStart(), /*decorators*/ null, /*modifiers*/ null);
             case SyntaxKind.IfKeyword:
 
                 return ParseIfStatement();
@@ -4697,7 +4697,7 @@ public class Parser
                 {
                     // We reached this point because we encountered decorators and/or modifiers and assumed a declaration
                     // would follow. For recovery and error reporting purposes, return an incomplete declaration.
-                    var node = (Statement)CreateMissingNode<Statement>(SyntaxKind.MissingDeclaration, /*reportAtCurrentPosition*/ true, DiagnosticMessage.Declaration_expected);
+                    var node = (Statement)CreateMissingNode<Statement>(SyntaxKind.MissingDeclaration, /*reportAtCurrentPosition*/ true, Diagnostics.Declaration_expected);
                     node.Pos = fullStart;
                     node.Decorators = decorators;
                     node.Modifiers = modifiers;
@@ -4712,7 +4712,7 @@ public class Parser
     {
         NextToken();
 
-        return !Scanner.HasPrecedingLineBreak && (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
+        return !scanner.HasPrecedingLineBreak() && (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
     }
 
     public Block ParseFunctionBlockOrSemicolon(bool isGenerator, bool isAsync, DiagnosticMessage diagnosticMessage = default)
@@ -4731,11 +4731,11 @@ public class Parser
     {
         if (Token() == SyntaxKind.CommaToken)
         {
-            return new OmittedExpression { Pos = Scanner.StartPos }; //(OmittedExpression)createNode(SyntaxKind.OmittedExpression);
+            return new OmittedExpression { Pos = scanner.GetTokenFullStart() }; //(OmittedExpression)createNode(SyntaxKind.OmittedExpression);
         }
         var node = new BindingElement
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             DotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken),
 
             Name = ParseIdentifierOrPattern(),
@@ -4750,7 +4750,7 @@ public class Parser
     {
         var node = new BindingElement
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             DotDotDotToken = (DotDotDotToken)ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken)
         };
         var tokenIsIdentifier = IsIdentifier();
@@ -4775,11 +4775,11 @@ public class Parser
 
     public ObjectBindingPattern ParseObjectBindingPattern()
     {
-        var node = new ObjectBindingPattern() { Pos = Scanner.StartPos };
+        var node = new ObjectBindingPattern() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBraceToken);
 
-        node.Elements = ParseDelimitedList(TsTypes.ParsingContext.ObjectBindingElements, ParseObjectBindingElement);
+        node.Elements = ParseDelimitedList(ParsingContext.ObjectBindingElements, ParseObjectBindingElement);
 
         ParseExpected(SyntaxKind.CloseBraceToken);
 
@@ -4788,11 +4788,11 @@ public class Parser
 
     public ArrayBindingPattern ParseArrayBindingPattern()
     {
-        var node = new ArrayBindingPattern() { Pos = Scanner.StartPos };
+        var node = new ArrayBindingPattern() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.OpenBracketToken);
 
-        node.Elements = ParseDelimitedList(TsTypes.ParsingContext.ArrayBindingElements, ParseArrayBindingElement);
+        node.Elements = ParseDelimitedList(ParsingContext.ArrayBindingElements, ParseArrayBindingElement);
 
         ParseExpected(SyntaxKind.CloseBracketToken);
 
@@ -4822,7 +4822,7 @@ public class Parser
     {
         var node = new VariableDeclaration
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParseIdentifierOrPattern(),
 
             Type = ParseTypeAnnotation()
@@ -4837,7 +4837,7 @@ public class Parser
 
     public IVariableDeclarationList ParseVariableDeclarationList(bool inForStatementInitializer)
     {
-        var node = new VariableDeclarationList() { Pos = Scanner.StartPos };
+        var node = new VariableDeclarationList() { Pos = scanner.GetTokenFullStart() };
         switch (Token())
         {
             case SyntaxKind.VarKeyword:
@@ -4869,7 +4869,7 @@ public class Parser
 
             SetDisallowInContext(inForStatementInitializer);
 
-            node.Declarations = ParseDelimitedList(TsTypes.ParsingContext.VariableDeclarations, ParseVariableDeclaration);
+            node.Declarations = ParseDelimitedList(ParsingContext.VariableDeclarations, ParseVariableDeclaration);
 
             SetDisallowInContext(savedDisallowIn);
         }
@@ -4930,7 +4930,7 @@ public class Parser
 
             Modifiers = modifiers
         };
-        
+
         ParseExpected(SyntaxKind.FunctionKeyword);
 
         node.AsteriskToken = (AsteriskToken)ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken);
@@ -4941,7 +4941,7 @@ public class Parser
 
         FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ isGenerator, /*awaitContext*/ isAsync, /*requireCompleteParameterList*/ false, node);
 
-        node.Body = ParseFunctionBlockOrSemicolon(isGenerator, isAsync, DiagnosticMessage.or_expected);
+        node.Body = ParseFunctionBlockOrSemicolon(isGenerator, isAsync, Diagnostics.or_expected);
 
         return AddJsDocComment(FinishNode(node));
     }
@@ -4965,7 +4965,7 @@ public class Parser
 
         FillSignature(SyntaxKind.ColonToken, /*yieldContext*/ false, /*awaitContext*/ false, /*requireCompleteParameterList*/ false, node);
 
-        node.Body = ParseFunctionBlockOrSemicolon(/*isGenerator*/ false, /*isAsync*/ false, DiagnosticMessage.or_expected);
+        node.Body = ParseFunctionBlockOrSemicolon(/*isGenerator*/ false, /*isAsync*/ false, Diagnostics.or_expected);
 
         return AddJsDocComment(FinishNode(node));
     }
@@ -5036,7 +5036,7 @@ public class Parser
         var questionToken = (QuestionToken)ParseOptionalToken<QuestionToken>(SyntaxKind.QuestionToken);
         if (asteriskToken != null || Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
         {
-            return ParseMethodDeclaration(fullStart, decorators, modifiers, asteriskToken, name, questionToken, DiagnosticMessage.or_expected);
+            return ParseMethodDeclaration(fullStart, decorators, modifiers, asteriskToken, name, questionToken, Diagnostics.or_expected);
         }
         else
         {
@@ -5167,7 +5167,7 @@ public class Parser
         var modifiers = CreateList<Modifier>();
         while (true)
         {
-            var modifierStart = Scanner.StartPos;
+            var modifierStart = scanner.GetTokenFullStart();
             var modifierKind = Token();
             if (Token() == SyntaxKind.ConstKeyword && permitInvalidConstAsModifier == true)
             {
@@ -5197,7 +5197,7 @@ public class Parser
         }
         if (modifiers != null)
         {
-            modifiers.End = Scanner.StartPos;
+            modifiers.End = scanner.GetTokenFullStart();
         }
 
         return modifiers;
@@ -5208,7 +5208,7 @@ public class Parser
         NodeArray<Modifier> modifiers = null;
         if (Token() == SyntaxKind.AsyncKeyword)
         {
-            var modifierStart = Scanner.StartPos;
+            var modifierStart = scanner.GetTokenFullStart();
             var modifierKind = Token();
 
             NextToken();
@@ -5219,7 +5219,7 @@ public class Parser
             modifiers.Pos = modifierStart;
             modifiers.Add(modifier);
 
-            modifiers.End = Scanner.StartPos;
+            modifiers.End = scanner.GetTokenFullStart();
         }
 
         return modifiers;
@@ -5229,7 +5229,7 @@ public class Parser
     {
         if (Token() == SyntaxKind.SemicolonToken)
         {
-            var result = new SemicolonClassElement() { Pos = Scanner.StartPos };
+            var result = new SemicolonClassElement() { Pos = scanner.GetTokenFullStart() };
 
             NextToken();
 
@@ -5261,7 +5261,7 @@ public class Parser
         }
         if (decorators?.Any() == true || modifiers?.Any() == true)
         {
-            var name = (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ true, DiagnosticMessage.Declaration_expected);
+            var name = (Identifier)CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ true, Diagnostics.Declaration_expected);
 
             return ParsePropertyDeclaration(fullStart, decorators, modifiers, name, /*questionToken*/ null);
         }
@@ -5273,8 +5273,8 @@ public class Parser
 
     public ClassExpression ParseClassExpression()
     {
-        var node = new ClassExpression { Pos = Scanner.StartPos };
-        node.Pos = Scanner.StartPos;
+        var node = new ClassExpression { Pos = scanner.GetTokenFullStart() };
+        node.Pos = scanner.GetTokenFullStart();
         //node.decorators = decorators;
 
         //node.modifiers = modifiers;
@@ -5358,7 +5358,7 @@ public class Parser
     {
         if (IsHeritageClause())
         {
-            return ParseList(TsTypes.ParsingContext.HeritageClauses, ParseHeritageClause);
+            return ParseList(ParsingContext.HeritageClauses, ParseHeritageClause);
         }
 
         return null;
@@ -5371,13 +5371,13 @@ public class Parser
         {
             var node = new HeritageClause
             {
-                Pos = Scanner.StartPos,
+                Pos = scanner.GetTokenFullStart(),
                 Token = tok
             };
 
             NextToken();
 
-            node.Types = ParseDelimitedList(TsTypes.ParsingContext.HeritageClauseElement, ParseExpressionWithTypeArguments);
+            node.Types = ParseDelimitedList(ParsingContext.HeritageClauseElement, ParseExpressionWithTypeArguments);
 
             return FinishNode(node);
         }
@@ -5389,12 +5389,12 @@ public class Parser
     {
         var node = new ExpressionWithTypeArguments
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Expression = ParseLeftHandSideExpressionOrHigher()
         };
         if (Token() == SyntaxKind.LessThanToken)
         {
-            node.TypeArguments = ParseBracketedList(TsTypes.ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
+            node.TypeArguments = ParseBracketedList(ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
         }
 
         return FinishNode(node);
@@ -5403,7 +5403,7 @@ public class Parser
     public NodeArray<ITypeNode> TryParseTypeArguments()
     {
         return Token() == SyntaxKind.LessThanToken ?
-            ParseBracketedList(TsTypes.ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken) : null;
+            ParseBracketedList(ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken) : null;
     }
 
     public bool IsHeritageClause()
@@ -5413,7 +5413,7 @@ public class Parser
 
     public NodeArray<IClassElement> ParseClassMembers()
     {
-        return ParseList2(TsTypes.ParsingContext.ClassMembers, ParseClassElement);
+        return ParseList2(ParsingContext.ClassMembers, ParseClassElement);
     }
 
     public InterfaceDeclaration ParseInterfaceDeclaration(int fullStart, NodeArray<Decorator> decorators, NodeArray<Modifier> modifiers)
@@ -5468,7 +5468,7 @@ public class Parser
     {
         var node = new EnumMember
         {
-            Pos = Scanner.StartPos,
+            Pos = scanner.GetTokenFullStart(),
             Name = ParsePropertyName(),
 
             Initializer = AllowInAnd(ParseNonParameterInitializer)
@@ -5492,7 +5492,7 @@ public class Parser
         node.Name = ParseIdentifier();
         if (ParseExpected(SyntaxKind.OpenBraceToken))
         {
-            node.Members = ParseDelimitedList(TsTypes.ParsingContext.EnumMembers, ParseEnumMember);
+            node.Members = ParseDelimitedList(ParsingContext.EnumMembers, ParseEnumMember);
 
             ParseExpected(SyntaxKind.CloseBraceToken);
         }
@@ -5506,10 +5506,10 @@ public class Parser
 
     public ModuleBlock ParseModuleBlock()
     {
-        var node = new ModuleBlock() { Pos = Scanner.StartPos };
+        var node = new ModuleBlock() { Pos = scanner.GetTokenFullStart() };
         if (ParseExpected(SyntaxKind.OpenBraceToken))
         {
-            node.Statements = ParseList2(TsTypes.ParsingContext.BlockStatements, ParseStatement);
+            node.Statements = ParseList2(ParsingContext.BlockStatements, ParseStatement);
 
             ParseExpected(SyntaxKind.CloseBraceToken);
         }
@@ -5637,7 +5637,7 @@ public class Parser
     public /*ImportEqualsDeclaration | ImportDeclaration*/IStatement ParseImportDeclarationOrImportEqualsDeclaration(int fullStart, NodeArray<Decorator> decorators, NodeArray<Modifier> modifiers)
     {
         ParseExpected(SyntaxKind.ImportKeyword);
-        var afterImportPos = Scanner.StartPos;
+        var afterImportPos = scanner.GetTokenFullStart();
         Identifier identifier = null;
         if (IsIdentifier())
         {
@@ -5719,7 +5719,7 @@ public class Parser
 
     public ExternalModuleReference ParseExternalModuleReference()
     {
-        var node = new ExternalModuleReference() { Pos = Scanner.StartPos };
+        var node = new ExternalModuleReference() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.RequireKeyword);
 
@@ -5750,7 +5750,7 @@ public class Parser
 
     public NamespaceImport ParseNamespaceImport()
     {
-        var namespaceImport = new NamespaceImport() { Pos = Scanner.StartPos };
+        var namespaceImport = new NamespaceImport() { Pos = scanner.GetTokenFullStart() };
 
         ParseExpected(SyntaxKind.AsteriskToken);
 
@@ -5767,8 +5767,8 @@ public class Parser
         {
             var node = new NamedImports
             {
-                Pos = Scanner.StartPos,
-                Elements = ParseBracketedList<ImportSpecifier>(TsTypes.ParsingContext.ImportOrExportSpecifiers, ParseImportSpecifier,
+                Pos = scanner.GetTokenFullStart(),
+                Elements = ParseBracketedList<ImportSpecifier>(ParsingContext.ImportOrExportSpecifiers, ParseImportSpecifier,
                SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken)
             };
 
@@ -5778,8 +5778,8 @@ public class Parser
         {
             var node = new NamedExports
             {
-                Pos = Scanner.StartPos,
-                Elements = ParseBracketedList<ExportSpecifier>(TsTypes.ParsingContext.ImportOrExportSpecifiers, ParseExportSpecifier,
+                Pos = scanner.GetTokenFullStart(),
+                Elements = ParseBracketedList<ExportSpecifier>(ParsingContext.ImportOrExportSpecifiers, ParseExportSpecifier,
                SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken)
             };
 
@@ -5789,7 +5789,7 @@ public class Parser
 
     public ExportSpecifier ParseExportSpecifier()
     {
-        var node = new ExportSpecifier { Pos = Scanner.StartPos };
+        var node = new ExportSpecifier { Pos = scanner.GetTokenFullStart() };
         var identifierName = ParseIdentifierName();
         if (Token() == SyntaxKind.AsKeyword)
         {
@@ -5807,18 +5807,18 @@ public class Parser
 
     public ImportSpecifier ParseImportSpecifier()
     {
-        var node = new ImportSpecifier() { Pos = Scanner.StartPos };
+        var node = new ImportSpecifier() { Pos = scanner.GetTokenFullStart() };
         var checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
-        var checkIdentifierStart = Scanner.TokenPos;
-        var checkIdentifierEnd = Scanner.TextPos;
+        var checkIdentifierStart = scanner.GetTokenEnd();
+        var checkIdentifierEnd = scanner.GetTokenStart();
         var identifierName = ParseIdentifierName();
         if (Token() == SyntaxKind.AsKeyword)
         {
             node.PropertyName = identifierName;
             ParseExpected(SyntaxKind.AsKeyword);
             checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
-            checkIdentifierStart = Scanner.TokenPos;
-            checkIdentifierEnd = Scanner.TextPos;
+            checkIdentifierStart = scanner.GetTokenEnd();
+            checkIdentifierEnd = scanner.GetTokenStart();
             node.Name = ParseIdentifierName();
         }
         else
@@ -5828,7 +5828,7 @@ public class Parser
         if (/*kind == SyntaxKind.ImportSpecifier && */checkIdentifierIsKeyword)
         {
             // Report error identifier expected
-            ParseErrorAtPosition(checkIdentifierStart, checkIdentifierEnd - checkIdentifierStart, DiagnosticMessage.Identifier_expected);
+            ParseErrorAtPosition(checkIdentifierStart, checkIdentifierEnd - checkIdentifierStart, Diagnostics.Identifier_expected);
         }
 
         return FinishNode(node);
@@ -5852,7 +5852,7 @@ public class Parser
         else
         {
             node.ExportClause = (NamedExports)ParseNamedImportsOrExports(SyntaxKind.NamedExports);
-            if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral && !Scanner.HasPrecedingLineBreak))
+            if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral && !scanner.HasPrecedingLineBreak()))
             {
                 ParseExpected(SyntaxKind.FromKeyword);
 

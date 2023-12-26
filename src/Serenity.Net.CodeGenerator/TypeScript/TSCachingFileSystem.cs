@@ -41,7 +41,7 @@ public class TSCachingFileSystem(IFileSystem fileSystem) : IFileSystem
         if (string.IsNullOrEmpty(path))
             return false;
 
-        var cacheKey = TypeScript.TsParser.Core.NormalizePath(path);
+        var cacheKey = TypeScript.Utilities.NormalizePath(path);
 
         return fileExists.GetOrAdd(cacheKey, cacheKey => new(() => fileSystem.FileExists(path))).Value;
     }
@@ -95,7 +95,7 @@ public class TSCachingFileSystem(IFileSystem fileSystem) : IFileSystem
             encoding != Encoding.UTF8)
             throw new NotImplementedException();
 
-        var cacheKey = TypeScript.TsParser.Core.NormalizePath(path);
+        var cacheKey = TypeScript.Utilities.NormalizePath(path);
 
         return allText.GetOrAdd(cacheKey, cacheKey => new(() => fileSystem.ReadAllText(path))).Value;
     }

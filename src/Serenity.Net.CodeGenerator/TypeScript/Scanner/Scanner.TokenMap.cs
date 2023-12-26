@@ -1,6 +1,6 @@
-using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript;
 
-namespace Serenity.TypeScript.TsParser;
+namespace Serenity.TypeScript;
 
 partial class Scanner
 {
@@ -155,42 +155,4 @@ partial class Scanner
         ["#"] = SyntaxKind.HashToken,
         ["`"] = SyntaxKind.BacktickToken
     };
-
-    private static string[] MakeReverseMap(Dictionary<string, SyntaxKind> source)
-    {
-        int max = 0;
-        foreach (var x in Enum.GetValues<SyntaxKind>())
-            if ((int)x > max)
-                max = (int)x;
-        var result = new string[max + 1];
-        foreach (var pair in source)
-            result[(int)pair.Value] = pair.Key;
-        return result;
-    }
-
-    private static readonly string[] tokenStrings = MakeReverseMap(textToToken);
-
-    internal static bool TokenIsIdentifierOrKeyword(SyntaxKind token)
-    {
-        return token >= SyntaxKind.Identifier;
-    }
-
-    private static bool TokenIsIdentifierOrKeywordOrGreaterThan(SyntaxKind token)
-    {
-        return token == SyntaxKind.GreaterThanToken || TokenIsIdentifierOrKeyword(token);
-    }
-
-    internal static string TokenToString(SyntaxKind t)
-    {
-        return t >= 0 && (int)t <= tokenStrings.Length ? tokenStrings[(int)t] : null;
-    }
-
-    private static SyntaxKind? StringToToken(string s)
-    {
-        if (textToToken.TryGetValue(s, out var token))
-            return token;
-
-        return null;
-    }
-
 }

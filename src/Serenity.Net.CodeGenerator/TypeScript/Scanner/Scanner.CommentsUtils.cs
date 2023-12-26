@@ -1,6 +1,6 @@
-using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript;
 
-namespace Serenity.TypeScript.TsParser;
+namespace Serenity.TypeScript;
 
 partial class Scanner
 {
@@ -136,6 +136,35 @@ partial class Scanner
         return cb.comments;
     }
 
+    List<CommentDirective> AppendIfCommentDirective(List<CommentDirective> commentDirectives, string text, Regex commentDirectiveRegEx, int lineStart)
+    {
+        var type = GetDirectiveFromComment(text.TrimStart(), commentDirectiveRegEx);
+        if (type == null)
+        {
+            return commentDirectives;
+        }
+
+        commentDirectives ??= new();
+        commentDirectives.Add(new(new() { Pos = lineStart, End = pos }, type.Value));
+        return commentDirectives;
+    }
+
+    CommentDirectiveType? GetDirectiveFromComment(string text, Regex commentDirectiveRegEx)
+    {
+        var match = commentDirectiveRegEx.Match(text);
+        if (!match.Success || match.Groups.Count < 0)
+        {
+            return null;
+        }
+
+        return match.Groups[1].Value switch
+        {
+            "ts-expect-error" => (CommentDirectiveType?)CommentDirectiveType.ExpectError,
+            "ts-ignore" => (CommentDirectiveType?)CommentDirectiveType.Ignore,
+            _ => null,
+        };
+    }
+
     internal static List<CommentRange> GetLeadingCommentRanges(string text, int pos)
     {
         return ReduceEachLeadingCommentRange<object, List<CommentRange>>(text, pos, AppendCommentRange, null, null) ?? [];
@@ -150,6 +179,7 @@ partial class Scanner
 #if ISSOURCEGENERATOR
     private static readonly Regex commentDirectiveRegExSingleLine = new(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)/", RegexOptions.Compiled);
     private static readonly Regex commentDirectiveRegExMultiLine = new(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)/", RegexOptions.Compiled);
+    private static readonly Regex jsDocSeeOrLink = new(@"@(?:see|link)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 #else
     // Test for whether a single line comment with leading whitespace trimmed's text contains a directive.
     private static readonly Regex commentDirectiveRegExSingleLine = commentDirectiveReExSingleLineGen();
@@ -162,5 +192,10 @@ partial class Scanner
 
     [GeneratedRegex(@"^(?:\\/|\\*)*\\s*@(ts-expect-error|ts-ignore)")]
     private static partial Regex commentDirectiveRegExMultiLineGen();
+
+    private static readonly Regex jsDocSeeOrLink = jsDocSeeOrLinkGen();
+
+    [GeneratedRegex(@"@(?:see|link)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex jsDocSeeOrLinkGen();
 #endif
 }

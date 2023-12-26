@@ -1,6 +1,3 @@
-using Serenity.TypeScript.TsParser;
-using Serenity.TypeScript.TsTypes;
-
 namespace Serenity.TypeScript;
 
 public interface ITypeScriptAST
@@ -9,6 +6,7 @@ public interface ITypeScriptAST
     Node RootNode { get; set; }
     void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true);
 }
+
 public class TypeScriptAST: ITypeScriptAST
 {
     public string SourceStr { get; set; }
@@ -34,7 +32,7 @@ public class TypeScriptAST: ITypeScriptAST
         {
             Optimized = optimized
         };
-        var sourceFile = parser.ParseSourceFile(fileName, source, false, ScriptKind.Ts);
+        var sourceFile = parser.ParseSourceFile(fileName, source, false, ScriptKind.TS);
         RootNode = sourceFile;
         RootNode.SourceStr = SourceStr;
         if (setChildren)

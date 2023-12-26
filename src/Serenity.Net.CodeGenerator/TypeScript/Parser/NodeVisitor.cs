@@ -1,8 +1,6 @@
-using Serenity.TypeScript.TsTypes;
+namespace Serenity.TypeScript;
 
-namespace Serenity.TypeScript.TsParser;
-
-public class Ts
+internal static class NodeVisitor
 {
     public static INode VisitNode(Func<INode, INode> cbNode, INode node)
     {

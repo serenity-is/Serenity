@@ -1,4 +1,4 @@
-using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript;
 
 namespace Serenity.TypeScript.Change;
 

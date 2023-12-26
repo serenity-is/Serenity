@@ -1,4 +1,4 @@
-namespace Serenity.TypeScript.TsTypes;
+namespace Serenity.TypeScript;
 
 public enum SyntaxKind
 {

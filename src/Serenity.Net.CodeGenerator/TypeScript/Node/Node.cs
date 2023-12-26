@@ -1,6 +1,4 @@
-using Serenity.TypeScript.TsParser;
-
-namespace Serenity.TypeScript.TsTypes;
+namespace Serenity.TypeScript;
 
 public class Node : TextRange, INode
 {
@@ -22,7 +20,6 @@ public class Node : TextRange, INode
         }
     }
     
-    public int ParentId { get; set; }
     public int NodeStart { get; set; } = -1;
     public SyntaxKind Kind { get; set; }
     public NodeFlags Flags { get; set; }
@@ -35,7 +32,7 @@ public class Node : TextRange, INode
     public void MakeChildren(string sourceStr)
     {
         Children = [];
-        Ts.ForEachChild(this, node =>
+        NodeVisitor.ForEachChild(this, node =>
         {
             if (node == null)
                 return null;
@@ -50,7 +47,7 @@ public class Node : TextRange, INode
 
     public void MakeChildrenOptimized(string sourceStr)
     {
-        Ts.ForEachChildOptimized(this, node =>
+        NodeVisitor.ForEachChildOptimized(this, node =>
         {
             if (node == null)
                 return;
@@ -117,26 +114,4 @@ public class Node : TextRange, INode
                 yield return ch;
         }
     }
-}
-
-public interface INode : ITextRange
-{
-    SyntaxKind Kind { get; set; }
-    NodeFlags Flags { get; set; }
-    ModifierFlags ModifierFlagsCache { get; set; }
-
-    NodeArray<Decorator> Decorators { get; set; }
-
-    /*ModifiersArray*/
-    NodeArray<Modifier> Modifiers { get; set; }
-
-    INode Parent { get; set; }
-    List<Node> Children { get; set; }
-    List<JsDoc> JsDoc { get; set; }
-
-    string GetText();
-    string GetTextWithComments(string source = null);
-
-    string ToString(bool withPos);
-
 }

@@ -1,10 +1,83 @@
-using Serenity.TypeScript.TsTypes;
 using System.Diagnostics;
 
-namespace Serenity.TypeScript.TsParser;
+namespace Serenity.TypeScript;
 
 partial class Scanner
 {
+    internal static bool CouldStartTrivia(string text, int pos)
+    {
+        if (pos >= text.Length)
+            return false;
+
+        // Keep in sync with skipTrivia
+        var ch = text[pos];
+        return ch switch
+        {
+            '\r' or '\n' or '\t' or '\v' or '\f' or ' ' or '/'
+            // starts of normal trivia falls through
+            or '<' // Starts of conflict marker trivia
+            or '|' or '=' or '>' => true,
+            '#' => pos == 0,// Only if its the beginning can we have #! trivia
+            _ => ch > CharacterCodes.MaxAsciiCharacter,
+        };
+    }
+
+    // All conflict markers consist of the same character repeated seven times.  If it is
+    // a <<<<<<< or >>>>>>> marker then it is also followed by a space.
+    private static readonly int mergeConflictMarkerLength = "<<<<<<<".Length;
+
+    private static bool IsConflictMarkerTrivia(string text, int pos)
+    {
+        Debug.Assert(pos >= 0);
+
+        // Conflict markers must be at the start of a line.
+        if (pos == 0 || (pos - 1 < text.Length && IsLineBreak(text[pos - 1])))
+        {
+            if ((pos + mergeConflictMarkerLength) < text.Length)
+            {
+                var ch = text[pos];
+                for (var i = 0; i < mergeConflictMarkerLength; i++)
+                {
+                    if (text[pos + i] != ch)
+                        return false;
+                }
+
+                return ch == '=' || text[pos + mergeConflictMarkerLength] == ' ';
+            }
+        }
+        return false;
+    }
+
+    private static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int?, int, object> error = null)
+    {
+        error?.Invoke(Diagnostics.Merge_conflict_marker_encountered, pos, mergeConflictMarkerLength, null);
+
+        var len = text.Length;
+        if (pos >= len)
+            return pos;
+
+        var ch = text[pos];
+        if (ch == '<' || ch == '>')
+        {
+            while (pos < len && !IsLineBreak(text[pos]))
+                pos++;
+        }
+        else
+        {
+            Debug.Assert(ch == '|' || ch == '=');
+            while (pos < len)
+            {
+                var currentChar = text[pos];
+                if ((currentChar == '=' || currentChar == '>') &&
+                    currentChar != ch && IsConflictMarkerTrivia(text, pos))
+                    break;
+                pos++;
+            }
+        }
+
+        return pos;
+    }
+
     internal static int SkipTrivia(string text, int pos, bool stopAfterLineBreak = false,
         bool stopAtComments = false, bool inJSDoc = false)
     {
@@ -119,68 +192,12 @@ partial class Scanner
         }
     }
 
-    // All conflict markers consist of the same character repeated seven times.  If it is
-    // a <<<<<<< or >>>>>>> marker then it is also followed by a space.
-    private static readonly int mergeConflictMarkerLength = "<<<<<<<".Length;
-
-    public static bool IsConflictMarkerTrivia(string text, int pos)
-    {
-        Debug.Assert(pos >= 0);
-
-        // Conflict markers must be at the start of a line.
-        if (pos == 0 || (pos - 1 < text.Length && IsLineBreak(text[pos - 1])))
-        {
-            if ((pos + mergeConflictMarkerLength) < text.Length)
-            {
-                var ch = text[pos];
-                for (var i = 0; i < mergeConflictMarkerLength; i++)
-                {
-                    if (text[pos + i] != ch)
-                        return false;
-                }
-
-                return ch == '=' || text[pos + mergeConflictMarkerLength] == ' ';
-            }
-        }
-        return false;
-    }
-
-    public static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int> error = null)
-    {
-        error?.Invoke(DiagnosticMessage.Merge_conflict_marker_encountered, mergeConflictMarkerLength);
-
-        var len = text.Length;
-        if (pos >= len)
-            return pos;
-
-        var ch = text[pos];
-        if (ch == '<' || ch == '>')
-        {
-            while (pos < len && !IsLineBreak(text[pos]))
-                pos++;
-        }
-        else
-        {
-            Debug.Assert(ch == '|' || ch == '=');
-            while (pos < len)
-            {
-                var currentChar = text[pos];
-                if ((currentChar == '=' || currentChar == '>') &&
-                    currentChar != ch && IsConflictMarkerTrivia(text, pos))
-                    break;
-                pos++;
-            }
-        }
-
-        return pos;
-    }
-
 #if ISSOURCEGENERATOR
-    private static readonly Regex shebangTriviaRegex = new("/^#!.*/", RegexOptions.Compiled);
+    private static readonly Regex shebangTriviaRegex = new("^#!.*", RegexOptions.Compiled);
 #else
     private static readonly Regex shebangTriviaRegex = shebangTriviaRegexGen();
 
-    [GeneratedRegex("/^#!.*/")]
+    [GeneratedRegex("^#!.*")]
     private static partial Regex shebangTriviaRegexGen();
 #endif
 
@@ -200,12 +217,11 @@ partial class Scanner
         return shebangTriviaRegex.IsMatch(text);
     }
 
-    public static int ScanShebangTrivia(string text, int pos)
+    private static int ScanShebangTrivia(string text, int pos)
     {
         var shebang = shebangTriviaRegex.Match(text);
         if (shebang.Success && shebang.Captures.Count > 0)
             pos += shebang.Captures[0].Length;
         return pos;
     }
-
 }
