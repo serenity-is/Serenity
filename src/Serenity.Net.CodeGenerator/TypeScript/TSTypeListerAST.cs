@@ -132,7 +132,7 @@ public class TSTypeListerAST
         }
         else if (node is Identifier idt && idt.Text is not null)
             return idt.Text;
-        else if (node is TypeNode)
+        else if (node is ITypeNode)
         {
             if (node.Kind == SyntaxKind.StringKeyword)
                 return "string";

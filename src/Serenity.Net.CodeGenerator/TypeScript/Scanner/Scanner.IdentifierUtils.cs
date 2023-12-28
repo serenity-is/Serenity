@@ -26,7 +26,7 @@ partial class Scanner
         return 1;
     }
 
-    private static bool IsIdentifierText(string name, ScriptTarget languageVersion, LanguageVariant identifierVariant)
+    internal static bool IsIdentifierText(string name, ScriptTarget languageVersion, LanguageVariant identifierVariant = LanguageVariant.Standard)
     {
         if (string.IsNullOrEmpty(name)) 
             return false;

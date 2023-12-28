@@ -1948,7 +1948,7 @@ internal partial class Scanner
         return ScanJsxAttributeValue();
     }
 
-    SyntaxKind ScanJSDocCommentTextToken(bool inBackticks)
+    internal SyntaxKind ScanJSDocCommentTextToken(bool inBackticks)
     {
         fullStartPos = tokenStart = pos;
         tokenFlags = TokenFlags.None;
@@ -1983,7 +1983,7 @@ internal partial class Scanner
         return token = SyntaxKind.JSDocCommentTextToken;
     }
 
-    SyntaxKind ScanJsDocToken()
+    internal SyntaxKind ScanJsDocToken()
     {
         fullStartPos = tokenStart = pos;
         tokenFlags = TokenFlags.None;
@@ -2096,7 +2096,7 @@ internal partial class Scanner
         }
     }
 
-    private bool IsFalsy(object obj)
+    internal static bool IsFalsy(object obj)
     {
         return obj is not true && obj != null &&
             (obj is false || obj is 0 || obj is "" || obj is SyntaxKind.Unknown ||

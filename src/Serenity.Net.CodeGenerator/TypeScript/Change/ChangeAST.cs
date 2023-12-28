@@ -60,7 +60,7 @@ public class ChangeAST(ICollection<NodeChangeItem> changeItems = null)
         if (_nodeChangeItems.Any(v => v.Node.Pos < node.Pos && v.Node.End > node.Pos))
             throw new Exception("ChangeItems already have node that contains this node. Delete first");
 
-        if (newValue != node.GetTextWithComments())
+        if (newValue != node.GetTextWithTrivia())
         {
             var nodeCh = new NodeChangeItem {ChangeType = NodeChangeType.Change, Node = node, NewValue = newValue};
             _nodeChangeItems.Add(nodeCh);

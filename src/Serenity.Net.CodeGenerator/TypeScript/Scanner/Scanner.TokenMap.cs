@@ -4,7 +4,7 @@ namespace Serenity.TypeScript;
 
 partial class Scanner
 {
-    private static readonly Dictionary<string, SyntaxKind> textToKeyword = new()
+    internal static readonly Dictionary<string, SyntaxKind> textToKeyword = new()
     {
         ["abstract"] = SyntaxKind.AbstractKeyword,
         ["accessor"] = SyntaxKind.AccessorKeyword,

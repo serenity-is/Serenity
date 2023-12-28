@@ -78,11 +78,13 @@ partial class Scanner
         return pos;
     }
 
-    internal static int SkipTrivia(string text, int pos, bool stopAfterLineBreak = false,
+    internal static int? SkipTrivia(string text, int? p, bool stopAfterLineBreak = false,
         bool stopAtComments = false, bool inJSDoc = false)
     {
-        if (pos < 0)
-            return pos;
+        if (p == null || p < 0)
+            return null;
+
+        var pos = p.Value;
 
         var canConsumeStar = false;
         while (true)

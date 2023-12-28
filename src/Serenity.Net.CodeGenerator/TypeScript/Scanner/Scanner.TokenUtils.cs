@@ -1,5 +1,3 @@
-using Serenity.TypeScript;
-
 namespace Serenity.TypeScript;
 
 partial class Scanner
@@ -17,6 +15,31 @@ partial class Scanner
         return SyntaxKind.FirstKeyword <= token && token <= SyntaxKind.LastKeyword;
     }
 
+    internal static bool IsKeywordOrPunctuation(SyntaxKind token)
+    {
+        return IsKeyword(token) || IsPunctuation(token);
+    }
+
+    internal static bool IsLiteralKind(SyntaxKind kind)
+    {
+        return SyntaxKind.FirstLiteralToken <= kind && kind <= SyntaxKind.LastLiteralToken;
+    }
+
+    internal static bool IsPunctuation(SyntaxKind token)
+    {
+        return SyntaxKind.FirstPunctuation <= token && token <= SyntaxKind.LastPunctuation;
+    }
+
+    internal static bool IsTemplateLiteralKind(SyntaxKind kind)
+    {
+        return SyntaxKind.FirstTemplateToken <= kind && kind <= SyntaxKind.LastTemplateToken;
+    }
+
+    internal static bool IsTaggedTemplateExpression(SyntaxKind kind)
+    {
+        return kind == SyntaxKind.TaggedTemplateExpression;
+    }
+
     internal static bool IsTrivia(SyntaxKind token)
     {
         return SyntaxKind.FirstTriviaToken <= token && token <= SyntaxKind.LastTriviaToken;
@@ -28,8 +51,7 @@ partial class Scanner
     {
         return token >= SyntaxKind.Identifier;
     }
-
-    private static bool TokenIsIdentifierOrKeywordOrGreaterThan(SyntaxKind token)
+    internal static bool TokenIsIdentifierOrKeywordOrGreaterThan(SyntaxKind token)
     {
         return token == SyntaxKind.GreaterThanToken || TokenIsIdentifierOrKeyword(token);
     }
@@ -39,7 +61,7 @@ partial class Scanner
         return t >= 0 && (int)t <= tokenStrings.Length ? tokenStrings[(int)t] : null;
     }
 
-    private static SyntaxKind? StringToToken(string s)
+    internal static SyntaxKind? StringToToken(string s)
     {
         if (textToToken.TryGetValue(s, out var token))
             return token;

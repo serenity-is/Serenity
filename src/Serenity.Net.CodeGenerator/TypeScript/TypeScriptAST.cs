@@ -1,16 +1,16 @@
 namespace Serenity.TypeScript;
 
-public interface ITypeScriptAST
+internal interface ITypeScriptAST
 {
     string SourceStr { get; set; }
-    Node RootNode { get; set; }
+    INode RootNode { get; set; }
     void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true);
 }
 
-public class TypeScriptAST: ITypeScriptAST
+internal class TypeScriptAST : ITypeScriptAST
 {
     public string SourceStr { get; set; }
-    public Node RootNode { get; set; }
+    public INode RootNode { get; set; }
 
     public TypeScriptAST(string source = null, string fileName = "fileName.ts", bool setChildren = true, bool optimized = false)
     {
@@ -25,22 +25,16 @@ public class TypeScriptAST: ITypeScriptAST
         MakeAST(source, fileName, setChildren, false);
     }
 
-    public void MakeAST(string source, string fileName = "fileName.ts", bool setChildren = true, bool optimized = false)
+    public void MakeAST(string source, string fileName = "fileName.ts", bool setParentNodes = true, bool optimized = false)
     {
         SourceStr = source;
+        
         var parser = new Parser
         {
             Optimized = optimized
         };
-        var sourceFile = parser.ParseSourceFile(fileName, source, false, ScriptKind.TS);
-        RootNode = sourceFile;
-        RootNode.SourceStr = SourceStr;
-        if (setChildren)
-        {
-            if (optimized)
-                RootNode.MakeChildrenOptimized(SourceStr);
-            else
-                RootNode.MakeChildren(SourceStr);
-        }
+
+        RootNode = parser.ParseSourceFile(fileName, source, ScriptTarget.Latest, 
+            syntaxCursor: null, setParentNodes);
     }
 }

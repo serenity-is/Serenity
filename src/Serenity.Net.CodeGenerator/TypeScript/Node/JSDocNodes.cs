@@ -1,115 +1,90 @@
 namespace Serenity.TypeScript;
 
 
-public class JsDocNamespaceDeclaration : ModuleDeclaration
+internal class JSDocNamespaceDeclaration : ModuleDeclaration
 {
 }
 
-public class JsDocTypeExpression : Node
+internal class JSDocTypeExpression : NodeBase
 {
-    public JsDocTypeExpression()
+    public JSDocTypeExpression()
     {
         Kind = SyntaxKind.JSDocTypeExpression;
     }
 
-    public IJsDocType Type { get; set; }
-}
-
-public interface IJsDocType : ITypeNode
-{
-}
-
-public class JsDocType : TypeNode, IJsDocType
-{
-}
-
-public class JsDocAllType : JsDocType
-{
-    public JsDocAllType()
-    {
-        Kind = SyntaxKind.JSDocAllType;
-    }
-}
-
-public class JsDocUnknownType : JsDocType
-{
-    public JsDocUnknownType()
-    {
-        Kind = SyntaxKind.JSDocUnknownType;
-    }
-}
-
-public class JsDocNonNullableType : JsDocType
-{
-    public JsDocNonNullableType()
-    {
-        Kind = SyntaxKind.JSDocNonNullableType;
-    }
-
     public ITypeNode Type { get; set; }
-    public bool Postfix { get; set; }
 }
 
-public class JsDocNullableType : JsDocType
+internal interface IJSDocType : ITypeNode
 {
-    public JsDocNullableType()
-    {
-        Kind = SyntaxKind.JSDocNullableType;
-    }
-
-    public ITypeNode Type { get; set; }
-    public bool Postfix { get; set; }
 }
 
-public class JsDocOptionalType : JsDocType
+internal class JSDocType(SyntaxKind kind) : TypeNodeBase(kind), IJSDocType
 {
-    public JsDocOptionalType()
-    {
-        Kind = SyntaxKind.JSDocOptionalType;
-    }
-
-    public IJsDocType Type { get; set; }
 }
 
-public class JsDocFunctionType : Node, IJsDocType, ISignatureDeclaration
+internal class JSDocAllType() : JSDocType(SyntaxKind.JSDocAllType)
 {
-    public JsDocFunctionType()
+}
+
+internal class JSDocUnknownType() : JSDocType(SyntaxKind.JSDocUnknownType)
+{
+}
+
+internal class JSDocNonNullableType(ITypeNode type, bool postfix) : JSDocType(SyntaxKind.JSDocNonNullableType)
+{
+    public ITypeNode Type { get; } = type;
+    public bool Postfix { get; } = postfix;
+}
+
+internal class JSDocNullableType(ITypeNode type, bool postfix) : JSDocType(SyntaxKind.JSDocNullableType)
+{
+    public ITypeNode Type { get; } = type;
+    public bool Postfix { get; } = postfix;
+}
+
+internal class JSDocOptionalType(ITypeNode type) : JSDocType(SyntaxKind.JSDocOptionalType)
+{
+
+    public ITypeNode Type { get; } = type;
+}
+
+internal class JSDocFunctionType : NodeBase, IJSDocType, ISignatureDeclaration, IHasName
+{
+    public JSDocFunctionType(NodeArray<ParameterDeclaration> parameters, ITypeNode type)
     {
         Kind = SyntaxKind.JSDocFunctionType;
+        Parameters = parameters;
+        Type = type;
     }
 
-    public INode Name { get; set; }
-    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
     public NodeArray<ParameterDeclaration> Parameters { get; set; }
     public ITypeNode Type { get; set; }
+    public IDeclarationName Name { get; set; }
+    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
 }
 
-public class JsDocVariadicType : JsDocType
+internal class JSDocVariadicType(ITypeNode type) : JSDocType(SyntaxKind.JSDocVariadicType)
 {
-    public JsDocVariadicType()
-    {
-        Kind = SyntaxKind.JSDocVariadicType;
-    }
-
-    public IJsDocType Type { get; set; }
+    public ITypeNode Type { get; } = type;
 }
 
-public class JsDoc : Node
+internal class JSDoc : NodeBase
 {
-    public NodeArray<IJsDocTag> Tags { get; set; }
+    public NodeArray<IJSDocTag> Tags { get; set; }
     public string Comment { get; set; }
 }
 
-public interface IJsDocTag : INode
+internal interface IJSDocTag : INode
 {
     AtToken AtToken { get; set; }
     Identifier TagName { get; set; }
     string Comment { get; set; }
 }
 
-public class JsDocTag : Node, IJsDocTag
+internal class JSDocTag : NodeBase, IJSDocTag
 {
-    public JsDocTag()
+    public JSDocTag()
     {
         Kind = SyntaxKind.JSDocTag;
     }
@@ -119,23 +94,23 @@ public class JsDocTag : Node, IJsDocTag
     public string Comment { get; set; }
 }
 
-public class JsDocUnknownTag : JsDocTag
+internal class JSDocUnknownTag : JSDocTag
 {
 }
 
-public class JsDocAugmentsTag : JsDocTag
+internal class JSDocAugmentsTag : JSDocTag
 {
-    public JsDocAugmentsTag()
+    public JSDocAugmentsTag()
     {
         Kind = SyntaxKind.JSDocAugmentsTag;
     }
 
-    public JsDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
 }
 
-public class JsDocTemplateTag : JsDocTag
+internal class JSDocTemplateTag : JSDocTag
 {
-    public JsDocTemplateTag()
+    public JSDocTemplateTag()
     {
         Kind = SyntaxKind.JSDocTemplateTag;
     }
@@ -143,78 +118,78 @@ public class JsDocTemplateTag : JsDocTag
     public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
 }
 
-public class JsDocReturnTag : JsDocTag
+internal class JSDocReturnTag : JSDocTag
 {
-    public JsDocReturnTag()
+    public JSDocReturnTag()
     {
         Kind = SyntaxKind.JSDocReturnTag;
     }
 
-    public JsDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
 }
 
-public class JsDocTypeTag : JsDocTag
+internal class JSDocTypeTag : JSDocTag
 {
-    public JsDocTypeTag()
+    public JSDocTypeTag()
     {
         Kind = SyntaxKind.JSDocTypeTag;
     }
 
-    public JsDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
 }
 
-public class JsDocTypedefTag : Node, IJsDocTag, IDeclaration
+internal class JSDocTypedefTag : NodeBase, IJSDocTag, IHasName
 {
-    public JsDocTypedefTag()
+    public JSDocTypedefTag()
     {
         Kind = SyntaxKind.JSDocTypedefTag;
     }
 
     public INode FullName { get; set; } // JSDocNamespaceDeclaration | Identifier
-    public JsDocTypeExpression TypeExpression { get; set; }
-    public JsDocTypeLiteral JsDocTypeLiteral { get; set; }
-    public INode Name { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeLiteral JSDocTypeLiteral { get; set; }
+    public IDeclarationName Name { get; set; }
     public AtToken AtToken { get; set; }
     public Identifier TagName { get; set; }
     public string Comment { get; set; }
 }
 
-public class JsDocPropertyTag : Node, IJsDocTag, ITypeElement
+internal class JSDocPropertyTag : NodeBase, IJSDocTag, ITypeElement, IHasName
 {
-    public JsDocPropertyTag()
+    public JSDocPropertyTag()
     {
         Kind = SyntaxKind.JSDocPropertyTag;
     }
 
-    public JsDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
     public AtToken AtToken { get; set; }
     public Identifier TagName { get; set; }
     public string Comment { get; set; }
-    public INode Name { get; set; }
+    public IDeclarationName Name { get; set; }
     public QuestionToken QuestionToken { get; set; }
 }
 
-public class JsDocTypeLiteral : JsDocType
+internal class JSDocTypeLiteral() : JSDocType(SyntaxKind.JSDocTypeLiteral)
 {
-    public JsDocTypeLiteral()
-    {
-        Kind = SyntaxKind.JSDocTypeLiteral;
-    }
-
-    public NodeArray<JsDocPropertyTag> JsDocPropertyTags { get; set; }
-    public JsDocTypeTag JsDocTypeTag { get; set; }
+    public NodeArray<JSDocPropertyTag> JSDocPropertyTags { get; set; }
+    public JSDocTypeTag JSDocTypeTag { get; set; }
 }
 
-public class JsDocParameterTag : JsDocTag
+internal class JSDocParameterTag : JSDocTag
 {
-    public JsDocParameterTag()
+    public JSDocParameterTag()
     {
         Kind = SyntaxKind.JSDocParameterTag;
     }
 
     public Identifier PreParameterName { get; set; }
-    public JsDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression TypeExpression { get; set; }
     public Identifier PostParameterName { get; set; }
     public Identifier ParameterName { get; set; }
     public bool IsBracketed { get; set; }
+}
+
+internal class JSDocNamepathType(ITypeNode type) : JSDocType(SyntaxKind.JSDocNamepathType)
+{
+    public ITypeNode Type { get; } = type;
 }

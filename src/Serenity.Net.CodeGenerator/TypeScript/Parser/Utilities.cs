@@ -1,9 +1,10 @@
+using System.Reflection.Metadata;
 using static Serenity.TypeScript.NodeVisitor;
 using static Serenity.TypeScript.Scanner;
 
 namespace Serenity.TypeScript;
 
-public class Utilities
+internal class Utilities
 {
     public static int GetFullWidth(INode node)
     {
@@ -17,7 +18,6 @@ public class Utilities
 
         return (node.Flags & NodeFlags.ThisNodeOrAnySubNodesHasError) != 0 ? node : null;
     }
-
 
     public static void AggregateChildData(INode node)
     {
@@ -49,7 +49,7 @@ public class Utilities
         if (NodeIsMissing(node))
             return "";
 
-        var start = SkipTrivia(sourceText, node.Pos ?? 0);
+        var start = SkipTrivia(sourceText, node.Pos ?? 0) ?? 0;
 
         if (node.End == null)
             return sourceText[start..];
@@ -62,7 +62,7 @@ public class Utilities
         return GetLeadingCommentRanges(text, node.Pos ?? 0);
     }
 
-    public static List<CommentRange> GetJsDocCommentRanges(INode node, string text)
+    public static List<CommentRange> GetJSDocCommentRanges(INode node, string text)
     {
         var commentRanges = node.Kind == SyntaxKind.Parameter ||
                             node.Kind == SyntaxKind.TypeParameter ||
@@ -107,7 +107,7 @@ public class Utilities
     }
 
 
-    public static bool HasModifiers(Node node)
+    public static bool HasModifiers(INode node)
     {
         return GetModifierFlags(node) != ModifierFlags.None;
     }
@@ -119,23 +119,20 @@ public class Utilities
 
     public static ModifierFlags GetModifierFlags(INode node)
     {
-        if ((node.ModifierFlagsCache & ModifierFlags.HasComputedFlags) != 0)
-            return node.ModifierFlagsCache & ~ModifierFlags.HasComputedFlags;
         var flags = ModifierFlags.None;
-        if (node.Modifiers != null)
-            foreach (var modifier in node.Modifiers)
-                flags |= ModifierToFlag(modifier.Kind);
+        if (node is not IHasModifierLike hasModifiers || hasModifiers.Modifiers is null)
+            return flags;
+
+        foreach (var modifier in hasModifiers.Modifiers)
+            flags |= ModifierToFlag(modifier.Kind);
         if ((node.Flags & NodeFlags.NestedNamespace) != 0 || node.Kind == SyntaxKind.Identifier &&
             ((Identifier)node).IsInJsDocNamespace)
             flags |= ModifierFlags.Export;
 
-
-        node.ModifierFlagsCache = flags | ModifierFlags.HasComputedFlags;
-
         return flags;
     }
 
-    public static ModifierFlags ModifiersToFlags(IEnumerable<Modifier> modifiers)
+    public static ModifierFlags ModifiersToFlags(IEnumerable<IModifierLike> modifiers)
     {
         var flags = ModifierFlags.None;
         if (modifiers != null)
@@ -314,6 +311,23 @@ public class Utilities
         return path.EndsWith(extension, StringComparison.Ordinal);
     }
 
+    public static Diagnostic CreateDetachedDiagnostic(string fileName, string sourceText, int start, int length, DiagnosticMessage message, object argument = null)
+    {
+
+        if ((start + length) > sourceText.Length)
+        {
+            length = sourceText.Length - start;
+        }
+
+        return new Diagnostic
+        {
+            FileName = fileName,
+            Start = start,
+            Length = length,
+            Message = message
+        };
+    }
+
     public static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, object argument)
     {
         return new Diagnostic
@@ -333,5 +347,201 @@ public class Utilities
 
 
         return node;
+    }
+
+    private static bool FileExtensionIsOneOf(string path, string[] extensions)
+    {
+        foreach (var extension in extensions)
+        {
+            if (FileExtensionIs(path, extension))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static class Extension
+    {
+        public const string Ts = ".ts";
+        public const string Tsx = ".tsx";
+        public const string Dts = ".d.ts";
+        public const string Js = ".js";
+        public const string Jsx = ".jsx";
+        public const string Json = ".json";
+        public const string TsBuildInfo = ".tsbuildinfo";
+        public const string Mjs = ".mjs";
+        public const string Mts = ".mts";
+        public const string Dmts = ".d.mts";
+        public const string Cjs = ".cjs";
+        public const string Cts = ".cts";
+        public const string Dcts = ".d.cts";
+    }
+
+    static readonly string[] SupportedDeclarationExtensions = [".d.ts" /* Dts */, ".d.cts" /* Dcts */, ".d.mts" /* Dmts */];
+
+    internal static bool IsDeclarationFileName(string fileName)
+    {
+        return FileExtensionIsOneOf(fileName, SupportedDeclarationExtensions) ||
+            (FileExtensionIs(fileName, ".ts") && System.IO.Path.GetFileName(fileName).Contains(".d.", StringComparison.Ordinal));
+    }
+
+    internal static string IdText(Identifier identifier)
+    {
+        return identifier.Text;
+        // return unescapeLeadingUnderscores(identifierOrPrivateName.escapedText);
+    }
+
+    internal static bool CanHaveModifiers(INode node)
+    {
+        var kind = node.Kind;
+        return kind == SyntaxKind.TypeParameter
+            || kind == SyntaxKind.Parameter
+            || kind == SyntaxKind.PropertySignature
+            || kind == SyntaxKind.PropertyDeclaration
+            || kind == SyntaxKind.MethodSignature
+            || kind == SyntaxKind.MethodDeclaration
+            || kind == SyntaxKind.Constructor
+            || kind == SyntaxKind.GetAccessor
+            || kind == SyntaxKind.SetAccessor
+            || kind == SyntaxKind.IndexSignature
+            || kind == SyntaxKind.ConstructorType
+            || kind == SyntaxKind.FunctionExpression
+            || kind == SyntaxKind.ArrowFunction
+            || kind == SyntaxKind.ClassExpression
+            || kind == SyntaxKind.VariableStatement
+            || kind == SyntaxKind.FunctionDeclaration
+            || kind == SyntaxKind.ClassDeclaration
+            || kind == SyntaxKind.InterfaceDeclaration
+            || kind == SyntaxKind.TypeAliasDeclaration
+            || kind == SyntaxKind.EnumDeclaration
+            || kind == SyntaxKind.ModuleDeclaration
+            || kind == SyntaxKind.ImportEqualsDeclaration
+            || kind == SyntaxKind.ImportDeclaration
+            || kind == SyntaxKind.ExportAssignment
+            || kind == SyntaxKind.ExportDeclaration;
+    }
+
+    static bool IsImportEqualsDeclaration(INode node)
+    {
+        return node.Kind == SyntaxKind.ImportEqualsDeclaration;
+    }
+
+    static bool HasModifierOfKind(INode node, SyntaxKind kind)
+    {
+        return node is IHasModifierLike hasModifiers && hasModifiers.Modifiers != null && 
+            hasModifiers.Modifiers.Any(m => m.Kind == kind);
+    }
+
+    static bool IsExternalModuleReference(INode node)
+    {
+        return node.Kind == SyntaxKind.ExternalModuleReference;
+    }
+    static bool IsImportDeclaration(INode node)
+    {
+        return node.Kind == SyntaxKind.ImportDeclaration;
+    }
+
+    static bool IsExportAssignment(INode node)
+    {
+        return node.Kind == SyntaxKind.ExportAssignment;
+    }
+
+    static bool IsExportDeclaration(INode node)
+    {
+        return node.Kind == SyntaxKind.ExportDeclaration;
+    }
+
+    static bool IsMetaProperty(INode node)
+    {
+        return node.Kind == SyntaxKind.MetaProperty;
+    }
+
+    static bool IsAnExternalModuleIndicatorNode(INode node)
+    {
+        return (CanHaveModifiers(node) && HasModifierOfKind(node, SyntaxKind.ExportKeyword))
+            || (IsImportEqualsDeclaration(node) && IsExternalModuleReference((node as ImportEqualsDeclaration)?.ModuleReference))
+            || IsImportDeclaration(node)
+            || IsExportAssignment(node)
+            || IsExportDeclaration(node);
+    }
+
+    static INode GetImportMetaIfNecessary(SourceFile sourceFile)
+    {
+        return (sourceFile.Flags & NodeFlags.PossiblyContainsImportMeta) != 0 ?
+            WalkTreeForImportMeta(sourceFile) :
+            null;
+    }
+
+    static INode WalkTreeForImportMeta(INode node)
+    {
+        return IsImportMeta(node) ? node : ForEachChild(node, WalkTreeForImportMeta);
+    }
+
+    static bool IsImportMeta(INode node)
+    {
+        return IsMetaProperty(node) && node is MetaProperty { KeywordToken: SyntaxKind.ImportKeyword } mp && mp.Name?.EscapedText == "meta";
+    }
+
+    internal static INode IsFileProbablyExternalModule(SourceFile sourceFile)
+    {
+        // Try to use the first top-level import/export when available, then
+        // fall back to looking for an 'import.meta' somewhere in the tree if necessary.
+        return sourceFile.Statements.FirstOrDefault(IsAnExternalModuleIndicatorNode) ??
+            GetImportMetaIfNecessary(sourceFile);
+    }
+
+    internal static void SetExternalModuleIndicator(SourceFile sourceFile)
+    {
+        sourceFile.ExternalModuleIndicator = IsFileProbablyExternalModule(sourceFile);
+    }
+
+    internal static ITextRange SetTextRangePosEnd(ITextRange range, int pos, int end)
+    {
+        range.Pos = pos;
+        range.End = end;
+        return range;
+    }
+
+    internal static ITextRange SetTextRangePosWidth(ITextRange range, int pos, int width)
+    {
+        return SetTextRangePosEnd(range, pos, pos + width);
+    }
+
+    internal static ITextRange SetTextRange(ITextRange range, ITextRange location)
+    {
+        return location != null ? SetTextRangePosEnd(range, location.Pos ?? 0, location.End ?? location.Pos ?? 0) : range;
+    }
+
+    internal static bool IsExternalModule(SourceFile sourceFile)
+    {
+        return sourceFile.ExternalModuleIndicator != null;
+    }
+
+    internal static bool CanHaveJSDoc(INode node)
+    {
+        return node.Kind switch
+        {
+            SyntaxKind.ArrowFunction or SyntaxKind.BinaryExpression or SyntaxKind.Block or SyntaxKind.BreakStatement or
+            SyntaxKind.CallSignature or SyntaxKind.CaseClause or SyntaxKind.ClassDeclaration or SyntaxKind.ClassExpression or
+            SyntaxKind.ClassStaticBlockDeclaration or SyntaxKind.Constructor or SyntaxKind.ConstructorType or
+            SyntaxKind.ConstructSignature or SyntaxKind.ContinueStatement or SyntaxKind.DebuggerStatement or
+            SyntaxKind.DoStatement or SyntaxKind.ElementAccessExpression or SyntaxKind.EmptyStatement or
+            SyntaxKind.EndOfFileToken or SyntaxKind.EnumDeclaration or SyntaxKind.EnumMember or SyntaxKind.ExportAssignment or
+            SyntaxKind.ExportDeclaration or SyntaxKind.ExportSpecifier or SyntaxKind.ExpressionStatement or
+            SyntaxKind.ForInStatement or SyntaxKind.ForOfStatement or SyntaxKind.ForStatement or SyntaxKind.FunctionDeclaration or
+            SyntaxKind.FunctionExpression or SyntaxKind.FunctionType or SyntaxKind.GetAccessor or SyntaxKind.Identifier or
+            SyntaxKind.IfStatement or SyntaxKind.ImportDeclaration or SyntaxKind.ImportEqualsDeclaration or SyntaxKind.IndexSignature or
+            SyntaxKind.InterfaceDeclaration or SyntaxKind.JSDocFunctionType or SyntaxKind.JSDocSignature or SyntaxKind.LabeledStatement or
+            SyntaxKind.MethodDeclaration or SyntaxKind.MethodSignature or SyntaxKind.ModuleDeclaration or SyntaxKind.NamedTupleMember or
+            SyntaxKind.NamespaceExportDeclaration or SyntaxKind.ObjectLiteralExpression or SyntaxKind.Parameter or
+            SyntaxKind.ParenthesizedExpression or SyntaxKind.PropertyAccessExpression or SyntaxKind.PropertyAssignment or
+            SyntaxKind.PropertyDeclaration or SyntaxKind.PropertySignature or SyntaxKind.ReturnStatement or SyntaxKind.SemicolonClassElement or
+            SyntaxKind.SetAccessor or SyntaxKind.ShorthandPropertyAssignment or SyntaxKind.SpreadAssignment or
+            SyntaxKind.SwitchStatement or SyntaxKind.ThrowStatement or SyntaxKind.TryStatement or SyntaxKind.TypeAliasDeclaration or
+            SyntaxKind.TypeParameter or SyntaxKind.VariableDeclaration or SyntaxKind.VariableStatement or SyntaxKind.WhileStatement or
+            SyntaxKind.WithStatement => true,
+            _ => false,
+        };
     }
 }
