@@ -2,15 +2,21 @@ namespace Serenity.TypeScript;
 
 internal class Token : NodeBase
 {
+    public Token()
+    {
+    }
+
     public Token(SyntaxKind kind)
     {
         Kind = kind;
     }
 }
 
-internal class TokenTypeNode : NodeBase, ITypeNode
+internal class TokenTypeNode : Token, ITypeNode
 {
 }
+
+internal class CommaToken() : Token(SyntaxKind.CommaToken);
 
 internal class DotDotDotToken() : Token(SyntaxKind.DotDotDotToken);
 

@@ -46,7 +46,7 @@ internal class TemplateLiteralTypeNode(TemplateLiteralLikeNode head, NodeArray<T
     public NodeArray<TemplateLiteralTypeSpan> TemplateSpans { get; } = templateSpans;
 }
 
-internal class TemplateExpression(TemplateLiteralLikeNode head, NodeArray<TemplateSpan> templateSpans) : PrimaryExpression(SyntaxKind.TemplateExpression)
+internal class TemplateExpression(TemplateLiteralLikeNode head, NodeArray<TemplateSpan> templateSpans) : PrimaryExpressionBase(SyntaxKind.TemplateExpression)
 {
     public TemplateLiteralLikeNode Head { get; } = head;
     public NodeArray<TemplateSpan> TemplateSpans { get; } = templateSpans;

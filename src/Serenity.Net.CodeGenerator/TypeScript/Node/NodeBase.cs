@@ -1,5 +1,11 @@
 namespace Serenity.TypeScript;
 
+internal class TextRange : ITextRange
+{
+    public int? Pos { get; set; }
+    public int? End { get; set; }
+}
+
 internal class NodeBase : TextRange, INode
 {
     public NodeBase()
@@ -56,4 +62,9 @@ internal class NodeBase : TextRange, INode
         return $"{Enum.GetName(typeof(SyntaxKind), Kind)}  {GetText(null)}";
     }
 
+}
+
+internal class NodeWithChildren : NodeBase, IHasChildren
+{
+    IEnumerable<INode> IHasChildren.Children { get; set; }
 }

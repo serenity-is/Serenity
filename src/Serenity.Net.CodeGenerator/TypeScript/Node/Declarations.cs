@@ -17,10 +17,9 @@ internal class ClassElement(SyntaxKind kind, IDeclarationName name) : NamedDecla
 {
 }
 
-internal class SemicolonClassElement(IDeclarationName name) : ClassElement(SyntaxKind.SemicolonClassElement, name)
+internal class SemicolonClassElement() : ClassElement(SyntaxKind.SemicolonClassElement, name: null)
 {
 }
-
 
 internal class TypeElement(SyntaxKind kind, IDeclarationName name, QuestionToken questionToken)
     : NamedDeclaration(kind, name), ITypeElement
@@ -43,7 +42,7 @@ internal class BindingElement(DotDotDotToken dotDotDotToken, IPropertyName prope
 }
 
 internal class TypeParameterDeclaration(NodeArray<IModifierLike> modifiers, Identifier name,
-    ITypeNode constraint, ITypeNode defaultType) : NamedDeclaration(SyntaxKind.TypeParameter, name), IHasModifiers
+    ITypeNode constraint, ITypeNode defaultType = null) : NamedDeclaration(SyntaxKind.TypeParameter, name), IHasModifiers
 {
     public NodeArray<IModifierLike> Modifiers { get; set; } = modifiers;
     public ITypeNode Constraint { get; } = constraint;
@@ -107,4 +106,57 @@ internal class ClassExpression(NodeArray<IModifierLike> modifiers, Identifier na
         members), IClassLikeDeclaration, IPrimaryExpression, IHasDecorators, IHasModifiers
 {
     public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+}
+
+internal class InterfaceDeclaration(NodeArray<IModifierLike> modifiers, Identifier name,
+    NodeArray<TypeParameterDeclaration> typeParameters, NodeArray<HeritageClause> heritageClauses,
+    NodeArray<IClassElement> members) : DeclarationStatement(SyntaxKind.InterfaceDeclaration, name), IHasModifiers
+{
+    public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+    public NodeArray<TypeParameterDeclaration> TypeParameters { get; } = typeParameters;
+    public NodeArray<HeritageClause> HeritageClauses { get; set; } = heritageClauses;
+    public NodeArray<IClassElement> Members { get; set; } = members;
+}
+
+internal class TypeAliasDeclaration(NodeArray<IModifierLike> modifiers, Identifier name,
+    NodeArray<TypeParameterDeclaration> typeParameters, ITypeNode type) 
+    : DeclarationStatement(SyntaxKind.TypeAliasDeclaration, name), IHasModifiers
+{
+    public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+    public NodeArray<TypeParameterDeclaration> TypeParameters { get; } = typeParameters;
+    public ITypeNode Type { get; } = type;
+}
+
+internal class EnumMember(IPropertyName name, IExpression initializer) 
+    : NamedDeclaration(SyntaxKind.EnumMember, name)
+{
+    public IExpression Initializer { get; } = initializer;
+}
+
+
+internal class EnumDeclaration(NodeArray<IModifierLike> modifiers, Identifier name,
+    NodeArray<EnumMember> members) : DeclarationStatement(SyntaxKind.EnumDeclaration, name), IHasModifiers
+{
+    public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+    public NodeArray<EnumMember> Members { get; set; } = members;
+}
+
+
+internal class ModuleDeclaration(NodeArray<IModifierLike> modifiers, Identifier name, IModuleBody body) 
+    : DeclarationStatement(SyntaxKind.ModuleDeclaration, name), IHasModifiers
+{
+    public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+    public IModuleBody Body { get; set; } = body;
+}
+
+internal class NamespaceDeclaration(NodeArray<IModifierLike> modifiers, Identifier name, INamespaceBody body)
+    : DeclarationStatement(SyntaxKind.ModuleDeclaration, name), IHasModifiers
+{
+    public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
+    public INamespaceBody Body { get; set; } = body;
+}
+
+internal class NamespaceExportDeclaration(Identifier name)
+    : NamedDeclaration(SyntaxKind.NamespaceExportDeclaration, name)
+{
 }

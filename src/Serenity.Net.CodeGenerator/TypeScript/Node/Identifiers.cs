@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class Identifier : PrimaryExpression, IDeclaration, IJsxTagNameExpression, IEntityName, IPropertyName, IBindingName
+internal class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpression, IEntityName, IPropertyName, IBindingName
 {
     public Identifier(string text, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null)
         : base(SyntaxKind.Identifier)
@@ -30,5 +30,14 @@ internal class Identifier : PrimaryExpression, IDeclaration, IJsxTagNameExpressi
     {
         get { return Text ?? escapedText; }
         set { escapedText = value; }
+    }
+}
+
+internal class PrivateIdentifier : Identifier
+{
+    public PrivateIdentifier(string text, string escapedText = null, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null)
+        : base(text, originalKeywordKind, hasExtendedUnicodeEscape)
+    {
+        EscapedText = escapedText;
     }
 }

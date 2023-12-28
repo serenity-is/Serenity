@@ -1,10 +1,5 @@
 namespace Serenity.TypeScript;
 
-
-internal class JSDocNamespaceDeclaration : ModuleDeclaration
-{
-}
-
 internal class JSDocTypeExpression : NodeBase
 {
     public JSDocTypeExpression()
@@ -73,6 +68,20 @@ internal class JSDoc : NodeBase
 {
     public NodeArray<IJSDocTag> Tags { get; set; }
     public string Comment { get; set; }
+}
+
+internal class JSDocArray : List<JSDoc>
+{
+    public JSDocArray()
+    {
+    }
+
+    public JSDocArray(JSDoc[] elements)
+        : base(elements.ToList())
+    {
+    }
+
+    public List<IJSDocTag> JSDocCache { get; set; }
 }
 
 internal interface IJSDocTag : INode

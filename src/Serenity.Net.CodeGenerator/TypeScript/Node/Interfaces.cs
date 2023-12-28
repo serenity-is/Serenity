@@ -1,15 +1,26 @@
 namespace Serenity.TypeScript;
-
 internal interface ITextRange
 {
     int? Pos { get; set; }
     int? End { get; set; }
 }
 
-internal class TextRange : ITextRange
+internal interface INode : ITextRange
 {
-    public int? Pos { get; set; }
-    public int? End { get; set; }
+    SyntaxKind Kind { get; set; }
+    internal NodeFlags Flags { get; set; }
+
+    INode Parent { get; set; }
+
+    string GetText(string sourceText = null);
+    string GetTextWithTrivia(string sourceText = null);
+
+    string ToString(bool withPos);
+}
+
+internal interface ISyntaxCursor
+{
+    public INode CurrentNode(int pos);
 }
 
 internal interface IModifierLike : INode
@@ -117,6 +128,18 @@ internal interface IMethodOrAccessorDeclaration : IFunctionLikeDeclaration, ICla
 internal interface IAccessorDeclaration : IMethodOrAccessorDeclaration, ISignatureDeclaration, ITypeElement, IObjectLiteralElementLike
 {
 }
+
+internal interface IClassLikeDeclaration : INamedDeclaration
+{
+    NodeArray<TypeParameterDeclaration> TypeParameters { get; }
+    NodeArray<HeritageClause> HeritageClauses { get; }
+    NodeArray<IClassElement> Members { get; }
+}
+
+internal interface IClassElement : IDeclaration
+{
+}
+
 
 internal interface ITypeNode : INode
 {
@@ -264,13 +287,19 @@ internal interface IModuleReference : INode
 {
 }
 
+internal interface INamedImportsOrExports : INode
+{
+}
+
+
 internal interface INamedImportBindings : INode, INamedImportsOrExports
 {
 }
 
-internal interface INamedImportsOrExports : INode
+internal interface INamedExportBindings : INode, INamedImportsOrExports
 {
 }
+
 
 internal interface IImportOrExportSpecifier : INamedDeclaration
 {

@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class JsxElement(IExpression openingElement, NodeArray<IJsxChild> children, JsxClosingElement closingElement) : PrimaryExpression(SyntaxKind.JsxElement), IJsxChild
+internal class JsxElement(IExpression openingElement, NodeArray<IJsxChild> children, JsxClosingElement closingElement) : PrimaryExpressionBase(SyntaxKind.JsxElement), IJsxChild
 {
     public /*JsxOpeningElement*/IExpression OpeningElement { get; } = openingElement;
     public NodeArray<IJsxChild> Children { get; } = children;
@@ -12,7 +12,7 @@ internal class JsxAttributes(NodeArray<ObjectLiteralElement> properties) : Objec
 }
 
 internal class JsxSelfClosingElement(IJsxTagNameExpression tagName, NodeArray<ITypeNode> typeArguments,
-    JsxAttributes attributes) : PrimaryExpression(SyntaxKind.JsxSelfClosingElement), IJsxChild
+    JsxAttributes attributes) : PrimaryExpressionBase(SyntaxKind.JsxSelfClosingElement), IJsxChild
 {
     public IJsxTagNameExpression TagName { get; } = tagName;
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
@@ -20,14 +20,14 @@ internal class JsxSelfClosingElement(IJsxTagNameExpression tagName, NodeArray<IT
 }
 
 internal class JsxOpeningElement(IJsxTagNameExpression tagName, NodeArray<ITypeNode> typeArguments,
-    JsxAttributes attributes) : Expression(SyntaxKind.JsxOpeningElement)
+    JsxAttributes attributes) : ExpressionBase(SyntaxKind.JsxOpeningElement)
 {
     public IJsxTagNameExpression TagName { get; } = tagName;
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
     public JsxAttributes Attributes { get; } = attributes;
 }
 
-internal class JsxExpression(DotDotDotToken dotDotDotToken, IExpression expression) : Expression(SyntaxKind.JsxExpression), IJsxChild
+internal class JsxExpression(DotDotDotToken dotDotDotToken, IExpression expression) : ExpressionBase(SyntaxKind.JsxExpression), IJsxChild
 {
     public DotDotDotToken DotDotDotToken { get; } = dotDotDotToken; // Token<SyntaxKind.DotDotDotToken>
     public IExpression Expression { get; } = expression;

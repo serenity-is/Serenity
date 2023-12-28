@@ -84,10 +84,10 @@ internal class ThisTypeNode() : TypeNodeBase(SyntaxKind.ThisType)
 {
 }
 
-internal class TypePredicateNode(AssertsKeyword assertsKeyword, INode parameterName, ITypeNode type)
+internal class TypePredicateNode(AssertsKeyword assertsModifier, INode parameterName, ITypeNode type)
     : TypeNodeBase(SyntaxKind.TypePredicate)
 {
-    public AssertsKeyword AssertsKeyword { get; } = assertsKeyword;
+    public AssertsKeyword AssertsModifier { get; } = assertsModifier;
     public INode ParameterName { get; } = parameterName; // Identifier | ThisTypeNode
     public ITypeNode Type { get; } = type;
 }
@@ -133,4 +133,19 @@ internal class NamedTupleMember(DotDotDotToken dotDotDotToken, Identifier name, 
     public Identifier Name { get; set; } = name;
     public QuestionToken QuestionToken { get; set; } = questionToken;
     public ITypeNode Type { get; set; } = type;
+}
+
+
+internal class InferTypeNode(TypeParameterDeclaration typeParameter) : TypeNodeBase(SyntaxKind.InferType), IInferTypeNode
+{
+    public TypeParameterDeclaration TypeParameter { get; } = typeParameter;
+}
+
+internal class ConditionalTypeNode(ITypeNode checkType, ITypeNode extendsType,
+    ITypeNode trueType, ITypeNode falseType) : TypeNodeBase(SyntaxKind.ConditionalType)
+{
+    public ITypeNode CheckType { get; } = checkType;
+    public ITypeNode ExtendsType { get; } = extendsType;
+    public ITypeNode TrueType { get; } = trueType;
+    public ITypeNode FalseType { get; } = falseType;
 }

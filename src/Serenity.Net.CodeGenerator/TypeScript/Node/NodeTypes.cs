@@ -92,12 +92,7 @@ internal class KeywordTypeNode(SyntaxKind kind) : TypeNodeBase(kind), IKeywordTy
 
 internal interface IInferTypeNode : ITypeNode
 {
-    TypeParameterDeclaration TypeParameter { get; set; }
-}
-
-internal class InferTypeNode() : TypeNodeBase(SyntaxKind.InferType), IInferTypeNode
-{
-    public TypeParameterDeclaration TypeParameter { get; set; }
+    TypeParameterDeclaration TypeParameter { get; }
 }
 
 internal class TypeQueryNode(IEntityName exprName, NodeArray<ITypeNode> typeArguments) : TypeNodeBase(SyntaxKind.TypeQuery)
@@ -123,7 +118,7 @@ internal interface IUnaryExpression : IExpression
 {
 }
 
-internal class UnaryExpression(SyntaxKind kind) : Expression(kind), IUnaryExpression
+internal class UnaryExpressionBase(SyntaxKind kind) : ExpressionBase(kind), IUnaryExpression
 {
 }
 
@@ -412,30 +407,6 @@ internal class CatchClause : NodeBase
     public Block Block { get; set; }
 }
 
-internal interface IClassLikeDeclaration : INamedDeclaration
-{
-    NodeArray<TypeParameterDeclaration> TypeParameters { get; }
-    NodeArray<HeritageClause> HeritageClauses { get; }
-    NodeArray<IClassElement> Members { get; }
-}
-
-
-internal interface IClassElement : IDeclaration
-{
-}
-
-internal class InterfaceDeclaration : DeclarationStatement
-{
-    public InterfaceDeclaration()
-    {
-        Kind = SyntaxKind.InterfaceDeclaration;
-    }
-
-    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
-    public NodeArray<HeritageClause> HeritageClauses { get; set; }
-    public NodeArray<ITypeElement> Members { get; set; }
-}
-
 internal class HeritageClause : NodeBase
 {
     public HeritageClause()
@@ -445,51 +416,6 @@ internal class HeritageClause : NodeBase
 
     public SyntaxKind Token { get; set; } //  SyntaxKind.ExtendsKeyword | SyntaxKind.ImplementsKeyword
     public NodeArray<ExpressionWithTypeArguments> Types { get; set; }
-}
-
-internal class TypeAliasDeclaration : DeclarationStatement
-{
-    public TypeAliasDeclaration()
-    {
-        Kind = SyntaxKind.TypeAliasDeclaration;
-    }
-
-    public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
-    public ITypeNode Type { get; set; }
-}
-
-internal class EnumMember : NamedDeclaration
-{
-    public EnumMember()
-    {
-        Kind = SyntaxKind.EnumMember;
-    }
-
-    public IExpression Initializer { get; set; }
-}
-
-internal class EnumDeclaration : DeclarationStatement
-{
-    public EnumDeclaration()
-    {
-        Kind = SyntaxKind.EnumDeclaration;
-    }
-
-    public NodeArray<EnumMember> Members { get; set; }
-}
-
-internal class ModuleDeclaration : DeclarationStatement
-{
-    public ModuleDeclaration()
-    {
-        Kind = SyntaxKind.ModuleDeclaration;
-    }
-
-    public /*ModuleDeclaration*/INode Body { get; set; } // ModuleBody | JSDocNamespaceDeclaration
-}
-
-internal class NamespaceDeclaration : ModuleDeclaration
-{
 }
 
 internal class ModuleBlock : Block
@@ -511,80 +437,6 @@ internal class ExternalModuleReference : NodeBase
     public IExpression Expression { get; set; }
 }
 
-internal class ImportDeclaration : Statement
-{
-    public ImportDeclaration()
-    {
-        Kind = SyntaxKind.ImportDeclaration;
-    }
-
-    public ImportClause ImportClause { get; set; }
-    public IExpression ModuleSpecifier { get; set; }
-}
-
-internal class NamespaceExportDeclaration : DeclarationStatement()
-{
-    public NamespaceExportDeclaration()
-    {
-        Kind = SyntaxKind.NamespaceExportDeclaration;
-    }
-}
-
-internal class ExportDeclaration : DeclarationStatement
-{
-    public ExportDeclaration()
-    {
-        Kind = SyntaxKind.ExportDeclaration;
-    }
-
-    public NamedExports ExportClause { get; set; }
-    public IExpression ModuleSpecifier { get; set; }
-}
-
-internal class NamedImports : NodeBase, INamedImportsOrExports, INamedImportBindings
-{
-    public NamedImports()
-    {
-        Kind = SyntaxKind.NamedImports;
-    }
-
-    public NodeArray<ImportSpecifier> Elements { get; set; }
-}
-
-internal class NamedExports : NodeBase, INamedImportsOrExports
-{
-    public NamedExports()
-    {
-        Kind = SyntaxKind.NamedExports;
-    }
-
-    public NodeArray<ExportSpecifier> Elements { get; set; }
-}
-
-internal class ImportSpecifier(bool isTypeOnly, Identifier propertyName, Identifier name)
-    : NamedDeclaration(SyntaxKind.ImportSpecifier, name), IImportOrExportSpecifier
-{
-    public bool IsTypeOnly { get; } = isTypeOnly;
-    public Identifier PropertyName { get; } = propertyName;
-}
-
-internal class ExportSpecifier(bool isTypeOnly, Identifier propertyName, Identifier name)
-    : NamedDeclaration(SyntaxKind.ExportSpecifier, name), IImportOrExportSpecifier
-{
-    public bool IsTypeOnly { get; } = isTypeOnly;
-    public Identifier PropertyName { get; } = propertyName;
-}
-
-internal class ExportAssignment : DeclarationStatement
-{
-    public ExportAssignment()
-    {
-        Kind = SyntaxKind.ExportAssignment;
-    }
-
-    public bool IsExportEquals { get; set; }
-    public IExpression Expression { get; set; }
-}
 
 internal class CommentRange : TextRange
 {

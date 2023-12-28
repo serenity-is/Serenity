@@ -33,14 +33,22 @@ internal class Utilities
         }
     }
 
-
-    public static bool NodeIsMissing(INode node)
+    internal static bool NodeIsMissing(INode node)
     {
         if (node == null)
             return true;
 
 
         return node.Pos == node.End && node.Pos >= 0 && node.Kind != SyntaxKind.EndOfFileToken;
+    }
+
+    internal static bool NodeIsPresent(INode node)
+    {
+        return !NodeIsMissing(node);
+    }
+    internal static bool IsInOrOfKeyword(SyntaxKind t)
+    {
+        return t == SyntaxKind.InKeyword || t == SyntaxKind.OfKeyword;
     }
 
 
@@ -429,7 +437,7 @@ internal class Utilities
 
     static bool HasModifierOfKind(INode node, SyntaxKind kind)
     {
-        return node is IHasModifierLike hasModifiers && hasModifiers.Modifiers != null && 
+        return node is IHasModifierLike hasModifiers && hasModifiers.Modifiers != null &&
             hasModifiers.Modifiers.Any(m => m.Kind == kind);
     }
 
@@ -513,9 +521,28 @@ internal class Utilities
         return location != null ? SetTextRangePosEnd(range, location.Pos ?? 0, location.End ?? location.Pos ?? 0) : range;
     }
 
+    static bool IsDeclareModifier(IModifierLike modifier)
+    {
+        return modifier.Kind == SyntaxKind.DeclareKeyword;
+    }
+
+    internal static bool IsAsyncModifier(IModifierLike modifier)
+    {
+        return modifier.Kind == SyntaxKind.AsyncKeyword;
+    }
+
     internal static bool IsExternalModule(SourceFile sourceFile)
     {
         return sourceFile.ExternalModuleIndicator != null;
+    }
+
+    internal static bool IsFunctionTypeNode(INode node)
+    {
+        return node.Kind == SyntaxKind.FunctionType;
+    }
+    internal static bool IsJSDocFunctionType(INode node)
+    {
+        return node.Kind == SyntaxKind.JSDocFunctionType;
     }
 
     internal static bool CanHaveJSDoc(INode node)
@@ -542,6 +569,33 @@ internal class Utilities
             SyntaxKind.TypeParameter or SyntaxKind.VariableDeclaration or SyntaxKind.VariableStatement or SyntaxKind.WhileStatement or
             SyntaxKind.WithStatement => true,
             _ => false,
+        };
+    }
+
+    internal static OperatorPrecedence GetBinaryOperatorPrecedence(SyntaxKind kind)
+    {
+        return kind switch
+        {
+            SyntaxKind.QuestionQuestionToken => OperatorPrecedence.Coalesce,
+            SyntaxKind.BarBarToken => OperatorPrecedence.LogicalOR,
+            SyntaxKind.AmpersandAmpersandToken => OperatorPrecedence.LogicalAND,
+            SyntaxKind.BarToken => OperatorPrecedence.BitwiseOR,
+            SyntaxKind.CaretToken => OperatorPrecedence.BitwiseXOR,
+            SyntaxKind.AmpersandToken => OperatorPrecedence.BitwiseAND,
+            SyntaxKind.EqualsEqualsToken or SyntaxKind.ExclamationEqualsToken or SyntaxKind.EqualsEqualsEqualsToken 
+                or SyntaxKind.ExclamationEqualsEqualsToken => OperatorPrecedence.Equality,
+            SyntaxKind.LessThanToken or SyntaxKind.GreaterThanToken or SyntaxKind.LessThanEqualsToken 
+                or SyntaxKind.GreaterThanEqualsToken or SyntaxKind.InstanceOfKeyword or SyntaxKind.InKeyword 
+                or SyntaxKind.AsKeyword or SyntaxKind.SatisfiesKeyword => OperatorPrecedence.Relational,
+            SyntaxKind.LessThanLessThanToken or SyntaxKind.GreaterThanGreaterThanToken 
+                or SyntaxKind.GreaterThanGreaterThanGreaterThanToken => OperatorPrecedence.Shift,
+            SyntaxKind.PlusToken or SyntaxKind.MinusToken => OperatorPrecedence.Additive,
+            SyntaxKind.AsteriskToken or SyntaxKind.SlashToken 
+                or SyntaxKind.PercentToken => OperatorPrecedence.Multiplicative,
+            SyntaxKind.AsteriskAsteriskToken => OperatorPrecedence.Exponentiation,
+            // -1 is lower than all other precedences.  Returning it will cause binary expression
+            // parsing to stop.
+            _ => (OperatorPrecedence)(-1),
         };
     }
 }

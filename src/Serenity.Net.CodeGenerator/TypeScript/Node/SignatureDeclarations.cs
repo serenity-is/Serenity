@@ -52,4 +52,5 @@ internal class PropertySignature(NodeArray<IModifierLike> modifiers, IPropertyNa
 {
     public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
     public ITypeNode Type { get; set; } = type;
+    public IExpression Initializer { get; set; } // error reporting only
 }
