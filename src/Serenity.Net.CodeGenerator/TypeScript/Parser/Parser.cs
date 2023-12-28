@@ -3680,7 +3680,7 @@ internal class Parser
         // If we do successfully parse arrow-function, we must *not* recurse for productions 1, 2 or 3. An ArrowFunction is
         // not a LeftHandSideExpression, nor does it start a ConditionalExpression.  So we are done
         // with AssignmentExpression if we see one.
-        IExpression arrowExpression = TryParseParenthesizedArrowFunctionExpression(allowReturnTypeInArrowFunction) 
+        IExpression arrowExpression = TryParseParenthesizedArrowFunctionExpression(allowReturnTypeInArrowFunction)
             ?? TryParseAsyncSimpleArrowFunctionExpression(allowReturnTypeInArrowFunction);
         if (arrowExpression != null)
         {
@@ -3716,7 +3716,7 @@ internal class Parser
         // for cases like `> > =` becoming `>>=`
         if (IsLeftHandSideExpression(expr) && IsAssignmentOperator(ReScanGreaterToken()))
         {
-            return MakeBinaryExpression(expr, ParseTokenNode<Token>(), 
+            return MakeBinaryExpression(expr, ParseTokenNode<Token>(),
                 ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction), pos);
         }
 
@@ -3790,12 +3790,12 @@ internal class Parser
         }
     }
 
-    ArrowFunction ParseSimpleArrowFunctionExpression(int pos, Identifier identifier, 
+    ArrowFunction ParseSimpleArrowFunctionExpression(int pos, Identifier identifier,
         bool allowReturnTypeInArrowFunction, bool hasJSDoc, NodeArray<IModifierLike> asyncModifier)
     {
-        Debug.Assert(Token() == SyntaxKind.EqualsGreaterThanToken, 
+        Debug.Assert(Token() == SyntaxKind.EqualsGreaterThanToken,
             "parseSimpleArrowFunctionExpression should only have been called if we had a =>");
-        
+
         var parameter = new ParameterDeclaration(
             modifiers: null,
             dotDotDotToken: null,
@@ -3882,7 +3882,7 @@ internal class Parser
                 var third = NextToken();
                 return third switch
                 {
-                    SyntaxKind.EqualsGreaterThanToken or SyntaxKind.ColonToken 
+                    SyntaxKind.EqualsGreaterThanToken or SyntaxKind.ColonToken
                         or SyntaxKind.OpenBraceToken => Tristate.True,
                     _ => Tristate.False,
                 };
@@ -4310,13 +4310,15 @@ internal class Parser
                 {
                     var keywordKind = Token();
                     NextToken();
-                    leftOperand = keywordKind == SyntaxKind.SatisfiesKeyword ? MakeSatisfiesExpression(leftOperand, ParseType()) :
-                        MakeAsExpression(leftOperand, ParseType());
+                    leftOperand = keywordKind == SyntaxKind.SatisfiesKeyword
+                        ? MakeSatisfiesExpression(leftOperand, ParseType())
+                        : MakeAsExpression(leftOperand, ParseType());
                 }
             }
             else
             {
-                leftOperand = MakeBinaryExpression(leftOperand, ParseTokenNode<Token>(), ParseBinaryExpressionOrHigher(newPrecedence), pos);
+                leftOperand = MakeBinaryExpression(leftOperand, ParseTokenNode<Token>(),
+                    ParseBinaryExpressionOrHigher(newPrecedence), pos);
             }
         }
 
@@ -4335,64 +4337,42 @@ internal class Parser
 
     SatisfiesExpression MakeSatisfiesExpression(IExpression left, ITypeNode right)
     {
-        return FinishNode(new SatisfiesExpression(left, right), left.pos);
+        return FinishNode(new SatisfiesExpression(left, right), left.Pos ?? 0);
     }
-
 
     BinaryExpression MakeBinaryExpression(IExpression left, Token operatorToken, IExpression right, int pos)
     {
         return FinishNode(new BinaryExpression(left, operatorToken, right), pos);
     }
 
-
     AsExpression MakeAsExpression(IExpression left, ITypeNode right)
     {
-        return FinishNode(new AsExpression(left, right), left.pos);
+        return FinishNode(new AsExpression(left, right), left.Pos ?? 0);
     }
-
-
-
-
 
     PrefixUnaryExpression ParsePrefixUnaryExpression()
     {
         var pos = GetNodePos();
-        return FinishNode(new PrefixUnaryExpression(Token() as PrefixUnaryOperator, nextTokenAnd(ParseSimpleUnaryExpression)), pos);
+        return FinishNode(new PrefixUnaryExpression(Token(), NextTokenAnd(ParseSimpleUnaryExpression)), pos);
     }
-
-
-
-
 
     DeleteExpression ParseDeleteExpression()
     {
         var pos = GetNodePos();
-        return FinishNode(new DeleteExpression(nextTokenAnd(ParseSimpleUnaryExpression)), pos);
+        return FinishNode(new DeleteExpression(NextTokenAnd(ParseSimpleUnaryExpression)), pos);
     }
-
-
-
-
 
     TypeOfExpression ParseTypeOfExpression()
     {
         var pos = GetNodePos();
-        return FinishNode(new TypeOfExpression(nextTokenAnd(ParseSimpleUnaryExpression)), pos);
+        return FinishNode(new TypeOfExpression(NextTokenAnd(ParseSimpleUnaryExpression)), pos);
     }
-
-
-
-
 
     VoidExpression ParseVoidExpression()
     {
         var pos = GetNodePos();
-        return FinishNode(new VoidExpression(nextTokenAnd(ParseSimpleUnaryExpression)), pos);
+        return FinishNode(new VoidExpression(NextTokenAnd(ParseSimpleUnaryExpression)), pos);
     }
-
-
-
-
 
     bool IsAwaitExpression()
     {
@@ -4416,14 +4396,12 @@ internal class Parser
         return FinishNode(new AwaitExpression(NextTokenAnd(ParseSimpleUnaryExpression)), pos);
     }
 
-    /**
-         * Parse ES7 exponential expression and await expression
-         *
-         * ES7 ExponentiationExpression:
-         *      1) UnaryExpression[?Yield]
-         *      2) UpdateExpression[?Yield] ** ExponentiationExpression[?Yield]
-         */
-    UnaryIExpression | BinaryExpression ParseUnaryExpressionOrHigher()
+    // Parse ES7 exponential expression and await expression
+    // 
+    // ES7 ExponentiationExpression:
+    //      1) UnaryExpression[?Yield]
+    //      2) UpdateExpression[?Yield] ** ExponentiationExpression[?Yield]
+    IExpression ParseUnaryExpressionOrHigher()
     {
         /**
          * ES7 UpdateExpression:
@@ -4433,10 +4411,10 @@ internal class Parser
          *      4) ++UnaryExpression[?Yield]
          *      5) --UnaryExpression[?Yield]
          */
-        if (isUpdateExpression())
+        if (IsUpdateExpression())
         {
             var pos = GetNodePos();
-            var updateExpression = parseUpdateExpression();
+            var updateExpression = ParseUpdateExpression();
             return Token() == SyntaxKind.AsteriskAsteriskToken ?
                 ParseBinaryExpressionRest(GetBinaryOperatorPrecedence(Token()), updateExpression, pos) as BinaryExpression :
                 updateExpression;
@@ -4454,11 +4432,11 @@ internal class Parser
          *      8) ! UpdateExpression[?yield]
          */
         var unaryOperator = Token();
-        var simpleUnaryExpression = parseSimpleUnaryExpression();
+        var simpleUnaryExpression = ParseSimpleUnaryExpression();
         if (Token() == SyntaxKind.AsteriskAsteriskToken)
         {
-            var pos = skipTrivia(sourceText, simpleUnaryExpression.pos);
-            var { end } = simpleUnaryExpression;
+            var pos = SkipTrivia(sourceText, simpleUnaryExpression.Pos) ?? 0;
+            var end = simpleUnaryExpression.End ?? 0;
             if (simpleUnaryExpression.Kind == SyntaxKind.TypeAssertionExpression)
             {
                 ParseErrorAt(pos, end, Diagnostics.A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses);
@@ -4472,24 +4450,19 @@ internal class Parser
         return simpleUnaryExpression;
     }
 
-
-
-
-    /**
-         * Parse ES7 simple-unary expression or higher:
-         *
-         * ES7 UnaryExpression:
-         *      1) UpdateExpression[?yield]
-         *      2) delete UnaryExpression[?yield]
-         *      3) void UnaryExpression[?yield]
-         *      4) typeof UnaryExpression[?yield]
-         *      5) + UnaryExpression[?yield]
-         *      6) - UnaryExpression[?yield]
-         *      7) ~ UnaryExpression[?yield]
-         *      8) ! UnaryExpression[?yield]
-         *      9) [+Await] await UnaryExpression[?yield]
-         */
-    UnaryIExpression ParseSimpleUnaryExpression()
+    // Parse ES7 simple-unary expression or higher:
+    // 
+    // ES7 UnaryExpression:
+    //      1) UpdateExpression[?yield]
+    //      2) delete UnaryExpression[?yield]
+    //      3) void UnaryExpression[?yield]
+    //      4) typeof UnaryExpression[?yield]
+    //      5) + UnaryExpression[?yield]
+    //      6) - UnaryExpression[?yield]
+    //      7) ~ UnaryExpression[?yield]
+    //      8) ! UnaryExpression[?yield]
+    //      9) [+Await] await UnaryExpression[?yield]
+    IUnaryExpression ParseSimpleUnaryExpression()
     {
         switch (Token())
         {
@@ -4498,28 +4471,36 @@ internal class Parser
             case SyntaxKind.TildeToken:
             case SyntaxKind.ExclamationToken:
                 return ParsePrefixUnaryExpression();
+
             case SyntaxKind.DeleteKeyword:
                 return ParseDeleteExpression();
+
             case SyntaxKind.TypeOfKeyword:
                 return ParseTypeOfExpression();
+
             case SyntaxKind.VoidKeyword:
                 return ParseVoidExpression();
+
             case SyntaxKind.LessThanToken:
                 // Just like in parseUpdateExpression, we need to avoid parsing type assertions when
                 // in JSX and we see an expression like "+ <foo> bar".
                 if (languageVariant == LanguageVariant.JSX)
                 {
-                    return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true, topInvalidNodePosition: null, openingTag: null, mustBeUnary: true);
+                    return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true,
+                        topInvalidNodePosition: null, openingTag: null, mustBeUnary: true) as IUnaryExpression;
                 }
                 // This is modified UnaryExpression grammar in TypeScript
                 //  UnaryExpression (modified):
                 //      < type > UnaryExpression
                 return ParseTypeAssertion();
+
             case SyntaxKind.AwaitKeyword:
-                if (isAwaitExpression())
+                if (IsAwaitExpression())
                 {
                     return ParseAwaitExpression();
                 }
+                return ParseUpdateExpression();
+
             // falls through
             default:
                 return ParseUpdateExpression();
@@ -4527,18 +4508,16 @@ internal class Parser
     }
 
 
-    
-     * Check if the current token can possibly be an ES7 increment expression.
-     *
-     * ES7 UpdateExpression:
-     *      LeftHandSideIExpression[?Yield]
-     * LeftHandSideExpression[?Yield][no LineTerminator here]++
-     *      LeftHandSideIExpression[?Yield][no LineTerminator here]--
-     *      ++LeftHandSideIExpression[?Yield]
-     *      --LeftHandSideIExpression[?Yield]
-     */
-bool IsUpdateExpression()
-{
+    // Check if the current token can possibly be an ES7 increment expression.
+    // 
+    // ES7 UpdateExpression:
+    //      LeftHandSideIExpression[?Yield]
+    // LeftHandSideExpression[?Yield][no LineTerminator here]++
+    //      LeftHandSideIExpression[?Yield][no LineTerminator here]--
+    //      ++LeftHandSideIExpression[?Yield]
+    //      --LeftHandSideIExpression[?Yield]
+    bool IsUpdateExpression()
+    {
         // This function is called inside parseUnaryExpression to decide
         // whether to call parseSimpleUnaryExpression or call parseUpdateExpression directly
         switch (Token())
@@ -4552,12 +4531,15 @@ bool IsUpdateExpression()
             case SyntaxKind.VoidKeyword:
             case SyntaxKind.AwaitKeyword:
                 return false;
+
             case SyntaxKind.LessThanToken:
                 // If we are not in JSX context, we are parsing TypeAssertion which is an UnaryExpression
                 if (languageVariant != LanguageVariant.JSX)
                 {
                     return false;
                 }
+                return true;
+
             // We are in JSX context and the token is part of JSXElement.
             // falls through
             default:
@@ -4565,31 +4547,26 @@ bool IsUpdateExpression()
         }
     }
 
-
-
-
-    /**
-         * Parse ES7 UpdateExpression. UpdateExpression is used instead of ES6's PostFixExpression.
-         *
-         * ES7 UpdateExpression[yield]:
-         *      1) LeftHandSideExpression[?yield]
-         *      2) LeftHandSideExpression[?yield] [[no LineTerminator here]]++
-         *      3) LeftHandSideExpression[?yield] [[no LineTerminator here]]--
-         *      4) ++LeftHandSideExpression[?yield]
-         *      5) --LeftHandSideExpression[?yield]
-         * In TypeScript (2), (3) are parsed as PostfixUnaryExpression. (4), (5) are parsed as PrefixUnaryExpression
-         */
+    // Parse ES7 UpdateExpression. UpdateExpression is used instead of ES6's PostFixExpression.
+    //
+    // ES7 UpdateExpression[yield]:
+    //      1) LeftHandSideExpression[?yield]
+    //      2) LeftHandSideExpression[?yield] [[no LineTerminator here]]++
+    //      3) LeftHandSideExpression[?yield] [[no LineTerminator here]]--
+    //      4) ++LeftHandSideExpression[?yield]
+    //      5) --LeftHandSideExpression[?yield]
+    // In TypeScript (2), (3) are parsed as PostfixUnaryExpression. (4), (5) are parsed as PrefixUnaryExpression
     IUpdateExpression ParseUpdateExpression()
     {
         if (Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken)
         {
             var pos = GetNodePos();
-            return FinishNode(new PrefixUnaryExpression(Token() as PrefixUnaryOperator, nextTokenAnd(ParseLeftHandSideExpressionOrHigher)), pos);
+            return FinishNode(new PrefixUnaryExpression(Token(), NextTokenAnd(ParseLeftHandSideExpressionOrHigher)), pos);
         }
         else if (languageVariant == LanguageVariant.JSX && Token() == SyntaxKind.LessThanToken && LookAhead(NextTokenIsIdentifierOrKeywordOrGreaterThan))
         {
             // JSXElement is part of primaryExpression
-            return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true);
+            return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true) as IUpdateExpression;
         }
 
         var expression = ParseLeftHandSideExpressionOrHigher();
@@ -4597,9 +4574,9 @@ bool IsUpdateExpression()
         Debug.Assert(IsLeftHandSideExpression(expression));
         if ((Token() == SyntaxKind.PlusPlusToken || Token() == SyntaxKind.MinusMinusToken) && !scanner.HasPrecedingLineBreak())
         {
-            var operator = Token() as PostfixUnaryOperator;
+            var @operator = Token();
             NextToken();
-            return FinishNode(new PostfixUnaryExpression(expression, operator), expression.pos);
+            return FinishNode(new PostfixUnaryExpression(expression, @operator), expression.Pos ?? 0);
         }
 
         return expression;
@@ -4640,7 +4617,7 @@ bool IsUpdateExpression()
         // 3)we have a MemberExpression which either completes the LeftHandSideExpression,
         // or starts the beginning of the first four CallExpression productions.
         var pos = GetNodePos();
-        var expression: MemberExpression;
+        IMemberExpression expression = null;
         if (Token() == SyntaxKind.ImportKeyword)
         {
             if (LookAhead(NextTokenIsOpenParenOrLessThan))
@@ -4651,7 +4628,7 @@ bool IsUpdateExpression()
                 //      import * as foo1 from "module-from-node
                 // We want this import to be a statement rather than import call expression
                 sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
-                expression = ParseTokenNode<PrimaryIExpression>();
+                expression = ParseTokenNode<ImportExpression>();
             }
             else if (LookAhead(NextTokenIsDot))
             {
@@ -4663,12 +4640,12 @@ bool IsUpdateExpression()
             }
             else
             {
-                expression = parseMemberExpressionOrHigher();
+                expression = ParseMemberExpressionOrHigher();
             }
         }
         else
         {
-            expression = Token() == SyntaxKind.SuperKeyword ? parseSuperExpression() : parseMemberExpressionOrHigher();
+            expression = Token() == SyntaxKind.SuperKeyword ? ParseSuperExpression() : ParseMemberExpressionOrHigher();
         }
 
         // Now, we *may* be complete.  However, we might have consumed the start of a
@@ -4677,11 +4654,7 @@ bool IsUpdateExpression()
         return ParseCallExpressionRest(pos, expression);
     }
 
-
-
-
-
-    MemberIExpression ParseMemberExpressionOrHigher()
+    IMemberExpression ParseMemberExpressionOrHigher()
     {
         // Note: to make our lives simpler, we decompose the NewExpression productions and
         // place ObjectCreationExpression and FunctionExpression into PrimaryExpression.
@@ -4731,23 +4704,23 @@ bool IsUpdateExpression()
         // Because CallExpression and MemberExpression are left recursive, we need to bottom out
         // of the recursion immediately.  So we parse out a primary expression to start with.
         var pos = GetNodePos();
-        var expression = parsePrimaryExpression();
+        var expression = ParsePrimaryExpression();
         return ParseMemberExpressionRest(pos, expression, allowOptionalChain: true);
     }
 
 
-    MemberIExpression ParseSuperExpression()
+    IMemberExpression ParseSuperExpression()
     {
         var pos = GetNodePos();
-        var expression = ParseTokenNode<MemberIExpression>();
+        IMemberExpression expression = ParseTokenNode<SuperExpression>();
         if (Token() == SyntaxKind.LessThanToken)
         {
             var startPos = GetNodePos();
             var typeArguments = TryParse(ParseTypeArgumentsInExpression);
-            if (typeArguments != undefined)
+            if (typeArguments != null)
             {
                 ParseErrorAt(startPos, GetNodePos(), Diagnostics.super_may_not_use_type_arguments);
-                if (!isTemplateStartOfTaggedTemplate())
+                if (!IsTemplateStartOfTaggedTemplate())
                 {
                     expression = new ExpressionWithTypeArguments(expression, typeArguments);
                 }
@@ -4761,79 +4734,78 @@ bool IsUpdateExpression()
 
         // If we have seen "super" it must be followed by '(' or '.'.
         // If it wasn't then just try to parse out a '.' and report an error.
-        ParseExpectedToken(SyntaxKind.DotToken, Diagnostics.super_must_be_followed_by_an_argument_list_or_member_access);
+        ParseExpectedToken<DotToken>(SyntaxKind.DotToken, Diagnostics.super_must_be_followed_by_an_argument_list_or_member_access);
         // private names will never work with `super` (`super.#foo`), but that's a semantic error, not syntactic
-        return FinishNode(new PropertyAccessExpression(expression, ParseRightSideOfDot(allowIdentifierNames: true, allowPrivateIdentifiers: true, allowUnicodeEscapeSequenceInIdentifierName: true)), pos);
+        return FinishNode(new PropertyAccessExpression(expression,
+            ParseRightSideOfDot(allowIdentifierNames: true, allowPrivateIdentifiers: true,
+            allowUnicodeEscapeSequenceInIdentifierName: true)), pos);
     }
 
-    JsxElement | JsxSelfClosingElement | JsxFragment ParseJsxElementOrSelfClosingElementOrFragment(bool inExpressionContext, number topInvalidNodePosition, JsxOpeningElement | JsxOpeningFragment openingTag, mustBeUnary)
+    IJsxElementOrSelfClosingOrFragment ParseJsxElementOrSelfClosingElementOrFragment(bool inExpressionContext, int? topInvalidNodePosition = null, INode openingTag = null, bool mustBeUnary = false)
     {
         var pos = GetNodePos();
-        var opening = parseJsxOpeningOrSelfClosingElementOrOpeningFragment(inExpressionContext);
-        var result: JsxElement | JsxSelfClosingElement | JsxFragment;
+        var opening = ParseJsxOpeningOrSelfClosingElementOrOpeningFragment(inExpressionContext);
+        IJsxElementOrSelfClosingOrFragment result;
         if (opening.Kind == SyntaxKind.JsxOpeningElement)
         {
-            var children = parseJsxChildren(opening);
-            var closingElement: JsxClosingElement;
+            var children = ParseJsxChildren(opening);
+            INode closingElement;
 
-            var lastChild: JsxChild | undefined = children[children.length - 1];
+            IJsxChild lastChild = children.Count > 0 ? children[^1] : null;
             if (
                 lastChild?.Kind == SyntaxKind.JsxElement
-                && !tagNamesAreEquivalent(lastChild.openingElement.tagName, lastChild.closingElement.tagName)
-                && tagNamesAreEquivalent(opening.tagName, lastChild.closingElement.tagName)
+                && !TagNamesAreEquivalent((lastChild as JsxElement)?.OpeningElement?.TagName,
+                    (lastChild as JsxElement)?.ClosingElement?.TagName)
+                && TagNamesAreEquivalent((opening as IJsxHasTagName)?.TagName,
+                    (lastChild as JsxElement)?.ClosingElement?.TagName)
             )
             {
                 // when an unclosed JsxOpeningElement incorrectly parses its parent's JsxClosingElement,
                 // restructure (<div>(...<span>...</div>)) --> (<div>(...<span>...</>)</div>)
                 // (no need to error; the parent will error)
-                var end = lastChild.children.end;
-                var newLast = FinishNode(
+                var end = (lastChild as JsxElement)?.Children?.End;
+                IJsxChild newLast = FinishNode(
                     new JsxElement(
-                        lastChild.openingElement,
-                        lastChild.children,
-                        FinishNode(new JsxClosingElement(FinishNode(new Identifier(""), end, end)), end, end),
+                        (lastChild as JsxElement)?.OpeningElement,
+                        (lastChild as JsxElement)?.Children,
+                        FinishNode(new JsxClosingElement(FinishNode(new Identifier(""), end ?? 0, end)), end ?? 0, end)
+                    ), (lastChild as JsxElement).OpeningElement?.Pos ?? 0, end);
 
-
-
-                    ),
-                    lastChild.openingElement.pos,
-                    end,
-
-
-
-                );
-
-                children = CreateNodeArray([...children.slice(0, children.length - 1), newLast], children.pos, end);
-                closingElement = lastChild.closingElement;
+                children = CreateNodeArray(children.Take(children.Count - 1).Concat([newLast]), children.Pos ?? 0, end);
+                closingElement = (lastChild as JsxElement)?.ClosingElement;
             }
             else
             {
-                closingElement = parseJsxClosingElement(opening, inExpressionContext);
-                if (!tagNamesAreEquivalent(opening.tagName, closingElement.tagName))
+                closingElement = ParseJsxClosingElement((opening as JsxOpeningElement), inExpressionContext);
+                if (!TagNamesAreEquivalent((opening as IJsxHasTagName)?.TagName, (closingElement as IJsxHasTagName)?.TagName))
                 {
-                    if (openingTag && isJsxOpeningElement(openingTag) && tagNamesAreEquivalent(closingElement.tagName, openingTag.tagName))
+                    if (openingTag != null && IsJsxOpeningElement(openingTag) &&
+                        TagNamesAreEquivalent((closingElement as IJsxHasTagName)?.TagName, (openingTag as IJsxHasTagName)?.TagName))
                     {
                         // opening incorrectly matched with its parent's closing -- put error on opening
-                        ParseErrorAtRange(opening.tagName, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag, getTextOfNodeFromSourceText(sourceText, opening.tagName));
+                        ParseErrorAtRange((opening as IJsxHasTagName)?.TagName, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
+                            GetTextOfNodeFromSourceText(sourceText, (opening as IJsxHasTagName)?.TagName));
                     }
                     else
                     {
                         // other opening/closing mismatches -- put error on closing
-                        ParseErrorAtRange(closingElement.tagName, Diagnostics.Expected_corresponding_JSX_closing_tag_for_0, getTextOfNodeFromSourceText(sourceText, opening.tagName));
+                        ParseErrorAtRange((closingElement as IJsxHasTagName)?.TagName, Diagnostics.Expected_corresponding_JSX_closing_tag_for_0,
+                            GetTextOfNodeFromSourceText(sourceText, (opening as IJsxHasTagName)?.TagName));
                     }
                 }
             }
-            result = FinishNode(new JsxElement(opening, children, closingElement), pos);
+            result = FinishNode(new JsxElement(opening as IJsxHasTagName, children, closingElement as JsxClosingElement), pos);
         }
         else if (opening.Kind == SyntaxKind.JsxOpeningFragment)
         {
-            result = FinishNode(new JsxFragment(opening, parseJsxChildren(opening), parseJsxClosingFragment(inExpressionContext)), pos);
+            result = FinishNode(new JsxFragment(opening as JsxOpeningFragment,
+                ParseJsxChildren(opening), ParseJsxClosingFragment(inExpressionContext)), pos);
         }
         else
         {
             Debug.Assert(opening.Kind == SyntaxKind.JsxSelfClosingElement);
             // Nothing else to do for self-closing elements
-            result = opening;
+            result = opening as JsxSelfClosingElement;
         }
 
         // If the user writes the invalid code '<div></div><div></div>' in an expression context (i.e. not wrapped in
@@ -4847,23 +4819,20 @@ bool IsUpdateExpression()
         // a valid UnaryExpression and will cause problems later.
         if (!mustBeUnary && inExpressionContext && Token() == SyntaxKind.LessThanToken)
         {
-            var topBadPos = typeof topInvalidNodePosition == "undefined" ? result.pos : topInvalidNodePosition;
-            var invalidElement = TryParse(() => parseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true, topBadPos));
-            if (invalidElement)
+            var topBadPos = topInvalidNodePosition == null ? result.Pos : topInvalidNodePosition;
+            var invalidElement = TryParse(() => ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true, topBadPos));
+            if (invalidElement != null)
             {
-                var operatorToken = createMissingNode(SyntaxKind.CommaToken, reportAtCurrentPosition: false);
-                SetTextRangePosWidth(operatorToken, invalidElement.pos, 0);
-                ParseErrorAt(skipTrivia(sourceText, topBadPos), invalidElement.end, Diagnostics.JSX_expressions_must_have_one_parent_element);
-                return FinishNode(new BinaryExpression(result, operatorToken as Token<SyntaxKind.CommaToken>, invalidElement), pos) as INode as JsxElement;
+                var operatorToken = CreateMissingNode<CommaToken>(SyntaxKind.CommaToken, reportAtCurrentPosition: false);
+                SetTextRangePosWidth(operatorToken, invalidElement.Pos ?? 0, 0);
+                ParseErrorAt(SkipTrivia(sourceText, topBadPos) ?? 0, invalidElement.End ?? 0, Diagnostics.JSX_expressions_must_have_one_parent_element);
+                return FinishNode(invalidElement, pos);
+                //return FinishNode(new BinaryExpression(result,  operatorToken, invalidElement), pos);
             }
         }
 
         return result;
     }
-
-
-
-
 
     JsxText ParseJsxText()
     {
@@ -4873,18 +4842,14 @@ bool IsUpdateExpression()
         return FinishNode(node, pos);
     }
 
-
-
-
-
-    JsxChild ParseJsxChild(JsxOpeningElement | JsxOpeningFragment openingTag, JsxTokenSyntaxKind token)
+    IJsxChild ParseJsxChild(IJsxOpeningLikeElementOrOpeningFragment openingTag, SyntaxKind token)
     {
         switch (token)
         {
             case SyntaxKind.EndOfFileToken:
                 // If we hit EOF, issue the error at the tag that lacks the closing element
                 // rather than at the end of the file (which is useless)
-                if (isJsxOpeningFragment(openingTag))
+                if (IsJsxOpeningFragment(openingTag))
                 {
                     ParseErrorAtRange(openingTag, Diagnostics.JSX_fragment_has_no_corresponding_closing_tag);
                 }
@@ -4892,9 +4857,10 @@ bool IsUpdateExpression()
                 {
                     // We want the error span to cover only 'Foo.Bar' in < Foo.Bar >
                     // or to cover only 'Foo' in < Foo >
-                    var tag = openingTag.tagName;
-                    var start = Math.min(skipTrivia(sourceText, tag.pos), tag.end);
-                    ParseErrorAt(start, tag.end, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag, getTextOfNodeFromSourceText(sourceText, openingTag.tagName));
+                    var tag = (openingTag as JsxOpeningElement)?.TagName;
+                    var start = Math.Min(SkipTrivia(sourceText, tag.Pos) ?? 0, tag.End ?? tag.Pos ?? 0);
+                    ParseErrorAt(start, tag.End ?? 0, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
+                        GetTextOfNodeFromSourceText(sourceText, (openingTag as JsxOpeningElement)?.TagName));
                 }
                 return null;
             case SyntaxKind.LessThanSlashToken:
@@ -4908,32 +4874,28 @@ bool IsUpdateExpression()
             case SyntaxKind.LessThanToken:
                 return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: false, topInvalidNodePosition: null, openingTag);
             default:
-                return Debug.AssertNever(token);
+                Debug.Fail($"{token} is not a valid JSX child to parse");
+                return null;
         }
     }
 
-
-
-
-
-    NodeArray<JsxChild> ParseJsxChildren(JsxOpeningElement | JsxOpeningFragment openingTag)
+    NodeArray<IJsxChild> ParseJsxChildren(IJsxOpeningLikeElementOrOpeningFragment openingTag)
     {
-        var list = [];
+        List<IJsxChild> list = [];
         var listPos = GetNodePos();
         var saveParsingContext = parsingContext;
-        parsingContext |= 1 << ParsingContext.JsxChildren;
+        parsingContext |= (ParsingContext)(1 << (int)ParsingContext.JsxChildren);
 
         while (true)
         {
-            var child = parseJsxChild(openingTag, currentToken = scanner.ReScanJsxToken());
-            if (!child) break;
-            list.push(child);
-            if (
-                isJsxOpeningElement(openingTag)
+            var child = ParseJsxChild(openingTag, currentToken = scanner.ReScanJsxToken());
+            if (child == null)
+                break;
+            list.Add(child);
+            if (IsJsxOpeningElement(openingTag)
                 && child?.Kind == SyntaxKind.JsxElement
-                && !tagNamesAreEquivalent(child.openingElement.tagName, child.closingElement.tagName)
-                && tagNamesAreEquivalent(openingTag.tagName, child.closingElement.tagName)
-            )
+                && !TagNamesAreEquivalent((child as JsxElement).OpeningElement.TagName, (child as JsxElement)?.ClosingElement?.TagName)
+                && TagNamesAreEquivalent((openingTag as IJsxHasTagName)?.TagName, (child as JsxElement)?.ClosingElement?.TagName)            )
             {
                 // stop after parsing a mismatched child like <div>...(<span></div>) in order to reattach the </div> higher
                 break;
@@ -4944,21 +4906,13 @@ bool IsUpdateExpression()
         return CreateNodeArray(list, listPos);
     }
 
-
-
-
-
     JsxAttributes ParseJsxAttributes()
     {
         var pos = GetNodePos();
-        return FinishNode(new JsxAttributes(ParseList(ParsingContext.JsxAttributes, parseJsxAttribute)), pos);
+        return FinishNode(new JsxAttributes(ParseList(ParsingContext.JsxAttributes, ParseJsxAttribute)), pos);
     }
 
-
-
-
-
-    JsxOpeningElement | JsxSelfClosingElement | JsxOpeningFragment ParseJsxOpeningOrSelfClosingElementOrOpeningFragment(bool inExpressionContext)
+    IJsxOpeningLikeElementOrOpeningFragment ParseJsxOpeningOrSelfClosingElementOrOpeningFragment(bool inExpressionContext)
     {
         var pos = GetNodePos();
 
@@ -4967,21 +4921,21 @@ bool IsUpdateExpression()
         if (Token() == SyntaxKind.GreaterThanToken)
         {
             // See below for explanation of scanJsxText
-            scanJsxText();
+            ScanJsxText();
             return FinishNode(new JsxOpeningFragment(), pos);
         }
-        var tagName = parseJsxElementName();
+        var tagName = ParseJsxElementName();
         var typeArguments = (contextFlags & NodeFlags.JavaScriptFile) == 0 ? TryParseTypeArguments() : null;
-        var attributes = parseJsxAttributes();
+        var attributes = ParseJsxAttributes();
 
-        var node: JsxOpeningLikeElement;
+        IJsxOpeningLikeElement node;
 
         if (Token() == SyntaxKind.GreaterThanToken)
         {
             // Closing tag, so scan the immediately-following text with the JSX scanning instead
             // of regular scanning to avoid treating illegal characters (e.g. '#') as immediate
             // scanning errors
-            scanJsxText();
+            ScanJsxText();
             node = new JsxOpeningElement(tagName, typeArguments, attributes);
         }
         else
@@ -4996,7 +4950,7 @@ bool IsUpdateExpression()
                 }
                 else
                 {
-                    scanJsxText();
+                    ScanJsxText();
                 }
             }
             node = new JsxSelfClosingElement(tagName, typeArguments, attributes);
@@ -5005,11 +4959,7 @@ bool IsUpdateExpression()
         return FinishNode(node, pos);
     }
 
-
-
-
-
-    JsxTagNameExpression ParseJsxElementName()
+    IJsxTagNameExpression ParseJsxElementName()
     {
         var pos = GetNodePos();
         // JsxElement can have name in the form of
@@ -5017,40 +4967,33 @@ bool IsUpdateExpression()
         //      primaryExpression in the form of an identifier and "this" keyword
         // We can't just simply use ParseLeftHandSideExpressionOrHigher because then we will start consider class,function etc as a keyword
         // We only want to consider "this" as a primaryExpression
-        var initialExpression = parseJsxTagName();
-        if (isJsxNamespacedName(initialExpression))
+        var initialExpression = ParseJsxTagName();
+        if (IsJsxNamespacedName(initialExpression))
         {
-            return initialExpression; // `a:b.c` is invalid syntax, don't even look for the `.` if we parse `a:b`, and let `parseAttribute` report "unexpected :" instead.
+            return initialExpression as IJsxTagNameExpression; // `a:b.c` is invalid syntax, don't even look for the `.` if we parse `a:b`, and let `parseAttribute` report "unexpected :" instead.
         }
-        var expression: PropertyAccessExpression | Identifier | ThisExpression = initialExpression;
+        IExpression expression = initialExpression;
         while (ParseOptional(SyntaxKind.DotToken))
         {
             expression = FinishNode(new PropertyAccessExpression(expression, ParseRightSideOfDot(allowIdentifierNames: true, allowPrivateIdentifiers: false, allowUnicodeEscapeSequenceInIdentifierName: false)), pos);
         }
-        return expression as JsxTagNameExpression;
+        return expression as IJsxTagNameExpression;
     }
 
-
-
-
-
-    Identifier | JsxNamespacedName | ThisExpression ParseJsxTagName()
+    IJsxTagNameExpression ParseJsxTagName()
     {
         var pos = GetNodePos();
-        scanJsxIdentifier();
+        ScanJsxIdentifier();
 
         var isThis = Token() == SyntaxKind.ThisKeyword;
         var tagName = ParseIdentifierNameErrorOnUnicodeEscapeSequence();
         if (ParseOptional(SyntaxKind.ColonToken))
         {
-            scanJsxIdentifier();
+            ScanJsxIdentifier();
             return FinishNode(new JsxNamespacedName(tagName, ParseIdentifierNameErrorOnUnicodeEscapeSequence()), pos);
         }
-        return isThis ? FinishNode(new Token(SyntaxKind.ThisKeyword), pos) : tagName;
+        return isThis ? FinishNode(new ThisExpression(), pos) : tagName;
     }
-
-
-
 
 
     JsxExpression ParseJsxExpression(bool inExpressionContext)
@@ -5061,18 +5004,18 @@ bool IsUpdateExpression()
             return null;
         }
 
-        var dotDotDotToken: DotDotDotToken | undefined;
-        var expression: Expression | undefined;
+        DotDotDotToken dotDotDotToken = null;
+        IExpression expression = null;
         if (Token() != SyntaxKind.CloseBraceToken)
         {
             if (!inExpressionContext)
             {
-                dotDotDotToken = ParseOptionalToken(SyntaxKind.DotDotDotToken);
+                dotDotDotToken = ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
             }
             // Only an AssignmentExpression is valid here per the JSX spec,
             // but we can unambiguously parse a comma sequence and provide
             // a better error message in grammar checking.
-            expression = parseExpression();
+            expression = ParseExpression();
         }
         if (inExpressionContext)
         {
@@ -5082,18 +5025,14 @@ bool IsUpdateExpression()
         {
             if (ParseExpected(SyntaxKind.CloseBraceToken, diagnosticMessage: null, shouldAdvance: false))
             {
-                scanJsxText();
+                ScanJsxText();
             }
         }
 
         return FinishNode(new JsxExpression(dotDotDotToken, expression), pos);
     }
 
-
-
-
-
-    JsxAttribute | JsxSpreadAttribute ParseJsxAttribute()
+    IObjectLiteralElement ParseJsxAttribute()
     {
         if (Token() == SyntaxKind.OpenBraceToken)
         {
@@ -5101,18 +5040,14 @@ bool IsUpdateExpression()
         }
 
         var pos = GetNodePos();
-        return FinishNode(new JsxAttribute(ParseJsxAttributeName(), parseJsxAttributeValue()), pos);
+        return FinishNode(new JsxAttribute(ParseJsxAttributeName(), ParseJsxAttributeValue()), pos);
     }
-
-
-
-
-
-    JsxAttributeValue ParseJsxAttributeValue()
+    
+    IJsxAttributeValue ParseJsxAttributeValue()
     {
         if (Token() == SyntaxKind.EqualsToken)
         {
-            if (scanJsxAttributeValue() == SyntaxKind.StringLiteral)
+            if (ScanJsxAttributeValue() == SyntaxKind.StringLiteral)
             {
                 return ParseLiteralNode() as StringLiteral;
             }
@@ -5129,65 +5064,50 @@ bool IsUpdateExpression()
         return null;
     }
 
-
-
-
-
-    Identifier | JsxNamespacedName ParseJsxAttributeName()
+    IJsxAttributeName ParseJsxAttributeName()
     {
         var pos = GetNodePos();
-        scanJsxIdentifier();
+        ScanJsxIdentifier();
 
         var attrName = ParseIdentifierNameErrorOnUnicodeEscapeSequence();
         if (ParseOptional(SyntaxKind.ColonToken))
         {
-            scanJsxIdentifier();
+            ScanJsxIdentifier();
             return FinishNode(new JsxNamespacedName(attrName, ParseIdentifierNameErrorOnUnicodeEscapeSequence()), pos);
         }
         return attrName;
     }
-
-
-
-
 
     JsxSpreadAttribute ParseJsxSpreadAttribute()
     {
         var pos = GetNodePos();
         ParseExpected(SyntaxKind.OpenBraceToken);
         ParseExpected(SyntaxKind.DotDotDotToken);
-        var expression = parseExpression();
+        var expression = ParseExpression();
         ParseExpected(SyntaxKind.CloseBraceToken);
         return FinishNode(new JsxSpreadAttribute(expression), pos);
     }
-
-
-
 
 
     JsxClosingElement ParseJsxClosingElement(JsxOpeningElement open, bool inExpressionContext)
     {
         var pos = GetNodePos();
         ParseExpected(SyntaxKind.LessThanSlashToken);
-        var tagName = parseJsxElementName();
+        var tagName = ParseJsxElementName();
         if (ParseExpected(SyntaxKind.GreaterThanToken, diagnosticMessage: null, shouldAdvance: false))
         {
             // manually advance the scanner in order to look for jsx text inside jsx
-            if (inExpressionContext || !tagNamesAreEquivalent(open.tagName, tagName))
+            if (inExpressionContext || !TagNamesAreEquivalent((open as IJsxHasTagName).TagName, tagName))
             {
                 NextToken();
             }
             else
             {
-                scanJsxText();
+                ScanJsxText();
             }
         }
         return FinishNode(new JsxClosingElement(tagName), pos);
     }
-
-
-
-
 
     JsxClosingFragment ParseJsxClosingFragment(bool inExpressionContext)
     {
@@ -5202,15 +5122,11 @@ bool IsUpdateExpression()
             }
             else
             {
-                scanJsxText();
+                ScanJsxText();
             }
         }
-        return FinishNode(new JsxJsxClosingFragment(), pos);
+        return FinishNode(new JsxClosingFragment(), pos);
     }
-
-
-
-
 
     TypeAssertion ParseTypeAssertion()
     {
@@ -5219,25 +5135,17 @@ bool IsUpdateExpression()
         ParseExpected(SyntaxKind.LessThanToken);
         var type = ParseType();
         ParseExpected(SyntaxKind.GreaterThanToken);
-        var expression = parseSimpleUnaryExpression();
+        var expression = ParseSimpleUnaryExpression();
         return FinishNode(new TypeAssertion(type, expression), pos);
     }
-
-
-
-
 
     bool NextTokenIsIdentifierOrKeywordOrOpenBracketOrTemplate()
     {
         NextToken();
         return TokenIsIdentifierOrKeyword(Token())
             || Token() == SyntaxKind.OpenBracketToken
-            || isTemplateStartOfTaggedTemplate();
+            || IsTemplateStartOfTaggedTemplate();
     }
-
-
-
-
 
     bool IsStartOfOptionalPropertyOrElementAccessChain()
     {
@@ -5245,31 +5153,27 @@ bool IsUpdateExpression()
             && LookAhead(NextTokenIsIdentifierOrKeywordOrOpenBracketOrTemplate);
     }
 
-
-
-
-
-    bool TryReParseOptionalChain(IExpression node)
+    static bool TryReParseOptionalChain(IExpression node)
     {
-        if (node.flags & NodeFlags.OptionalChain)
+        if ((node.Flags & NodeFlags.OptionalChain) != 0)
         {
             return true;
         }
         // check for an optional chain in a non-null expression
-        if (isNonNullExpression(node))
+        if (IsNonNullExpression(node))
         {
-            var expr = node.expression;
-            while (isNonNullExpression(expr) && !(expr.flags & NodeFlags.OptionalChain))
+            var expr = (node as NonNullExpression).Expression;
+            while (IsNonNullExpression(expr) && (expr.Flags & NodeFlags.OptionalChain) == 0)
             {
-                expr = expr.expression;
+                expr = (expr as NonNullExpression)?.Expression;
             }
-            if (expr.flags & NodeFlags.OptionalChain)
+            if ((expr.Flags & NodeFlags.OptionalChain) != 0)
             {
                 // this is part of an optional chain. Walk down from `node` to `expression` and set the flag.
-                while (isNonNullExpression(node))
+                while (IsNonNullExpression(node))
                 {
-                    (node as Mutable<NonNullExpression>).flags |= NodeFlags.OptionalChain;
-                    node = node.expression;
+                    node.Flags |= NodeFlags.OptionalChain;
+                    node = (node as NonNullExpression).Expression;
                 }
                 return true;
             }
@@ -5277,11 +5181,8 @@ bool IsUpdateExpression()
         return false;
     }
 
-
-
-
-
-    PropertyAccessExpression ParsePropertyAccessExpressionRest(int pos, LeftHandSideIExpression expression, QuestionDotToken questionDotToken)
+    PropertyAccessExpression ParsePropertyAccessExpressionRest(int pos, ILeftHandSideExpression expression, 
+        QuestionDotToken questionDotToken)
     {
         var name = ParseRightSideOfDot(allowIdentifierNames: true, allowPrivateIdentifiers: true, allowUnicodeEscapeSequenceInIdentifierName: true);
         var isOptionalChain = questionDotToken || tryReParseOptionalChain(expression);
@@ -5294,16 +5195,12 @@ bool IsUpdateExpression()
         }
         if (isExpressionWithTypeArguments(expression) && expression.typeArguments)
         {
-            var pos = expression.typeArguments.pos - 1;
+            var pos = expression.typeArguments.Pos - 1;
             var end = skipTrivia(sourceText, expression.typeArguments.end) + 1;
             ParseErrorAt(pos, end, Diagnostics.An_instantiation_expression_cannot_be_followed_by_a_property_access);
         }
         return FinishNode(propertyAccess, pos);
     }
-
-
-
-
 
     ElementAccessExpression ParseElementAccessExpressionRest(int pos, LeftHandSideIExpression expression, QuestionDotToken questionDotToken)
     {
@@ -5334,15 +5231,15 @@ bool IsUpdateExpression()
 
 
 
-    MemberIExpression ParseMemberExpressionRest(int pos, LeftHandSideIExpression expression, bool allowOptionalChain)
+    IMemberExpression ParseMemberExpressionRest(int pos, ILeftHandSideExpression expression, bool allowOptionalChain)
     {
         while (true)
         {
-            var questionDotToken: QuestionDotToken | undefined;
+            QuestionDotToken questionDotToken = null;
             var isPropertyAccess = false;
             if (allowOptionalChain && IsStartOfOptionalPropertyOrElementAccessChain())
             {
-                questionDotToken = ParseExpectedToken(SyntaxKind.QuestionDotToken);
+                questionDotToken = ParseExpectedToken<QuestionDotToken>(SyntaxKind.QuestionDotToken);
                 isPropertyAccess = TokenIsIdentifierOrKeyword(Token());
             }
             else
@@ -5352,7 +5249,7 @@ bool IsUpdateExpression()
 
             if (isPropertyAccess)
             {
-                expression = parsePropertyAccessExpressionRest(pos, expression, questionDotToken);
+                expression = ParsePropertyAccessExpressionRest(pos, expression, questionDotToken);
                 continue;
             }
 
@@ -5388,7 +5285,7 @@ bool IsUpdateExpression()
                 }
             }
 
-            return expression as MemberIExpression;
+            return expression as IMemberExpression;
         }
     }
 
@@ -5426,10 +5323,7 @@ bool IsUpdateExpression()
     }
 
 
-
-
-
-    LeftHandSideIExpression ParseCallExpressionRest(int pos, LeftHandSideIExpression expression)
+    ILeftHandSideExpression ParseCallExpressionRest(int pos, ILeftHandSideExpression expression)
     {
         while (true)
         {
@@ -7412,7 +7306,7 @@ bool IsUpdateExpression()
             return WithJSDoc(FinishNode(new SemicolonClassElement(), pos), hasJSDoc);
         }
 
-        var modifiers = ParseModifiers(allowDecorators: true, permitConstAsModifier: true, 
+        var modifiers = ParseModifiers(allowDecorators: true, permitConstAsModifier: true,
             stopOnStartOfClassStaticBlock: true);
 
         if (Token() == SyntaxKind.StaticKeyword && LookAhead(NextTokenIsOpenBrace))

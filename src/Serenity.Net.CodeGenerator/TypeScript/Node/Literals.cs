@@ -20,7 +20,7 @@ internal class NumericLiteral : LiteralExpression, IPropertyName
     public TokenFlags NumericLiteralFlags { get; set; }
 }
 
-internal class StringLiteral : LiteralExpression, IPropertyName
+internal class StringLiteral : LiteralExpression, IPropertyName, IJsxAttributeValue
 {
     internal StringLiteral(string text, bool? isSingleQuote = null, bool hasExtendedUnicodeEscape = false)
     {

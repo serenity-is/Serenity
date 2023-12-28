@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpression, IEntityName, IPropertyName, IBindingName
+internal class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpression, IEntityName, IPropertyName, IBindingName, IJsxAttributeName
 {
     public Identifier(string text, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null)
         : base(SyntaxKind.Identifier)

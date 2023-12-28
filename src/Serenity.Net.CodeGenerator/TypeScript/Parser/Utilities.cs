@@ -545,6 +545,16 @@ internal class Utilities
         return node.Kind == SyntaxKind.JSDocFunctionType;
     }
 
+    internal static bool IsJsxOpeningElement(INode node)
+    {
+        return node.Kind == SyntaxKind.JsxOpeningElement;
+    }
+
+    internal static bool IsJsxOpeningFragment(INode node)
+    {
+        return node.Kind == SyntaxKind.JsxOpeningFragment;
+    }
+
     internal static bool CanHaveJSDoc(INode node)
     {
         return node.Kind switch
@@ -582,15 +592,15 @@ internal class Utilities
             SyntaxKind.BarToken => OperatorPrecedence.BitwiseOR,
             SyntaxKind.CaretToken => OperatorPrecedence.BitwiseXOR,
             SyntaxKind.AmpersandToken => OperatorPrecedence.BitwiseAND,
-            SyntaxKind.EqualsEqualsToken or SyntaxKind.ExclamationEqualsToken or SyntaxKind.EqualsEqualsEqualsToken 
+            SyntaxKind.EqualsEqualsToken or SyntaxKind.ExclamationEqualsToken or SyntaxKind.EqualsEqualsEqualsToken
                 or SyntaxKind.ExclamationEqualsEqualsToken => OperatorPrecedence.Equality,
-            SyntaxKind.LessThanToken or SyntaxKind.GreaterThanToken or SyntaxKind.LessThanEqualsToken 
-                or SyntaxKind.GreaterThanEqualsToken or SyntaxKind.InstanceOfKeyword or SyntaxKind.InKeyword 
+            SyntaxKind.LessThanToken or SyntaxKind.GreaterThanToken or SyntaxKind.LessThanEqualsToken
+                or SyntaxKind.GreaterThanEqualsToken or SyntaxKind.InstanceOfKeyword or SyntaxKind.InKeyword
                 or SyntaxKind.AsKeyword or SyntaxKind.SatisfiesKeyword => OperatorPrecedence.Relational,
-            SyntaxKind.LessThanLessThanToken or SyntaxKind.GreaterThanGreaterThanToken 
+            SyntaxKind.LessThanLessThanToken or SyntaxKind.GreaterThanGreaterThanToken
                 or SyntaxKind.GreaterThanGreaterThanGreaterThanToken => OperatorPrecedence.Shift,
             SyntaxKind.PlusToken or SyntaxKind.MinusToken => OperatorPrecedence.Additive,
-            SyntaxKind.AsteriskToken or SyntaxKind.SlashToken 
+            SyntaxKind.AsteriskToken or SyntaxKind.SlashToken
                 or SyntaxKind.PercentToken => OperatorPrecedence.Multiplicative,
             SyntaxKind.AsteriskAsteriskToken => OperatorPrecedence.Exponentiation,
             // -1 is lower than all other precedences.  Returning it will cause binary expression
@@ -598,4 +608,45 @@ internal class Utilities
             _ => (OperatorPrecedence)(-1),
         };
     }
+
+    internal static bool IsJsxNamespacedName(INode node)
+    {
+        return node.Kind == SyntaxKind.JsxNamespacedName;
+    }
+
+    internal static bool TagNamesAreEquivalent(IJsxTagNameExpression lhs, IJsxTagNameExpression rhs)
+    {
+        if (lhs == null || rhs == null || lhs.Kind != rhs.Kind)
+            return false;
+
+        if (lhs.Kind == SyntaxKind.Identifier)
+        {
+            return (lhs as Identifier)?.EscapedText == (rhs as Identifier)?.EscapedText;
+        }
+
+        if (lhs.Kind == SyntaxKind.ThisKeyword)
+        {
+            return true;
+        }
+
+        if (lhs.Kind == SyntaxKind.JsxNamespacedName)
+        {
+            return (lhs as JsxNamespacedName)?.Namespace?.EscapedText ==
+                (rhs as JsxNamespacedName)?.Namespace?.EscapedText &&
+                (lhs as JsxNamespacedName)?.Name?.EscapedText == (rhs as JsxNamespacedName)?.Name?.EscapedText;
+        }
+
+        // If we are at this statement then we must have PropertyAccessExpression and because tag name in Jsx element can only
+        // take forms of JsxTagNameExpression which includes an identifier, "this" expression, or another propertyAccessExpression
+        // it is safe to case the expression property as such. See parseJsxElementName for how we parse tag name in Jsx element
+        return (lhs as PropertyAccessExpression)?.Name?.EscapedText == (rhs as PropertyAccessExpression)?.Name.EscapedText &&
+            TagNamesAreEquivalent((lhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression, 
+                (rhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression);
+    }
+
+    internal static bool IsNonNullExpression(INode node)
+    {
+        return node.Kind == SyntaxKind.NonNullExpression;
+    }
+
 }

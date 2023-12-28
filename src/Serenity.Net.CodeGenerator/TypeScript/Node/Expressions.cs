@@ -54,7 +54,7 @@ internal class PostfixUnaryExpression(IExpression operand, SyntaxKind @operator)
 
 
 internal class SuperExpression() 
-    : PrimaryExpressionBase(SyntaxKind.SuperKeyword)
+    : PrimaryExpressionBase(SyntaxKind.SuperKeyword), IMemberExpression
 {
 }
 
@@ -197,7 +197,7 @@ internal class ImportCall(ImportExpression expression, NodeArray<ITypeNode> type
 }
 
 internal class ExpressionWithTypeArguments(IExpression expression, NodeArray<ITypeNode> typeArguments)
-    : TypeNodeBase(SyntaxKind.ExpressionWithTypeArguments)
+    : TypeNodeBase(SyntaxKind.ExpressionWithTypeArguments), IMemberExpression
 {
     public /*LeftHandSideExpression*/IExpression Expression { get; } = expression;
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
@@ -241,4 +241,11 @@ internal class MetaProperty(SyntaxKind keywordToken, Identifier name) : PrimaryE
 {
     public SyntaxKind KeywordToken { get; } = keywordToken;
     public Identifier Name { get; } = name;
+}
+
+internal class SatisfiesExpression(IExpression expression, ITypeNode type)
+    : ExpressionBase(SyntaxKind.SatisfiesExpression)
+{
+    public IExpression Expression { get; } = expression;
+    public ITypeNode Type { get; } = type;
 }

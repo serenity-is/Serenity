@@ -230,7 +230,20 @@ internal interface IAssertionExpression : IExpression
 {
 }
 
-internal interface IJsxOpeningLikeElement : IExpression
+internal interface IJsxNamespacedNameOrIdentifier : IExpression
+{
+
+}
+
+internal interface IJsxOpeningLikeElementOrOpeningFragment : INode
+{
+}
+
+internal interface IJsxElementOrSelfClosingOrFragment : IJsxChild, IPrimaryExpression, IJsxAttributeValue
+{
+}
+
+internal interface IJsxOpeningLikeElement : IJsxOpeningLikeElementOrOpeningFragment, IExpression
 {
 }
 
@@ -238,8 +251,17 @@ internal interface IJsxAttributeLike : IObjectLiteralElement
 {
 }
 
+internal interface IJsxAttributeValue : IExpression
+{
+}
+
 internal interface IJsxTagNameExpression : IExpression
 {
+}
+
+internal interface IJsxHasTagName : INode
+{
+    IJsxTagNameExpression TagName { get; }
 }
 
 internal interface IJsxChild : INode

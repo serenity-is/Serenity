@@ -37,6 +37,7 @@ internal class EqualsGreaterThanToken() : Token(SyntaxKind.EqualsGreaterThanToke
 internal class EndOfFileToken() : Token(SyntaxKind.EndOfFileToken);
 
 internal class AtToken() : Token(SyntaxKind.AtToken);
+internal class QuestionDotToken() : Token(SyntaxKind.QuestionDotToken);
 
 internal class AbstractKeyword() : Token(SyntaxKind.AbstractKeyword), IModifier;
 internal class AccessorKeyword() : Token(SyntaxKind.AccessorKeyword), IModifier;
