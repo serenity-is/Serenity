@@ -3017,7 +3017,7 @@ internal class Parser
         var hasJSDoc = HasPrecedingJSDocComment();
         var modifiers = ParseModifiersForConstructorType();
         var isConstructorType = ParseOptional(SyntaxKind.NewKeyword);
-        Debug.Assert(modifiers != null || isConstructorType, "Per isStartOfFunctionOrConstructorType, a function type cannot have modifiers.");
+        Debug.Assert(modifiers == null || isConstructorType, "Per isStartOfFunctionOrConstructorType, a function type cannot have modifiers.");
         var typeParameters = ParseTypeParameters();
         var parameters = ParseParameters(SignatureFlags.Type);
         var type = ParseReturnType(SyntaxKind.EqualsGreaterThanToken, isType: false);

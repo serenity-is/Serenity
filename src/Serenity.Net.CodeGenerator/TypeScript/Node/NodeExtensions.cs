@@ -33,11 +33,11 @@ internal static class NodeExtensions
         if (node.Pos == null)
             return null;
 
-        var pos = Scanner.SkipTrivia(sourceText, node.Pos);
+        var pos = Scanner.SkipTrivia(sourceText, node.Pos) ?? node.Pos ?? 0;
         if (node.End < pos)
             return null;
 
-        return sourceText[node.Pos.Value..node.End.Value];
+        return sourceText[pos..node.End.Value];
     }
 
     public static string GetTextWithTrivia(this INode node, string sourceText = null)

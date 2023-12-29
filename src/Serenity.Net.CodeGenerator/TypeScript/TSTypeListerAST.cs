@@ -70,11 +70,11 @@ public class TSTypeListerAST
                     md = smd;
                 }
 
-                if (md.Body is Block b)
+                if (md.Body is IBlockLike blockLike &&
+                    blockLike.Statements != null)
                 {
-                    if (b.Statements != null)
-                        foreach (var x in EnumerateTypesAndModules(b.Statements))
-                            yield return x;
+                    foreach (var x in EnumerateTypesAndModules(blockLike.Statements))
+                        yield return x;
                 }
             }
             else if (node.Kind == SyntaxKind.ClassDeclaration ||

@@ -318,6 +318,7 @@ internal interface IJsxChild : INode
 
 internal interface IBlockLike : INode
 {
+    NodeArray<IStatement> Statements { get; }
 }
 
 internal interface IForInitializer : INode

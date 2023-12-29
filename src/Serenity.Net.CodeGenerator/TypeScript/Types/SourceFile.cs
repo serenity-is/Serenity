@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class SourceFile : Declaration, IBlockLike
+internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
 {
     public SourceFile() 
         : base(SyntaxKind.SourceFile)
@@ -23,4 +23,9 @@ internal class SourceFile : Declaration, IBlockLike
     public int NodeCount { get; set; }
     public int IdentifierCount { get; set; }
     public HashSet<string> Identifiers { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return Statements;
+    }
 }

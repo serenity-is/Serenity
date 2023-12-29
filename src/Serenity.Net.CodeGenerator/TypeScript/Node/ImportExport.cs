@@ -89,7 +89,7 @@ internal class NamedImports(NodeArray<ImportSpecifier> elements)
 }
 
 internal class NamedExports(NodeArray<ExportSpecifier> elements)
-    : Node(SyntaxKind.NamedExports), INamedImportsOrExports, IGetRestChildren
+    : Node(SyntaxKind.NamedExports), INamedImportsOrExports, INamedExportBindings, IGetRestChildren
 {
     public NodeArray<ExportSpecifier> Elements { get; } = elements;
 
