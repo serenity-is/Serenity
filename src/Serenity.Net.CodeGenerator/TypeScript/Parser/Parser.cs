@@ -110,8 +110,6 @@ internal class Parser
     // attached to the EOF token.
     private bool parseErrorBeforeNextFinishedNode = false;
 
-    public SourceFile SourceFile;
-
     public Parser()
     {
     }
