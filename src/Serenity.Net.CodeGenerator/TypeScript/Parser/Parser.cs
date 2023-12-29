@@ -116,10 +116,8 @@ internal class Parser
     {
     }
 
-    public bool Optimized { get; set; }
-
-    public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion,
-        ISyntaxCursor syntaxCursor, bool setParentNodes = false, ScriptKind scriptKind = ScriptKind.Unknown,
+    public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion = ScriptTarget.Latest,
+        ISyntaxCursor syntaxCursor = null, bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
         Action<SourceFile> setExternalModuleIndicatorOverride = null,
         JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseAll)
     {

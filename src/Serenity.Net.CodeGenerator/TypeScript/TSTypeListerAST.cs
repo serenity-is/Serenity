@@ -13,12 +13,12 @@ public class TSTypeListerAST
     private readonly List<string> fileNames = [];
     private readonly HashSet<string> exportedTypeNames = [];
     private readonly IFileSystem fileSystem;
-    private readonly ConcurrentDictionary<string, SourceFile> astCache;
+    private readonly ConcurrentDictionary<string, object> astCache;
     private readonly TSModuleResolver moduleResolver;
     private readonly CancellationToken cancellationToken;
 
     internal TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
-        TSConfig tsConfig, ConcurrentDictionary<string, SourceFile> astCache = null, 
+        TSConfig tsConfig, ConcurrentDictionary<string, object> astCache = null, 
         CancellationToken cancellationToken = default)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -942,11 +942,10 @@ public class TSTypeListerAST
 
             SourceFile parseSourceFile()
             {
-                return (SourceFile)new TypeScriptAST(sourceFileText,
-                    fileFullPath, optimized: true).RootNode;
+                return new Parser().ParseSourceFile(fileFullPath, sourceFileText);
             }
 
-            var sourceFile = astCache?.GetOrAdd(sourceFileText, _ => parseSourceFile()) ?? parseSourceFile();
+            var sourceFile = (SourceFile)astCache?.GetOrAdd(sourceFileText, _ => parseSourceFile()) ?? parseSourceFile();
 
             if (sourceFile.ExternalModuleIndicator is not null)
             {
