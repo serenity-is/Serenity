@@ -4100,7 +4100,7 @@ internal class Parser
         var lastToken = Token();
         var equalsGreaterThanToken = ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken);
         var body = (lastToken == SyntaxKind.EqualsGreaterThanToken || lastToken == SyntaxKind.OpenBraceToken)
-            ? ParseArrowFunctionExpressionBody(modifiers.Any(IsAsyncModifier) == true, allowReturnTypeInArrowFunction)
+            ? ParseArrowFunctionExpressionBody(modifiers?.Any(IsAsyncModifier) == true, allowReturnTypeInArrowFunction)
             : ParseIdentifier();
 
         // Given:
