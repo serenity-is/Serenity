@@ -12,9 +12,6 @@ internal interface INode : ITextRange
 
     INode Parent { get; set; }
 
-    string GetText(string sourceText = null);
-    string GetTextWithTrivia(string sourceText = null);
-
     string ToString(bool withPos);
 }
 
@@ -31,6 +28,26 @@ internal interface IModifier : IModifierLike
 {
 }
 
+public class NodeArray<T> : List<T>, ITextRange
+{
+    public static readonly NodeArray<T> EmptyArray = [];
+
+    public NodeArray()
+    {
+    }
+
+    public NodeArray(IEnumerable<T> elements)
+        : base(elements)
+    {
+    }
+
+    public bool HasTrailingComma { get; set; }
+    public int? Pos { get; set; }
+    public int? End { get; set; }
+    public bool IsMissingList { get; set; }
+}
+
+
 internal interface IHasModifierLike : INode
 {
     NodeArray<IModifierLike> Modifiers { get; }
@@ -44,9 +61,9 @@ internal interface IHasModifiers : IHasModifierLike
 {
 }
 
-internal interface IHasChildren : INode
+internal interface IGetRestChildren : INode
 {
-    IEnumerable<INode> Children { get; set; }
+    IEnumerable<INode> GetRestChildren();
 }
 
 internal interface IHasJSDoc : INode
@@ -54,11 +71,33 @@ internal interface IHasJSDoc : INode
     JSDocArray JSDoc { get; set; }
 }
 
+internal interface IStringLiteralLike : IDeclarationName
+{
+}
+
+internal interface ILiteralLikeNode : INode
+{
+    string Text { get; set; }
+    bool IsUnterminated { get; set; }
+    bool HasExtendedUnicodeEscape { get; set; }
+    bool IsOctalLiteral { get; set; }
+}
+
+internal interface ILiteralExpression : ILiteralLikeNode, IPrimaryExpression
+{
+}
+
+
+internal interface IHasLiteralText : INode
+{
+    string Text { get; set; }
+}
+
 internal interface IDeclaration : INode
 {
 }
 
-internal interface IEntityName : INode
+internal interface IEntityName : INode, IModuleReference
 {
 }
 
@@ -75,12 +114,12 @@ internal interface IBindingName : IDeclarationName
 {
 }
 
-internal interface IHasName : INode
+internal interface IHasNameProperty : INode
 {
     IDeclarationName Name { get; }
 }
 
-internal interface INamedDeclaration : IDeclaration, IHasName
+internal interface INamedDeclaration : IDeclaration, IHasNameProperty
 {
 }
 
@@ -90,7 +129,6 @@ internal interface IVariableLikeDeclaration : INamedDeclaration
 
 internal interface ITypeElement : INamedDeclaration
 {
-    QuestionToken QuestionToken { get; }
 }
 
 
@@ -114,6 +152,10 @@ internal interface IObjectLiteralElement : INamedDeclaration, IObjectLiteralElem
 {
 }
 
+internal interface IObjectTypeDeclaration : IDeclaration
+{
+}
+
 internal interface IFunctionLikeDeclaration : ISignatureDeclaration
 {
     AsteriskToken AsteriskToken { get; set; }
@@ -125,18 +167,18 @@ internal interface IMethodOrAccessorDeclaration : IFunctionLikeDeclaration, ICla
 {
 }
 
-internal interface IAccessorDeclaration : IMethodOrAccessorDeclaration, ISignatureDeclaration, ITypeElement, IObjectLiteralElementLike
+internal interface IAccessorDeclaration : IMethodOrAccessorDeclaration, ISignatureDeclaration, 
+    ITypeElement, IObjectLiteralElementLike, IDeclarationWithTypeParameterChildren
 {
 }
 
-internal interface IClassLikeDeclaration : INamedDeclaration
+internal interface IClassLikeDeclaration : INamedDeclaration, IObjectTypeDeclaration, IDeclarationWithTypeParameterChildren
 {
-    NodeArray<TypeParameterDeclaration> TypeParameters { get; }
     NodeArray<HeritageClause> HeritageClauses { get; }
     NodeArray<IClassElement> Members { get; }
 }
 
-internal interface IClassElement : IDeclaration
+internal interface IClassElement : INamedDeclaration
 {
 }
 
@@ -149,9 +191,12 @@ internal interface IKeywordTypeNode : ITypeNode
 {
 }
 
-internal interface ISignatureDeclaration : INamedDeclaration
+internal interface IDeclarationStatement : INamedDeclaration, IStatement
 {
-    NodeArray<TypeParameterDeclaration> TypeParameters { get; }
+}
+
+internal interface ISignatureDeclaration : INamedDeclaration, IDeclarationWithTypeParameterChildren
+{
     NodeArray<ParameterDeclaration> Parameters { get; }
     ITypeNode Type { get; }
 }
@@ -165,17 +210,9 @@ internal interface IBlockOrExpression : INode
 {
 }
 
-internal interface IVariableDeclarationListOrExpression : INode
+internal interface IVariableDeclarationList : INode, IForInitializer
 {
-}
-
-internal interface IVariableDeclarationList : INode, IVariableDeclarationListOrExpression
-{
-    NodeArray<VariableDeclaration> Declarations { get; set; }
-}
-
-internal interface IExpression : IBlockOrExpression, IVariableDeclarationListOrExpression
-{
+    NodeArray<VariableDeclaration> Declarations { get; }
 }
 
 internal interface IIntersectsChange : INode
@@ -206,8 +243,10 @@ internal interface IConciseBody : INode
 {
 }
 
-internal interface ITemplateLiteral : INode
+internal interface ITemplateLiteralLikeNode : ILiteralLikeNode
 {
+    string RawText { get; }
+    TokenFlags? TemplateFlags { get; }
 }
 
 internal interface IEntityNameExpression : INode
@@ -223,6 +262,15 @@ internal interface ISuperProperty : INode
 }
 
 internal interface ICallLikeExpression : INode
+{
+}
+
+
+internal interface IExpression : IBlockOrExpression, IForInitializer
+{
+}
+
+internal interface IUnaryExpression : IExpression
 {
 }
 
@@ -278,18 +326,23 @@ internal interface IForInitializer : INode
 
 internal interface IBreakOrContinueStatement : IStatement
 {
-    Identifier Label { get; set; }
+    Identifier Label { get; }
 }
 
-internal interface ICaseOrDefaultClause : INode
+internal interface ICaseOrDefaultClause : INode, IBlockLike
 {
+}
+
+internal interface IDeclarationWithTypeParameterChildren : INode, IDeclarationWithTypeParameters
+{
+    NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
 }
 
 internal interface IDeclarationWithTypeParameters : INode
 {
 }
 
-internal interface IModuleName : INode
+internal interface IModuleName : INode, IDeclarationName
 {
 }
 
@@ -297,7 +350,7 @@ internal interface IModuleBody : INode
 {
 }
 
-internal interface INamespaceBody : INode
+internal interface INamespaceBody : INode, IModuleBody
 {
 }
 
@@ -338,5 +391,25 @@ internal interface IAnyImportSyntax : INode
 }
 
 internal interface IDestructuringPattern : INode
+{
+}
+
+internal interface IUpdateExpression : IUnaryExpression
+{
+}
+
+internal interface ILeftHandSideExpression : IUpdateExpression
+{
+}
+
+internal interface IMemberExpression : ILeftHandSideExpression
+{
+}
+
+internal interface IPrimaryExpression : IMemberExpression
+{
+}
+
+internal interface IStatement : INode
 {
 }

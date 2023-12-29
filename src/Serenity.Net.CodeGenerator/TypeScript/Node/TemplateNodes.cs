@@ -1,53 +1,59 @@
+
 namespace Serenity.TypeScript;
 
-internal class TemplateLiteralLikeNode : LiteralLikeNode
+internal class TemplateLiteralLikeNode(SyntaxKind kind, string text, string rawText, TokenFlags? templateFlags)
+    : LiteralLikeNode(kind, text), ITemplateLiteralLikeNode
 {
-    internal TemplateLiteralLikeNode(SyntaxKind kind, string text, string rawText, TokenFlags? templateFlags)
-        : base(kind, text)
-    {
-        RawText = rawText;
-        TemplateFlags = (templateFlags ?? TokenFlags.None) & TokenFlags.TemplateLiteralLikeFlags;
-    }
-
-    public string RawText { get; set; }
-    internal TokenFlags? TemplateFlags { get; set; }
+    public string RawText { get; set; } = rawText;
+    public TokenFlags? TemplateFlags { get; set; } = (templateFlags ?? TokenFlags.None) & TokenFlags.TemplateLiteralLikeFlags;
 }
 
-internal class TemplateSpan : NodeBase
+internal class TemplateSpan(IExpression expression, ITemplateLiteralLikeNode literal)
+    : Node(SyntaxKind.TemplateSpan), IGetRestChildren
 {
-    public TemplateSpan(IExpression expression, TemplateLiteralLikeNode literal)
-    {
-        Kind = SyntaxKind.TemplateSpan;
-        Expression = expression;
-        Literal = literal;
-    }
+    public IExpression Expression { get; } = expression;
+    public ITemplateLiteralLikeNode Literal { get; } = literal; // TemplateMiddle | TemplateTail
 
-    public IExpression Expression { get; }
-    public TemplateLiteralLikeNode Literal { get; } // TemplateMiddle | TemplateTail
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Expression, Literal];
+    }
 }
 
-internal class TemplateLiteralTypeSpan : TypeNodeBase
+internal class TemplateLiteralTypeSpan(ITypeNode type, ITemplateLiteralLikeNode literal) 
+    : TypeNodeBase(SyntaxKind.TemplateLiteralTypeSpan), IGetRestChildren
 {
-    public TemplateLiteralTypeSpan(ITypeNode type, TemplateLiteralLikeNode literal)
-        : base(SyntaxKind.TemplateLiteralTypeSpan)
-    {
-        Type = type;
-        Literal = literal;
-    }
+    public ITypeNode Type { get; } = type;
+    public ITemplateLiteralLikeNode Literal { get; } = literal;
 
-    public ITypeNode Type { get; }
-    public TemplateLiteralLikeNode Literal { get; }
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type, Literal];
+    }
 }
 
-internal class TemplateLiteralTypeNode(TemplateLiteralLikeNode head, NodeArray<TemplateLiteralTypeSpan> templateSpans)
-    : TypeNodeBase(SyntaxKind.TemplateLiteralType)
+internal class TemplateLiteralTypeNode(ITemplateLiteralLikeNode head, NodeArray<TemplateLiteralTypeSpan> templateSpans)
+    : TypeNodeBase(SyntaxKind.TemplateLiteralType), IGetRestChildren
 {
-    public TemplateLiteralLikeNode Head { get; } = head;
+    public ITemplateLiteralLikeNode Head { get; } = head;
     public NodeArray<TemplateLiteralTypeSpan> TemplateSpans { get; } = templateSpans;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        yield return Head;
+        if (TemplateSpans != null) foreach (var x in TemplateSpans) yield return x;
+    }
 }
 
-internal class TemplateExpression(TemplateLiteralLikeNode head, NodeArray<TemplateSpan> templateSpans) : PrimaryExpressionBase(SyntaxKind.TemplateExpression)
+internal class TemplateExpression(ITemplateLiteralLikeNode head, NodeArray<TemplateSpan> templateSpans) 
+    : PrimaryExpressionBase(SyntaxKind.TemplateExpression), IGetRestChildren
 {
-    public TemplateLiteralLikeNode Head { get; } = head;
+    public ITemplateLiteralLikeNode Head { get; } = head;
     public NodeArray<TemplateSpan> TemplateSpans { get; } = templateSpans;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        yield return Head;
+        if (TemplateSpans != null) foreach (var x in TemplateSpans) yield return x;
+    }
 }

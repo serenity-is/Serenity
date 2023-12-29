@@ -1,5 +1,5 @@
-using System.Reflection.Metadata;
 using static Serenity.TypeScript.NodeVisitor;
+using static Serenity.TypeScript.NodeTests;
 using static Serenity.TypeScript.Scanner;
 
 namespace Serenity.TypeScript;
@@ -24,7 +24,7 @@ internal class Utilities
         if ((node.Flags & NodeFlags.HasAggregatedChildData) != 0)
         {
             var thisNodeOrAnySubNodesHasError = (node.Flags & NodeFlags.ThisNodeHasError) != 0 ||
-                                                ForEachChild(node, ContainsParseError) != null;
+                node.ForEachChild(ContainsParseError) != null;
             if (thisNodeOrAnySubNodesHasError)
                 node.Flags |= NodeFlags.ThisNodeOrAnySubNodesHasError;
 
@@ -97,6 +97,18 @@ internal class Utilities
         };
     }
 
+    internal static bool IsParameterPropertyModifier(SyntaxKind kind)
+    {
+        return (ModifierToFlag(kind) & ModifierFlags.ParameterPropertyModifier) != 0;
+    }
+
+    internal static bool IsClassMemberModifier(SyntaxKind idToken)
+    {
+        return IsParameterPropertyModifier(idToken) ||
+            idToken == SyntaxKind.StaticKeyword ||
+            idToken == SyntaxKind.OverrideKeyword ||
+            idToken == SyntaxKind.AccessorKeyword;
+    }
 
     public static bool IsParameterDeclaration(IVariableLikeDeclaration node)
     {
@@ -105,7 +117,6 @@ internal class Utilities
         return root.Kind == SyntaxKind.Parameter;
     }
 
-
     public static INode GetRootDeclaration(INode node)
     {
         while (node.Kind == SyntaxKind.BindingElement)
@@ -113,7 +124,6 @@ internal class Utilities
 
         return node;
     }
-
 
     public static bool HasModifiers(INode node)
     {
@@ -179,7 +189,6 @@ internal class Utilities
                || token == SyntaxKind.AmpersandAmpersandToken
                || token == SyntaxKind.ExclamationToken;
     }
-
 
     public static bool IsAssignmentOperator(SyntaxKind token)
     {
@@ -430,39 +439,10 @@ internal class Utilities
             || kind == SyntaxKind.ExportDeclaration;
     }
 
-    static bool IsImportEqualsDeclaration(INode node)
-    {
-        return node.Kind == SyntaxKind.ImportEqualsDeclaration;
-    }
-
     static bool HasModifierOfKind(INode node, SyntaxKind kind)
     {
         return node is IHasModifierLike hasModifiers && hasModifiers.Modifiers != null &&
             hasModifiers.Modifiers.Any(m => m.Kind == kind);
-    }
-
-    static bool IsExternalModuleReference(INode node)
-    {
-        return node.Kind == SyntaxKind.ExternalModuleReference;
-    }
-    static bool IsImportDeclaration(INode node)
-    {
-        return node.Kind == SyntaxKind.ImportDeclaration;
-    }
-
-    static bool IsExportAssignment(INode node)
-    {
-        return node.Kind == SyntaxKind.ExportAssignment;
-    }
-
-    static bool IsExportDeclaration(INode node)
-    {
-        return node.Kind == SyntaxKind.ExportDeclaration;
-    }
-
-    static bool IsMetaProperty(INode node)
-    {
-        return node.Kind == SyntaxKind.MetaProperty;
     }
 
     static bool IsAnExternalModuleIndicatorNode(INode node)
@@ -483,7 +463,7 @@ internal class Utilities
 
     static INode WalkTreeForImportMeta(INode node)
     {
-        return IsImportMeta(node) ? node : ForEachChild(node, WalkTreeForImportMeta);
+        return IsImportMeta(node) ? node : node.ForEachChild(WalkTreeForImportMeta);
     }
 
     static bool IsImportMeta(INode node)
@@ -521,38 +501,15 @@ internal class Utilities
         return location != null ? SetTextRangePosEnd(range, location.Pos ?? 0, location.End ?? location.Pos ?? 0) : range;
     }
 
-    static bool IsDeclareModifier(IModifierLike modifier)
+    internal static ITextRange SetTextRangePos(ITextRange range, int pos)
     {
-        return modifier.Kind == SyntaxKind.DeclareKeyword;
-    }
-
-    internal static bool IsAsyncModifier(IModifierLike modifier)
-    {
-        return modifier.Kind == SyntaxKind.AsyncKeyword;
+        range.Pos = pos;
+        return range;
     }
 
     internal static bool IsExternalModule(SourceFile sourceFile)
     {
         return sourceFile.ExternalModuleIndicator != null;
-    }
-
-    internal static bool IsFunctionTypeNode(INode node)
-    {
-        return node.Kind == SyntaxKind.FunctionType;
-    }
-    internal static bool IsJSDocFunctionType(INode node)
-    {
-        return node.Kind == SyntaxKind.JSDocFunctionType;
-    }
-
-    internal static bool IsJsxOpeningElement(INode node)
-    {
-        return node.Kind == SyntaxKind.JsxOpeningElement;
-    }
-
-    internal static bool IsJsxOpeningFragment(INode node)
-    {
-        return node.Kind == SyntaxKind.JsxOpeningFragment;
     }
 
     internal static bool CanHaveJSDoc(INode node)
@@ -609,11 +566,6 @@ internal class Utilities
         };
     }
 
-    internal static bool IsJsxNamespacedName(INode node)
-    {
-        return node.Kind == SyntaxKind.JsxNamespacedName;
-    }
-
     internal static bool TagNamesAreEquivalent(IJsxTagNameExpression lhs, IJsxTagNameExpression rhs)
     {
         if (lhs == null || rhs == null || lhs.Kind != rhs.Kind)
@@ -639,14 +591,19 @@ internal class Utilities
         // If we are at this statement then we must have PropertyAccessExpression and because tag name in Jsx element can only
         // take forms of JsxTagNameExpression which includes an identifier, "this" expression, or another propertyAccessExpression
         // it is safe to case the expression property as such. See parseJsxElementName for how we parse tag name in Jsx element
-        return (lhs as PropertyAccessExpression)?.Name?.EscapedText == (rhs as PropertyAccessExpression)?.Name.EscapedText &&
-            TagNamesAreEquivalent((lhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression, 
+        return ((lhs as PropertyAccessExpression)?.Name as Identifier)?.EscapedText ==
+            ((rhs as PropertyAccessExpression)?.Name as Identifier).EscapedText &&
+            TagNamesAreEquivalent((lhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression,
                 (rhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression);
     }
 
-    internal static bool IsNonNullExpression(INode node)
+    internal static bool IsStringLiteralLike(INode node)
     {
-        return node.Kind == SyntaxKind.NonNullExpression;
+        return node.Kind == SyntaxKind.StringLiteral || node.Kind == SyntaxKind.NoSubstitutionTemplateLiteral;
     }
 
+    internal static bool IsStringOrNumericLiteralLike(INode node)
+    {
+        return IsStringLiteralLike(node) || IsNumericLiteral(node);
+    }
 }

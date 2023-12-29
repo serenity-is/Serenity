@@ -8,7 +8,7 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class TSTypeLister
+internal class TSTypeLister
 {
     private readonly IFileSystem fileSystem;
     private readonly CancellationToken cancellationToken;

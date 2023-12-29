@@ -17,7 +17,7 @@ public class TSTypeListerAST
     private readonly TSModuleResolver moduleResolver;
     private readonly CancellationToken cancellationToken;
 
-    public TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
+    internal TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
         TSConfig tsConfig, ConcurrentDictionary<string, SourceFile> astCache = null, 
         CancellationToken cancellationToken = default)
     {
@@ -37,12 +37,13 @@ public class TSTypeListerAST
 
     static bool HasExportModifier(INode node)
     {
-        return node.Modifiers != null && node.Modifiers.Any(x => x.Kind == SyntaxKind.ExportKeyword);
+        
+        return node.HasModifier(SyntaxKind.ExportKeyword);
     }
 
     static bool HasDeclareModifier(INode node)
     {
-        return node.Modifiers != null && node.Modifiers.Any(x => x.Kind == SyntaxKind.DeclareKeyword);
+        return node.HasModifier(SyntaxKind.DeclareKeyword);
     }
 
     static IEnumerable<INode> EnumerateParents(INode node)
@@ -154,11 +155,11 @@ public class TSTypeListerAST
             if (node is ArrayTypeNode atn)
                 return GetText(atn.ElementType) + "[]";
         }
-        else if (node is Declaration de && de.Name != null)
+        else if (node is IHasNameProperty de && de.Name != null)
             return GetText(de.Name);
         else if (node is TypeLiteralNode tln)
         {
-            var text = tln.GetText();
+            var text = tln.GetText(sourceText: null);
             return string.IsNullOrEmpty(text) ? "{}" : text;
         }
         return node?.GetText();
@@ -380,8 +381,7 @@ public class TSTypeListerAST
     {
         return EnumerateParents(node).Any(x => 
             (x.Kind == SyntaxKind.ModuleDeclaration &&
-             x.Modifiers != null &&
-             x.Modifiers.Any(z => z.Kind == SyntaxKind.DeclareKeyword)) ||
+             x.HasModifier(SyntaxKind.DeclareKeyword)) ||
             (x.Kind == SyntaxKind.SourceFile &&
              (x as SourceFile).IsDeclarationFile));
     }
@@ -422,7 +422,7 @@ public class TSTypeListerAST
                     case SyntaxKind.NumericLiteral:
                         result.Arguments.Add(new()
                         {
-                            Value = double.Parse((arg as LiteralExpression).Text, CultureInfo.InvariantCulture.NumberFormat)
+                            Value = double.Parse((arg as LiteralExpressionBase).Text, CultureInfo.InvariantCulture.NumberFormat)
                         });
                         break;
 
@@ -510,10 +510,11 @@ public class TSTypeListerAST
                 continue;
 
             externalMember.Name = name;
-            if (member.Modifiers != null && member.Modifiers.Any(x => x.Kind == SyntaxKind.StaticKeyword))
+            if (member.HasModifier(SyntaxKind.StaticKeyword))
                 externalMember.IsStatic = true;
-            if (member.Decorators != null && member.Decorators.Count > 0)
-                externalMember.Attributes = member.Decorators.Select(DecoratorToExternalAttribute).ToList();
+            var decorators = member.GetDecorators();
+            if (decorators.Any())
+                externalMember.Attributes = decorators.Select(DecoratorToExternalAttribute).ToList();
 
             result.Add(externalMember);
         }
@@ -566,8 +567,9 @@ public class TSTypeListerAST
                 continue;
 
             externalMember.Name = name;
-            if (member.Decorators != null && member.Decorators.Count > 0)
-                externalMember.Attributes = member.Decorators.Select(DecoratorToExternalAttribute).ToList();
+            var decorators = member.GetDecorators();
+            if (decorators.Any())
+                externalMember.Attributes = decorators.Select(DecoratorToExternalAttribute).ToList();
 
             result.Add(externalMember);
         }
@@ -606,8 +608,9 @@ public class TSTypeListerAST
         if (result.Methods != null && result.Methods.Count == 0)
             result.Methods = null;
         result.Interfaces = GetInterfaces(klass);
-        if (klass.Decorators?.Any() == true)
-            result.Attributes = klass.Decorators.Select(DecoratorToExternalAttribute).ToList();
+        var decorators = klass.GetDecorators();
+        if (decorators.Any())
+            result.Attributes = decorators.Select(DecoratorToExternalAttribute).ToList();
 
         return result;
     }
@@ -631,8 +634,9 @@ public class TSTypeListerAST
         if (result.Methods != null && result.Methods.Count == 0)
             result.Methods = null;
         result.Interfaces = GetBaseInterfaces(intf);
-        if (intf.Decorators?.Any() == true)
-            result.Attributes = intf.Decorators.Select(DecoratorToExternalAttribute).ToList();
+        var decorators = intf.GetDecorators();
+        if (decorators.Any())
+            result.Attributes = decorators.Select(DecoratorToExternalAttribute).ToList();
 
         return result;
     }
@@ -696,8 +700,9 @@ public class TSTypeListerAST
 
             externalMember.Name = name;
             externalMember.IsStatic = true;
-            if (member.Decorators != null && member.Decorators.Count > 0)
-                externalMember.Attributes = member.Decorators?.Select(DecoratorToExternalAttribute).ToList();
+            var decorators = member.GetDecorators();
+            if (decorators.Any())
+                externalMember.Attributes = decorators.Select(DecoratorToExternalAttribute).ToList();
 
             result.Add(externalMember);
         }

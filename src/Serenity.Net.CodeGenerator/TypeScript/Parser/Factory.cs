@@ -2,10 +2,10 @@ namespace Serenity.TypeScript;
 
 internal static class Factory
 {
-    internal static ILiteralLikeNode CreateTemplateLiteralLikeNode(SyntaxKind kind, string text, string rawText, TokenFlags? templateFlags)
+    internal static ITemplateLiteralLikeNode CreateTemplateLiteralLikeNode(SyntaxKind kind, string text, string rawText, TokenFlags? templateFlags)
     {
         if (kind == SyntaxKind.NoSubstitutionTemplateLiteral)
-            return new NoSubstitutionTemplateLiteral(text, rawText, templateFlags);
+            return new NoSubstitutionTemplateLiteral(text, rawText, templateFlags ?? TokenFlags.None);
 
         return new TemplateLiteralLikeNode(kind, text, rawText, templateFlags);
     }

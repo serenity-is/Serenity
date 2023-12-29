@@ -2,7 +2,7 @@ using Serenity.TypeScript;
 
 namespace Serenity.TypeScript.Change;
 
-public class ChangeAST(ICollection<NodeChangeItem> changeItems = null)
+internal class ChangeAST(ICollection<NodeChangeItem> changeItems = null)
 {
     private readonly ICollection<NodeChangeItem> _nodeChangeItems = changeItems ?? new List<NodeChangeItem>();
 

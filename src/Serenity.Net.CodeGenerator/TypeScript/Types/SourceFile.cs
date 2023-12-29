@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class SourceFile : Declaration
+internal class SourceFile : Declaration, IBlockLike
 {
     public SourceFile() 
         : base(SyntaxKind.SourceFile)
@@ -19,9 +19,6 @@ internal class SourceFile : Declaration
     public INode ExternalModuleIndicator { get; set; }
     internal List<Diagnostic> ParseDiagnostics { get; set; }
     public string Text { get; set; }
-
-
-
     public IEnumerable<CommentDirective> CommentDirectives { get; set; }
     public int NodeCount { get; set; }
     public int IdentifierCount { get; set; }

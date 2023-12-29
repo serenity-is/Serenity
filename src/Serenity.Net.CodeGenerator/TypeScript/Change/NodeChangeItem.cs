@@ -1,15 +1,12 @@
-﻿using Serenity.TypeScript;
+using Serenity.TypeScript;
 
 namespace Serenity.TypeScript.Change;
 
-public class NodeChangeItem
+internal class NodeChangeItem
 {
     public NodeChangeType ChangeType { get; set; }
 
     public INode Node { get; set; }
-    //public int Pos { get; set; }
-
-    //public int End { get; set; }
     public string NewValue { get; set; }
 
     private string NewValueSmall => NewValue == null

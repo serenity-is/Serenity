@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-public class Diagnostic
+internal class Diagnostic
 {
     public SourceFile File { get; set; }
     public string FileName { get; set; }

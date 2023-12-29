@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class JSDocTypeExpression : NodeBase
+internal class JSDocTypeExpression : Node, IGetRestChildren
 {
     public JSDocTypeExpression()
     {
@@ -8,6 +8,11 @@ internal class JSDocTypeExpression : NodeBase
     }
 
     public ITypeNode Type { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type];
+    }
 }
 
 internal interface IJSDocType : ITypeNode
@@ -26,25 +31,43 @@ internal class JSDocUnknownType() : JSDocType(SyntaxKind.JSDocUnknownType)
 {
 }
 
-internal class JSDocNonNullableType(ITypeNode type, bool postfix) : JSDocType(SyntaxKind.JSDocNonNullableType)
+internal class JSDocNonNullableType(ITypeNode type, bool postfix) 
+    : JSDocType(SyntaxKind.JSDocNonNullableType), IGetRestChildren
 {
     public ITypeNode Type { get; } = type;
     public bool Postfix { get; } = postfix;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type];
+    }
 }
 
-internal class JSDocNullableType(ITypeNode type, bool postfix) : JSDocType(SyntaxKind.JSDocNullableType)
+internal class JSDocNullableType(ITypeNode type, bool postfix) 
+    : JSDocType(SyntaxKind.JSDocNullableType), IGetRestChildren
 {
     public ITypeNode Type { get; } = type;
     public bool Postfix { get; } = postfix;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type];
+    }
 }
 
-internal class JSDocOptionalType(ITypeNode type) : JSDocType(SyntaxKind.JSDocOptionalType)
+internal class JSDocOptionalType(ITypeNode type) 
+    : JSDocType(SyntaxKind.JSDocOptionalType), IGetRestChildren
 {
-
     public ITypeNode Type { get; } = type;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type];
+    }
 }
 
-internal class JSDocFunctionType : NodeBase, IJSDocType, ISignatureDeclaration, IHasName
+internal class JSDocFunctionType : Node, IJSDocType, ISignatureDeclaration, IHasNameProperty, IGetRestChildren
+
 {
     public JSDocFunctionType(NodeArray<ParameterDeclaration> parameters, ITypeNode type)
     {
@@ -57,17 +80,36 @@ internal class JSDocFunctionType : NodeBase, IJSDocType, ISignatureDeclaration, 
     public ITypeNode Type { get; set; }
     public IDeclarationName Name { get; set; }
     public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        if (Parameters != null) foreach (var x in Parameters) yield return x;
+        yield return Type;
+        yield return Name;
+        if (TypeParameters != null) foreach (var x in TypeParameters) yield return x;
+    }
 }
 
-internal class JSDocVariadicType(ITypeNode type) : JSDocType(SyntaxKind.JSDocVariadicType)
+internal class JSDocVariadicType(ITypeNode type) 
+    : JSDocType(SyntaxKind.JSDocVariadicType), IGetRestChildren
 {
     public ITypeNode Type { get; } = type;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [Type];
+    }
 }
 
-internal class JSDoc : NodeBase
+internal class JSDoc : Node, IGetRestChildren
 {
     public NodeArray<IJSDocTag> Tags { get; set; }
     public string Comment { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        if (Tags != null) foreach (var x in Tags) yield return x;
+    }
 }
 
 internal class JSDocArray : List<JSDoc>
@@ -91,7 +133,7 @@ internal interface IJSDocTag : INode
     string Comment { get; set; }
 }
 
-internal class JSDocTag : NodeBase, IJSDocTag
+internal class JSDocTag : Node, IJSDocTag, IGetRestChildren
 {
     public JSDocTag()
     {
@@ -101,13 +143,18 @@ internal class JSDocTag : NodeBase, IJSDocTag
     public AtToken AtToken { get; set; }
     public Identifier TagName { get; set; }
     public string Comment { get; set; }
+
+    public virtual IEnumerable<INode> GetRestChildren()
+    {
+        return [AtToken, TagName];
+    }
 }
 
 internal class JSDocUnknownTag : JSDocTag
 {
 }
 
-internal class JSDocAugmentsTag : JSDocTag
+internal class JSDocAugmentsTag : JSDocTag, IGetRestChildren
 {
     public JSDocAugmentsTag()
     {
@@ -115,9 +162,16 @@ internal class JSDocAugmentsTag : JSDocTag
     }
 
     public JSDocTypeExpression TypeExpression { get; set; }
+
+    public override IEnumerable<INode> GetRestChildren()
+    {
+        foreach (var x in base.GetRestChildren())
+            yield return x;
+        yield return TypeExpression;
+    }
 }
 
-internal class JSDocTemplateTag : JSDocTag
+internal class JSDocTemplateTag : JSDocTag, IDeclarationWithTypeParameterChildren
 {
     public JSDocTemplateTag()
     {
@@ -125,9 +179,10 @@ internal class JSDocTemplateTag : JSDocTag
     }
 
     public NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
+
 }
 
-internal class JSDocReturnTag : JSDocTag
+internal class JSDocReturnTag : JSDocTag, IGetRestChildren
 {
     public JSDocReturnTag()
     {
@@ -135,9 +190,17 @@ internal class JSDocReturnTag : JSDocTag
     }
 
     public JSDocTypeExpression TypeExpression { get; set; }
+
+    public override IEnumerable<INode> GetRestChildren()
+    {
+        foreach (var x in base.GetRestChildren())
+            yield return x;
+
+        yield return TypeExpression;
+    }
 }
 
-internal class JSDocTypeTag : JSDocTag
+internal class JSDocTypeTag : JSDocTag, IGetRestChildren
 {
     public JSDocTypeTag()
     {
@@ -145,9 +208,17 @@ internal class JSDocTypeTag : JSDocTag
     }
 
     public JSDocTypeExpression TypeExpression { get; set; }
+
+    public override IEnumerable<INode> GetRestChildren()
+    {
+        foreach (var x in base.GetRestChildren())
+            yield return x;
+
+        yield return TypeExpression;
+    }
 }
 
-internal class JSDocTypedefTag : NodeBase, IJSDocTag, IHasName
+internal class JSDocTypedefTag : Node, IJSDocTag, IHasNameProperty, IGetRestChildren, IDeclarationWithTypeParameters
 {
     public JSDocTypedefTag()
     {
@@ -161,9 +232,14 @@ internal class JSDocTypedefTag : NodeBase, IJSDocTag, IHasName
     public AtToken AtToken { get; set; }
     public Identifier TagName { get; set; }
     public string Comment { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [FullName, TypeExpression, JSDocTypeLiteral, Name, AtToken, TagName];
+    }
 }
 
-internal class JSDocPropertyTag : NodeBase, IJSDocTag, ITypeElement, IHasName
+internal class JSDocPropertyTag : Node, IJSDocTag, ITypeElement, IHasNameProperty, IGetRestChildren
 {
     public JSDocPropertyTag()
     {
@@ -176,15 +252,26 @@ internal class JSDocPropertyTag : NodeBase, IJSDocTag, ITypeElement, IHasName
     public string Comment { get; set; }
     public IDeclarationName Name { get; set; }
     public QuestionToken QuestionToken { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        return [TypeExpression, AtToken, TagName, AtToken, Name, QuestionToken];
+    }
 }
 
-internal class JSDocTypeLiteral() : JSDocType(SyntaxKind.JSDocTypeLiteral)
+internal class JSDocTypeLiteral() : JSDocType(SyntaxKind.JSDocTypeLiteral), IGetRestChildren
 {
     public NodeArray<JSDocPropertyTag> JSDocPropertyTags { get; set; }
     public JSDocTypeTag JSDocTypeTag { get; set; }
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        if (JSDocPropertyTags != null) foreach (var x in JSDocPropertyTags) yield return x;
+        yield return JSDocTypeTag;
+    }
 }
 
-internal class JSDocParameterTag : JSDocTag
+internal class JSDocParameterTag : JSDocTag, IGetRestChildren
 {
     public JSDocParameterTag()
     {
@@ -196,9 +283,26 @@ internal class JSDocParameterTag : JSDocTag
     public Identifier PostParameterName { get; set; }
     public Identifier ParameterName { get; set; }
     public bool IsBracketed { get; set; }
+
+    public override IEnumerable<INode> GetRestChildren()
+    {
+        foreach (var x in base.GetRestChildren())
+            yield return x;
+
+        yield return PreParameterName;
+        yield return TypeExpression;
+        yield return PostParameterName;
+        yield return ParameterName;
+    }
 }
 
-internal class JSDocNamepathType(ITypeNode type) : JSDocType(SyntaxKind.JSDocNamepathType)
+internal class JSDocNamepathType(ITypeNode type)
+    : JSDocType(SyntaxKind.JSDocNamepathType), IGetRestChildren
 {
     public ITypeNode Type { get; } = type;
+
+    public IEnumerable<INode> GetRestChildren()
+    {
+        yield return Type;
+    }
 }
