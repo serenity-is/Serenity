@@ -12,6 +12,7 @@ public partial class TypeScriptTests
 {
     const string TestCaseExtension = ".testcase";
     const string TypeScriptCasesFolder = "/Sandbox/misc/TypeScript/tests/cases/compiler/";
+    const string DummyCaseFile = "__dummyFile__";
 
     // For these tests to work, clone TypeScript repo, npm i, npm run build and
     // create a testcases.cjs at root with the following content:
@@ -74,15 +75,16 @@ public partial class TypeScriptTests
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
             if (!Directory.Exists(TypeScriptCasesFolder))
-                return [];
+                return [[DummyCaseFile]];
 
             var fullPath = Path.GetFullPath(TypeScriptCasesFolder);
-            return new DirectoryInfo(TypeScriptCasesFolder).GetFiles("*" + TestCaseExtension, SearchOption.AllDirectories)
+            var cases = new DirectoryInfo(TypeScriptCasesFolder).GetFiles("*" + TestCaseExtension, SearchOption.AllDirectories)
                 .OrderBy(x => x.Length)
                 .Select(x => new object[] { Path.ChangeExtension(Path.GetRelativePath(fullPath, x.FullName), null) })
-                .Concat([["__dummyFile__"]])
                 .Where(x => !TypeScriptCasesToSkip.Contains(x[0] as string))
                 .ToArray();
+
+            return cases.Length == 0 ? [[DummyCaseFile]] : cases;
         }
     }
 
@@ -184,7 +186,7 @@ public partial class TypeScriptTests
     [Theory]
     public void Scanner_Outputs_Matching_Tokens(string file)
     {
-        if (file == "__dummyFile__")
+        if (file == DummyCaseFile)
             return;
 
         var path = Path.Combine(TypeScriptCasesFolder, file) + TestCaseExtension;
@@ -233,7 +235,7 @@ public partial class TypeScriptTests
     [Theory]
     public void Parser_Outputs_Matching_Nodes(string file)
     {
-        if (file == "__dummyFile__")
+        if (file == DummyCaseFile)
             return;
 
         var path = Path.Combine(TypeScriptCasesFolder, file) + TestCaseExtension;
