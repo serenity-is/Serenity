@@ -24,48 +24,60 @@ public partial class TypeScriptTests
     // var fs = require("fs");
     // var path = require("path");
     // var scanner = createScanner(ts.ScriptTarget.Latest, true);
+    // var host = ts.createCompilerHost({});
     // for (var file of glob.sync("./tests/cases/compiler/**/*.{ts,tsx}")) {
-    //     var content = fs.readFileSync(file, 'utf8');
-    //     
-    //     scanner.setText(content ?? "");
-    //     var tokens = [];
-    //     while (scanner.scan() != ts.SyntaxKind.EndOfFileToken) {
-    //         tokens.push({
-    //             Kind: scanner.getToken(),
-    //             Text: scanner.getTokenText(),
-    //             Value: scanner.getTokenValue(),
-    //             FS: scanner.getTokenFullStart(),
-    //             TS: scanner.getTokenStart(),
-    //             TE: scanner.getTokenEnd(),
-    //             XE: scanner.hasExtendedUnicodeEscape(),
-    //             UE: scanner.hasUnicodeEscape(),
-    //             LB: scanner.hasPrecedingLineBreak(),
-    //             ID: scanner.isIdentifier(),
-    //             RW: scanner.isReservedWord(),
-    //             UT: scanner.isUnterminated()
-    //         });
-    //     }
-    //     
-    //     let program = createProgram([file], {
-    //        target: ScriptTarget.Latest
-    //     });
-    //     var sourceFile = program.getSourceFile(file);
-    //     var nodes = [];
-    //     var visitor = node => {
-    //        nodes.push({
-    //            Kind: node.kind
-    //        });
-    //        return node.forEachChild(visitor);
-    //     }
-    //     
-    //     sourceFile.forEachChild(visitor);
+    //     try {
+    //         // stack overflow for forEachChild
+    //         if (/binderBinaryExpressionStress(Js)?.ts$/.test(file))
+    //             continue;
+    //         var content = host.readFile(file);
     // 
+    //         scanner.setText(content ?? "");
+    //         var tokens = [];
+    //         while (scanner.scan() != ts.SyntaxKind.EndOfFileToken) {
+    //             tokens.push({
+    //                 Kind: scanner.getToken(),
+    //                 Text: scanner.getTokenText(),
+    //                 Value: scanner.getTokenValue(),
+    //                 FS: scanner.getTokenFullStart(),
+    //                 TS: scanner.getTokenStart(),
+    //                 TE: scanner.getTokenEnd(),
+    //                 XE: scanner.hasExtendedUnicodeEscape(),
+    //                 UE: scanner.hasUnicodeEscape(),
+    //                 LB: scanner.hasPrecedingLineBreak(),
+    //                 ID: scanner.isIdentifier(),
+    //                 RW: scanner.isReservedWord(),
+    //                 UT: scanner.isUnterminated()
+    //             });
+    //         }
+    //         
+    //         let program = createProgram([file], {
+    //             target: ScriptTarget.Latest,
+    //         }, host);
+    //         var sourceFile = program.getSourceFile(file);
+    //         var nodes = [];
+    //         var visitor = node => {
+    //             if (nodes.length > 100000) {
+    //                 throw "Possible infinite recursion!";
+    //             }
+    //             nodes.push({
+    //                 Kind: node.kind
+    //             });
+    //             return node.forEachChild(visitor);
+    //         }
+    //         
+    //         sourceFile.forEachChild(visitor);
+    // 
+    //     } catch(e) {
+    //         console.log('error parsing: ' + file + ': ' + e.toString());
+    //         continue;
+    //     }
     //     fs.writeFileSync(file.replace(/.tsx?$/, ".testcase"), JSON.stringify({
-    //        Extension: path.extname(file),
-    //        Content: content,
-    //        Tokens: tokens,
-    //        Nodes: nodes
-    //    }));
+    //         Extension: path.extname(file),
+    //         Content: content,
+    //         Tokens: tokens,
+    //         Nodes: nodes
+    //     }));
     // }
     //
     // Run it with node ./testcases.cjs then set the TypeScriptTestCases constant
