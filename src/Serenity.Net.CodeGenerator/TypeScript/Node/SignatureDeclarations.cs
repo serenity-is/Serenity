@@ -67,6 +67,6 @@ internal class PropertySignature(NodeArray<IModifierLike> modifiers, IPropertyNa
 
     public override IEnumerable<INode> GetRestChildren()
     {
-        return [Name, Type, QuestionToken, Initializer];
+        return [Name, QuestionToken, Type, Initializer];
     }
 }

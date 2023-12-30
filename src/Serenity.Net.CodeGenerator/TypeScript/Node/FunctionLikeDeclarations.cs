@@ -13,8 +13,8 @@ internal class FunctionLikeDeclarationBase(SyntaxKind kind, IDeclarationName nam
 
     public override IEnumerable<INode> GetRestChildren()
     {
-        foreach (var x in base.GetRestChildren()) yield return x;
         yield return AsteriskToken;
+        foreach (var x in base.GetRestChildren()) yield return x;
         yield return QuestionToken;
         yield return ExclamationToken;
         yield return Body;
@@ -67,7 +67,7 @@ internal class FunctionExpression(NodeArray<IModifierLike> modifiers, AsteriskTo
     Identifier name, NodeArray<TypeParameterDeclaration> typeParameters, NodeArray<ParameterDeclaration> parameters,
     ITypeNode type, Block body)
     : FunctionLikeDeclarationBase(SyntaxKind.FunctionExpression, name, typeParameters, parameters, 
-        type, asteriskToken, body: body), IPrimaryExpression, IFunctionLikeDeclaration
+        type, asteriskToken, body: body), IPrimaryExpression, IFunctionLikeDeclaration, IHasModifiers
 {
     public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
 }
@@ -75,7 +75,7 @@ internal class FunctionExpression(NodeArray<IModifierLike> modifiers, AsteriskTo
 internal class ArrowFunction(NodeArray<IModifierLike> modifiers, NodeArray<TypeParameterDeclaration> typeParameters, 
     NodeArray<ParameterDeclaration> parameters, ITypeNode type, EqualsGreaterThanToken equalsGreaterThanToken, 
     IBlockOrExpression body)
-    : FunctionLikeDeclarationBase(SyntaxKind.FunctionExpression, name: null, typeParameters, parameters,
+    : FunctionLikeDeclarationBase(SyntaxKind.ArrowFunction, name: null, typeParameters, parameters,
         type, body: body), IExpression, IFunctionLikeDeclaration, IHasModifiers, IGetRestChildren
 {
     public NodeArray<IModifierLike> Modifiers { get; } = modifiers;

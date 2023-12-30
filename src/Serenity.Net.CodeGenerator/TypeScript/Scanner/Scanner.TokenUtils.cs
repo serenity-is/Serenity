@@ -12,7 +12,7 @@ partial class Scanner
 
     internal static bool IsKeyword(SyntaxKind token)
     {
-        return SyntaxKind.FirstKeyword <= token && token <= SyntaxKind.LastKeyword;
+        return SyntaxKindMarker.FirstKeyword <= token && token <= SyntaxKindMarker.LastKeyword;
     }
 
     internal static bool IsKeywordOrPunctuation(SyntaxKind token)
@@ -22,17 +22,17 @@ partial class Scanner
 
     internal static bool IsLiteralKind(SyntaxKind kind)
     {
-        return SyntaxKind.FirstLiteralToken <= kind && kind <= SyntaxKind.LastLiteralToken;
+        return SyntaxKindMarker.FirstLiteralToken <= kind && kind <= SyntaxKindMarker.LastLiteralToken;
     }
 
     internal static bool IsPunctuation(SyntaxKind token)
     {
-        return SyntaxKind.FirstPunctuation <= token && token <= SyntaxKind.LastPunctuation;
+        return SyntaxKindMarker.FirstPunctuation <= token && token <= SyntaxKindMarker.LastPunctuation;
     }
 
     internal static bool IsTemplateLiteralKind(SyntaxKind kind)
     {
-        return SyntaxKind.FirstTemplateToken <= kind && kind <= SyntaxKind.LastTemplateToken;
+        return SyntaxKindMarker.FirstTemplateToken <= kind && kind <= SyntaxKindMarker.LastTemplateToken;
     }
 
     internal static bool IsTaggedTemplateExpression(SyntaxKind kind)
@@ -42,7 +42,7 @@ partial class Scanner
 
     internal static bool IsTrivia(SyntaxKind token)
     {
-        return SyntaxKind.FirstTriviaToken <= token && token <= SyntaxKind.LastTriviaToken;
+        return SyntaxKindMarker.FirstTriviaToken <= token && token <= SyntaxKindMarker.LastTriviaToken;
     }
 
     private static readonly string[] tokenStrings = MakeReverseMap(textToToken);

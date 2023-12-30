@@ -41,6 +41,7 @@ internal class PrivateIdentifier : Identifier
         : base(text, originalKeywordKind, hasExtendedUnicodeEscape)
     {
         EscapedText = escapedText;
+        Kind = SyntaxKind.PrivateIdentifier;
     }
 }
 

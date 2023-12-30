@@ -942,7 +942,16 @@ public class TSTypeListerAST
 
             SourceFile parseSourceFile()
             {
-                return new Parser().ParseSourceFile(fileFullPath, sourceFileText);
+                try
+                {
+                    return new Parser().ParseSourceFile(fileFullPath, sourceFileText);
+                }
+                catch
+                {
+                    // if parser fails it is better to return an empty source file, log to console for sergen
+                    Console.Error.WriteLine("Error parsing file: ", fileFullPath);
+                    return new SourceFile();
+                }
             }
 
             var sourceFile = (SourceFile)astCache?.GetOrAdd(sourceFileText, _ => parseSourceFile()) ?? parseSourceFile();

@@ -432,42 +432,45 @@ public enum SyntaxKind
     SyntheticReferenceExpression,
 
     // Enum value count
-    Count,
+    Count
+}
 
+public static class SyntaxKindMarker
+{
     // Markers
-    FirstAssignment = EqualsToken,
-    LastAssignment = CaretEqualsToken,
-    FirstCompoundAssignment = PlusEqualsToken,
-    LastCompoundAssignment = CaretEqualsToken,
-    FirstReservedWord = BreakKeyword,
-    LastReservedWord = WithKeyword,
-    FirstKeyword = BreakKeyword,
-    LastKeyword = OfKeyword,
-    FirstFutureReservedWord = ImplementsKeyword,
-    LastFutureReservedWord = YieldKeyword,
-    FirstTypeNode = TypePredicate,
-    LastTypeNode = ImportType,
-    FirstPunctuation = OpenBraceToken,
-    LastPunctuation = CaretEqualsToken,
-    FirstToken = Unknown,
-    LastToken = LastKeyword,
-    FirstTriviaToken = SingleLineCommentTrivia,
-    LastTriviaToken = ConflictMarkerTrivia,
-    FirstLiteralToken = NumericLiteral,
-    LastLiteralToken = NoSubstitutionTemplateLiteral,
-    FirstTemplateToken = NoSubstitutionTemplateLiteral,
-    LastTemplateToken = TemplateTail,
-    FirstBinaryOperator = LessThanToken,
-    LastBinaryOperator = CaretEqualsToken,
-    FirstStatement = VariableStatement,
-    LastStatement = DebuggerStatement,
-    FirstNode = QualifiedName,
-    FirstJSDocNode = JSDocTypeExpression,
-    LastJSDocNode = JSDocSatisfiesTag,
-    FirstJSDocTagNode = JSDocTag,
-    LastJSDocTagNode = JSDocSatisfiesTag,
+    public const SyntaxKind FirstAssignment = SyntaxKind.EqualsToken;
+    public const SyntaxKind LastAssignment = SyntaxKind.CaretEqualsToken;
+    public const SyntaxKind FirstCompoundAssignment = SyntaxKind.PlusEqualsToken;
+    public const SyntaxKind LastCompoundAssignment = SyntaxKind.CaretEqualsToken;
+    public const SyntaxKind FirstReservedWord = SyntaxKind.BreakKeyword;
+    public const SyntaxKind LastReservedWord = SyntaxKind.WithKeyword;
+    public const SyntaxKind FirstKeyword = SyntaxKind.BreakKeyword;
+    public const SyntaxKind LastKeyword = SyntaxKind.OfKeyword;
+    public const SyntaxKind FirstFutureReservedWord = SyntaxKind.ImplementsKeyword;
+    public const SyntaxKind LastFutureReservedWord = SyntaxKind.YieldKeyword;
+    public const SyntaxKind FirstTypeNode = SyntaxKind.TypePredicate;
+    public const SyntaxKind LastTypeNode = SyntaxKind.ImportType;
+    public const SyntaxKind FirstPunctuation = SyntaxKind.OpenBraceToken;
+    public const SyntaxKind LastPunctuation = SyntaxKind.CaretEqualsToken;
+    public const SyntaxKind FirstToken = SyntaxKind.Unknown;
+    public const SyntaxKind LastToken = LastKeyword;
+    public const SyntaxKind FirstTriviaToken = SyntaxKind.SingleLineCommentTrivia;
+    public const SyntaxKind LastTriviaToken = SyntaxKind.ConflictMarkerTrivia;
+    public const SyntaxKind FirstLiteralToken = SyntaxKind.NumericLiteral;
+    public const SyntaxKind LastLiteralToken = SyntaxKind.NoSubstitutionTemplateLiteral;
+    public const SyntaxKind FirstTemplateToken = SyntaxKind.NoSubstitutionTemplateLiteral;
+    public const SyntaxKind LastTemplateToken = SyntaxKind.TemplateTail;
+    public const SyntaxKind FirstBinaryOperator = SyntaxKind.LessThanToken;
+    public const SyntaxKind LastBinaryOperator = SyntaxKind.CaretEqualsToken;
+    public const SyntaxKind FirstStatement = SyntaxKind.VariableStatement;
+    public const SyntaxKind LastStatement = SyntaxKind.DebuggerStatement;
+    public const SyntaxKind FirstNode = SyntaxKind.QualifiedName;
+    public const SyntaxKind FirstJSDocNode = SyntaxKind.JSDocTypeExpression;
+    public const SyntaxKind LastJSDocNode = SyntaxKind.JSDocSatisfiesTag;
+    public const SyntaxKind FirstJSDocTagNode = SyntaxKind.JSDocTag;
+    public const SyntaxKind LastJSDocTagNode = SyntaxKind.JSDocSatisfiesTag;
     // @internal
-    FirstContextualKeyword = AbstractKeyword,
+    public const SyntaxKind FirstContextualKeyword = SyntaxKind.AbstractKeyword;
     // @internal
-    LastContextualKeyword = OfKeyword
+    public const SyntaxKind LastContextualKeyword = SyntaxKind.OfKeyword;
 }

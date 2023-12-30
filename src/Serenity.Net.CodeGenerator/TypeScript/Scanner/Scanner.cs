@@ -61,8 +61,8 @@ internal partial class Scanner
     public bool HasExtendedUnicodeEscape() => (tokenFlags & TokenFlags.ExtendedUnicodeEscape) != 0;
     public bool HasPrecedingLineBreak() => (tokenFlags & TokenFlags.PrecedingLineBreak) != 0;
     internal bool HasPrecedingJSDocComment() => (tokenFlags & TokenFlags.PrecedingJSDocComment) != 0;
-    public bool IsIdentifier() => token == SyntaxKind.Identifier || token > SyntaxKind.LastReservedWord;
-    public bool IsReservedWord() => token >= SyntaxKind.FirstReservedWord && token <= SyntaxKind.LastReservedWord;
+    public bool IsIdentifier() => token == SyntaxKind.Identifier || token > SyntaxKindMarker.LastReservedWord;
+    public bool IsReservedWord() => token >= SyntaxKindMarker.FirstReservedWord && token <= SyntaxKindMarker.LastReservedWord;
     public bool IsUnterminated() => (tokenFlags & TokenFlags.Unterminated) != 0;
     internal TokenFlags GetNumericLiteralFlags() => tokenFlags & TokenFlags.NumericLiteralFlags;
     internal IEnumerable<CommentDirective> GetCommentDirectives() => commentDirectives;
@@ -587,7 +587,7 @@ internal partial class Scanner
                 if (shouldEmitInvalidEscapeError)
                 {
                     Error(Diagnostics.Escape_sequence_0_is_not_allowed, start, pos - start, text[start..pos]);
-                    sb.Append((char)ch);
+                    sb.Append(ch);
                     return;
                 }
                 sb.Append(text[start..pos]);
@@ -1665,7 +1665,7 @@ internal partial class Scanner
     {
         if (token == SyntaxKind.GreaterThanToken)
         {
-            if (text[pos] == CharacterCodes.GreaterThan)
+            if (pos < end && text[pos] == CharacterCodes.GreaterThan)
             {
                 if (pos + 1 < end && text[pos + 1] == CharacterCodes.GreaterThan)
                 {
@@ -1685,7 +1685,7 @@ internal partial class Scanner
                 pos++;
                 return token = SyntaxKind.GreaterThanGreaterThanToken;
             }
-            if (text[pos] == CharacterCodes.Equals)
+            if (pos < end && text[pos] == CharacterCodes.Equals)
             {
                 pos++;
                 return token = SyntaxKind.GreaterThanEqualsToken;
@@ -2098,9 +2098,8 @@ internal partial class Scanner
 
     internal static bool IsFalsy(object obj)
     {
-        return obj is not true && obj != null &&
-            (obj is false || obj is 0 || obj is "" || obj is SyntaxKind.Unknown ||
-            (obj is not string && int.TryParse(obj.ToString(), out int i) && i == 0));
+        return obj is null or false or 0 or "" or SyntaxKind.Unknown ||
+            (obj is not true and not string && int.TryParse(obj.ToString(), out int i) && i == 0);
     }
 
     private T SpeculationHelper<T>(Func<T> callback, bool isLookahead)

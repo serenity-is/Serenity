@@ -2,16 +2,43 @@ namespace Serenity.TypeScript;
 
 internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
 {
-    public SourceFile() 
+
+    public SourceFile()
         : base(SyntaxKind.SourceFile)
     {
+    }
+
+    internal SourceFile(string sourceText, string fileName, ScriptTarget languageVersion, ScriptKind scriptKind, bool isDeclarationFile,
+        NodeArray<IStatement> statements, EndOfFileToken endOfFileToken, NodeFlags flags) : this()
+    {
+        // code from createNode is inlined here so createNode won't have to deal with special case of creating source files
+        // this is quite rare comparing to other nodes and createNode should be as fast as possible
+        Statements = statements;
+        EndOfFileToken = endOfFileToken;
+        Flags = flags;
+        Utilities.SetTextRangePosWidth(this, 0, sourceText.Length);
+
+        Text = sourceText;
+        //sourceFile.BindDiagnostics = [];
+        //sourceFile.BindSuggestionDiagnostics = undefined;
+        LanguageVersion = languageVersion;
+        FileName = fileName;
+        LanguageVariant = Utilities.GetLanguageVariant(scriptKind);
+        IsDeclarationFile = isDeclarationFile;
+        ScriptKind = scriptKind;
+
+        // If we parsed this as an external module, it may contain top-level await
+        //if (!isDeclarationFile && IsExternalModule(sourceFile) && sourceFile.TransformFlags & TransformFlags.ContainsPossibleTopLevelAwait)
+        //{
+        //    var oldSourceFile = sourceFile;
+        //    sourceFile = ReparseTopLevelAwait(sourceFile);
+        //    if (oldSourceFile !== sourceFile) setFields(sourceFile);
+        //}
     }
 
     public NodeArray<IStatement> Statements { get; set; }
     public Token EndOfFileToken { get; set; }
     public string FileName { get; set; }
-    public string ModuleName { get; set; }
-
     public LanguageVariant LanguageVariant { get; set; }
     public ScriptTarget LanguageVersion { get; set; }
     public bool IsDeclarationFile { get; set; }
@@ -23,9 +50,10 @@ internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
     public int NodeCount { get; set; }
     public int IdentifierCount { get; set; }
     public HashSet<string> Identifiers { get; set; }
-
+    public JSDocParsingMode JsDocParsingMode { get; set; }
     public IEnumerable<INode> GetRestChildren()
     {
-        return Statements;
+        if (Statements != null) foreach (var x in Statements) yield return x;
+        yield return EndOfFileToken;
     }
 }

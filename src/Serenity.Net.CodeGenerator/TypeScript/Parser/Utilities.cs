@@ -11,6 +11,11 @@ internal class Utilities
         return (node.End ?? 0) - (node.Pos ?? 0);
     }
 
+    public static LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
+    {
+        // .tsx and .jsx files are treated as jsx language variant.
+        return scriptKind == ScriptKind.TSX || scriptKind == ScriptKind.JSX || scriptKind == ScriptKind.JS ? LanguageVariant.JSX : LanguageVariant.Standard;
+    }
 
     public static INode ContainsParseError(INode node)
     {
@@ -92,7 +97,11 @@ internal class Utilities
     {
         return token switch
         {
-            SyntaxKind.AbstractKeyword or SyntaxKind.AsyncKeyword or SyntaxKind.ConstKeyword or SyntaxKind.DeclareKeyword or SyntaxKind.DefaultKeyword or SyntaxKind.ExportKeyword or SyntaxKind.PublicKeyword or SyntaxKind.PrivateKeyword or SyntaxKind.ProtectedKeyword or SyntaxKind.ReadonlyKeyword or SyntaxKind.StaticKeyword => true,
+            SyntaxKind.AbstractKeyword or SyntaxKind.AccessorKeyword or SyntaxKind.AsyncKeyword 
+                or SyntaxKind.ConstKeyword or SyntaxKind.DeclareKeyword or SyntaxKind.DefaultKeyword 
+                or SyntaxKind.ExportKeyword or SyntaxKind.InKeyword or SyntaxKind.PublicKeyword 
+                or SyntaxKind.PrivateKeyword or SyntaxKind.ProtectedKeyword or SyntaxKind.ReadonlyKeyword 
+                or SyntaxKind.StaticKeyword or SyntaxKind.OutKeyword or SyntaxKind.OverrideKeyword => true,
             _ => false,
         };
     }
@@ -192,39 +201,30 @@ internal class Utilities
 
     public static bool IsAssignmentOperator(SyntaxKind token)
     {
-        return token >= SyntaxKind.FirstAssignment && token <= SyntaxKind.LastAssignment;
+        return token >= SyntaxKindMarker.FirstAssignment && token <= SyntaxKindMarker.LastAssignment;
     }
 
 
     public static bool IsLeftHandSideExpressionKind(SyntaxKind kind)
     {
-        return kind == SyntaxKind.PropertyAccessExpression
-               || kind == SyntaxKind.ElementAccessExpression
-               || kind == SyntaxKind.NewExpression
-               || kind == SyntaxKind.CallExpression
-               || kind == SyntaxKind.JsxElement
-               || kind == SyntaxKind.JsxSelfClosingElement
-               || kind == SyntaxKind.TaggedTemplateExpression
-               || kind == SyntaxKind.ArrayLiteralExpression
-               || kind == SyntaxKind.ParenthesizedExpression
-               || kind == SyntaxKind.ObjectLiteralExpression
-               || kind == SyntaxKind.ClassExpression
-               || kind == SyntaxKind.FunctionExpression
-               || kind == SyntaxKind.Identifier
-               || kind == SyntaxKind.RegularExpressionLiteral
-               || kind == SyntaxKind.NumericLiteral
-               || kind == SyntaxKind.StringLiteral
-               || kind == SyntaxKind.NoSubstitutionTemplateLiteral
-               || kind == SyntaxKind.TemplateExpression
-               || kind == SyntaxKind.FalseKeyword
-               || kind == SyntaxKind.NullKeyword
-               || kind == SyntaxKind.ThisKeyword
-               || kind == SyntaxKind.TrueKeyword
-               || kind == SyntaxKind.SuperKeyword
-               || kind == SyntaxKind.NonNullExpression
-               || kind == SyntaxKind.MetaProperty;
+        return kind switch
+        {
+            SyntaxKind.PropertyAccessExpression or SyntaxKind.ElementAccessExpression or SyntaxKind.NewExpression 
+                or SyntaxKind.CallExpression or SyntaxKind.JsxElement or SyntaxKind.JsxSelfClosingElement 
+                or SyntaxKind.JsxFragment or SyntaxKind.TaggedTemplateExpression 
+                or SyntaxKind.ArrayLiteralExpression or SyntaxKind.ParenthesizedExpression 
+                or SyntaxKind.ObjectLiteralExpression or SyntaxKind.ClassExpression 
+                or SyntaxKind.FunctionExpression or SyntaxKind.Identifier or SyntaxKind.PrivateIdentifier 
+                or SyntaxKind.RegularExpressionLiteral or SyntaxKind.NumericLiteral or SyntaxKind.BigIntLiteral 
+                or SyntaxKind.StringLiteral or SyntaxKind.NoSubstitutionTemplateLiteral 
+                or SyntaxKind.TemplateExpression or SyntaxKind.FalseKeyword or SyntaxKind.NullKeyword 
+                or SyntaxKind.ThisKeyword or SyntaxKind.TrueKeyword or SyntaxKind.SuperKeyword 
+                or SyntaxKind.NonNullExpression or SyntaxKind.ExpressionWithTypeArguments 
+                or SyntaxKind.MetaProperty or SyntaxKind.ImportKeyword 
+                or SyntaxKind.MissingDeclaration => true,
+            _ => false,
+        };
     }
-
 
     public static bool IsLeftHandSideExpression(IExpression node)
     {
@@ -341,7 +341,8 @@ internal class Utilities
             FileName = fileName,
             Start = start,
             Length = length,
-            Message = message
+            Message = message,
+            Argument = argument
         };
     }
 
@@ -359,9 +360,8 @@ internal class Utilities
 
     public static INode SkipPartiallyEmittedExpressions(INode node)
     {
-        while (node.Kind == SyntaxKind.PartiallyEmittedExpression)
-            node = ((PartiallyEmittedExpression)node).Expression;
-
+        while (node is PartiallyEmittedExpression partiallyEmitted)
+            node = partiallyEmitted.Expression;
 
         return node;
     }
@@ -591,8 +591,8 @@ internal class Utilities
         // If we are at this statement then we must have PropertyAccessExpression and because tag name in Jsx element can only
         // take forms of JsxTagNameExpression which includes an identifier, "this" expression, or another propertyAccessExpression
         // it is safe to case the expression property as such. See parseJsxElementName for how we parse tag name in Jsx element
-        return ((lhs as PropertyAccessExpression)?.Name as Identifier)?.EscapedText ==
-            ((rhs as PropertyAccessExpression)?.Name as Identifier).EscapedText &&
+        return ((lhs as PropertyAccessExpression)?.Name)?.EscapedText ==
+            ((rhs as PropertyAccessExpression)?.Name).EscapedText &&
             TagNamesAreEquivalent((lhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression,
                 (rhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression);
     }

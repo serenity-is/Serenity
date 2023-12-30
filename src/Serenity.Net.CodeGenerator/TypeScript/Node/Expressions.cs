@@ -113,7 +113,8 @@ internal class VoidExpression(IExpression expression) : UnaryExpressionBase(Synt
     }
 }
 
-internal class AwaitExpression(IExpression expression) : UnaryExpressionBase(SyntaxKind.AwaitExpression), IGetRestChildren
+internal class AwaitExpression(IExpression expression) 
+    : UnaryExpressionBase(SyntaxKind.AwaitExpression), IGetRestChildren
 {
     public /*UnaryExpression*/IExpression Expression { get; } = expression;
 
@@ -235,7 +236,7 @@ internal class PropertyAccessExpression(IExpression expression, Identifier name)
 
     public override IEnumerable<INode> GetRestChildren()
     {
-        return [Expression, Name, QuestionDotToken];
+        return [Expression, QuestionDotToken, Name];
     }
 }
 

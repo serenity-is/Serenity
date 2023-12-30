@@ -70,7 +70,7 @@ internal static class NodeExtensions
 
                 if (recursively &&
                     (modifier is IHasModifierLike || modifier is IGetRestChildren) &&
-                    (result = ForEachChild(modifier, visitor)) != null)
+                    (result = ForEachChild(modifier, visitor, recursively: true)) != null)
                     return result;
             }
         }
@@ -92,7 +92,7 @@ internal static class NodeExtensions
 
             if (recursively && 
                 (child is IHasModifierLike || child is IGetRestChildren) &&
-                (result = ForEachChild(child, visitor)) != null)
+                (result = ForEachChild(child, visitor, recursively: true)) != null)
                 return result;
         }
 

@@ -9,8 +9,7 @@ internal class ImportEqualsDeclaration(NodeArray<IModifierLike> modifiers, bool 
 
     public override IEnumerable<INode> GetRestChildren()
     {
-        if (Modifiers != null) foreach (var x in Modifiers) yield return x;
-        yield return ModuleReference;
+        return [Name, ModuleReference];
     }
 }
 
@@ -134,12 +133,12 @@ internal class ImportDeclaration(NodeArray<IModifierLike> modifiers, ImportClaus
 
     public IEnumerable<INode> GetRestChildren()
     {
-        return [ImportClause, ModuleSpecifier];
+        return [ImportClause, ModuleSpecifier, Attributes];
     }
 }
 
 internal class ExportAssignment(NodeArray<IModifierLike> modifiers, bool isExportEquals, IExpression expression)
-    : DeclarationStatement<IDeclarationName>(SyntaxKind.ExportAssignment, name: null), IGetRestChildren
+    : DeclarationStatement<IDeclarationName>(SyntaxKind.ExportAssignment, name: null), IGetRestChildren, IHasModifiers
 {
     public NodeArray<IModifierLike> Modifiers { get; } = modifiers;
     public bool IsExportEquals { get; } = isExportEquals;

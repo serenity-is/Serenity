@@ -1,7 +1,8 @@
+// Last converted from https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c on 2023-12-21 
+
 using static Serenity.TypeScript.Scanner;
 using static Serenity.TypeScript.NodeTests;
 using static Serenity.TypeScript.Utilities;
-using Debug = System.Diagnostics.Debug;
 
 namespace Serenity.TypeScript;
 
@@ -117,7 +118,7 @@ internal class Parser
     public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion = ScriptTarget.Latest,
         ISyntaxCursor syntaxCursor = null, bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
         Action<SourceFile> setExternalModuleIndicatorOverride = null,
-        JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseAll)
+        JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseNone)
     {
         scriptKind = EnsureScriptKind(fileName, scriptKind);
 
@@ -134,12 +135,6 @@ internal class Parser
         return result;
     }
 
-    public static LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
-    {
-        // .tsx and .jsx files are treated as jsx language variant.
-        return scriptKind == ScriptKind.TSX || scriptKind == ScriptKind.JSX || scriptKind == ScriptKind.JS ? LanguageVariant.JSX : LanguageVariant.Standard;
-    }
-
     private void InitializeState(string fileName, string sourceText, ScriptTarget languageVersion, ISyntaxCursor syntaxCursor,
         ScriptKind scriptKind, JSDocParsingMode jsDocParsingMode)
     {
@@ -152,7 +147,7 @@ internal class Parser
 
         parseDiagnostics = [];
         parsingContext = 0;
-        identifiers = new();
+        identifiers = [];
         identifierCount = 0;
         nodeCount = 0;
         sourceFlags = 0;
@@ -218,7 +213,22 @@ internal class Parser
         var endHasJSDoc = HasPrecedingJSDocComment();
         var endOfFileToken = WithJSDoc(ParseTokenNode<EndOfFileToken>(), endHasJSDoc);
 
-        var sourceFile = CreateSourceFile(fileName, languageVersion, scriptKind, isDeclarationFile, statements, endOfFileToken, sourceFlags, setExternalModuleIndicator);
+        var sourceFile = new SourceFile(sourceText, fileName, languageVersion, scriptKind,
+            isDeclarationFile, statements, endOfFileToken, sourceFlags);
+        
+        setExternalModuleIndicator(sourceFile);
+
+        // If we parsed this as an external module, it may contain top-level await
+        // if (!isDeclarationFile && IsExternalModule(sourceFile) &&
+        //     sourceFile.Statements != null && sourceFile.Statements.Any(x => ContainsPossibleTopLevelAwait(x)))
+        // {
+        //     var oldSourceFile = sourceFile;
+        //     sourceFile = ReparseTopLevelAwait(sourceFile);
+        //     if (oldSourceFile == sourceFile)
+        //     {
+        //         //setFields(sourceFile);
+        //     }
+        // }
 
         // A member of ReadonlyArray<T> isn't assignable to a member of T[] (and prevents a direct cast) - but this is where we set up those members so they can be readonly in the future
         //ProcessCommentPragmas(sourceFile, sourceText);
@@ -230,7 +240,7 @@ internal class Parser
         sourceFile.Identifiers = identifiers;
         //sourceFile.ParseDiagnostics = AttachFileToDiagnostics(parseDiagnostics, sourceFile);
         sourceFile.ParseDiagnostics = parseDiagnostics;
-        //sourceFile.JsDocParsingMode = jsDocParsingMode;
+        sourceFile.JsDocParsingMode = jsDocParsingMode;
         //if (jsDocDiagnostics != null)
         //{
         //    sourceFile.JsDocDiagnostics = AttachFileToDiagnostics(jsDocDiagnostics, sourceFile);
@@ -250,42 +260,6 @@ internal class Parser
             SetParentRecursive(child);
             return null;
         }, recursively: false);
-    }
-
-    SourceFile CreateSourceFile(string fileName, ScriptTarget languageVersion, ScriptKind scriptKind, bool isDeclarationFile,
-        NodeArray<IStatement> statements, EndOfFileToken endOfFileToken, NodeFlags flags, Action<SourceFile> setExternalModuleIndicator)
-    {
-        // code from createNode is inlined here so createNode won't have to deal with special case of creating source files
-        // this is quite rare comparing to other nodes and createNode should be as fast as possible
-        var sourceFile = new SourceFile { Statements = statements, EndOfFileToken = endOfFileToken, Flags = flags };
-        SetTextRangePosWidth(sourceFile, 0, sourceText.Length);
-
-        void setFields(SourceFile sourceFile)
-        {
-            sourceFile.Text = sourceText;
-            //sourceFile.BindDiagnostics = [];
-            //sourceFile.BindSuggestionDiagnostics = undefined;
-            sourceFile.LanguageVersion = languageVersion;
-            sourceFile.FileName = fileName;
-            sourceFile.LanguageVariant = GetLanguageVariant(scriptKind);
-            sourceFile.IsDeclarationFile = isDeclarationFile;
-            sourceFile.ScriptKind = scriptKind;
-
-            setExternalModuleIndicator(sourceFile);
-            //sourceFile.SetExternalModuleIndicator = setExternalModuleIndicator;
-        }
-
-        setFields(sourceFile);
-
-        // If we parsed this as an external module, it may contain top-level await
-        //if (!isDeclarationFile && IsExternalModule(sourceFile) && sourceFile.TransformFlags & TransformFlags.ContainsPossibleTopLevelAwait)
-        //{
-        //    var oldSourceFile = sourceFile;
-        //    sourceFile = ReparseTopLevelAwait(sourceFile);
-        //    if (oldSourceFile !== sourceFile) setFields(sourceFile);
-        //}
-
-        return sourceFile;
     }
 
     void SetContextFlag(bool val, NodeFlags flag)
@@ -662,7 +636,7 @@ internal class Parser
         }
 
         // `let await`/`let yield` in [Yield] or [Await] are allowed here and disallowed in the binder.
-        return Token() > SyntaxKind.LastReservedWord;
+        return Token() > SyntaxKindMarker.LastReservedWord;
     }
 
     // Ignore strict mode flag because we will report an error in type checker instead.
@@ -687,7 +661,7 @@ internal class Parser
             return false;
         }
 
-        return Token() > SyntaxKind.LastReservedWord;
+        return Token() > SyntaxKindMarker.LastReservedWord;
     }
 
     bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = null, bool shouldAdvance = true)
@@ -877,7 +851,7 @@ internal class Parser
         return false;
     }
 
-    void ParseExpectedMatchingBrackets(SyntaxKind openKind, SyntaxKind closeKind, bool openParsed, int openPosition)
+    void ParseExpectedMatchingBrackets(SyntaxKind _1, SyntaxKind closeKind, bool openParsed, int _2)
     {
         if (Token() == closeKind)
         {
@@ -1377,15 +1351,24 @@ internal class Parser
             case ParsingContext.JSDocComment:
                 return true;
             case ParsingContext.Count:
-                throw ParseFailure("ParsingContext.Count used as a context", GetNodePos()); // Not a real context, only a marker.
+                throw Debug.Fail("ParsingContext.Count used as a context", GetNodePos()); // Not a real context, only a marker.
             default:
-                throw ParseFailure("Non-exhaustive case in 'isListElement' {0}.", parsingContext);
+                throw Debug.Fail("Non-exhaustive case in 'isListElement' {0}.", parsingContext);
         }
     }
 
-    internal ParseException ParseFailure(string message, params object[] args)
+    internal static class Debug
     {
-        return new ParseException(string.Format(message, args), GetNodePos());
+        internal static void Assert(bool condition, string message = null, params object[] args)
+        {
+            if (!condition)
+                throw new ParseException(string.Format(message ?? "Parser assert condition failed!", args));
+        }
+
+        internal static ParseException Fail(string message, params object[] args)
+        {
+            return new ParseException(string.Format(message, args));
+        }
     }
 
     bool IsValidHeritageClauseObjectLiteral()
@@ -1679,7 +1662,7 @@ internal class Parser
                     // into an actual .ConstructorDeclaration.
                     var methodDeclaration = node as MethodDeclaration;
                     var nameIsConstructor = methodDeclaration.Name.Kind == SyntaxKind.Identifier &&
-                        (methodDeclaration.Name as Identifier)?.EscapedText == "constructor";
+                        methodDeclaration.Name is Identifier { EscapedText: "constructor" };
 
                     return !nameIsConstructor;
             }
@@ -1884,9 +1867,9 @@ internal class Parser
             case ParsingContext.JSDocComment:
                 return ParseErrorAtCurrentToken(Diagnostics.Identifier_expected);
             case ParsingContext.Count:
-                throw ParseFailure("ParsingContext.Count used as a context"); // Not a real context, only a marker.
+                throw Debug.Fail("ParsingContext.Count used as a context"); // Not a real context, only a marker.
             default:
-                throw ParseFailure($"{context} is not exhaustive in ParsingContextErrors");
+                throw Debug.Fail($"{context} is not exhaustive in ParsingContextErrors");
         }
     }
 
@@ -2000,7 +1983,6 @@ internal class Parser
 
     IEntityName ParseEntityName(bool allowReservedWords, DiagnosticMessage diagnosticMessage = null)
     {
-        var pos = GetNodePos();
         IEntityName entity = allowReservedWords ? ParseIdentifierName(diagnosticMessage) : ParseIdentifier(diagnosticMessage);
         while (ParseOptional(SyntaxKind.DotToken))
         {
@@ -2144,7 +2126,7 @@ internal class Parser
     }
 
     TLiteral ParseLiteralNode<TLiteral>()
-        where TLiteral: ILiteralLikeNode
+        where TLiteral : ILiteralLikeNode
     {
         return ParseLiteralLikeNode<TLiteral>(Token());
     }
@@ -2171,11 +2153,11 @@ internal class Parser
     {
         var isLast = kind == SyntaxKind.NoSubstitutionTemplateLiteral || kind == SyntaxKind.TemplateTail;
         var tokenText = scanner.GetTokenText();
-        return tokenText.Substring(1, tokenText.Length - (scanner.IsUnterminated() ? 0 : isLast ? 1 : 2));
+        return tokenText[1..(tokenText.Length - (scanner.IsUnterminated() ? 0 : isLast ? 1 : 2))];
     }
 
     TLiteral ParseLiteralLikeNode<TLiteral>(SyntaxKind kind)
-        where TLiteral: ILiteralLikeNode
+        where TLiteral : ILiteralLikeNode
     {
         var pos = GetNodePos();
         ILiteralLikeNode node = IsTemplateLiteralKind(kind) ? Factory.CreateTemplateLiteralLikeNode(kind, scanner.GetTokenValue(),
@@ -2188,7 +2170,7 @@ internal class Parser
             kind == SyntaxKind.NumericLiteral ? new NumericLiteral(scanner.GetTokenValue(), scanner.GetNumericLiteralFlags()) :
             kind == SyntaxKind.StringLiteral ? new StringLiteral(scanner.GetTokenValue(), isSingleQuote: null, scanner.HasExtendedUnicodeEscape()) :
             IsLiteralKind(kind) ? Factory.CreateLiteralLikeNode(kind, scanner.GetTokenValue()) :
-            throw ParseFailure($"{kind} is unknown literal like node");
+            throw Debug.Fail($"{kind} is unknown literal like node");
 
         if (scanner.HasExtendedUnicodeEscape())
         {
@@ -2726,7 +2708,7 @@ internal class Parser
     {
         var name = ParsePropertyName();
         var questionToken = ParseOptionalToken<QuestionToken>(SyntaxKind.QuestionToken);
-        ITypeElement node = null;
+        ITypeElement node;
         if (Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
         {
             // Method signatures don't exist in expression contexts.  So they have neither
@@ -2839,14 +2821,11 @@ internal class Parser
 
     bool NextTokenIsOpenParenOrLessThanOrDot()
     {
-        switch (NextToken())
+        return NextToken() switch
         {
-            case SyntaxKind.OpenParenToken:
-            case SyntaxKind.LessThanToken:
-            case SyntaxKind.DotToken:
-                return true;
-        }
-        return false;
+            SyntaxKind.OpenParenToken or SyntaxKind.LessThanToken or SyntaxKind.DotToken => true,
+            _ => false,
+        };
     }
 
     TypeLiteralNode ParseTypeLiteral()
@@ -2985,7 +2964,7 @@ internal class Parser
             pos);
     }
 
-    ITypeNode ParseParenthesizedType()
+    ParenthesizedTypeNode ParseParenthesizedType()
     {
         var pos = GetNodePos();
         ParseExpected(SyntaxKind.OpenParenToken);
@@ -3063,7 +3042,7 @@ internal class Parser
         ImportAttributes attributes = null;
         if (ParseOptional(SyntaxKind.CommaToken))
         {
-            var openBracePosition = scanner.GetTokenStart();
+            var _ = scanner.GetTokenStart();
             ParseExpected(SyntaxKind.OpenBraceToken);
             var currentToken = Token();
             if (currentToken == SyntaxKind.WithKeyword || currentToken == SyntaxKind.AssertKeyword)
@@ -3767,7 +3746,7 @@ internal class Parser
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
-    IExpression TryParseParenthesizedArrowFunctionExpression(bool allowReturnTypeInArrowFunction)
+    ArrowFunction TryParseParenthesizedArrowFunctionExpression(bool allowReturnTypeInArrowFunction)
     {
         var triState = IsParenthesizedArrowFunctionExpression();
         if (triState == Tristate.False)
@@ -3926,15 +3905,11 @@ internal class Parser
                     if (third == SyntaxKind.ExtendsKeyword)
                     {
                         var fourth = NextToken();
-                        switch (fourth)
+                        return fourth switch
                         {
-                            case SyntaxKind.EqualsToken:
-                            case SyntaxKind.GreaterThanToken:
-                            case SyntaxKind.SlashToken:
-                                return false;
-                            default:
-                                return true;
-                        }
+                            SyntaxKind.EqualsToken or SyntaxKind.GreaterThanToken or SyntaxKind.SlashToken => false,
+                            _ => true,
+                        };
                     }
                     else if (third == SyntaxKind.CommaToken || third == SyntaxKind.EqualsToken)
                     {
@@ -4440,7 +4415,7 @@ internal class Parser
                 if (languageVariant == LanguageVariant.JSX)
                 {
                     return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: true,
-                        topInvalidNodePosition: null, openingTag: null, mustBeUnary: true) as IUnaryExpression;
+                        topInvalidNodePosition: null, openingTag: null, mustBeUnary: true);
                 }
                 // This is modified UnaryExpression grammar in TypeScript
                 //  UnaryExpression (modified):
@@ -4569,7 +4544,7 @@ internal class Parser
         // 3)we have a MemberExpression which either completes the LeftHandSideExpression,
         // or starts the beginning of the first four CallExpression productions.
         var pos = GetNodePos();
-        IMemberExpression expression = null;
+        ILeftHandSideExpression expression = null;
         if (Token() == SyntaxKind.ImportKeyword)
         {
             if (LookAhead(NextTokenIsOpenParenOrLessThan))
@@ -4606,7 +4581,7 @@ internal class Parser
         return ParseCallExpressionRest(pos, expression);
     }
 
-    IMemberExpression ParseMemberExpressionOrHigher()
+    ILeftHandSideExpression ParseMemberExpressionOrHigher()
     {
         // Note: to make our lives simpler, we decompose the NewExpression productions and
         // place ObjectCreationExpression and FunctionExpression into PrimaryExpression.
@@ -4825,7 +4800,7 @@ internal class Parser
             case SyntaxKind.LessThanToken:
                 return ParseJsxElementOrSelfClosingElementOrFragment(inExpressionContext: false, topInvalidNodePosition: null, openingTag);
             default:
-                throw ParseFailure($"{token} is not a valid JSX child to parse");
+                throw Debug.Fail($"{token} is not a valid JSX child to parse");
         }
     }
 
@@ -5180,7 +5155,7 @@ internal class Parser
         return FinishNode(indexedAccess, pos);
     }
 
-    IMemberExpression ParseMemberExpressionRest(int pos, ILeftHandSideExpression expression, bool allowOptionalChain)
+    ILeftHandSideExpression ParseMemberExpressionRest(int pos, ILeftHandSideExpression expression, bool allowOptionalChain)
     {
         while (true)
         {
@@ -5234,7 +5209,7 @@ internal class Parser
                 }
             }
 
-            return expression as IMemberExpression;
+            return expression;
         }
     }
 
@@ -5524,13 +5499,15 @@ internal class Parser
         {
             ParseExpected(SyntaxKind.ColonToken);
             var initializer = AllowInAnd(() => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true));
-            node = new PropertyAssignment(name, initializer);
+            node = new PropertyAssignment(name, initializer)
+            {
+                // Decorators, Modifiers, questionToken, and exclamationToken are not supported
+                // by property assignments and are reported in the grammar checker
+                Modifiers = modifiers,
+                QuestionToken = questionToken,
+                ExclamationToken = exclamationToken
+            };
         }
-        // Decorators, Modifiers, questionToken, and exclamationToken are not supported
-        // by property assignments and are reported in the grammar checker
-        // node.modifiers = modifiers;
-        // node.questionToken = questionToken;
-        // node.exclamationToken = exclamationToken;
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
@@ -5951,11 +5928,7 @@ internal class Parser
         return FinishNode(new CatchClause(variableDeclaration, block), pos);
     }
 
-
-
-
-
-    Statement ParseDebuggerStatement()
+    DebuggerStatement ParseDebuggerStatement()
     {
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
@@ -6382,16 +6355,12 @@ internal class Parser
                 return ParseImportDeclarationOrImportEqualsDeclaration(pos, hasJSDoc, modifiersIn);
             case SyntaxKind.ExportKeyword:
                 NextToken();
-                switch (Token())
+                return Token() switch
                 {
-                    case SyntaxKind.DefaultKeyword:
-                    case SyntaxKind.EqualsToken:
-                        return ParseExportAssignment(pos, hasJSDoc, modifiersIn);
-                    case SyntaxKind.AsKeyword:
-                        return ParseNamespaceExportDeclaration(pos, hasJSDoc, modifiersIn);
-                    default:
-                        return ParseExportDeclaration(pos, hasJSDoc, modifiersIn);
-                }
+                    SyntaxKind.DefaultKeyword or SyntaxKind.EqualsToken => ParseExportAssignment(pos, hasJSDoc, modifiersIn),
+                    SyntaxKind.AsKeyword => ParseNamespaceExportDeclaration(pos, hasJSDoc, modifiersIn),
+                    _ => ParseExportDeclaration(pos, hasJSDoc, modifiersIn),
+                };
             default:
                 if (modifiersIn != null)
                 {
@@ -6461,7 +6430,7 @@ internal class Parser
         var dotDotDotToken = ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
         var TokenIsIdentifier = IsBindingIdentifier();
         IPropertyName propertyName = ParsePropertyName();
-        IBindingName name = null;
+        IBindingName name;
         if (TokenIsIdentifier && Token() != SyntaxKind.ColonToken)
         {
             name = propertyName as Identifier;
@@ -6569,7 +6538,7 @@ internal class Parser
                 NextToken();
                 break;
             default:
-                throw ParseFailure($"Unknown syntax kind in ParseVariableDeclarationList: {Token()}");
+                throw Debug.Fail($"Unknown syntax kind in ParseVariableDeclarationList: {Token()}");
         }
 
         NextToken();
@@ -6647,7 +6616,7 @@ internal class Parser
         }
         if (Token() == SyntaxKind.StringLiteral && LookAhead(NextToken) == SyntaxKind.OpenParenToken)
         {
-            return new (TryParse(() =>
+            return new(TryParse(() =>
             {
                 var literalNode = ParseLiteralNode<ILiteralExpression>();
                 return literalNode.Text == "constructor" ? literalNode : null;
@@ -6706,13 +6675,13 @@ internal class Parser
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
-    PropertyDeclaration ParsePropertyDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers, 
+    PropertyDeclaration ParsePropertyDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers,
         IPropertyName name, QuestionToken questionToken)
     {
-        var exclamationToken = questionToken == null && !scanner.HasPrecedingLineBreak() 
+        var exclamationToken = questionToken == null && !scanner.HasPrecedingLineBreak()
             ? ParseOptionalToken<ExclamationToken>(SyntaxKind.ExclamationToken) : null;
         var type = ParseTypeAnnotation();
-        var initializer = DoOutsideOfContext(NodeFlags.YieldContext | NodeFlags.AwaitContext | NodeFlags.DisallowInContext, 
+        var initializer = DoOutsideOfContext(NodeFlags.YieldContext | NodeFlags.AwaitContext | NodeFlags.DisallowInContext,
             ParseInitializer);
         ParseSemicolonAfterPropertyName(name, type, initializer);
         var node = new PropertyDeclaration(
@@ -6739,7 +6708,7 @@ internal class Parser
         return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken);
     }
 
-    IAccessorDeclaration ParseAccessorDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers, 
+    IAccessorDeclaration ParseAccessorDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers,
         SyntaxKind kind, SignatureFlags flags)
     {
         var name = ParsePropertyName();
@@ -6752,7 +6721,7 @@ internal class Parser
             : new SetAccessorDeclaration(modifiers, name, parameters, body);
         // Keep track of `typeParameters` (for both) and `type` (for setters) if they were parsed those indicate grammar errors
         node.TypeParameters = typeParameters;
-        if (node is SetAccessorDeclaration setAccessorDeclaration) 
+        if (node is SetAccessorDeclaration setAccessorDeclaration)
             setAccessorDeclaration.Type = type;
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
@@ -6814,23 +6783,22 @@ internal class Parser
 
             // If it *is* a keyword, but not an accessor, check a little farther along
             // to see if it should actually be parsed as a class member.
-            switch (Token())
+            return Token() switch
             {
-                case SyntaxKind.OpenParenToken: // Method declaration
-                case SyntaxKind.LessThanToken: // Generic Method declaration
-                case SyntaxKind.ExclamationToken: // Non-null assertion on property name
-                case SyntaxKind.ColonToken: // Type Annotation for declaration
-                case SyntaxKind.EqualsToken: // Initializer for declaration
-                case SyntaxKind.QuestionToken: // Not valid, but permitted so that it gets caught later on.
-                    return true;
-                default:
+                SyntaxKind.OpenParenToken // Method declaration
+                    or SyntaxKind.LessThanToken // Generic Method declaration
+                    or SyntaxKind.ExclamationToken // Non-null assertion on property name
+                    or SyntaxKind.ColonToken // Type Annotation for declaration
+                    or SyntaxKind.EqualsToken // Initializer for declaration
+                    or SyntaxKind.QuestionToken => true, // Not valid, but permitted so that it gets caught later on.
+                _ =>
                     // Covers
                     //  - Semicolons     (declaration termination)
                     //  - Closing braces (end-of-class, must be declaration)
                     //  - End-of-files   (not valid, but permitted so that it gets caught later on)
                     //  - Line-breaks    (enabling *automatic semicolon insertion*)
-                    return CanParseSemicolon();
-            }
+                    CanParseSemicolon()
+            };
         }
 
         return false;
@@ -6887,7 +6855,7 @@ internal class Parser
         return FinishNode(new Decorator(expression), pos);
     }
 
-    IModifier TryParseModifier(bool hasSeenStaticModifier, bool permitConstAsModifier, bool stopOnStartOfClassStaticBlock)
+    ModifierToken TryParseModifier(bool hasSeenStaticModifier, bool permitConstAsModifier, bool stopOnStartOfClassStaticBlock)
     {
         var pos = GetNodePos();
         var kind = Token();
@@ -6952,10 +6920,10 @@ internal class Parser
         }
 
         // parse leading modifiers
-        while ((modifier = TryParseModifier(hasSeenStaticModifier, permitConstAsModifier, 
+        while ((modifier = TryParseModifier(hasSeenStaticModifier, permitConstAsModifier,
             stopOnStartOfClassStaticBlock)) != null)
         {
-            if (modifier.Kind == SyntaxKind.StaticKeyword) 
+            if (modifier.Kind == SyntaxKind.StaticKeyword)
                 hasSeenStaticModifier = true;
             list ??= [];
             list.Add(modifier);
@@ -6976,10 +6944,10 @@ internal class Parser
         // parse trailing modifiers, but only if we parsed any trailing decorators
         if (hasTrailingDecorator)
         {
-            while ((modifier = TryParseModifier(hasSeenStaticModifier, permitConstAsModifier, 
+            while ((modifier = TryParseModifier(hasSeenStaticModifier, permitConstAsModifier,
                 stopOnStartOfClassStaticBlock)) != null)
             {
-                if (modifier.Kind == SyntaxKind.StaticKeyword) 
+                if (modifier.Kind == SyntaxKind.StaticKeyword)
                     hasSeenStaticModifier = true;
                 list ??= [];
                 list.Add(modifier);
@@ -7061,7 +7029,7 @@ internal class Parser
                 {
                     m.Flags |= NodeFlags.Ambient;
                 }
-                return DoInsideOfContext(NodeFlags.Ambient, 
+                return DoInsideOfContext(NodeFlags.Ambient,
                     () => ParsePropertyOrMethodDeclaration(pos, hasJSDoc, modifiers));
             }
             else
@@ -7073,13 +7041,13 @@ internal class Parser
         if (modifiers != null)
         {
             // treat this as a property declaration with a missing name.
-            var name = CreateMissingNode<Identifier>(SyntaxKind.Identifier, reportAtCurrentPosition: true, 
+            var name = CreateMissingNode<Identifier>(SyntaxKind.Identifier, reportAtCurrentPosition: true,
                 Diagnostics.Declaration_expected);
             return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken: null);
         }
 
         // 'isClassMemberStart' should have hinted not to attempt parsing.
-        throw ParseFailure("Should not have attempted to parse class member declaration.");
+        throw Debug.Fail("Should not have attempted to parse class member declaration.");
     }
 
     IPrimaryExpression ParseDecoratedExpression()
@@ -7092,7 +7060,7 @@ internal class Parser
             return ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassExpression) as ClassExpression;
         }
 
-        var missing = CreateMissingNode<MissingDeclaration>(SyntaxKind.MissingDeclaration, reportAtCurrentPosition: true, 
+        var missing = CreateMissingNode<MissingDeclaration>(SyntaxKind.MissingDeclaration, reportAtCurrentPosition: true,
             Diagnostics.Expression_expected);
         SetTextRangePos(missing, pos);
         missing.Modifiers = modifiers;
@@ -7109,7 +7077,7 @@ internal class Parser
         return ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassDeclaration) as ClassDeclaration;
     }
 
-    IClassLikeDeclaration ParseClassDeclarationOrExpression(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers, 
+    IClassLikeDeclaration ParseClassDeclarationOrExpression(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers,
         SyntaxKind kind)
     {
         var savedAwaitContext = InAwaitContext();
@@ -7118,7 +7086,7 @@ internal class Parser
         // We don't parse the name here in await context, instead we will report a grammar error in the checker.
         var name = ParseNameOfClassDeclarationOrExpression();
         var typeParameters = ParseTypeParameters();
-        if (modifiers?.Any(IsExportModifier) == true) 
+        if (modifiers?.Any(IsExportModifier) == true)
             SetAwaitContext(val: true);
         var heritageClauses = ParseHeritageClauses();
 
@@ -7290,7 +7258,7 @@ internal class Parser
         var namespaceFlag = flags & NodeFlags.Namespace;
         var name = (flags & NodeFlags.NestedNamespace) != 0 ? ParseIdentifierName() : ParseIdentifier();
         INamespaceBody body = ParseOptional(SyntaxKind.DotToken)
-            ? ParseModuleOrNamespaceDeclaration(GetNodePos(), hasJSDoc: false, modifiers: null, 
+            ? ParseModuleOrNamespaceDeclaration(GetNodePos(), hasJSDoc: false, modifiers: null,
                 NodeFlags.NestedNamespace | namespaceFlag)
             : ParseModuleBlock();
         var node = new NamespaceDeclaration(modifiers, name, body, flags);
@@ -7300,7 +7268,7 @@ internal class Parser
     ModuleDeclaration ParseAmbientExternalModuleDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiersIn)
     {
         NodeFlags flags = 0;
-        IModuleName name = null;
+        IModuleName name;
         if (Token() == SyntaxKind.GlobalKeyword)
         {
             // parse 'global' as name of global scope augmentation
@@ -7426,7 +7394,7 @@ internal class Parser
         var moduleSpecifier = ParseModuleSpecifier();
         var currentToken = Token();
         ImportAttributes attributes = null;
-        if ((currentToken == SyntaxKind.WithKeyword || currentToken == SyntaxKind.AssertKeyword) 
+        if ((currentToken == SyntaxKind.WithKeyword || currentToken == SyntaxKind.AssertKeyword)
             && !scanner.HasPrecedingLineBreak())
         {
             attributes = ParseImportAttributes(currentToken);
@@ -7439,7 +7407,7 @@ internal class Parser
     ImportAttribute ParseImportAttribute()
     {
         var pos = GetNodePos();
-        IDeclarationName name = TokenIsIdentifierOrKeyword(Token()) ? ParseIdentifierName() 
+        IDeclarationName name = TokenIsIdentifierOrKeyword(Token()) ? ParseIdentifierName()
             : ParseLiteralLikeNode<StringLiteral>(SyntaxKind.StringLiteral);
         ParseExpected(SyntaxKind.ColonToken);
         var value = ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true);
@@ -7457,7 +7425,7 @@ internal class Parser
         if (ParseExpected(SyntaxKind.OpenBraceToken))
         {
             var multiLine = scanner.HasPrecedingLineBreak();
-            var elements = ParseDelimitedList(ParsingContext.ImportAttributes, 
+            var elements = ParseDelimitedList(ParsingContext.ImportAttributes,
                 ParseImportAttribute, considerSemicolonAsDelimiter: true);
             if (!ParseExpected(SyntaxKind.CloseBraceToken))
             {
@@ -7491,7 +7459,7 @@ internal class Parser
         return Token() == SyntaxKind.CommaToken || Token() == SyntaxKind.FromKeyword;
     }
 
-    ImportEqualsDeclaration ParseImportEqualsDeclaration(int pos, bool hasJSDoc, 
+    ImportEqualsDeclaration ParseImportEqualsDeclaration(int pos, bool hasJSDoc,
         NodeArray<IModifierLike> modifiers, Identifier identifier, bool isTypeOnly)
     {
         ParseExpected(SyntaxKind.EqualsToken);
@@ -7517,7 +7485,7 @@ internal class Parser
         if (identifier == null ||
             ParseOptional(SyntaxKind.CommaToken))
         {
-            namedBindings = Token() == SyntaxKind.AsteriskToken ? ParseNamespaceImport() 
+            namedBindings = Token() == SyntaxKind.AsteriskToken ? ParseNamespaceImport()
                 : (INamedImportBindings)ParseNamedImportsOrExports(SyntaxKind.NamedImports);
         }
 
@@ -7582,9 +7550,9 @@ internal class Parser
         //  ImportSpecifier
         //  ImportsList, ImportSpecifier
         INamedImportsOrExports node = kind == SyntaxKind.NamedImports
-            ? new NamedImports(ParseBracketedList(ParsingContext.ImportOrExportSpecifiers, 
+            ? new NamedImports(ParseBracketedList(ParsingContext.ImportOrExportSpecifiers,
                 ParseImportSpecifier, SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken))
-            : new NamedExports(ParseBracketedList(ParsingContext.ImportOrExportSpecifiers, 
+            : new NamedExports(ParseBracketedList(ParsingContext.ImportOrExportSpecifiers,
                 ParseExportSpecifier, SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken));
         return FinishNode(node, pos);
     }
@@ -7599,7 +7567,7 @@ internal class Parser
     {
         return ParseImportOrExportSpecifier(SyntaxKind.ImportSpecifier) as ImportSpecifier;
     }
-    
+
     IImportOrExportSpecifier ParseImportOrExportSpecifier(SyntaxKind kind)
     {
         var pos = GetNodePos();
@@ -7724,7 +7692,7 @@ internal class Parser
             // It is not uncommon to accidentally omit the 'from' keyword. Additionally, in editing scenarios,
             // the 'from' keyword can be parsed as a named export when the export clause is unterminated (i.e. `export { from "moduleName";`)
             // If we don't have a 'from' keyword, see if we have a string literal such that ASI won't take effect.
-            if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral && 
+            if (Token() == SyntaxKind.FromKeyword || (Token() == SyntaxKind.StringLiteral &&
                 !scanner.HasPrecedingLineBreak()))
             {
                 ParseExpected(SyntaxKind.FromKeyword);
@@ -7733,7 +7701,7 @@ internal class Parser
         }
 
         var currentToken = Token();
-        if (moduleSpecifier != null && (currentToken == SyntaxKind.WithKeyword || 
+        if (moduleSpecifier != null && (currentToken == SyntaxKind.WithKeyword ||
             currentToken == SyntaxKind.AssertKeyword) && !scanner.HasPrecedingLineBreak())
         {
             attributes = ParseImportAttributes(currentToken);
@@ -7763,4 +7731,137 @@ internal class Parser
         var node = new ExportAssignment(modifiers, isExportEquals, expression);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
+
+    // SourceFile ReparseTopLevelAwait(SourceFile sourceFile)
+    // {
+    //     // var savedSyntaxCursor = syntaxCursor;
+    //     // const baseSyntaxCursor = IncrementalParser.createSyntaxCursor(sourceFile);
+    //     // syntaxCursor = { currentNode };
+    // 
+    //     List<IStatement> statements = [];
+    //     var savedParseDiagnostics = parseDiagnostics;
+    // 
+    //     parseDiagnostics = [];
+    // 
+    //     var pos = 0;
+    //     var start = FindNextStatementWithAwait(sourceFile.Statements, 0);
+    //     while (start != -1)
+    //     {
+    //         // append all statements between pos and start
+    //         var prevStatement = sourceFile.Statements[pos];
+    //         var nextStatement = sourceFile.Statements[start];
+    //         statements.AddRange(sourceFile.Statements.Skip(pos).Take(start - pos));
+    //         pos = FindNextStatementWithoutAwait(sourceFile.Statements, start);
+    // 
+    //         // append all diagnostics associated with the copied range
+    //         var diagnosticStart = savedParseDiagnostics.FindIndex(diagnostic => diagnostic.Start >= prevStatement.Pos);
+    //         var diagnosticEnd = diagnosticStart >= 0 ? savedParseDiagnostics.FindIndex(diagnosticStart, diagnostic => diagnostic.Start >= nextStatement.Pos) : -1;
+    //         if (diagnosticStart >= 0)
+    //         {
+    //             parseDiagnostics.AddRange(savedParseDiagnostics.Skip(diagnosticStart)
+    //                 .Take(diagnosticEnd >= 0 ? diagnosticEnd - diagnosticStart : savedParseDiagnostics.Count));
+    //         }
+    // 
+    //         // reparse all statements between start and pos. We skip existing diagnostics
+    //         // for the same range and allow the parser to generate new ones.
+    //         SpeculationHelper<INode>(() =>
+    //         {
+    //             var savedContextFlags = contextFlags;
+    //             contextFlags |= NodeFlags.AwaitContext;
+    //             scanner.ResetTokenState(nextStatement.Pos ?? 0);
+    //             NextToken();
+    // 
+    //             while (Token() != SyntaxKind.EndOfFileToken)
+    //             {
+    //                 var startPos = scanner.GetTokenFullStart();
+    //                 var statement = ParseListElement(ParsingContext.SourceElements, ParseStatement);
+    //                 statements.Add(statement);
+    //                 if (startPos == scanner.GetTokenFullStart())
+    //                 {
+    //                     NextToken();
+    //                 }
+    // 
+    //                 if (pos >= 0)
+    //                 {
+    //                     var nonAwaitStatement = sourceFile.Statements[pos];
+    //                     if (statement.End == nonAwaitStatement.Pos)
+    //                     {
+    //                         // done reparsing this section
+    //                         break;
+    //                     }
+    //                     if (statement.End > nonAwaitStatement.Pos)
+    //                     {
+    //                         // we ate into the next statement, so we must reparse it.
+    //                         pos = FindNextStatementWithoutAwait(sourceFile.Statements, pos + 1);
+    //                     }
+    //                 }
+    //             }
+    // 
+    //             contextFlags = savedContextFlags;
+    //             return null;
+    //         }, SpeculationKind.Reparse);
+    // 
+    //         // find the next statement containing an `await`
+    //         start = pos >= 0 ? FindNextStatementWithAwait(sourceFile.Statements, pos) : -1;
+    //     }
+    // 
+    //     // append all statements between pos and the end of the list
+    //     if (pos >= 0)
+    //     {
+    //         var prevStatement = sourceFile.Statements[pos];
+    //         statements.AddRange(sourceFile.Statements.Skip(pos));
+    // 
+    //         // append all diagnostics associated with the copied range
+    //         var diagnosticStart = savedParseDiagnostics.FindIndex(diagnostic => diagnostic.Start >= prevStatement.Pos);
+    //         if (diagnosticStart >= 0)
+    //         {
+    //             parseDiagnostics.AddRange(savedParseDiagnostics.Skip(diagnosticStart));
+    //         }
+    //     }
+    // 
+    //     var newStatements = CreateNodeArray(statements, 0);
+    //     SetTextRange(newStatements, sourceFile.Statements);
+    //     return sourceFile;
+    // }
+    // 
+    // static bool ContainsPossibleTopLevelAwait(INode node)
+    // {
+    //     if (node is ExportAssignment exportAssignment &&
+    //         exportAssignment.Expression != null)
+    //         return ContainsPossibleTopLevelAwait(exportAssignment.Expression);
+    // 
+    //     if (node is VariableStatement varStatement &&
+    //         varStatement.DeclarationList is VariableDeclarationList varList &&
+    //         varList.Declarations != null &&
+    //         varList.Declarations.Any(x => x.Initializer is CallExpression callExpression &&
+    //             callExpression.Expression is Identifier identifier &&
+    //             identifier.Text == "await"))
+    //         return true;
+    // 
+    //     return false;
+    // }
+    // 
+    // static int FindNextStatementWithAwait(NodeArray<IStatement> statements, int start = 0)
+    // {
+    //     for (var i = start; i < statements.Count; i++)
+    //     {
+    //         if (ContainsPossibleTopLevelAwait(statements[i]))
+    //         {
+    //             return i;
+    //         }
+    //     }
+    //     return -1;
+    // }
+    // 
+    // static int FindNextStatementWithoutAwait(NodeArray<IStatement> statements, int start = 0)
+    // {
+    //     for (var i = start; i < statements.Count; i++)
+    //     {
+    //         if (!ContainsPossibleTopLevelAwait(statements[i]))
+    //         {
+    //             return i;
+    //         }
+    //     }
+    //     return -1;
+    // }
 }
