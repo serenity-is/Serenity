@@ -1,9 +1,9 @@
 using Serenity.TypeScript;
+
 #if ISSOURCEGENERATOR
 #else
 using CharSpan = System.ReadOnlySpan<char>;
 #endif
-using Debug = System.Diagnostics.Debug;
 
 namespace Serenity.TypeScript;
 

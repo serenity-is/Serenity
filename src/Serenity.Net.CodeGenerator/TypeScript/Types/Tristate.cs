@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-public enum Tristate
+internal enum Tristate
 {
     False,
     True,

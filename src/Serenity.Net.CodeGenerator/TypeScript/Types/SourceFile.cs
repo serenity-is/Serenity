@@ -2,7 +2,6 @@ namespace Serenity.TypeScript;
 
 internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
 {
-
     public SourceFile()
         : base(SyntaxKind.SourceFile)
     {
@@ -19,21 +18,11 @@ internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
         Utilities.SetTextRangePosWidth(this, 0, sourceText.Length);
 
         Text = sourceText;
-        //sourceFile.BindDiagnostics = [];
-        //sourceFile.BindSuggestionDiagnostics = undefined;
         LanguageVersion = languageVersion;
         FileName = fileName;
         LanguageVariant = Utilities.GetLanguageVariant(scriptKind);
         IsDeclarationFile = isDeclarationFile;
         ScriptKind = scriptKind;
-
-        // If we parsed this as an external module, it may contain top-level await
-        //if (!isDeclarationFile && IsExternalModule(sourceFile) && sourceFile.TransformFlags & TransformFlags.ContainsPossibleTopLevelAwait)
-        //{
-        //    var oldSourceFile = sourceFile;
-        //    sourceFile = ReparseTopLevelAwait(sourceFile);
-        //    if (oldSourceFile !== sourceFile) setFields(sourceFile);
-        //}
     }
 
     public NodeArray<IStatement> Statements { get; set; }
@@ -51,6 +40,7 @@ internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
     public int IdentifierCount { get; set; }
     public HashSet<string> Identifiers { get; set; }
     public JSDocParsingMode JsDocParsingMode { get; set; }
+
     public IEnumerable<INode> GetRestChildren()
     {
         if (Statements != null) foreach (var x in Statements) yield return x;

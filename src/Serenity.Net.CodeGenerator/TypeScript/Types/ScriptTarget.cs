@@ -1,4 +1,5 @@
 namespace Serenity.TypeScript;
+
 internal enum ScriptTarget
 {
     ES3 = 0,

@@ -1,4 +1,5 @@
 namespace Serenity.TypeScript;
+
 internal enum TokenFlags
 {
     None = 0,

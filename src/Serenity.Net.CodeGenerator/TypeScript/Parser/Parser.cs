@@ -857,7 +857,7 @@ internal class Parser
             NextToken();
             return;
         }
-        var lastError = ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(closeKind));
+        ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(closeKind));
         if (!openParsed)
         {
             return;
@@ -1001,7 +1001,7 @@ internal class Parser
 
         var pos = GetNodePos();
         var result = kind == SyntaxKind.Identifier ? new Identifier("", SyntaxKind.Unknown) :
-            IsTemplateLiteralKind(kind) ? Factory.CreateTemplateLiteralLikeNode(kind, "", "", null) :
+            IsTemplateLiteralKind(kind) ? CreateTemplateLiteralLikeNode(kind, "", "", null) :
             kind == SyntaxKind.NumericLiteral ? new NumericLiteral("") :
             kind == SyntaxKind.StringLiteral ? new StringLiteral("", isSingleQuote: null) :
             kind == SyntaxKind.MissingDeclaration ? new MissingDeclaration() :
@@ -1347,20 +1347,6 @@ internal class Parser
                 throw Debug.Fail("ParsingContext.Count used as a context", GetNodePos()); // Not a real context, only a marker.
             default:
                 throw Debug.Fail("Non-exhaustive case in 'isListElement' {0}.", parsingContext);
-        }
-    }
-
-    internal static class Debug
-    {
-        internal static void Assert(bool condition, string message = null, params object[] args)
-        {
-            if (!condition)
-                throw new ParseException(string.Format(message ?? "Parser assert condition failed!", args));
-        }
-
-        internal static ParseException Fail(string message, params object[] args)
-        {
-            return new ParseException(string.Format(message, args));
         }
     }
 
@@ -2153,7 +2139,7 @@ internal class Parser
         where TLiteral : ILiteralLikeNode
     {
         var pos = GetNodePos();
-        ILiteralLikeNode node = IsTemplateLiteralKind(kind) ? Factory.CreateTemplateLiteralLikeNode(kind, scanner.GetTokenValue(),
+        ILiteralLikeNode node = IsTemplateLiteralKind(kind) ? CreateTemplateLiteralLikeNode(kind, scanner.GetTokenValue(),
             GetTemplateLiteralRawText(kind), scanner.GetTokenFlags() & TokenFlags.TemplateLiteralLikeFlags) :
             // Note that theoretically the following condition would hold true literals like 009,
             // which is not octal. But because of how the scanner separates the tokens, we would
@@ -2162,7 +2148,7 @@ internal class Parser
             // parent unary expression.
             kind == SyntaxKind.NumericLiteral ? new NumericLiteral(scanner.GetTokenValue(), scanner.GetNumericLiteralFlags()) :
             kind == SyntaxKind.StringLiteral ? new StringLiteral(scanner.GetTokenValue(), isSingleQuote: null, scanner.HasExtendedUnicodeEscape()) :
-            IsLiteralKind(kind) ? Factory.CreateLiteralLikeNode(kind, scanner.GetTokenValue()) :
+            IsLiteralKind(kind) ? CreateLiteralLikeNode(kind, scanner.GetTokenValue()) :
             throw Debug.Fail($"{kind} is unknown literal like node");
 
         if (scanner.HasExtendedUnicodeEscape())

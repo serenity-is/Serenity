@@ -1,4 +1,5 @@
 namespace Serenity.TypeScript;
+
 public enum SpeculationKind
 {
     TryParse,
