@@ -494,6 +494,8 @@ internal class Utilities
         // it is safe to case the expression property as such. See parseJsxElementName for how we parse tag name in Jsx element
         return lhs is PropertyAccessExpression lhsAccessExpr && rhs is PropertyAccessExpression rhsAccessExpr &&
             lhsAccessExpr.Name?.EscapedText == rhsAccessExpr.Name?.EscapedText &&
-            TagNamesAreEquivalent(lhsAccessExpr, rhsAccessExpr);
+            lhsAccessExpr.Expression is IJsxTagNameExpression lhsJsxTag && 
+            rhsAccessExpr.Expression is IJsxTagNameExpression rhsJsxTag &&
+            TagNamesAreEquivalent(lhsJsxTag, rhsJsxTag);
     }
 }

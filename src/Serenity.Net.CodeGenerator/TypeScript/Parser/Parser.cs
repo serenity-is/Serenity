@@ -2235,7 +2235,7 @@ internal class Parser
         return FinishNode(new JSDocNonNullableType(ParseNonArrayType(), postfix: false), pos);
     }
 
-    JSDocType ParseJSDocUnknownOrNullableType()
+    JSDocTypeBase ParseJSDocUnknownOrNullableType()
     {
         var pos = GetNodePos();
         // skip the ?

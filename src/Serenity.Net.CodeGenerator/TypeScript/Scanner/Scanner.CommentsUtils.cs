@@ -1,5 +1,3 @@
-using Serenity.TypeScript;
-
 namespace Serenity.TypeScript;
 
 partial class Scanner
@@ -119,23 +117,6 @@ partial class Scanner
         return accumulator;
     }
 
-    private static U ReduceEachLeadingCommentRange<T, U>(string text, int pos, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial)
-    {
-        return IterateCommentRanges(reduce: true, text, pos, trailing: false, cb, state, initial);
-    }
-
-    private static U ReduceEachTrailingCommentRange<T, U>(string text, int pos, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial)
-    {
-        return IterateCommentRanges(reduce: true, text, pos, trailing: true, cb, state, initial);
-    }
-
-    private static List<CommentRange> AppendCommentRange((int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, object _state, List<CommentRange> comments) cb)
-    {
-        cb.comments ??= [];
-        cb.comments.Add(new CommentRange { Kind = cb.kind, Pos = cb.pos, End = cb.end, HasTrailingNewLine = cb.hasTrailingNewLine });
-        return cb.comments;
-    }
-
     List<CommentDirective> AppendIfCommentDirective(List<CommentDirective> commentDirectives, string text, Regex commentDirectiveRegEx, int lineStart)
     {
         var type = GetDirectiveFromComment(text.TrimStart(), commentDirectiveRegEx);
@@ -144,7 +125,7 @@ partial class Scanner
             return commentDirectives;
         }
 
-        commentDirectives ??= new();
+        commentDirectives ??= [];
         commentDirectives.Add(new(new() { Pos = lineStart, End = pos }, type.Value));
         return commentDirectives;
     }
@@ -163,16 +144,6 @@ partial class Scanner
             "ts-ignore" => (CommentDirectiveType?)CommentDirectiveType.Ignore,
             _ => null,
         };
-    }
-
-    internal static List<CommentRange> GetLeadingCommentRanges(string text, int pos)
-    {
-        return ReduceEachLeadingCommentRange<object, List<CommentRange>>(text, pos, AppendCommentRange, null, null) ?? [];
-    }
-
-    internal static List<CommentRange> GetTrailingCommentRanges(string text, int pos)
-    {
-        return ReduceEachTrailingCommentRange<object, List<CommentRange>>(text, pos, AppendCommentRange, null, null) ?? [];
     }
 
 

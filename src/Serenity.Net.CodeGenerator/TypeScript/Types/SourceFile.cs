@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-internal class SourceFile : Declaration, IBlockLike, IGetRestChildren
+internal class SourceFile : Node, IDeclaration, IBlockLike, IGetRestChildren
 {
     public SourceFile()
         : base(SyntaxKind.SourceFile)

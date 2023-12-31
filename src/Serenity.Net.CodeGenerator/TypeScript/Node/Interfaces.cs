@@ -191,6 +191,11 @@ internal interface IKeywordTypeNode : ITypeNode
 {
 }
 
+internal interface IInferTypeNode : ITypeNode
+{
+    TypeParameterDeclaration TypeParameter { get; }
+}
+
 internal interface IDeclarationStatement : INamedDeclaration, IStatement
 {
 }
@@ -413,4 +418,15 @@ internal interface IPrimaryExpression : IMemberExpression
 
 internal interface IStatement : INode
 {
+}
+
+internal interface IJSDocType : ITypeNode
+{
+}
+
+internal interface IJSDocTag : INode
+{
+    AtToken AtToken { get; set; }
+    Identifier TagName { get; set; }
+    string Comment { get; set; }
 }
