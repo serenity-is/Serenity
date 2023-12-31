@@ -1,7 +1,6 @@
 // Last converted from https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c on 2023-12-21 
 
 using static Serenity.TypeScript.Scanner;
-using static Serenity.TypeScript.NodeTests;
 using static Serenity.TypeScript.Utilities;
 
 namespace Serenity.TypeScript;
@@ -862,12 +861,6 @@ internal class Parser
         if (!openParsed)
         {
             return;
-        }
-        if (lastError != null)
-        {
-            //AddRelatedInfo(lastError,
-            //    CreateDetachedDiagnostic(fileName, sourceText, openPosition, 1, Diagnostics.The_parser_expected_to_find_a_1_to_match_the_0_token_here,
-            //    TokenToString(openKind) + "," + TokenToString(closeKind)));
         }
     }
 
@@ -3055,17 +3048,7 @@ internal class Parser
             }
             ParseExpected(SyntaxKind.ColonToken);
             attributes = ParseImportAttributes(currentToken, skipKeyword: true);
-            if (!ParseExpected(SyntaxKind.CloseBraceToken))
-            {
-                var lastError = parseDiagnostics.LastOrDefault();
-                if (lastError != null && lastError.Message?.Code == Diagnostics._0_expected.Code)
-                {
-                    //addRelatedInfo(
-                    //    lastError,
-                    //    createDetachedDiagnostic(fileName, sourceText, openBracePosition, 1, Diagnostics.The_parser_expected_to_find_a_1_to_match_the_0_token_here, "{", "}"),
-                    //);
-                }
-            }
+            ParseExpected(SyntaxKind.CloseBraceToken);
         }
         ParseExpected(SyntaxKind.CloseParenToken);
         var qualifier = ParseOptional(SyntaxKind.DotToken) ? ParseEntityNameOfTypeReference() : null;
@@ -3285,7 +3268,7 @@ internal class Parser
         {
             var type = ParseFunctionOrConstructorType();
             DiagnosticMessage diagnostic;
-            if (IsFunctionTypeNode(type))
+            if (type is FunctionTypeNode)
             {
                 diagnostic = IsInUnionType
                     ? Diagnostics.Function_type_notation_must_be_parenthesized_when_used_in_a_union_type
@@ -3995,7 +3978,7 @@ internal class Parser
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
         var modifiers = ParseModifiersForArrowFunction();
-        var isAsync = modifiers?.Any(x => IsAsyncModifier(x)) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
         // Arrow functions are never generators.
         //
         // If we're speculatively parsing a signature for a parenthesized arrow function, then
@@ -4059,7 +4042,7 @@ internal class Parser
             unwrappedType = (unwrappedType as ParenthesizedTypeNode)?.Type; // Skip parens if need be
         }
 
-        var hasJSDocFunctionType = unwrappedType != null && IsJSDocFunctionType(unwrappedType);
+        var hasJSDocFunctionType = unwrappedType is JSDocFunctionType;
         if (!allowAmbiguity && Token() != SyntaxKind.EqualsGreaterThanToken && (hasJSDocFunctionType || Token() != SyntaxKind.OpenBraceToken))
         {
             // Returning undefined here will cause our caller to rewind to where we started from.
@@ -4071,7 +4054,8 @@ internal class Parser
         var lastToken = Token();
         var equalsGreaterThanToken = ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken);
         var body = (lastToken == SyntaxKind.EqualsGreaterThanToken || lastToken == SyntaxKind.OpenBraceToken)
-            ? ParseArrowFunctionExpressionBody(modifiers?.Any(IsAsyncModifier) == true, allowReturnTypeInArrowFunction)
+            ? ParseArrowFunctionExpressionBody(modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true, 
+                allowReturnTypeInArrowFunction)
             : ParseIdentifier();
 
         // Given:
@@ -4705,8 +4689,8 @@ internal class Parser
                 closingElement = ParseJsxClosingElement((opening as JsxOpeningElement), inExpressionContext);
                 if (!TagNamesAreEquivalent((opening as IJsxHasTagName)?.TagName, (closingElement as IJsxHasTagName)?.TagName))
                 {
-                    if (openingTag != null && IsJsxOpeningElement(openingTag) &&
-                        TagNamesAreEquivalent((closingElement as IJsxHasTagName)?.TagName, (openingTag as IJsxHasTagName)?.TagName))
+                    if (openingTag is JsxOpeningElement openingElement &&
+                        TagNamesAreEquivalent((closingElement as IJsxHasTagName)?.TagName, openingElement.TagName))
                     {
                         // opening incorrectly matched with its parent's closing -- put error on opening
                         ParseErrorAtRange((opening as IJsxHasTagName)?.TagName, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
@@ -4775,7 +4759,7 @@ internal class Parser
             case SyntaxKind.EndOfFileToken:
                 // If we hit EOF, issue the error at the tag that lacks the closing element
                 // rather than at the end of the file (which is useless)
-                if (IsJsxOpeningFragment(openingTag))
+                if (openingTag is JsxOpeningFragment)
                 {
                     ParseErrorAtRange(openingTag, Diagnostics.JSX_fragment_has_no_corresponding_closing_tag);
                 }
@@ -4817,10 +4801,10 @@ internal class Parser
             if (child == null)
                 break;
             list.Add(child);
-            if (IsJsxOpeningElement(openingTag)
-                && child?.Kind == SyntaxKind.JsxElement
-                && !TagNamesAreEquivalent((child as JsxElement).OpeningElement.TagName, (child as JsxElement)?.ClosingElement?.TagName)
-                && TagNamesAreEquivalent((openingTag as IJsxHasTagName)?.TagName, (child as JsxElement)?.ClosingElement?.TagName))
+            if (openingTag is JsxOpeningElement openingElement
+                && child is JsxElement jsxChild
+                && !TagNamesAreEquivalent(jsxChild.OpeningElement?.TagName, jsxChild.ClosingElement?.TagName)
+                && TagNamesAreEquivalent(openingElement.TagName, jsxChild.ClosingElement?.TagName))
             {
                 // stop after parsing a mismatched child like <div>...(<span></div>) in order to reattach the </div> higher
                 break;
@@ -4893,7 +4877,7 @@ internal class Parser
         // We can't just simply use ParseLeftHandSideExpressionOrHigher because then we will start consider class,function etc as a keyword
         // We only want to consider "this" as a primaryExpression
         var initialExpression = ParseJsxTagName();
-        if (IsJsxNamespacedName(initialExpression))
+        if (initialExpression is JsxNamespacedName)
         {
             return initialExpression; // `a:b.c` is invalid syntax, don't even look for the `.` if we parse `a:b`, and let `parseAttribute` report "unexpected :" instead.
         }
@@ -5083,20 +5067,20 @@ internal class Parser
             return true;
         }
         // check for an optional chain in a non-null expression
-        if (IsNonNullExpression(node))
+        if (node is NonNullExpression)
         {
             var expr = (node as NonNullExpression).Expression;
-            while (IsNonNullExpression(expr) && (expr.Flags & NodeFlags.OptionalChain) == 0)
+            while (expr is NonNullExpression nonNullExpr && (expr.Flags & NodeFlags.OptionalChain) == 0)
             {
-                expr = (expr as NonNullExpression)?.Expression;
+                expr = nonNullExpr.Expression;
             }
             if ((expr.Flags & NodeFlags.OptionalChain) != 0)
             {
                 // this is part of an optional chain. Walk down from `node` to `expression` and set the flag.
-                while (IsNonNullExpression(node))
+                while (node is NonNullExpression nonNullExpr)
                 {
                     node.Flags |= NodeFlags.OptionalChain;
-                    node = (node as NonNullExpression).Expression;
+                    node = nonNullExpr.Expression;
                 }
                 return true;
             }
@@ -5113,7 +5097,7 @@ internal class Parser
         var propertyAccess = isOptionalChain ?
             new PropertyAccessChain(expression, questionDotToken, name) :
             new PropertyAccessExpression(expression, name);
-        if (isOptionalChain && IsPrivateIdentifier(propertyAccess.Name))
+        if (isOptionalChain && propertyAccess.Name is PrivateIdentifier)
         {
             ParseErrorAtRange(propertyAccess.Name, Diagnostics.An_optional_chain_cannot_contain_private_identifiers);
         }
@@ -5139,7 +5123,7 @@ internal class Parser
         else
         {
             var argument = AllowInAnd(ParseExpression);
-            if (IsStringOrNumericLiteralLike(argument) &&
+            if (argument is IStringLiteralLike or NumericLiteral &&
                 argument is IHasLiteralText hasLiteralText)
             {
                 hasLiteralText.Text = InternIdentifier(hasLiteralText.Text);
@@ -5540,7 +5524,7 @@ internal class Parser
         ParseExpected(SyntaxKind.FunctionKeyword);
         var asteriskToken = ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken);
         var isGenerator = asteriskToken != null ? SignatureFlags.Yield : SignatureFlags.None;
-        var isAsync = modifiers?.Any(IsAsyncModifier) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
         var name = isGenerator != 0 && isAsync != 0 ? DoInYieldAndAwaitContext(ParseOptionalBindingIdentifier) :
             isGenerator != 0 ? DoInYieldContext(ParseOptionalBindingIdentifier) :
             isAsync != 0 ? DoInAwaitContext(ParseOptionalBindingIdentifier) :
@@ -6653,7 +6637,7 @@ internal class Parser
         DiagnosticMessage diagnosticMessage = null)
     {
         var isGenerator = asteriskToken != null ? SignatureFlags.Yield : SignatureFlags.None;
-        var isAsync = modifiers?.Any(IsAsyncModifier) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
         var typeParameters = ParseTypeParameters();
         var parameters = ParseParameters(isGenerator | isAsync);
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
@@ -7086,7 +7070,7 @@ internal class Parser
         // We don't parse the name here in await context, instead we will report a grammar error in the checker.
         var name = ParseNameOfClassDeclarationOrExpression();
         var typeParameters = ParseTypeParameters();
-        if (modifiers?.Any(IsExportModifier) == true)
+        if (modifiers?.Any(x => x.Kind == SyntaxKind.ExportKeyword) == true)
             SetAwaitContext(val: true);
         var heritageClauses = ParseHeritageClauses();
 
@@ -7427,17 +7411,7 @@ internal class Parser
             var multiLine = scanner.HasPrecedingLineBreak();
             var elements = ParseDelimitedList(ParsingContext.ImportAttributes,
                 ParseImportAttribute, considerSemicolonAsDelimiter: true);
-            if (!ParseExpected(SyntaxKind.CloseBraceToken))
-            {
-                var lastError = parseDiagnostics?.LastOrDefault();
-                if (lastError != null && lastError.Message?.Code == Diagnostics._0_expected.Code)
-                {
-                    //addRelatedInfo(
-                    //    lastError,
-                    //    createDetachedDiagnostic(fileName, sourceText, openBracePosition, 1, Diagnostics.The_parser_expected_to_find_a_1_to_match_the_0_token_here, "{", "}"),
-                    //);
-                }
-            }
+            ParseExpected(SyntaxKind.CloseBraceToken);
             return FinishNode(new ImportAttributes(elements, multiLine, token), pos);
         }
         else
@@ -7731,137 +7705,4 @@ internal class Parser
         var node = new ExportAssignment(modifiers, isExportEquals, expression);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
-
-    // SourceFile ReparseTopLevelAwait(SourceFile sourceFile)
-    // {
-    //     // var savedSyntaxCursor = syntaxCursor;
-    //     // const baseSyntaxCursor = IncrementalParser.createSyntaxCursor(sourceFile);
-    //     // syntaxCursor = { currentNode };
-    // 
-    //     List<IStatement> statements = [];
-    //     var savedParseDiagnostics = parseDiagnostics;
-    // 
-    //     parseDiagnostics = [];
-    // 
-    //     var pos = 0;
-    //     var start = FindNextStatementWithAwait(sourceFile.Statements, 0);
-    //     while (start != -1)
-    //     {
-    //         // append all statements between pos and start
-    //         var prevStatement = sourceFile.Statements[pos];
-    //         var nextStatement = sourceFile.Statements[start];
-    //         statements.AddRange(sourceFile.Statements.Skip(pos).Take(start - pos));
-    //         pos = FindNextStatementWithoutAwait(sourceFile.Statements, start);
-    // 
-    //         // append all diagnostics associated with the copied range
-    //         var diagnosticStart = savedParseDiagnostics.FindIndex(diagnostic => diagnostic.Start >= prevStatement.Pos);
-    //         var diagnosticEnd = diagnosticStart >= 0 ? savedParseDiagnostics.FindIndex(diagnosticStart, diagnostic => diagnostic.Start >= nextStatement.Pos) : -1;
-    //         if (diagnosticStart >= 0)
-    //         {
-    //             parseDiagnostics.AddRange(savedParseDiagnostics.Skip(diagnosticStart)
-    //                 .Take(diagnosticEnd >= 0 ? diagnosticEnd - diagnosticStart : savedParseDiagnostics.Count));
-    //         }
-    // 
-    //         // reparse all statements between start and pos. We skip existing diagnostics
-    //         // for the same range and allow the parser to generate new ones.
-    //         SpeculationHelper<INode>(() =>
-    //         {
-    //             var savedContextFlags = contextFlags;
-    //             contextFlags |= NodeFlags.AwaitContext;
-    //             scanner.ResetTokenState(nextStatement.Pos ?? 0);
-    //             NextToken();
-    // 
-    //             while (Token() != SyntaxKind.EndOfFileToken)
-    //             {
-    //                 var startPos = scanner.GetTokenFullStart();
-    //                 var statement = ParseListElement(ParsingContext.SourceElements, ParseStatement);
-    //                 statements.Add(statement);
-    //                 if (startPos == scanner.GetTokenFullStart())
-    //                 {
-    //                     NextToken();
-    //                 }
-    // 
-    //                 if (pos >= 0)
-    //                 {
-    //                     var nonAwaitStatement = sourceFile.Statements[pos];
-    //                     if (statement.End == nonAwaitStatement.Pos)
-    //                     {
-    //                         // done reparsing this section
-    //                         break;
-    //                     }
-    //                     if (statement.End > nonAwaitStatement.Pos)
-    //                     {
-    //                         // we ate into the next statement, so we must reparse it.
-    //                         pos = FindNextStatementWithoutAwait(sourceFile.Statements, pos + 1);
-    //                     }
-    //                 }
-    //             }
-    // 
-    //             contextFlags = savedContextFlags;
-    //             return null;
-    //         }, SpeculationKind.Reparse);
-    // 
-    //         // find the next statement containing an `await`
-    //         start = pos >= 0 ? FindNextStatementWithAwait(sourceFile.Statements, pos) : -1;
-    //     }
-    // 
-    //     // append all statements between pos and the end of the list
-    //     if (pos >= 0)
-    //     {
-    //         var prevStatement = sourceFile.Statements[pos];
-    //         statements.AddRange(sourceFile.Statements.Skip(pos));
-    // 
-    //         // append all diagnostics associated with the copied range
-    //         var diagnosticStart = savedParseDiagnostics.FindIndex(diagnostic => diagnostic.Start >= prevStatement.Pos);
-    //         if (diagnosticStart >= 0)
-    //         {
-    //             parseDiagnostics.AddRange(savedParseDiagnostics.Skip(diagnosticStart));
-    //         }
-    //     }
-    // 
-    //     var newStatements = CreateNodeArray(statements, 0);
-    //     SetTextRange(newStatements, sourceFile.Statements);
-    //     return sourceFile;
-    // }
-    // 
-    // static bool ContainsPossibleTopLevelAwait(INode node)
-    // {
-    //     if (node is ExportAssignment exportAssignment &&
-    //         exportAssignment.Expression != null)
-    //         return ContainsPossibleTopLevelAwait(exportAssignment.Expression);
-    // 
-    //     if (node is VariableStatement varStatement &&
-    //         varStatement.DeclarationList is VariableDeclarationList varList &&
-    //         varList.Declarations != null &&
-    //         varList.Declarations.Any(x => x.Initializer is CallExpression callExpression &&
-    //             callExpression.Expression is Identifier identifier &&
-    //             identifier.Text == "await"))
-    //         return true;
-    // 
-    //     return false;
-    // }
-    // 
-    // static int FindNextStatementWithAwait(NodeArray<IStatement> statements, int start = 0)
-    // {
-    //     for (var i = start; i < statements.Count; i++)
-    //     {
-    //         if (ContainsPossibleTopLevelAwait(statements[i]))
-    //         {
-    //             return i;
-    //         }
-    //     }
-    //     return -1;
-    // }
-    // 
-    // static int FindNextStatementWithoutAwait(NodeArray<IStatement> statements, int start = 0)
-    // {
-    //     for (var i = start; i < statements.Count; i++)
-    //     {
-    //         if (!ContainsPossibleTopLevelAwait(statements[i]))
-    //         {
-    //             return i;
-    //         }
-    //     }
-    //     return -1;
-    // }
 }

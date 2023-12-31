@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-public struct TypeOption<Type1, Type2>
+internal struct TypeOption<Type1, Type2>
 {
     private Type1 value1;
     private Type2 value2;
@@ -48,18 +48,4 @@ public struct TypeOption<Type1, Type2>
         value1 = default;
         value2 = default;
     }
-
-    //public static implicit operator TypeOption<Type1, Type2>(Type1 value1) 
-    //{ 
-    //    return new TypeOption<Type1, Type2>() { Value1 = value1 }; 
-    //}
-
-    //public static implicit operator TypeOption<Type1, Type2>(Type2 value2)
-    //{
-    //    return new TypeOption<Type1, Type2>() { Value2 = value2 };
-    //}
-
-    //public static explicit operator Type1(TypeOption<Type1, Type2> o) => o.Value1;
-
-    //public static explicit operator Type2(TypeOption<Type1, Type2> o) => o.Value2;
 }

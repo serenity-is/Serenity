@@ -1,5 +1,3 @@
-using static Serenity.TypeScript.NodeVisitor;
-using static Serenity.TypeScript.NodeTests;
 using static Serenity.TypeScript.Scanner;
 
 namespace Serenity.TypeScript;
@@ -51,11 +49,11 @@ internal class Utilities
     {
         return !NodeIsMissing(node);
     }
+
     internal static bool IsInOrOfKeyword(SyntaxKind t)
     {
         return t == SyntaxKind.InKeyword || t == SyntaxKind.OfKeyword;
     }
-
 
     public static string GetTextOfNodeFromSourceText(string sourceText, INode node)
     {
@@ -69,29 +67,6 @@ internal class Utilities
 
         return sourceText[start..node.End.Value];
     }
-
-    public static List<CommentRange> GetLeadingCommentRangesOfNodeFromText(INode node, string text)
-    {
-        return GetLeadingCommentRanges(text, node.Pos ?? 0);
-    }
-
-    public static List<CommentRange> GetJSDocCommentRanges(INode node, string text)
-    {
-        var commentRanges = node.Kind == SyntaxKind.Parameter ||
-                            node.Kind == SyntaxKind.TypeParameter ||
-                            node.Kind == SyntaxKind.FunctionExpression ||
-                            node.Kind == SyntaxKind.ArrowFunction
-            ? GetTrailingCommentRanges(text, node.Pos ?? 0).Concat(GetLeadingCommentRanges(text, node.Pos ?? 0))
-            : GetLeadingCommentRangesOfNodeFromText(node, text);
-        commentRanges ??= new List<CommentRange>();
-        return commentRanges.Where(comment =>
-                text[(comment.Pos ?? 0) + 1] == '*' &&
-                text[(comment.Pos ?? 0) + 2] == '*' &&
-                text[(comment.Pos ?? 0) + 3] != '/')
-            .ToList();
-    }
-
-
 
     public static bool IsModifierKind(SyntaxKind token)
     {
@@ -117,46 +92,6 @@ internal class Utilities
             idToken == SyntaxKind.StaticKeyword ||
             idToken == SyntaxKind.OverrideKeyword ||
             idToken == SyntaxKind.AccessorKeyword;
-    }
-
-    public static bool IsParameterDeclaration(IVariableLikeDeclaration node)
-    {
-        var root = GetRootDeclaration(node);
-
-        return root.Kind == SyntaxKind.Parameter;
-    }
-
-    public static INode GetRootDeclaration(INode node)
-    {
-        while (node.Kind == SyntaxKind.BindingElement)
-            node = node.Parent.Parent;
-
-        return node;
-    }
-
-    public static bool HasModifiers(INode node)
-    {
-        return GetModifierFlags(node) != ModifierFlags.None;
-    }
-
-    public static bool HasModifier(INode node, ModifierFlags flags)
-    {
-        return (GetModifierFlags(node) & flags) != 0;
-    }
-
-    public static ModifierFlags GetModifierFlags(INode node)
-    {
-        var flags = ModifierFlags.None;
-        if (node is not IHasModifierLike hasModifiers || hasModifiers.Modifiers is null)
-            return flags;
-
-        foreach (var modifier in hasModifiers.Modifiers)
-            flags |= ModifierToFlag(modifier.Kind);
-        if ((node.Flags & NodeFlags.NestedNamespace) != 0 || node.Kind == SyntaxKind.Identifier &&
-            ((Identifier)node).IsInJsDocNamespace)
-            flags |= ModifierFlags.Export;
-
-        return flags;
     }
 
     public static ModifierFlags ModifiersToFlags(IEnumerable<IModifierLike> modifiers)
@@ -189,14 +124,6 @@ internal class Utilities
             SyntaxKind.ReadonlyKeyword => ModifierFlags.Readonly,
             _ => ModifierFlags.None,
         };
-    }
-
-
-    public static bool IsLogicalOperator(SyntaxKind token)
-    {
-        return token == SyntaxKind.BarBarToken
-               || token == SyntaxKind.AmpersandAmpersandToken
-               || token == SyntaxKind.ExclamationToken;
     }
 
     public static bool IsAssignmentOperator(SyntaxKind token)
@@ -242,6 +169,7 @@ internal class Utilities
         var sk = scriptKind != ScriptKind.Unknown ? scriptKind : GetScriptKindFromFileName(fileName);
         return sk != ScriptKind.Unknown ? sk : ScriptKind.TS;
     }
+
     public static ScriptKind GetScriptKindFromFileName(string fileName)
     {
         //var ext = fileName.substr(fileName.LastIndexOf("."));
@@ -378,23 +306,6 @@ internal class Utilities
         return false;
     }
 
-    static class Extension
-    {
-        public const string Ts = ".ts";
-        public const string Tsx = ".tsx";
-        public const string Dts = ".d.ts";
-        public const string Js = ".js";
-        public const string Jsx = ".jsx";
-        public const string Json = ".json";
-        public const string TsBuildInfo = ".tsbuildinfo";
-        public const string Mjs = ".mjs";
-        public const string Mts = ".mts";
-        public const string Dmts = ".d.mts";
-        public const string Cjs = ".cjs";
-        public const string Cts = ".cts";
-        public const string Dcts = ".d.cts";
-    }
-
     static readonly string[] SupportedDeclarationExtensions = [".d.ts" /* Dts */, ".d.cts" /* Dcts */, ".d.mts" /* Dmts */];
 
     internal static bool IsDeclarationFileName(string fileName)
@@ -448,10 +359,10 @@ internal class Utilities
     static bool IsAnExternalModuleIndicatorNode(INode node)
     {
         return (CanHaveModifiers(node) && HasModifierOfKind(node, SyntaxKind.ExportKeyword))
-            || (IsImportEqualsDeclaration(node) && IsExternalModuleReference((node as ImportEqualsDeclaration)?.ModuleReference))
-            || IsImportDeclaration(node)
-            || IsExportAssignment(node)
-            || IsExportDeclaration(node);
+            || (node is ImportEqualsDeclaration importEquals && importEquals.ModuleReference is ExternalModuleReference)
+            || node is ImportDeclaration
+            || node is ExportAssignment
+            || node is ExportDeclaration;
     }
 
     static INode GetImportMetaIfNecessary(SourceFile sourceFile)
@@ -468,7 +379,7 @@ internal class Utilities
 
     static bool IsImportMeta(INode node)
     {
-        return IsMetaProperty(node) && node is MetaProperty { KeywordToken: SyntaxKind.ImportKeyword } mp && mp.Name?.EscapedText == "meta";
+        return node is MetaProperty { KeywordToken: SyntaxKind.ImportKeyword } mp && mp.Name?.EscapedText == "meta";
     }
 
     internal static INode IsFileProbablyExternalModule(SourceFile sourceFile)
@@ -507,38 +418,6 @@ internal class Utilities
         return range;
     }
 
-    internal static bool IsExternalModule(SourceFile sourceFile)
-    {
-        return sourceFile.ExternalModuleIndicator != null;
-    }
-
-    internal static bool CanHaveJSDoc(INode node)
-    {
-        return node.Kind switch
-        {
-            SyntaxKind.ArrowFunction or SyntaxKind.BinaryExpression or SyntaxKind.Block or SyntaxKind.BreakStatement or
-            SyntaxKind.CallSignature or SyntaxKind.CaseClause or SyntaxKind.ClassDeclaration or SyntaxKind.ClassExpression or
-            SyntaxKind.ClassStaticBlockDeclaration or SyntaxKind.Constructor or SyntaxKind.ConstructorType or
-            SyntaxKind.ConstructSignature or SyntaxKind.ContinueStatement or SyntaxKind.DebuggerStatement or
-            SyntaxKind.DoStatement or SyntaxKind.ElementAccessExpression or SyntaxKind.EmptyStatement or
-            SyntaxKind.EndOfFileToken or SyntaxKind.EnumDeclaration or SyntaxKind.EnumMember or SyntaxKind.ExportAssignment or
-            SyntaxKind.ExportDeclaration or SyntaxKind.ExportSpecifier or SyntaxKind.ExpressionStatement or
-            SyntaxKind.ForInStatement or SyntaxKind.ForOfStatement or SyntaxKind.ForStatement or SyntaxKind.FunctionDeclaration or
-            SyntaxKind.FunctionExpression or SyntaxKind.FunctionType or SyntaxKind.GetAccessor or SyntaxKind.Identifier or
-            SyntaxKind.IfStatement or SyntaxKind.ImportDeclaration or SyntaxKind.ImportEqualsDeclaration or SyntaxKind.IndexSignature or
-            SyntaxKind.InterfaceDeclaration or SyntaxKind.JSDocFunctionType or SyntaxKind.JSDocSignature or SyntaxKind.LabeledStatement or
-            SyntaxKind.MethodDeclaration or SyntaxKind.MethodSignature or SyntaxKind.ModuleDeclaration or SyntaxKind.NamedTupleMember or
-            SyntaxKind.NamespaceExportDeclaration or SyntaxKind.ObjectLiteralExpression or SyntaxKind.Parameter or
-            SyntaxKind.ParenthesizedExpression or SyntaxKind.PropertyAccessExpression or SyntaxKind.PropertyAssignment or
-            SyntaxKind.PropertyDeclaration or SyntaxKind.PropertySignature or SyntaxKind.ReturnStatement or SyntaxKind.SemicolonClassElement or
-            SyntaxKind.SetAccessor or SyntaxKind.ShorthandPropertyAssignment or SyntaxKind.SpreadAssignment or
-            SyntaxKind.SwitchStatement or SyntaxKind.ThrowStatement or SyntaxKind.TryStatement or SyntaxKind.TypeAliasDeclaration or
-            SyntaxKind.TypeParameter or SyntaxKind.VariableDeclaration or SyntaxKind.VariableStatement or SyntaxKind.WhileStatement or
-            SyntaxKind.WithStatement => true,
-            _ => false,
-        };
-    }
-
     internal static OperatorPrecedence GetBinaryOperatorPrecedence(SyntaxKind kind)
     {
         return kind switch
@@ -571,9 +450,9 @@ internal class Utilities
         if (lhs == null || rhs == null || lhs.Kind != rhs.Kind)
             return false;
 
-        if (lhs.Kind == SyntaxKind.Identifier)
+        if (lhs is Identifier identifier && rhs is Identifier rhsIdentifier)
         {
-            return (lhs as Identifier)?.EscapedText == (rhs as Identifier)?.EscapedText;
+            return identifier.EscapedText == rhsIdentifier.EscapedText;
         }
 
         if (lhs.Kind == SyntaxKind.ThisKeyword)
@@ -581,29 +460,17 @@ internal class Utilities
             return true;
         }
 
-        if (lhs.Kind == SyntaxKind.JsxNamespacedName)
+        if (lhs is JsxNamespacedName lhsNamespaced && rhs is JsxNamespacedName rhsNamespaced)
         {
-            return (lhs as JsxNamespacedName)?.Namespace?.EscapedText ==
-                (rhs as JsxNamespacedName)?.Namespace?.EscapedText &&
-                (lhs as JsxNamespacedName)?.Name?.EscapedText == (rhs as JsxNamespacedName)?.Name?.EscapedText;
+            return lhsNamespaced.Namespace?.EscapedText == rhsNamespaced.Namespace?.EscapedText &&
+                lhsNamespaced.Name?.EscapedText == rhsNamespaced?.Name?.EscapedText;
         }
 
         // If we are at this statement then we must have PropertyAccessExpression and because tag name in Jsx element can only
         // take forms of JsxTagNameExpression which includes an identifier, "this" expression, or another propertyAccessExpression
         // it is safe to case the expression property as such. See parseJsxElementName for how we parse tag name in Jsx element
-        return ((lhs as PropertyAccessExpression)?.Name)?.EscapedText ==
-            ((rhs as PropertyAccessExpression)?.Name).EscapedText &&
-            TagNamesAreEquivalent((lhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression,
-                (rhs as PropertyAccessExpression)?.Expression as IJsxTagNameExpression);
-    }
-
-    internal static bool IsStringLiteralLike(INode node)
-    {
-        return node.Kind == SyntaxKind.StringLiteral || node.Kind == SyntaxKind.NoSubstitutionTemplateLiteral;
-    }
-
-    internal static bool IsStringOrNumericLiteralLike(INode node)
-    {
-        return IsStringLiteralLike(node) || IsNumericLiteral(node);
+        return lhs is PropertyAccessExpression lhsAccessExpr && rhs is PropertyAccessExpression rhsAccessExpr &&
+            lhsAccessExpr.Name?.EscapedText == rhsAccessExpr.Name?.EscapedText &&
+            TagNamesAreEquivalent(lhsAccessExpr, rhsAccessExpr);
     }
 }
