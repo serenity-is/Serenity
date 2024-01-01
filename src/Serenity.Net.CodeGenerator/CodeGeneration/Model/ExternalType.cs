@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public class ExternalType
 {
@@ -15,6 +15,7 @@ public class ExternalType
     public bool? IsAbstract { get; set; }
     public bool? IsDeclaration { get; set; }
     public bool? IsInterface { get; set; }
+    public bool? IsIntersectionType { get; set; }
 
     public string FullName
     {

@@ -170,12 +170,40 @@ public class TSTypeListerAST
         return GetTypeReferenceExpression(node, out _, isDecorator);
     }
 
-    string GetTypeReferenceExpression(INode node, out string genericArgs, bool isDecorator = false)
+    string GetTypeReferenceExpression(INode node, out string genericArgs, 
+        bool isDecorator = false)
     {
         genericArgs = null;
 
         if (node == null)
             return string.Empty;
+
+        if (node is IntersectionTypeNode intersectionType)
+        {
+            if (intersectionType.Types != null &&
+                intersectionType.Types.Count > 0)
+            {
+                return '[' + string.Join(",", intersectionType.Types.Select(x => 
+                    GetTypeReferenceExpression(x, isDecorator: false))
+                        .Where(x => x != null)
+                        .Select(x => x.ToDoubleQuoted())) + ']';
+            }
+
+            return null;
+        }
+
+        if (node is TypeLiteralNode typeLiteral)
+        {
+            if (typeLiteral.Members is not null &&
+                typeLiteral.Members.Count > 0)
+            {
+                var members = GetInterfaceOrLiteralTypeMembers(typeLiteral.Members);
+                return "{" + string.Join(",", members.Select(x => x.Name.ToDoubleQuoted() 
+                    + ":" + x.Type.ToDoubleQuoted())) + "}";
+            }
+
+            return null;
+        }
 
         var text = GetText(node);
         if (text is null || text.Length == 0 || text == "any")
@@ -527,10 +555,15 @@ public class TSTypeListerAST
         if (node.Members == null)
             return null;
 
+        return GetInterfaceOrLiteralTypeMembers(node.Members);
+    }
+
+    List<ExternalMember> GetInterfaceOrLiteralTypeMembers(NodeArray<ITypeElement> members)
+    { 
         var result = new List<ExternalMember>();
         var used = new HashSet<string>();
 
-        foreach (var member in node.Members) 
+        foreach (var member in members) 
         {
             if (member.Kind != SyntaxKind.PropertySignature &&
                 member.Kind != SyntaxKind.MethodSignature)

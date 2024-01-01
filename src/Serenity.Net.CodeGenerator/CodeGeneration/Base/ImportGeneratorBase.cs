@@ -112,6 +112,37 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
     protected ExternalType GetScriptTypeFrom(ExternalType fromType, string typeName)
     {
+        if (typeName == null)
+            return null;
+
+        if (typeName.StartsWith('[') && typeName.EndsWith(']'))
+        {
+            return new ExternalType
+            {
+                Name = typeName,
+                IsInterface = true,
+                IsDeclaration = true,
+                Interfaces = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(typeName),
+                IsIntersectionType = true
+            };
+        }
+
+        if (typeName.StartsWith('{') && typeName.EndsWith('}'))
+        {
+            return new ExternalType
+            {
+                Name = typeName,
+                IsInterface = true,
+                IsDeclaration = true,
+                Fields = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(typeName)
+                    .Select(x => new ExternalMember
+                    {
+                        Name = x.Key,
+                        Type = x.Value
+                    }).ToList()
+            };
+        }
+
         var ns = fromType.Namespace;
         var scriptType = GetScriptType(typeName);
         if (scriptType != null)

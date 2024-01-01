@@ -94,16 +94,31 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         }
     }
 
-    private static void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
-        ExternalType type, bool isOptions)
+    private void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
+        ExternalType fromType, ExternalType optionsType, bool isOptions)
     {
         List<ExternalMember> members = [];
 
-        if (type.Fields != null)
-            members.AddRange(type.Fields);
+        if (optionsType == null)
+            return;
 
-        if (type.Methods != null)
-            members.AddRange(type.Methods.Where(x => x.Arguments?.Count == 1));
+        if (optionsType.IsIntersectionType == true && optionsType.Interfaces != null)
+        {
+            foreach (var intersectedTypeName in optionsType.Interfaces)
+            {
+                var intersectedType = GetScriptTypeFrom(fromType, intersectedTypeName);
+                if (intersectedType != null)
+                {
+                    AddOptionMembers(dict, fromType, intersectedType, true);
+                }
+            }
+        }
+
+        if (optionsType.Fields != null)
+            members.AddRange(optionsType.Fields);
+
+        if (optionsType.Methods != null)
+            members.AddRange(optionsType.Methods.Where(x => x.Arguments?.Count == 1));
 
         foreach (var member in members)
         {
@@ -226,7 +241,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         var result = new SortedDictionary<string, ExternalMember>();
         var optionsType = GetOptionsTypeFor(type);
         if (optionsType != null)
-            AddOptionMembers(result, optionsType, isOptions: true);
+            AddOptionMembers(result, type, optionsType, isOptions: true);
         
         int loop = 0;
         do
@@ -234,7 +249,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             if (type.Namespace?.StartsWith("System", StringComparison.Ordinal) == true)
                 break;
 
-            AddOptionMembers(result, type, isOptions: false);
+            AddOptionMembers(result, type, type, isOptions: false);
         }
         while ((type = GetBaseType(type)) != null && loop++ < 100);
 
