@@ -79,6 +79,7 @@ public class TSTypeListerAST
             }
             else if (node.Kind == SyntaxKind.ClassDeclaration ||
                 node.Kind == SyntaxKind.InterfaceDeclaration ||
+                node.Kind == SyntaxKind.TypeAliasDeclaration ||
                 node.Kind == SyntaxKind.EnumDeclaration)
                 yield return node;
         }
@@ -674,6 +675,42 @@ public class TSTypeListerAST
         return result;
     }
 
+    ExternalType TypeAliasToExternalType(TypeAliasDeclaration typeAlias)
+    {
+        var result = new ExternalType
+        {
+            GenericParameters = TypeParametersToExternal(typeAlias.TypeParameters),
+            Namespace = GetNamespace(typeAlias),
+            Name = GetText(typeAlias.Name),
+            IsInterface = true,
+            IsDeclaration = IsUnderAmbientNamespace(typeAlias) ? true : null
+        };
+
+        if (typeAlias.Type is IntersectionTypeNode intersectionType)
+        {
+            if (intersectionType.Types.Count == 0)
+                return null;
+
+            result.IsIntersectionType = true;
+            result.Interfaces = intersectionType.Types.Select(x => GetTypeReferenceExpression(x))
+                .Where(x => x != null).ToList();
+        }
+        else if (typeAlias.Type is TypeLiteralNode typeLiteral)
+        {
+            var members = GetInterfaceOrLiteralTypeMembers(typeLiteral.Members);
+            result.Fields = members?.Where(x => x is not ExternalMethod).ToList();
+            if (result.Fields != null && result.Fields.Count == 0)
+                result.Fields = null;
+            result.Methods = members?.OfType<ExternalMethod>().ToList();
+            if (result.Methods != null && result.Methods.Count == 0)
+                result.Methods = null;
+        }
+        else
+            return null;
+
+        return result;
+    }
+
     private ExternalArgument MapMethodParam(ParameterDeclaration arg)
     {
         var type = GetTypeReferenceExpression(arg.Type, out string genericArguments);
@@ -888,6 +925,21 @@ public class TSTypeListerAST
                         var exportedType = InterfaceToExternalType(intf);
                         result.Add(exportedType);
                     }
+                    break;
+
+                case SyntaxKind.TypeAliasDeclaration:
+                    if (node is not TypeAliasDeclaration typeAlias ||
+                        typeAlias.Type is null ||
+                        typeAlias.TypeParameters?.Count > 0 || // can't handle yet
+                        (!sourceFile.IsDeclarationFile && !HasExportModifier(node)))
+                        break;
+
+                    {
+                        var exportedType = TypeAliasToExternalType(typeAlias);
+                        if (exportedType != null)
+                            result.Add(exportedType);
+                    }
+                    
                     break;
 
                 case SyntaxKind.ModuleDeclaration:
