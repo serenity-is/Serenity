@@ -7,9 +7,9 @@ public interface IPasswordRuleValidator
 {
 
     /// <summary>
-    /// Validates password rules
+    /// Validates password strength rules
     /// </summary>
     /// <param name="password"></param>
-    /// <exception cref="ValidationError">Throws validation error if password does not match the rules</exception>
-    string ValidatePasswordRules(string password);
+    /// <exception cref="ValidationError">Throws validation error if password does not match the strength rules</exception>
+    string ValidatePasswordStrengthRules(string password);
 }
