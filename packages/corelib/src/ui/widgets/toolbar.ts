@@ -91,9 +91,9 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.domNode.classList.add('s-Toolbar clearfix');
-        this.domNode.innerHTML = '<div class="tool-buttons"><div class="buttons-outer">' +
-            '<div class="buttons-inner"></div></div></div>';
+        this.domNode.classList.add("s-Toolbar");
+        this.domNode.classList.add("clearfix");
+        this.domNode.innerHTML = '<div class="tool-buttons"><div class="buttons-outer"><div class="buttons-inner"></div></div></div>';
 
         this.createButtons();
     }
