@@ -40,7 +40,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     protected responsive: boolean;
 
     public arrange(): void {
-        this.element.find('.require-layout').filter(':visible').each(function (i, e) {
+        $(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
             $(e).triggerHandler('layout');
         });
     }

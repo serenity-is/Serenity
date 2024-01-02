@@ -129,7 +129,7 @@ export class TemplatedWidget<P> extends Widget<P> {
             end = idx + txt.length;
         }
 
-        this.element.html(widgetMarkup);
+        this.domNode.innerHTML = widgetMarkup;
     }
 
     protected useIdPrefix(): IdPrefixType {

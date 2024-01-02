@@ -30,9 +30,9 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let div = this.element;
-        div.addClass('s-PopupMenuButton');
-        div.click(e => {
+        let div = this.domNode;
+        div.classList.add('s-PopupMenuButton');
+        $(div).on('click', e => {
             e.preventDefault();
             e.stopPropagation();
             if (this.options.onPopup != null) {
@@ -43,7 +43,7 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
             (menu.show() as any).position?.({
                 my: this.options.positionMy ?? 'left top',
                 at: this.options.positionAt ?? 'left bottom',
-                of: this.element
+                of: div
             });
 
             var uq = this.uniqueName;
@@ -75,8 +75,8 @@ export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonO
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.element.addClass('s-PopupToolButton');
-        $('<b/>').appendTo(this.element.children('.button-outer').children('span'));
+        this.domNode.classList.add('s-PopupToolButton');
+        $('<b/>').appendTo($(this.domNode).children('.button-outer').children('span'));
     }
 }
 
@@ -91,15 +91,15 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.element.addClass('s-Toolbar clearfix')
-            .html('<div class="tool-buttons"><div class="buttons-outer">' +
-                '<div class="buttons-inner"></div></div></div>');
+        this.domNode.classList.add('s-Toolbar clearfix');
+        this.domNode.innerHTML = '<div class="tool-buttons"><div class="buttons-outer">' +
+            '<div class="buttons-inner"></div></div></div>';
 
         this.createButtons();
     }
 
     destroy() {
-        this.element.find('div.tool-button').unbind('click');
+        $(this.domNode).find('div.tool-button').off('click');
         if (this.mouseTrap) {
             if (!!this.mouseTrap.destroy) {
                 this.mouseTrap.destroy();
@@ -116,7 +116,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     protected mouseTrap: any;
 
     protected createButtons() {
-        var container: JQuery = $('div.buttons-inner', this.element).last();
+        var container = $('div.buttons-inner', this.domNode).last();
         var buttons = this.options.buttons || [];
         var currentCount = 0;
         for (var i = 0; i < buttons.length; i++) {
@@ -208,11 +208,11 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         if (className != null && className.startsWith('.')) {
             className = className.substr(1);
         }
-        return $('div.tool-button.' + className, this.element);
+        return $('div.tool-button.' + className, this.domNode);
     }
 
     updateInterface() {
-        this.element.find('.tool-button').each(function (i: number, el: Element) {
+        $(this.domNode).find('.tool-button').each(function (_, el: Element) {
             $(el).triggerHandler('updateInterface')
         });
     }
