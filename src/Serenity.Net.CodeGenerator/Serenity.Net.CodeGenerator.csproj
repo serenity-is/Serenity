@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
+    <ProjectReference Include="..\Serenity.TypeScript\Serenity.TypeScript.csproj" />
     <InternalsVisibleTo Include="Serenity.Net.CodeGenerator.Tests" />
   </ItemGroup>
   <ItemGroup>
