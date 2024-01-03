@@ -193,7 +193,7 @@ export function handleScriptDataError(name: string, status?: number, statusText?
         });
     }
     else {
-        message = "An error occurred while trying to load " +
+        message = "An error occurred while trying to load" +
             (isLookup ? ' the lookup: "' + name.substring(7) : ' dynamic data: "' + name) +
             '"!. Please check the error message displayed in the console for more info.';
         notifyError(message);

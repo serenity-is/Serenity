@@ -16,6 +16,7 @@ public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
     /// all the table / view columns, but not unmapped or
     /// complex object style (list etc.) columns.
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public RetrieveColumnSelection ColumnSelection { get; set; }
 
     /// <inheritdoc/>
