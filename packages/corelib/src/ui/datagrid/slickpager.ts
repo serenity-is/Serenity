@@ -12,72 +12,45 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         let o = this.options;
         o.showRowsPerPage ??= true;
         o.rowsPerPageOptions ??= [20, 100, 500, 2000];
+        var v = o.view; if (!v) throw "SlickPager requires view option to be set!";
 
-        var v = o.view;
+        let p = "slick-pg-";
+        let grp = (t: string) => ` class="${p}grp ${p}grp-${t}"`;
+        let btn = (t: string) => `<div class="${p}${t} ${p}btn"><span class="${p}btn-span"></span></div>`;
 
-        if (!v)
-            throw "SlickPager requires view option to be set!";
+        $(this.domNode).addClass('s-SlickPager slick-pg')
+            .html(`<div class="${p}in"><div${grp("firstprev")}>${btn("first")}${btn("prev")}</div>
+<div${grp("control")}><span class="${p}control"><span class="${p}pagetext">${htmlEncode(localText("Controls.Pager.Page"))}</span>
+<input id="${this.idPrefix}CurrentPage" class="${p}current" type="text" size="4" value="1" />
+<span class="${p}pagesep">/</span><span class="${p}total">1</span></span></div>
+<div${grp("nextlast")}>${btn("next")}${btn("last")}</div><div${grp("reload")}>${btn("reload")}</div><div${grp("stat")}><span class="${p}stat"></span></div></div>`);
 
-        this.element.addClass('s-SlickPager slick-pg')
-            .html(`<div class="slick-pg-in">
-    <div class="slick-pg-grp slick-pg-grp-firstprev">
-        <div class="slick-pg-first slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
-        <div class="slick-pg-prev slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
-    </div>
-    <div class="slick-pg-grp slick-pg-grp-control">
-        <span class="slick-pg-control">
-            <span class="slick-pg-pagetext">${htmlEncode(localText("Controls.Pager.Page"))}</span>
-            <input id="${this.idPrefix}CurrentPage" class="slick-pg-current" type="text" size="4" value="1" />
-            <span class="slick-pg-pagesep">/</span>
-            <span class="slick-pg-total">1</span>
-        </span>
-    </div>
-    <div class="slick-pg-grp slick-pg-grp-nextlast">
-        <div class="slick-pg-next slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
-        <div class="slick-pg-last slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
-    </div>
-    <div class="slick-pg-grp slick-pg-grp-reload">
-        <div class="slick-pg-reload slick-pg-btn"><span class="slick-pg-btn-span"></span></div>
-    </div>
-    <div class="slick-pg-grp slick-pg-grp-stat">
-        <span class="slick-pg-stat"></span>
-    </div>
-</div>`);
+        ['first', 'prev', 'next', 'last'].forEach(s => $(`.${p}${s}`, this.domNode).on('click', () => this._changePage(s)));
+        $(`.${p}reload`, this.domNode).on('click', () => v.populate());
+        $(`.${p}current`, this.domNode).on('keydown', e => { if (e.key === 'Enter') this._changePage('input') });
 
-        var self = this;
-        $('.slick-pg-reload', this.element).click(function () { v.populate() });
-        $('.slick-pg-first', this.element).click(function () { self._changePage('first') });
-        $('.slick-pg-prev', this.element).click(function () { self._changePage('prev') });
-        $('.slick-pg-next', this.element).click(function () { self._changePage('next') });
-        $('.slick-pg-last', this.element).click(function () { self._changePage('last') });
-        $('.slick-pg-current', this.element).keydown(function (e) { if (e.keyCode == 13) self._changePage('input') });
-
-        if (self.options.showRowsPerPage) {
+        if (this.options.showRowsPerPage) {
             var opt: string = "", sel = "";
             for (var nx = 0; nx < o.rowsPerPageOptions.length; nx++) {
                 if (v.rowsPerPage == o.rowsPerPageOptions[nx])
                     sel = 'selected="selected"'; else sel = '';
                 opt += "<option value='" + o.rowsPerPageOptions[nx] + "' " + sel + " >" + o.rowsPerPageOptions[nx] + "&nbsp;&nbsp;</option>";
             };
-            $('.slick-pg-in', this.element).prepend('<div class="slick-pg-grp"><select class="slick-pg-size" name="rp">' + opt + '</select></div>');
-            $('select.slick-pg-size', this.element).change(
-                function (this: HTMLSelectElement) {
-                    if (o.onRowsPerPageChange)
-                        o.onRowsPerPageChange(+this.value);
-                    else {
-                        v["newp"] = 1;
-                        v.setPagingOptions({
-                            page: 1,
-                            rowsPerPage: +this.value
-                        });
-                    }
+            $(`.${p}in`, this.domNode).prepend(`<div class="${p}grp"><select class="${p}size" name="rp">${opt}</select></div>`);
+            $(`select.${p}size`, this.domNode).on('change', function (this: HTMLSelectElement) {
+                if (o.onRowsPerPageChange)
+                    o.onRowsPerPageChange(+this.value);
+                else {
+                    v["newp"] = 1;
+                    v.setPagingOptions({
+                        page: 1,
+                        rowsPerPage: +this.value
+                    });
                 }
-            );
+            });
         }
 
-        v.onPagingInfoChanged.subscribe(function () {
-            self._updatePager();
-        });
+        v.onPagingInfoChanged.subscribe(() => this._updatePager());
     }
 
     _changePage(ctype: string) { //change page
