@@ -12,7 +12,7 @@ export class TemplatedWidget<P> extends Widget<P> {
     private static templateNames: { [key: string]: string } = {};
 
     protected byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id, this.domNode);
+        return sQuery('#' + this.idPrefix + id, this.domNode);
     }
 
     private byID<TWidget>(id: string, type: { new(...args: any[]): TWidget }) {

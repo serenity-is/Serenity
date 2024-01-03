@@ -60,11 +60,11 @@ export class Widget<P = {}> {
         this.widgetName = Widget.getWidgetName(getInstanceType(this));
         this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
 
-        if (!jQuery.isMock) {
-            if (jQuery(this.domNode).data(this.widgetName))
+        if (!sQuery.isMock) {
+            if (sQuery(this.domNode).data(this.widgetName))
                 throw new Exception(stringFormat("The element already has widget '{0}'!", this.widgetName));
 
-            jQuery(this.domNode).on('remove.' + this.widgetName, e => {
+            sQuery(this.domNode).on('remove.' + this.widgetName, e => {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
@@ -80,7 +80,7 @@ export class Widget<P = {}> {
     public destroy(): void {
         if (this.domNode) {
             toggleClass(this.domNode, this.getCssClass(), false);
-            !jQuery.isMock && jQuery(this.domNode).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+            !sQuery.isMock && sQuery(this.domNode).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
             delete (this as any).domNode;
         }
     }
@@ -89,8 +89,8 @@ export class Widget<P = {}> {
         var elementAttr = getAttributes(this, ElementAttribute, true);
         if (elementAttr.length) {
             let node: HTMLElement;
-            if (!jQuery.isMock) {
-                node = jQuery(elementAttr[0].value).get(0);
+            if (!sQuery.isMock) {
+                node = sQuery(elementAttr[0].value).get(0);
                 node.parentNode?.removeChild(node);
                 return node;
             }
@@ -112,7 +112,7 @@ export class Widget<P = {}> {
      * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
      */
     public get element(): JQuery {
-        return jQuery(this.domNode);
+        return sQuery(this.domNode);
     }
 
     protected addCssClass(): void {
