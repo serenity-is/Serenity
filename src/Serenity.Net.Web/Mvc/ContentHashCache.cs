@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
@@ -156,7 +156,7 @@ public class ContentHashCache : IContentHashCache
         }
         else
         {
-            var path = PathHelper.ToPath(contentUrl[2..]);
+            var path = PathHelper.ToUrl(contentUrl[2..]);
 
             var hash = hashByContentPath.GetOrAdd(path, (filePath) => 
             {
