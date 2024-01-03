@@ -103,7 +103,7 @@ export class Widget<P = {}> {
             return node;
         }
         else {
-            return document.createElement(typeof this.defaultTagName);
+            return document.createElement(this.defaultTagName);
         }
     }
 
