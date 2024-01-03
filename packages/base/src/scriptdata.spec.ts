@@ -248,7 +248,7 @@ describe("fetchScriptData", () => {
             let notify = await import("./notify");
             await expect(async () => {
                 await fetchScriptData("Lookup.Test")
-            }).rejects.toMatch("Server error");
+            }).rejects.toMatch('An error occurred while trying to load the lookup: "Test"!. Please check the error message displayed in the console for more info.');
 
             expect(notify.notifyError).toHaveBeenCalledTimes(1);
             expect(logSpy).toHaveBeenCalledTimes(1);
@@ -437,7 +437,7 @@ describe("getScriptData", () => {
             let notify = await import("./notify");
             await expect(async () => {
                 await getScriptData("Lookup.Test")
-            }).rejects.toMatch("Server error");
+            }).rejects.toMatch('An error occurred while trying to load the lookup: "Test"!. Please check the error message displayed in the console for more info.');
 
             expect(notify.notifyError).toHaveBeenCalledTimes(1);
             expect(logSpy).toHaveBeenCalledTimes(1);
