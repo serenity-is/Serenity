@@ -579,7 +579,7 @@ declare function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
  * @param status HTTP status returned if available
  * @param statusText HTTP status text returned if available
  */
-declare function handleScriptDataError(name: string, status?: number, statusText?: string): void;
+declare function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow?: boolean): string;
 declare function peekScriptData(name: string): any;
 /**
  * Forces reload of a lookup from the server. Note that only the

@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.SleekGrid", "..\packages\sleekgrid\Serenity.SleekGrid.csproj", "{6FAF5ED7-017D-46CD-B351-2F9640C08655}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.TypeScript", "Serenity.TypeScript\Serenity.TypeScript.csproj", "{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,14 @@ Global
 		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|x86.ActiveCfg = Release|Any CPU
 		{6FAF5ED7-017D-46CD-B351-2F9640C08655}.Release|x86.Build.0 = Release|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B84660A-9D2C-4A3D-9CC4-80AA09C74F89}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

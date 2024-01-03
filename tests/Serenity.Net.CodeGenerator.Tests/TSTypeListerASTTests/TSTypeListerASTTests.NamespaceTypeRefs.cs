@@ -32,7 +32,7 @@ declare namespace jsPDF {
         var styles = Assert.Single(type.Fields, x => x.Name == "styles");
         Assert.Equal("jsPDF.AutoTableStyles", styles.Type);
         var columnStyles = Assert.Single(type.Fields, x => x.Name == "columnStyles");
-        Assert.Null(columnStyles.Type);
+        Assert.Equal("{}", columnStyles.Type);
         var margin = Assert.Single(type.Fields, x => x.Name == "margin");
         Assert.Equal("jsPDF.AutoTableMargin", margin.Type);
     }

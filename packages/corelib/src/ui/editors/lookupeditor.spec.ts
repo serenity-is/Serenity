@@ -21,19 +21,21 @@ describe("LookupEditor", () => {
     test('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
         var logSpy = jest.spyOn(window.console, 'log').mockImplementation(() => {});
-        var oldAjax = $.ajax;
+        var oldXHR = window.XMLHttpRequest
         try {
-            $.ajax = function(settings: JQueryAjaxSettings): JQueryXHR {
-                (settings.error as any)({ status: 404 } as any, null, null);
-                return {} as any;
-            } as unknown as any;
+            window.XMLHttpRequest = class {
+                open() { }
+                send() {
+                    (this as any).status = 404;
+                }
+             } as any;
             expect(() => new LookupEditor({
                 lookupKey: "Test"
             })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
         }
         finally {
             logSpy.mockRestore();
-            $.ajax = oldAjax;
+            window.XMLHttpRequest = oldXHR;
         }
     });
 
