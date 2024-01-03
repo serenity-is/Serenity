@@ -1865,7 +1865,7 @@ declare namespace Serenity {
      * @param status HTTP status returned if available
      * @param statusText HTTP status text returned if available
      */
-    function handleScriptDataError(name: string, status?: number, statusText?: string): void;
+    function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow?: boolean): string;
     function peekScriptData(name: string): any;
     /**
      * Forces reload of a lookup from the server. Note that only the

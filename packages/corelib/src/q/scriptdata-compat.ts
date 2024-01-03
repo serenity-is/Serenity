@@ -5,38 +5,18 @@
     handleScriptDataError, peekScriptData, reloadLookupAsync, resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
 } from "@serenity-is/base";
 
+import jQuery from "@optionaldeps/jquery";
+
 export namespace ScriptData {
 
     export function bindToChange(name: string, onChange: () => void): void | (() => void) {
         if (typeof document !== "undefined" && document.addEventListener) {
-            var unbind = function() {
-                onChange && typeof document !== "undefined" && document.removeEventListener?.('scriptdatachange.' + name, onChange); 
+            var unbind = function () {
+                onChange && typeof document !== "undefined" && document.removeEventListener?.('scriptdatachange.' + name, onChange);
                 onChange = null;
             }
             document.addEventListener('scriptdatachange.' + name, onChange);
             return unbind;
-        }
-    }
-
-    function xhrOptions(name: string, dynJS: boolean): JQueryAjaxSettings {
-        return {
-            async: false,
-            cache: true,
-            type: 'GET',
-            url: resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime()),
-            data: null,
-            dataType: dynJS ? 'text' : 'json',
-            converters: {
-                "text script": function (text: string) {
-                    return text;
-                }
-            },
-            success: dynJS ? function (data) {
-                $.globalEval(data);
-            } : undefined,
-            error: function (xhr) {
-                handleScriptDataError(name, xhr.status, xhr.statusText);
-            }
         }
     }
 
@@ -47,20 +27,38 @@ export namespace ScriptData {
         if (data != null)
             return data;
 
-        if (dynJS) {
-            $.ajax(xhrOptions(name, true))
-            data = peekScriptData(name);
+        var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, false);
+        typeof jQuery !== "undefined" && typeof (jQuery as any).active === "number" &&
+            ((jQuery as any).active++ === 0) && (jQuery as any).event?.trigger?.("ajaxStart");
+        try {
+
+            xhr.send(null);
+            if (xhr.status !== 200)
+                handleScriptDataError(name, xhr.status, xhr.statusText);
+                
+            if (dynJS) {
+                var script = document.createElement("script");
+                script.text = xhr.responseText;
+                document.head.appendChild(script).parentNode.removeChild(script);
+                data = peekScriptData(name);
+                if (data == null)
+                    handleScriptDataError(name);
+            }
+
+            data = JSON.parse(xhr.responseText);
             if (data == null)
                 handleScriptDataError(name);
+            if (name.startsWith("Lookup."))
+                data = new Lookup(data.Params, data.Items);
+            set(name, data);
             return data;
         }
-        data = $.ajax(xhrOptions(name, false)).responseJSON;
-        if (data == null)
-            handleScriptDataError(name);
-        if (name.startsWith("Lookup."))
-            data = new Lookup(data.Params, data.Items);
-        set(name, data);
-        return data;
+        finally {
+            typeof (jQuery as any) !== "undefined" && typeof (jQuery as any).active === "number" &&
+                !(--(jQuery as any).active) && (jQuery as any).event?.trigger?.("ajaxStop");            
+        }
     }
 
     export function reload<TData = any>(name: string, dynJS?: boolean): TData {

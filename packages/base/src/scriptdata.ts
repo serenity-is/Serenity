@@ -1,4 +1,5 @@
 ﻿import { blockUI, blockUndo } from "./blockui";
+import { htmlEncode } from "./html";
 import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { PropertyItemsData } from "./propertyitem";
@@ -78,10 +79,8 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
                         }
                     });
 
-                    if (!response.ok) {
+                    if (!response.ok)
                         handleScriptDataError(name, response.status, response.statusText ?? '');
-                        throw (response.statusText ?? response.status?.toString() ?? "unknown");
-                    }
 
                     const data = await response.json();
                     if (name.startsWith("Lookup."))
@@ -165,11 +164,12 @@ export async function getRemoteDataAsync<TData = any>(key: string): Promise<TDat
  * @param status HTTP status returned if available
  * @param statusText HTTP status text returned if available
  */
-export function handleScriptDataError(name: string, status?: number, statusText?: string): void {
+export function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow = true): string {
 
-    if (status == null && statusText == null) {
-        var message;
-        if (name?.startsWith('Lookup.'))
+    var isLookup = name?.startsWith("Lookup.");
+    var message: string;
+    if ((status == null && statusText == null) || (status === 404)) {
+        if (isLookup)
             message = 'No lookup with key "' + name.substring(7) + '" is registered. Please make sure you have a' +
                 ' [LookupScript("' + name.substring(7) + '")] attribute in server side code on top of a row / custom lookup and ' +
                 ' its key is exactly the same.';
@@ -177,34 +177,39 @@ export function handleScriptDataError(name: string, status?: number, statusText?
             message = `Can't load dynamic data: ${name}!`;
 
         notifyError(message);
-        throw new Error(message);
     }
-
-    var isLookup = name?.startsWith("Lookup.");
-    if (status == 403 && isLookup) {
-        notifyError('<p>Access denied while trying to load the lookup: "<b>' +
-            name.substring(7) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
+    else if (status == 403 && isLookup) {
+        message = '<p>Access denied while trying to load the lookup: "<b>' +
+            htmlEncode(name.substring(7)) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
             '<p><em>Lookups use the ReadPermission of their row by default. You may override that for the lookup ' +
             'like [LookupScript("Some.Lookup", Permission = "?")] to grant all ' +
             'authenticated users to read it (or use "*" for public).</em></p>' +
             '<p><em>Note that this might be a security risk if the lookup contains sensitive data, ' +
-            'so it could be better to set a separate permission for lookups, like "MyModule:Lookups".</em></p>', null, {
+            'so it could be better to set a separate permission for lookups, like "MyModule:Lookups".</em></p>';
+
+        notifyError(message, null, {
             timeOut: 10000,
             escapeHtml: false
         });
-        return;
+    }
+    else {
+        message = "An error occurred while trying to load " +
+            (isLookup ? ' the lookup: "' + name.substring(7) : ' dynamic data: "' + name) +
+            '"!. Please check the error message displayed in the console for more info.';
+        notifyError(message);
+
+        if (!status)
+            console.log("An unknown connection error occurred!");
+        else if (status == 500)
+            console.log("HTTP 500: Connection refused!");
+        else
+            console.log("HTTP " + status + ': ' + statusText);
     }
 
-    notifyError("An error occurred while trying to load " +
-        (isLookup ? ' the lookup: "' + name.substring(7) : ' dynamic data: "' + name) +
-        '"!. Please check the error message displayed in the console for more info.');
+    if (shouldThrow)
+        throw message;
 
-    if (!status)
-        console.log("An unknown connection error occurred!");
-    else if (status == 500)
-        console.log("HTTP 500: Connection refused!");
-    else
-        console.log("HTTP " + status + ': ' + statusText);
+    return message;
 }
 
 export function peekScriptData(name: string): any {
