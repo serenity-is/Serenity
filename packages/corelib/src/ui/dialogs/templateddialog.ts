@@ -291,7 +291,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected onDialogOpen(): void {
         if (!isMobileView())
-            sQuery(':input', this.domNode).not('button').eq(0).focus();
+            sQuery('input:not([type=hidden]), textarea, select', this.domNode).eq(0).focus();
         this.arrange();
         this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
     }

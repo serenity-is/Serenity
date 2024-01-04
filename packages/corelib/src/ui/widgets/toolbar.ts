@@ -214,7 +214,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     updateInterface() {
         sQuery(this.domNode).find('.tool-button').each(function (_, el: Element) {
-            sQuery(el).triggerHandler('updateInterface')
+            sQuery(el).trigger('updateInterface')
         });
     }
 }

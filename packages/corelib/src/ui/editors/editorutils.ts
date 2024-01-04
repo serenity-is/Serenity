@@ -4,7 +4,16 @@ import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, I
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
 
+export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
+    return isInputTag(node?.nodeName);
+}
+
+export function isInputTag(tag: string) {
+    return /^(?:input|select|textarea|button)$/i.test(tag);
+}
+
 export namespace EditorUtils {
+
     export function getDisplayText(editor: Widget<any>): string {
 
         var select2 = editor.element.data('select2');
@@ -73,8 +82,8 @@ export namespace EditorUtils {
             return;
         }
 
-        if (editor.element.is(':input')) {
-            target[item.name] = editor.element.val();
+        if (isInputLike(editor.domNode)) {
+            target[item.name] = editor.domNode.value;
             return;
         }
     }
@@ -137,7 +146,7 @@ export namespace EditorUtils {
             return;
         }
 
-        if (editor.element.is(':input')) {
+        if (isInputLike(editor.domNode)) {
             var v = source[item.name];
             if (v == null) {
                 editor.element.val('');
@@ -182,8 +191,8 @@ export namespace EditorUtils {
         if (readOnly != null) {
             readOnly.set_readOnly(isReadOnly);
         }
-        else if (widget.element.is(':input')) {
-            setReadonly(widget.element, isReadOnly);
+        else if (isInputLike(widget.domNode)) {
+            setReadonly(widget.domNode, isReadOnly);
         }
     }
 
@@ -192,8 +201,8 @@ export namespace EditorUtils {
         if (req != null) {
             req.set_required(isRequired);
         }
-        else if (widget.element.is(':input')) {
-            widget.element.toggleClass('required', !!isRequired);
+        else if (isInputLike(widget.domNode)) {
+            widget.domNode.classList.toggle('required', !!isRequired);
         }
         var gridField = widget.element.closest('.field');
         var hasSupItem = gridField.find('sup').get().length > 0;

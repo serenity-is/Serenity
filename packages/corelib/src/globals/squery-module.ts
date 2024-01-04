@@ -22,6 +22,10 @@ class sQ extends Array<HTMLElement> {
         return SQ([this[0]]);
     }
 
+    last() {
+        return SQ([this[this.length - 1]]);
+    }
+
     addClass(className: string) {
         this.forEach(el => { toggleClass(el, className, true); });
         return this;
@@ -195,6 +199,12 @@ class sQ extends Array<HTMLElement> {
         Array.prototype.forEach.call(this, (el: HTMLElement) => {
             items = items.concat(Array.from(el.children) as HTMLElement[]);
         });
+        return sQ.from(Array.from(new Set(items)));
+    }
+
+    closest(selector: string) {
+        var items = Array.prototype.map.call(this, (el: HTMLElement) => el.closest(selector) as HTMLElement);
+        items = Array.prototype.filter.call(items, (x: any) => x != null);
         return sQ.from(Array.from(new Set(items)));
     }
 

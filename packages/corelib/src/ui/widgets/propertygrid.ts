@@ -3,7 +3,7 @@ import { Culture, faIcon, getTypeShortName, isBS3, isBS5Plus, localText, tryGetT
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
 import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
-import { EditorUtils } from "../editors/editorutils";
+import { EditorUtils, isInputLike } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget, WidgetProps } from "./widget";
 
@@ -342,7 +342,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             element: el => {
                 el.classList.add("editor");
                 
-                if (/^(?:input|select|textarea|button)$/i.test(el.nodeName))
+                if (isInputLike(el))
                     el.setAttribute("name", item.name ?? "");
 
                 if (placeHolder)
@@ -528,9 +528,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     private static setMaxLength(widget: Widget<any>, maxLength: number) {
-        if (widget.element.is(':input')) {
+        if (isInputLike(widget.domNode)) {
             if (maxLength > 0) {
-                widget.element.attr('maxlength', maxLength);
+                widget.domNode.setAttribute('maxlength', (maxLength ?? 0).toString());
             }
             else {
                 widget.element.removeAttr('maxlength');

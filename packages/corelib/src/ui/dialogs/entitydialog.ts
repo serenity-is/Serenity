@@ -4,7 +4,7 @@ import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute,
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ServiceOptions, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, serviceCall, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
-import { EditorUtils } from "../editors/editorutils";
+import { EditorUtils, isInputLike } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ValidationHelper } from "../helpers/validationhelper";
@@ -647,7 +647,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         var valueByName: Record<string, any> = {};
 
         this.localizationGrid.enumerateItems((item, widget) => {
-            if (item.name.indexOf('$') < 0 && widget.element.is(':input')) {
+            if (item.name.indexOf('$') < 0 && isInputLike(widget.domNode)) {
                 valueByName[item.name] = this.byId(item.name).val();
                 widget.element.val(valueByName[item.name]);
             }
@@ -655,7 +655,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         this.localizationGrid.enumerateItems((item1, widget1) => {
             var idx = item1.name.indexOf('$');
-            if (idx >= 0 && widget1.element.is(':input')) {
+            if (idx >= 0 && isInputLike(widget1.domNode)) {
                 var hint = valueByName[item1.name.substr(idx + 1)];
                 if (hint != null && hint.length > 0) {
                     widget1.element.attr('title', hint).attr('placeholder', hint);

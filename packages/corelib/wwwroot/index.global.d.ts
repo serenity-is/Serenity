@@ -3683,6 +3683,8 @@ declare namespace Serenity {
         protected getFallbackTemplate(): string;
     }
 
+    function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+    function isInputTag(tag: string): boolean;
     namespace EditorUtils {
         function getDisplayText(editor: Widget<any>): string;
         function getValue(editor: Widget<any>): any;
