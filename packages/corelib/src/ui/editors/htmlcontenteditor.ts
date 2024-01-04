@@ -1,4 +1,5 @@
-﻿import { localText, resolveUrl } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { localText, resolveUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
@@ -23,7 +24,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let textArea = $(this.domNode);
+        let textArea = sQuery(this.domNode);
         this._instanceReady = false;
         HtmlContentEditor.includeCKEditor();
 
@@ -56,11 +57,11 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected instanceReady(x: any): void {
         this._instanceReady = true;
-        $(x.editor.container.$).addClass(this.domNode.getAttribute("class"));
-        $(this.domNode).addClass('select2-offscreen').css('display', 'block');
+        sQuery(x.editor.container.$).addClass(this.domNode.getAttribute("class"));
+        sQuery(this.domNode).addClass('select2-offscreen').css('display', 'block');
 
         // for validation to work
-        x.editor.setData($(this.domNode).val());
+        x.editor.setData(sQuery(this.domNode).val());
         x.editor.setReadOnly(this.get_readOnly());
     }
 
@@ -70,7 +71,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         var CKEDITOR = (window as any)['CKEDITOR'];
 
-        var lang = $('html').attr('lang')?.trim() || 'en';
+        var lang = sQuery('html').attr('lang')?.trim() || 'en';
         if (!!CKEDITOR.lang.languages[lang]) {
             return lang;
         }
@@ -92,7 +93,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 instanceReady: (x: any) => this.instanceReady(x),
                 change: (x1: any) => {
                     x1.editor.updateElement();
-                    $(this.domNode).triggerHandler('change');
+                    sQuery(this.domNode).triggerHandler('change');
                 }
             },
             toolbarGroups: [
@@ -149,7 +150,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return instance.getData();
         }
         else {
-            return $(this.domNode).val() as string;
+            return sQuery(this.domNode).val() as string;
         }
     }
 
@@ -159,7 +160,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     set_value(value: string): void {
         var instance = this.getEditorInstance();
-        $(this.domNode).val(value);
+        sQuery(this.domNode).val(value);
         if (this._instanceReady && instance)
             instance.setData(value);
     }
@@ -176,10 +177,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         if (this.get_readOnly() !== value) {
             if (value) {
-                $(this.domNode).attr('disabled', 'disabled');
+                sQuery(this.domNode).attr('disabled', 'disabled');
             }
             else {
-                $(this.domNode).removeAttr('disabled');
+                sQuery(this.domNode).removeAttr('disabled');
             }
 
             var instance = this.getEditorInstance();
@@ -211,12 +212,12 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return;
         }
 
-        var script = $('#CKEditorScript');
+        var script = sQuery('#CKEditorScript');
         if (script.length > 0) {
             return;
         }
 
-        $('<script/>').attr('type', 'text/javascript')
+        sQuery('<script/>').attr('type', 'text/javascript')
             .attr('id', 'CKEditorScript')
             .attr('src', resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' +
                 HtmlContentEditor.CKEditorVer))

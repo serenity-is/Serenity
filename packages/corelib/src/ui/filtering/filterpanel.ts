@@ -1,4 +1,5 @@
-﻿import { PropertyItem, localText, tryGetText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { PropertyItem, localText, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { cast } from "../../q";
 import { Select2Editor } from "../editors/select2editor";
@@ -247,7 +248,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         // if an error occurred, display it, otherwise set current filters
         if (errorText != null) {
-            $('<span/>').addClass('error')
+            sQuery('<span/>').addClass('error')
                 .attr('title', errorText).appendTo(row.children('div.v'));
             row.children('div.v').find('input:first').focus();
             return;
@@ -285,13 +286,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         var result: JQuery = null;
 
         this.rowsDiv.children().each(function (index, row) {
-            var fieldInput = $(row).children('div.f')
+            var fieldInput = sQuery(row).children('div.f')
                 .children('input.field-select').first();
             if (fieldInput.length === 0)
                 return;
             var val = fieldInput.val() as string;
             if (val == null || val.length === 0) {
-                result = $(row);
+                result = sQuery(row);
                 return false;
             }
         });
@@ -313,7 +314,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         var isLastRowOr = this.rowsDiv.children().last()
             .children('a.andor').hasClass('or');
 
-        var row = $(
+        var row = sQuery(
             "<div class='filter-line'>" +
             "<a class='delete'><span></span></a>" +
             "<div class='l'>" +
@@ -366,7 +367,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     }
 
     protected onRowFieldChange(e: Event) {
-        var row = $(e.target).closest('div.filter-line');
+        var row = sQuery(e.target).closest('div.filter-line');
         this.rowFieldChange(row as any);
         var opSelect = row.children('div.o').find('input.op-select');
         opSelect.select2('focus');
@@ -442,7 +443,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     }
 
     protected onRowOperatorChange(e: Event) {
-        var row = $(e.target).closest('div.filter-line');
+        var row = sQuery(e.target).closest('div.filter-line');
         this.rowOperatorChange(row as any);
         var firstInput = row.children('div.v').find(':input:visible').first();
         try {
@@ -484,7 +485,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     protected deleteRowClick(e: Event): void {
         e.preventDefault();
-        var row = $(e.target).closest('div.filter-line');
+        var row = sQuery(e.target).closest('div.filter-line');
         row.remove();
 
         if (this.rowsDiv.children().length === 0) {
@@ -504,14 +505,14 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     protected andOrClick(e: Event): void {
         e.preventDefault();
-        var andor = $(e.target).toggleClass('or');
+        var andor = sQuery(e.target).toggleClass('or');
         andor.text(localText('Controls.FilterPanel.' +
             (andor.hasClass('or') ? 'Or' : 'And')));
     }
 
     protected leftRightParenClick(e: Event): void {
         e.preventDefault();
-        $(e.target).toggleClass('active');
+        sQuery(e.target).toggleClass('active');
         this.updateParens();
     }
 

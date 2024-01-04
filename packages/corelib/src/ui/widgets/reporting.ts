@@ -1,4 +1,5 @@
-﻿import { PropertyItem, ServiceRequest, ServiceResponse } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { PropertyItem, ServiceRequest, ServiceResponse } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { postToService, serviceCall } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -115,8 +116,8 @@ export namespace Reporting {
         constructor(props: WidgetProps<P>) {
             super(props);
 
-            $('.report-link').click((e) => this.reportLinkClick(e as any));
-            $('div.line').click((e) => this.categoryClick(e as any));
+            sQuery('.report-link').click((e) => this.reportLinkClick(e as any));
+            sQuery('div.line').click((e) => this.categoryClick(e as any));
             var self = this;
             new QuickSearchInput({
                 element: "#QuickSearchInput",
@@ -128,7 +129,7 @@ export namespace Reporting {
         }
 
         protected updateMatchFlags(text: string) {
-            var liList = $('#ReportList').find('li').removeClass('non-match');
+            var liList = sQuery('#ReportList').find('li').removeClass('non-match');
             text = text?.trim() || null;
             if (text == null) {
                 liList.children('ul').hide();
@@ -141,7 +142,7 @@ export namespace Reporting {
             }
             var reportItems = liList.filter('.report-item');
             reportItems.each(function (i1, e) {
-                var x = $(e);
+                var x = sQuery(e);
                 var title = Select2.util.stripDiacritics((x.text() ?? '').toUpperCase());
                 for (var $t1 = 0; $t1 < parts.length; $t1++) {
                     var p = parts[$t1];
@@ -163,7 +164,7 @@ export namespace Reporting {
         }
 
         protected categoryClick(e: Event) {
-            var li = $(e.target).closest('li');
+            var li = sQuery(e.target).closest('li');
             if (li.hasClass('expanded')) {
                 li.find('ul').hide('fast');
                 li.removeClass('expanded');
@@ -180,7 +181,7 @@ export namespace Reporting {
 
         protected reportLinkClick(e: Event) {
             e.preventDefault();
-            var dialog = new ReportDialog({ reportKey: $(e.target).data('key') });
+            var dialog = new ReportDialog({ reportKey: sQuery(e.target).data('key') });
         }
     }
 

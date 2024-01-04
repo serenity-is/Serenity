@@ -1,4 +1,5 @@
-﻿import { localText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { addValidationRule } from "../../q";
@@ -15,18 +16,18 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
     constructor(props: EditorProps<P>) {
         super(props);
 
-        $(this.domNode).addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
-        if (!!((window as any)['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
+        sQuery(this.domNode).addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
+        if (!!((window as any)['grecaptcha'] == null && sQuery('script#RecaptchaInclude').length === 0)) {
             var src = 'https://www.google.com/recaptcha/api.js';
             var lng = this.options.language;
             if (lng == null) {
-                lng = $('html').attr('lang') ?? '';
+                lng = sQuery('html').attr('lang') ?? '';
             }
             src += '?hl=' + lng;
-            $('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
+            sQuery('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
         }
 
-        var valInput = $('<input />').insertBefore(this.domNode)
+        var valInput = sQuery('<input />').insertBefore(this.domNode)
             .attr('id', this.uniqueName + '_validate').val('x');
 
         var gro: Record<string, string> = {};
@@ -47,7 +48,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
     }
 
     get_value(): string {
-        return $(this.domNode).find('.g-recaptcha-response').val() as string;
+        return sQuery(this.domNode).find('.g-recaptcha-response').val() as string;
     }
 
     set_value(value: string): void {

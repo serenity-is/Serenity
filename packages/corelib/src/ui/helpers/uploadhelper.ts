@@ -1,3 +1,4 @@
+import sQuery from "@optionaldeps/squery";
 import { ServiceResponse, alertDialog, blockUI, blockUndo, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
 import { replaceAll } from "../../q";
 
@@ -18,7 +19,7 @@ export namespace UploadHelper {
             uploadUrl += encodeURIComponent(options.uploadIntent);
         }
 
-        var uploadInput = $('<input/>').attr('type', 'file')
+        var uploadInput = sQuery('<input/>').attr('type', 'file')
             .attr('name', options.inputName + '[]')
             .attr('data-url', resolveUrl(uploadUrl))
             .appendTo(container);
@@ -80,19 +81,19 @@ export namespace UploadHelper {
             start: function () {
                 blockUI(null);
                 if (progress) {
-                    $(progress).show();
+                    sQuery(progress).show();
                 }
             },
             stop: function () {
                 blockUndo();
                 if (progress) {
-                    $(progress).hide();
+                    sQuery(progress).hide();
                 }
             },
             progress: function (e: Event, data1: any) {
                 if (progress) {
                     var percent = data1.loaded / data1.total * 100;
-                    $(progress).children().css('width', percent.toString() + '%');
+                    sQuery(progress).children().css('width', percent.toString() + '%');
                 }
             }
         });
@@ -200,7 +201,7 @@ export namespace UploadHelper {
         container.html('');
         for (var index = 0; index < items.length; index++) {
             var item = items[index];
-            var li = $('<li/>').addClass('file-item').data('index', index);
+            var li = sQuery('<li/>').addClass('file-item').data('index', index);
             var isImage = hasImageExtension(item.Filename);
             if (isImage) {
                 li.addClass('file-image');
@@ -208,8 +209,7 @@ export namespace UploadHelper {
             else {
                 li.addClass('file-binary');
             }
-            var editLink = '#' + index;
-            var thumb = $('<a/>').addClass('thumb').appendTo(li);
+            var thumb = sQuery('<a/>').addClass('thumb').appendTo(li);
             var originalName = item.OriginalName ?? '';
             var fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
@@ -230,7 +230,7 @@ export namespace UploadHelper {
             }
 
             if (displayOriginalName) {
-                $('<div/>').addClass('filename').text(originalName)
+                sQuery('<div/>').addClass('filename').text(originalName)
                     .attr('title', originalName).appendTo(li);
             }
 

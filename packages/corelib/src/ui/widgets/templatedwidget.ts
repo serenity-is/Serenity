@@ -61,14 +61,14 @@ export class TemplatedWidget<P> extends Widget<P> {
 
             name = replaceAll(name, '.', '_');
             if (canLoadScriptData('Template.' + name) ||
-                $('script#Template_' + name).length > 0) {
+                document.querySelector('script#Template_' + name)) {
                 templateNames[fullName] = name;
                 return name;
             }
 
             name = TemplatedWidget.noGeneric(getTypeShortName(type));
             if (canLoadScriptData('Template.' + name) ||
-                $('script#Template_' + name).length > 0) {
+                document.querySelector('script#Template_' + name)) {
                 TemplatedWidget.templateNames[fullName] = name;
                 return name;
             }
@@ -87,9 +87,9 @@ export class TemplatedWidget<P> extends Widget<P> {
     protected getTemplate(): string {
         var templateName = this.getTemplateName();
 
-        var script = $('script#Template_' + templateName);
-        if (script.length > 0) {
-            return script.html();
+        var script = document.querySelector('script#Template_' + templateName);
+        if (script) {
+            return script.innerHTML;
         }
 
         let template: string;
@@ -129,7 +129,7 @@ export class TemplatedWidget<P> extends Widget<P> {
             end = idx + txt.length;
         }
 
-        $(this.domNode).html(widgetMarkup);
+        sQuery(this.domNode).html(widgetMarkup);
     }
 
     protected useIdPrefix(): IdPrefixType {

@@ -1,4 +1,5 @@
-﻿import { IconClassName, htmlEncode, iconClassName } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { IconClassName, htmlEncode, iconClassName } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { Widget, WidgetProps } from "./widget";
 
@@ -32,7 +33,7 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
 
         let div = this.domNode;
         div.classList.add('s-PopupMenuButton');
-        $(div).on('click', e => {
+        sQuery(div).on('click', e => {
             e.preventDefault();
             e.stopPropagation();
             if (this.options.onPopup != null) {
@@ -47,7 +48,7 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
             });
 
             var uq = this.uniqueName;
-            $(document).one('click.' + uq, function (x) {
+            sQuery(document).one('click.' + uq, function (x) {
                 menu.hide();
             });
         });
@@ -76,7 +77,7 @@ export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonO
         super(props);
 
         this.domNode.classList.add('s-PopupToolButton');
-        $('<b/>').appendTo($(this.domNode).children('.button-outer').children('span'));
+        sQuery('<b/>').appendTo(sQuery(this.domNode).children('.button-outer').children('span'));
     }
 }
 
@@ -99,7 +100,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     }
 
     destroy() {
-        $(this.domNode).find('div.tool-button').off('click');
+        sQuery(this.domNode).find('div.tool-button').off('click');
         if (this.mouseTrap) {
             if (!!this.mouseTrap.destroy) {
                 this.mouseTrap.destroy();
@@ -116,13 +117,13 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     protected mouseTrap: any;
 
     protected createButtons() {
-        var container = $('div.buttons-inner', this.domNode).last();
+        var container = sQuery('div.buttons-inner', this.domNode).last();
         var buttons = this.options.buttons || [];
         var currentCount = 0;
         for (var i = 0; i < buttons.length; i++) {
             var button = buttons[i];
             if (button.separator && currentCount > 0) {
-                container = $('<div class="buttons-inner"></div>').appendTo(container.parent());
+                container = sQuery('<div class="buttons-inner"></div>').appendTo(container.parent());
                 currentCount = 0;
             }
             this.createButton(container, button);
@@ -133,7 +134,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     protected createButton(container: JQuery, b: ToolButton) {
         var cssClass = b.cssClass ?? '';
 
-        var btn = $('<div class="tool-button"><div class="button-outer">' +
+        var btn = sQuery('<div class="tool-button"><div class="button-outer">' +
             '<span class="button-inner"></span></div></div>')
             .appendTo(container);
 
@@ -141,7 +142,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
             btn.attr('data-action', b.action);
 
         if (b.separator === 'right' || b.separator === 'both') {
-            $('<div class="separator"></div>').appendTo(container);
+            sQuery('<div class="separator"></div>').appendTo(container);
         }
 
         if (cssClass.length > 0) {
@@ -208,12 +209,12 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         if (className != null && className.startsWith('.')) {
             className = className.substr(1);
         }
-        return $('div.tool-button.' + className, this.domNode);
+        return sQuery('div.tool-button.' + className, this.domNode);
     }
 
     updateInterface() {
-        $(this.domNode).find('.tool-button').each(function (_, el: Element) {
-            $(el).triggerHandler('updateInterface')
+        sQuery(this.domNode).find('.tool-button').each(function (_, el: Element) {
+            sQuery(el).triggerHandler('updateInterface')
         });
     }
 }

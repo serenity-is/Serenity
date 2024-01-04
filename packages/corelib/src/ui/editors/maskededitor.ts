@@ -1,4 +1,5 @@
-﻿import { Decorators } from "../../decorators";
+﻿import sQuery from "@optionaldeps/squery";
+import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
 
@@ -10,15 +11,15 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         (input as any).mask(this.options.mask || '', {
             placeholder: (this.options.placeholder ?? '_')
         });
     }
 
     public get value(): string {
-        $(this.domNode).triggerHandler("blur.mask");
-        return $(this.domNode).val() as string;
+        sQuery(this.domNode).triggerHandler("blur.mask");
+        return sQuery(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -26,7 +27,7 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
     }
 
     public set value(value: string) {
-        $(this.domNode).val(value);
+        sQuery(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {

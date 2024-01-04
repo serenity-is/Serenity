@@ -1,4 +1,5 @@
-﻿import { PropertyItem, localText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { PropertyItem, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { extend, isTrimmedEmpty, replaceAll } from "../../q";
@@ -27,7 +28,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (!this.options || this.options.allowNonImage == null)
             this.options.allowNonImage = true;
 
-        let div = $(this.domNode);
+        let div = sQuery(this.domNode);
         div.addClass('s-FileUploadEditor');
 
         if (!this.options.originalNameProperty)
@@ -35,10 +36,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => $(this.domNode).append(el)
+            element: el => sQuery(this.domNode).append(el)
         });
 
-        this.progress = $('<div><div></div></div>')
+        this.progress = sQuery('<div><div></div></div>')
             .addClass('upload-progress')
             .prependTo(this.toolbar.element);
 
@@ -47,12 +48,12 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (this.options.readOnly)
             this.set_readOnly(true);
 
-        this.fileSymbols = $('<ul/>').appendTo(this.domNode);
+        this.fileSymbols = sQuery('<ul/>').appendTo(this.domNode);
 
         if (!this.domNode.getAttribute("id"))
-            $(this.domNode).attr('id', this.uniqueName);
+            sQuery(this.domNode).attr('id', this.uniqueName);
 
-        this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
+        this.hiddenInput = sQuery('<input type="text" class="s-offscreen" name="' + this.uniqueName +
             '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '"/>')
             .appendTo(this.domNode);
 
@@ -297,25 +298,25 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         super(props);
 
         this.entities = [];
-        let div = $(this.domNode);
+        let div = sQuery(this.domNode);
         div.addClass('s-MultipleFileUploadEditor');
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => $(this.domNode).append(el)
+            element: el => sQuery(this.domNode).append(el)
         });
 
-        this.progress = $('<div><div></div></div>')
+        this.progress = sQuery('<div><div></div></div>')
             .addClass('upload-progress')
             .prependTo(this.toolbar.element);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
-        this.fileSymbols = $('<ul/>').appendTo(this.domNode);
+        this.fileSymbols = sQuery('<ul/>').appendTo(this.domNode);
         if (!this.domNode.getAttribute("id")) {
-            $(this.domNode).attr('id', this.uniqueName);
+            sQuery(this.domNode).attr('id', this.uniqueName);
         }
 
-        this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
+        this.hiddenInput = sQuery('<input type="text" class="s-offscreen" name="' + this.uniqueName +
             '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '" multiple="multiple"></input>').appendTo(this.domNode);
 
         this.updateInterface();
@@ -370,7 +371,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
         this.fileSymbols.children().each((i, e) => {
             var x = i;
-            $("<a class='delete'></a>").appendTo($(e).children('.filename'))
+            sQuery("<a class='delete'></a>").appendTo(sQuery(e).children('.filename'))
                 .click(ev => {
                     ev.preventDefault();
                     this.entities.splice(x, 1);

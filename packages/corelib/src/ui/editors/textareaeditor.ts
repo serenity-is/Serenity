@@ -1,4 +1,5 @@
-﻿import { Decorators } from "../../decorators";
+﻿import sQuery from "@optionaldeps/squery";
+import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
 
@@ -13,7 +14,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
 
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         if (this.options.cols !== 0) {
             input.attr('cols', (this.options.cols ?? 80));
         }
@@ -23,7 +24,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public get value(): string {
-        return $(this.domNode).val() as string;
+        return sQuery(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -31,7 +32,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public set value(value: string) {
-        $(this.domNode).val(value);
+        sQuery(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {

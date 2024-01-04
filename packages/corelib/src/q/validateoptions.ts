@@ -1,4 +1,5 @@
-﻿import { isBS3, localText, notifyError } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { isBS3, localText, notifyError } from "@serenity-is/base";
 import { extend } from "./system-compat";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
 
@@ -7,7 +8,7 @@ let oldShowLabel: (e: HTMLElement, message: string) => void;
 function validateShowLabel(element: HTMLElement, message: string) {
     oldShowLabel.call(this, element, message);
     this.errorsFor(element).each(function (i: number, e: any) {
-        var $e = $(e);
+        var $e = sQuery(e);
         if ($e.parent('.vx').length) {
             $e.attr('title', $e.text());
             if (message && $e.hasClass('error'))
@@ -18,11 +19,11 @@ function validateShowLabel(element: HTMLElement, message: string) {
 
 function jQueryValidationInitialization() {
 
-    if (typeof $ === "undefined" ||
-        !$.validator)
+    if (typeof sQuery === "undefined" ||
+        !sQuery.validator)
         return;
 
-    let p: any = $.validator;
+    let p: any = sQuery.validator;
     p = p.prototype;
     oldShowLabel = p.showLabel;
     p.showLabel = validateShowLabel;
@@ -65,7 +66,7 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
             let field: any = null;
             let vx = element.attr('data-vx-id');
             if (vx) {
-                field = $('#' + vx);
+                field = sQuery('#' + vx);
                 if (!field.length)
                     field = null;
                 else
@@ -74,7 +75,7 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
             if (field == null) {
                 field = element.parents('div.field');
                 if (field.length) {
-                    let inner = $('div.vx', field[0]);
+                    let inner = sQuery('div.vx', field[0]);
                     if (inner.length)
                         field = inner[0];
                 }
@@ -89,37 +90,37 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
         invalidHandler: function (event: any, validator: JQueryValidation.Validator) {
             notifyError(localText("Validation.InvalidFormMessage"));
 
-            $(validator.errorList.map(x => x.element))
+            sQuery(validator.errorList.map(x => x.element))
                 .closest('.category.collapsed')
                 .children('.category-title')
                 .each((i, x) => {
-                    $(x).click();
+                    sQuery(x).click();
                 });
 
             if (validator.errorList.length)
             {
                 var el = validator.errorList[0].element;
                 if (el) {
-                    var bsPaneId = $(el).closest('.tab-content>.tab-pane[id]:not(.active)').attr('id');
+                    var bsPaneId = sQuery(el).closest('.tab-content>.tab-pane[id]:not(.active)').attr('id');
                     if (bsPaneId) {
                         let selector = 'a[href="#' + bsPaneId + '"]';
-                        $(selector).click(); // bs3/bs4
+                        sQuery(selector).click(); // bs3/bs4
                         (document.querySelector(selector) as HTMLAnchorElement)?.click(); // bs5+
                     }
 
-                    var uiPaneId = $(el).closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)').attr('id');
+                    var uiPaneId = sQuery(el).closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)').attr('id');
                     if (uiPaneId)
-                        $('a[href="#' + uiPaneId + '"]').click();
+                        sQuery('a[href="#' + uiPaneId + '"]').click();
 
-                    if (($.fn as any).tooltip) {
+                    if ((sQuery.fn as any).tooltip) {
                         var $el: any;
                         var hl = getHighlightTarget(el);
                         if (hl)
-                            $el = $(hl);
+                            $el = sQuery(hl);
                         else
-                            $el = $(el);
+                            $el = sQuery(el);
 
-                        ($.fn as any).tooltip && $el.tooltip({
+                        (sQuery.fn as any).tooltip && $el.tooltip({
                             title: validator.errorList[0].message,
                             trigger: 'manual'
                         }).tooltip('show');
@@ -137,11 +138,11 @@ export function validateOptions(options?: JQueryValidation.ValidationOptions) {
     }), options);
 };
 
-if (typeof $ !== "undefined") {
-    if ($.validator)
+if (typeof sQuery !== "undefined") {
+    if (sQuery.validator)
         jQueryValidationInitialization();
     else
-        $(jQueryValidationInitialization);
+        sQuery(jQueryValidationInitialization);
 }
 else if (typeof document !== "undefined") {
     if (document.readyState === 'loading')

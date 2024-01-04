@@ -1,3 +1,4 @@
+import jQuery from "@optionaldeps/jquery";
 import { Lookup } from "@serenity-is/base";
 import { ScriptData } from "../../q/scriptdata-compat";
 import { LookupEditor } from "./lookupeditor";
@@ -107,7 +108,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const select2Container = $(`<div class="select2-container" />`);
+        const select2Container = jQuery(`<div class="select2-container" />`);
         document.body.appendChild(select2Container[0]);
 
         const editor = new LookupEditor({
@@ -405,14 +406,14 @@ describe("LookupEditor", () => {
 
         expect(editor.items).toHaveLength(2);
 
-        $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+        jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
 
         let options = Array.from(document.body.querySelectorAll(".select2-results li"));
         expect(options).toHaveLength(2);
 
         const input = document.body.querySelector(".select2-input") as HTMLInputElement
         input.value = "Test2";
-        $(input).trigger("input");
+        jQuery(input).trigger("input");
 
         expect(document.body.querySelector(".select2-active")).toBeNull();
 

@@ -1,14 +1,14 @@
-﻿export {}
+﻿import sQuery from "@optionaldeps/squery";
 
 export class PrefixedContext {
     constructor(public readonly idPrefix: string) {
     }
 
     byId(id: string): JQuery {
-        return $('#' + this.idPrefix + id);
+        return sQuery('#' + this.idPrefix + id);
     }
 
     w<TWidget>(id: string, type: { new (...args: any[]): TWidget }): TWidget {
-        return $('#' + this.idPrefix + id).getWidget<TWidget>(type);
+        return sQuery('#' + this.idPrefix + id).getWidget<TWidget>(type);
     }
 }

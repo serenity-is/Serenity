@@ -1,4 +1,5 @@
-﻿import { Decorators } from "../../decorators";
+﻿import sQuery from "@optionaldeps/squery";
+import { Decorators } from "../../decorators";
 import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
@@ -40,8 +41,8 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     protected responsive: boolean;
 
     public arrange(): void {
-        $(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
-            $(e).triggerHandler('layout');
+        sQuery(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
+            sQuery(e).triggerHandler('layout');
         });
     }
 

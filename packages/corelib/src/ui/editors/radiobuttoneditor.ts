@@ -1,4 +1,5 @@
-﻿import { Enum, tryGetText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Enum, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getAttributes, getLookup } from "../../q";
@@ -55,15 +56,15 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     protected addRadio(value: string, text: string) {
-        var label = $('<label/>').text(text);
-        $('<input type="radio"/>').attr('name', this.uniqueName)
+        var label = sQuery('<label/>').text(text);
+        sQuery('<input type="radio"/>').attr('name', this.uniqueName)
             .attr('id', this.uniqueName + '_' + value)
             .attr('value', value).prependTo(label);
         label.appendTo(this.domNode);
     }
 
     get_value(): string {
-        return $(this.domNode).find('input:checked').first().val() as string;
+        return sQuery(this.domNode).find('input:checked').first().val() as string;
     }
 
     get value(): string {
@@ -72,7 +73,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
 
     set_value(value: string): void {
         if (value !== this.get_value()) {
-            var inputs = $(this.domNode).find('input');
+            var inputs = sQuery(this.domNode).find('input');
             var checks = inputs.filter(':checked');
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
@@ -97,11 +98,11 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
             if (value) {
-                $(this.domNode).attr('disabled', 'disabled')
+                sQuery(this.domNode).attr('disabled', 'disabled')
                     .find('input').attr('disabled', 'disabled');
             }
             else {
-                $(this.domNode).removeAttr('disabled')
+                sQuery(this.domNode).removeAttr('disabled')
                     .find('input').removeAttr('disabled');
             }
         }

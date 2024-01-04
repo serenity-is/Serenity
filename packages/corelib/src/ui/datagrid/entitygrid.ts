@@ -18,7 +18,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props: WidgetProps<P>) {
         super(props);
         this.domNode.classList.add('route-handler');
-        $(this.domNode).on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
+        sQuery(this.domNode).on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
     }
 
     protected handleRoute(args: HandleRouteEventArgs): void {

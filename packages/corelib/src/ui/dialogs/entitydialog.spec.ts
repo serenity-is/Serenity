@@ -20,7 +20,7 @@ describe('EntityDialog.getIdProperty', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var Dialog = new DefaultDialog($('<div/>'));
+        var Dialog = new DefaultDialog({});
         expect(getIdProperty(Dialog)).toBe("ID");
     });
 
@@ -30,7 +30,7 @@ describe('EntityDialog.getIdProperty', () => {
             getIdProperty() { return "subClassId" };
         }
 
-        var Dialog = new SubClassDialog($('<div/>'));
+        var Dialog = new SubClassDialog({});
         expect(getIdProperty(Dialog)).toBe("subClassId");
     });
 
@@ -40,7 +40,7 @@ describe('EntityDialog.getIdProperty', () => {
         }
         addAttribute(AttrDialog, new IdPropertyAttribute("attrId"));
 
-        var Dialog = new AttrDialog($('<div/>'));
+        var Dialog = new AttrDialog({});
         expect(getIdProperty(Dialog)).toBe("attrId");
     });
 
@@ -54,7 +54,7 @@ describe('EntityDialog.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var Dialog = new TestRowDialog($('<div/>'));
+        var Dialog = new TestRowDialog({});
         expect(getIdProperty(Dialog)).toBe("idForTestRow");
     });
 
@@ -68,7 +68,7 @@ describe('EntityDialog.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getIdProperty(dialog)).toBe("");
     });
 });
@@ -83,7 +83,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var Dialog = new DefaultDialog($('<div/>'));
+        var Dialog = new DefaultDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("");
     });
 
@@ -93,7 +93,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
             getIsActiveProperty() { return "subClassIsActive" };
         }
 
-        var Dialog = new SubClassDialog($('<div/>'));
+        var Dialog = new SubClassDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("subClassIsActive");
     });
 
@@ -103,7 +103,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
         }
         addAttribute(AttrDialog, new IsActivePropertyAttribute("attrIsActive"));
 
-        var Dialog = new AttrDialog($('<div/>'));
+        var Dialog = new AttrDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("attrIsActive");
     });
 
@@ -117,7 +117,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var Dialog = new TestRowDialog($('<div/>'));
+        var Dialog = new TestRowDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("isActiveForTestRow");
     });
 
@@ -131,7 +131,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getIsActiveProperty(dialog)).toBe("");
     });
 });
@@ -146,7 +146,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.Default.");
     });
 
@@ -156,7 +156,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             static readonly __typeName = 'MyProject.TestModule.DefaultDialog';
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.TestModule.Default.");
     });
 
@@ -166,7 +166,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.MyModule.Some.Default.");
     });
 
@@ -176,7 +176,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getLocalTextDbPrefix() { return "My.Prefix." };
         }
 
-        var dialog = new SubClassDialog($('<div/>'));
+        var dialog = new SubClassDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("My.Prefix.");
     });
 
@@ -186,7 +186,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getLocalTextPrefix() { return "MySubClassPrefix" };
         }
 
-        var dialog = new SubClassDialog($('<div/>'));
+        var dialog = new SubClassDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.MySubClassPrefix.");
     });
 
@@ -196,7 +196,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
         }
         addAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var dialog = new AttrDialog($('<div/>'));
+        var dialog = new AttrDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.attrPrefix.");
     });
 
@@ -210,7 +210,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.prefixForTestRow.");
     });
 
@@ -224,7 +224,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("");
     });
 });
@@ -239,7 +239,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("Default");
     });
 
@@ -249,7 +249,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("TestModule.Default");
     });
 
@@ -259,7 +259,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
-        var dialog = new DefaultDialog($('<div/>'));
+        var dialog = new DefaultDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("MyModule.Some.Default");
     });
 
@@ -269,7 +269,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getLocalTextPrefix() { return "subClassPrefix" };
         }
 
-        var dialog = new SubClassDialog($('<div/>'));
+        var dialog = new SubClassDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("subClassPrefix");
     });
 
@@ -279,7 +279,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
         }
         addAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var dialog = new AttrDialog($('<div/>'));
+        var dialog = new AttrDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("attrPrefix");
     });
 
@@ -293,7 +293,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("prefixForTestRow");
     });
 
@@ -307,7 +307,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var dialog = new TestRowDialog($('<div/>'));
+        var dialog = new TestRowDialog({});
         expect(getLocalTextPrefix(dialog)).toBeUndefined();
     });
 });

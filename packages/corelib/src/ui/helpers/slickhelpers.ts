@@ -1,4 +1,5 @@
-﻿import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem, isArrayLike } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { Authorization, clearKeys, replaceAll, safeCast, serviceCall } from "../../q";
@@ -30,7 +31,7 @@ export class GridRowSelectionMixin {
         this.options = options || {};
 
         grid.getGrid().onClick.subscribe((e, p) => {
-            if ($(e.target).hasClass('select-item')) {
+            if (sQuery(e.target).hasClass('select-item')) {
                 e.preventDefault();
                 var item = grid.getView().getItem(p.row);
                 var id = item[this.idField].toString();
@@ -53,7 +54,7 @@ export class GridRowSelectionMixin {
         grid.getGrid().onHeaderClick.subscribe((e1, u) => {
             if ((e1 as any).isDefaultPrevented?.() || e1.defaultPrevented)
                 return;
-            if ($(e1.target).hasClass('select-all-items')) {
+            if (sQuery(e1.target).hasClass('select-all-items')) {
                 e1.preventDefault();
                 if (Object.keys(this.include).length > 0) {
                     clearKeys(this.include);
@@ -182,7 +183,7 @@ export class GridRadioSelectionMixin {
         this.options = options || {};
 
         grid.getGrid().onClick.subscribe((e, p) => {
-            if ($(e.target).hasClass('rad-select-item')) {
+            if (sQuery(e.target).hasClass('rad-select-item')) {
                 e.preventDefault();
                 var item = grid.getView().getItem(p.row);
 
@@ -336,7 +337,7 @@ export namespace GridUtils {
     export function addToggleButton(toolDiv: JQuery, cssClass: string,
         callback: (p1: boolean) => void, hint: string, initial?: boolean): void {
 
-        var div = $('<div><a href="#"></a></div>')
+        var div = sQuery('<div><a href="#"></a></div>')
             .addClass('s-ToggleButton').addClass(cssClass)
             .prependTo(toolDiv);
         div.children('a').click(function (e) {
@@ -429,7 +430,7 @@ export namespace GridUtils {
         onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
 
-        var div = $('<div><input type="text"/></div>')
+        var div = sQuery('<div><input type="text"/></div>')
             .addClass('s-QuickSearchBar').prependTo(container);
 
         if (fields != null && fields.length > 0) {
@@ -649,12 +650,12 @@ export namespace SlickFormatting {
         };
     }
 
-    export function getItemType(link: JQuery): string {
-        return link.data('item-type');
+    export function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string {
+        return (isArrayLike(link) ? link[0] : link)?.getAttribute('data-item-type');
     }
 
-    export function getItemId(link: JQuery): string {
-        var value = link.data('item-id');
+    export function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string {
+        var value = (isArrayLike(link) ? link[0] : link)?.getAttribute('data-item-id');
         return value == null ? null : value.toString();
     }
 
@@ -778,7 +779,7 @@ export namespace SlickTreeHelper {
 
     export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: RemoteView<TItem>, getId: (x: TItem) => any): void {
-        var target = $(e.target);
+        var target = sQuery(e.target);
         if (!target.hasClass('s-TreeToggle')) {
             return;
         }

@@ -1,4 +1,5 @@
-﻿import { isArrayLike } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { isArrayLike } from "@serenity-is/base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";
 
@@ -22,17 +23,17 @@ export namespace SubDialogHelper {
     }
 
     export function triggerDataChange(dialog: Widget<any>): any {
-        $(dialog.domNode).triggerHandler('ondatachange');
+        sQuery(dialog.domNode).triggerHandler('ondatachange');
         return dialog;
     }
 
     export function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void {
-        $(element).triggerHandler('ondatachange');
+        sQuery(element).triggerHandler('ondatachange');
     }
 
     export function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any {
         return bindToDataChange(dialog, owner, function (e, dci) {
-            $(owner.domNode).triggerHandler('ondatachange');
+            sQuery(owner.domNode).triggerHandler('ondatachange');
         }, useTimeout);
     }
 

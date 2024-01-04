@@ -1311,7 +1311,7 @@ declare function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, k
 /** @deprecated use htmlEncode as it also encodes quotes */
 declare const attrEncode: typeof htmlEncode;
 /** Clears the options in the select element */
-declare function clearOptions(select: ArrayLike<HTMLElement>): void;
+declare function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>): void;
 /**
  * Finds the first element with the given relative id to the source element.
  * It can handle underscores in the source element id.
@@ -1338,7 +1338,7 @@ declare function newBodyDiv(): JQuery;
 /**
  * Returns the outer HTML of the element.
  */
-declare function outerHtml(element: ArrayLike<HTMLElement>): string;
+declare function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
 /**
  * Appends child at first argument to given node at second argument.
  * From https://github.com/alex-kinokon/jsx-dom.
@@ -3551,8 +3551,8 @@ declare namespace SlickFormatting {
     function dateTime(format?: string): Format;
     function checkBox(): Format;
     function number(format: string): Format;
-    function getItemType(link: JQuery): string;
-    function getItemId(link: JQuery): string;
+    function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
+    function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
     function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
     function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
 }

@@ -1,4 +1,5 @@
-﻿import validator from "@optionaldeps/jquery.validation";
+﻿import sQuery from "@optionaldeps/squery";
+import validator from "@optionaldeps/jquery.validation";
 import { Config, htmlEncode, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
 import { Exception, extend } from "./system-compat";
@@ -19,7 +20,7 @@ if (validator && validator.methods && validator.addMethod) {
         if (element == null || !!result) {
             return result;
         }
-        var events = ($ as any)._data(element, 'events');
+        var events = (sQuery as any)._data(element, 'events');
         if (!events) {
             return true;
         }
@@ -28,9 +29,9 @@ if (validator && validator.methods && validator.addMethod) {
             return true;
         }
 
-        var el = $(element);
+        var el = sQuery(element);
         for (var i = 0; !!(i < handlers.length); i++) {
-            if ($.isFunction(handlers[i].handler)) {
+            if (sQuery.isFunction(handlers[i].handler)) {
                 var message = handlers[i].handler(el);
                 if (message != null) {
                     el.data('customValidationMessage', message);
@@ -40,7 +41,7 @@ if (validator && validator.methods && validator.addMethod) {
         }
         return true;
     }, function (o: any, e: any) {
-        return $(e).data('customValidationMessage');
+        return sQuery(e).data('customValidationMessage');
     });
 
     validator.addMethod("dateQ", function (value, element) {
@@ -106,7 +107,7 @@ if (validator && validator.methods && validator.addMethod) {
         return emailRegex.test(value);
     });
 
-    $(loadValidationErrorMessages);
+    sQuery(loadValidationErrorMessages);
 }
 
 export function loadValidationErrorMessages() {
@@ -156,7 +157,7 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
         ignore: '[style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
         ignoreTitle: true,
         normalizer: function (value: any) {
-            return $.trim(value);
+            return sQuery.trim(value);
         },
         highlight: function (element: HTMLElement, errorClass: string, validClass: string) {
             if ((element as any).type === "radio") {
@@ -193,15 +194,15 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
             }
         },
         showErrors: function () {
-            if (($?.fn as any)?.tooltip) {
+            if ((sQuery?.fn as any)?.tooltip) {
                 var i: number, elements: any, error: any, $el: any, hl: any;
                 for (i = 0; this.errorList[i]; i++) {
                     error = this.errorList[i];
                     hl = getHighlightTarget(error.element);
                     if (hl != null)
-                        $el = $(hl);
+                        $el = sQuery(hl);
                     else
-                        $el = $(error.element);
+                        $el = sQuery(error.element);
                     if (i != 0)
                         setTooltip($el, '', false);
                     else
@@ -211,9 +212,9 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
                 for (i = 0, elements = this.validElements(); elements[i]; i++) {
                     hl = getHighlightTarget(error.element);
                     if (hl != null)
-                        $el = $(hl);
+                        $el = sQuery(hl);
                     else
-                        $el = $(error.element);
+                        $el = sQuery(error.element);
                     setTooltip($el, '', false);
                 }
             }

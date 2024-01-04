@@ -1,4 +1,5 @@
-﻿import { Culture, DialogTexts, faIcon, htmlEncode, localText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Culture, DialogTexts, faIcon, htmlEncode, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { Authorization, Router, centerDialog } from "../../q";
@@ -29,9 +30,9 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
             element: this.byId("Search"),
             onSearch: (fld, txt, done) => {
                 txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
-                $(this.domNode).find('li').each((x, e) => {
-                    $(e).toggle(!txt || Select2.util.stripDiacritics(
-                        $(e).text().toLowerCase()).indexOf(txt) >= 0);
+                sQuery(this.domNode).find('li').each((x, e) => {
+                    sQuery(e).toggle(!txt || Select2.util.stripDiacritics(
+                        sQuery(e).text().toLowerCase()).indexOf(txt) >= 0);
                 });
                 done && done(true);
             }
@@ -85,7 +86,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                 click: () => {
                     let liByKey: { [key: string]: JQuery } = {};
                     this.ulVisible.children().add(this.ulHidden.children()).each((x, e) => {
-                        let el = $(e);
+                        let el = sQuery(e);
                         liByKey[el.data('key')] = el;
                     });
 
@@ -120,7 +121,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                         col.visible = false;
 
                     this.visibleColumns = this.ulVisible.children().toArray().map(x => {
-                        let id = $(x).data("key");
+                        let id = sQuery(x).data("key");
                         var col = this.colById[id];
                         col.visible = true;
                         newColumns.push(col);
@@ -165,7 +166,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
     private createLI(col: Column): JQuery {
         var allowHide = this.allowHide(col);
-        return $(`
+        return sQuery(`
 <li data-key="${col.id}" class="${allowHide ? "" : "cant-hide"}">
 <span class="drag-handle">☰</span>
 ${htmlEncode(this.getTitle(col))}
@@ -230,11 +231,11 @@ ${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(loca
                 group: this.uniqueName + "_group",
                 filter: '.js-hide',
                 onFilter: (evt: any) => {
-                    $(evt.item).appendTo(this.ulHidden);
+                    sQuery(evt.item).appendTo(this.ulHidden);
                     this.updateListStates();
                 },
                 onMove: (x: any) => {
-                    if ($(x.dragged).hasClass('cant-hide') &&
+                    if (sQuery(x.dragged).hasClass('cant-hide') &&
                         x.from == this.ulVisible[0] &&
                         x.to !== x.from)
                         return false;
@@ -249,7 +250,7 @@ ${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(loca
                 sort: false,
                 filter: '.js-show',
                 onFilter: (evt: any) => {
-                    $(evt.item).appendTo(this.ulVisible);
+                    sQuery(evt.item).appendTo(this.ulVisible);
                     this.updateListStates();
                 },
                 onEnd: () => this.updateListStates()
@@ -259,8 +260,8 @@ ${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(loca
 
     protected onDialogOpen(): void {
         super.onDialogOpen();
-        $(this.domNode).find("input").removeAttr("disabled")
-        $(this.domNode).closest('.ui-dialog').children(".ui-dialog-buttonpane")
+        sQuery(this.domNode).find("input").removeAttr("disabled")
+        sQuery(this.domNode).closest('.ui-dialog').children(".ui-dialog-buttonpane")
             .find('button').eq(0).addClass("restore-defaults")
             .next().focus();
 

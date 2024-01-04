@@ -1,4 +1,5 @@
-﻿import { Decorators } from "../../decorators";
+﻿import sQuery from "@optionaldeps/squery";
+import { Decorators } from "../../decorators";
 import { IBooleanValue } from "../../interfaces";
 import { EditorWidget } from "../widgets/widget";
 
@@ -7,7 +8,7 @@ import { EditorWidget } from "../widgets/widget";
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
 
     public get value(): boolean {
-        return $(this.domNode).is(":checked");
+        return sQuery(this.domNode).is(":checked");
     }
 
     protected get_value(): boolean {
@@ -15,7 +16,7 @@ export class BooleanEditor<P = {}> extends EditorWidget<P> {
     }
 
     public set value(value: boolean) {
-        $(this.domNode).prop("checked", !!value);
+        sQuery(this.domNode).prop("checked", !!value);
     }
 
     protected set_value(value: boolean): void {

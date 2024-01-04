@@ -1,3 +1,4 @@
+import jQuery from "@optionaldeps/jquery";
 import { ListResponse, ServiceResponse } from "@serenity-is/base";
 import { ServiceOptions } from "../../q";
 import { ServiceLookupEditor } from "./servicelookupeditor";
@@ -27,7 +28,7 @@ test('ServiceLookupEditor loads items from service', () => {
         element: el => document.body.appendChild(el)
     })
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
 
         const response = {
@@ -42,7 +43,7 @@ test('ServiceLookupEditor loads items from service', () => {
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
 
     jest.runOnlyPendingTimers();
 
@@ -63,7 +64,7 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
         element: el => document.body.appendChild(el)
     });
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(document.body.querySelector(".select2-active")).not.toBeNull();
         expect(options.url).toBe("/Services/Test/List");
 
@@ -76,7 +77,7 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
 
     jest.runOnlyPendingTimers();
@@ -94,7 +95,7 @@ test('ServiceLookupEditor can search items', () => {
         element: el => document.body.appendChild(el)        
     });
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
 
         const containsText = options.request.ContainsText;
@@ -111,8 +112,8 @@ test('ServiceLookupEditor can search items', () => {
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
-    $(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
 
     jest.runOnlyPendingTimers();
 
@@ -131,7 +132,7 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
         element: el => document.body.appendChild(el)
     });
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(document.body.querySelector(".select2-active")).not.toBeNull();
         expect(options.url).toBe("/Services/Test/List");
 
@@ -148,9 +149,9 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
-    $(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
 
     jest.runOnlyPendingTimers();
 
@@ -176,7 +177,7 @@ test('ServiceLookupEditor aborts previous requests', () => {
 
     let containsTexts: any[] = [];
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
         containsTexts.push(options.request.ContainsText);
 
@@ -192,24 +193,24 @@ test('ServiceLookupEditor aborts previous requests', () => {
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
 
-    $(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
     jest.advanceTimersByTime(debounceDelay);
 
-    $(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
     jest.advanceTimersByTime(debounceDelay - 1);
 
-    $(document.body.querySelector(".select2-input")).val("Test4").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test4").trigger("input");
     jest.advanceTimersByTime(debounceDelay - 1);
 
-    $(document.body.querySelector(".select2-input")).val("Test5").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test5").trigger("input");
     jest.advanceTimersByTime(debounceDelay);
 
-    $(document.body.querySelector(".select2-input")).val("Test6").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test6").trigger("input");
     jest.advanceTimersByTime(debounceDelay - 1);
 
-    $(document.body.querySelector(".select2-input")).val("Test7").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test7").trigger("input");
     jest.advanceTimersByTime(debounceDelay);
 
     expect(containsTexts).toEqual(["Test2", "Test5", "Test7"]);
@@ -231,7 +232,7 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
     let containsTexts: any[] = [];
     let successCallbacks: (() => void)[] = [];
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
         containsTexts.push(options.request.ContainsText);
 
@@ -247,11 +248,11 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
     expect(document.body.querySelector(".select2-active")).toBeNull(); // no requests are pending
 
-    $(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
     jest.advanceTimersByTime(debounceDelay);
     expect(document.body.querySelector(".select2-searching")).not.toBeNull(); // shows searching
@@ -260,19 +261,19 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
     expect(document.body.querySelector(".select2-active")).toBeNull();
 
 
-    $(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
     expect(document.body.querySelector(".select2-searching")).toBeNull();
     jest.advanceTimersByTime(debounceDelay - 1);
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
     expect(document.body.querySelector(".select2-active")).toBeNull(); // no requests are pending
 
-    $(document.body.querySelector(".select2-input")).val("Test4").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test4").trigger("input");
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
     jest.advanceTimersByTime(debounceDelay - 1);
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
     expect(document.body.querySelector(".select2-active")).toBeNull(); // no requests are pending
 
-    $(document.body.querySelector(".select2-input")).val("Test5").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test5").trigger("input");
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
     jest.advanceTimersByTime(debounceDelay);
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
@@ -280,7 +281,7 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
     successCallbacks[1]();
     expect(document.body.querySelector(".select2-active")).toBeNull(); // no requests are pending
 
-    $(document.body.querySelector(".select2-input")).val("Test6").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test6").trigger("input");
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
     jest.advanceTimersByTime(debounceDelay);
     expect(document.body.querySelector(".select2-searching")).toBeNull(); // doesn't show searching as there is data on screen
@@ -309,7 +310,7 @@ test('ServiceLookupEditor aborts while request is pending', () => {
     let successCallbacks: (() => void)[] = [];
     let abortedTexts: any[] = [];
 
-    jest.spyOn($, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
+    jest.spyOn(jQuery, "ajax").mockImplementation(function (options: ServiceOptions<ServiceResponse & any>) {
         expect(options.url).toBe("/Services/Test/List");
 
         const response = {
@@ -333,17 +334,17 @@ test('ServiceLookupEditor aborts while request is pending', () => {
 
     jest.useFakeTimers();
 
-    $(document.body.querySelector(".select2-choice")).trigger("mousedown");
+    jQuery(document.body.querySelector(".select2-choice")).trigger("mousedown");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
     expect(document.body.querySelector(".select2-active")).toBeNull(); // no requests are pending
 
-    $(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test2").trigger("input");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull();
     jest.advanceTimersByTime(debounceDelay);
     expect(document.body.querySelector(".select2-searching")).not.toBeNull(); // shows searching
     expect(document.body.querySelector(".select2-active")).not.toBeNull(); // shows active as there is a pending request
 
-    $(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
+    jQuery(document.body.querySelector(".select2-input")).val("Test3").trigger("input");
     expect(document.body.querySelector(".select2-searching")).not.toBeNull(); // shows searching
     expect(document.body.querySelector(".select2-active")).toBeNull(); // aborted previous request
     jest.advanceTimersByTime(debounceDelay); // aborts previous request

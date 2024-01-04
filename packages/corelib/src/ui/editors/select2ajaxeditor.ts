@@ -1,4 +1,5 @@
-﻿import { ListRequest, ListResponse, RetrieveResponse, localText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { ListRequest, ListResponse, RetrieveResponse, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { ServiceOptions, safeCast, serviceCall } from "../../q";
@@ -14,7 +15,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = $(this.domNode);
+        let hidden = sQuery(this.domNode);
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null)
             hidden.attr("placeholder", emptyItemText);
@@ -105,7 +106,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
                     window.clearTimeout(queryTimeout);
                 }
 
-                var select2 = $(this.domNode).data('select2');
+                var select2 = sQuery(this.domNode).data('select2');
                 select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
 
                 queryTimeout = window.setTimeout(() => {
@@ -140,7 +141,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
     protected addInplaceCreate(title: string): void {
         var self = this;
-        $('<a><b/></a>').addClass('inplace-button inplace-create')
+        sQuery('<a><b/></a>').addClass('inplace-button inplace-create')
             .attr('title', title).insertAfter(this.domNode).click(function (e) {
                 self.inplaceCreateClick(e);
             });
@@ -153,11 +154,11 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     }
 
     protected get_select2Container(): JQuery {
-        return $(this.domNode).prevAll('.select2-container');
+        return sQuery(this.domNode).prevAll('.select2-container');
     }
 
     get_value(): string {
-        return safeCast($(this.domNode).select2('val'), String);
+        return safeCast(sQuery(this.domNode).select2('val'), String);
     }
 
     get value(): string {
@@ -166,7 +167,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
     set_value(value: string) {
         if (value !== this.get_value()) {
-            var el = $(this.domNode);
+            var el = sQuery(this.domNode);
             el.select2('val', value);
             el.data('select2-change-triggered', true);
             try {

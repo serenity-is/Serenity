@@ -1,4 +1,5 @@
-﻿import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ServiceOptions, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, serviceCall, validatorAbortHandler } from "../../q";
@@ -439,8 +440,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         this.loadById(entityId,
             response => window.setTimeout(() => this.dialogOpen(asPanel), 0),
             () => {
-                if (!$(this.domNode).is(':visible')) {
-                    $(this.domNode).remove();
+                if (!sQuery(this.domNode).is(':visible')) {
+                    sQuery(this.domNode).remove();
                 }
             });
     }
@@ -503,7 +504,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (!pgOptions.items.some(x => x.localizable === true))
             return;
 
-        var localGridDiv = $('<div/>')
+        var localGridDiv = sQuery('<div/>')
             .attr('id', this.idPrefix + 'LocalizationGrid')
             .hide().insertAfter(pgDiv);
 
@@ -713,7 +714,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if ($(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
+        if (sQuery(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }
     }
@@ -787,7 +788,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                     entityId: eid
                 };
 
-                $(this.domNode).triggerHandler('ondatachange', [dci]);
+                sQuery(this.domNode).triggerHandler('ondatachange', [dci]);
             };
 
         opt.onCleanup = () => {
@@ -1089,7 +1090,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         baseOptions.request = request;
         baseOptions.onSuccess = response => {
             callback && callback(response);
-            $(this.domNode).triggerHandler('ondatachange', [{
+            sQuery(this.domNode).triggerHandler('ondatachange', [{
                 entityId: this.get_entityId(),
                 entity: this.entity,
                 type: 'undelete'

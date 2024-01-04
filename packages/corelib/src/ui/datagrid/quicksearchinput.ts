@@ -1,4 +1,5 @@
-﻿import { localText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -26,32 +27,32 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
         this.lastValue = ((input.val() ?? '') as string).trim();
 
         var self = this;
-        $(this.domNode).on('keyup.' + this.uniqueName, function () {
+        sQuery(this.domNode).on('keyup.' + this.uniqueName, function () {
             self.checkIfValueChanged();
         });
 
-        $(this.domNode).on('change.' + this.uniqueName, function () {
+        sQuery(this.domNode).on('change.' + this.uniqueName, function () {
             self.checkIfValueChanged();
         });
 
-        $('<span><i></i></span>').addClass('quick-search-icon')
+        sQuery('<span><i></i></span>').addClass('quick-search-icon')
             .insertBefore(input);
 
         if (this.options.fields?.length > 0) {
-            var a = $('<a/>').addClass('quick-search-field').attr('title',
+            var a = sQuery('<a/>').addClass('quick-search-field').attr('title',
                 localText('Controls.QuickSearch.FieldSelection')).insertBefore(input);
 
-            var menu = $('<ul></ul>').css('width', '120px');
+            var menu = sQuery('<ul></ul>').css('width', '120px');
 
             for (var item of this.options.fields) {
                 var field = { $: item };
-                $('<li><a/></li>').appendTo(menu).children().attr('href', '#')
+                sQuery('<li><a/></li>').appendTo(menu).children().attr('href', '#')
                     .text(item.title ?? '').click(function (e: any) {
                         e.preventDefault();
                         this.$this.fieldChanged = self.field !== this.field.$;
@@ -75,11 +76,11 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             this.updateInputPlaceHolder();
         }
 
-        $(this.domNode).on('execute-search.' + this.uniqueName, e1 => {
+        sQuery(this.domNode).on('execute-search.' + this.uniqueName, e1 => {
             if (!!this.timer) {
                 window.clearTimeout(this.timer);
             }
-            this.searchNow(($(this.domNode).val() as string ?? '').trim());
+            this.searchNow((sQuery(this.domNode).val() as string ?? '').trim());
         });
     }
 
@@ -109,7 +110,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     get_value(): string {
-        return ($(this.domNode).val() as string ?? '').trim();
+        return (sQuery(this.domNode).val() as string ?? '').trim();
     }
 
     get_field(): QuickSearchField {
@@ -126,7 +127,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected updateInputPlaceHolder() {
-        var qsf = $(this.domNode).prevAll('.quick-search-field');
+        var qsf = sQuery(this.domNode).prevAll('.quick-search-field');
         if (this.field) {
             qsf.text(this.field.title);
         }
@@ -139,7 +140,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.fieldChanged = false;
         this.field = field;
         var value = (value ?? '').trim();
-        $(this.domNode).val(value);
+        sQuery(this.domNode).val(value);
         this.lastValue = value;
         if (!!this.timer) {
             window.clearTimeout(this.timer);
@@ -149,18 +150,18 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected searchNow(value: string) {
-        $(this.domNode).parent().toggleClass(
+        sQuery(this.domNode).parent().toggleClass(
             (this.options.filteredParentClass ?? 's-QuickSearchFiltered'), !!(value.length > 0));
 
-        $(this.domNode).parent().addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
+        sQuery(this.domNode).parent().addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
                 .addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading');
 
         var done = (results: any) => {
-            $(this.domNode).removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
+            sQuery(this.domNode).removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
             .parent().removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading');
 
             if (!results) {
-                var el = $(this.domNode).closest('.s-QuickSearchBar')
+                var el = sQuery(this.domNode).closest('.s-QuickSearchBar')
                     .find('.quick-search-icon i')[0] as HTMLElement;
                 if (el) {
                     el.classList.add('s-shake-effect');

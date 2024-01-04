@@ -1,4 +1,5 @@
-﻿import { toId } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { toId } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
 import { addOption } from "../../q";
@@ -21,7 +22,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
         
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         input.addClass('editor s-TimeEditor hour');
 
         if (!this.options.noEmptyOption) {
@@ -32,8 +33,8 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
             addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
         }
 
-        this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
-        this.minutes.change(() => $(this.domNode).trigger("change"));
+        this.minutes = sQuery('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
+        this.minutes.change(() => sQuery(this.domNode).trigger("change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
             addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
@@ -41,7 +42,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     }
 
     public get value(): number {
-        var hour = toId($(this.domNode).val());
+        var hour = toId(sQuery(this.domNode).val());
         var minute = toId(this.minutes.val());
         if (hour == null || minute == null) {
             return null;
@@ -56,16 +57,16 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     public set value(value: number) {
         if (!value) {
             if (this.options.noEmptyOption) {
-                $(this.domNode).val(this.options.startHour);
+                sQuery(this.domNode).val(this.options.startHour);
                 this.minutes.val('0');
             }
             else {
-                $(this.domNode).val('');
+                sQuery(this.domNode).val('');
                 this.minutes.val('0');
             }
         }
         else {
-            $(this.domNode).val(Math.floor(value / 60).toString());
+            sQuery(this.domNode).val(Math.floor(value / 60).toString());
             this.minutes.val(value % 60);
         }
     }
@@ -82,10 +83,10 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                $(this.domNode).addClass('readonly').attr('readonly', 'readonly');
+                sQuery(this.domNode).addClass('readonly').attr('readonly', 'readonly');
             }
             else {
-                $(this.domNode).removeClass('readonly').removeAttr('readonly');
+                sQuery(this.domNode).removeClass('readonly').removeAttr('readonly');
             }
             EditorUtils.setReadonly(this.minutes, value);
         }

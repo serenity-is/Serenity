@@ -1,4 +1,5 @@
-﻿import Select2 from "@optionaldeps/select2";
+﻿import sQuery from "@optionaldeps/squery";
+import Select2 from "@optionaldeps/select2";
 import { PropertyItem, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
@@ -67,7 +68,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = $(this.domNode);
+        let hidden = sQuery(this.domNode);
 
         this._items = [];
         this._itemById = {};
@@ -94,7 +95,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     destroy() {
         this.initSelectionPromise?.abort?.();
         this.abortPendingQuery();
-        $(this.domNode)?.select2?.('destroy');
+        sQuery(this.domNode)?.select2?.('destroy');
         super.destroy();
     }
 
@@ -205,7 +206,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
                 this.abortPendingQuery();
 
-                var select2 = $(this.domNode).data('select2');
+                var select2 = sQuery(this.domNode).data('select2');
                 select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
 
                 this.typeTimeout = setTimeout(() => {
@@ -392,7 +393,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
         editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
-        var inplaceButton = $('<a><b/></a>')
+        var inplaceButton = sQuery('<a><b/></a>')
             .addClass('inplace-button inplace-create')
             .attr('title', addTitle)
             .insertAfter(this.domNode).click(function (e) {
@@ -401,12 +402,12 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
         this.get_select2Container().add(this.domNode).addClass('has-inplace-button');
 
-        $(this.domNode).change(() => {
+        sQuery(this.domNode).change(() => {
             var isNew = this.isMultiple() || !this.get_value();
             inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
         });
 
-        $(this.domNode).change((e: any, valueSet: boolean) => {
+        sQuery(this.domNode).change((e: any, valueSet: boolean) => {
             if (valueSet === true)
                 return;
             if (this.isMultiple()) {
@@ -424,7 +425,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
         if (this.isMultiple()) {
             this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
-                var q = $(e3.target);
+                var q = sQuery(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
                 }
@@ -518,7 +519,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_select2Container(): JQuery {
-        return $(this.domNode).prevAll('.select2-container');
+        return sQuery(this.domNode).prevAll('.select2-container');
     }
 
     protected get_items() {
@@ -553,14 +554,14 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     get_value() {
         var val;
-        if ($(this.domNode).data('select2')) {
-            val = $(this.domNode).select2('val');
+        if (sQuery(this.domNode).data('select2')) {
+            val = sQuery(this.domNode).select2('val');
             if (val != null && Array.isArray(val)) {
                 return val.join(',');
             }
         }
         else
-            val = $(this.domNode).val();
+            val = sQuery(this.domNode).val();
 
         return val;
     }
@@ -581,7 +582,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 });
             }
 
-            var el = $(this.domNode);
+            var el = sQuery(this.domNode);
             el.select2('val', val);
             el.data('select2-change-triggered', true);
             try {
@@ -625,7 +626,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     protected get_values(): string[] {
 
-        var val = $(this.domNode).select2('val');
+        var val = sQuery(this.domNode).select2('val');
         if (val == null) {
             return [];
         }
@@ -661,7 +662,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_text(): string {
-        return ($(this.domNode).select2('data') ?? {}).text;
+        return (sQuery(this.domNode).select2('data') ?? {}).text;
     }
 
     get text(): string {
@@ -680,7 +681,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         var readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
 
-        $(this.domNode).nextAll('.inplace-create')
+        sQuery(this.domNode).nextAll('.inplace-create')
             .attr('disabled', (readOnly ? 'disabled' : ''))
             .css('opacity', (readOnly ? '0.1' : ''))
             .css('cursor', (readOnly ? 'default' : ''));
@@ -688,7 +689,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     set_readOnly(value: boolean) {
         if (value !== this.get_readOnly()) {
-            $(this.domNode).attr("readonly", value ? "readonly" : null);
+            sQuery(this.domNode).attr("readonly", value ? "readonly" : null);
             this.updateInplaceReadOnly();
         }
     }

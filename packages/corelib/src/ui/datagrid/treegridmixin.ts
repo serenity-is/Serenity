@@ -1,4 +1,5 @@
-﻿import { ListResponse, htmlEncode } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { ListResponse, htmlEncode } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { toGrouping } from "../../q";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
@@ -18,7 +19,7 @@ export class TreeGridMixin<TItem> {
         var getId = this.getId = (item: TItem) => (item as any)[idProperty];
 
         dg.element.find('.grid-container').on('click', e => {
-            if ($(e.target).hasClass('s-TreeToggle')) {
+            if (sQuery(e.target).hasClass('s-TreeToggle')) {
                 var src = dg.slickGrid.getCellFromEvent(e);
                 if (src.cell >= 0 &&
                     src.row >= 0) {

@@ -2593,7 +2593,7 @@ declare namespace Serenity {
     /** @deprecated use htmlEncode as it also encodes quotes */
     const attrEncode: typeof htmlEncode;
     /** Clears the options in the select element */
-    function clearOptions(select: ArrayLike<HTMLElement>): void;
+    function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>): void;
     /**
      * Finds the first element with the given relative id to the source element.
      * It can handle underscores in the source element id.
@@ -2620,7 +2620,7 @@ declare namespace Serenity {
     /**
      * Returns the outer HTML of the element.
      */
-    function outerHtml(element: ArrayLike<HTMLElement>): string;
+    function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
     /**
      * Appends child at first argument to given node at second argument.
      * From https://github.com/alex-kinokon/jsx-dom.
@@ -4706,8 +4706,8 @@ declare namespace Serenity {
         function dateTime(format?: string): Format;
         function checkBox(): Format;
         function number(format: string): Format;
-        function getItemType(link: JQuery): string;
-        function getItemId(link: JQuery): string;
+        function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
+        function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
         function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
         function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
     }

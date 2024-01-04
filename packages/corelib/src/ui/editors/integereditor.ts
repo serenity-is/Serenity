@@ -1,4 +1,5 @@
-﻿import { formatNumber, parseInteger } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { formatNumber, parseInteger } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend, isTrimmedEmpty } from "../../q";
@@ -18,7 +19,7 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         input.addClass('integerQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
             {
@@ -27,21 +28,21 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
                 aSep: null
             });
 
-        if (($.fn as any).autoNumeric)
+        if ((sQuery.fn as any).autoNumeric)
             (input as any).autoNumeric(numericOptions);
     }
 
     get_value(): number {
         var val: string;
-        if (($.fn as any).autoNumeric) {
-            val = ($(this.domNode) as any).autoNumeric('get') as string;
+        if ((sQuery.fn as any).autoNumeric) {
+            val = (sQuery(this.domNode) as any).autoNumeric('get') as string;
             if (isTrimmedEmpty(val))
                 return null;
             else
                 return parseInt(val, 10);
         }
         else {
-            val = ($(this.domNode).val() as string)?.trim();
+            val = (sQuery(this.domNode).val() as string)?.trim();
             if (!val)
                 return null;
             return parseInteger(val)
@@ -55,11 +56,11 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
 
     set_value(value: number) {
         if (value == null || (value as any) === '')
-            $(this.domNode).val('');
-        else if (($.fn as any).autoNumeric)
-            ($(this.domNode) as any).autoNumeric('set', value);
+            sQuery(this.domNode).val('');
+        else if ((sQuery.fn as any).autoNumeric)
+            (sQuery(this.domNode) as any).autoNumeric('set', value);
         else
-            $(this.domNode).val(formatNumber(value));
+            sQuery(this.domNode).val(formatNumber(value));
     }
 
     set value(v: number) {

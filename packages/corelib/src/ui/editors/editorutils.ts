@@ -1,4 +1,5 @@
-﻿import { PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
@@ -197,11 +198,11 @@ export namespace EditorUtils {
         var gridField = widget.element.closest('.field');
         var hasSupItem = gridField.find('sup').get().length > 0;
         if (isRequired && !hasSupItem) {
-            $('<sup>*</sup>').attr('title', localText('Controls.PropertyGrid.RequiredHint'))
+            sQuery('<sup>*</sup>').attr('title', localText('Controls.PropertyGrid.RequiredHint'))
                 .prependTo(gridField.find('.caption')[0]);
         }
         else if (!isRequired && hasSupItem) {
-            $(gridField.find('sup')[0]).remove();
+            sQuery(gridField.find('sup')[0]).remove();
         }
     }
 
@@ -214,11 +215,11 @@ export namespace EditorUtils {
 
             container.removeClass('readonly-container').find(".editor.container-readonly")
                 .removeClass('container-readonly').each((i, e) => {
-                    var w = $(e).tryGetWidget() as any;
+                    var w = sQuery(e).tryGetWidget() as any;
                     if (w != null)
                         EditorUtils.setReadOnly(w, false);
                     else
-                        EditorUtils.setReadonly($(e), false);
+                        EditorUtils.setReadonly(sQuery(e), false);
                 });
 
             return;
@@ -227,25 +228,25 @@ export namespace EditorUtils {
         container.addClass('readonly-container').find(".editor")
             .not('.container-readonly')
             .each((i, e) => {
-                var w = $(e).tryGetWidget() as any;
+                var w = sQuery(e).tryGetWidget() as any;
                 if (w != null) {
 
                     if (w['get_readOnly']) {
                         if (w['get_readOnly']())
                             return;
                     }
-                    else if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                    else if (sQuery(e).is('[readonly]') || sQuery(e).is('[disabled]') || sQuery(e).is('.readonly') || sQuery(e).is('.disabled'))
                         return;
 
-                    $(e).addClass('container-readonly');
+                    sQuery(e).addClass('container-readonly');
                     EditorUtils.setReadOnly(w, true);
 
                 }
                 else {
-                    if ($(e).is('[readonly]') || $(e).is('[disabled]') || $(e).is('.readonly') || $(e).is('.disabled'))
+                    if (sQuery(e).is('[readonly]') || sQuery(e).is('[disabled]') || sQuery(e).is('.readonly') || sQuery(e).is('.disabled'))
                         return;
 
-                    EditorUtils.setReadonly($(e).addClass('container-readonly'), true);
+                    EditorUtils.setReadonly(sQuery(e).addClass('container-readonly'), true);
                 }
             });
     }

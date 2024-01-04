@@ -1,4 +1,5 @@
-﻿import validator from "@optionaldeps/jquery.validation";
+﻿import sQuery from "@optionaldeps/squery";
+import validator from "@optionaldeps/jquery.validation";
 import { Config, DialogButton, bsModalMarkup, closePanel, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, getInstanceType, openPanel, parseInteger, positionToastContainer } from "@serenity-is/base";
 import { Decorators, FlexifyAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
@@ -62,9 +63,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     private static applyCssSizes(opt: any, dialogClass: string) {
         let size: number;
-        let dialog = $('<div/>').hide().addClass(dialogClass).appendTo(document.body);
+        let dialog = sQuery('<div/>').hide().addClass(dialogClass).appendTo(document.body);
         try {
-            var sizeHelper = $('<div/>').addClass('size').appendTo(dialog);
+            var sizeHelper = sQuery('<div/>').addClass('size').appendTo(dialog);
             size = TemplatedDialog.getCssSize(sizeHelper, 'minWidth');
             if (size != null)
                 opt.minWidth = size;
@@ -95,17 +96,17 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.validator = null;
         if (this.domNode != null &&
             this.domNode.classList.contains('ui-dialog-content')) {
-            ($(this.domNode) as any)?.dialog?.('destroy');
-            $(this.domNode).removeClass('ui-dialog-content');
+            (sQuery(this.domNode) as any)?.dialog?.('destroy');
+            sQuery(this.domNode).removeClass('ui-dialog-content');
         }
         else if (this.domNode != null &&
             this.domNode.classList.contains('modal-body')) {
-            var modal = $(this.domNode).closest('.modal').data('bs.modal', null);
-            this.domNode && $(this.domNode).removeClass('modal-body');
+            var modal = sQuery(this.domNode).closest('.modal').data('bs.modal', null);
+            this.domNode && sQuery(this.domNode).removeClass('modal-body');
             window.setTimeout(() => modal.remove(), 0);
         }
 
-        $(window).unbind('.' + this.uniqueName);
+        sQuery(window).unbind('.' + this.uniqueName);
         super.destroy();
     }
 
@@ -113,37 +114,37 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         if (this.domNode.classList.contains('ui-dialog-content'))
             return;
 
-        $(this.domNode).removeClass('hidden');
+        sQuery(this.domNode).removeClass('hidden');
 
-        ($(this.domNode) as any)?.dialog?.(this.getDialogOptions());
-        $(this.domNode).closest('.ui-dialog').on('resize', e => this.arrange());
+        (sQuery(this.domNode) as any)?.dialog?.(this.getDialogOptions());
+        sQuery(this.domNode).closest('.ui-dialog').on('resize', e => this.arrange());
 
         let type = getInstanceType(this);
 
         if (this.isResponsive) {
-            DialogExtensions.dialogResizable($(this.domNode));
+            DialogExtensions.dialogResizable(sQuery(this.domNode));
 
-            $(window).bind('resize.' + this.uniqueName, e => {
-                if (this.domNode && $(this.domNode).is(':visible')) {
+            sQuery(window).bind('resize.' + this.uniqueName, e => {
+                if (this.domNode && sQuery(this.domNode).is(':visible')) {
                     this.handleResponsive();
                 }
             });
 
-            $(this.domNode).closest('.ui-dialog').addClass('flex-layout');
+            sQuery(this.domNode).closest('.ui-dialog').addClass('flex-layout');
         }
         else if (DialogExtensions["dialogFlexify"] &&
             getAttributes(type, FlexifyAttribute, true).length > 0) {
-            DialogExtensions["dialogFlexify"]($(this.domNode));
-            DialogExtensions.dialogResizable($(this.domNode));
+            DialogExtensions["dialogFlexify"](sQuery(this.domNode));
+            DialogExtensions.dialogResizable(sQuery(this.domNode));
         }
 
         if (getAttributes(type, MaximizableAttribute, true).length > 0) {
-            DialogExtensions.dialogMaximizable($(this.domNode));
+            DialogExtensions.dialogMaximizable(sQuery(this.domNode));
         }
 
         var self = this;
-        $(this.domNode).on('dialogopen.' + this.uniqueName, () => {
-            $(document.body).addClass('modal-dialog-open');
+        sQuery(this.domNode).on('dialogopen.' + this.uniqueName, () => {
+            sQuery(document.body).addClass('modal-dialog-open');
 
             if (this.isResponsive) {
                 this.handleResponsive();
@@ -152,8 +153,8 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             self.onDialogOpen();
         });
 
-        $(this.domNode).on('dialogclose.' + this.uniqueName, () => {
-            $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
+        sQuery(this.domNode).on('dialogclose.' + this.uniqueName, () => {
+            sQuery(document.body).toggleClass('modal-dialog-open', sQuery('.ui-dialog:visible').length > 0);
             self.onDialogClose();
         });
     }
@@ -171,7 +172,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         if (this.domNode.classList.contains('modal-body'))
             return;
 
-        var title = $(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
+        var title = sQuery(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
         var opt = this.getModalOptions();
         (opt as any)["show"] = false;
         var modalClass = "s-Modal";
@@ -180,14 +181,14 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             modalClass += ' ' + opt.modalClass;
 
         var div = bsModalMarkup(title, '', modalClass);
-        var modal = $(div).appendTo(document.body).addClass('flex-layout');
+        var modal = sQuery(div).appendTo(document.body).addClass('flex-layout');
         modal.one('shown.bs.modal.' + this.uniqueName, () => {
-            $(this.domNode).triggerHandler('shown.bs.modal');
+            sQuery(this.domNode).triggerHandler('shown.bs.modal');
             this.onDialogOpen();
         });
 
         modal.one('hidden.bs.modal.' + this.uniqueName, () => {
-            $(document.body).toggleClass('modal-open', $('.modal.show').length + $('.modal.in').length > 0);
+            sQuery(document.body).toggleClass('modal-open', sQuery('.modal.show').length + sQuery('.modal.in').length > 0);
             this.onDialogClose();
         });
         if (opt.size)
@@ -197,15 +198,15 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         var buttons = this.getDialogButtons();
         if (buttons != null) {
             for (var x of buttons) {
-                $(dialogButtonToBS(x)).appendTo(footer).click(x.click as any);
+                sQuery(dialogButtonToBS(x)).appendTo(footer).click(x.click as any);
             }
         }
         else
             footer.hide();
 
         (modal as any).modal(opt);
-        modal.find('.modal-body').replaceWith($(this.domNode).removeClass('hidden').addClass('modal-body'));
-        $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
+        modal.find('.modal-body').replaceWith(sQuery(this.domNode).removeClass('hidden').addClass('modal-body'));
+        sQuery(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
     }
 
     protected initToolbar(): void {
@@ -214,11 +215,11 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             return;
         }
 
-        var hotkeyContext = $(this.domNode).closest('.ui-dialog');
+        var hotkeyContext = sQuery(this.domNode).closest('.ui-dialog');
         if (hotkeyContext.length === 0) {
-            hotkeyContext = $(this.domNode).closest('.modal');
+            hotkeyContext = sQuery(this.domNode).closest('.modal');
             if (hotkeyContext.length == 0)
-                hotkeyContext = $(this.domNode);
+                hotkeyContext = sQuery(this.domNode);
         }
 
         this.toolbar = new Toolbar({ element:toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
@@ -253,10 +254,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         if (asPanel) {
             if (!this.domNode.classList.contains('s-Panel')) {
                 // so that panel title is created if needed
-                $(this.domNode).on('panelopen.' + this.uniqueName, () => {
+                sQuery(this.domNode).on('panelopen.' + this.uniqueName, () => {
                     this.onDialogOpen();
                 });
-                $(this.domNode).on('panelclose.' + this.uniqueName, () => {
+                sQuery(this.domNode).on('panelclose.' + this.uniqueName, () => {
                     this.onDialogClose();
                 });
             }
@@ -266,16 +267,16 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         }
         else if (this.useBSModal()) {
             this.initModal();
-            ($(this.domNode).closest('.modal') as any).modal('show');
+            (sQuery(this.domNode).closest('.modal') as any).modal('show');
         }
         else {
             this.initDialog();
-            ($(this.domNode) as any).dialog?.('open');
+            (sQuery(this.domNode) as any).dialog?.('open');
         }
     }
 
     private useBSModal() {
-        return !!((!($ as any).ui || !($ as any).ui?.dialog) || TemplatedDialog.bootstrapModal);
+        return !!((!(sQuery as any).ui || !(sQuery as any).ui?.dialog) || TemplatedDialog.bootstrapModal);
     }
 
     public static bootstrapModal: boolean;
@@ -290,29 +291,29 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected onDialogOpen(): void {
         if (!isMobileView())
-            $(':input', this.domNode).not('button').eq(0).focus();
+            sQuery(':input', this.domNode).not('button').eq(0).focus();
         this.arrange();
         this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
     }
 
     public arrange(): void {
-        $(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
-            $(e).triggerHandler('layout');
+        sQuery(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
+            sQuery(e).triggerHandler('layout');
         });
     }
 
     protected onDialogClose() {
-        $(document).trigger('click');
+        sQuery(document).trigger('click');
 
         // for tooltips etc.
-        if (($ as any).qtip) {
-            $(document.body).children('.qtip').each(function (index, el) {
-                ($(el) as any).qtip('hide');
+        if ((sQuery as any).qtip) {
+            sQuery(document.body).children('.qtip').each(function (index, el) {
+                (sQuery(el) as any).qtip('hide');
             });
         }
 
         window.setTimeout(() => {
-            var element = $(this.domNode);
+            var element = sQuery(this.domNode);
             this.destroy();
             element.remove();
             positionToastContainer(defaultNotifyOptions, false);
@@ -345,8 +346,8 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         let type = getInstanceType(this);
         opt.resizable = getAttributes(type, ResizableAttribute, true).length > 0;
         opt.modal = true;
-        opt.position = { my: 'center', at: 'center', of: $(window.window) };
-        opt.title = $(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
+        opt.position = { my: 'center', at: 'center', of: sQuery(window.window) };
+        opt.title = sQuery(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
         return opt;
     }
 
@@ -356,9 +357,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public dialogClose(): void {
         if (this.domNode.classList.contains('ui-dialog-content'))
-            ($(this.domNode) as any).dialog?.().dialog?.('close');
+            (sQuery(this.domNode) as any).dialog?.().dialog?.('close');
         else if (this.domNode.classList.contains('modal-body'))
-            ($(this.domNode).closest('.modal') as any).modal('hide');
+            (sQuery(this.domNode).closest('.modal') as any).modal('hide');
         else if (this.domNode.classList.contains('s-Panel') && !this.domNode.classList.contains('hidden')) {
             TemplatedDialog.closePanel(this.domNode);
         }
@@ -366,30 +367,30 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public get dialogTitle(): string {
         if (this.domNode.classList.contains('ui-dialog-content'))
-            return ($(this.domNode) as any).dialog?.('option', 'title');
+            return (sQuery(this.domNode) as any).dialog?.('option', 'title');
         else if (this.domNode.classList.contains('modal-body'))
-            return $(this.domNode).closest('.modal').find('.modal-header').children('h5').text();
+            return sQuery(this.domNode).closest('.modal').find('.modal-header').children('h5').text();
 
-        return $(this.domNode).data('dialogtitle');
+        return sQuery(this.domNode).data('dialogtitle');
     }
 
     private setupPanelTitle() {
         var value = this.dialogTitle ?? this.getDialogTitle();
-        var pt = $(this.domNode).children('.panel-titlebar');
+        var pt = sQuery(this.domNode).children('.panel-titlebar');
 
         if (!value) {
             pt.remove();
         }
         else {
-            if (!$(this.domNode).children('.panel-titlebar').length) {
-                pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
+            if (!sQuery(this.domNode).children('.panel-titlebar').length) {
+                pt = sQuery("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
                     .prependTo(this.domNode);
             }
             pt.children('.panel-titlebar-text').text(value);
 
             if (this.domNode.classList.contains('s-Panel')) {
                 if (!pt.children('.panel-titlebar-close').length) {
-                    $('<button class="panel-titlebar-close">&nbsp;</button>')
+                    sQuery('<button class="panel-titlebar-close">&nbsp;</button>')
                         .prependTo(pt)
                         .click(e => {
                             TemplatedDialog.closePanel(this.domNode, e as any);
@@ -401,12 +402,12 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public set dialogTitle(value: string) {
         var oldTitle = this.dialogTitle;
-        $(this.domNode).data('dialogtitle', value);
+        sQuery(this.domNode).data('dialogtitle', value);
 
         if (this.domNode.classList.contains('ui-dialog-content'))
-            ($(this.domNode) as any).dialog?.('option', 'title', value);
+            (sQuery(this.domNode) as any).dialog?.('option', 'title', value);
         else if (this.domNode.classList.contains('modal-body')) {
-            $(this.domNode).closest('.modal').find('.modal-header').children('h5').text(value ?? '');
+            sQuery(this.domNode).closest('.modal').find('.modal-header').children('h5').text(value ?? '');
         }
         else if (this.domNode.classList.contains('s-Panel')) {
             if (oldTitle != this.dialogTitle) {
@@ -431,10 +432,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected handleResponsive(): void {
-        var dlg = ($(this.domNode) as any)?.dialog();
-        var uiDialog = $(this.domNode).closest('.ui-dialog');
+        var dlg = (sQuery(this.domNode) as any)?.dialog();
+        var uiDialog = sQuery(this.domNode).closest('.ui-dialog');
         if (isMobileView()) {
-            var data = $(this.domNode).data('responsiveData');
+            var data = sQuery(this.domNode).data('responsiveData');
             if (!data) {
                 data = {};
                 data.draggable = dlg.dialog('option', 'draggable');
@@ -445,25 +446,25 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                 data.top = pos.top;
                 data.width = uiDialog.width();
                 data.height = uiDialog.height();
-                data.contentHeight = $(this.domNode).height();
-                $(this.domNode).data('responsiveData', data);
+                data.contentHeight = sQuery(this.domNode).height();
+                sQuery(this.domNode).data('responsiveData', data);
                 dlg.dialog('option', 'draggable', false);
                 dlg.dialog('option', 'resizable', false);
             }
             uiDialog.addClass('mobile-layout');
-            uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
-            $(document.body).scrollTop(0);
+            uiDialog.css({ left: '0px', top: '0px', width: sQuery(window).width() + 'px', height: sQuery(window).height() + 'px', position: 'fixed' });
+            sQuery(document.body).scrollTop(0);
             layoutFillHeight(this.domNode);
         }
         else {
-            var d = $(this.domNode).data('responsiveData');
+            var d = sQuery(this.domNode).data('responsiveData');
             if (d) {
                 dlg.dialog('option', 'draggable', d.draggable);
                 dlg.dialog('option', 'resizable', d.resizable);
-                $(this.domNode).closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
-                $(this.domNode).height(d.contentHeight);
+                sQuery(this.domNode).closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
+                sQuery(this.domNode).height(d.contentHeight);
                 uiDialog.removeClass('mobile-layout');
-                $(this.domNode).removeData('responsiveData');
+                sQuery(this.domNode).removeData('responsiveData');
             }
         }
     }

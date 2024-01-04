@@ -1,13 +1,13 @@
 import { toggleClass } from "@serenity-is/base";
 import jQuery from "@optionaldeps/jquery";
 
-class sQueryInstance extends Array<HTMLElement> {
+class sQ extends Array<HTMLElement> {
 
     jquery: "squery";
     isMock: true;
 
     eq(i: number) {
-        return sQuery(this[i]);
+        return SQ(this[i]);
     }
 
     get(i: number) {
@@ -15,11 +15,11 @@ class sQueryInstance extends Array<HTMLElement> {
     }
 
     ready(cb: () => void) {
-        sQuery.ready(cb);
+        SQ.ready(cb);
     }
 
     first() {
-        return sQuery([this[0]]);
+        return SQ([this[0]]);
     }
 
     addClass(className: string) {
@@ -64,7 +64,7 @@ class sQueryInstance extends Array<HTMLElement> {
         this.forEach(el => {
             if (typeof content === "string") {
                 el.insertAdjacentHTML(place, content);
-            } else if (content instanceof sQueryInstance) {
+            } else if (content instanceof sQ) {
                 func.apply(el, content);
             } else if (content instanceof Node) {
                 func.call(el, content);
@@ -166,7 +166,7 @@ class sQueryInstance extends Array<HTMLElement> {
     find(a: any): any {
         const nodes: Element[] = [];
         this.forEach(el => { nodes.push(...Array.from(el.querySelectorAll(a))) });
-        return sQuery([...Array.from(new Set(nodes))]) as sQueryInstance;
+        return SQ([...Array.from(new Set(nodes))]) as sQ;
     }
 
     on(eventName: string, ...args: any[]) {
@@ -195,13 +195,13 @@ class sQueryInstance extends Array<HTMLElement> {
         Array.prototype.forEach.call(this, (el: HTMLElement) => {
             items = items.concat(Array.from(el.children) as HTMLElement[]);
         });
-        return sQueryInstance.from(Array.from(new Set(items)));
+        return sQ.from(Array.from(new Set(items)));
     }
 
     parent() {
         var items = Array.prototype.map.call(this, (el: HTMLElement) => el.parentNode as HTMLElement);
         items = Array.prototype.filter.call(items, (x: any) => x != null);
-        return sQueryInstance.from(Array.from(new Set(items)));
+        return sQ.from(Array.from(new Set(items)));
     }
 
     siblings() {
@@ -211,7 +211,7 @@ class sQueryInstance extends Array<HTMLElement> {
             nodes.push(...Array.prototype.filter.call((el.parentNode as HTMLElement).children, (child: any) => child !== el));
         });
 
-        return sQuery(nodes);
+        return SQ(nodes);
     }
 
     parents(selector: any) {
@@ -227,25 +227,25 @@ class sQueryInstance extends Array<HTMLElement> {
             }
         });
 
-        return sQuery([...Array.from(new Set(nodes))]);
+        return SQ([...Array.from(new Set(nodes))]);
     }
 
     not(a: any): any {
         if (typeof a === 'string') {
-            return sQuery(Array.prototype.filter.call(this, (el: any) => !el.matches(a)));
+            return SQ(Array.prototype.filter.call(this, (el: any) => !el.matches(a)));
         } else if (typeof a === 'function') {
-            return sQuery(Array.prototype.filter.call(this, (el: any) => !a(el)));
+            return SQ(Array.prototype.filter.call(this, (el: any) => !a(el)));
         } else
-            return sQuery(Array.prototype.filter.call(this, (el: any) => el !== a));
+            return SQ(Array.prototype.filter.call(this, (el: any) => el !== a));
     }
 
     filter(a: any): any {
         if (typeof a === 'string') {
-            return sQuery(Array.prototype.filter.call(this, (el: any) => el.matches(a)));
+            return SQ(Array.prototype.filter.call(this, (el: any) => el.matches(a)));
         } else if (typeof a === 'function') {
-            return sQuery(Array.prototype.filter.call(this, a));
+            return SQ(Array.prototype.filter.call(this, a));
         } else
-            return sQuery(Array.prototype.filter.call(this, (el: any) => el === a));
+            return SQ(Array.prototype.filter.call(this, (el: any) => el === a));
     }
 
     serialize(): any {
@@ -275,7 +275,7 @@ class sQueryInstance extends Array<HTMLElement> {
     }
 }
 
-const sQuery: any = function (a: any) {
+const SQ: any = function (a: any) {
     let nodes: HTMLElement[] = [];
 
     if (typeof a === 'string') {
@@ -302,15 +302,15 @@ const sQuery: any = function (a: any) {
         return null;
     }
 
-    var $ = sQueryInstance.from(nodes);
+    var $ = sQ.from(nodes);
     return $;
 };
 
-sQuery.ajaxSetup = function (options: any) {
+SQ.ajaxSetup = function (options: any) {
     this.ajaxOptions = Object.assign({ headers: {} }, options);
 };
 
-sQuery.ajax = function (params: any) {
+SQ.ajax = function (params: any) {
     params = Object.assign({ method: 'get', dataType: 'html' }, params);
     const headers = Object.assign({}, this.ajaxOptions.headers);
     const isJson = params.dataType.toLowerCase() === 'json';
@@ -360,7 +360,7 @@ sQuery.ajax = function (params: any) {
     });
 } as any;
 
-sQuery.debounce = function (callback: any, wait: any) {
+SQ.debounce = function (callback: any, wait: any) {
     let timeout: number;
 
     return function () {
@@ -370,7 +370,7 @@ sQuery.debounce = function (callback: any, wait: any) {
     }
 } as any;
 
-sQuery.throttle = function (callback: any, limit: number) {
+SQ.throttle = function (callback: any, limit: number) {
     let inThrottle = false;
 
     return function () {
@@ -382,9 +382,9 @@ sQuery.throttle = function (callback: any, limit: number) {
     }
 };
 
-sQuery.fn = sQueryInstance.prototype;
+SQ.fn = sQ.prototype;
 
-sQuery.isMock = true;
+SQ.isMock = true;
 
 declare global {
     interface JQueryStatic {
@@ -392,4 +392,4 @@ declare global {
     }
 }
 
-export default (jQuery || sQuery as unknown as JQueryStatic);
+export default (jQuery || SQ as unknown as JQueryStatic);

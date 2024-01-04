@@ -1,24 +1,25 @@
-﻿import { Widget } from "./widget";
+﻿import sQuery from "@optionaldeps/squery";
+import { Widget } from "./widget";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 
-if (typeof $ !== "undefined" && $.fn) {
-    $.fn.flexHeightOnly = function (flexY: number = 1) {
+if (sQuery.fn) {
+    sQuery.fn.flexHeightOnly = function (flexY: number = 1) {
         return this.flexWidthHeight(0, flexY);
     }
 
-    $.fn.flexWidthOnly = function (flexX: number = 1) {
+    sQuery.fn.flexWidthOnly = function (flexX: number = 1) {
         return this.flexWidthHeight(flexX, 0);
     }
 
-    $.fn.flexWidthHeight = function (flexX: number = 1, flexY: number = 1) {
+    sQuery.fn.flexWidthHeight = function (flexX: number = 1, flexY: number = 1) {
         return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
     }
 
-    $.fn.flexX = function (flexX: number): JQuery {
+    sQuery.fn.flexX = function (flexX: number): JQuery {
         return this.data('flex-x', flexX);
     }
 
-    $.fn.flexY = function (flexY: number): JQuery {
+    sQuery.fn.flexY = function (flexY: number): JQuery {
         return this.data('flex-y', flexY);
     }
 }
@@ -35,29 +36,29 @@ export class Flexify extends Widget<FlexifyOptions> {
     }
 
     storeInitialSize() {
-        if (!!$(this.domNode).data('flexify-init')) {
+        if (!!sQuery(this.domNode).data('flexify-init')) {
             return;
         }
 
         var designWidth = this.options.designWidth;
         if (designWidth == null)
-            designWidth = $(this.domNode).width();
-        $(this.domNode).data('flexify-width', designWidth);
+            designWidth = sQuery(this.domNode).width();
+        sQuery(this.domNode).data('flexify-width', designWidth);
 
         var designHeight = this.options.designHeight;
         if (designHeight == null)
-            designHeight = $(this.domNode).height();
-        $(this.domNode).data('flexify-height', designHeight);
+            designHeight = sQuery(this.domNode).height();
+        sQuery(this.domNode).data('flexify-height', designHeight);
 
-        $(this.domNode).data('flexify-init', true);
+        sQuery(this.domNode).data('flexify-init', true);
 
-        $(this.domNode).on('resize.' + this.uniqueName, () =>
+        sQuery(this.domNode).on('resize.' + this.uniqueName, () =>
             this.resizeElements());
 
-        $(this.domNode).on('resizestop.' + this.uniqueName, () =>
+        sQuery(this.domNode).on('resizestop.' + this.uniqueName, () =>
             this.resizeElements());
         
-        var tabs = $(this.domNode).find('.ui-tabs');
+        var tabs = sQuery(this.domNode).find('.ui-tabs');
         if (tabs.length > 0) {
             tabs.on('tabsactivate.' + this.uniqueName, () =>
                 this.resizeElements());
@@ -91,25 +92,25 @@ export class Flexify extends Widget<FlexifyOptions> {
     }
 
     private resizeElements(): void {
-        var width = $(this.domNode).width();
-        var initialWidth = $(this.domNode).data('flexify-width');
+        var width = sQuery(this.domNode).width();
+        var initialWidth = sQuery(this.domNode).data('flexify-width');
         if (initialWidth == null) {
-            $(this.domNode).data('flexify-width', width);
+            sQuery(this.domNode).data('flexify-width', width);
             initialWidth = width;
         }
 
-        var height = $(this.domNode).height();
-        var initialHeight = $(this.domNode).data('flexify-height');
+        var height = sQuery(this.domNode).height();
+        var initialHeight = sQuery(this.domNode).data('flexify-height');
         if (initialHeight == null) {
-            $(this.domNode).data('flexify-height', height);
+            sQuery(this.domNode).data('flexify-height', height);
             initialHeight = height;
         }
 
         this.xDifference = width - initialWidth;
         this.yDifference = height - initialHeight;
 
-        var containers = $(this.domNode);
-        var tabPanels = $(this.domNode).find('.ui-tabs-panel');
+        var containers = sQuery(this.domNode);
+        var tabPanels = sQuery(this.domNode).find('.ui-tabs-panel');
 
         if (tabPanels.length > 0) {
             containers = tabPanels.filter(':visible');
@@ -118,7 +119,7 @@ export class Flexify extends Widget<FlexifyOptions> {
         containers.find('.flexify')
             .add(tabPanels.filter('.flexify:visible'))
             .each((i, e) => {
-                this.resizeElement($(e as any));
+                this.resizeElement(sQuery(e as any));
             });
     }
 

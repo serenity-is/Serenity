@@ -1,4 +1,5 @@
-﻿import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
@@ -115,7 +116,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected createSlickGrid(): Grid {
-        $(this.domNode).addClass('slick-no-cell-border').addClass('slick-no-odd-even');
+        sQuery(this.domNode).addClass('slick-no-cell-border').addClass('slick-no-odd-even');
         var result = super.createSlickGrid();
         this.domNode.classList.add("slick-hide-header'")
         result.resizeCanvas();
@@ -176,7 +177,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             return;
         }
 
-        var target = $(e.target);
+        var target = sQuery(e.target);
         if (target.hasClass('check-box')) {
             e.preventDefault();
 
@@ -201,7 +202,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 this.view.endUpdate();
             }
             if (anyChanged) {
-                $(this.domNode).triggerHandler('change');
+                sQuery(this.domNode).triggerHandler('change');
             }
         }
     }

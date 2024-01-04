@@ -1,4 +1,5 @@
-﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
 import { getAttributes, getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
@@ -38,7 +39,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
         if (this.domNode.closest('.ui-panel')?.classList?.contains?.('s-Flexify')) {
-            $(this.propertyGrid.domNode).children('.categories').flexHeightOnly(1);
+            sQuery(this.propertyGrid.domNode).children('.categories').flexHeightOnly(1);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿import { Decorators } from "../../decorators";
+﻿import sQuery from "@optionaldeps/squery";
+import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorProps } from "../widgets/widget";
 import { StringEditor } from "./stringeditor";
@@ -9,7 +10,7 @@ export class URLEditor<P = {}> extends StringEditor<P> {
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = $(this.domNode);
+        let input = sQuery(this.domNode);
         input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
         input.on("blur." + this.uniqueName, e => {

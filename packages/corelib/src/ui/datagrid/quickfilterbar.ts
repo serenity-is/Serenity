@@ -23,7 +23,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        $(this.domNode).addClass('quick-filters-bar').addClass('clear');
+        sQuery(this.domNode).addClass('quick-filters-bar').addClass('clear');
 
         var filters = this.options.filters;
         for (var f = 0; f < filters.length; f++) {
@@ -35,7 +35,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public addSeparator(): void {
-        $(this.domNode).append($('<hr/>'));
+        sQuery(this.domNode).append(sQuery('<hr/>'));
     }
 
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
@@ -48,7 +48,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        var item = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
+        var item = sQuery("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
             .appendTo(this.domNode)
             .data('qffield', opt.field).children();
 
@@ -150,11 +150,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             type: DateEditor,
             title: title,
             element: function (el) {
-                end = new DateEditor({ element: el2 => $(el2).insertAfter(el) });
+                end = new DateEditor({ element: el2 => sQuery(el2).insertAfter(el) });
                 end.element.change(function (x) {
                     el.triggerHandler('change');
                 });
-                $('<span/>').addClass('range-separator').text('-').insertAfter(el);
+                sQuery('<span/>').addClass('range-separator').text('-').insertAfter(el);
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
@@ -231,14 +231,14 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             title: title,
             element: function (el) {
                 end = new DateTimeEditor({
-                    element: el2 => $(el2).insertAfter(el),
+                    element: el2 => sQuery(el2).insertAfter(el),
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
                 end.element.change(function (x) {
                     el.triggerHandler('change');
                 });
 
-                $('<span/>').addClass('range-separator').text('-').insertAfter(el);
+                sQuery('<span/>').addClass('range-separator').text('-').insertAfter(el);
             },
             init: function (i) {
                 i.element.parent().find('.time').change(function (x1) {
@@ -366,11 +366,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public find<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        return $('#' + this.options.idPrefix + field).getWidget(type);
+        return sQuery('#' + this.options.idPrefix + field).getWidget(type);
     }
 
     public tryFind<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        var el = $('#' + this.options.idPrefix + field);
+        var el = sQuery('#' + this.options.idPrefix + field);
         if (!el.length)
             return null;
 

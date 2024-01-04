@@ -1,4 +1,5 @@
-﻿import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
 import { ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
@@ -87,7 +88,7 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
         }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if ($(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
+        if (sQuery(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }
     }

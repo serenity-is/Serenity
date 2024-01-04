@@ -1,4 +1,5 @@
-﻿import { Invariant, formatDate, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import sQuery from "@optionaldeps/squery";
+import { Invariant, formatDate, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as datePickerIconSvg_, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
@@ -23,13 +24,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
 
-        var input = $(this.domNode);
+        var input = sQuery(this.domNode);
         // @ts-ignore
-        if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker)) {
+        if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !sQuery.fn.datepicker)) {
             // @ts-ignore
             flatpickr(input[0], DateEditor.flatPickrOptions(input));
         }
-        else if (($.fn as any)?.datepicker) {
+        else if ((sQuery.fn as any)?.datepicker) {
             (input as any).datepicker({
                 showOn: 'button',
                 beforeShow: (inp: any, inst: any) => {
@@ -50,7 +51,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             if (e.which === 32 && !this.get_readOnly()) {
                 if (this.get_valueAsDate() != today()) {
                     this.set_valueAsDate(today());
-                    $(this.domNode).trigger('change');
+                    sQuery(this.domNode).trigger('change');
                 }
             }
             else {
@@ -81,7 +82,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }
 
     get_value(): string {
-        var value = ($(this.domNode).val() as string)?.trim();
+        var value = (sQuery(this.domNode).val() as string)?.trim();
         if (!value) {
             return null;
         }
@@ -95,13 +96,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     set_value(value: string) {
         if (value == null) {
-            $(this.domNode).val('');
+            sQuery(this.domNode).val('');
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            $(this.domNode).val(formatDate(today(), this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
+            sQuery(this.domNode).val(formatDate(today(), this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
         }
         else {
-            $(this.domNode).val(formatDate(value, this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
+            sQuery(this.domNode).val(formatDate(value, this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
         }
     }
 
@@ -140,12 +141,12 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                $(this.domNode).addClass('readonly').attr('readonly', 'readonly');
-                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
+                sQuery(this.domNode).addClass('readonly').attr('readonly', 'readonly');
+                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
             }
             else {
-                $(this.domNode).removeClass('readonly').removeAttr('readonly');
-                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
+                sQuery(this.domNode).removeClass('readonly').removeAttr('readonly');
+                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
             }
         }
     }
@@ -223,15 +224,15 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     public static flatPickrTrigger(input: JQuery): JQuery {
         if (!input.length)
             return;
-        return $(flatPickrTrigger(input[0] as HTMLInputElement)).insertAfter(input);
+        return sQuery(flatPickrTrigger(input[0] as HTMLInputElement)).insertAfter(input);
     }
 
     public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
         let input = isArrayLike(el) ? el[0] : el;
         if (!input)
             return;
-        jQueryDatepickerZIndexWorkaround(input as HTMLInputElement, $);
+        jQueryDatepickerZIndexWorkaround(input as HTMLInputElement, sQuery);
     }
 }
 
-typeof $ !== "undefined" && $.fn && !jQueryDatepickerInitialization($) && $(jQueryDatepickerInitialization);
+typeof sQuery !== "undefined" && sQuery.fn && !jQueryDatepickerInitialization(sQuery) && sQuery(jQueryDatepickerInitialization);

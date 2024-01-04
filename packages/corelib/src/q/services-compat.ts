@@ -1,18 +1,10 @@
-﻿import { Config, ListRequest, ServiceResponse, alertDialog, blockUI, blockUndo, iframeDialog, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
+﻿import jQuery from "@optionaldeps/jquery";
+import sQuery from "@optionaldeps/squery";
+import { Config, ListRequest, ServiceResponse, alertDialog, blockUI, blockUndo, iframeDialog, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
 import { ErrorHandling } from "./errorhandling";
 import { extend } from "./system-compat";
 
-export function getCookie(name: string) {
-    if (($ as any).cookie)
-        return ($ as any).cookie(name);
-
-    name += '=';
-    for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
-        if (!ca[i].indexOf(name))
-            return ca[i].replace(name, '');
-}
-
-typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
+typeof jQuery !== 'undefined' && jQuery.ajaxSetup && jQuery.ajaxSetup({
     beforeSend: function (xhr, opt) {
         if (!opt || !opt.crossDomain) {
             var token = getCookie('CSRF-TOKEN');
@@ -21,6 +13,16 @@ typeof $ != 'undefined' && $.ajaxSetup && $.ajaxSetup({
         }
     }
 });
+
+export function getCookie(name: string) {
+    if ((jQuery as any).cookie)
+        return (jQuery as any).cookie(name);
+
+    name += '=';
+    for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
+        if (!ca[i].indexOf(name))
+            return ca[i].replace(name, '');
+}
 
 export interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
     request?: any;
@@ -87,7 +89,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
                 }
                 if ((xhr.getResponseHeader('content-type') || '')
                     .toLowerCase().indexOf('application/json') >= 0) {
-                    var json = $.parseJSON(xhr.responseText);
+                    var json = JSON.parse(xhr.responseText);
                     if (json && json.Error) {
                         handleError(json);
                         return;
@@ -117,7 +119,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
     }, options);
 
     options.blockUI && blockUI(null);
-    return $.ajax(options);
+    return sQuery.ajax(options);
 }
 
 export function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any,
@@ -166,48 +168,48 @@ export function parseQueryString(s?: string): {} {
 }
 
 export function postToService(options: PostToServiceOptions) {
-    let form = $('<form/>')
+    let form = sQuery('<form/>')
         .attr('method', 'POST')
         .attr('action', options.url ? (resolveUrl(options.url)) : resolveServiceUrl(options.service))
         .appendTo(document.body);
     if (options.target)
         form.attr('target', options.target);
-    let div = $('<div/>').appendTo(form);
-    $('<input/>').attr('type', 'hidden').attr('name', 'request')
-        .val($['toJSON'](options.request))
+    let div = sQuery('<div/>').appendTo(form);
+    sQuery('<input/>').attr('type', 'hidden').attr('name', 'request')
+        .val(jQuery['toJSON'](options.request))
         .appendTo(div);
     var csrfToken = getCookie('CSRF-TOKEN');
     if (csrfToken) {
-        $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+        sQuery('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
             .appendTo(div).val(csrfToken);
     }
-    $('<input/>').attr('type', 'submit')
+    sQuery('<input/>').attr('type', 'submit')
         .appendTo(div);
     form.submit();
     window.setTimeout(function () { form.remove(); }, 0);
 }
 
 export function postToUrl(options: PostToUrlOptions) {
-    let form = $('<form/>')
+    let form = sQuery('<form/>')
         .attr('method', 'POST')
         .attr('action', resolveUrl(options.url))
         .appendTo(document.body);
     if (options.target)
         form.attr('target', options.target);
-    let div = $('<div/>').appendTo(form);
+    let div = sQuery('<div/>').appendTo(form);
     if (options.params != null) {
         for (let k in options.params) {
-            $('<input/>').attr('type', 'hidden').attr('name', k)
+            sQuery('<input/>').attr('type', 'hidden').attr('name', k)
                 .val(options.params[k])
                 .appendTo(div);
         }
     }
     var csrfToken = getCookie('CSRF-TOKEN');
     if (csrfToken) {
-        $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+        sQuery('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
             .appendTo(div).val(csrfToken);
     }
-    $('<input/>').attr('type', 'submit')
+    sQuery('<input/>').attr('type', 'submit')
         .appendTo(div);
     form.submit();
     window.setTimeout(function () { form.remove(); }, 0);
