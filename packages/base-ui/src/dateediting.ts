@@ -19,7 +19,7 @@ export function dateInputChangeHandler(e: Event) {
     if (val.length >= 5) {
         var d = parseDate(val);
         if (d && !isNaN(d.valueOf()))
-            input.value = formatDate(d, null);
+            input.value = formatDate(d, null) ?? '';
     }
 }
 
@@ -109,7 +109,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
                 return;
             }
         }
-        input.value = val;
+        input.value = val ?? '';
     }
 
     if (!(val.length < 6 && (e.which >= 48 && e.which <= 57 || e.which >= 96 && e.which <= 105) &&
