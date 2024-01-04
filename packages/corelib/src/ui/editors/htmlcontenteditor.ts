@@ -89,6 +89,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             customConfig: '',
             language: this.getLanguage(),
             bodyClass: 's-HtmlContentBody',
+            versionCheck: false,
             on: {
                 instanceReady: (x: any) => this.instanceReady(x),
                 change: (x1: any) => {
