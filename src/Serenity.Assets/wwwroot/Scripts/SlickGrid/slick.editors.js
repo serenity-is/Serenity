@@ -51,7 +51,7 @@ Slick._ = (() => {
       return this._input.value;
     }
     setValue(val) {
-      this._input.value = val;
+      this._input.value = val != null ? val : "";
     }
     loadValue(item) {
       var _a;

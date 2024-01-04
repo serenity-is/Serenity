@@ -661,12 +661,12 @@ export namespace SlickFormatting {
 
     export function itemLinkText(itemType: string, id: any, text: any,
         extraClass: string, encode: boolean): string {
-        return '<a' + (id != null ? (' href="#' + replaceAll(itemType, '.', '-') +
-            '/' + id + '"') : '') + ' data-item-type="' +
+        return '<a' + (id != null ? (' href="#' + htmlEncode(replaceAll(itemType, '.', '-')) +
+            '/' + htmlEncode(id) + '"') : '') + ' data-item-type="' +
             htmlEncode(itemType) + '"' + ' data-item-id="' +
             htmlEncode(id) + '"' + ' class="s-EditLink s-' +
-            replaceAll(itemType, '.', '-') + 'Link' +
-            (!extraClass ? '' : (' ' + extraClass)) + '">' +
+            htmlEncode(replaceAll(itemType, '.', '-')) + 'Link' +
+            (!extraClass ? '' : (' ' + htmlEncode(extraClass))) + '">' +
             (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
     }
 
