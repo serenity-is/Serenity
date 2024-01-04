@@ -295,6 +295,10 @@ export class Widget<P = {}> {
         else
             asyncMethod.call(this).then(then.bind(this));
     }
+
+    protected useIdPrefix(): IdPrefixType {
+        return useIdPrefix(this.idPrefix);
+    }
 }
 
 function ensureParentOrFragment(node: HTMLElement): HTMLElement {
@@ -336,6 +340,22 @@ export class EditorWidget<P> extends Widget<EditorProps<P>> {
         super(props);
     }
 }
+
+
+type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
+
+export function useIdPrefix(prefix: string): IdPrefixType {
+    return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
+}
+
+const idPrefixHandler = {
+    get(target: any, p: string) {
+        if (p.startsWith('#'))
+            return '#' + target._ + p.substring(1);
+
+        return target._ + p;
+    }
+};
 
 jQueryPatch(sQuery, Widget);
 reactPatch();

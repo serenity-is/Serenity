@@ -2695,10 +2695,19 @@ declare namespace Serenity {
         protected renderContents(): any | void;
         get props(): WidgetProps<P>;
         protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
+        protected useIdPrefix(): IdPrefixType;
     }
     class EditorWidget<P> extends Widget<EditorProps<P>> {
         constructor(props: EditorProps<P>);
     }
+    type IdPrefixType = {
+        [key: string]: string;
+        Form: string;
+        Tabs: string;
+        Toolbar: string;
+        PropertyGrid: string;
+    };
+    function useIdPrefix(prefix: string): IdPrefixType;
 
     function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
         type: CreateWidgetParams<TGrid, P>["type"];
@@ -3458,16 +3467,7 @@ declare namespace Serenity {
         protected getFallbackTemplate(): string;
         protected getTemplate(): string;
         protected renderContents(): void;
-        protected useIdPrefix(): IdPrefixType;
     }
-    type IdPrefixType = {
-        [key: string]: string;
-        Form: string;
-        Tabs: string;
-        Toolbar: string;
-        PropertyGrid: string;
-    };
-    function useIdPrefix(prefix: string): IdPrefixType;
 
     class TemplatedDialog<P> extends TemplatedWidget<P> {
         protected tabs: JQuery;

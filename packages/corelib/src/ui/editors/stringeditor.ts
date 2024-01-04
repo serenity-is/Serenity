@@ -15,7 +15,7 @@ export class StringEditor<P={}> extends EditorWidget<P> {
     }
 
     public set value(value: string) {
-        (this.domNode as HTMLInputElement).value = value;
+        (this.domNode as HTMLInputElement).value = value ?? '';
     }
 
     protected set_value(value: string): void {

@@ -131,23 +131,4 @@ export class TemplatedWidget<P> extends Widget<P> {
 
         sQuery(this.domNode).html(widgetMarkup);
     }
-
-    protected useIdPrefix(): IdPrefixType {
-        return useIdPrefix(this.idPrefix);
-    }
 }
-
-type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
-
-export function useIdPrefix(prefix: string): IdPrefixType {
-    return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
-}
-
-const idPrefixHandler = {
-    get(target: any, p: string) {
-        if (p.startsWith('#'))
-            return '#' + target._ + p.substring(1);
-
-        return target._ + p;
-    }
-};

@@ -1413,10 +1413,19 @@ declare class Widget<P = {}> {
     protected renderContents(): any | void;
     get props(): WidgetProps<P>;
     protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
+    protected useIdPrefix(): IdPrefixType;
 }
 declare class EditorWidget<P> extends Widget<EditorProps<P>> {
     constructor(props: EditorProps<P>);
 }
+type IdPrefixType = {
+    [key: string]: string;
+    Form: string;
+    Tabs: string;
+    Toolbar: string;
+    PropertyGrid: string;
+};
+declare function useIdPrefix(prefix: string): IdPrefixType;
 
 declare function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
     type: CreateWidgetParams<TGrid, P>["type"];
@@ -2303,16 +2312,7 @@ declare class TemplatedWidget<P> extends Widget<P> {
     protected getFallbackTemplate(): string;
     protected getTemplate(): string;
     protected renderContents(): void;
-    protected useIdPrefix(): IdPrefixType;
 }
-type IdPrefixType = {
-    [key: string]: string;
-    Form: string;
-    Tabs: string;
-    Toolbar: string;
-    PropertyGrid: string;
-};
-declare function useIdPrefix(prefix: string): IdPrefixType;
 
 declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected tabs: JQuery;
