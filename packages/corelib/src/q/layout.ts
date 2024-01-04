@@ -65,7 +65,7 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
         !el.classList.contains('s-Panel')));
 
     let layout = function () {
-        setHeight && layoutFillHeight(sQuery(el));
+        setHeight && layoutFillHeight(el);
         !sQuery.isMock ? sQuery(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
     };
 
@@ -97,24 +97,24 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
 export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = 0;
-    $(element).parent().children().not($(element)).each(function (i, e) {
+    sQuery(element).parent().children().not(sQuery(element)).each(function (i, e) {
         let q = sQuery(e);
         if (q.is(':visible')) {
             h += q.outerHeight(true);
         }
     });
-    h = $(element).parent().height() - h;
-    if ($(element).css('box-sizing') !== 'border-box') {
-        h = h - ($(element).outerHeight(true) - $(element).height());
+    h = sQuery(element).parent().height() - h;
+    if (sQuery(element).css('box-sizing') !== 'border-box') {
+        h = h - (sQuery(element).outerHeight(true) - sQuery(element).height());
     }
     return h;
 }
 
 export function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>) {
-    let h = layoutFillHeightValue($(element));
+    let h = layoutFillHeightValue(element);
     let n = Math.round(h) + 'px';
-    if ($(element).css('height') != n) {
-        $(element).css('height', n);
+    if (sQuery(element).css('height') != n) {
+        sQuery(element).css('height', n);
     }
 }
 
@@ -138,12 +138,12 @@ sQuery(initOnLoad);
 
 export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>) {
     executeEverytimeWhenVisible(element, function () {
-        $(element).triggerHandler('layout');
+        sQuery(element).triggerHandler('layout');
     }, true);
 }
 
 export function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>) {
-    var dlg = $(el).closest(".ui-dialog");
+    var dlg = sQuery(el).closest(".ui-dialog");
     (dlg as any).position?.({ at: 'center center', of: window });
     let pos = dlg.position();
     if (pos.left < 0)

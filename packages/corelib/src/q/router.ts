@@ -84,15 +84,15 @@ export namespace Router {
 
     function dialogOpen(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
         var route = [];
-        var isDialog = $(owner).hasClass(".ui-dialog-content") || $(owner).hasClass('.s-Panel');
+        var isDialog = sQuery(owner).hasClass(".ui-dialog-content") || sQuery(owner).hasClass('.s-Panel');
         var dialog = isDialog ? owner :
-            $(owner).closest('.ui-dialog-content, .s-Panel');
+            sQuery(owner).closest('.ui-dialog-content, .s-Panel');
         var value = hash();
 
         var idPrefix: string;
-        if ($(dialog).length) {
+        if (sQuery(dialog).length) {
             var dialogs = visibleDialogs();
-            var index = dialogs.indexOf($(dialog)[0]);
+            var index = dialogs.indexOf(sQuery(dialog)[0]);
 
             for (var i = 0; i <= index; i++) {
                 var q = sQuery(dialogs[i]).data("qroute") as string;
@@ -101,30 +101,30 @@ export namespace Router {
             }
 
             if (!isDialog) {
-                idPrefix = $(dialog).attr("id");
+                idPrefix = sQuery(dialog).attr("id");
                 if (idPrefix) {
                     idPrefix += "_";
-                    var id = $(owner).attr("id");
+                    var id = sQuery(owner).attr("id");
                     if (id?.startsWith(idPrefix))
                         value = id.substring(idPrefix.length) + '@' + value;
                 }
             }
         }
         else {
-            var id = $(owner).attr("id");
-            if (id && (!$(owner).hasClass("route-handler") ||
+            var id = sQuery(owner).attr("id");
+            if (id && (!sQuery(owner).hasClass("route-handler") ||
                 sQuery('.route-handler').first().attr("id") != id))
                 value = id + "@" + value;
         }
 
         route.push(value);
-        $(element).data("qroute", value);
+        sQuery(element).data("qroute", value);
         replace(route.join("/+/"));
 
-        $(element).bind("dialogclose.qrouter panelclose.qrouter", e => {
-            $(element).data("qroute", null);
-            $(element).off(".qrouter");
-            var prhash = $(element).data("qprhash");
+        sQuery(element).bind("dialogclose.qrouter panelclose.qrouter", e => {
+            sQuery(element).data("qroute", null);
+            sQuery(element).off(".qrouter");
+            var prhash = sQuery(element).data("qprhash");
             var tryBack = sQuery(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
                 ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
                 sQuery(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
@@ -140,7 +140,7 @@ export namespace Router {
         if (!enabled)
             return;
         
-        $(element).on("dialogopen.qrouter panelopen.qrouter", e => {
+        sQuery(element).on("dialogopen.qrouter panelopen.qrouter", e => {
             dialogOpen(owner, element, hash);
         });
     }

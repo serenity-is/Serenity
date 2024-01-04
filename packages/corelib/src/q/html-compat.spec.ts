@@ -4,7 +4,7 @@ import sQuery from "@optionaldeps/squery";
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addEmptyOption(sQuery(select));
+        addEmptyOption(select);
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("Controls.SelectEditor.EmptyItemText");
@@ -14,7 +14,7 @@ describe("addEmptyOption", () => {
 describe("addOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), "test", "text");
+        addOption(select, "test", "text");
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("test");
         expect(select.children[0].textContent).toBe("text");
@@ -22,7 +22,7 @@ describe("addOption", () => {
 
     it("can handle null values", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), null, null);
+        addOption(select, null, null);
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("");
@@ -39,9 +39,9 @@ describe("attrEncode", () => {
 describe("clearOptions", () => {
     it("clears all options from the select", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), "test", "text");
-        addEmptyOption(sQuery(select));
-        clearOptions(sQuery(select));
+        addOption(select, "test", "text");
+        addEmptyOption(select);
+        clearOptions(select);
         expect(select.children.length).toBe(0);
     });
 });

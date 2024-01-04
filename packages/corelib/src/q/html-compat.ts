@@ -17,15 +17,20 @@ export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElemen
  * Adds an option to the select.
  */
 export function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string) {
-    sQuery('<option/>').attr("value", key ?? "").text(text ?? "").appendTo(select as any);
+    var option = document.createElement("option");
+    option.value = key ?? "";
+    option.textContent = text ?? "";
+    (isArrayLike(select) ? select[0] : select)?.append(option);
 }
 
 /** @deprecated use htmlEncode as it also encodes quotes */
 export const attrEncode = htmlEncode;
 
 /** Clears the options in the select element */
-export function clearOptions(select: ArrayLike<HTMLElement>) {
-    (select as any).html('');
+export function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>) {
+    select = isArrayLike(select) ? select[0] : select;
+    if (select)
+        select.innerHTML = '';
 }
 
 /**
@@ -95,8 +100,10 @@ export function newBodyDiv(): JQuery {
 /**
  * Returns the outer HTML of the element.
  */
-export function outerHtml(element: ArrayLike<HTMLElement>) {
-    return sQuery('<i/>').append((element as any).eq(0).clone()).html();
+export function outerHtml(element: Element | ArrayLike<HTMLElement>) {
+    var el = document.createElement('i');
+    el.append((isArrayLike(element) ? element[0] : element).cloneNode(true));
+    return el.innerHTML;
 }
 
 /**
