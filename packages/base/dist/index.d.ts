@@ -425,10 +425,7 @@ declare function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?:
  * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
  * @param e The event triggering the open
  */
-declare function openPanel(element: (HTMLElement | {
-    jquery: string;
-    get: ((index: number) => HTMLElement);
-}), uniqueName?: string): void;
+declare function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string): void;
 
 interface LookupOptions<TItem> {
     idField?: string;

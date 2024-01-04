@@ -19,7 +19,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         input.addClass('decimalQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(), {
             vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00')),
@@ -41,7 +41,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
     get_value(): number {
         var val;
         if (($.fn as any).autoNumeric) {
-            val = (this.element as any).autoNumeric('get');
+            val = ($(this.domNode) as any).autoNumeric('get');
 
             if (!!(val == null || val === ''))
                 return null;
@@ -49,7 +49,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             return parseFloat(val);
         }
 
-        val = this.element.val() as any;
+        val = $(this.domNode).val() as any;
         return parseDecimal(val);
     }
 
@@ -59,13 +59,13 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
 
     set_value(value: number) {
         if (value == null || (value as any) === '') {
-            this.element.val('');
+            $(this.domNode).val('');
         }
         else if (($.fn as any).autoNumeric) {
-            (this.element as any).autoNumeric('set', value);
+            ($(this.domNode) as any).autoNumeric('set', value);
         }
         else
-            this.element.val(formatNumber(value));
+            $(this.domNode).val(formatNumber(value));
     }
 
     set value(v: number) {

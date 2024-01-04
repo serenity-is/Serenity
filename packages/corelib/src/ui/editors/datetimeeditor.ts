@@ -19,7 +19,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         input.addClass('s-DateTimeEditor');
 
         if (this.options.inputOnly) {
@@ -40,7 +40,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 beforeShow: function () {
                     if (input.hasClass('readonly') as any)
                         return false as any;
-                    DateEditor.uiPickerZIndexWorkaround(this.element);
+                    DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
                 } as any,
                 yearRange: (this.options.yearRange ?? '-100:+50')
@@ -108,13 +108,13 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 if (e.which === 32) {
                     if (this.get_valueAsDate() !== new Date()) {
                         this.set_valueAsDate(new Date());
-                        this.element.trigger('change');
+                        $(this.domNode).trigger('change');
                     }
                 }
                 else {
-                    var before = this.element.val();
+                    var before = $(this.domNode).val();
                     DateEditor.dateInputKeyup(e as any);
-                    if (before != this.element.val())
+                    if (before != $(this.domNode).val())
                         this.lastSetValue = null;
                 }
             }
@@ -126,7 +126,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             $("<i class='inplace-button inplace-now'><b></b></div>")
                 .attr('title', this.getInplaceNowText())
                 .insertAfter(this.time).click(e2 => {
-                    if (this.element.hasClass('readonly')) {
+                    if (this.domNode.classList.contains('readonly')) {
                         return;
                     }
                     this.lastSetValue = null;
@@ -147,13 +147,13 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
             onChange: () => {
                 this.lastSetValue = null;
-                this.element && this.element.triggerHandler('change');
+                this.domNode && $(this.domNode).triggerHandler('change');
             }
         }
     }
 
     get_value(): string {
-        var value = (this.element.val() as string).trim();
+        var value = ($(this.domNode).val() as string).trim();
         if (value != null && value.length === 0) {
             return null;
         }
@@ -165,7 +165,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             result = datePart + 'T' + timePart + ':00.000';
         }
         else
-            result = formatDate(parseDate(this.element.val() as string), "yyyy-MM-ddTHH:mm:ss.fff");
+            result = formatDate(parseDate($(this.domNode).val() as string), "yyyy-MM-ddTHH:mm:ss.fff");
 
         if (this.options.useUtc)
             result = formatISODateTimeUTC(parseISODateTime(result));
@@ -183,27 +183,27 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
     set_value(value: string) {
         if (!value) {
-            this.element.val('');
+            $(this.domNode).val('');
             this.time && this.time.val('00:00');
         }
         else if (value.toLowerCase() === 'today') {
             if (this.time) {
-                this.element.val(formatDate(today(), null));
+                $(this.domNode).val(formatDate(today(), null));
                 this.time.val('00:00');
             }
             else {
-                this.element.val(this.getDisplayFormat())
+                $(this.domNode).val(this.getDisplayFormat())
             }
         }
         else {
             var val = ((value.toLowerCase() === 'now') ? new Date() : parseISODateTime(value));
             if (this.time) {
                 val = DateTimeEditor.roundToMinutes(val, (this.options.intervalMinutes ?? 5));
-                this.element.val(formatDate(val, null));
+                $(this.domNode).val(formatDate(val, null));
                 this.time.val(formatDate(val, 'HH:mm'));
             }
             else
-                this.element.val(formatDate(val, this.getDisplayFormat()));
+                $(this.domNode).val(formatDate(val, this.getDisplayFormat()));
         }
 
         this.lastSetValue = null;
@@ -300,21 +300,21 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     }
 
     get_readOnly(): boolean {
-        return this.element.hasClass('readonly');
+        return this.domNode.classList.contains('readonly');
     }
 
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                this.element.addClass('readonly').attr('readonly', 'readonly');
-                this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
-                this.element.nextAll('.inplace-now').css('opacity', '0.1');
+                $(this.domNode).addClass('readonly').attr('readonly', 'readonly');
+                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
+                $(this.domNode).nextAll('.inplace-now').css('opacity', '0.1');
             }
             else {
-                this.element.removeClass('readonly').removeAttr('readonly');
-                this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
-                this.element.nextAll('.inplace-now').css('opacity', '1');
+                $(this.domNode).removeClass('readonly').removeAttr('readonly');
+                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
+                $(this.domNode).nextAll('.inplace-now').css('opacity', '1');
             }
 
             this.time && EditorUtils.setReadonly(this.time, value);

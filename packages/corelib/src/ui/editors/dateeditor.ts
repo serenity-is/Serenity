@@ -1,8 +1,8 @@
-﻿import { Invariant, formatDate, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Invariant, formatDate, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as datePickerIconSvg_, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, today } from "../../q";
+import { addValidationRule, isArray, today } from "../../q";
 import { EditorWidget, EditorProps } from "../widgets/widget";
 
 export const datePickerIconSvg = datePickerIconSvg_;
@@ -23,7 +23,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
 
-        var input = this.element;
+        var input = $(this.domNode);
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$.fn.datepicker)) {
             // @ts-ignore
@@ -50,7 +50,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             if (e.which === 32 && !this.get_readOnly()) {
                 if (this.get_valueAsDate() != today()) {
                     this.set_valueAsDate(today());
-                    this.element.trigger('change');
+                    $(this.domNode).trigger('change');
                 }
             }
             else {
@@ -81,7 +81,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }
 
     get_value(): string {
-        var value = (this.element.val() as string)?.trim();
+        var value = ($(this.domNode).val() as string)?.trim();
         if (!value) {
             return null;
         }
@@ -95,13 +95,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     set_value(value: string) {
         if (value == null) {
-            this.element.val('');
+            $(this.domNode).val('');
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            this.element.val(formatDate(today(), this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
+            $(this.domNode).val(formatDate(today(), this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
         }
         else {
-            this.element.val(formatDate(value, this.element.attr('type') === 'date' ? 'yyyy-MM-dd' : null));
+            $(this.domNode).val(formatDate(value, this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
         }
     }
 
@@ -133,19 +133,19 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }
 
     get_readOnly(): boolean {
-        return this.element.hasClass('readonly');
+        return this.domNode.classList.contains('readonly');
     }
 
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                this.element.addClass('readonly').attr('readonly', 'readonly');
-                this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
+                $(this.domNode).addClass('readonly').attr('readonly', 'readonly');
+                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
             }
             else {
-                this.element.removeClass('readonly').removeAttr('readonly');
-                this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
+                $(this.domNode).removeClass('readonly').removeAttr('readonly');
+                $(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
             }
         }
     }
@@ -226,10 +226,11 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         return $(flatPickrTrigger(input[0] as HTMLInputElement)).insertAfter(input);
     }
 
-    public static uiPickerZIndexWorkaround(input: JQuery) {
-        if (!input?.length)
+    public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
+        let input = isArrayLike(el) ? el[0] : el;
+        if (!input)
             return;
-        jQueryDatepickerZIndexWorkaround(input.get(0) as HTMLInputElement, $);
+        jQueryDatepickerZIndexWorkaround(input as HTMLInputElement, $);
     }
 }
 

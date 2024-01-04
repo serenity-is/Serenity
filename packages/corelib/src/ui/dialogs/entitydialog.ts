@@ -439,8 +439,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         this.loadById(entityId,
             response => window.setTimeout(() => this.dialogOpen(asPanel), 0),
             () => {
-                if (!this.element.is(':visible')) {
-                    this.element.remove();
+                if (!$(this.domNode).is(':visible')) {
+                    $(this.domNode).remove();
                 }
             });
     }
@@ -713,7 +713,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
+        if ($(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
             this.propertyGrid.element.children('.categories').flexHeightOnly(1);
         }
     }
@@ -787,7 +787,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                     entityId: eid
                 };
 
-                this.element.triggerHandler('ondatachange', [dci]);
+                $(this.domNode).triggerHandler('ondatachange', [dci]);
             };
 
         opt.onCleanup = () => {
@@ -988,7 +988,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
                 var cloneEntity = this.getCloningEntity();
                 var cloneDialog = Widget.create({ type: getInstanceType(this) })
-                SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.element), this, true);
+                SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.domNode), this, true);
                 (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
             },
             visible: () => false,
@@ -1089,7 +1089,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         baseOptions.request = request;
         baseOptions.onSuccess = response => {
             callback && callback(response);
-            this.element.triggerHandler('ondatachange', [{
+            $(this.domNode).triggerHandler('ondatachange', [{
                 entityId: this.get_entityId(),
                 entity: this.entity,
                 type: 'undelete'

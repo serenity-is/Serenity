@@ -71,7 +71,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt($('input.slick-pg-current', this.element).val() as string);
+                var nv = parseInt($('input.slick-pg-current', this.domNode).val() as string);
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)
@@ -79,7 +79,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                 else if (nv > pages)
                     nv = pages;
 
-                $('.slick-pg-current', this.element).val(nv);
+                $('.slick-pg-current', this.domNode).val(nv);
 
                 newp = nv;
                 break;
@@ -101,8 +101,8 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var info = view.getPagingInfo();
         var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
 
-        $('.slick-pg-current', this.element).val(info.page);
-        $('.slick-pg-total', this.element).html(pages as any);
+        $('.slick-pg-current', this.domNode).val(info.page);
+        $('.slick-pg-total', this.domNode).html(pages as any);
 
         var r1 = (info.page - 1) * info.rowsPerPage + 1;
         var r2 = r1 + info.rowsPerPage - 1;
@@ -127,7 +127,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         else
             stat = htmlEncode(localText("Controls.Pager.NoRowStatus"));
 
-        $('.slick-pg-stat', this.element).html(stat);
-        $('.slick-pg-size', this.element).val((info.rowsPerPage || 0).toString());
+        $('.slick-pg-stat', this.domNode).html(stat);
+        $('.slick-pg-size', this.domNode).val((info.rowsPerPage || 0).toString());
     }
 }

@@ -27,7 +27,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (!this.options || this.options.allowNonImage == null)
             this.options.allowNonImage = true;
 
-        let div = this.element;
+        let div = $(this.domNode);
         div.addClass('s-FileUploadEditor');
 
         if (!this.options.originalNameProperty)
@@ -35,7 +35,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => this.element.append(el)
+            element: el => $(this.domNode).append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -47,14 +47,14 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (this.options.readOnly)
             this.set_readOnly(true);
 
-        this.fileSymbols = $('<ul/>').appendTo(this.element);
+        this.fileSymbols = $('<ul/>').appendTo(this.domNode);
 
-        if (!this.element.attr('id'))
-            this.element.attr('id', this.uniqueName);
+        if (!this.domNode.getAttribute("id"))
+            $(this.domNode).attr('id', this.uniqueName);
 
         this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
-            '_Validator" data-vx-highlight="' + this.element.attr('id') + '"/>')
-            .appendTo(this.element);
+            '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '"/>')
+            .appendTo(this.domNode);
 
         this.updateInterface();
     }
@@ -62,7 +62,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     protected getUploadInputOptions(): UploadInputOptions {
         return {
             container: this.toolbar.findButton('add-file-button'),
-            zone: this.element,
+            zone: this.domNode,
             inputName: this.uniqueName,
             progress: this.progress,
             uploadIntent: this.options.uploadIntent,
@@ -277,7 +277,7 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
         if (this.options.allowNonImage == null)
             this.options.allowNonImage = false;
 
-        this.element.addClass('s-ImageUploadEditor');
+        this.domNode.classList.add("s-ImageUploadEditor'")
     }
 }
 
@@ -297,11 +297,11 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         super(props);
 
         this.entities = [];
-        let div = this.element;
+        let div = $(this.domNode);
         div.addClass('s-MultipleFileUploadEditor');
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => this.element.append(el)
+            element: el => $(this.domNode).append(el)
         });
 
         this.progress = $('<div><div></div></div>')
@@ -310,13 +310,13 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
-        this.fileSymbols = $('<ul/>').appendTo(this.element);
-        if (!this.element.attr('id')) {
-            this.element.attr('id', this.uniqueName);
+        this.fileSymbols = $('<ul/>').appendTo(this.domNode);
+        if (!this.domNode.getAttribute("id")) {
+            $(this.domNode).attr('id', this.uniqueName);
         }
 
         this.hiddenInput = $('<input type="text" class="s-offscreen" name="' + this.uniqueName +
-            '_Validator" data-vx-highlight="' + this.element.attr('id') + '" multiple="multiple"></input>').appendTo(this.element);
+            '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '" multiple="multiple"></input>').appendTo(this.domNode);
 
         this.updateInterface();
     }
@@ -326,7 +326,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
         return {
             container: addFileButton,
-            zone: this.element,
+            zone: this.domNode,
             inputName: this.uniqueName,
             progress: this.progress,
             uploadIntent: this.options.uploadIntent,
@@ -483,6 +483,6 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
     constructor(props: EditorProps<P>) {
         super(props);
-        this.element.addClass('s-MultipleImageUploadEditor');
+        this.domNode.classList.add("s-MultipleImageUploadEditor'")
     }
 }

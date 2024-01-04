@@ -9,7 +9,7 @@ export class URLEditor<P = {}> extends StringEditor<P> {
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
         input.on("blur." + this.uniqueName, e => {

@@ -18,7 +18,7 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         input.addClass('integerQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
             {
@@ -34,14 +34,14 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
     get_value(): number {
         var val: string;
         if (($.fn as any).autoNumeric) {
-            val = (this.element as any).autoNumeric('get') as string;
+            val = ($(this.domNode) as any).autoNumeric('get') as string;
             if (isTrimmedEmpty(val))
                 return null;
             else
                 return parseInt(val, 10);
         }
         else {
-            val = (this.element.val() as string)?.trim();
+            val = ($(this.domNode).val() as string)?.trim();
             if (!val)
                 return null;
             return parseInteger(val)
@@ -55,11 +55,11 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
 
     set_value(value: number) {
         if (value == null || (value as any) === '')
-            this.element.val('');
+            $(this.domNode).val('');
         else if (($.fn as any).autoNumeric)
-            (this.element as any).autoNumeric('set', value);
+            ($(this.domNode) as any).autoNumeric('set', value);
         else
-            this.element.val(formatNumber(value));
+            $(this.domNode).val(formatNumber(value));
     }
 
     set value(v: number) {

@@ -1,4 +1,5 @@
-﻿import { DataChangeInfo } from "../../types/datachangeinfo";
+﻿import { isArrayLike } from "@serenity-is/base";
+import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";
 
 export namespace SubDialogHelper {
@@ -21,29 +22,28 @@ export namespace SubDialogHelper {
     }
 
     export function triggerDataChange(dialog: Widget<any>): any {
-        dialog.element.triggerHandler('ondatachange');
+        $(dialog.domNode).triggerHandler('ondatachange');
         return dialog;
     }
 
-    export function triggerDataChanged(element: JQuery): JQuery {
-        element.triggerHandler('ondatachange');
-        return element;
+    export function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void {
+        $(element).triggerHandler('ondatachange');
     }
 
     export function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any {
         return bindToDataChange(dialog, owner, function (e, dci) {
-            owner.element.triggerHandler('ondatachange');
+            $(owner.domNode).triggerHandler('ondatachange');
         }, useTimeout);
     }
 
-    export function cascade(cascadedDialog: any, ofElement: JQuery): any {
+    export function cascade(cascadedDialog: any, ofElement: HTMLElement | ArrayLike<HTMLElement>): any {
         cascadedDialog.element.one('dialogopen', function (e: Event) {
             cascadedDialog.element.dialog().dialog('option', 'position', cascadedDialogOffset(ofElement));
         });
         return cascadedDialog;
     }
 
-    export function cascadedDialogOffset(element: JQuery): any {
-        return { my: 'left top', at: 'left+20 top+20', of: element[0] };
+    export function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any {
+        return { my: 'left top', at: 'left+20 top+20', of: isArrayLike(element) ? element[0] : element };
     }
 }

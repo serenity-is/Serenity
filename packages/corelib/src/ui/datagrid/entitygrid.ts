@@ -18,7 +18,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props: WidgetProps<P>) {
         super(props);
         this.domNode.classList.add('route-handler');
-        this.element.on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
+        $(this.domNode).on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
     }
 
     protected handleRoute(args: HandleRouteEventArgs): void {
@@ -256,7 +256,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     }
 
     protected routeDialog(itemType: string, dialog: Widget<any>) {
-        Router && Router.dialog && Router.dialog(this.element, dialog.element, () => {
+        Router && Router.dialog && Router.dialog(this.domNode, dialog.domNode, () => {
             var hash = '';
 
             if (itemType !== this.getItemType())

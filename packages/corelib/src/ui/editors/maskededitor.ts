@@ -10,15 +10,15 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         (input as any).mask(this.options.mask || '', {
             placeholder: (this.options.placeholder ?? '_')
         });
     }
 
     public get value(): string {
-        this.element.triggerHandler("blur.mask");
-        return this.element.val() as string;
+        $(this.domNode).triggerHandler("blur.mask");
+        return $(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -26,7 +26,7 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
     }
 
     public set value(value: string) {
-        this.element.val(value);
+        $(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {

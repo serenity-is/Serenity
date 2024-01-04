@@ -95,10 +95,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             if (this._layoutTimer != null)
                 LayoutTimer.store(this._layoutTimer);
         }.bind(this);
-        this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
+        $(this.domNode).addClass('require-layout').on('layout.' + this.uniqueName, layout);
 
         if (this.useLayoutTimer())
-            this._layoutTimer = LayoutTimer.onSizeChange(() => this.element && this.element[0], debounce(layout, 50));
+            this._layoutTimer = LayoutTimer.onSizeChange(() => this.domNode && this.domNode, debounce(layout, 50));
 
         this.setTitle(this.getInitialTitle());
 
@@ -165,10 +165,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected layout(): void {
-        if (!this.element || !this.element.is(':visible') || !this.slickContainer || !this.slickGrid)
+        if (!this.domNode || !$(this.domNode).is(':visible') || !this.slickContainer || !this.slickGrid)
             return;
 
-        var responsiveHeight = this.element.hasClass('responsive-height');
+        var responsiveHeight = this.domNode.classList.contains('responsive-height');
         var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
         var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
@@ -427,10 +427,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected initialPopulate(): void {
         var self = this;
         if (this.populateWhenVisible()) {
-            LazyLoadHelper.executeEverytimeWhenShown(this.element, function () {
+            LazyLoadHelper.executeEverytimeWhenShown(this.domNode, function () {
                 self.refreshIfNeeded();
             }, false);
-            if (this.element.is(':visible') && this.view) {
+            if ($(this.domNode).is(':visible') && this.view) {
                 this.view.populate();
             }
         }
@@ -705,7 +705,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createSlickContainer(): JQuery {
-        return $('<div class="grid-container"></div>').appendTo(this.element);
+        return $('<div class="grid-container"></div>').appendTo(this.domNode);
     }
 
     protected createView(): RemoteView<TItem> {
@@ -753,7 +753,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected createFilterBar(): void {
         this.filterBar = new FilterDisplayBar({
-            element: el => this.element.append(el)
+            element: el => $(this.domNode).append(el)
         });
         this.initializeFilterBar();
     }
@@ -767,7 +767,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createPager(): void {
-        new SlickPager({ ...this.getPagerOptions(), element: el => this.element.append(el) });
+        new SlickPager({ ...this.getPagerOptions(), element: el => $(this.domNode).append(el) });
     }
 
     protected getViewOptions() {
@@ -778,7 +778,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (!this.usePager()) {
             opt.rowsPerPage = 0;
         }
-        else if (this.element.hasClass('responsive-height')) {
+        else if (this.domNode.classList.contains('responsive-height')) {
             opt.rowsPerPage = (($(window.window).width() < 768) ? 20 : 100);
         }
         else {
@@ -795,7 +795,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected createToolbar(buttons: ToolButton[]): void {
         this.toolbar = new Toolbar({
             buttons: buttons,
-            hotkeyContext: this.element[0],
+            hotkeyContext: this.domNode,
             element: el => this.domNode.appendChild(el).classList.add("grid-toolbar")
         });
     }
@@ -819,7 +819,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             else {
                 if (!this.titleDiv) {
                     this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>')
-                        .prependTo(this.element);
+                        .prependTo(this.domNode);
                 }
                 this.titleDiv.children('.title-text').text(value);
             }
@@ -1316,7 +1316,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
             if (settings.includeDeleted != null &&
                 flags.includeDeleted !== false) {
-                var includeDeletedToggle = this.element.find('.s-IncludeDeletedToggle');
+                var includeDeletedToggle = $(this.domNode).find('.s-IncludeDeletedToggle');
                 if (!!settings.includeDeleted !== includeDeletedToggle.hasClass('pressed')) {
                     includeDeletedToggle.children('a').click();
                 }
@@ -1401,7 +1401,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         if (flags.includeDeleted !== false) {
-            settings.includeDeleted = this.element.find('.s-IncludeDeletedToggle').hasClass('pressed');
+            settings.includeDeleted = $(this.domNode).find('.s-IncludeDeletedToggle').hasClass('pressed');
         }
 
         if (flags.filterItems !== false && (this.filterBar != null) && (this.filterBar.get_store() != null)) {
@@ -1464,7 +1464,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     getElement(): JQuery {
-        return this.element;
+        return $(this.domNode);
     }
 
     getGrid(): Grid {

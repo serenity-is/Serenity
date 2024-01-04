@@ -59,11 +59,11 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         $('<input type="radio"/>').attr('name', this.uniqueName)
             .attr('id', this.uniqueName + '_' + value)
             .attr('value', value).prependTo(label);
-        label.appendTo(this.element);
+        label.appendTo(this.domNode);
     }
 
     get_value(): string {
-        return this.element.find('input:checked').first().val() as string;
+        return $(this.domNode).find('input:checked').first().val() as string;
     }
 
     get value(): string {
@@ -72,7 +72,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
 
     set_value(value: string): void {
         if (value !== this.get_value()) {
-            var inputs = this.element.find('input');
+            var inputs = $(this.domNode).find('input');
             var checks = inputs.filter(':checked');
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
@@ -91,17 +91,17 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     get_readOnly(): boolean {
-        return this.element.attr('disabled') != null;
+        return this.domNode.getAttribute("disabled") != null;
     }
 
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
             if (value) {
-                this.element.attr('disabled', 'disabled')
+                $(this.domNode).attr('disabled', 'disabled')
                     .find('input').attr('disabled', 'disabled');
             }
             else {
-                this.element.removeAttr('disabled')
+                $(this.domNode).removeAttr('disabled')
                     .find('input').removeAttr('disabled');
             }
         }

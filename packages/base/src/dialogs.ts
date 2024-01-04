@@ -673,9 +673,9 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
  * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
  * @param e The event triggering the open
  */
- export function openPanel(element: (HTMLElement | { jquery: string, get: ((index: number) => HTMLElement) }), uniqueName?: string) {
+ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
-    let el = typeof (element as any)?.get === "function" && typeof (element as any).jquery === "string" ? (element as any).get(0) : element as HTMLElement;
+    let el = isArrayLike(element) ? element[0] : element;
     if (!el)
         return;
     let event: any;

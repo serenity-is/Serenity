@@ -13,7 +13,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
 
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = this.element;
+        let input = $(this.domNode);
         if (this.options.cols !== 0) {
             input.attr('cols', (this.options.cols ?? 80));
         }
@@ -23,7 +23,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public get value(): string {
-        return this.element.val() as string;
+        return $(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -31,7 +31,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public set value(value: string) {
-        this.element.val(value);
+        $(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {

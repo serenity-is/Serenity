@@ -115,9 +115,9 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected createSlickGrid(): Grid {
-        this.element.addClass('slick-no-cell-border').addClass('slick-no-odd-even');
+        $(this.domNode).addClass('slick-no-cell-border').addClass('slick-no-odd-even');
         var result = super.createSlickGrid();
-        this.element.addClass('slick-hide-header');
+        this.domNode.classList.add("slick-hide-header'")
         result.resizeCanvas();
         return result;
     }
@@ -201,7 +201,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 this.view.endUpdate();
             }
             if (anyChanged) {
-                this.element.triggerHandler('change');
+                $(this.domNode).triggerHandler('change');
             }
         }
     }

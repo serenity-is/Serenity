@@ -29,7 +29,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
             element: this.byId("Search"),
             onSearch: (fld, txt, done) => {
                 txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
-                this.element.find('li').each((x, e) => {
+                $(this.domNode).find('li').each((x, e) => {
                     $(e).toggle(!txt || Select2.util.stripDiacritics(
                         $(e).text().toLowerCase()).indexOf(txt) >= 0);
                 });
@@ -259,13 +259,13 @@ ${allowHide ? `<i class="js-hide ${faIcon("eye-slash")} title="${htmlEncode(loca
 
     protected onDialogOpen(): void {
         super.onDialogOpen();
-        this.element.find("input").removeAttr("disabled")
-        this.element.closest('.ui-dialog').children(".ui-dialog-buttonpane")
+        $(this.domNode).find("input").removeAttr("disabled")
+        $(this.domNode).closest('.ui-dialog').children(".ui-dialog-buttonpane")
             .find('button').eq(0).addClass("restore-defaults")
             .next().focus();
 
         this.setupColumns();
-        centerDialog(this.element);
+        centerDialog(this.domNode);
     }
 
     protected getTemplate() {

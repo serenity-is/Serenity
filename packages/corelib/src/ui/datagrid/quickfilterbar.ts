@@ -23,7 +23,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.element.addClass('quick-filters-bar').addClass('clear');
+        $(this.domNode).addClass('quick-filters-bar').addClass('clear');
 
         var filters = this.options.filters;
         for (var f = 0; f < filters.length; f++) {
@@ -35,7 +35,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public addSeparator(): void {
-        this.element.append($('<hr/>'));
+        $(this.domNode).append($('<hr/>'));
     }
 
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
@@ -49,7 +49,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         }
 
         var item = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
-            .appendTo(this.element)
+            .appendTo(this.domNode)
             .data('qffield', opt.field).children();
 
         var title = tryGetText(opt.title) ?? opt.title;

@@ -29,35 +29,35 @@ export class Flexify extends Widget<FlexifyOptions> {
     constructor(container: JQuery, options: FlexifyOptions) {
         super({ element: container, ...options });
 
-        LazyLoadHelper.executeOnceWhenShown(this.element, () => {
+        LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
             this.storeInitialSize();
         });
     }
 
     storeInitialSize() {
-        if (!!this.element.data('flexify-init')) {
+        if (!!$(this.domNode).data('flexify-init')) {
             return;
         }
 
         var designWidth = this.options.designWidth;
         if (designWidth == null)
-            designWidth = this.element.width();
-        this.element.data('flexify-width', designWidth);
+            designWidth = $(this.domNode).width();
+        $(this.domNode).data('flexify-width', designWidth);
 
         var designHeight = this.options.designHeight;
         if (designHeight == null)
-            designHeight = this.element.height();
-        this.element.data('flexify-height', designHeight);
+            designHeight = $(this.domNode).height();
+        $(this.domNode).data('flexify-height', designHeight);
 
-        this.element.data('flexify-init', true);
+        $(this.domNode).data('flexify-init', true);
 
-        this.element.on('resize.' + this.uniqueName, () =>
+        $(this.domNode).on('resize.' + this.uniqueName, () =>
             this.resizeElements());
 
-        this.element.on('resizestop.' + this.uniqueName, () =>
+        $(this.domNode).on('resizestop.' + this.uniqueName, () =>
             this.resizeElements());
         
-        var tabs = this.element.find('.ui-tabs');
+        var tabs = $(this.domNode).find('.ui-tabs');
         if (tabs.length > 0) {
             tabs.on('tabsactivate.' + this.uniqueName, () =>
                 this.resizeElements());
@@ -91,25 +91,25 @@ export class Flexify extends Widget<FlexifyOptions> {
     }
 
     private resizeElements(): void {
-        var width = this.element.width();
-        var initialWidth = this.element.data('flexify-width');
+        var width = $(this.domNode).width();
+        var initialWidth = $(this.domNode).data('flexify-width');
         if (initialWidth == null) {
-            this.element.data('flexify-width', width);
+            $(this.domNode).data('flexify-width', width);
             initialWidth = width;
         }
 
-        var height = this.element.height();
-        var initialHeight = this.element.data('flexify-height');
+        var height = $(this.domNode).height();
+        var initialHeight = $(this.domNode).data('flexify-height');
         if (initialHeight == null) {
-            this.element.data('flexify-height', height);
+            $(this.domNode).data('flexify-height', height);
             initialHeight = height;
         }
 
         this.xDifference = width - initialWidth;
         this.yDifference = height - initialHeight;
 
-        var containers = this.element;
-        var tabPanels = this.element.find('.ui-tabs-panel');
+        var containers = $(this.domNode);
+        var tabPanels = $(this.domNode).find('.ui-tabs-panel');
 
         if (tabPanels.length > 0) {
             containers = tabPanels.filter(':visible');

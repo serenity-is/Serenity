@@ -7,7 +7,7 @@ import { EditorWidget } from "../widgets/widget";
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
 
     public get value(): boolean {
-        return this.element.is(":checked");
+        return $(this.domNode).is(":checked");
     }
 
     protected get_value(): boolean {
@@ -15,7 +15,7 @@ export class BooleanEditor<P = {}> extends EditorWidget<P> {
     }
 
     public set value(value: boolean) {
-        this.element.prop("checked", !!value);
+        $(this.domNode).prop("checked", !!value);
     }
 
     protected set_value(value: boolean): void {

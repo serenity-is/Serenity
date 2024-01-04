@@ -26,17 +26,17 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let input = this.element;
+        let input = $(this.domNode);
         input.attr('title', localText('Controls.QuickSearch.Hint'))
             .attr('placeholder', localText('Controls.QuickSearch.Placeholder'));
         this.lastValue = ((input.val() ?? '') as string).trim();
 
         var self = this;
-        this.element.bind('keyup.' + this.uniqueName, function () {
+        $(this.domNode).on('keyup.' + this.uniqueName, function () {
             self.checkIfValueChanged();
         });
 
-        this.element.bind('change.' + this.uniqueName, function () {
+        $(this.domNode).on('change.' + this.uniqueName, function () {
             self.checkIfValueChanged();
         });
 
@@ -75,16 +75,16 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             this.updateInputPlaceHolder();
         }
 
-        this.element.bind('execute-search.' + this.uniqueName, e1 => {
+        $(this.domNode).on('execute-search.' + this.uniqueName, e1 => {
             if (!!this.timer) {
                 window.clearTimeout(this.timer);
             }
-            this.searchNow((this.element.val() as string ?? '').trim());
+            this.searchNow(($(this.domNode).val() as string ?? '').trim());
         });
     }
 
     protected checkIfValueChanged(): void {
-        if (this.element.hasClass('ignore-change')) {
+        if (this.domNode.classList.contains('ignore-change')) {
             return;
         }
 
@@ -109,7 +109,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     get_value(): string {
-        return (this.element.val() as string ?? '').trim();
+        return ($(this.domNode).val() as string ?? '').trim();
     }
 
     get_field(): QuickSearchField {
@@ -126,7 +126,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected updateInputPlaceHolder() {
-        var qsf = this.element.prevAll('.quick-search-field');
+        var qsf = $(this.domNode).prevAll('.quick-search-field');
         if (this.field) {
             qsf.text(this.field.title);
         }
@@ -139,7 +139,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.fieldChanged = false;
         this.field = field;
         var value = (value ?? '').trim();
-        this.element.val(value);
+        $(this.domNode).val(value);
         this.lastValue = value;
         if (!!this.timer) {
             window.clearTimeout(this.timer);
@@ -149,18 +149,18 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected searchNow(value: string) {
-        this.element.parent().toggleClass(
+        $(this.domNode).parent().toggleClass(
             (this.options.filteredParentClass ?? 's-QuickSearchFiltered'), !!(value.length > 0));
 
-        this.element.parent().addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
+        $(this.domNode).parent().addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
                 .addClass(this.options.loadingParentClass ?? 's-QuickSearchLoading');
 
         var done = (results: any) => {
-            this.element.removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
+            $(this.domNode).removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading')
             .parent().removeClass(this.options.loadingParentClass ?? 's-QuickSearchLoading');
 
             if (!results) {
-                var el = this.element.closest('.s-QuickSearchBar')
+                var el = $(this.domNode).closest('.s-QuickSearchBar')
                     .find('.quick-search-icon i')[0] as HTMLElement;
                 if (el) {
                     el.classList.add('s-shake-effect');

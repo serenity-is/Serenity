@@ -93,15 +93,15 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.toolbar = null;
         this.validator && this.byId('Form').remove();
         this.validator = null;
-        if (this.element != null &&
-            this.element.hasClass('ui-dialog-content')) {
-            (this.element as any)?.dialog?.('destroy');
-            this.element.removeClass('ui-dialog-content');
+        if (this.domNode != null &&
+            this.domNode.classList.contains('ui-dialog-content')) {
+            ($(this.domNode) as any)?.dialog?.('destroy');
+            $(this.domNode).removeClass('ui-dialog-content');
         }
-        else if (this.element != null &&
-            this.element.hasClass('modal-body')) {
-            var modal = this.element.closest('.modal').data('bs.modal', null);
-            this.element && this.element.removeClass('modal-body');
+        else if (this.domNode != null &&
+            this.domNode.classList.contains('modal-body')) {
+            var modal = $(this.domNode).closest('.modal').data('bs.modal', null);
+            this.domNode && $(this.domNode).removeClass('modal-body');
             window.setTimeout(() => modal.remove(), 0);
         }
 
@@ -110,39 +110,39 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected initDialog(): void {
-        if (this.element.hasClass('ui-dialog-content'))
+        if (this.domNode.classList.contains('ui-dialog-content'))
             return;
 
-        this.element.removeClass('hidden');
+        $(this.domNode).removeClass('hidden');
 
-        (this.element as any)?.dialog?.(this.getDialogOptions());
-        this.element.closest('.ui-dialog').on('resize', e => this.arrange());
+        ($(this.domNode) as any)?.dialog?.(this.getDialogOptions());
+        $(this.domNode).closest('.ui-dialog').on('resize', e => this.arrange());
 
         let type = getInstanceType(this);
 
         if (this.isResponsive) {
-            DialogExtensions.dialogResizable(this.element);
+            DialogExtensions.dialogResizable($(this.domNode));
 
             $(window).bind('resize.' + this.uniqueName, e => {
-                if (this.element && this.element.is(':visible')) {
+                if (this.domNode && $(this.domNode).is(':visible')) {
                     this.handleResponsive();
                 }
             });
 
-            this.element.closest('.ui-dialog').addClass('flex-layout');
+            $(this.domNode).closest('.ui-dialog').addClass('flex-layout');
         }
         else if (DialogExtensions["dialogFlexify"] &&
             getAttributes(type, FlexifyAttribute, true).length > 0) {
-            DialogExtensions["dialogFlexify"](this.element);
-            DialogExtensions.dialogResizable(this.element);
+            DialogExtensions["dialogFlexify"]($(this.domNode));
+            DialogExtensions.dialogResizable($(this.domNode));
         }
 
         if (getAttributes(type, MaximizableAttribute, true).length > 0) {
-            DialogExtensions.dialogMaximizable(this.element);
+            DialogExtensions.dialogMaximizable($(this.domNode));
         }
 
         var self = this;
-        this.element.bind('dialogopen.' + this.uniqueName, () => {
+        $(this.domNode).on('dialogopen.' + this.uniqueName, () => {
             $(document.body).addClass('modal-dialog-open');
 
             if (this.isResponsive) {
@@ -152,7 +152,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             self.onDialogOpen();
         });
 
-        this.element.bind('dialogclose.' + this.uniqueName, () => {
+        $(this.domNode).on('dialogclose.' + this.uniqueName, () => {
             $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
             self.onDialogClose();
         });
@@ -168,10 +168,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected initModal(): void {
-        if (this.element.hasClass('modal-body'))
+        if (this.domNode.classList.contains('modal-body'))
             return;
 
-        var title = this.element.data('dialogtitle') ?? this.getDialogTitle() ?? '';
+        var title = $(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
         var opt = this.getModalOptions();
         (opt as any)["show"] = false;
         var modalClass = "s-Modal";
@@ -182,7 +182,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         var div = bsModalMarkup(title, '', modalClass);
         var modal = $(div).appendTo(document.body).addClass('flex-layout');
         modal.one('shown.bs.modal.' + this.uniqueName, () => {
-            this.element.triggerHandler('shown.bs.modal');
+            $(this.domNode).triggerHandler('shown.bs.modal');
             this.onDialogOpen();
         });
 
@@ -204,7 +204,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             footer.hide();
 
         (modal as any).modal(opt);
-        modal.find('.modal-body').replaceWith(this.element.removeClass('hidden').addClass('modal-body'));
+        modal.find('.modal-body').replaceWith($(this.domNode).removeClass('hidden').addClass('modal-body'));
         $(window).on('resize.' + this.uniqueName, this.arrange.bind(this));
     }
 
@@ -214,11 +214,11 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             return;
         }
 
-        var hotkeyContext = this.element.closest('.ui-dialog');
+        var hotkeyContext = $(this.domNode).closest('.ui-dialog');
         if (hotkeyContext.length === 0) {
-            hotkeyContext = this.element.closest('.modal');
+            hotkeyContext = $(this.domNode).closest('.modal');
             if (hotkeyContext.length == 0)
-                hotkeyContext = this.element;
+                hotkeyContext = $(this.domNode);
         }
 
         this.toolbar = new Toolbar({ element:toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] });
@@ -251,26 +251,26 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     public dialogOpen(asPanel?: boolean): void {
         asPanel = asPanel ?? this.isMarkedAsPanel;
         if (asPanel) {
-            if (!this.element.hasClass('s-Panel')) {
+            if (!this.domNode.classList.contains('s-Panel')) {
                 // so that panel title is created if needed
-                this.element.on('panelopen.' + this.uniqueName, () => {
+                $(this.domNode).on('panelopen.' + this.uniqueName, () => {
                     this.onDialogOpen();
                 });
-                this.element.on('panelclose.' + this.uniqueName, () => {
+                $(this.domNode).on('panelclose.' + this.uniqueName, () => {
                     this.onDialogClose();
                 });
             }
 
-            TemplatedDialog.openPanel(this.element, this.uniqueName);
+            TemplatedDialog.openPanel(this.domNode, this.uniqueName);
             this.setupPanelTitle();
         }
         else if (this.useBSModal()) {
             this.initModal();
-            (this.element.closest('.modal') as any).modal('show');
+            ($(this.domNode).closest('.modal') as any).modal('show');
         }
         else {
             this.initDialog();
-            (this.element as any).dialog?.('open');
+            ($(this.domNode) as any).dialog?.('open');
         }
     }
 
@@ -280,23 +280,23 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public static bootstrapModal: boolean;
 
-    public static openPanel(element: JQuery, uniqueName: string) {
+    public static openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string) {
         return openPanel(element, uniqueName);
     }
 
-    public static closePanel(element: JQuery, e?: Event) {
+    public static closePanel(element: HTMLElement | ArrayLike<HTMLElement>, e?: Event) {
         return closePanel(element, e);
     }
 
     protected onDialogOpen(): void {
         if (!isMobileView())
-            $(':input', this.element).not('button').eq(0).focus();
+            $(':input', this.domNode).not('button').eq(0).focus();
         this.arrange();
         this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
     }
 
     public arrange(): void {
-        this.element.find('.require-layout').filter(':visible').each(function (i, e) {
+        $(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
             $(e).triggerHandler('layout');
         });
     }
@@ -312,7 +312,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         }
 
         window.setTimeout(() => {
-            var element = this.element;
+            var element = $(this.domNode);
             this.destroy();
             element.remove();
             positionToastContainer(defaultNotifyOptions, false);
@@ -324,7 +324,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             super.addCssClass();
 
             if (this.isResponsive)
-                this.element.addClass("flex-layout");
+                this.domNode.classList.add("flex-layout");
         }
     }
 
@@ -346,7 +346,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         opt.resizable = getAttributes(type, ResizableAttribute, true).length > 0;
         opt.modal = true;
         opt.position = { my: 'center', at: 'center', of: $(window.window) };
-        opt.title = this.element.data('dialogtitle') ?? this.getDialogTitle() ?? '';
+        opt.title = $(this.domNode).data('dialogtitle') ?? this.getDialogTitle() ?? '';
         return opt;
     }
 
@@ -355,44 +355,44 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     public dialogClose(): void {
-        if (this.element.hasClass('ui-dialog-content'))
-            (this.element as any).dialog?.().dialog?.('close');
-        else if (this.element.hasClass('modal-body'))
-            (this.element.closest('.modal') as any).modal('hide');
-        else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
-            TemplatedDialog.closePanel(this.element);
+        if (this.domNode.classList.contains('ui-dialog-content'))
+            ($(this.domNode) as any).dialog?.().dialog?.('close');
+        else if (this.domNode.classList.contains('modal-body'))
+            ($(this.domNode).closest('.modal') as any).modal('hide');
+        else if (this.domNode.classList.contains('s-Panel') && !this.domNode.classList.contains('hidden')) {
+            TemplatedDialog.closePanel(this.domNode);
         }
     }
 
     public get dialogTitle(): string {
-        if (this.element.hasClass('ui-dialog-content'))
-            return (this.element as any).dialog?.('option', 'title');
-        else if (this.element.hasClass('modal-body'))
-            return this.element.closest('.modal').find('.modal-header').children('h5').text();
+        if (this.domNode.classList.contains('ui-dialog-content'))
+            return ($(this.domNode) as any).dialog?.('option', 'title');
+        else if (this.domNode.classList.contains('modal-body'))
+            return $(this.domNode).closest('.modal').find('.modal-header').children('h5').text();
 
-        return this.element.data('dialogtitle');
+        return $(this.domNode).data('dialogtitle');
     }
 
     private setupPanelTitle() {
         var value = this.dialogTitle ?? this.getDialogTitle();
-        var pt = this.element.children('.panel-titlebar');
+        var pt = $(this.domNode).children('.panel-titlebar');
 
         if (!value) {
             pt.remove();
         }
         else {
-            if (!this.element.children('.panel-titlebar').length) {
+            if (!$(this.domNode).children('.panel-titlebar').length) {
                 pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
-                    .prependTo(this.element);
+                    .prependTo(this.domNode);
             }
             pt.children('.panel-titlebar-text').text(value);
 
-            if (this.element.hasClass('s-Panel')) {
+            if (this.domNode.classList.contains('s-Panel')) {
                 if (!pt.children('.panel-titlebar-close').length) {
                     $('<button class="panel-titlebar-close">&nbsp;</button>')
                         .prependTo(pt)
                         .click(e => {
-                            TemplatedDialog.closePanel(this.element, e as any);
+                            TemplatedDialog.closePanel(this.domNode, e as any);
                         });
                 }
             }
@@ -401,14 +401,14 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public set dialogTitle(value: string) {
         var oldTitle = this.dialogTitle;
-        this.element.data('dialogtitle', value);
+        $(this.domNode).data('dialogtitle', value);
 
-        if (this.element.hasClass('ui-dialog-content'))
-            (this.element as any).dialog?.('option', 'title', value);
-        else if (this.element.hasClass('modal-body')) {
-            this.element.closest('.modal').find('.modal-header').children('h5').text(value ?? '');
+        if (this.domNode.classList.contains('ui-dialog-content'))
+            ($(this.domNode) as any).dialog?.('option', 'title', value);
+        else if (this.domNode.classList.contains('modal-body')) {
+            $(this.domNode).closest('.modal').find('.modal-header').children('h5').text(value ?? '');
         }
-        else if (this.element.hasClass('s-Panel')) {
+        else if (this.domNode.classList.contains('s-Panel')) {
             if (oldTitle != this.dialogTitle) {
                 this.setupPanelTitle();
                 this.arrange();
@@ -431,10 +431,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected handleResponsive(): void {
-        var dlg = (this.element as any)?.dialog();
-        var uiDialog = this.element.closest('.ui-dialog');
+        var dlg = ($(this.domNode) as any)?.dialog();
+        var uiDialog = $(this.domNode).closest('.ui-dialog');
         if (isMobileView()) {
-            var data = this.element.data('responsiveData');
+            var data = $(this.domNode).data('responsiveData');
             if (!data) {
                 data = {};
                 data.draggable = dlg.dialog('option', 'draggable');
@@ -445,25 +445,25 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                 data.top = pos.top;
                 data.width = uiDialog.width();
                 data.height = uiDialog.height();
-                data.contentHeight = this.element.height();
-                this.element.data('responsiveData', data);
+                data.contentHeight = $(this.domNode).height();
+                $(this.domNode).data('responsiveData', data);
                 dlg.dialog('option', 'draggable', false);
                 dlg.dialog('option', 'resizable', false);
             }
             uiDialog.addClass('mobile-layout');
             uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
             $(document.body).scrollTop(0);
-            layoutFillHeight(this.element);
+            layoutFillHeight(this.domNode);
         }
         else {
-            var d = this.element.data('responsiveData');
+            var d = $(this.domNode).data('responsiveData');
             if (d) {
                 dlg.dialog('option', 'draggable', d.draggable);
                 dlg.dialog('option', 'resizable', d.resizable);
-                this.element.closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
-                this.element.height(d.contentHeight);
+                $(this.domNode).closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
+                $(this.domNode).height(d.contentHeight);
                 uiDialog.removeClass('mobile-layout');
-                this.element.removeData('responsiveData');
+                $(this.domNode).removeData('responsiveData');
             }
         }
     }

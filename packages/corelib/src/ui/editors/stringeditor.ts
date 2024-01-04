@@ -7,7 +7,7 @@ import { EditorWidget } from "../widgets/widget";
 export class StringEditor<P={}> extends EditorWidget<P> {
 
     public get value(): string {
-        return this.element.val() as string;
+        return $(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -15,7 +15,7 @@ export class StringEditor<P={}> extends EditorWidget<P> {
     }
 
     public set value(value: string) {
-        this.element.val(value);
+        $(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {

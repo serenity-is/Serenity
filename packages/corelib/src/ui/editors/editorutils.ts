@@ -1,4 +1,4 @@
-﻿import { PropertyItem, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
+﻿import { PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
@@ -148,26 +148,30 @@ export namespace EditorUtils {
         }
     }
 
-    export function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery {
-        elements.each(function (index, el) {
-            var elx = $(el);
-            var type = elx.attr('type');
-            if (elx.is('select') || type === 'radio' || type === 'checkbox') {
+    export function setReadonly(elements: HTMLElement | ArrayLike<HTMLElement>, isReadOnly: boolean) {
+        elements = isArrayLike(elements) ? elements : [elements];
+        for (var i = 0; i < elements.length; i++) {
+            let el = elements[i];
+            var type = el.getAttribute('type');
+            if (el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox') {
                 if (isReadOnly) {
-                    elx.addClass('readonly').attr('disabled', 'disabled');
+                    el.classList.add('readonly');
+                    el.setAttribute('disabled', 'disabled');
                 }
                 else {
-                    elx.removeClass('readonly').removeAttr('disabled');
+                    el.classList.remove('readonly');
+                    el.removeAttribute('disabled');
                 }
             }
             else if (isReadOnly) {
-                elx.addClass('readonly').attr('readonly', 'readonly');
+                el.classList.add('readonly');
+                el.setAttribute('readonly', 'readonly');
             }
             else {
-                elx.removeClass('readonly').removeAttr('readonly');
+                el.classList.remove('readonly');
+                el.removeAttribute('readonly');
             }
-        });
-        return elements;
+        }
     }
 
     export function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void {

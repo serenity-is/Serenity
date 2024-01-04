@@ -1711,10 +1711,7 @@ declare namespace Serenity {
      * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
      * @param e The event triggering the open
      */
-    function openPanel(element: (HTMLElement | {
-        jquery: string;
-        get: ((index: number) => HTMLElement);
-    }), uniqueName?: string): void;
+    function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string): void;
 
     interface LookupOptions<TItem> {
         idField?: string;
@@ -2725,11 +2722,11 @@ declare namespace Serenity {
         noRoute?: boolean;
         setHeight?: boolean;
     }): void;
-    function layoutFillHeightValue(element: JQuery): number;
-    function layoutFillHeight(element: JQuery): void;
+    function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>): number;
+    function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>): void;
     function isMobileView(): boolean;
-    function triggerLayoutOnShow(element: JQuery): void;
-    function centerDialog(el: JQuery): void;
+    function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>): void;
+    function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>): void;
 
     namespace LayoutTimer {
         function store(key: number): void;
@@ -2766,7 +2763,7 @@ declare namespace Serenity {
         function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
         function replace(hash: string, tryBack?: boolean): void;
         function replaceLast(hash: string, tryBack?: boolean): void;
-        function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+        function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string): void;
         function resolve(hash?: string): void;
     }
 
@@ -3495,8 +3492,8 @@ declare namespace Serenity {
         dialogOpen(asPanel?: boolean): void;
         private useBSModal;
         static bootstrapModal: boolean;
-        static openPanel(element: JQuery, uniqueName: string): void;
-        static closePanel(element: JQuery, e?: Event): void;
+        static openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
+        static closePanel(element: HTMLElement | ArrayLike<HTMLElement>, e?: Event): void;
         protected onDialogOpen(): void;
         arrange(): void;
         protected onDialogClose(): void;
@@ -3642,10 +3639,10 @@ declare namespace Serenity {
     namespace SubDialogHelper {
         function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
         function triggerDataChange(dialog: Widget<any>): any;
-        function triggerDataChanged(element: JQuery): JQuery;
+        function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void;
         function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-        function cascade(cascadedDialog: any, ofElement: JQuery): any;
-        function cascadedDialogOffset(element: JQuery): any;
+        function cascade(cascadedDialog: any, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
+        function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
     }
 
     namespace DialogExtensions {
@@ -3692,7 +3689,7 @@ declare namespace Serenity {
         function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
         function setValue(editor: Widget<any>, value: any): void;
         function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
-        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
+        function setReadonly(elements: HTMLElement | ArrayLike<HTMLElement>, isReadOnly: boolean): void;
         function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Widget<any>, isRequired: boolean): void;
         function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
@@ -3799,7 +3796,7 @@ declare namespace Serenity {
             onChange: () => void;
         };
         static flatPickrTrigger(input: JQuery): JQuery;
-        static uiPickerZIndexWorkaround(input: JQuery): void;
+        static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
     }
 
     class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
@@ -4208,9 +4205,9 @@ declare namespace Serenity {
         OriginalName?: string;
     }
     interface UploadInputOptions {
-        container?: JQuery;
-        zone?: JQuery;
-        progress?: JQuery;
+        container?: HTMLElement | ArrayLike<HTMLElement>;
+        zone?: HTMLElement | ArrayLike<HTMLElement>;
+        progress?: HTMLElement | ArrayLike<HTMLElement>;
         inputName?: string;
         allowMultiple?: boolean;
         uploadIntent?: string;

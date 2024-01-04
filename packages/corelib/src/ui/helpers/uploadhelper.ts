@@ -1,10 +1,12 @@
-import { ServiceResponse, alertDialog, blockUI, blockUndo, htmlEncode, iframeDialog, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { ServiceResponse, alertDialog, blockUI, blockUndo, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
 import { replaceAll } from "../../q";
 
 export namespace UploadHelper {
 
     export function addUploadInput(options: UploadInputOptions): JQuery {
-        options.container.addClass('fileinput-button');
+        let container = isArrayLike(options.container) ? options.container[0] : options.container;
+        let progress = isArrayLike(options.progress) ? options.progress[0] : options.progress;
+        container.classList.add('fileinput-button');
 
         var uploadUrl = options.uploadUrl || '~/File/TemporaryUpload';
         if (options.uploadIntent) {
@@ -19,7 +21,7 @@ export namespace UploadHelper {
         var uploadInput = $('<input/>').attr('type', 'file')
             .attr('name', options.inputName + '[]')
             .attr('data-url', resolveUrl(uploadUrl))
-            .appendTo(options.container);
+            .appendTo(container);
 
         if (options.allowMultiple) {
             uploadInput.attr('multiple', 'multiple');
@@ -77,20 +79,20 @@ export namespace UploadHelper {
             },
             start: function () {
                 blockUI(null);
-                if (options.progress != null) {
-                    options.progress.show();
+                if (progress) {
+                    $(progress).show();
                 }
             },
             stop: function () {
                 blockUndo();
-                if (options.progress != null) {
-                    options.progress.hide();
+                if (progress) {
+                    $(progress).hide();
                 }
             },
             progress: function (e: Event, data1: any) {
-                if (options.progress != null) {
+                if (progress) {
                     var percent = data1.loaded / data1.total * 100;
-                    options.progress.children().css('width', percent.toString() + '%');
+                    $(progress).children().css('width', percent.toString() + '%');
                 }
             }
         });
@@ -243,9 +245,9 @@ export interface UploadedFile {
 }
 
 export interface UploadInputOptions {
-    container?: JQuery;
-    zone?: JQuery;
-    progress?: JQuery;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
+    zone?: HTMLElement | ArrayLike<HTMLElement>;
+    progress?: HTMLElement | ArrayLike<HTMLElement>;
     inputName?: string;
     allowMultiple?: boolean;
     uploadIntent?: string;

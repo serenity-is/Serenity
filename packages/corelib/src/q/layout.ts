@@ -95,26 +95,26 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
     }
 }
 
-export function layoutFillHeightValue(element: JQuery) {
+export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = 0;
-    element.parent().children().not(element).each(function (i, e) {
+    $(element).parent().children().not($(element)).each(function (i, e) {
         let q = sQuery(e);
         if (q.is(':visible')) {
             h += q.outerHeight(true);
         }
     });
-    h = element.parent().height() - h;
-    if (element.css('box-sizing') !== 'border-box') {
-        h = h - (element.outerHeight(true) - element.height());
+    h = $(element).parent().height() - h;
+    if ($(element).css('box-sizing') !== 'border-box') {
+        h = h - ($(element).outerHeight(true) - $(element).height());
     }
     return h;
 }
 
-export function layoutFillHeight(element: JQuery) {
-    let h = layoutFillHeightValue(element);
+export function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>) {
+    let h = layoutFillHeightValue($(element));
     let n = Math.round(h) + 'px';
-    if (element.css('height') != n) {
-        element.css('height', n);
+    if ($(element).css('height') != n) {
+        $(element).css('height', n);
     }
 }
 
@@ -136,18 +136,18 @@ function initOnLoad() {
 
 sQuery(initOnLoad);
 
-export function triggerLayoutOnShow(element: JQuery) {
+export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>) {
     executeEverytimeWhenVisible(element, function () {
-        element.triggerHandler('layout');
+        $(element).triggerHandler('layout');
     }, true);
 }
 
-export function centerDialog(el: JQuery) {
-    el = el.closest(".ui-dialog");
-    (el as any).position?.({ at: 'center center', of: window });
-    let pos = el.position();
+export function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>) {
+    var dlg = $(el).closest(".ui-dialog");
+    (dlg as any).position?.({ at: 'center center', of: window });
+    let pos = dlg.position();
     if (pos.left < 0)
-        el.css("left", "0px");
+        dlg.css("left", "0px");
     if (pos.top < 0)
-        el.css("top", "0px");
+        dlg.css("top", "0px");
 }

@@ -14,7 +14,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = this.element;
+        let hidden = $(this.domNode);
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null)
             hidden.attr("placeholder", emptyItemText);
@@ -32,7 +32,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     }
 
     protected emptyItemText(): string {
-        var txt = this.element.attr('placeholder');
+        var txt = this.domNode.getAttribute("placeholder");
         if (txt == null) {
             txt = localText('Controls.SelectEditor.EmptyItemText');
         }
@@ -105,7 +105,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
                     window.clearTimeout(queryTimeout);
                 }
 
-                var select2 = $(this.element).data('select2');
+                var select2 = $(this.domNode).data('select2');
                 select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
 
                 queryTimeout = window.setTimeout(() => {
@@ -141,11 +141,11 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     protected addInplaceCreate(title: string): void {
         var self = this;
         $('<a><b/></a>').addClass('inplace-button inplace-create')
-            .attr('title', title).insertAfter(this.element).click(function (e) {
+            .attr('title', title).insertAfter(this.domNode).click(function (e) {
                 self.inplaceCreateClick(e);
             });
 
-        this.get_select2Container().add(this.element)
+        this.get_select2Container().add(this.domNode)
             .addClass('has-inplace-button');
     }
 
@@ -153,11 +153,11 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     }
 
     protected get_select2Container(): JQuery {
-        return this.element.prevAll('.select2-container');
+        return $(this.domNode).prevAll('.select2-container');
     }
 
     get_value(): string {
-        return safeCast(this.element.select2('val'), String);
+        return safeCast($(this.domNode).select2('val'), String);
     }
 
     get value(): string {
@@ -166,7 +166,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
     set_value(value: string) {
         if (value !== this.get_value()) {
-            var el = this.element;
+            var el = $(this.domNode);
             el.select2('val', value);
             el.data('select2-change-triggered', true);
             try {

@@ -23,7 +23,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let textArea = this.element;
+        let textArea = $(this.domNode);
         this._instanceReady = false;
         HtmlContentEditor.includeCKEditor();
 
@@ -48,7 +48,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return null;
         });
 
-        LazyLoadHelper.executeOnceWhenShown(this.element, () => {
+        LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
             var config = this.getConfig();
             (window as any)['CKEDITOR'] && (window as any)['CKEDITOR'].replace(id, config);
         });
@@ -56,11 +56,11 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected instanceReady(x: any): void {
         this._instanceReady = true;
-        $(x.editor.container.$).addClass(this.element.attr('class'));
-        this.element.addClass('select2-offscreen').css('display', 'block');
+        $(x.editor.container.$).addClass(this.domNode.getAttribute("class"));
+        $(this.domNode).addClass('select2-offscreen').css('display', 'block');
 
         // for validation to work
-        x.editor.setData(this.element.val());
+        x.editor.setData($(this.domNode).val());
         x.editor.setReadOnly(this.get_readOnly());
     }
 
@@ -92,7 +92,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 instanceReady: (x: any) => this.instanceReady(x),
                 change: (x1: any) => {
                     x1.editor.updateElement();
-                    this.element.triggerHandler('change');
+                    $(this.domNode).triggerHandler('change');
                 }
             },
             toolbarGroups: [
@@ -133,7 +133,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     }
 
     protected getEditorInstance() {
-        var id = this.element.attr('id');
+        var id = this.domNode.getAttribute("id");
         return (window as any)['CKEDITOR'].instances[id];
     }
 
@@ -149,7 +149,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return instance.getData();
         }
         else {
-            return this.element.val() as string;
+            return $(this.domNode).val() as string;
         }
     }
 
@@ -159,7 +159,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     set_value(value: string): void {
         var instance = this.getEditorInstance();
-        this.element.val(value);
+        $(this.domNode).val(value);
         if (this._instanceReady && instance)
             instance.setData(value);
     }
@@ -169,17 +169,17 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     }
 
     get_readOnly(): boolean {
-        return !!this.element.attr('disabled');
+        return !!this.domNode.getAttribute("disabled");
     }
 
     set_readOnly(value: boolean) {
 
         if (this.get_readOnly() !== value) {
             if (value) {
-                this.element.attr('disabled', 'disabled');
+                $(this.domNode).attr('disabled', 'disabled');
             }
             else {
-                this.element.removeAttr('disabled');
+                $(this.domNode).removeAttr('disabled');
             }
 
             var instance = this.getEditorInstance();

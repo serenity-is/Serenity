@@ -429,10 +429,7 @@ declare function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?:
  * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
  * @param e The event triggering the open
  */
-declare function openPanel(element: (HTMLElement | {
-    jquery: string;
-    get: ((index: number) => HTMLElement);
-}), uniqueName?: string): void;
+declare function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string): void;
 
 interface LookupOptions<TItem> {
     idField?: string;
@@ -1443,11 +1440,11 @@ declare function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLEle
     noRoute?: boolean;
     setHeight?: boolean;
 }): void;
-declare function layoutFillHeightValue(element: JQuery): number;
-declare function layoutFillHeight(element: JQuery): void;
+declare function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>): number;
+declare function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>): void;
 declare function isMobileView(): boolean;
-declare function triggerLayoutOnShow(element: JQuery): void;
-declare function centerDialog(el: JQuery): void;
+declare function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>): void;
+declare function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>): void;
 
 declare namespace LayoutTimer {
     function store(key: number): void;
@@ -1484,7 +1481,7 @@ declare namespace Router {
     function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
     function replace(hash: string, tryBack?: boolean): void;
     function replaceLast(hash: string, tryBack?: boolean): void;
-    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+    function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string): void;
     function resolve(hash?: string): void;
 }
 
@@ -2340,8 +2337,8 @@ declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     dialogOpen(asPanel?: boolean): void;
     private useBSModal;
     static bootstrapModal: boolean;
-    static openPanel(element: JQuery, uniqueName: string): void;
-    static closePanel(element: JQuery, e?: Event): void;
+    static openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
+    static closePanel(element: HTMLElement | ArrayLike<HTMLElement>, e?: Event): void;
     protected onDialogOpen(): void;
     arrange(): void;
     protected onDialogClose(): void;
@@ -2487,10 +2484,10 @@ declare class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
 declare namespace SubDialogHelper {
     function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
     function triggerDataChange(dialog: Widget<any>): any;
-    function triggerDataChanged(element: JQuery): JQuery;
+    function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void;
     function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-    function cascade(cascadedDialog: any, ofElement: JQuery): any;
-    function cascadedDialogOffset(element: JQuery): any;
+    function cascade(cascadedDialog: any, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
+    function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
 }
 
 declare namespace DialogExtensions {
@@ -2537,7 +2534,7 @@ declare namespace EditorUtils {
     function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
     function setValue(editor: Widget<any>, value: any): void;
     function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
-    function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
+    function setReadonly(elements: HTMLElement | ArrayLike<HTMLElement>, isReadOnly: boolean): void;
     function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
     function setRequired(widget: Widget<any>, isRequired: boolean): void;
     function setContainerReadOnly(container: JQuery, readOnly: boolean): void;
@@ -2644,7 +2641,7 @@ declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extend
         onChange: () => void;
     };
     static flatPickrTrigger(input: JQuery): JQuery;
-    static uiPickerZIndexWorkaround(input: JQuery): void;
+    static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
 }
 
 declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
@@ -3053,9 +3050,9 @@ interface UploadedFile {
     OriginalName?: string;
 }
 interface UploadInputOptions {
-    container?: JQuery;
-    zone?: JQuery;
-    progress?: JQuery;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
+    zone?: HTMLElement | ArrayLike<HTMLElement>;
+    progress?: HTMLElement | ArrayLike<HTMLElement>;
     inputName?: string;
     allowMultiple?: boolean;
     uploadIntent?: string;

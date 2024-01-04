@@ -54,7 +54,7 @@ export class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends Ed
             new google.maps.Marker(markerOpt);
         }
 
-        LazyLoadHelper.executeOnceWhenShown(this.element, () => {
+        LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
             // @ts-ignore
             google.maps.event.trigger(this.map, 'resize', []);
             this.map.setCenter(center);

@@ -14,7 +14,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = this.element;
+        let input = $(this.domNode);
         EmailEditor.registerValidationMethods();
 
         input.addClass('emailuser');
@@ -80,8 +80,8 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     get_value(): string {
-        var domain = this.element.nextAll('.emaildomain');
-        var value = this.element.val();
+        var domain = $(this.domNode).nextAll('.emaildomain');
+        var value = $(this.domNode).val();
         var domainValue = domain.val();
         if (!value) {
             if (this.options.readOnlyDomain || !domainValue) {
@@ -97,31 +97,31 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     set_value(value: string): void {
-        var domain = this.element.nextAll('.emaildomain');
+        var domain = $(this.domNode).nextAll('.emaildomain');
         value = value?.trim();
         if (!value) {
             if (!this.options.readOnlyDomain)
                 domain.val('');
-            this.element.val('');
+            $(this.domNode).val('');
         }
         else {
             var parts = value.split('@');
             if (parts.length > 1) {
                 if (!this.options.readOnlyDomain) {
                     domain.val(parts[1]);
-                    this.element.val(parts[0]);
+                    $(this.domNode).val(parts[0]);
                 }
                 else if (this.options.domain) {
                     if (parts[1] !== this.options.domain)
-                        this.element.val(value);
+                        $(this.domNode).val(value);
                     else
-                        this.element.val(parts[0]);
+                        $(this.domNode).val(parts[0]);
                 }
                 else
-                    this.element.val(parts[0]);
+                    $(this.domNode).val(parts[0]);
             }
             else
-                this.element.val(parts[0]);
+                $(this.domNode).val(parts[0]);
         }
     }
 
@@ -130,21 +130,21 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     get_readOnly(): boolean {
-        var domain = this.element.nextAll('.emaildomain');
-        return !(this.element.attr('readonly') == null &&
+        var domain = $(this.domNode).nextAll('.emaildomain');
+        return !(this.domNode.getAttribute("readonly") == null &&
             (!this.options.readOnlyDomain || domain.attr('readonly') == null));
     }
 
     set_readOnly(value: boolean): void {
-        var domain = this.element.nextAll('.emaildomain');
+        var domain = $(this.domNode).nextAll('.emaildomain');
         if (value) {
-            this.element.attr('readonly', 'readonly').addClass('readonly');
+            $(this.domNode).attr('readonly', 'readonly').addClass('readonly');
             if (!this.options.readOnlyDomain) {
                 domain.attr('readonly', 'readonly').addClass('readonly');
             }
         }
         else {
-            this.element.removeAttr('readonly').removeClass('readonly');
+            $(this.domNode).removeAttr('readonly').removeClass('readonly');
             if (!this.options.readOnlyDomain) {
                 domain.removeAttr('readonly').removeClass('readonly');
             }

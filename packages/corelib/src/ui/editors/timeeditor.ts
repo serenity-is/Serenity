@@ -21,7 +21,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
         
-        let input = this.element;
+        let input = $(this.domNode);
         input.addClass('editor s-TimeEditor hour');
 
         if (!this.options.noEmptyOption) {
@@ -33,7 +33,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         }
 
         this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
-        this.minutes.change(() => this.element.trigger("change"));
+        this.minutes.change(() => $(this.domNode).trigger("change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
             addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
@@ -41,7 +41,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     }
 
     public get value(): number {
-        var hour = toId(this.element.val());
+        var hour = toId($(this.domNode).val());
         var minute = toId(this.minutes.val());
         if (hour == null || minute == null) {
             return null;
@@ -56,16 +56,16 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     public set value(value: number) {
         if (!value) {
             if (this.options.noEmptyOption) {
-                this.element.val(this.options.startHour);
+                $(this.domNode).val(this.options.startHour);
                 this.minutes.val('0');
             }
             else {
-                this.element.val('');
+                $(this.domNode).val('');
                 this.minutes.val('0');
             }
         }
         else {
-            this.element.val(Math.floor(value / 60).toString());
+            $(this.domNode).val(Math.floor(value / 60).toString());
             this.minutes.val(value % 60);
         }
     }
@@ -75,17 +75,17 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     }
 
     get_readOnly(): boolean {
-        return this.element.hasClass('readonly');
+        return this.domNode.classList.contains('readonly');
     }
 
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                this.element.addClass('readonly').attr('readonly', 'readonly');
+                $(this.domNode).addClass('readonly').attr('readonly', 'readonly');
             }
             else {
-                this.element.removeClass('readonly').removeAttr('readonly');
+                $(this.domNode).removeClass('readonly').removeAttr('readonly');
             }
             EditorUtils.setReadonly(this.minutes, value);
         }

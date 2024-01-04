@@ -16,7 +16,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let div = this.element;
+        let div = $(this.domNode);
         this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
 
         if (this.options.mode == null)
@@ -32,18 +32,18 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if (useTabs) {
             var itemsWithoutTab = items.filter(f => !f.tab);
             if (itemsWithoutTab.length > 0) {
-                this.createItems(this.element, itemsWithoutTab);
+                this.createItems(this.domNode, itemsWithoutTab);
 
-                $("<div class='pad'></div>").appendTo(this.element);
+                $("<div class='pad'></div>").appendTo(this.domNode);
             }
 
             var itemsWithTab = items.filter(f => f.tab);
 
             var ul = $("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
-                .appendTo(this.element);
+                .appendTo(this.domNode);
 
             var tc = $("<div class='tab-content property-panes'></div>")
-                .appendTo(this.element);
+                .appendTo(this.domNode);
 
             var tabIndex = 0;
             var i = 0;
@@ -86,12 +86,12 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 }
 
                 pane.attr('id', tabID);
-                this.createItems(pane, tabItems);
+                this.createItems(pane[0], tabItems);
                 tabIndex++;
             }
         }
         else {
-            this.createItems(this.element, items);
+            this.createItems(this.domNode, items);
         }
 
         this.updateInterface();
@@ -104,13 +104,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
             this.editors = null;
         }
-        this.element.find('a.category-link').off('click',
+        $(this.domNode).find('a.category-link').off('click',
             this.categoryLinkClick as any).remove();
 
         Widget.prototype.destroy.call(this);
     }
 
-    private createItems(container: JQuery, items: PropertyItem[]) {
+    private createItems(container: HTMLElement, items: PropertyItem[]) {
         var categoryIndexes = {};
         var categoriesDiv = container;
 
@@ -128,13 +128,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
         }
 
-        categoriesDiv = $('<div/>').addClass('categories').appendTo(container);
-        var fieldContainer;
+        categoriesDiv = $('<div/>').addClass('categories').appendTo(container)[0];
+        var fieldContainer: HTMLElement;
         if (useCategories) {
             fieldContainer = categoriesDiv;
         }
         else {
-            fieldContainer = $('<div/>').addClass('category').appendTo(categoriesDiv);
+            fieldContainer = $('<div/>').addClass('category').appendTo(categoriesDiv)[0];
         }
         var priorCategory = null;
         for (var i = 0; i < items.length; i++) {
@@ -151,7 +151,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                         item.collapsed ?? false));
 
                 if (priorCategory == null) {
-                    categoryDiv.addClass('first-category');
+                    $(categoryDiv).addClass('first-category');
                 }
                 priorCategory = category;
                 fieldContainer = categoryDiv;
@@ -162,11 +162,11 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
-    private createCategoryDiv(categoriesDiv: JQuery,
-        categoryIndexes: { [key: string]: number }, category: string, collapsed: boolean) {
+    private createCategoryDiv(categoriesDiv: HTMLElement,
+        categoryIndexes: { [key: string]: number }, category: string, collapsed: boolean): HTMLElement {
 
         var categoryDiv = $('<div/>').addClass('category')
-            .appendTo(categoriesDiv);
+            .appendTo(categoriesDiv)[0];
 
         var title = $('<div/>').addClass('category-title')
             .append($('<a/>').addClass('category-anchor')
@@ -178,13 +178,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             .appendTo(categoryDiv);
 
         if (collapsed != null) {
-            categoryDiv.addClass(((collapsed === true) ?
+            $(categoryDiv).addClass(((collapsed === true) ?
                 'collapsible collapsed' : 'collapsible'));
 
             var img = $('<i/>').addClass(faIcon((collapsed === true) ? "plus" : "minus")).appendTo(title);
 
             title.click(function (e) {
-                categoryDiv.toggleClass('collapsed');
+                $(categoryDiv).toggleClass('collapsed');
                 img.toggleClass(faIcon("plus")).toggleClass(faIcon("minus"));
             });
         }
@@ -249,7 +249,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return text;
     }
 
-    private createField(container: JQuery, item: PropertyItem) {
+    private createField(container: HTMLElement, item: PropertyItem) {
         var fieldDiv = $('<div/>').addClass('field')
             .addClass(item.name).data('PropertyItem', item).appendTo(container);
 
@@ -517,8 +517,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     // Obsolete
-    private static setReadonly(elements: JQuery, isReadOnly: boolean): JQuery {
-        return EditorUtils.setReadonly(elements, isReadOnly);
+    private static setReadonly(elements: ArrayLike<HTMLElement>, isReadOnly: boolean): void {
+        EditorUtils.setReadonly(elements, isReadOnly);
     }
 
     // Obsolete

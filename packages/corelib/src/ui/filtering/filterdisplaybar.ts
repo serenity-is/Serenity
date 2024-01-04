@@ -10,13 +10,13 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.element.find('.cap').text(
+        $(this.domNode).find('.cap').text(
             localText('Controls.FilterPanel.EffectiveFilter'));
 
-        this.element.find('.edit').text(
+        $(this.domNode).find('.edit').text(
             localText('Controls.FilterPanel.EditFilter'));
 
-        this.element.find('.reset').attr('title',
+        $(this.domNode).find('.reset').attr('title',
             localText('Controls.FilterPanel.ResetFilterHint'));
 
         var openFilterDialog = (e: Event) => {
@@ -26,10 +26,10 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
             dialog.dialogOpen(null);
         };
 
-        this.element.find('.edit').click(openFilterDialog as any);
-        this.element.find('.txt').click(openFilterDialog as any);
+        $(this.domNode).find('.edit').click(openFilterDialog as any);
+        $(this.domNode).find('.txt').click(openFilterDialog as any);
 
-        this.element.find('.reset').click(e1 => {
+        $(this.domNode).find('.reset').click(e1 => {
             e1.preventDefault();
             this.get_store().get_items().length = 0;
             this.get_store().raiseChanged();
@@ -41,13 +41,13 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
         var displayText = this.get_store().get_displayText()?.trim() || null;
 
-        this.element.find('.current').toggle(displayText != null);
-        this.element.find('.reset').toggle(displayText != null);
+        $(this.domNode).find('.current').toggle(displayText != null);
+        $(this.domNode).find('.reset').toggle(displayText != null);
 
         if (displayText == null)
             displayText = localText('Controls.FilterPanel.EffectiveEmpty');
 
-        this.element.find('.txt').text('[' + displayText + ']');
+        $(this.domNode).find('.txt').text('[' + displayText + ']');
     }
 
     protected getTemplate() {

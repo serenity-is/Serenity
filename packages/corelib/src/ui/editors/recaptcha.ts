@@ -15,7 +15,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
     constructor(props: EditorProps<P>) {
         super(props);
 
-        this.element.addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
+        $(this.domNode).addClass('g-recaptcha').attr('data-sitekey', this.options.siteKey);
         if (!!((window as any)['grecaptcha'] == null && $('script#RecaptchaInclude').length === 0)) {
             var src = 'https://www.google.com/recaptcha/api.js';
             var lng = this.options.language;
@@ -26,7 +26,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
             $('<script/>').attr('id', 'RecaptchaInclude').attr('src', src).appendTo(document.body);
         }
 
-        var valInput = $('<input />').insertBefore(this.element)
+        var valInput = $('<input />').insertBefore(this.domNode)
             .attr('id', this.uniqueName + '_validate').val('x');
 
         var gro: Record<string, string> = {};
@@ -47,7 +47,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
     }
 
     get_value(): string {
-        return this.element.find('.g-recaptcha-response').val() as string;
+        return $(this.domNode).find('.g-recaptcha-response').val() as string;
     }
 
     set_value(value: string): void {
