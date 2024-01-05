@@ -617,7 +617,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                     (this.get_mode() === PropertyGridMode.insert && item.hideOnInsert === true) ||
                     (this.get_mode() === 2 && item.hideOnUpdate === true);
 
-                editor.getGridField().toggle(!hidden);
+                var field = editor.getFieldElement();
+                if (field)
+                    field.classList.toggle("hidden", !!hidden);
             }
         }
     }

@@ -167,14 +167,14 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
     set_value(value: string) {
         if (value !== this.get_value()) {
-            var el = sQuery(this.domNode);
-            el.select2('val', value);
-            el.data('select2-change-triggered', true);
+            var el = this.domNode;
+            sQuery(el).select2('val', value);
+            el.dataset.select2settingvalue = "true";
             try {
-                el.triggerHandler('change', [true]); // valueSet: true
+                sQuery(el).trigger('change');
             }
             finally {
-                el.data('select2-change-triggered', false);
+                delete el.dataset.select2settingvalue;
             }
         }
     }

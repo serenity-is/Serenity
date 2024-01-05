@@ -39,12 +39,12 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
         var input = valInput.css(gro);
         var self = this;
 
-        addValidationRule(input, this.uniqueName, e => {
+        addValidationRule(input, e => {
             if (!this.get_value()) {
                 return localText('Validation.Required');
             }
             return null;
-        });
+        }, this.uniqueName);
     }
 
     get_value(): string {

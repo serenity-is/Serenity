@@ -1,8 +1,8 @@
-﻿import sQuery from "@optionaldeps/squery";
-import validator from "@optionaldeps/jquery.validation";
-import { Config, htmlEncode, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
+﻿import validator from "@optionaldeps/jquery.validation";
+import sQuery from "@optionaldeps/squery";
+import { Config, htmlEncode, isArrayLike, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
-import { Exception, extend } from "./system-compat";
+import { extend } from "./system-compat";
 
 if (validator && validator.methods && validator.addMethod) {
 
@@ -15,33 +15,32 @@ if (validator && validator.methods && validator.addMethod) {
         }
     }
 
-    validator.addMethod('customValidate', function (value: any, element: any) {
-        var result = this.optional(element) as any;
-        if (element == null || !!result) {
+    validator.addMethod('customValidate', function (value: any, element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) {
+        let result = this.optional(element) as any;
+        if (!element || !!result)
             return result;
-        }
-        var events = (sQuery as any)._data(element, 'events');
-        if (!events) {
-            return true;
-        }
-        var handlers = events.customValidate;
-        if (handlers == null || handlers.length === 0) {
-            return true;
-        }
 
-        var el = sQuery(element);
-        for (var i = 0; !!(i < handlers.length); i++) {
-            if (sQuery.isFunction(handlers[i].handler)) {
-                var message = handlers[i].handler(el);
-                if (message != null) {
-                    el.data('customValidationMessage', message);
-                    return false;
+        let rules = customValidateRules.get(element);
+        if (!rules)
+            return true;
+
+        for (let k in rules) {
+            let handlers = rules[k];
+            for (let handler of handlers) {
+                if (typeof handler === "function") {
+                    let message = handler(element);
+                    if (message != null) {
+                        element.dataset.customvalidationmessage = message;
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
-    }, function (o: any, e: any) {
-        return sQuery(e).data('customValidationMessage');
+
+    }, function (_, element: any) {
+        return element?.dataset?.customvalidationmessage;
     });
 
     validator.addMethod("dateQ", function (value, element) {
@@ -228,16 +227,30 @@ export function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptio
     return form.validate(extend(baseValidateOptions(), opt));
 }
 
-export function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery {
-    if (!element.length)
-        return element;
-    if (rule == null)
-        throw new Exception('rule is null!');
-    element.addClass('customValidate').bind('customValidate.' + eventClass, rule as any);
-    return element;
+let customValidateRules: WeakMap<HTMLElement, { [key: string]: ((input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string)[] }> = new WeakMap();
+
+export function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string,
+    eventClass?: string): void {
+    element = isArrayLike(element) ? element[0] : element;
+    if (!element)
+        return;
+    element.classList.add('customValidate');
+    var rules = customValidateRules.get(element);
+    if (!rules)
+        customValidateRules.set(element, rules = {});
+    eventClass ??= '';
+    rules[eventClass] ??= [];
+    rules[eventClass].push(rule);
 }
 
-export function removeValidationRule(element: JQuery, eventClass: string): JQuery {
-    element.unbind('customValidate.' + eventClass);
-    return element;
+export function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, eventClass: string): void {
+    element = isArrayLike(element) ? element[0] : element;
+    if (!element)
+        return;
+    var rules = customValidateRules.get(element);
+    if (rules) {
+        delete rules[eventClass];
+        if (!Object.keys(rules).length)
+            customValidateRules.delete(element);
+    }
 }

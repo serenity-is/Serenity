@@ -81,7 +81,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 addOption(this.time, t, t);
             }
 
-            addValidationRule(input, this.uniqueName, e1 => {
+            addValidationRule(input, e1 => {
                 var value = this.get_value();
                 if (!value) {
                     return null;
@@ -96,7 +96,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 }
 
                 return null;
-            });
+            }, this.uniqueName);
         }
         else
             input.attr('type', 'datetime').addClass('dateTimeQ');

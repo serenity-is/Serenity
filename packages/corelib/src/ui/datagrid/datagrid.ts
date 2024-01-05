@@ -24,6 +24,7 @@ import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
+import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 
 export interface SettingStorage {
     getItem(key: string): string | Promise<string>;
@@ -293,18 +294,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.find(type, field);
 
-        return sQuery('#' + this.uniqueName + '_QuickFilter_' + field).getWidget(type);
+        return getWidgetFrom('#' + this.uniqueName + '_QuickFilter_' + field, type);
     }
 
     protected tryFindQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.tryFind(type, field);
 
-        var el = sQuery('#' + this.uniqueName + '_QuickFilter_' + field);
-        if (!el.length)
-            return null;
-
-        return el.tryGetWidget(type);
+        return tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, type);
     }
 
     protected createIncludeDeletedButton(): void {
@@ -1334,7 +1331,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                         return;
                     }
 
-                    var widget = sQuery('#' + this.uniqueName + '_QuickFilter_' + field).tryGetWidget(Widget);
+                    var widget = tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, Widget);
                     if (widget == null) {
                         return;
                     }
@@ -1351,9 +1348,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             }
 
             if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
-                var qsInput = this.toolbar.element.find('.s-QuickSearchInput').first();
-                if (qsInput.length > 0) {
-                    var qsWidget = qsInput.tryGetWidget(QuickSearchInput);
+                var qsInput = this.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+                if (qsInput) {
+                    var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
                     qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
                 }
             }
@@ -1410,10 +1407,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         if (flags.quickSearch === true) {
-            var qsInput = this.toolbar.element.find('.s-QuickSearchInput').first();
-            if (qsInput.length > 0) {
-                var qsWidget = qsInput.tryGetWidget(QuickSearchInput);
-                if (qsWidget != null) {
+            var qsInput = this.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+            if (qsInput) {
+                var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
+                if (qsWidget) {
                     settings.quickSearchField = qsWidget.get_field();
                     settings.quickSearchText = qsWidget.element.val() as string;
                 }
@@ -1428,10 +1425,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                     return;
                 }
 
-                var widget = sQuery('#' + this.uniqueName + '_QuickFilter_' + field).tryGetWidget(Widget);
-                if (widget == null) {
+                var widget = tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, Widget);
+                if (!widget)
                     return;
-                }
 
                 var saveState = sQuery(e).data('qfsavestate');
                 var state = (saveState != null) ? saveState(widget) : EditorUtils.getValue(widget);

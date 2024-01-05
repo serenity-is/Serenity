@@ -20,7 +20,7 @@ export namespace WX {
     }
 
     export function getGridField(widget: Widget<any>): JQuery {
-        return widget.getGridField();
+        return jQuery(widget.getGridField());
     }
 }
 

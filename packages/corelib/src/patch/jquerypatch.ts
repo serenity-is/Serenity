@@ -1,59 +1,20 @@
-﻿import { faIcon, getInstanceType, getTypeFullName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
+﻿import { faIcon, getTypeFullName, stringFormat } from "@serenity-is/base";
 import { isMobileView } from "../q";
+import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
-function applyGetWidgetExtensions(jQuery: any, widgetType: { getWidgetName(type: any): string }) {
-    if (!widgetType || !jQuery || !jQuery.fn || jQuery.isMock)
+function applyGetWidgetExtensions(jQuery: any) {
+    if (!jQuery || !jQuery.fn || jQuery.isMock)
         return;
 
-    jQuery.fn.tryGetWidget = function tryGetWidget(this: JQuery, type?: any) {
-        var element = this;
-        var w;
-        type ??= widgetType;
-        if (isAssignableFrom(widgetType, type)) {
-            var widgetName = widgetType.getWidgetName(type);
-            w = element.data(widgetName);
-            if (w != null && !isAssignableFrom(type, getInstanceType(w))) {
-                w = null;
-            }
-            if (w != null) {
-                return w;
-            }
-        }
-
-        var data = element.data();
-        if (data == null) {
-            return null;
-        }
-
-        for (var key of Object.keys(data)) {
-            w = data[key];
-            if (w != null && isAssignableFrom(type, getInstanceType(w))) {
-                return w;
-            }
-        }
-
-        return null;
+    jQuery.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: JQuery,  type?: { new (...args: any[]): TWidget }): TWidget {
+        return tryGetWidget(this[0], type);
     }
 
-    jQuery.fn.getWidget = function getWidget<TWidget>(this: JQuery, type: { new(...args: any[]): TWidget }) {
-        if (this == null)
-            throw new Error("element argument is required for getting widgets!");
+    jQuery.fn.getWidget = function getWidget$<TWidget>(this: JQuery,  type?: { new (...args: any[]): TWidget }): TWidget {
+        if (!this?.length)
+            throw new Error(`Searching for widget of type '${getTypeFullName(type)}' on a non-existent element! (${(this as any)?.selector})`);
 
-        if (this.length === 0) {
-            throw new Error(stringFormat("Searching for widget of type '{0}' on a non-existent element! ({1})",
-                getTypeFullName(type), (this as any).selector));
-        }
-
-        var w = (this as any).tryGetWidget(type);
-        if (w == null) {
-            var message = stringFormat("Element has no widget of type '{0}'! If you have recently changed " +
-                "editor type of a property in a form class, or changed data type in row (which also changes " +
-                "editor type) your script side Form definition might be out of date. Make sure your project " +
-                "builds successfully and transform T4 templates", getTypeFullName(type));
-            notifyError(message, '', null);
-            throw new Error(message);
-        }
-        return w;
+        return getWidgetFrom(this[0], type);
     };
 }
 
@@ -117,8 +78,8 @@ function applyCleanDataPatch(jQuery: any) {
     })((jQuery as any).cleanData);
 }
 
-export function jQueryPatch(jQuery: any, widgetType: { getWidgetName(type: any): string }) {
+export function jQueryPatch(jQuery: any) {
     !applyJQueryUIFixes(jQuery) && jQuery && jQuery(applyJQueryUIFixes);
     applyCleanDataPatch(jQuery);
-    applyGetWidgetExtensions(jQuery, widgetType);
+    applyGetWidgetExtensions(jQuery);
 }

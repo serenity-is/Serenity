@@ -2,6 +2,7 @@
 import { Decorators } from "../../decorators";
 import { findElementWithRelativeId } from "../../q";
 import { Widget } from "../widgets/widget";
+import { tryGetWidget } from "../widgets/widgetutils";
 
 @Decorators.registerClass('Serenity.CascadedWidgetLink')
 export class CascadedWidgetLink<TParent extends Widget<any>> {
@@ -25,7 +26,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
+        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
             parent.element.bind('change.' + (this.widget as any).uniqueName, () => {
@@ -45,7 +46,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
+        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
             parent.element.unbind('.' + (this.widget as any).uniqueName);

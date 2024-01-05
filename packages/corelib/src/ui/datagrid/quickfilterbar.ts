@@ -9,6 +9,7 @@ import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { QuickFilter } from "./quickfilter";
+import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 
 export interface QuickFilterBarOptions {
     filters: QuickFilter<Widget<any>, any>[];
@@ -366,14 +367,10 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public find<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        return sQuery('#' + this.options.idPrefix + field).getWidget(type);
+        return getWidgetFrom('#' + this.options.idPrefix + field, type);
     }
 
     public tryFind<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        var el = sQuery('#' + this.options.idPrefix + field);
-        if (!el.length)
-            return null;
-
-        return el.tryGetWidget(type);
+        return tryGetWidget('#' + this.options.idPrefix + field, type);
     }
 }

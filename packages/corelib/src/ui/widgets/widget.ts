@@ -1,45 +1,28 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Config, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, stringFormat, toggleClass } from "@serenity-is/base";
-import { Decorators, ElementAttribute } from "../../decorators";
+﻿import jQuery from "@optionaldeps/jquery";
+import { Config, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
+import { Decorators } from "../../decorators";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
-import { Exception, addValidationRule as addValRule, appendChild, getAttributes, replaceAll } from "../../q";
-import { EditorUtils } from "../editors/editorutils";
-
-export type NoInfer<T> = [T][T extends any ? 0 : never];
-
-export type WidgetProps<P> = {
-    id?: string;
-    class?: string;
-    element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
-} & NoInfer<P>
-
-export type EditorProps<T> = WidgetProps<T> & {
-    initialValue?: any;
-    maxLength?: number;
-    name?: string;
-    placeholder?: string;
-    required?: boolean;
-    readOnly?: boolean;
-}
+import { addValidationRule, appendChild, replaceAll } from "../../q";
+import { createDefaultElement, ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
+import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type EditorProps, type WidgetProps } from "./widgetutils";
+export { getWidgetFrom, tryGetWidget, useIdPrefix, type EditorProps, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     type?: { new(options?: P): TWidget, prototype: TWidget };
     options?: P & WidgetProps<{}>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
-    element?: (e: JQuery) => void;
+    element?: (e: HTMLElement) => void;
     init?: (w: TWidget) => void;
 }
 
 let initialized = Symbol();
-let isFragmentWorkaround = Symbol();
 let renderContentsCalled = Symbol();
 
 @Decorators.registerClass('Serenity.Widget')
 export class Widget<P = {}> {
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
-    declare protected readonly widgetName: string;
     declare protected readonly uniqueName: string;
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
@@ -55,21 +38,20 @@ export class Widget<P = {}> {
         }
 
         delete this.options.element;
-        this.setElementProps();
+        setElementProps(this, this.props as any);
 
-        this.widgetName = Widget.getWidgetName(getInstanceType(this));
-        this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
+        let widgetName = getWidgetName(getInstanceType(this));
+        this.uniqueName = widgetName + (Widget.nextWidgetNumber++).toString();
 
-        if (!sQuery.isMock) {
-            if (sQuery(this.domNode).data(this.widgetName))
-                throw new Exception(stringFormat("The element already has widget '{0}'!", this.widgetName));
+        associateWidget(this);
 
-            sQuery(this.domNode).on('remove.' + this.widgetName, e => {
+        if (jQuery) {
+            jQuery(this.domNode).on('remove.' + widgetName, e => {
                 if (e.bubbles || e.cancelable) {
                     return;
                 }
                 this.destroy();
-            }).data(this.widgetName, this);
+            }).data(widgetName, this);
         }
 
         this.idPrefix = this.uniqueName + '_';
@@ -79,40 +61,26 @@ export class Widget<P = {}> {
 
     public destroy(): void {
         if (this.domNode) {
+            deassociateWidget(this);
             toggleClass(this.domNode, this.getCssClass(), false);
-            !sQuery.isMock && sQuery(this.domNode).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+            if (jQuery) {
+                let widgetName = getWidgetName(getInstanceType(this));
+                jQuery(this.domNode).off('.' + widgetName).off('.' + this.uniqueName).removeData(widgetName);
+            }
             delete (this as any).domNode;
         }
     }
 
     static createDefaultElement(): HTMLElement {
-        var elementAttr = getAttributes(this, ElementAttribute, true);
-        if (elementAttr.length) {
-            let node: HTMLElement;
-            if (!sQuery.isMock) {
-                node = sQuery(elementAttr[0].value).get(0);
-                node.parentNode?.removeChild(node);
-                return node;
-            }
-            let wrap = document.createElement("div");
-            wrap.innerHTML = elementAttr[0].value;
-            node = wrap.children[0] as HTMLElement;
-            if (!node)
-                return document.createElement(this.defaultTagName);
-            node.parentNode?.removeChild(node);
-            return node;
-        }
-        else {
-            return document.createElement(this.defaultTagName);
-        }
+        return createDefaultElement(this);
     }
 
     /**
      * @deprecated
-     * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+     * Prefer domNode as this one depends on jQuery
      */
     public get element(): JQuery {
-        return sQuery(this.domNode);
+        return jQuery(this.domNode);
     }
 
     protected addCssClass(): void {
@@ -140,46 +108,42 @@ export class Widget<P = {}> {
     }
 
     public static getWidgetName(type: Function): string {
-        return replaceAll(getTypeFullName(type), '.', '_');
+        return getWidgetName(type);
     }
 
-    /**
-     * @deprecated Prefer WidgetType.createDefaultElement
-     */
-    public static elementFor(editorType: typeof Widget): JQuery {
-        return sQuery(editorType.createDefaultElement());
-    }
-
-    public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return addValRule(sQuery(this.domNode), eventClass, rule);
+    public addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
+    public addValidationRule(eventClass: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
+    public addValidationRule(arg1: any, arg2: any): void {
+        addValidationRule(this.domNode, typeof arg1 === "function" ? arg1 : arg2, typeof arg1 === "function" ? arg2 ?? this.uniqueName : arg1);
     }
 
     public getFieldElement(): HTMLElement {
         return this.domNode.closest('.field');
     }
 
-    public getGridField(): JQuery {
-        return sQuery(this.domNode).closest('.field');
+    public getGridField(): HTMLDivElement {
+        return this.domNode.closest('.field');
     }
 
     public change(handler: (e: Event) => void) {
-        sQuery(this.domNode).on('change.' + this.uniqueName, handler);
+        this.domNode.addEventListener('change', handler);
     };
 
     public changeSelect2(handler: (e: Event) => void) {
-        sQuery(this.domNode).on('change.' + this.uniqueName, function (e, valueSet) {
-            if (valueSet !== true)
-                handler(e as any);
+        this.domNode.addEventListener("change", e => {
+            if ((e.target as HTMLElement)?.dataset?.select2settingvalue)
+                return;
+            handler(e);
         });
-    };
+    }
 
     protected static defaultTagName: string = "div";
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
         let node = handleElementProp(params.type as any, props);
-        params.container && (isArrayLike(params.container) ? sQuery(params.container).append(node) : params.container.appendChild(node));
-        params.element?.(sQuery(node));
+        params.container && (isArrayLike(params.container) ? params.container[0] : params.container)?.appendChild(node);
+        params.element?.(node);
         props.element = node;
         let widget = new params.type(props as any);
         widget.init();
@@ -187,61 +151,7 @@ export class Widget<P = {}> {
         return widget;
     }
 
-    private setElementProps(): void {
-        let el = this.domNode;
-        let props = this.props as EditorProps<{}>;
-        if (!el || !props)
-            return;
-
-        if (typeof props.id === "string")
-            el.id = props.id;
-
-        if (typeof props.name === "string")
-            el.setAttribute("name", props.name);
-
-        if (typeof props.placeholder === "string")
-            el.setAttribute("placeholder", props.placeholder);
-
-        if (typeof props.class === "string")
-            toggleClass(el, props.class, true);
-
-        if (typeof (props as any).className === "string")
-            toggleClass(el, (props as any).className, true);
-
-        if (typeof props.maxLength === "number")
-            el.setAttribute("maxLength", (props.maxLength || 0).toString());
-        else if (typeof (props as any).maxlength === "number")
-            el.setAttribute("maxLength", ((props as any).maxlength || 0).toString());
-
-        // using try catch here as some editors might not be able
-        // to set them in the constructor if forwarding these
-        // properties to any elements created in the constructor
-        if (props.required != null)
-        {
-            try {
-                EditorUtils.setRequired(this, props.required);
-            }
-            catch {
-            }
-        }
-
-        if (props.readOnly != null) {
-            try {
-                EditorUtils.setReadOnly(this, props.readOnly);
-            }
-            catch {
-            }
-        }
-
-        if (props.initialValue != null) {
-            try {
-                EditorUtils.setValue(this, props.initialValue);            
-            }
-            catch {
-            }
-        }
-    }
-
+    
     protected internalInit() {
         getInstanceType(this).deferRenderContents && this.internalRenderContents();
 
@@ -301,37 +211,6 @@ export class Widget<P = {}> {
     }
 }
 
-function ensureParentOrFragment(node: HTMLElement): HTMLElement {
-    if (!node || node.parentNode)
-        return node;
-    let fragment = document.createDocumentFragment();
-    fragment.appendChild(node);
-    (fragment as any)[isFragmentWorkaround] = true;
-    return node;
-}
-
-function handleElementProp(type: typeof Widget, props: WidgetProps<{}>): HTMLElement {
-    let elementProp = props?.element;
-    let domNode: HTMLElement;
-    if (typeof elementProp == "string") {
-        domNode = document.querySelector(elementProp);
-        if (domNode == null)
-            throw `The element ${elementProp} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
-    }
-    else if (isArrayLike(elementProp)) {
-        domNode = elementProp[0];
-    }
-    else if (elementProp instanceof HTMLElement) {
-        domNode = elementProp;
-    }
-    else {
-        domNode = type.createDefaultElement();
-        if (typeof elementProp === "function")
-            elementProp(domNode);
-    }
-
-    return ensureParentOrFragment(domNode);
-}
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
@@ -341,21 +220,5 @@ export class EditorWidget<P> extends Widget<EditorProps<P>> {
     }
 }
 
-
-type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
-
-export function useIdPrefix(prefix: string): IdPrefixType {
-    return new Proxy({ _: prefix ?? '' }, idPrefixHandler);
-}
-
-const idPrefixHandler = {
-    get(target: any, p: string) {
-        if (p.startsWith('#'))
-            return '#' + target._ + p.substring(1);
-
-        return target._ + p;
-    }
-};
-
-jQueryPatch(sQuery, Widget);
+jQueryPatch(jQuery);
 reactPatch();

@@ -3,6 +3,7 @@ import { PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, t
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
+import { tryGetWidget } from "../widgets/widgetutils";
 
 export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
     return isInputTag(node?.nodeName);
@@ -224,7 +225,7 @@ export namespace EditorUtils {
 
             container.removeClass('readonly-container').find(".editor.container-readonly")
                 .removeClass('container-readonly').each((i, e) => {
-                    var w = sQuery(e).tryGetWidget() as any;
+                    var w = tryGetWidget(e) as any;
                     if (w != null)
                         EditorUtils.setReadOnly(w, false);
                     else
@@ -237,7 +238,7 @@ export namespace EditorUtils {
         container.addClass('readonly-container').find(".editor")
             .not('.container-readonly')
             .each((i, e) => {
-                var w = sQuery(e).tryGetWidget() as any;
+                var w = tryGetWidget(e) as any;
                 if (w != null) {
 
                     if (w['get_readOnly']) {

@@ -61,7 +61,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
         input.on('change.' + this.uniqueName, DateEditor.dateInputChange);
 
-        addValidationRule(input, this.uniqueName, e1 => {
+        addValidationRule(input, e1 => {
             var value = this.get_value();
             if (!value) {
                 return null;
@@ -76,7 +76,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             }
 
             return null;
-        });
+        }, this.uniqueName);
 
         this.set_sqlMinMax(true)
     }

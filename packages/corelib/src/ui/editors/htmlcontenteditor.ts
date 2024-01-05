@@ -40,8 +40,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         if (this.options.rows != null)
             textArea.attr('rows', this.options.rows);
 
-        this.addValidationRule(this.uniqueName, e => {
-            if (e.hasClass('required')) {
+        this.addValidationRule(this.uniqueName, input => {
+            if (input.classList.contains('required')) {
                 if (!this.get_value()?.trim())
                     return localText('Validation.Required');
             }

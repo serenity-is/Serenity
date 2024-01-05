@@ -2580,7 +2580,6 @@ declare namespace Serenity {
      */
     function parseDayHourAndMin(s: string): number;
 
-    function isJQueryReal(val: any): val is JQuery;
     /**
      * Adds an empty option to the select.
      * @param select the select element
@@ -2602,21 +2601,12 @@ declare namespace Serenity {
      * @param context the context element (optional)
      * @returns the element with the given relative id to the source element.
      */
-    function findElementWithRelativeId(element: ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery;
-    /**
-     * Finds the first element with the given relative id to the source element.
-     * It can handle underscores in the source element id.
-     * @param element the source element
-     * @param relativeId the relative id to the source element
-     * @param context the context element (optional)
-     * @returns the element with the given relative id to the source element.
-     */
-    function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
+    function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): HTMLElement;
     /**
      * Creates a new DIV and appends it to the body.
      * @returns the new DIV element.
      */
-    function newBodyDiv(): JQuery;
+    function newBodyDiv(): HTMLDivElement;
     /**
      * Returns the outer HTML of the element.
      */
@@ -2629,6 +2619,20 @@ declare namespace Serenity {
      */
     function appendChild(child: any, node: HTMLElement): void;
 
+    function tryGetWidget<TWidget>(element: Element | string, type?: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    function getWidgetFrom<TWidget>(element: Element | string, type?: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    type IdPrefixType = {
+        [key: string]: string;
+        Form: string;
+        Tabs: string;
+        Toolbar: string;
+        PropertyGrid: string;
+    };
+    function useIdPrefix(prefix: string): IdPrefixType;
     type NoInfer<T> = [T][T extends any ? 0 : never];
     type WidgetProps<P> = {
         id?: string;
@@ -2643,6 +2647,7 @@ declare namespace Serenity {
         required?: boolean;
         readOnly?: boolean;
     };
+
     interface CreateWidgetParams<TWidget extends Widget<P>, P> {
         type?: {
             new (options?: P): TWidget;
@@ -2650,13 +2655,12 @@ declare namespace Serenity {
         };
         options?: P & WidgetProps<{}>;
         container?: HTMLElement | ArrayLike<HTMLElement>;
-        element?: (e: JQuery) => void;
+        element?: (e: HTMLElement) => void;
         init?: (w: TWidget) => void;
     }
     class Widget<P = {}> {
         private static nextWidgetNumber;
         protected readonly options: WidgetProps<P>;
-        protected readonly widgetName: string;
         protected readonly uniqueName: string;
         readonly idPrefix: string;
         readonly domNode: HTMLElement;
@@ -2665,24 +2669,20 @@ declare namespace Serenity {
         static createDefaultElement(): HTMLElement;
         /**
          * @deprecated
-         * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+         * Prefer domNode as this one depends on jQuery
          */
         get element(): JQuery;
         protected addCssClass(): void;
         protected getCssClass(): string;
         static getWidgetName(type: Function): string;
-        /**
-         * @deprecated Prefer WidgetType.createDefaultElement
-         */
-        static elementFor(editorType: typeof Widget): JQuery;
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
+        addValidationRule(eventClass: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
         getFieldElement(): HTMLElement;
-        getGridField(): JQuery;
+        getGridField(): HTMLDivElement;
         change(handler: (e: Event) => void): void;
         changeSelect2(handler: (e: Event) => void): void;
         protected static defaultTagName: string;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
-        private setElementProps;
         protected internalInit(): void;
         init(): this;
         /**
@@ -2700,14 +2700,6 @@ declare namespace Serenity {
     class EditorWidget<P> extends Widget<EditorProps<P>> {
         constructor(props: EditorProps<P>);
     }
-    type IdPrefixType = {
-        [key: string]: string;
-        Form: string;
-        Tabs: string;
-        Toolbar: string;
-        PropertyGrid: string;
-    };
-    function useIdPrefix(prefix: string): IdPrefixType;
 
     function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
         type: CreateWidgetParams<TGrid, P>["type"];
@@ -2965,8 +2957,8 @@ declare namespace Serenity {
     function getHighlightTarget(el: HTMLElement): HTMLElement;
     function baseValidateOptions(): JQueryValidation.ValidationOptions;
     function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
-    function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-    function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+    function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
+    function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, eventClass: string): void;
 
     namespace Aggregators {
         function Avg(field: string): void;
@@ -3538,11 +3530,6 @@ declare namespace Serenity {
         function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
         function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
         function getValidator(element: JQuery): JQueryValidation.Validator;
-    }
-    namespace VX {
-        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-        function validateElement(validator: JQueryValidation.Validator, widget: Widget<any>): boolean;
     }
 
     class CascadedWidgetLink<TParent extends Widget<any>> {

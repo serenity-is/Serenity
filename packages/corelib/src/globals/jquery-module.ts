@@ -1,3 +1,2 @@
 /// <reference types="jquery" />
-const $: JQueryStatic = typeof jQuery === "function" ? jQuery : typeof window !== "undefined" ? (window as any).jQuery : undefined;
-export default $;
+export default typeof jQuery === "function" ? jQuery : typeof $ === "function" && $.fn ? $ : undefined;

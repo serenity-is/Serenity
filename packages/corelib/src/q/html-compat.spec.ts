@@ -1,5 +1,4 @@
 ﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
-import sQuery from "@optionaldeps/squery";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {
@@ -129,14 +128,14 @@ describe("findElementWithRelativeId", () => {
         }
     });
 
-    it("may use jQuery if a jQuery object is passed", () => {
+    it("may use jQuery if a jQuery like object is passed", () => {
         var target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
         document.body.append(from);
         try {
-            expect(findElementWithRelativeId(sQuery(from), "test")?.get(0) === target).toBe(true);
+            expect(findElementWithRelativeId([from], "test") === target).toBe(true);
         }
         finally {
             target.remove();
@@ -254,7 +253,7 @@ describe("findElementWithRelativeId", () => {
         document.body.append(country);
         document.body.append(city);
         try {
-            expect(findElementWithRelativeId(sQuery(city), "Country")?.get?.(0) === country).toBe(true);
+            expect(findElementWithRelativeId([city], "Country") === country).toBe(true);
         }
         finally {
             city.remove();
@@ -280,14 +279,14 @@ describe("outerHtml", () => {
     it("returns the outer html of the element", () => {
         const div = document.createElement("div");
         div.innerHTML = "<span>test</span>";
-        expect(outerHtml(sQuery(div))).toBe("<div><span>test</span></div>");
+        expect(outerHtml([div])).toBe("<div><span>test</span></div>");
     });
 });
 
 describe("newBodyDiv", () => {
     it("creates a new div and appends it to the document body", () => {
         const div = newBodyDiv();
-        expect(div.parent().get(0) === document.body).toBe(true);
-        expect(div.get(0).tagName).toBe("DIV");
+        expect(div.parentElement === document.body).toBe(true);
+        expect(div.nodeName).toBe("DIV");
     });
 });

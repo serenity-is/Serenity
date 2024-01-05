@@ -1,9 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { htmlEncode, isArrayLike, isPromiseLike, localText } from "@serenity-is/base";
-
-export function isJQueryReal(val: any): val is JQuery {
-    return isArrayLike(val) && !(val as any).isMock && typeof (val as JQuery).outerHeight === "function";
-}
+﻿import { htmlEncode, isArrayLike, isPromiseLike, localText } from "@serenity-is/base";
 
 /**
  * Adds an empty option to the select.
@@ -41,17 +36,7 @@ export function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>) {
  * @param context the context element (optional)
  * @returns the element with the given relative id to the source element.
  */
-export function findElementWithRelativeId(element: ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery;
-/**
- * Finds the first element with the given relative id to the source element.
- * It can handle underscores in the source element id.
- * @param element the source element
- * @param relativeId the relative id to the source element
- * @param context the context element (optional)
- * @returns the element with the given relative id to the source element.
- */
-export function findElementWithRelativeId(element: HTMLElement, relativeId: string, context?: HTMLElement): HTMLElement;
-export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): JQuery | HTMLElement {
+export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLElement>, relativeId: string, context?: HTMLElement): HTMLElement {
 
     const from: HTMLElement = isArrayLike(element) ? element[0] : element as HTMLElement;
     const doc = typeof document === "undefined" ? null : document;
@@ -79,7 +64,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
         }
 
         if (res || !fromId.length)
-            return isArrayLike(element) ? sQuery(res ?? null) : (res ?? null);
+            return res ?? null;
 
         let idx = fromId.lastIndexOf('_');
         if (idx <= 0)
@@ -93,8 +78,10 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
  * Creates a new DIV and appends it to the body.
  * @returns the new DIV element.
  */
-export function newBodyDiv(): JQuery {
-    return sQuery('<div/>').appendTo(document.body);
+export function newBodyDiv(): HTMLDivElement {
+    var element = document.createElement("div");
+    document.body.append(element);
+    return element;
 }
 
 /**
@@ -144,4 +131,3 @@ function appendChildToNode(child: any, node: HTMLElement) {
         node.appendChild(child)
     }
 }
-
