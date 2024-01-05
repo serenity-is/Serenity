@@ -3,8 +3,8 @@ import { Invariant, formatDate, isArrayLike, localText, parseISODateTime, string
 import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as datePickerIconSvg_, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, isArray, today } from "../../q";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { addValidationRule, today } from "../../q";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export const datePickerIconSvg = datePickerIconSvg_;
 

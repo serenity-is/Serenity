@@ -111,10 +111,11 @@ export class Widget<P = {}> {
         return getWidgetName(type);
     }
 
-    public addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
-    public addValidationRule(eventClass: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
-    public addValidationRule(arg1: any, arg2: any): void {
-        addValidationRule(this.domNode, typeof arg1 === "function" ? arg1 : arg2, typeof arg1 === "function" ? arg2 ?? this.uniqueName : arg1);
+    public addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
+    public addValidationRule(uniqueName: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
+    public addValidationRule(rule: any, uniqueName: any): void {
+        addValidationRule(this.domNode, typeof rule === "function" ? rule : uniqueName,
+            typeof rule === "function" ? uniqueName ?? this.uniqueName : rule);
     }
 
     public getFieldElement(): HTMLElement {

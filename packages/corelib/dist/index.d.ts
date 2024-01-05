@@ -1393,8 +1393,8 @@ declare class Widget<P = {}> {
     protected addCssClass(): void;
     protected getCssClass(): string;
     static getWidgetName(type: Function): string;
-    addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
-    addValidationRule(eventClass: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
+    addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
+    addValidationRule(uniqueName: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
     getFieldElement(): HTMLElement;
     getGridField(): HTMLDivElement;
     change(handler: (e: Event) => void): void;
@@ -1675,8 +1675,8 @@ declare function loadValidationErrorMessages(): void;
 declare function getHighlightTarget(el: HTMLElement): HTMLElement;
 declare function baseValidateOptions(): JQueryValidation.ValidationOptions;
 declare function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator;
-declare function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, eventClass?: string): void;
-declare function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, eventClass: string): void;
+declare function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
+declare function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
 
 declare namespace Aggregators {
     function Avg(field: string): void;

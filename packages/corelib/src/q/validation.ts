@@ -230,7 +230,7 @@ export function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptio
 let customValidateRules: WeakMap<HTMLElement, { [key: string]: ((input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string)[] }> = new WeakMap();
 
 export function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string,
-    eventClass?: string): void {
+    uniqueName?: string): void {
     element = isArrayLike(element) ? element[0] : element;
     if (!element)
         return;
@@ -238,18 +238,18 @@ export function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>,
     var rules = customValidateRules.get(element);
     if (!rules)
         customValidateRules.set(element, rules = {});
-    eventClass ??= '';
-    rules[eventClass] ??= [];
-    rules[eventClass].push(rule);
+    uniqueName ??= '';
+    rules[uniqueName] ??= [];
+    rules[uniqueName].push(rule);
 }
 
-export function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, eventClass: string): void {
+export function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void {
     element = isArrayLike(element) ? element[0] : element;
     if (!element)
         return;
     var rules = customValidateRules.get(element);
     if (rules) {
-        delete rules[eventClass];
+        delete rules[uniqueName];
         if (!Object.keys(rules).length)
             customValidateRules.delete(element);
     }
