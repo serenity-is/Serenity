@@ -1,4 +1,5 @@
 import type { MessageDialogOptions } from "./dialogs";
+import { EventHandler } from "./eventhandler";
 
 jest.mock("./localtext", () => ({
     ...jest.requireActual("./localtext"),
@@ -212,8 +213,8 @@ describe("Bootstrap version detection", () => {
         };
         dialogs.alertDialog("hello", opt);
         expect($.fn.modal).toHaveBeenCalledTimes(2);
-        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
-        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');        
+        expect($.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
+        expect($.fn.modal).toHaveBeenNthCalledWith(2, 'show');        
         let instance = $.fn.modal.mock?.contexts[0];
         let div = instance._selector;
         expect(div).toBeDefined();
@@ -243,8 +244,8 @@ describe("Bootstrap version detection", () => {
         let dialogs = await import("./dialogs");
         dialogs.alertDialog("hello");
         expect($.fn.modal).toHaveBeenCalledTimes(2);
-        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
-        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');
+        expect($.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
+        expect($.fn.modal).toHaveBeenNthCalledWith(2, 'show');
         let html = $.fn.modal.mock?.contexts[0]?._selectorHtml;
         expect(html).toBeDefined();
         let idx1 = html.indexOf('class="close"');
@@ -1008,8 +1009,8 @@ describe("closePanel", () => {
         let closedPanel: any;
         let panelClosing = (e: any) => closingPanel = e.panel;
         let panelClosed = (e: any) => closedPanel = e.panel;
-        jQuery(window).on('panelclosing', panelClosing);
-        jQuery(window).on('panelclosed', panelClosed);
+        EventHandler.on(window, 'panelclosing', panelClosing);
+        EventHandler.on(window, 'panelclosed', panelClosed);
         try {
             let dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
@@ -1018,8 +1019,8 @@ describe("closePanel", () => {
             expect(closedPanel).toBe(divEl);
         }
         finally {
-            jQuery(window).off('panelclosing', panelClosing);
-            jQuery(window).off('panelclosed', panelClosed);
+            EventHandler.off(window, 'panelclosing', panelClosing);
+            EventHandler.off(window, 'panelclosed', panelClosed);
             div.remove();
         }
     });
@@ -1031,8 +1032,8 @@ describe("closePanel", () => {
         let closedPanel: any;
         let panelClosing = (e: any) => closingPanel = e.panel;
         let panelClosed = (e: any) => closedPanel = e.panel;
-        window.addEventListener('panelclosing', panelClosing);
-        window.addEventListener('panelclosed', panelClosed);
+        EventHandler.on(window, 'panelclosing', panelClosing);
+        EventHandler.on(window, 'panelclosed', panelClosed);
         try {
             div.classList.add("s-Panel");
             let dialogs = (await import("./dialogs"));
@@ -1042,8 +1043,8 @@ describe("closePanel", () => {
             expect(closedPanel).toBe(div);
         }
         finally {
-            window.removeEventListener('panelclosing', panelClosing);
-            window.removeEventListener('panelclosed', panelClosed);
+            EventHandler.off(window, 'panelclosing', panelClosing);
+            EventHandler.off(window, 'panelclosed', panelClosed);
             div.remove();
         }
     });

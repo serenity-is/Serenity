@@ -247,32 +247,33 @@ type DialogType = "bs3" | "bs4" | "bs5" | "jqueryui" | "panel";
  * Options that apply to all dialog types
  */
 interface CommonDialogOptions {
-    /** Event handler that is called when dialog is opened */
-    onOpen?: () => void;
-    /** Event handler that is called when dialog is closed */
-    onClose?: (result: string) => void;
-    /** Show close button, default is true */
-    closeButton?: boolean;
-    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
-    cssClass?: string;
-    /** Additional CSS class to use only for BS modals, like modal-lg etc. */
-    bsModalClass?: string;
-    /** True to use Bootstrap modals even when jQuery UI present, default is based on `Q.Config.bootstrapMessages */
-    bsPreference?: boolean;
-    /** Dialog title */
-    title?: string;
-    /** List of buttons to show on the dialog */
-    buttons?: DialogButton[];
-    /** Dialog content element, or callback that will populate the content */
-    element?: HTMLElement | ((element: HTMLElement) => void);
     /** True to open dialog as panel */
     asPanel?: boolean;
     /** True to auto open. Ignored for message dialogs. */
     autoOpen?: boolean;
+    /** Prefer Bootstrap modals to jQuery UI dialogs when both are available */
+    bootstrap?: boolean;
+    /** List of buttons to show on the dialog */
+    buttons?: DialogButton[];
+    /** Show close button, default is true */
+    closeButton?: boolean;
+    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
+    dialogClass?: string;
+    /** Dialog content element, or callback that will populate the content */
+    element?: HTMLElement | ((element: HTMLElement) => void);
+    /** Additional CSS class to use only for BS modals, like modal-lg etc. */
+    modalClass?: string;
+    /** Event handler that is called when dialog is opened */
+    onOpen?: () => void;
+    /** Event handler that is called when dialog is closed */
+    onClose?: (result: string) => void;
     /** Callback to get options specific to the dialog provider type */
     providerOptions?: (type: DialogType, opt: CommonDialogOptions) => any;
+    /** Dialog title */
+    title?: string;
 }
-interface IDialogLike {
+interface ICommonDialog {
+    /** Gets dialog provider type used */
     readonly type: DialogType;
     /** Opens the dialog */
     open(): void;
@@ -280,9 +281,9 @@ interface IDialogLike {
     close(result?: string): void;
     /** Sets the title of the dialog */
     setTitle(title: string): void;
-    /** Destroy */
+    /** Dispose the dialog instance */
     dispose(): void;
-    /** The code that is returned from message dialog function when this button is clicked */
+    /** The result code of the button that is clicked */
     readonly result?: string;
 }
 /**
@@ -329,7 +330,7 @@ declare namespace DialogTexts {
     const WarningTitle: string;
     const YesButton: string;
 }
-declare function createDialog(options: CommonDialogOptions): IDialogLike;
+declare function createCommonDialog(options: CommonDialogOptions): ICommonDialog;
 /** Converts a `DialogButton` declaration to Bootstrap button element
  * @param x Dialog button declaration
  * @returns Bootstrap button element
@@ -352,7 +353,7 @@ declare function cancelDialogButton(opt?: DialogButton): DialogButton;
  * @example
  * alertDialog("An error occured!"); }
  */
-declare function alertDialog(message: string, options?: MessageDialogOptions): Partial<IDialogLike>;
+declare function alertDialog(message: string, options?: MessageDialogOptions): Partial<ICommonDialog>;
 /** Additional options for confirm dialog */
 interface ConfirmDialogOptions extends MessageDialogOptions {
     /** True to also add a cancel button */
@@ -373,7 +374,7 @@ interface ConfirmDialogOptions extends MessageDialogOptions {
  *     // do something when yes is clicked
  * }
  */
-declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<IDialogLike>;
+declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<ICommonDialog>;
 /**
  * Display an information dialog
  * @param message The message to display
@@ -385,7 +386,7 @@ declare function confirmDialog(message: string, onYes: () => void, options?: Con
  *     // do something when OK is clicked
  * }
  */
-declare function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<IDialogLike>;
+declare function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<ICommonDialog>;
 /**
  * Display a success dialog
  * @param message The message to display
@@ -397,7 +398,7 @@ declare function informationDialog(message: string, onOk?: () => void, options?:
  *     // do something when OK is clicked
  * }
  */
-declare function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<IDialogLike>;
+declare function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<ICommonDialog>;
 /**
  * Display a warning dialog
  * @param message The message to display
@@ -406,7 +407,7 @@ declare function successDialog(message: string, onOk?: () => void, options?: Mes
  * @example
  * warningDialog("Something is odd!");
  */
-declare function warningDialog(message: string, options?: MessageDialogOptions): Partial<IDialogLike>;
+declare function warningDialog(message: string, options?: MessageDialogOptions): Partial<ICommonDialog>;
 /** Options for `iframeDialog` **/
 interface IFrameDialogOptions {
     html?: string;
@@ -415,7 +416,7 @@ interface IFrameDialogOptions {
  * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
  * @param options The options
  */
-declare function iframeDialog(options: IFrameDialogOptions): Partial<IDialogLike>;
+declare function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialog>;
 /**
  * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
  * If the panelbeforeclose prevents the default, the operation is cancelled.
@@ -982,5 +983,6 @@ declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function isArrayLike(obj: any): obj is ArrayLike<any>;
 declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
+declare function getjQuery(): any;
 
-export { type AnyIconClass, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, Enum, type IDialogLike, type IFrameDialogOptions, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, isArrayLike, isAssignableFrom, isEnum, isInstanceOfType, isPromiseLike, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toId, toggleClass, trunc, tryGetText, warningDialog, yesDialogButton };
+export { type AnyIconClass, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, Enum, type ICommonDialog, type IFrameDialogOptions, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createCommonDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getjQuery, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, isArrayLike, isAssignableFrom, isEnum, isInstanceOfType, isPromiseLike, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toId, toggleClass, trunc, tryGetText, warningDialog, yesDialogButton };

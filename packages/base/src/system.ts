@@ -1,6 +1,6 @@
-﻿let globalObject: any = 
-    (typeof globalThis !== "undefined" && globalThis) || 
-    (typeof window !== "undefined" && window) || 
+﻿let globalObject: any =
+    (typeof globalThis !== "undefined" && globalThis) ||
+    (typeof window !== "undefined" && window) ||
     (typeof self !== "undefined" && self) ||
     // @ts-ignore check for global
     (typeof global !== "undefined" && global) || {};
@@ -67,7 +67,7 @@ export function getNested(from: any, name: string) {
     return from;
 }
 
-export function getType(name: string, target?: any): Type  {
+export function getType(name: string, target?: any): Type {
     var type: any;
     if (target == null) {
         const types = getTypeStore();
@@ -144,7 +144,7 @@ export function getBaseType(type: any) {
         !type.prototype ||
         (type as TypeExt).__interface === true)
         return null;
-        
+
     return Object.getPrototypeOf(type.prototype).constructor;
 }
 
@@ -154,17 +154,17 @@ function merge(arr1: any[], arr2: any[]) {
 
     function distinct(arr: any[]) {
         return arr.filter((item, pos) => arr.indexOf(item) === pos);
-    }        
+    }
 
     return distinct(arr1.concat(arr2));
 }
 
 function interfaceIsAssignableFrom(from: any) {
-    return from != null && 
-        Array.isArray((from as TypeExt).__interfaces) && 
-        (from as TypeExt).__interfaces.some(x => 
+    return from != null &&
+        Array.isArray((from as TypeExt).__interfaces) &&
+        (from as TypeExt).__interfaces.some(x =>
             x === this ||
-            (getTypeNameProp(this)?.length && 
+            (getTypeNameProp(this)?.length &&
                 x.__interface &&
                 getTypeNameProp(x) === this.__typeName));
 }
@@ -285,4 +285,9 @@ export function isPromiseLike(obj: any): obj is PromiseLike<any> {
     return obj instanceof Promise || ((typeof obj === "object" && obj != null && typeof obj.then === "function" && typeof obj.catch === "function"));
 }
 
-export {}
+export function getjQuery(): any {
+    // @ts-ignore
+    return typeof jQuery === "function" ? jQuery : typeof $ === "function" && ($ as any).fn ? $ : undefined;
+}
+
+export { }
