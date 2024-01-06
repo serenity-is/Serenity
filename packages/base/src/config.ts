@@ -17,7 +17,12 @@
     responsiveDialogs: true,
 
     /**
-     * Set this to true, to prefer bootstrap dialogs over jQuery UI dialogs by default for message dialogs
+     * Set this to true, to prefer bootstrap modals over jQuery UI dialogs by default for general dialogs
+     */
+    bootstrapDialogs: false,
+
+    /**
+     * Set this to true, to prefer bootstrap modals over jQuery UI dialogs by default for message dialogs
      */
     bootstrapMessages: false,
 

@@ -1,4 +1,4 @@
-import type { CommonDialogOptions } from "./dialogs";
+import type { MessageDialogOptions } from "./dialogs";
 
 jest.mock("./localtext", () => ({
     ...jest.requireActual("./localtext"),
@@ -190,15 +190,15 @@ describe("Bootstrap version detection", () => {
         jQuery.fn.modal.Constructor.VERSION = "3.3.1";
         let dialogs = await import("./dialogs");
         dialogs.alertDialog("hello");
-        expect(jQuery.fn.modal).toHaveBeenCalledTimes(1);
+        expect(jQuery.fn.modal).toHaveBeenCalledTimes(2);
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');
         let html = jQuery.fn.modal.mock?.contexts[0]?._selectorHtml;
         expect(html).toBeDefined();
         let idx1 = html.indexOf('class="close"');
         let idx2 = html.indexOf('<h5');
         expect(idx1).toBeGreaterThan(-1);
         expect(idx2).toBeGreaterThan(idx1);
-        expect(dialogs.isBS3()).toBe(true);
-        expect(dialogs.isBS5Plus()).toBe(false);
     });
 
 
@@ -211,7 +211,9 @@ describe("Bootstrap version detection", () => {
             onClose: jest.fn()
         };
         dialogs.alertDialog("hello", opt);
-        expect($.fn.modal).toHaveBeenCalledTimes(1);
+        expect($.fn.modal).toHaveBeenCalledTimes(2);
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');        
         let instance = $.fn.modal.mock?.contexts[0];
         let div = instance._selector;
         expect(div).toBeDefined();
@@ -230,6 +232,7 @@ describe("Bootstrap version detection", () => {
         const hiddenEvent = new Event("hidden.bs.modal");
         div.dispatchEvent(hiddenEvent);
         expect(opt.onClose).toHaveBeenCalledTimes(1);
+        expect(opt.onClose).toHaveBeenCalledWith(void 0);
         expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
     });
 
@@ -239,7 +242,9 @@ describe("Bootstrap version detection", () => {
         $.fn.modal.Constructor.VERSION = '4.1.0';
         let dialogs = await import("./dialogs");
         dialogs.alertDialog("hello");
-        expect($.fn.modal).toHaveBeenCalledTimes(1);
+        expect($.fn.modal).toHaveBeenCalledTimes(2);
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false });
+        expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');
         let html = $.fn.modal.mock?.contexts[0]?._selectorHtml;
         expect(html).toBeDefined();
         let idx1 = html.indexOf('class="close"');
@@ -376,9 +381,10 @@ describe("alertDialog", () => {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
-        dialogs.alertDialog("hello", opt);
-        expect($.fn.dialog).toHaveBeenCalledTimes(1);
-        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+        var dialog = dialogs.alertDialog("hello", opt);
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Alert");
         expect(x.modal).toBe(true);
@@ -395,13 +401,12 @@ describe("alertDialog", () => {
         expect(x.resizable).toBe(false);
         x.open();
         expect(opt.onOpen).toHaveBeenCalledTimes(1);
-        expect(opt.onClose).not.toHaveBeenCalled();
         expect(opt.onOpen.mock?.contexts?.[0]).toBeDefined();
-        x.close();
-        expect(opt.onClose).toHaveBeenCalledTimes(1);
-        expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
+        expect(opt.onClose).not.toHaveBeenCalled();
         x.buttons[0].click();
-        expect((opt as any).result).toBe("ok");
+        expect(opt.onOpen).toHaveBeenCalledTimes(1);
+        expect(dialog.type).toBe("jqueryui");
+        expect(dialog.result).toBe("ok");
     });
 
     it('returns expected bootstrap.Modal markup', async function () {
@@ -411,13 +416,13 @@ describe("alertDialog", () => {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
-        dialogs.alertDialog("hello", opt);
+        var dialog = dialogs.alertDialog("hello", opt);
         let modal = document.querySelector(".modal");
         try {
             expect(modal).not.toBeNull();
             expect(modal.classList).toContain("modal");
-            expect(modal.classList).toContain("s-MessageModal");
-            expect(modal.classList).toContain("s-AlertModal");
+            expect(modal.classList).toContain("s-MessageDialog");
+            expect(modal.classList).toContain("s-AlertDialog");
             expect(modal.getAttribute("tabIndex")).toBe("-1");
             expect(modal.getAttribute("role")).toBe("dialog");
             let modalDialog = modal.querySelector(".modal-dialog");
@@ -450,11 +455,13 @@ describe("alertDialog", () => {
             const hiddenEvent = new Event("hidden.bs.modal");
             div.dispatchEvent(hiddenEvent);
             expect(opt.onClose).toHaveBeenCalledTimes(1);
+            expect(opt.onClose).toHaveBeenCalledWith(void 0);
             expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
             const clickEvent = new Event("click");
             button.dispatchEvent(clickEvent);
-            expect((opt as any).result).toBe("ok");
             expect(modal.getRootNode()).toBe(modal);
+            expect(dialog.type).toBe("bs5");
+            expect(dialog.result).toBe("ok");
         }
         finally {
             modal?.remove();
@@ -470,30 +477,11 @@ describe("alertDialog", () => {
                 onClose: jest.fn()
             };
             dialogs.alertDialog("hello", opt);
-            expect($.fn.dialog).toHaveBeenCalledTimes(1);
-            let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+            expect($.fn.dialog).toHaveBeenCalledTimes(2);
+            expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+            let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
             expect(x).toBeDefined();
             expect(x.title).toBe("Alert");
-        }
-        finally {
-            jest.resetModules();
-        }
-    });
-
-    it('can hide OK button', async function () {
-        let $ = mockJQueryWithUIDialog();
-        try {
-            const dialogs = await import("./dialogs");
-            let opt = {
-                onOpen: jest.fn(),
-                onClose: jest.fn(),
-                okButton: false
-            };
-            dialogs.alertDialog("hello", opt);
-            expect($.fn.dialog).toHaveBeenCalledTimes(1);
-            let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
-            expect(x).toBeDefined();
-            expect(x.buttons).toEqual([]);
         }
         finally {
             jest.resetModules();
@@ -526,9 +514,10 @@ describe("informationDialog", () => {
         };
         let onOK = jest.fn(function () {
         });
-        dialogs.informationDialog("hello", onOK, opt);
-        expect($.fn.dialog).toHaveBeenCalledTimes(1);
-        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+        var dialog = dialogs.informationDialog("hello", onOK, opt);
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Information");
         expect(x.modal).toBe(true);
@@ -551,10 +540,12 @@ describe("informationDialog", () => {
         expect(opt.onOpen.mock?.contexts?.[0]).toBeDefined();
         x.close();
         expect(opt.onClose).toHaveBeenCalledTimes(1);
+        expect(opt.onClose).toHaveBeenCalledWith(void 0);
         expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
         x.buttons[0].click();
-        expect((opt as any).result).toBe("ok");
         expect(onOK).toHaveBeenCalledTimes(1);
+        expect(dialog.type).toBe("jqueryui");
+        expect(dialog.result).toBe("ok");
     });    
 });
 
@@ -606,8 +597,9 @@ describe("confirmDialog", () => {
         let onYes = jest.fn(function () {
         });
         dialogs.confirmDialog("hello", onYes, opt);
-        expect($.fn.dialog).toHaveBeenCalledTimes(1);
-        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Confirm");
         expect(x.modal).toBe(true);
@@ -633,9 +625,9 @@ describe("confirmDialog", () => {
         expect(opt.onOpen.mock?.contexts?.[0]).toBeDefined();
         x.close();
         expect(opt.onClose).toHaveBeenCalledTimes(1);
+        expect(opt.onClose).toHaveBeenCalledWith(void 0);
         expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
         x.buttons[0].click();
-        expect((opt as any).result).toBe("yes");
         expect(onYes).toHaveBeenCalledTimes(1);
     });
 
@@ -654,8 +646,8 @@ describe("confirmDialog", () => {
         try {
             expect(modal).not.toBeNull();
             expect(modal.classList).toContain("modal");
-            expect(modal.classList).toContain("s-MessageModal");
-            expect(modal.classList).toContain("s-ConfirmModal");
+            expect(modal.classList).toContain("s-MessageDialog");
+            expect(modal.classList).toContain("s-ConfirmDialog");
             expect(modal.getAttribute("tabIndex")).toBe("-1");
             expect(modal.getAttribute("role")).toBe("dialog");
             let modalDialog = modal.querySelector(".modal-dialog");
@@ -696,10 +688,10 @@ describe("confirmDialog", () => {
             const hiddenEvent = new Event("hidden.bs.modal");
             div.dispatchEvent(hiddenEvent);
             expect(opt.onClose).toHaveBeenCalledTimes(1);
+            expect(opt.onClose).toHaveBeenCalledWith(void 0);
             expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
             const clickEvent = new Event("click");
             yesButton.dispatchEvent(clickEvent);
-            expect((opt as any).result).toBe("yes");
             expect(modal.getRootNode()).toBe(modal);
         }
         finally {
@@ -738,8 +730,9 @@ describe("successDialog", () => {
         let onOK = jest.fn(function () {
         });
         dialogs.successDialog("hello", onOK, opt);
-        expect($.fn.dialog).toHaveBeenCalledTimes(1);
-        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Success");
         expect(x.modal).toBe(true);
@@ -762,9 +755,9 @@ describe("successDialog", () => {
         expect(opt.onOpen.mock?.contexts?.[0]).toBeDefined();
         x.close();
         expect(opt.onClose).toHaveBeenCalledTimes(1);
+        expect(opt.onClose).toHaveBeenCalledWith(void 0);
         expect(opt.onClose.mock?.contexts?.[0]).toBeDefined();
         x.buttons[0].click();
-        expect((opt as any).result).toBe("ok");
         expect(onOK).toHaveBeenCalledTimes(1);
     });
 });
@@ -795,8 +788,10 @@ describe("iframeDialog", () => {
             html: "<span>test</span>"
         };
         dialogs.iframeDialog(opt);
-        expect($.fn.dialog).toHaveBeenCalledTimes(1);
-        var x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & CommonDialogOptions;
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        
+        var x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Alert");
         expect(x.modal).toBe(true);
@@ -804,7 +799,7 @@ describe("iframeDialog", () => {
         expect(x.buttons).toBeUndefined();
 
         expect(typeof x.close).toBe("function");
-        expect(x.dialogClass).toBeUndefined();
+        expect(x.dialogClass).toBe("s-IFrameDialog");
         expect(x.width).toBe("60%");
         expect(x.height).toBe("400");
         expect(x.modal).toBe(true);
@@ -950,16 +945,6 @@ describe("dialogButtonToBS", () => {
         expect(button.getAttribute("title")).toBe("test");
     });
 });
-
-describe("bsModalMarkup", () => {
-    it("html encodes by default", async function () {
-        const dialogs = (await import("./dialogs"));
-        let div = dialogs.bsModalMarkup("test", "<div>x</div>", null);
-        expect(div.className).toBe("modal");
-        expect(div.querySelector(".modal-body")?.textContent).toBe("<div>x</div>");
-    });
-});
-
 
 describe("dialogButtonToUI", () => {
     it("html encodes by default", async function () {

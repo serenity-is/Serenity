@@ -4,6 +4,52 @@ import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
 import { isArrayLike } from "./system";
 
+export type DialogType = "bs3" | "bs4" | "bs5" | "jqueryui" | "panel";
+
+/**
+ * Options that apply to all dialog types
+ */
+export interface CommonDialogOptions {
+    /** Event handler that is called when dialog is opened */
+    onOpen?: () => void;
+    /** Event handler that is called when dialog is closed */
+    onClose?: (result: string) => void;
+    /** Show close button, default is true */
+    closeButton?: boolean;
+    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
+    cssClass?: string;
+    /** Additional CSS class to use only for BS modals, like modal-lg etc. */
+    bsModalClass?: string;
+    /** True to use Bootstrap modals even when jQuery UI present, default is based on `Q.Config.bootstrapMessages */
+    bsPreference?: boolean;
+    /** Dialog title */
+    title?: string;
+    /** List of buttons to show on the dialog */
+    buttons?: DialogButton[];
+    /** Dialog content element, or callback that will populate the content */
+    element?: HTMLElement | ((element: HTMLElement) => void);
+    /** True to open dialog as panel */
+    asPanel?: boolean;
+    /** True to auto open. Ignored for message dialogs. */
+    autoOpen?: boolean;
+    /** Callback to get options specific to the dialog provider type */
+    providerOptions?: (type: DialogType, opt: CommonDialogOptions) => any;
+}
+
+export interface IDialogLike {
+    readonly type: DialogType;
+    /** Opens the dialog */
+    open(): void;
+    /** Closes the dialog */
+    close(result?: string): void;
+    /** Sets the title of the dialog */
+    setTitle(title: string): void;
+    /** Destroy */
+    dispose(): void;
+    /** The code that is returned from message dialog function when this button is clicked */
+    readonly result?: string;
+}
+
 /**
  * Options for a message dialog button
  */
@@ -20,34 +66,20 @@ export interface DialogButton {
     cssClass?: string;
     /** HTML encode button text. Default is true. */
     htmlEncode?: boolean;
-    /** The code that is returned from message dialog function when this button is clicked */
+    /** The code that is returned from message dialog function when this button is clicked.
+     *  If this is set, and click event will not be defaultPrevented dialog will close.
+     */
     result?: string;
 }
 
 /**
  * Options that apply to all message dialog types
  */
-export interface CommonDialogOptions {
-    /** Event handler that is called when dialog is opened */
-    onOpen?: () => void;
-    /** Event handler that is called when dialog is closed */
-    onClose?: (result: string) => void;
-    /** Dialog title */
-    title?: string;
+export interface MessageDialogOptions extends CommonDialogOptions {
     /** HTML encode the message, default is true */
     htmlEncode?: boolean;
     /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
-    /** Dialog css class. Default is based on the message dialog type */
-    dialogClass?: string;
-    /** List of buttons to show on the dialog */
-    buttons?: DialogButton[];
-    /** Class to use for the modal element for Bootstrap dialogs */
-    modalClass?: string;
-    /** True to use Bootstrap dialogs even when jQuery UI  present, default is based on `Q.Config.bootstrapMessages */
-    bootstrap?: boolean;
-    /** The result code of the button used to close the dialog is returned via this variable in the options object */
-    result?: string;
 }
 
 // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
@@ -55,57 +87,23 @@ if (typeof jQuery !== "undefined" && (jQuery.fn as any)?.button?.noConflict && (
     (jQuery.fn as any).btn = (jQuery as any).fn.button.noConflict();
 }
 
-function internalUIDialog(options: CommonDialogOptions, bodyHtml: string, dialogClass: string) {
-    let opt = Object.assign(<any>{
-        modal: true,
-        width: '40%',
-        maxWidth: 450,
-        minWidth: 180,
-        resizable: false,
-        open: function () {
-            if (options.onOpen)
-                options.onOpen.call(this);
-        },
-        close: function () {
-            jQuery(this).dialog?.('destroy');
-            if (options.onClose)
-                options.onClose.call(this, options.result);
-        }
-    }, options);
 
-    opt.dialogClass = 's-MessageDialog ' + dialogClass;
-
-    if (options.buttons) {
-        opt.buttons = options.buttons.map(x => {
-            let btn = dialogButtonToUI(x);
-            btn.click = function (e: any) {
-                options.result = x.result;
-                jQuery(this).dialog('close');
-                x.click && x.click.call(this, e);
-            }
-            return btn;
-        });
-    }
-
-    return jQuery('<div>' + bodyHtml + '</div>').dialog(opt);
+function hasBSModal() {
+    return isBS5Plus() || (typeof jQuery !== 'undefined' && !!jQuery?.fn.modal);
 }
 
-let _isBS3: boolean;
-let _isBS5Plus: boolean;
+function hasUIDialog() {
+    return typeof jQuery !== 'undefined' && !!jQuery?.ui?.dialog;
+}
 
 /** Returns true if Bootstrap 3 is loaded */
-export function isBS3(): boolean {
-    if (_isBS3 != null)
-        return _isBS3;
-    // @ts-ignore
-    return (_isBS3 = !!(typeof jQuery !== "undefined" && jQuery.fn?.modal?.Constructor?.VERSION && (jQuery.fn.modal.Constructor.VERSION + "").charAt(0) == '3'));
+function isBS3(): boolean {
+    return !!(typeof jQuery !== "undefined" && jQuery.fn?.modal?.Constructor?.VERSION && (jQuery.fn.modal.Constructor.VERSION + "").charAt(0) == '3');
 }
 
 /** Returns true if Bootstrap 5+ is loaded */
-export function isBS5Plus(): boolean {
-    if (_isBS5Plus != null)
-        return _isBS5Plus;
-    return (_isBS5Plus = typeof bootstrap !== "undefined" && (!bootstrap.Modal || !bootstrap.Modal.VERSION || (!bootstrap.Modal.VERSION + "").charAt(0) != '4'));
+function isBS5Plus(): boolean {
+    return typeof bootstrap !== "undefined" && !!bootstrap.Modal && (bootstrap.Modal.VERSION + "").charAt(0) != '4';
 }
 
 export namespace DialogTexts {
@@ -148,6 +146,254 @@ export namespace DialogTexts {
     }
 }
 
+function bsCreateButton(footer: HTMLElement, x: DialogButton, close: (result: string) => void) {
+
+    if (!footer)
+        return;
+
+    let button = dialogButtonToBS(x);
+    footer.append(button);
+    button.addEventListener("click", e => {
+        x.click && x.click.call(this, e);
+        if (x.result && !((e as any)?.isDefaultPrevented?.() || e.defaultPrevented))
+            close(x.result);
+    });
+}
+
+function createPanel(options: CommonDialogOptions): IDialogLike {
+    let result: string;
+    let panelBody = options.element && typeof options.element !== "function" ? options.element :
+        document.createElement("div");
+    panelBody.classList.add("panel-body");
+    let sPanel = document.createElement("div");
+    sPanel.classList.add("s-Panel");
+    sPanel.append(panelBody);
+    if (typeof options.element === "function")
+        options.element(panelBody);
+    setPanelTitle(panelBody, options.title, options.closeButton ?? true);
+    if (options.onOpen) {
+        panelBody.addEventListener('panelopen', options.onOpen);
+    }
+    if (options.onClose) {
+        panelBody.addEventListener('panelclose', () => options.onClose(result));
+    }
+    let close = (res?: string) => {
+        if (res !== void 0)
+            result = res;
+        panelBody && closePanel(panelBody);
+    }
+
+    if (options.buttons) {
+        let footer = sPanel.appendChild(document.createElement("div"));
+        footer.classList.add("panel-footer");
+        for (let button of options.buttons) {
+            bsCreateButton(footer, button, close);
+        }
+    }
+
+    return {
+        type: "panel",
+        open: () => panelBody && openPanel(panelBody),
+        close,
+        dispose: () => panelBody = null,
+        setTitle: (title: string) => panelBody && setPanelTitle(panelBody, title),
+        get result() { return result }
+    }
+}
+
+function createUIDialog(options: CommonDialogOptions): IDialogLike {
+    var result: string;
+    let opt = {
+        dialogClass: options.cssClass,
+        title: options.title,
+        modal: true,
+        open: function () {
+            options.onOpen?.();
+        },
+        close: function () {
+            options.onClose?.(result);
+        }
+    } as any;
+
+    let div = options.element && typeof options.element !== "function" ? options.element :
+        document.createElement("div");
+
+    let close = (res?: string) => {
+        if (res !== "void 0")
+            result = res;
+        div && jQuery(div).dialog("close");
+    }
+
+    if (options.buttons) {
+        opt.buttons = options.buttons.map(x => {
+            let btn = dialogButtonToUI(x);
+            btn.click = function (e: Event) {
+                e ??= new Event("click", {});
+                x.click && x.click.call(this, e);
+                if (x.result && !((e as any).isDefaultPrevented?.() || e.defaultPrevented))
+                    close(x.result);
+            }
+            return btn;
+        });
+    }
+
+    if (options.providerOptions)
+        opt = Object.assign(opt, options.providerOptions("jqueryui", options));
+
+    if (typeof options.element === "function")
+        options.element(div);
+
+    jQuery(div).dialog(opt);
+
+    return {
+        type: "jqueryui",
+        open: () => div && jQuery(div).dialog("open"),
+        close,
+        dispose: () => {
+            if (div) {
+                jQuery(div)?.dialog?.('destroy');
+                (div.querySelector('.ui-dialog-content') as HTMLElement)?.classList.remove('ui-dialog-content');
+                div.remove();
+                div = null;
+            }
+        },
+        setTitle: (title: string) => {
+            div && jQuery(div).dialog("option", "title", title);
+        },
+        get result() { return result; }
+    }
+}
+
+function createBSModal(options: CommonDialogOptions): IDialogLike {
+    let result: string;
+    let modalDiv = bsModalMarkup(options.title, options.cssClass + (options.bsModalClass ? ' ' + options.bsModalClass : ''));
+    if (options.element) {
+        if (typeof options.element === "function")
+            options.element(modalDiv.querySelector(".modal-body"));
+        else
+            options.element.querySelector(".modal-body").replaceWith(options.element);
+    }
+
+    let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
+    let rawBS5 = typeof jQuery === "undefined" && isBS5Plus();
+
+    if (rawBS5) {
+        document.body.appendChild(modalDiv);
+        if (options.onOpen)
+            modalDiv.addEventListener("shown.bs.modal", options.onOpen);
+
+        modalDiv.addEventListener('hidden.bs.modal', e => {
+            try {
+                options.onClose?.(result);
+            }
+            finally {
+                modalDiv.remove();
+            }
+        });
+
+        var modal = new bootstrap.Modal(modalDiv, {
+            backdrop: false
+        });
+
+        let close = (res: string) => {
+            if (res !== void 0)
+                result = res;
+            modal && modal.hide();
+        }
+
+        if (options.buttons) {
+            for (let button of options.buttons) {
+                bsCreateButton(footer, button, close);
+            }
+        }
+
+        return {
+            type: "bs5",
+            open: () => modal && modal.show(),
+            close: close,
+            setTitle: (title) => {
+                let titleEl = modal?.querySelector('.modal-title');
+                if (!titleEl)
+                    return;
+                titleEl.textContent = title ?? '';
+            },
+            dispose: () => {
+                if (modal) {
+                    jQuery(this.domNode).closest('.modal').data('bs.modal', null);
+                    this.domNode && jQuery(this.domNode).removeClass('modal-body');
+                    window.setTimeout(() => modal.remove(), 0);
+                    modal = null;
+                }
+            },
+            get result() { return result; }
+        }
+    }
+
+    jQuery(modalDiv).appendTo(document.body);
+
+    if (options.onOpen)
+        jQuery(modalDiv).one('shown.bs.modal', options.onOpen);
+
+    jQuery(modalDiv).one('hidden.bs.modal', (e: any) => {
+        try {
+            options.onClose?.(result);
+        }
+        finally {
+            jQuery(modalDiv).remove();
+        }
+    });
+
+    jQuery(modalDiv).modal({
+        backdrop: false
+    });
+
+    let close = (res?: string) => {
+        if (res !== void 0)
+            result = res;
+        modalDiv && jQuery(modalDiv).modal('hide');
+    }
+
+    if (options.buttons) {
+        for (let button of options.buttons) {
+            bsCreateButton(footer, button, close);
+        }
+    }
+
+    return {
+        type: isBS5Plus ? "bs5" : (isBS3 ? "bs3" : "bs4"),
+        open: () => modalDiv && jQuery(modalDiv).modal('show'),
+        close,
+        setTitle: (title: string) => modalDiv && jQuery(modalDiv).find('.modal-title').first().text(title ?? ''),
+        dispose: () => {
+            if (!modalDiv)
+                return;
+            jQuery(modalDiv).data('bs.modal', null);
+            window.setTimeout(() => {
+                modalDiv?.remove();
+                modalDiv = null;
+            }, 0);
+        },
+        get result() { return result; }
+    };
+}
+
+export function createDialog(options: CommonDialogOptions): IDialogLike {
+
+    let dialogLike: IDialogLike;
+
+    if (options.asPanel || (!hasBSModal() && !hasUIDialog))
+        dialogLike = createPanel(options);
+    else if (hasUIDialog() && (!hasBSModal() || !options.bsPreference))
+        dialogLike = createUIDialog(options);
+    else
+        dialogLike = createBSModal(options);
+
+    if (options.autoOpen)
+        dialogLike.open();
+
+    return dialogLike;
+}
+
 /** 
  * Builds HTML DIV element for a Bootstrap modal dialog
  * @param title Modal title
@@ -156,7 +402,7 @@ export namespace DialogTexts {
  * @param escapeHtml True to html encode body, default is true
  * @returns 
  */
-export function bsModalMarkup(title: string, body: string, modalClass?: string, escapeHtml: boolean = true): HTMLDivElement {
+function bsModalMarkup(title: string, modalClass?: string): HTMLDivElement {
     let closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${DialogTexts.CloseButton}">` +
         `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
     let div = document.createElement("div");
@@ -170,7 +416,7 @@ export function bsModalMarkup(title: string, body: string, modalClass?: string, 
         <div class="modal-header">
             ${(isBS3() ? closeButton : "")}<h5 class="modal-title">${htmlEncode(title)}</h5>${(isBS3() ? "" : closeButton)}
         </div>
-        <div class="modal-body">${escapeHtml ? htmlEncode(body) : body}</div>
+        <div class="modal-body"></div>
         <div class="modal-footer"></div>
     </div>
 </div>`;
@@ -214,98 +460,7 @@ export function dialogButtonToUI(x: DialogButton): any {
     return button;
 }
 
-function internalBSModal(options: CommonDialogOptions, bodyHtml: string, modalClass: string) {
-    let modalDiv = bsModalMarkup(options.title, bodyHtml, "s-MessageModal" + (modalClass ? (" " + modalClass) : ""), false);
-    let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
-    let rawBS5 = typeof jQuery === "undefined" && isBS5Plus();
-
-    function createButton(x: DialogButton) {
-
-        if (!footer) {
-            return;
-        }
-
-        let button = dialogButtonToBS(x);
-        footer.append(button);
-        button.addEventListener("click", e => {
-            options.result = x.result;
-            if (rawBS5) {
-                bootstrap.Modal.getInstance(modalDiv)?.hide();
-            }
-            else
-                jQuery(modalDiv).modal('hide');
-            x.click && x.click.call(this, e);
-        });
-    }
-
-    if (options.buttons) {
-        for (let button of options.buttons) {
-            createButton(button);
-        }
-    }
-
-    if (rawBS5) {
-        document.body.appendChild(modalDiv);
-        if (options.onOpen)
-            modalDiv.addEventListener("shown.bs.modal", options.onOpen);
-
-        modalDiv.addEventListener('hidden.bs.modal', e => {
-            try {
-                options.onClose && options.onClose(options.result);
-            }
-            finally {
-                modalDiv.remove();
-            }
-        });
-
-        document.body.appendChild(modalDiv);
-        new bootstrap.Modal(modalDiv, {
-            backdrop: false
-        }).show();
-    }
-    else {
-        let div = jQuery(modalDiv).appendTo(document.body);
-
-        if (options.onOpen)
-            div.one('shown.bs.modal', options.onOpen);
-
-        div.one('hidden.bs.modal', (e: any) => {
-            try {
-                options.onClose && options.onClose(options.result);
-            }
-            finally {
-                div.remove();
-            }
-        });
-
-        if (isBS5Plus()) {
-            div.modal({
-                backdrop: false,
-            });
-            div.modal('show');
-        }
-        else {
-            div.modal({
-                backdrop: false,
-                show: true
-            });
-        }
-    }
-}
-
-let _useBrowserDialogs: boolean;
-function useBrowserDialogs() {
-    if (_useBrowserDialogs == null) {
-        _useBrowserDialogs = !isBS5Plus() && (typeof jQuery === 'undefined' || ((!jQuery.ui || !jQuery.ui?.dialog) && (!jQuery.fn || !(jQuery.fn.modal))));
-    }
-    return _useBrowserDialogs;
-}
-
-function useBSModal(options: CommonDialogOptions): boolean {
-    return Config.bootstrapMessages || options.bootstrap || (typeof jQuery === "undefined" || !jQuery?.ui?.dialog);
-}
-
-function getMessageBodyHtml(message: string, options?: CommonDialogOptions): string {
+function getMessageBodyHtml(message: string, options?: MessageDialogOptions): string {
     let encode = options == null || options.htmlEncode == null || options.htmlEncode;
     if (encode)
         message = htmlEncode(message);
@@ -314,14 +469,92 @@ function getMessageBodyHtml(message: string, options?: CommonDialogOptions): str
     return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
 }
 
-/**
- * Additional options for Alert dialogs
- */
-export interface AlertOptions extends CommonDialogOptions {
-    /** The title of OK button, or false to hide the OK button */
-    okButton?: string | boolean;
-    /** CSS class for OK button */
-    okButtonClass?: string;
+
+
+function messageDialog(opt: {
+    cssClass: string,
+    title: string,
+    getButtons: () => DialogButton[],
+    native: (msg: string) => string,
+    message: string, 
+    options: MessageDialogOptions
+}) {
+
+    if (!hasBSModal() && !hasUIDialog()) {
+        var result = opt.native(opt.message);
+        opt.options?.onClose(result);
+        return {
+            result: result
+        }
+    }
+
+    let options = Object.assign({
+        autoOpen: true,
+        cssClass: "s-MessageDialog" + (opt.cssClass ? " " + opt.cssClass : ""),
+        htmlEncode: true,
+        title: opt.title
+    }, opt.options);
+
+    if (options.buttons == void 0) {
+        options.buttons = opt.getButtons();
+    }
+
+    if (options.providerOptions === void 0) {
+        options.providerOptions = (type: string) => {
+            if (type === "jqueryui") {
+                return {
+                    modal: true,
+                    width: '40%',
+                    maxWidth: 450,
+                    minWidth: 180,
+                    resizable: false
+                }
+            }
+        }
+    }
+
+    if (options.element === void 0) {
+        options.element = el => el.innerHTML = getMessageBodyHtml(opt.message, options);
+    }
+
+    return createDialog(options);
+}
+
+
+export function okDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.OkButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-info',
+        result: opt?.result != void 0 ? opt.result : 'ok',
+        click: opt?.click
+    }
+}
+
+export function yesDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.YesButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-primary',
+        result: opt?.result != void 0 ? opt.result : 'yes',
+        click: opt?.click
+    }
+}
+
+export function noDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.NoButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-danger' : 'btn-default',
+        result: opt?.result != void 0 ? opt.result : 'no',
+        click: opt?.click
+    }
+}
+
+export function cancelDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.CancelButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-secondary' : 'btn-default',
+        result: 'cancel',
+        click: opt?.click
+    }
 }
 
 /** 
@@ -332,54 +565,24 @@ export interface AlertOptions extends CommonDialogOptions {
  * @example 
  * alertDialog("An error occured!"); }
  */
-export function alertDialog(message: string, options?: AlertOptions) {
-
-    if (useBrowserDialogs()) {
-        window.alert(message);
-        return;
-    }
-
-    options ??= {};
-    let useBS = useBSModal(options);
-
-    if (options.htmlEncode == null)
-        options.htmlEncode = true;
-
-    if (options.okButton == null || options.okButton === true)
-        options.okButton = DialogTexts.OkButton;
-
-    if (options.title == null)
-        options.title = DialogTexts.AlertTitle;
-
-    if (options.buttons == null) {
-        options.buttons = [];
-        if (options.okButton) {
-            options.buttons.push({
-                text: options.okButton,
-                cssClass: options.okButtonClass ?? (useBS ? 'btn-danger' : undefined),
-                result: 'ok'
-            });
+export function alertDialog(message: string, options?: MessageDialogOptions): Partial<IDialogLike> {
+    return messageDialog({
+        message,
+        options,
+        cssClass: "s-AlertDialog",
+        title: DialogTexts.AlertTitle,
+        getButtons: () => [okDialogButton({ cssClass: 'btn-danger' })],
+        native: (msg) => {
+            alert(msg);
+            return "ok";
         }
-    }
-
-    let bodyHtml = getMessageBodyHtml(message, options);
-
-    if (useBS)
-        internalBSModal(options, bodyHtml, options.modalClass ?? "s-AlertModal");
-    else
-        internalUIDialog(options, bodyHtml, options.dialogClass ?? "s-AlertDialog");
+    });
 }
 
 /** Additional options for confirm dialog */
-export interface ConfirmOptions extends CommonDialogOptions {
-    /** Title of the Yes button, or false to hide the Yes button. Default is value of local text: "Dialogs.YesButton" */
-    yesButton?: string | boolean;
-    /** CSS class for the Yes button. */
-    yesButtonClass?: string;
-    /** Title of the NO button, or false to hide the No button. Default is value of local text: "Dialogs.NoButton" */
-    noButton?: string | boolean;
-    /** Title of the CANCEL button, or false to hide the Cancel button. Default is value of local text: "Dialogs.NoButton" */
-    cancelButton?: string | boolean;
+export interface ConfirmDialogOptions extends MessageDialogOptions {
+    /** True to also add a cancel button */
+    cancelButton?: boolean;
     /** Event handler for cancel button click */
     onCancel?: () => void;
     /** Event handler for no button click */
@@ -397,66 +600,30 @@ export interface ConfirmOptions extends CommonDialogOptions {
  *     // do something when yes is clicked
  * }
  */
-export function confirmDialog(message: string, onYes: () => void, options?: ConfirmOptions): void {
-    if (useBrowserDialogs()) {
-        if (window.confirm(message))
-            onYes && onYes();
-        return;
-    }
-
-    options ??= {};
-    let useBS = useBSModal(options);
-
-    if (options.htmlEncode == null)
-        options.htmlEncode = true;
-
-    if (options.yesButton == null)
-        options.yesButton = DialogTexts.YesButton;
-
-    if (options.noButton == null)
-        options.noButton = DialogTexts.NoButton;
-
-    if (typeof options.title === "undefined")
-        options.title = DialogTexts.ConfirmationTitle;
-
-    if (options.buttons == null) {
-        options.buttons = [];
-        if (options.yesButton == null || options.yesButton) {
-            options.buttons.push({
-                text: typeof options.yesButton == "boolean" ? DialogTexts.YesButton : options.yesButton,
-                cssClass: options.yesButtonClass ?? (useBS ? 'btn-primary' : undefined),
-                result: 'yes',
-                click: onYes
-            });
+export function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<IDialogLike> {
+    return messageDialog({
+        message,
+        options,
+        cssClass: "s-ConfirmDialog",
+        title: DialogTexts.ConfirmationTitle,
+        getButtons: () => {
+            let buttons = [yesDialogButton({ click: onYes }), noDialogButton({ click: options.onNo })];
+            if (options.cancelButton)
+                buttons.push(cancelDialogButton({ click: options.onCancel }));
+            return buttons;
+        },
+        native: (msg) => {
+            var result = window.confirm(msg);
+            if (result) {
+                onYes?.();
+                return 'yes';
+            }
+            else {
+                options?.onNo();
+                return result === false ? "no" : "";
+            }
         }
-        if (options.noButton == null || options.noButton) {
-            options.buttons.push({
-                text: typeof options.noButton == "boolean" ? DialogTexts.NoButton : options.noButton,
-                cssClass: useBS ? (isBS5Plus() ? 'btn-danger' : 'btn-default') : undefined,
-                result: 'no',
-                click: options.onNo
-            });
-        }
-        if (options.cancelButton) {
-            options.buttons.push({
-                text: typeof options.cancelButton == "boolean" ? DialogTexts.CancelButton : options.cancelButton,
-                cssClass: useBS ? (isBS5Plus() ? 'btn-secondary' : 'btn-default') : undefined,
-                result: 'cancel',
-                click: options.onCancel
-            });
-        }
-    }
-
-    message = getMessageBodyHtml(message, options);
-    if (useBS)
-        internalBSModal(options, message, options.modalClass ?? "s-ConfirmModal");
-    else
-        internalUIDialog(options, message, options.dialogClass ?? "s-ConfirmDialog");
-}
-
-/** Options for `iframeDialog` **/
-export interface IFrameDialogOptions {
-    html?: string;
+    });
 }
 
 /** 
@@ -470,33 +637,19 @@ export interface IFrameDialogOptions {
  *     // do something when OK is clicked
  * }
  */
-export function informationDialog(message: string, onOk?: () => void, options?: ConfirmOptions) {
-    options ??= {};
-
-    if (useBrowserDialogs()) {
-        window.alert(message);
-        options.result = "ok";
-        onOk && onOk();
-        return;
-    }
-
-    if (typeof options.title === "undefined")
-        options.title = DialogTexts.InformationTitle;
-    if (typeof options.dialogClass === "undefined")
-        options.dialogClass = "s-InformationDialog";
-    if (typeof options.modalClass === "undefined")
-        options.modalClass = "s-InformationModal";
-    if (typeof options.yesButton === "undefined")
-        options.yesButton = DialogTexts.OkButton;
-    if (typeof options.yesButtonClass === "undefined")
-        options.yesButtonClass = "btn-info";
-    if (typeof options.noButton === "undefined")
-        options.noButton = false;
-
-    confirmDialog(message, () => {
-        options.result = 'ok';
-        onOk && onOk();
-    }, options);
+export function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<IDialogLike> {
+    return messageDialog({
+        message,
+        options,
+        cssClass: "s-InformationDialog",
+        title: DialogTexts.InformationTitle,
+        getButtons: () => [okDialogButton({ click: onOk, cssClass: 'btn-info' })],
+        native: (msg) => {
+            alert(msg);
+            onOk?.();
+            return "ok";
+        }
+    });
 }
 
 /** 
@@ -504,42 +657,48 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
  * @param message The message to display
  * @param onOk Callback for OK button click 
  * @param options Additional options. 
- * @see ConfirmOptions 
+ * @see MessageDialogOptions 
  * @example 
  * successDialog("Operation complete", () => { 
  *     // do something when OK is clicked
  * }
  */
-export function successDialog(message: string, onOk?: () => void, options?: ConfirmOptions) {
-    options ??= {};
-    if (typeof options.title === "undefined")
-        options.title = DialogTexts.SuccessTitle;
-    if (typeof options.dialogClass === "undefined")
-        options.dialogClass = "s-SuccessDialog";
-    if (typeof options.modalClass === "undefined")
-        options.modalClass = "s-SuccessModal";
-    if (typeof options.yesButtonClass === "undefined")
-        options.yesButtonClass = "btn-success";
-    informationDialog(message, onOk, options);
+export function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<IDialogLike> {
+    return messageDialog({
+        message,
+        options,
+        cssClass: "s-SuccessDialog",
+        title: DialogTexts.SuccessTitle,
+        getButtons: () => [okDialogButton({ click: onOk, cssClass: 'btn-success' })],
+        native: (msg) => {
+            alert(msg);
+            onOk?.();
+            return "ok";
+        }
+    });
 }
 
 /** 
  * Display a warning dialog 
  * @param message The message to display
  * @param options Additional options. 
- * @see AlertOptions 
+ * @see MessageDialogOptions 
  * @example 
  * warningDialog("Something is odd!");
  */
-export function warningDialog(message: string, options?: AlertOptions) {
-    alertDialog(message, Object.assign({
-        title: DialogTexts.WarningTitle,
-        dialogClass: "s-WarningDialog",
-        modalClass: "s-WarningModal",
-        okButtonClass: 'btn-warning'
-    }, options));
+export function warningDialog(message: string, options?: MessageDialogOptions): Partial<IDialogLike> {
+    return messageDialog({
+        message,
+        options,
+        cssClass: "s-WarningDialog",
+        title: DialogTexts.SuccessTitle,
+        getButtons: () => [okDialogButton({ cssClass: 'btn-warning' })],
+        native: (msg) => {
+            alert(msg);
+            return "ok";
+        }
+    });
 }
-
 
 /** Options for `iframeDialog` **/
 export interface IFrameDialogOptions {
@@ -550,11 +709,13 @@ export interface IFrameDialogOptions {
  * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
  * @param options The options
  */
-export function iframeDialog(options: IFrameDialogOptions) {
+export function iframeDialog(options: IFrameDialogOptions): Partial<IDialogLike> {
 
-    if (useBrowserDialogs()) {
+    if (!hasBSModal() && !hasUIDialog()) {
         window.alert(options.html);
-        return;
+        return {
+            result: "ok"
+        }
     }
 
     let doc: Document;
@@ -571,32 +732,26 @@ export function iframeDialog(options: IFrameDialogOptions) {
         }
     }
 
-    if (useBSModal(options as any)) {
-        internalBSModal({
-            title: DialogTexts.AlertTitle,
-            modalClass: 'modal-lg',
-            onOpen: function () { onOpen(this.querySelector(".modal-body>div")) }
-        }, '<div style="overflow: hidden"></div>', 's-IFrameModal');
-        return;
-    }
-
-    let div = document.createElement('div');
-    div.style.overflow = "hidden";
-    document.body.appendChild(div);
-    let settings: IFrameDialogOptions = Object.assign({
-        autoOpen: true,
-        modal: true,
-        width: '60%',
-        height: '400',
+    return createDialog({
         title: DialogTexts.AlertTitle,
-        open: function () {
+        cssClass: "s-IFrameDialog",
+        bsModalClass: "modal-lg",
+        autoOpen: true,
+        element: el => {
+            let div = document.createElement("div");
+            div.style.overflow = "hidden";
+            el.append(div);
             onOpen(div);
         },
-        close: function () {
-            (jQuery(div) as any).dialog?.('destroy').html('')?.remove?.();
+        providerOptions: (type) => {
+            if (type == "jqueryui") {
+                return {
+                    width: '60%',
+                    height: '400'
+                }
+            }
         }
-    }, options);
-    (jQuery(div) as any).dialog?.(settings);
+    });
 }
 
 /** 
@@ -607,33 +762,34 @@ export function iframeDialog(options: IFrameDialogOptions) {
  */
 export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
 
-    let el = isArrayLike(element) ? element[0] : element;
-    if (!el || !el.classList?.contains("s-Panel") || el.classList?.contains("hidden"))
+    element = isArrayLike(element) ? element[0] : element;
+    let sPanel = element?.closest('.s-Panel:not(.hidden)') as HTMLElement;
+    if (!sPanel)
         return;
 
     let event: any;
     if (typeof jQuery !== "undefined") {
-        event = jQuery.Event('panelbeforeclose', { target: el });
-        jQuery(el).trigger(event);
-        if (event.isDefaultPrevented())
+        event = jQuery.Event('panelbeforeclose', { target: element });
+        jQuery(element).trigger(event);
+        if (event?.isDefaultPrevented?.())
             return;
-        event = jQuery.Event("panelclosing", { panel: el });
+        event = jQuery.Event("panelclosing", { panel: element });
         jQuery(window).trigger(event);
     }
     else {
         event = new Event("panelbeforeclose", { cancelable: true });
-        el.dispatchEvent(event);
+        element.dispatchEvent(event);
         if (event.defaultPrevented) {
             return;
         }
         event = new Event("panelclosing");
-        event.panel = el;
+        event.panel = element;
         window.dispatchEvent(event);
     }
 
-    el.classList.add("hidden");
+    sPanel.classList.add("hidden");
 
-    let uniqueName = el.dataset.paneluniquename;
+    let uniqueName = sPanel.dataset.paneluniquename;
     if (uniqueName) {
         document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
             e.classList.remove("panel-hidden")
@@ -644,9 +800,9 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
     if (typeof jQuery !== "undefined") {
         jQuery(window).triggerHandler('resize');
         jQuery('.require-layout:visible').triggerHandler('layout');
-        event = jQuery.Event('panelclose', { target: el});
-        jQuery(el).trigger(event);
-        event = jQuery.Event("panelclosed", { panel: el });
+        event = jQuery.Event('panelclose', { target: element });
+        jQuery(element).trigger(event);
+        event = jQuery.Event("panelclosed", { panel: element });
         jQuery(window).trigger(event);
     }
     else {
@@ -658,9 +814,9 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
                 rl.dispatchEvent(layoutEvent);
         });
 
-        el.dispatchEvent(new Event("panelclose"));
+        element.dispatchEvent(new Event("panelclose"));
         event = new Event("panelclosed");
-        event.panel = el;
+        event.panel = element;
         window.dispatchEvent(event);
     }
 }
@@ -673,7 +829,7 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
  * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
  * @param e The event triggering the open
  */
- export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
+export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
     let el = isArrayLike(element) ? element[0] : element;
     if (!el)
@@ -732,5 +888,32 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         event = new Event("panelopened") as any;
         event.panel = el;
         window.dispatchEvent(event);
+    }
+}
+
+function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {
+    element = element?.closest('.s-Panel');
+    if (!element)
+        return;
+
+    var pt = element.querySelector(':scope > .panel-titlebar');
+
+    if (!pt) {
+        pt = document.createElement("div");
+        pt.classList.add("panel-titlebar");
+        pt.appendChild(document.createElement("div"));
+        element.prepend(pt);
+    }
+
+    let ptt = pt.querySelector(".panel-titlebar-text");
+    if (ptt)
+        ptt.textContent = title ?? "";
+
+    let ptc = pt.querySelector(".panel-titlebar-close");
+    if (closeButton && !ptc) {
+        ptc = document.createElement("button");
+        ptc.classList.add("panel-titlebar-close");
+        ptc.addEventListener("click", e => closePanel((e.target as any)?.closest("s-Panel")));
+        pt.prepend(ptc);
     }
 }
