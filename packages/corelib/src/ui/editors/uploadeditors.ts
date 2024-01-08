@@ -150,10 +150,11 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
+            let $ = getjQuery();
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
-                    (this.uploadInput as any).fileupload('disable');
+                    $ && $(this.uploadInput).fileupload?.('disable');
                 }
                 catch {
                 }
@@ -161,7 +162,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             else {
                 this.uploadInput.removeAttr('disabled');
                 try {
-                    (this.uploadInput as any).fileupload('enable');
+                    $ && $(this.uploadInput).fileupload?.('enable');
                 } catch {
                 }
             }
@@ -386,10 +387,11 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
+            let $ = getjQuery();
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
-                    (this.uploadInput as any).fileupload('disable');
+                    $ && $(this.uploadInput).fileupload?.('disable');
                 }
                 catch {
                 }
@@ -397,7 +399,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
             else {
                 this.uploadInput.removeAttr('disabled');
                 try {
-                    (this.uploadInput as any).fileupload('enable');
+                    $ && $(this.uploadInput)?.fileupload('enable');
                 } catch {
                 }
             }

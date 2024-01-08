@@ -27,7 +27,8 @@ export namespace UploadHelper {
             uploadInput.attr('multiple', 'multiple');
         }
 
-        (uploadInput as any).fileupload({
+        let $ = getjQuery();
+        $ && $(uploadInput).fileupload?.({
             dataType: 'json',
             dropZone: options.zone,
             pasteZone: options.zone,

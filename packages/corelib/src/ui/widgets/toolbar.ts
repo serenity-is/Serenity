@@ -145,15 +145,16 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     protected createButton(container: HTMLElement, tb: ToolButton) {
         var cssClass = tb.cssClass ?? '';
 
-        let btn = document.createElement("div");
-        btn.classList.add("tool-button");
-        let outer = btn.appendChild(document.createElement("div"));
-        outer.classList.add("button-outer");
-        let inner = outer.appendChild(document.createElement("div"));
-        inner.classList.add("button-inner");
+        let span = Fluent("span").addClass("button-inner");
+        let btn = Fluent("div")
+            .addClass("tool-button")
+            .append(Fluent("div")
+                .addClass("button-outer")
+                .append(span))
+            .appendTo(container);
 
         if (tb.action != null)
-            btn.setAttribute('data-action', tb.action);
+            btn.attr('data-action', tb.action);
 
         if (tb.separator === 'right' || tb.separator === 'both') {
             let sep = container.appendChild(document.createElement("div"));
@@ -161,13 +162,13 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         }
 
         if (cssClass.length > 0)
-            addClass(btn, cssClass);
+            btn.addClass(cssClass);
 
         if (tb.hint)
-            btn.setAttribute('title', tb.hint);
+            btn.attr('title', tb.hint);
 
-        Fluent.on(btn, "click", e => {
-            if (btn.classList.contains('disabled'))
+        btn.on("click", e => {
+            if (btn.hasClass('disabled'))
                 return;
             tb.onClick(e);
         });
@@ -178,30 +179,29 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         }
 
         if (tb.icon) {
-            btn.classList.add('icon-tool-button');
+            btn.addClass('icon-tool-button');
             text = "<i class='" + htmlEncode(iconClassName(tb.icon)) + "'></i> " + text;
         }
         if (text == null || text.length === 0) {
-            btn.classList.add('no-text');
+            btn.addClass('no-text');
         }
         else {
-            let span = btn.querySelector('span');
-            span && (span.innerHTML = text);
+            span.html(text);
         }
 
         if (tb.visible === false)
-            btn.style.display = "none";
+            btn.getNode().style.display = "none";
 
         if (tb.disabled != null && typeof tb.disabled !== "function")
-            btn.classList.toggle('disabled', !!tb.disabled);
+            btn.toggleClass('disabled', !!tb.disabled);
 
         if (typeof tb.visible === "function" || typeof tb.disabled == "function") {
-            Fluent.on(btn, 'updateInterface', () => {
+            btn.on('updateInterface', () => {
                 if (typeof tb.visible === "function")
-                    btn.style.display = !tb.visible() ? "none" : "";
+                    btn.toggle(tb.visible());
 
                 if (typeof tb.disabled === "function")
-                    btn.classList.toggle("disabled", !!tb.disabled());
+                    btn.toggleClass("disabled", !!tb.disabled());
             });
         }
 
@@ -210,8 +210,8 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
                 tb.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
             this.mouseTrap.bind(tb.hotkey, function () {
-                if (btn.style.display != "none") {
-                    Fluent.trigger(btn, "click");
+                if (btn.getNode().style.display != "none") {
+                    btn.trigger("click");
                 }
                 return tb.hotkeyAllowDefault;
             });

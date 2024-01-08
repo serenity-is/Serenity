@@ -2377,7 +2377,7 @@ declare namespace Serenity {
     function resolveUrl(url: string): string;
     function resolveServiceUrl(url: string): string;
     function getCookie(name: string): any;
-    function isSameOrigin(url1: string, url2?: string): boolean;
+    function isSameOrigin(url: string): boolean;
     function requestStarting(): void;
     function requestFinished(): void;
     function getActiveRequests(): number;

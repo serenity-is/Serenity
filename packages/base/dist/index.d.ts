@@ -1084,7 +1084,7 @@ declare function notifyWarning(message: string, title?: string, options?: Toastr
 declare function resolveUrl(url: string): string;
 declare function resolveServiceUrl(url: string): string;
 declare function getCookie(name: string): any;
-declare function isSameOrigin(url1: string, url2?: string): boolean;
+declare function isSameOrigin(url: string): boolean;
 declare function requestStarting(): void;
 declare function requestFinished(): void;
 declare function getActiveRequests(): number;

@@ -156,15 +156,15 @@ function addHandler(element: EventTarget, originalTypeEvent: string, handler: Fu
         return;
     }
 
-    const $ = getjQuery();
-    if ($) {
-        let $element = $(element);
-        if (oneOff)
-            $element.one(originalTypeEvent, handler, delegationFunction);
-        else
-            $element.on(originalTypeEvent, handler, delegationFunction);
-        return;
-    }
+    //const $ = getjQuery();
+    //if ($) {
+    //    let $element = $(element);
+    //    if (oneOff)
+    //        $element.one(originalTypeEvent, handler, delegationFunction);
+    //    else
+    //        $element.on(originalTypeEvent, handler, delegationFunction);
+    //    return;
+    //}
 
     let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction)
 

@@ -280,7 +280,7 @@ Fluent.prototype.removeClass = function (this: FluentThis, value: string | boole
 }
 
 Fluent.prototype.findFirst = function (this: FluentThis, selector: string): Fluent<HTMLElement> {
-    return new (Fluent as any)(this.el.querySelector<HTMLElement>(selector));
+    return new (Fluent as any)(this.el?.querySelector<HTMLElement>(selector));
 }
 
 Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLElement[] {

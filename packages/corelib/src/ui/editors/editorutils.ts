@@ -194,8 +194,8 @@ export namespace EditorUtils {
             widget.domNode.classList.toggle('required', !!isRequired);
         }
         var gridField = widget.domNode.closest('.field');
-        var hasSupItem = gridField.querySelector('sup');
-        if (isRequired && !hasSupItem) {
+        var hasSupItem = gridField?.querySelector('sup');
+        if (isRequired && !hasSupItem && gridField) {
             Fluent("sup").text("*").attr('title', localText('Controls.PropertyGrid.RequiredHint'))
                 .prependTo(gridField.querySelector('.caption'));
         }

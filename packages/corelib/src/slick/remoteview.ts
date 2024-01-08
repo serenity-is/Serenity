@@ -1390,7 +1390,7 @@ export class RemoteView<TEntity> {
                     "Accept": (dataType == "json" || dataType == "application/json") ? "application/json" : dataType
                 },
                 request,
-                service: intf.url,
+                url: intf.url,
                 signal: controller.signal,
                 onSuccess: function (response: ServiceResponse) {
                     addData(response);

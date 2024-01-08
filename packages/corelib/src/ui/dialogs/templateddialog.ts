@@ -1,4 +1,4 @@
-﻿import { CommonDialogOptions, Config, DialogButton, Fluent, ICommonDialog, createCommonDialog, defaultNotifyOptions, getInstanceType, getjQuery, positionToastContainer } from "@serenity-is/base";
+﻿import { CommonDialogOptions, Config, DialogButton, Fluent, ICommonDialog, addClass, createCommonDialog, defaultNotifyOptions, getInstanceType, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { Decorators, MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
 import { getAttributes, isMobileView, layoutFillHeight, validateOptions } from "../../q";
@@ -257,7 +257,7 @@ function applyCssSizes(opt: any, dialogClass: string) {
     let dialog = document.createElement("div");
     try {
         dialog.style.visibility = "hidden !important";
-        dialog.classList.add(dialogClass);
+        addClass(dialog, dialogClass);
         document.body.append(dialog);
 
         var sizeHelper = document.createElement("div");

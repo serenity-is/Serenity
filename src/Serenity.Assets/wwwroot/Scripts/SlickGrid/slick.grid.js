@@ -1111,6 +1111,8 @@ Slick._ = (() => {
         this._container = container;
       else if (typeof container === "string")
         this._container = document.querySelector(container);
+      else if (container.length)
+        container = container[0];
       if (this._container == null) {
         throw new Error("SleekGrid requires a valid container, " + container + " does not exist in the DOM.");
       }

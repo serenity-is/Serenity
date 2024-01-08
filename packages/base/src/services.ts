@@ -41,13 +41,15 @@ export function getCookie(name: string) {
             return ca[i].replace(name, '');
 }
 
-export function isSameOrigin(url1: string, url2?: string) {
-    url2 ??= window.location.href;
-    var uri1 = new URL(url1);
-    var uri2 = new URL(url2);
-    return uri1.host === uri2.host &&
-        uri1.port === uri2.port &&
-        uri1.protocol === uri2.protocol;
+export function isSameOrigin(url: string) {
+    var loc = window.location,
+        a = document.createElement('a');
+
+    a.href = url;
+
+    return a.hostname == loc.hostname &&
+        a.port == loc.port &&
+        a.protocol == loc.protocol;
 }
 
 function serviceOptions<TResponse>(url: string, options: ServiceOptions<TResponse>) {
@@ -94,8 +96,8 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
     return (async function () {
 
-        let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-        options = serviceOptions(url, options);
+        let uri = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+        options = serviceOptions(uri, options);
 
         requestStarting();
         try {
@@ -103,19 +105,21 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
             try {
                 let {
-                    allowRedirect,
-                    async,
-                    blockUI,
-                    request,
-                    service,
-                    url,
-                    onCleanup,
-                    onError,
-                    onSuccess,
+                    allowRedirect: _1,
+                    async: _2,
+                    blockUI: _3,
+                    request: _4,
+                    service: _5,
+                    url: _6,
+                    onCleanup: _7,
+                    onError: _8,
+                    onSuccess: _9,
                     ...fetchInit
                 } = options;
 
-                var fetchResponse = await fetch(url, fetchInit);
+                fetchInit.body = JSON.stringify(options.request);
+
+                var fetchResponse = await fetch(uri, fetchInit);
 
                 if (!fetchResponse.ok) {
                     await handleFetchError(fetchResponse, options);
