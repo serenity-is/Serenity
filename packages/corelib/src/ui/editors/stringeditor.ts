@@ -6,6 +6,8 @@ import { EditorWidget } from "../widgets/widget";
 @Decorators.element("<input type=\"text\"/>")
 export class StringEditor<P={}> extends EditorWidget<P> {
 
+    declare readonly domNode: HTMLInputElement;
+
     public get value(): string {
         return (this.domNode as HTMLInputElement).value;
     }

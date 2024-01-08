@@ -1,34 +1,32 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { ListRequest, ListResponse, RetrieveResponse, localText } from "@serenity-is/base";
+﻿import { Fluent, ListRequest, ListResponse, RetrieveResponse, ServiceOptions, getjQuery, isArrayLike, localText, serviceCall } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { ServiceOptions, safeCast, serviceCall } from "../../q";
 import { ValidationHelper } from "../helpers/validationhelper";
 import { EditorProps, Widget } from "../widgets/widget";
-import { WX } from "../widgets/wx";
 
 @Decorators.registerEditor('Serenity.Select2AjaxEditor', [IStringValue])
 @Decorators.element('<input type="hidden" />')
 export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
     pageSize: number = 50;
 
+    declare readonly domNode: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = sQuery(this.domNode);
+        let hidden = Fluent(this.domNode);
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null)
             hidden.attr("placeholder", emptyItemText);
 
-        hidden.select2(this.getSelect2Options());
+        let $ = getjQuery();
+        if ($?.fn?.select2)
+            $(hidden).select2(this.getSelect2Options());
 
         hidden.attr("type", "text"); // jquery validate to work
 
-        hidden.on("change." + this.uniqueName, (e, x) => {
-            if (WX.hasOriginalEvent(e) || !x) {
-                if (ValidationHelper.getValidator(hidden) != null)
-                    hidden.valid();
-            }
+        this.changeSelect2((e) => {
+            ValidationHelper.validateElement(hidden);
         });
     }
 
@@ -106,7 +104,11 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
                     window.clearTimeout(queryTimeout);
                 }
 
-                var select2 = sQuery(this.domNode).data('select2');
+                let $ = getjQuery();
+                var select2: any;
+                if ($?.fn?.select2) {
+                     select2 = $(this.domNode).data('select2');
+                }
                 select2 && select2.search && select2.search.removeClass('select2-active').parent().removeClass('select2-active');
 
                 queryTimeout = window.setTimeout(() => {
@@ -123,7 +125,7 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
             },
             initSelection: (element, callback) => {
-                var val = element.val() as string;
+                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any)?.value;
                 if (!val) {
                     callback(null);
                     return;
@@ -141,24 +143,38 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
 
     protected addInplaceCreate(title: string): void {
         var self = this;
-        sQuery('<a><b/></a>').addClass('inplace-button inplace-create')
-            .attr('title', title).insertAfter(this.domNode).click(function (e) {
+        Fluent("a").append(Fluent("b")).addClass('inplace-button inplace-create')
+            .attr('title', title).insertAfter(this.domNode).on("click", function (e) {
                 self.inplaceCreateClick(e);
             });
 
-        this.get_select2Container().add(this.domNode)
-            .addClass('has-inplace-button');
+        this.get_select2Container().addClass("has-inplace-button");
+        this.domNode.classList.add("has-inplace-button");
     }
 
     protected inplaceCreateClick(e: any): void {
     }
 
-    protected get_select2Container(): JQuery {
-        return sQuery(this.domNode).prevAll('.select2-container');
+    protected get_select2Container(): Fluent {
+        let container = this.domNode.previousElementSibling;
+        while (container && !container.classList.contains("select2-container"))
+            container = container.previousElementSibling;
+        return Fluent(container);
     }
 
     get_value(): string {
-        return safeCast(sQuery(this.domNode).select2('val'), String);
+        var val;
+        let $ = getjQuery();
+        if ($ && $(this.domNode).data('select2')) {
+            val = $(this.domNode).select2('val');
+            if (val != null && Array.isArray(val)) {
+                return val.join(',');
+            }
+        }
+        else
+            val = this.domNode.value;
+
+        return val;        
     }
 
     get value(): string {
@@ -166,15 +182,20 @@ export class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements
     }
 
     set_value(value: string) {
-        if (value !== this.get_value()) {
-            var el = this.domNode;
-            sQuery(el).select2('val', value);
-            el.dataset.select2settingvalue = "true";
-            try {
-                sQuery(el).trigger('change');
+        if (value != this.get_value()) {
+            var val: any = value;
+            let $ = getjQuery();
+            if ($?.fn?.select2) {
+                $(this.domNode).select2('val', val);
+                this.domNode.dataset.select2settingvalue = "true";
+                try {
+                    Fluent.trigger(this.domNode, "change");
+                } finally {
+                    delete this.domNode.dataset.select2settingvalue;
+                }
             }
-            finally {
-                delete el.dataset.select2settingvalue;
+            else {
+                this.domNode.value = val;
             }
         }
     }

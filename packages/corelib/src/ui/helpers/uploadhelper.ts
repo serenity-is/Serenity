@@ -1,10 +1,9 @@
-import sQuery from "@optionaldeps/squery";
-import { ServiceResponse, alertDialog, blockUI, blockUndo, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { Fluent, ServiceResponse, alertDialog, blockUI, blockUndo, getjQuery, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
 import { replaceAll } from "../../q";
 
 export namespace UploadHelper {
 
-    export function addUploadInput(options: UploadInputOptions): JQuery {
+    export function addUploadInput(options: UploadInputOptions): Fluent {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
         let progress = isArrayLike(options.progress) ? options.progress[0] : options.progress;
         container.classList.add('fileinput-button');
@@ -19,7 +18,7 @@ export namespace UploadHelper {
             uploadUrl += encodeURIComponent(options.uploadIntent);
         }
 
-        var uploadInput = sQuery('<input/>').attr('type', 'file')
+        var uploadInput = Fluent("input").attr('type', 'file')
             .attr('name', options.inputName + '[]')
             .attr('data-url', resolveUrl(uploadUrl))
             .appendTo(container);
@@ -52,7 +51,7 @@ export namespace UploadHelper {
 
                 if ((xhr.getResponseHeader('content-type') || '')
                     .toLowerCase().indexOf('application/json') >= 0) {
-                    var json = $.parseJSON(xhr.responseText);
+                    var json = JSON.parse(xhr.responseText);
                     if (json && json.Error && json.Error.Message) {
                         notifyError(json.Error.Message);
                         return;
@@ -81,19 +80,20 @@ export namespace UploadHelper {
             start: function () {
                 blockUI(null);
                 if (progress) {
-                    sQuery(progress).show();
+                    Fluent(progress).show();
                 }
             },
             stop: function () {
                 blockUndo();
                 if (progress) {
-                    sQuery(progress).hide();
+                    Fluent(progress).hide();
                 }
             },
             progress: function (e: Event, data1: any) {
                 if (progress) {
                     var percent = data1.loaded / data1.total * 100;
-                    sQuery(progress).children().css('width', percent.toString() + '%');
+                    var bar = progress.firstElementChild as HTMLElement;
+                    bar && (bar.style.width = percent.toString() + '%');
                 }
             }
         });
@@ -185,8 +185,14 @@ export namespace UploadHelper {
         return resolveUrl('~/upload/') + filename;
     }
 
-    export function colorBox(link: JQuery, options: any): void {
-        (link as any).colorbox({
+    export function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options: any): void {
+        link = isArrayLike(link) ? link[0] : link;
+        if (!link)
+            return;
+        let $ = getjQuery();
+        if (!$)
+            return;
+        $(link).colorbox?.({
             current: htmlEncode(localText('Controls.ImageUpload.ColorboxCurrent')),
             previous: htmlEncode(localText('Controls.ImageUpload.ColorboxPrior')),
             next: htmlEncode(localText('Controls.ImageUpload.ColorboxNext')),
@@ -194,14 +200,16 @@ export namespace UploadHelper {
         });
     }
 
-    export function populateFileSymbols(container: JQuery, items: UploadedFile[],
+    export function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[],
         displayOriginalName?: boolean, urlPrefix?: string): void {
-
+        let container = isArrayLike(c) ? c[0] : c;
+        if (!container)
+            return;
         items = items || [];
-        container.html('');
+        container.innerHTML = "";
         for (var index = 0; index < items.length; index++) {
             var item = items[index];
-            var li = sQuery('<li/>').addClass('file-item').data('index', index);
+            var li = Fluent("li").addClass('file-item').data('index', index.toString());
             var isImage = hasImageExtension(item.Filename);
             if (isImage) {
                 li.addClass('file-image');
@@ -209,7 +217,7 @@ export namespace UploadHelper {
             else {
                 li.addClass('file-binary');
             }
-            var thumb = sQuery('<a/>').addClass('thumb').appendTo(li);
+            var thumb = Fluent("a").addClass('thumb').appendTo(li);
             var originalName = item.OriginalName ?? '';
             var fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
@@ -224,13 +232,12 @@ export namespace UploadHelper {
             }
 
             if (isImage) {
-                thumb.css('backgroundImage', "url('" + dbFileUrl(
-                    thumbFileName(item.Filename)) + "')");
+                thumb.getNode().style.backgroundImage = "url('" + dbFileUrl(thumbFileName(item.Filename)) + "')";
                 colorBox(thumb, new Object());
             }
 
             if (displayOriginalName) {
-                sQuery('<div/>').addClass('filename').text(originalName)
+                Fluent("div").addClass('filename').text(originalName)
                     .attr('title', originalName).appendTo(li);
             }
 

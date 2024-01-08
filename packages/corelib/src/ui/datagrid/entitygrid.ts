@@ -1,8 +1,7 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { faIcon, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Decorators, DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, HandleRouteEventArgs, Router, replaceAll, safeCast } from "../../q";
+import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../q";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -18,40 +17,40 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props: WidgetProps<P>) {
         super(props);
         this.domNode.classList.add('route-handler');
-        sQuery(this.domNode).on('handleroute.' + this.uniqueName, (_, args: any) => this.handleRoute(args));
+        Fluent.on(this.domNode, "handleroute." + this.uniqueName, this.handleRoute.bind(this));
     }
 
-    protected handleRoute(args: HandleRouteEventArgs): void {
-        if (!!args.handled)
+    protected handleRoute(ev: HandleRouteEvent): void {
+        if (!!ev.handled)
             return;
 
-        if (!!(args.route === 'new')) {
-            args.handled = true;
+        if (!!(ev.route === 'new')) {
+            ev.handled = true;
             this.addButtonClick();
             return;
         }
 
-        var oldRequests = (sQuery as any)?.["active"];
+        var oldRequests = getActiveRequests();
 
-        var parts = args.route.split('/');
+        var parts = ev.route.split('/');
         if (!!(parts.length === 2 && parts[0] === 'edit')) {
-            args.handled = true;
+            ev.handled = true;
             this.editItem(decodeURIComponent(parts[1]));
         }
         else if (!!(parts.length === 2 && parts[1] === 'new')) {
-            args.handled = true;
+            ev.handled = true;
             this.editItemOfType(parts[0], null);
         }
         else if (!!(parts.length === 3 && parts[1] === 'edit')) {
-            args.handled = true;
+            ev.handled = true;
             this.editItemOfType(parts[0], decodeURIComponent(parts[2]));
         }
         else
             return;
 
-        if ((sQuery as any)?.["active"] > oldRequests && args.handled && args.index >= 0 && args.index < args.parts.length - 1) {
-            sQuery(document).one('ajaxStop', () => {
-                setTimeout(() => Router.resolve('#' + args.parts.join('/+/')), 1);
+        if (getActiveRequests() > oldRequests && ev.handled && ev.index >= 0 && ev.index < ev.parts.length - 1) {
+            Fluent.one(document, "ajaxStop", () => {
+                setTimeout(() => Router.resolve('#' + ev.parts.join('/+/')), 1);
             });
         }
     }
@@ -286,7 +285,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     }
 
     protected initDialog(dialog: Widget<any>): void {
-        SubDialogHelper.bindToDataChange(dialog, this, (e, dci) => {
+        SubDialogHelper.bindToDataChange(dialog, this, (dci) => {
             this.subDialogDataChange();
         }, true);
 
@@ -300,7 +299,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             return;
         }
 
-        SubDialogHelper.bindToDataChange(dialog, this, (e, dci) => {
+        SubDialogHelper.bindToDataChange(dialog, this, (dci) => {
             this.subDialogDataChange();
         }, true);
 

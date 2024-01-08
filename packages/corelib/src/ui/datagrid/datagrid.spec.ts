@@ -1,6 +1,5 @@
 ﻿import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { DataGrid } from "./datagrid";
-import sQuery from "@optionaldeps/squery";
 import { addAttribute } from "../../q/system-compat";
 
 function getIdProperty(grid: DataGrid<any, any>): string {

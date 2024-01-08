@@ -1,5 +1,5 @@
 import type { MessageDialogOptions } from "./dialogs";
-import { EventHandler } from "./eventhandler";
+import { Fluent } from "./html";
 
 jest.mock("./localtext", () => ({
     ...jest.requireActual("./localtext"),
@@ -1009,8 +1009,8 @@ describe("closePanel", () => {
         let closedPanel: any;
         let panelClosing = (e: any) => closingPanel = e.panel;
         let panelClosed = (e: any) => closedPanel = e.panel;
-        EventHandler.on(window, 'panelclosing', panelClosing);
-        EventHandler.on(window, 'panelclosed', panelClosed);
+        Fluent.on(window, 'panelclosing', panelClosing);
+        Fluent.on(window, 'panelclosed', panelClosed);
         try {
             let dialogs = (await import("./dialogs"));
             dialogs.closePanel(div);
@@ -1019,8 +1019,8 @@ describe("closePanel", () => {
             expect(closedPanel).toBe(divEl);
         }
         finally {
-            EventHandler.off(window, 'panelclosing', panelClosing);
-            EventHandler.off(window, 'panelclosed', panelClosed);
+            Fluent.off(window, 'panelclosing', panelClosing);
+            Fluent.off(window, 'panelclosed', panelClosed);
             div.remove();
         }
     });
@@ -1032,8 +1032,8 @@ describe("closePanel", () => {
         let closedPanel: any;
         let panelClosing = (e: any) => closingPanel = e.panel;
         let panelClosed = (e: any) => closedPanel = e.panel;
-        EventHandler.on(window, 'panelclosing', panelClosing);
-        EventHandler.on(window, 'panelclosed', panelClosed);
+        Fluent.on(window, 'panelclosing', panelClosing);
+        Fluent.on(window, 'panelclosed', panelClosed);
         try {
             div.classList.add("s-Panel");
             let dialogs = (await import("./dialogs"));
@@ -1043,8 +1043,8 @@ describe("closePanel", () => {
             expect(closedPanel).toBe(div);
         }
         finally {
-            EventHandler.off(window, 'panelclosing', panelClosing);
-            EventHandler.off(window, 'panelclosed', panelClosed);
+            Fluent.off(window, 'panelclosing', panelClosing);
+            Fluent.off(window, 'panelclosed', panelClosed);
             div.remove();
         }
     });
@@ -1286,4 +1286,4 @@ describe("openPanel", () => {
 
 });
 
-export { }
+export { };

@@ -1,5 +1,4 @@
-﻿import jQuery from "@optionaldeps/jquery";
-import { Config, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
+﻿import { Config, Fluent, addClass, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
@@ -12,7 +11,7 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     type?: { new(options?: P): TWidget, prototype: TWidget };
     options?: P & WidgetProps<{}>;
     container?: HTMLElement | ArrayLike<HTMLElement>;
-    element?: (e: HTMLElement) => void;
+    element?: (e: Fluent) => void;
     init?: (w: TWidget) => void;
 }
 
@@ -45,16 +44,13 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        if (jQuery) {
-            jQuery(this.domNode).on('remove.' + widgetName, e => {
-                if (e.bubbles || e.cancelable) {
-                    return;
-                }
-                this.destroy();
-            }).data(widgetName, this);
-        }
+        Fluent.on(this.domNode, 'remove.' + widgetName, e => {
+            if (e.bubbles || e.cancelable)
+                return;
+            this.destroy();
+        });
 
-        this.idPrefix = this.uniqueName + '_';
+        this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
         this.addCssClass();
         !getInstanceType(this).deferRenderContents && this.internalRenderContents();
     }
@@ -63,10 +59,9 @@ export class Widget<P = {}> {
         if (this.domNode) {
             deassociateWidget(this);
             toggleClass(this.domNode, this.getCssClass(), false);
-            if (jQuery) {
-                let widgetName = getWidgetName(getInstanceType(this));
-                jQuery(this.domNode).off('.' + widgetName).off('.' + this.uniqueName).removeData(widgetName);
-            }
+            let widgetName = getWidgetName(getInstanceType(this));
+            Fluent.off(this.domNode, '.' + widgetName);
+            Fluent.off(this.domNode, '.' + this.uniqueName);
             delete (this as any).domNode;
         }
     }
@@ -77,14 +72,14 @@ export class Widget<P = {}> {
 
     /**
      * @deprecated
-     * Prefer domNode as this one depends on jQuery
+     * Prefer domNode as this one returns a Fluent object emulating jQuery
      */
-    public get element(): JQuery {
-        return jQuery(this.domNode);
+    public get element(): Fluent {
+        return Fluent(this.domNode);
     }
 
     protected addCssClass(): void {
-        toggleClass(this.domNode, this.getCssClass(), true);
+        addClass(this.domNode, this.getCssClass());
     }
 
     protected getCssClass(): string {
@@ -122,16 +117,16 @@ export class Widget<P = {}> {
         return this.domNode.closest('.field');
     }
 
-    public getGridField(): HTMLDivElement {
-        return this.domNode.closest('.field');
+    public getGridField(): Fluent {
+        return Fluent(this.domNode.closest('.field'));
     }
 
     public change(handler: (e: Event) => void) {
-        this.domNode.addEventListener('change', handler);
+        Fluent.on(this.domNode, 'change', handler);
     };
 
     public changeSelect2(handler: (e: Event) => void) {
-        this.domNode.addEventListener("change", e => {
+        Fluent.on(this.domNode, "change." + this.uniqueName, e => {
             if ((e.target as HTMLElement)?.dataset?.select2settingvalue)
                 return;
             handler(e);
@@ -144,14 +139,13 @@ export class Widget<P = {}> {
         let props: WidgetProps<P> = params.options ?? ({} as any);
         let node = handleElementProp(params.type as any, props);
         params.container && (isArrayLike(params.container) ? params.container[0] : params.container)?.appendChild(node);
-        params.element?.(node);
+        params.element?.(Fluent(node));
         props.element = node;
         let widget = new params.type(props as any);
         widget.init();
         params.init?.(widget);
         return widget;
     }
-
     
     protected internalInit() {
         getInstanceType(this).deferRenderContents && this.internalRenderContents();
@@ -221,5 +215,5 @@ export class EditorWidget<P> extends Widget<EditorProps<P>> {
     }
 }
 
-jQueryPatch(jQuery);
+!jQueryPatch() && Fluent.ready(jQueryPatch);
 reactPatch();

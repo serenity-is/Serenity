@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Enum, tryGetText } from "@serenity-is/base";
+﻿import { Enum, Fluent, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getAttributes, getLookup } from "../../q";
@@ -56,15 +55,15 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     protected addRadio(value: string, text: string) {
-        var label = sQuery('<label/>').text(text);
-        sQuery('<input type="radio"/>').attr('name', this.uniqueName)
+        var label = Fluent("label").text(text);
+        Fluent("input").attr("type", "radio").attr('name', this.uniqueName)
             .attr('id', this.uniqueName + '_' + value)
             .attr('value', value).prependTo(label);
         label.appendTo(this.domNode);
     }
 
     get_value(): string {
-        return sQuery(this.domNode).find('input:checked').first().val() as string;
+        return (Fluent(this.domNode).findAll('input').filter(x => (x as HTMLInputElement).checked)[0] as HTMLInputElement)?.value
     }
 
     get value(): string {
@@ -73,13 +72,13 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
 
     set_value(value: string): void {
         if (value !== this.get_value()) {
-            var inputs = sQuery(this.domNode).find('input');
-            var checks = inputs.filter(':checked');
+            var inputs = Fluent(this.domNode).findAll('input');
+            var checks = inputs.filter(x => (x as HTMLInputElement).checked);
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
             }
             if (value) {
-                checks = inputs.filter('[value=' + value + ']');
+                checks = inputs.filter(x => x.matches('[value=' + value + ']'));
                 if (checks.length > 0) {
                     (checks[0] as HTMLInputElement).checked = true;
                 }
@@ -98,12 +97,12 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
             if (value) {
-                sQuery(this.domNode).attr('disabled', 'disabled')
-                    .find('input').attr('disabled', 'disabled');
+                Fluent(this.domNode).attr('disabled', 'disabled')
+                    .findFirst('input').attr('disabled', 'disabled');
             }
             else {
-                sQuery(this.domNode).removeAttr('disabled')
-                    .find('input').removeAttr('disabled');
+                Fluent(this.domNode).removeAttr('disabled')
+                    .findFirst('input').removeAttr('disabled');
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { htmlEncode, localText } from "@serenity-is/base";
+﻿import { Fluent, htmlEncode, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { PagerOptions } from "../../slick";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -19,16 +18,17 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         let grp = (t: string) => ` class="${p}grp ${p}grp-${t}"`;
         let btn = (t: string) => `<div class="${p}${t} ${p}btn"><span class="${p}btn-span"></span></div>`;
 
-        sQuery(this.domNode).addClass('s-SlickPager slick-pg')
+        let el = Fluent(this.domNode);
+        el.addClass('s-SlickPager slick-pg')
             .html(`<div class="${p}in"><div${grp("firstprev")}>${btn("first")}${btn("prev")}</div>
 <div${grp("control")}><span class="${p}control"><span class="${p}pagetext">${htmlEncode(localText("Controls.Pager.Page"))}</span>
 <input id="${this.idPrefix}CurrentPage" class="${p}current" type="text" size="4" value="1" />
 <span class="${p}pagesep">/</span><span class="${p}total">1</span></span></div>
 <div${grp("nextlast")}>${btn("next")}${btn("last")}</div><div${grp("reload")}>${btn("reload")}</div><div${grp("stat")}><span class="${p}stat"></span></div></div>`);
 
-        ['first', 'prev', 'next', 'last'].forEach(s => sQuery(`.${p}${s}`, this.domNode).on('click', () => this._changePage(s)));
-        sQuery(`.${p}reload`, this.domNode).on('click', () => v.populate());
-        sQuery(`.${p}current`, this.domNode).on('keydown', e => { if (e.key === 'Enter') this._changePage('input') });
+        ['first', 'prev', 'next', 'last'].forEach(s => el.findFirst(`.${p}${s}`).on('click', () => this._changePage(s)));
+        el.findFirst(`.${p}reload`).on('click', () => v.populate());
+        el.findFirst(`.${p}current`).on('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') this._changePage('input') });
 
         if (this.options.showRowsPerPage) {
             var opt: string = "", sel = "";
@@ -37,8 +37,8 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                     sel = 'selected="selected"'; else sel = '';
                 opt += "<option value='" + o.rowsPerPageOptions[nx] + "' " + sel + " >" + o.rowsPerPageOptions[nx] + "&nbsp;&nbsp;</option>";
             };
-            sQuery(`.${p}in`, this.domNode).prepend(`<div class="${p}grp"><select class="${p}size" name="rp">${opt}</select></div>`);
-            sQuery(`select.${p}size`, this.domNode).on('change', function (this: HTMLSelectElement) {
+            el.findFirst(`.${p}in`).prepend(`<div class="${p}grp"><select class="${p}size" name="rp">${opt}</select></div>`);
+            el.findFirst(`select.${p}size`).on('change', function (this: HTMLSelectElement) {
                 if (o.onRowsPerPageChange)
                     o.onRowsPerPageChange(+this.value);
                 else {
@@ -72,7 +72,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt(sQuery('input.slick-pg-current', this.domNode).val() as string);
+                var nv = parseInt(this.domNode.querySelector<HTMLInputElement>('input.slick-pg-current')?.value);
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)
@@ -80,7 +80,8 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                 else if (nv > pages)
                     nv = pages;
 
-                sQuery('.slick-pg-current', this.domNode).val(nv);
+                let cur = this.domNode.querySelector<HTMLInputElement>('.slick-pg-current');
+                cur && (cur.value = "" + nv);
 
                 newp = nv;
                 break;
@@ -101,9 +102,10 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var view = this.options.view;
         var info = view.getPagingInfo();
         var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
+        var el = Fluent(this.domNode);
 
-        sQuery('.slick-pg-current', this.domNode).val(info.page);
-        sQuery('.slick-pg-total', this.domNode).html(pages as any);
+        el.findFirst('.slick-pg-current').val(info.page);
+        el.findFirst('.slick-pg-total').html(pages as any);
 
         var r1 = (info.page - 1) * info.rowsPerPage + 1;
         var r2 = r1 + info.rowsPerPage - 1;
@@ -128,7 +130,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         else
             stat = htmlEncode(localText("Controls.Pager.NoRowStatus"));
 
-        sQuery('.slick-pg-stat', this.domNode).html(stat);
-        sQuery('.slick-pg-size', this.domNode).val((info.rowsPerPage || 0).toString());
+        el.findFirst('.slick-pg-stat').html(stat);
+        el.findFirst('.slick-pg-size').val((info.rowsPerPage || 0).toString());
     }
 }

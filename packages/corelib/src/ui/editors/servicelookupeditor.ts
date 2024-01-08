@@ -1,6 +1,5 @@
-﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, resolveServiceUrl } from "@serenity-is/base";
+﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
-import { ServiceOptions, serviceCall } from "../../q";
 import { EditorProps } from "../widgets/widget";
 import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
 
@@ -142,7 +141,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
     protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>> {
         return {
             blockUI: false,
-            url: this.getServiceUrl(),
+            service: this.getServiceUrl(),
             request: this.getListRequest(query),
             onSuccess: response => {
                 var items = response.Entities || [];
@@ -155,7 +154,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
                     more: query.checkMore && query.take && items.length > query.take
                 });
             }
-        };
+        }
     }
 
     protected hasAsyncSource() {

@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Decorators } from "../../decorators";
+﻿import { Decorators } from "../../decorators";
 import { IBooleanValue } from "../../interfaces";
 import { EditorWidget } from "../widgets/widget";
 
@@ -7,8 +6,10 @@ import { EditorWidget } from "../widgets/widget";
 @Decorators.element('<input type="checkbox"/>')
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
 
+    declare public readonly domNode: HTMLInputElement;
+
     public get value(): boolean {
-        return sQuery(this.domNode).is(":checked");
+        return !!(this.domNode as HTMLInputElement).checked;
     }
 
     protected get_value(): boolean {
@@ -16,7 +17,7 @@ export class BooleanEditor<P = {}> extends EditorWidget<P> {
     }
 
     public set value(value: boolean) {
-        sQuery(this.domNode).prop("checked", !!value);
+        (this.domNode as HTMLInputElement).checked = !!value;
     }
 
     protected set_value(value: boolean): void {

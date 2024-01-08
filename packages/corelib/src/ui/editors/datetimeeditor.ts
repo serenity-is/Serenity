@@ -1,9 +1,8 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Culture, Invariant, formatDate, formatISODateTimeUTC, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
+﻿import { Culture, Fluent, Invariant, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, addValidationRule, today } from "../../q";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
 
@@ -13,33 +12,36 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
     private minValue: string;
     private maxValue: string;
-    private time: JQuery;
+    private time: HTMLSelectElement;
     private lastSetValue: string;
     private lastSetValueGet: string;
+
+    declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = sQuery(this.domNode);
-        input.addClass('s-DateTimeEditor');
+        this.domNode.classList.add('s-DateTimeEditor');
 
+        let $ = getjQuery();
         if (this.options.inputOnly) {
-            input.addClass('dateTimeQ');
+            this.domNode.classList.add('dateTimeQ');
             // just a basic input, usually read only display
         }
         // @ts-ignore
-        else if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !sQuery.fn.datepicker || this.options.seconds)) {
-            input.addClass('dateTimeQ');
+        else if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker || this.options.seconds)) {
+            this.domNode.classList.add('dateTimeQ');
             // @ts-ignore
-            flatpickr(input[0], this.getFlatpickrOptions());
+            flatpickr(this.domNode, this.getFlatpickrOptions());
         }
-        else if ((sQuery.fn as any)?.datepicker) {
-            input.addClass('dateQ');
+        else if ($?.fn?.datepicker) {
+            this.domNode.classList.add('dateQ');
 
-            (input as any).datepicker({
+            let $ = getjQuery();
+            $(this.domNode).datepicker({
                 showOn: 'button',
                 beforeShow: function () {
-                    if (input.hasClass('readonly') as any)
+                    if (this.domNode.classList.contains('readonly'))
                         return false as any;
                     DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
@@ -47,29 +49,29 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 yearRange: (this.options.yearRange ?? '-100:+50')
             });
 
-            input.bind('change.' + this.uniqueName, (e) => {
+            Fluent.on(this.domNode, 'change.' + this.uniqueName, (e) => {
                 this.lastSetValue = null;
                 DateEditor.dateInputChange(e as any);
             });
 
-            this.time = sQuery('<select/>').addClass('editor s-DateTimeEditor time');
-            var after = input.next('.ui-datepicker-trigger');
-            if (after.length > 0) {
-                this.time.insertAfter(after);
+            this.time = Fluent("select").addClass('editor s-DateTimeEditor time').getNode();
+            var after = this.domNode.nextElementSibling as HTMLElement;
+            if (after?.classList.contains("ui-datepicker-triggerlength")) {
+                Fluent(this.time).insertAfter(after);
             }
             else {
-                after = input.prev('.ui-datepicker-trigger');
-                if (after.length > 0) {
-                    this.time.insertBefore(after);
+                after = this.domNode.previousElementSibling as HTMLElement;
+                if (after?.classList.contains("ui-datepicker-trigger")) {
+                    Fluent(this.time).insertBefore(after);
                 }
                 else {
-                    this.time.insertAfter(input);
+                    Fluent(this.time).insertAfter(this.domNode);
                 }
             }
 
-            this.time.on('change', () => {
+            Fluent.on(this.time, 'change', () => {
                 this.lastSetValue = null;
-                input.triggerHandler('change');
+                Fluent.trigger(this.domNode, 'change');
             });
 
             var timeOpt = DateTimeEditor.getTimeOptions(
@@ -81,7 +83,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 addOption(this.time, t, t);
             }
 
-            addValidationRule(input, e1 => {
+            addValidationRule(this.domNode, e1 => {
                 var value = this.get_value();
                 if (!value) {
                     return null;
@@ -96,26 +98,28 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 }
 
                 return null;
-            }, this.uniqueName);
+            });
         }
-        else
-            input.attr('type', 'datetime').addClass('dateTimeQ');
+        else {
+            this.domNode.setAttribute('type', 'datetime');
+            this.domNode.classList.add('dateTimeQ');
+        }
 
-        input.bind('keyup.' + this.uniqueName, e => {
+        Fluent.on(this.domNode, 'keyup.' + this.uniqueName, (e: KeyboardEvent) => {
             if (this.get_readOnly())
                 return;
 
             if (this.time) {
-                if (e.which === 32) {
+                if (e.key === "Space") {
                     if (this.get_valueAsDate() !== new Date()) {
                         this.set_valueAsDate(new Date());
-                        sQuery(this.domNode).trigger('change');
+                        Fluent.trigger(this.domNode, 'change');
                     }
                 }
                 else {
-                    var before = sQuery(this.domNode).val();
+                    var before = this.domNode.value;
                     DateEditor.dateInputKeyup(e as any);
-                    if (before != sQuery(this.domNode).val())
+                    if (before != this.domNode.value)
                         this.lastSetValue = null;
                 }
             }
@@ -124,15 +128,16 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_sqlMinMax(true);
 
         if (!this.options.inputOnly) {
-            sQuery("<i class='inplace-button inplace-now'><b></b></div>")
+            Fluent("i").addClass("inplace-button inplace-now")
+                .append(Fluent("b"))
                 .attr('title', this.getInplaceNowText())
-                .insertAfter(this.time).click(e2 => {
+                .insertAfter(this.time).on("click", () => {
                     if (this.domNode.classList.contains('readonly')) {
                         return;
                     }
                     this.lastSetValue = null;
                     this.set_valueAsDate(new Date());
-                    input.triggerHandler('change');
+                    Fluent.trigger(this.domNode, 'change');
                 });
         }
     }
@@ -148,13 +153,13 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
             onChange: () => {
                 this.lastSetValue = null;
-                this.domNode && sQuery(this.domNode).triggerHandler('change');
+                this.domNode && Fluent.trigger(this.domNode, 'change');
             }
         }
     }
 
     get_value(): string {
-        var value = (sQuery(this.domNode).val() as string).trim();
+        var value = this.domNode.value?.trim();
         if (value != null && value.length === 0) {
             return null;
         }
@@ -162,11 +167,11 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         var result: string;
         if (this.time) {
             var datePart = formatDate(value, 'yyyy-MM-dd');
-            var timePart = this.time.val();
+            var timePart = this.time.value;
             result = datePart + 'T' + timePart + ':00.000';
         }
         else
-            result = formatDate(parseDate(sQuery(this.domNode).val() as string), "yyyy-MM-ddTHH:mm:ss.fff");
+            result = formatDate(parseDate(this.domNode.value), "yyyy-MM-ddTHH:mm:ss.fff");
 
         if (this.options.useUtc)
             result = formatISODateTimeUTC(parseISODateTime(result));
@@ -184,27 +189,27 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
     set_value(value: string) {
         if (!value) {
-            sQuery(this.domNode).val('');
-            this.time && this.time.val('00:00');
+            this.domNode.value = "";
+            this.time && (this.time.value = "00:00");
         }
         else if (value.toLowerCase() === 'today') {
             if (this.time) {
-                sQuery(this.domNode).val(formatDate(today(), null));
-                this.time.val('00:00');
+                this.domNode.value = formatDate(today(), null);
+                this.time.value = '00:00';
             }
             else {
-                sQuery(this.domNode).val(this.getDisplayFormat())
+                this.domNode.value = formatDate(value, this.getDisplayFormat());
             }
         }
         else {
             var val = ((value.toLowerCase() === 'now') ? new Date() : parseISODateTime(value));
             if (this.time) {
                 val = DateTimeEditor.roundToMinutes(val, (this.options.intervalMinutes ?? 5));
-                sQuery(this.domNode).val(formatDate(val, null));
-                this.time.val(formatDate(val, 'HH:mm'));
+                this.domNode.value = formatDate(val, null);
+                this.time.value = formatDate(val, 'HH:mm');
             }
             else
-                sQuery(this.domNode).val(formatDate(val, this.getDisplayFormat()));
+                this.domNode.value = formatDate(val, this.getDisplayFormat());
         }
 
         this.lastSetValue = null;
@@ -308,14 +313,18 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                sQuery(this.domNode).addClass('readonly').attr('readonly', 'readonly');
-                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
-                sQuery(this.domNode).nextAll('.inplace-now').css('opacity', '0.1');
-            }
-            else {
-                sQuery(this.domNode).removeClass('readonly').removeAttr('readonly');
-                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
-                sQuery(this.domNode).nextAll('.inplace-now').css('opacity', '1');
+                this.domNode.classList.toggle('readonly', !!value);
+                value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
+                
+                let trg = this.domNode.nextElementSibling;
+                while (trg && !trg.classList.contains("ui-datepicker-trigger"))
+                    trg = trg.nextElementSibling;
+                trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
+
+                trg = this.domNode.nextElementSibling;
+                while (trg && !trg.classList.contains("inplace-now"))
+                    trg = trg.nextElementSibling;
+                    trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
             }
 
             this.time && EditorUtils.setReadonly(this.time, value);

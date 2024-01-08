@@ -8,14 +8,15 @@
       "@serenity-is/squery": [
         "./src/globals/squery-module"
       ],
-      "@optionaldeps/*": [
-        "./src/globals/*-module"
-      ]
+      "@mockdeps": [
+        "./src/globals/mockdeps"
+      ],
     },
     "outDir": "./out",
     "target": "ES2017"
   },
   "include": [
-    "src"
+    "src",
+    "src/q/services-internal.ts"
   ]
 }

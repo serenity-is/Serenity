@@ -1,4 +1,4 @@
-﻿import { htmlEncode, toggleClass } from "./html";
+﻿import { addClass, htmlEncode, toggleClass } from "./html";
 
 // adapted from https://github.com/JPeer264/toastr2
 export type ToastContainerOptions = {
@@ -98,7 +98,7 @@ export class Toastr {
         container.setAttribute('id', this.options.containerId);
         let positionClass = options?.positionClass ?? this.options.positionClass;
         if (positionClass)
-            toggleClass(container, positionClass, true);
+            addClass(container, positionClass);
 
         let targetSelector = options?.target ?? this.options.target;
         const target = document.querySelector(targetSelector);
@@ -334,7 +334,7 @@ export class Toastr {
                     suffix = htmlEncode(map.title);
                 }
                 $titleElement.innerHTML = suffix;
-                toggleClass($titleElement, opt.titleClass, true);
+                addClass($titleElement, opt.titleClass);
                 toastElement.appendChild($titleElement);
             }
         };
@@ -348,14 +348,14 @@ export class Toastr {
                 }
 
                 $messageElement.innerHTML = suffix;
-                toggleClass($messageElement, opt.messageClass, true);
+                addClass($messageElement, opt.messageClass);
                 toastElement.appendChild($messageElement);
             }
         };
 
         const setCloseButton = (): void => {
             if (opt.closeButton && closeElement) {
-                toggleClass(closeElement, opt.closeClass, true);
+                addClass(closeElement, opt.closeClass);
                 closeElement.setAttribute('role', 'button');
                 toastElement.insertBefore(closeElement, toastElement.firstChild);
             }
@@ -383,8 +383,8 @@ export class Toastr {
         const personalizeToast = (): void => {
             toastElement.classList.add('show');
             opt.rtl && toastElement.classList.add('rtl');
-            opt.toastClass && toggleClass(toastElement, opt.toastClass, true);
-            opt.iconClass && toggleClass(toastElement, opt.iconClass, true);
+            opt.toastClass && addClass(toastElement, opt.toastClass);
+            opt.iconClass && addClass(toastElement, opt.iconClass);
             setTitle();
             setMessage();
             setCloseButton();

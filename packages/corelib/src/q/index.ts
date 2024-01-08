@@ -1,7 +1,6 @@
 export * from "./arrays-compat";
 export * from "./authorization";
 export * from "./dialogs-compat";
-export * from "./errorhandling";
 export * from "./formatting-compat";
 export * from "./html-compat";
 export * from "./layout";

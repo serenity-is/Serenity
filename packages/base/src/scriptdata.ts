@@ -3,8 +3,8 @@ import { htmlEncode } from "./html";
 import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { PropertyItemsData } from "./propertyitem";
-import { resolveUrl } from "./services";
-import { getStateStore, getjQuery } from "./system";
+import { requestFinished, requestStarting, resolveUrl } from "./services";
+import { getStateStore } from "./system";
 
 /**
  * Gets the known hash value for a given dynamic script name. They are usually
@@ -67,9 +67,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
                 let url = resolveUrl('~/DynamicData/') + name + '?v=' +
                     (getScriptDataHash(name) ?? new Date().getTime());
 
-                let $ = getjQuery();
-                $ && typeof $.active === "number" && ($.active++ === 0) && $.event?.trigger?.("ajaxStart");
-
+                requestStarting();
                 try {
                     var response = await fetch(url, {
                         method: 'GET',
@@ -88,7 +86,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
                     return data;
                 }
                 finally {
-                    $ && typeof $.active === "number" && !(--$.active) && $.event?.trigger?.("ajaxStop");
+                    requestFinished();
                 }
             }
             finally {

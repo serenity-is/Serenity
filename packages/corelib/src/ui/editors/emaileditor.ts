@@ -1,8 +1,8 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { tryGetText } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
+import { ValidationHelper } from "../helpers/validationhelper";
 
 export interface EmailEditorOptions {
     domain?: string;
@@ -13,22 +13,22 @@ export interface EmailEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
+    declare readonly domNode: HTMLInputElement;
+    private readonly domain: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = sQuery(this.domNode);
         EmailEditor.registerValidationMethods();
 
-        input.addClass('emailuser');
+        this.domNode.classList.add('emailuser');
 
-        var spanAt = sQuery('<span/>').text('@').addClass('emailat').insertAfter(input);
+        var spanAt = Fluent("span").text('@').addClass('emailat').insertAfter(this.domNode);
 
-        var domain = sQuery('<input type="text"/>').addClass('emaildomain').insertAfter(spanAt);
+        var domain = Fluent("input").attr("type", "text").addClass('emaildomain').insertAfter(spanAt);
         domain.on('blur.' + this.uniqueName, function () {
-            var validator = domain.closest('form').data('validator');
-            if (validator != null) {
-                validator.element(input[0]);
-            }
+            ValidationHelper.validateElement(this.domNode);
         });
+        this.domain = domain.getNode();
 
         if (this.options.domain) {
             domain.val(this.options.domain);
@@ -38,52 +38,51 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             domain.attr('readonly', 'readonly').addClass('disabled').attr('tabindex', '-1');
         }
 
-        input.bind('keypress.' + this.uniqueName, e => {
-            if (e.which === 64) {
+        Fluent(this.domNode).on('keypress.' + this.uniqueName, (e: KeyboardEvent) => {
+            if (e.key === "@") {
                 e.preventDefault();
                 if (!this.options.readOnlyDomain) {
-                    domain.focus();
-                    domain.select();
+                    domain.getNode().focus();
+                    domain.getNode().select();
                 }
             }
         });
 
-        domain.bind('keypress.' + this.uniqueName, function (e1) {
-            if (e1.which === 64) {
-                e1.preventDefault();
-            }
+        domain.on('keypress.' + this.uniqueName, function (e: KeyboardEvent) {
+            if (e.key === "@")
+                e.preventDefault();
         });
 
         if (!this.options.readOnlyDomain) {
-            input.change(e2 => this.set_value(input.val() as string));
+            Fluent.on(this.domNode, "change", e => this.set_value(this.domNode.value));
         }
     }
 
     static registerValidationMethods(): void {
-        if (!sQuery.validator || !sQuery.validator.methods || sQuery.validator.methods['emailuser'] != null)
+        let $ = getjQuery();
+        if (!$?.validator?.methods || $.validator.methods.emailuser)
             return;
 
-        sQuery.validator.addMethod('emailuser', function (value, element) {
+        $.validator.addMethod('emailuser', function (value: string, element: any) {
 
-            var domain = sQuery(element).nextAll('.emaildomain');
+            var domain = $(element).nextAll('.emaildomain');
             if (domain.length > 0 && domain.attr('readonly') == null) {
 
                 if (this.optional(element) && this.optional(domain[0])) {
                     return true;
                 }
 
-                return sQuery.validator.methods.email.call(this, value + '@' + domain.val(), element);
+                return $.validator.methods.email.call(this, value + '@' + domain.val(), element);
             }
             else {
-                return sQuery.validator.methods.email.call(this, value + '@dummy.com', element);
+                return $.validator.methods.email.call(this, value + '@dummy.com', element);
             }
-        }, tryGetText("Validation.Email") ?? sQuery.validator.messages.email);
+        }, tryGetText("Validation.Email") ?? $.validator.messages.email);
     }
 
     get_value(): string {
-        var domain = sQuery(this.domNode).nextAll('.emaildomain');
-        var value = sQuery(this.domNode).val();
-        var domainValue = domain.val();
+        var value = this.domNode.value;
+        var domainValue = this.domain.value;
         if (!value) {
             if (this.options.readOnlyDomain || !domainValue) {
                 return '';
@@ -98,31 +97,30 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     set_value(value: string): void {
-        var domain = sQuery(this.domNode).nextAll('.emaildomain');
         value = value?.trim();
         if (!value) {
             if (!this.options.readOnlyDomain)
-                domain.val('');
-            sQuery(this.domNode).val('');
+                this.domain.value = '';
+            this.domNode.value = "";
         }
         else {
             var parts = value.split('@');
             if (parts.length > 1) {
                 if (!this.options.readOnlyDomain) {
-                    domain.val(parts[1]);
-                    sQuery(this.domNode).val(parts[0]);
+                    this.domain.value = parts[1];
+                    this.domNode.value = parts[0];
                 }
                 else if (this.options.domain) {
                     if (parts[1] !== this.options.domain)
-                        sQuery(this.domNode).val(value);
+                        this.domNode.value = value;
                     else
-                        sQuery(this.domNode).val(parts[0]);
+                        this.domNode.value = parts[0];
                 }
                 else
-                    sQuery(this.domNode).val(parts[0]);
+                    this.domNode.value = parts[0];
             }
             else
-                sQuery(this.domNode).val(parts[0]);
+                this.domNode.value = parts[0];
         }
     }
 
@@ -131,23 +129,25 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     get_readOnly(): boolean {
-        var domain = sQuery(this.domNode).nextAll('.emaildomain');
         return !(this.domNode.getAttribute("readonly") == null &&
-            (!this.options.readOnlyDomain || domain.attr('readonly') == null));
+            (!this.options.readOnlyDomain || this.domain.getAttribute('readonly') == null));
     }
 
     set_readOnly(value: boolean): void {
-        var domain = sQuery(this.domNode).nextAll('.emaildomain');
         if (value) {
-            sQuery(this.domNode).attr('readonly', 'readonly').addClass('readonly');
+            this.domNode.setAttribute('readonly', 'readonly');
+            this.domNode.classList.add('readonly');
             if (!this.options.readOnlyDomain) {
-                domain.attr('readonly', 'readonly').addClass('readonly');
+                this.domain.setAttribute('readonly', 'readonly');
+                this.domain.classList.add('readonly');
             }
         }
         else {
-            sQuery(this.domNode).removeAttr('readonly').removeClass('readonly');
+            this.domNode.removeAttribute('readonly');
+            this.domNode.classList.remove('readonly');
             if (!this.options.readOnlyDomain) {
-                domain.removeAttr('readonly').removeClass('readonly');
+                this.domain.removeAttribute('readonly');
+                this.domain.classList.remove('readonly');
             }
         }
     }

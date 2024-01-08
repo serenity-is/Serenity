@@ -1,4 +1,4 @@
-﻿import { getTypeFullName, isArrayLike, toggleClass } from "@serenity-is/base";
+﻿import { Fluent, addClass, getTypeFullName, isArrayLike, toggleClass } from "@serenity-is/base";
 import { ElementAttribute } from "../../decorators";
 import { getAttributes } from "../../q/system-compat";
 import { EditorUtils } from "../editors/editorutils";
@@ -70,10 +70,10 @@ export function setElementProps(widget: { domNode: HTMLElement }, props: EditorP
         el.setAttribute("placeholder", props.placeholder);
 
     if (typeof props.class === "string")
-        toggleClass(el, props.class, true);
+        addClass(el, props.class);
 
     if (typeof (props as any).className === "string")
-        toggleClass(el, (props as any).className, true);
+        addClass(el, (props as any).className);
 
     if (typeof props.maxLength === "number")
         el.setAttribute("maxLength", (props.maxLength || 0).toString());

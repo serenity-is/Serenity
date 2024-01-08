@@ -25,8 +25,6 @@ export * from "@serenity-is/base";
 export * from "./q";
 export * from "./slick";
 export * from "./globals/select2-globals"
-export * from "./globals/jquery-globals"
-export * from "./globals/jquery.validation-globals"
 export * from "./interfaces";
 export * from "./types";
 export * from "./ui/datagrid/irowdefinition";
@@ -34,8 +32,9 @@ export * from "./ui/datagrid/islickformatter";
 export * from "./decorators";
 export * from "./ui/helpers/lazyloadhelper";
 export * from "./ui/widgets/prefixedcontext";
+export * from "./ui/widgets/widgetutils";
 export * from "./ui/widgets/widget";
-export * from "./ui/widgets/jquerywidgetfn";
+export * from "./globals/jquery-globals";
 export * from "./ui/widgets/toolbar";
 export * from "./ui/widgets/templatedwidget";
 export * from "./ui/dialogs/templateddialog";
@@ -102,8 +101,6 @@ export * from "./ui/widgets/jsx";
 export * from "./ui/widgets/reporting";
 export * from "./ui/widgets/scriptcontext";
 export * from "./interfaces/iasyncinit";
-export * from "./ui/widgets/wx";
-export * from "./ui/widgets/flexify";
 export * from "./ui/widgets/googlemap";
 export * from "./ui/editors/select2ajaxeditor";
 

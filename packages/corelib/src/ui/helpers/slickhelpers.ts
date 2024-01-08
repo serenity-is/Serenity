@@ -1,8 +1,7 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Culture, SaveRequest, htmlEncode, localText, tryGetText, type PropertyItem, isArrayLike } from "@serenity-is/base";
+﻿import { Culture, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem, Fluent } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
-import { Authorization, clearKeys, replaceAll, safeCast, serviceCall } from "../../q";
+import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
@@ -10,6 +9,7 @@ import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { getWidgetFrom } from "../widgets/widgetutils";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
@@ -31,7 +31,7 @@ export class GridRowSelectionMixin {
         this.options = options || {};
 
         grid.getGrid().onClick.subscribe((e, p) => {
-            if (sQuery(e.target).hasClass('select-item')) {
+            if ((e.target as HTMLElement).classList.contains('select-item')) {
                 e.preventDefault();
                 var item = grid.getView().getItem(p.row);
                 var id = item[this.idField].toString();
@@ -54,7 +54,7 @@ export class GridRowSelectionMixin {
         grid.getGrid().onHeaderClick.subscribe((e1, u) => {
             if ((e1 as any).isDefaultPrevented?.() || e1.defaultPrevented)
                 return;
-            if (sQuery(e1.target).hasClass('select-all-items')) {
+            if ((e1.target as HTMLElement).classList.contains('select-all-items')) {
                 e1.preventDefault();
                 if (Object.keys(this.include).length > 0) {
                     clearKeys(this.include);
@@ -79,11 +79,11 @@ export class GridRowSelectionMixin {
 
     updateSelectAll(): void {
         var selectAllButton = this.grid.getElement()
-            .find('.select-all-header .slick-column-name .select-all-items');
+            .querySelector('.select-all-header .slick-column-name .select-all-items');
 
         if (selectAllButton) {
             var keys = Object.keys(this.include);
-            selectAllButton.toggleClass('checked',
+            selectAllButton.classList.toggle('checked',
                 keys.length > 0 &&
                 this.grid.getView().getItems().filter(
                     this.isSelectable.bind(this)).length <= keys.length);
@@ -183,7 +183,7 @@ export class GridRadioSelectionMixin {
         this.options = options || {};
 
         grid.getGrid().onClick.subscribe((e, p) => {
-            if (sQuery(e.target).hasClass('rad-select-item')) {
+            if ((e.target as HTMLElement).classList.contains('rad-select-item')) {
                 e.preventDefault();
                 var item = grid.getView().getItem(p.row);
 
@@ -285,11 +285,11 @@ export class GridRadioSelectionMixin {
 
 export namespace GridSelectAllButtonHelper {
     export function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void {
-        var toolbar = (grid as any).element.children('.s-Toolbar') as JQuery;
-        if (toolbar.length === 0) {
+        var toolbar = grid.getElement().querySelector('.s-Toolbar');
+        if (!toolbar) {
             return;
         }
-        var btn = toolbar.getWidget(Toolbar).findButton('select-all-button');
+        var btn = getWidgetFrom(toolbar, Toolbar).findButton('select-all-button');
         var items = grid.getView().getItems();
         btn.toggleClass('checked', items.length > 0 && !items.some(function (x) {
             return !getSelected(x);
@@ -334,24 +334,31 @@ export namespace GridSelectAllButtonHelper {
 }
 
 export namespace GridUtils {
-    export function addToggleButton(toolDiv: JQuery, cssClass: string,
+    export function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string,
         callback: (p1: boolean) => void, hint: string, initial?: boolean): void {
 
-        var div = sQuery('<div><a href="#"></a></div>')
-            .addClass('s-ToggleButton').addClass(cssClass)
-            .prependTo(toolDiv);
-        div.children('a').click(function (e) {
-            e.preventDefault();
-            div.toggleClass('pressed');
-            var pressed = div.hasClass('pressed');
-            callback && callback(pressed);
-        }).attr('title', hint ?? '');
+        toolDiv = isArrayLike(toolDiv) ? toolDiv[0] : toolDiv;
+
+        var div = Fluent("div")
+            .addClass('s-ToggleButton')
+            .addClass(cssClass)
+            .prependTo(toolDiv)
+            .append(Fluent("a")
+                .attr("href", "#")
+                .attr('title', hint ?? '')
+                .on("click", function (e) {
+                    e.preventDefault();
+                    div.toggleClass('pressed');
+                    var pressed = div.hasClass('pressed');
+                    callback && callback(pressed);
+                }));
+
         if (initial) {
             div.addClass('pressed');
         }
     }
 
-    export function addIncludeDeletedToggle(toolDiv: JQuery,
+    export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: RemoteView<any>, hint?: string, initial?: boolean): void {
 
         var includeDeleted = false;
@@ -373,13 +380,14 @@ export namespace GridUtils {
                 view.seekToPage = 1;
                 view.populate();
             }, hint, initial);
-        toolDiv.bind('remove', function () {
+
+        Fluent.on(isArrayLike(toolDiv) ? toolDiv[0] : toolDiv, "remove", function () {
             view.onSubmit = null;
             oldSubmit = null;
         });
     }
 
-    export function addQuickSearchInput(toolDiv: JQuery,
+    export function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
 
         var oldSubmit = view.onSubmit;
@@ -426,22 +434,26 @@ export namespace GridUtils {
         return input;
     }
 
-    export function addQuickSearchInputCustom(container: JQuery,
+    export function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>,
         onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
 
-        var div = sQuery('<div><input type="text"/></div>')
-            .addClass('s-QuickSearchBar').prependTo(container);
+        var input = Fluent("input").attr("type", "text");
+        var div = Fluent("div")
+            .append(input)
+            .addClass('s-QuickSearchBar')
+            .prependTo(isArrayLike(container) ? container[0] : container);
 
         if (fields != null && fields.length > 0) {
             div.addClass('has-quick-search-fields');
         }
 
         return new QuickSearchInput({
-            element: div.children(),
+            element: input,
             fields: fields,
             onSearch: onSearch as any
         });
+
     }
 
     export function makeOrderable(grid: Grid,
@@ -504,11 +516,8 @@ export namespace GridUtils {
             var i = 0;
             var next: any = null;
             next = function () {
-                serviceCall({
-                    service: service,
-                    request: getUpdateRequest(getId(
-                        grid.getGrid().getDataItem(rows[i])), order++),
-                    onSuccess: function () {
+                serviceRequest(service, getUpdateRequest(getId(grid.getGrid().getDataItem(rows[i])), order++),
+                    () => {
                         i++;
                         if (i < rows.length) {
                             next();
@@ -516,8 +525,7 @@ export namespace GridUtils {
                         else {
                             grid.getView().populate();
                         }
-                    }
-                });
+                    });
             };
             next();
         });
@@ -779,11 +787,11 @@ export namespace SlickTreeHelper {
 
     export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: RemoteView<TItem>, getId: (x: TItem) => any): void {
-        var target = sQuery(e.target);
-        if (!target.hasClass('s-TreeToggle')) {
+        var target = e.target as HTMLElement;
+        if (!target.classList.contains('s-TreeToggle')) {
             return;
         }
-        if (target.hasClass('s-TreeCollapse') || target.hasClass('s-TreeExpand')) {
+        if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {
             var item = view.getItem(row);
             if (item != null) {
                 if (!!!item._collapsed) {

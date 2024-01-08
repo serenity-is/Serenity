@@ -1,5 +1,5 @@
 export default {
-  testEnvironment: 'jsdom',
+  testEnvironment: './build/jsdom-global.js',
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
   },

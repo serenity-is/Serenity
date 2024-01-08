@@ -1,7 +1,6 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { closePanel } from "@serenity-is/base";
+﻿import { Fluent, closePanel, getjQuery, isArrayLike } from "@serenity-is/base";
 
-export interface HandleRouteEventArgs {
+export interface HandleRouteEvent extends Event {
     handled: boolean,
     route: string,
     parts: string[],
@@ -77,72 +76,94 @@ export namespace Router {
     }
 
     function visibleDialogs() {
-        return sQuery('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort((a, b) => {
-            return (sQuery(a).data('qrouterorder') || 0) - (sQuery(b).data('qrouterorder') || 0);
+        var dialogs = document.querySelectorAll(".ui-dialog-content, .ui-dialog.panel-hidden>.ui-dialog-content, .panel-body");
+        var visibleDialogs: HTMLElement[] = [];
+        dialogs.forEach((el: HTMLElement) => {
+            if (!el.classList.contains(".ui-dialog-content") ||
+                el.closest(".ui-dialog.panel-hidden"))
+                visibleDialogs.push(el);
+            if (el.offsetWidth > 0 && el.offsetHeight > 0)
+                visibleDialogs.push(el);
         });
+        visibleDialogs.sort((a: any, b: any) => {
+            return parseInt(a.dataset.qrouterorder || "0", 10) - parseInt(b.dataset.qrouterorder || "0", 10);
+        });
+        return visibleDialogs;
     }
 
     function dialogOpen(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
         var route = [];
-        var isDialog = sQuery(owner).hasClass(".ui-dialog-content") || sQuery(owner).hasClass('.s-Panel');
-        var dialog = isDialog ? owner :
-            sQuery(owner).closest('.ui-dialog-content, .s-Panel');
+        owner = isArrayLike(owner) ? owner[0] : owner;
+        element = isArrayLike(element) ? element[0] : element;
+        var isDialog = owner.classList.contains(".ui-dialog-content") || owner.classList.contains('panel-body');
+        var dialog = isDialog ? owner : owner.closest('.ui-dialog-content, .panel-body') as HTMLElement;
         var value = hash();
 
         var idPrefix: string;
-        if (sQuery(dialog).length) {
+        if (dialog) {
             var dialogs = visibleDialogs();
-            var index = dialogs.indexOf(sQuery(dialog)[0]);
+            var index = dialogs.indexOf(dialog);
 
             for (var i = 0; i <= index; i++) {
-                var q = sQuery(dialogs[i]).data("qroute") as string;
+                var q = dialogs[i].dataset.qroute;
                 if (q && q.length)
                     route.push(q);
             }
 
             if (!isDialog) {
-                idPrefix = sQuery(dialog).attr("id");
+                idPrefix = dialog.getAttribute("id");
                 if (idPrefix) {
                     idPrefix += "_";
-                    var id = sQuery(owner).attr("id");
+                    var id = owner.getAttribute("id");
                     if (id?.startsWith(idPrefix))
                         value = id.substring(idPrefix.length) + '@' + value;
                 }
             }
         }
         else {
-            var id = sQuery(owner).attr("id");
-            if (id && (!sQuery(owner).hasClass("route-handler") ||
-                sQuery('.route-handler').first().attr("id") != id))
+            var id = owner.getAttribute("id");
+            if (id && (!owner.classList.contains("route-handler") ||
+                document.querySelector('.route-handler')?.getAttribute("id") != id))
                 value = id + "@" + value;
         }
 
         route.push(value);
-        sQuery(element).data("qroute", value);
+        element.dataset.qroute = value;
         replace(route.join("/+/"));
 
-        sQuery(element).bind("dialogclose.qrouter panelclose.qrouter", e => {
-            sQuery(element).data("qroute", null);
-            sQuery(element).off(".qrouter");
-            var prhash = sQuery(element).data("qprhash");
-            var tryBack = sQuery(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
+        var el = element;
+        var handler = (e: any) => {
+            el.dataset.qroute = null;
+            Fluent.off(el, ".qrouter");
+            var prhash = el.dataset.qprhash;
+            var tryBack = e.target.closest('.s-MessageDialog') || (e && e.originalEvent &&
                 ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
-                sQuery(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
-                sQuery(e.originalEvent.target).hasClass("panel-titlebar-close")));
+                    e.originalEvent.target.hasClass("ui-dialog-titlebar-close") ||
+                    e.originalEvent.target.hasClass("panel-titlebar-close")));
             if (prhash != null)
                 replace(prhash, tryBack);
             else
                 replaceLast('', tryBack);
-        });
+        }
+
+        Fluent.on(element, "dialogclose.qrouter", handler);
+        Fluent.on(element, "panelclose.qrouter", handler);
     }
 
     export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
         if (!enabled)
             return;
-        
-        sQuery(element).on("dialogopen.qrouter panelopen.qrouter", e => {
-            dialogOpen(owner, element, hash);
-        });
+
+        var el = isArrayLike(element) ? element[0] : element;
+        if (!el)
+            return;
+
+        function handler() {
+            dialogOpen(owner, el, hash);
+        }
+
+        Fluent.on(el, "dialogopen.qrouter", handler);
+        Fluent.on(el, "panelopen.qrouter", handler);
     }
 
     export function resolve(hash?: string) {
@@ -157,7 +178,7 @@ export namespace Router {
 
             var dialogs = visibleDialogs();
             var newParts = hash.split("/+/");
-            var oldParts = dialogs.map(el => sQuery(el).data('qroute') as string);
+            var oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
             var same = 0;
             while (same < dialogs.length &&
@@ -167,43 +188,43 @@ export namespace Router {
             }
 
             for (var i = same; i < dialogs.length; i++) {
-                var d = sQuery(dialogs[i]);
-                if (d.hasClass('ui-dialog-content'))
-                    (d as any).dialog?.('close');
-                else if (d.hasClass('s-Panel'))
+                var d = dialogs[i];
+                if (d.classList.contains('ui-dialog-content'))
+                    getjQuery()(d as any).dialog?.('close');
+                else if (d.classList.contains('panel-body'))
                     closePanel(d);
             }
 
             for (var i = same; i < newParts.length; i++) {
                 var route = newParts[i];
                 var routeParts = route.split('@');
-                var handler: JQuery;
+                var handler: HTMLElement;
                 if (routeParts.length == 2) {
-                    var dialog = i > 0 ? sQuery(dialogs[i - 1]) : sQuery([]);
-                    if (dialog.length) {
-                        var idPrefix = dialog.attr("id");
+                    var dialog = i > 0 ? dialogs[i - 1] : null;
+                    if (dialog) {
+                        var idPrefix = dialog.getAttribute("id");
                         if (idPrefix) {
-                            handler = sQuery('#' + idPrefix + "_" + routeParts[0]);
-                            if (handler.length) {
+                            handler = document.querySelector('#' + idPrefix + "_" + routeParts[0]);
+                            if (handler) {
                                 route = routeParts[1];
                             }
                         }
                     }
 
-                    if (!handler || !handler.length) {
-                        handler = sQuery('#' + routeParts[0]);
-                        if (handler.length) {
+                    if (!handler) {
+                        handler = document.querySelector('#' + routeParts[0]);
+                        if (handler) {
                             route = routeParts[1];
                         }
                     }
                 }
 
-                if (!handler || !handler.length) {
-                    handler = i > 0 ? sQuery(dialogs[i - 1]) :
-                        sQuery('.route-handler').first();
+                if (!handler) {
+                    handler = i > 0 ? dialogs[i - 1] : document.querySelector('.route-handler');
                 }
 
-                handler.triggerHandler("handleroute", <HandleRouteEventArgs>{
+                Fluent.trigger(handler, "handleroute", <HandleRouteEvent>{
+                    bubbles: false,
                     handled: false,
                     route: route,
                     parts: newParts,
@@ -238,24 +259,28 @@ export namespace Router {
 
     let routerOrder = 1;
 
-    typeof document !== "undefined" && typeof sQuery !== "undefined" &&
-        sQuery.fn && sQuery(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
-        if (!enabled)
-            return;
+    if (typeof document !== "undefined") {
+        function handler(event: any) {
+            if (!enabled)
+                return;
 
-        var dlg = sQuery(event.target);
-        dlg.data("qrouterorder", routerOrder++);
+            var dlg = event.target as HTMLElement;
+            dlg.dataset.qrouterorder = (routerOrder++).toString();
 
-        if (dlg.data("qroute"))
-            return;
+            if (dlg.dataset.qroute)
+                return;
 
-        dlg.data("qprhash", window.location.hash);
-        var owner = sQuery(visibleDialogs).not(dlg).last();
-        if (!owner.length)
-            owner = sQuery('html');
+            dlg.dataset.qprhash = window.location.hash;
+            var owner = visibleDialogs().filter(x => x !== dlg).pop();
+            if (!owner)
+                owner = document.documentElement;
 
-        dialogOpen(owner, dlg, () => {
-            return "!" + (++autoinc).toString(36);
-        });
-    });
+            dialogOpen(owner, dlg, () => {
+                return "!" + (++autoinc).toString(36);
+            });
+        }
+
+        Fluent.on(document, "dialogopen", ".ui-dialog-content", handler);
+        Fluent.on(document, "panelopen", ".panel-body", handler);
+    }
 }

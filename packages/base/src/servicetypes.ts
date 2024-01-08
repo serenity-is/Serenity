@@ -5,7 +5,7 @@
     Details?: string;
     ErrorId?: string;
 }               
-      
+
 export interface ServiceResponse {
     Error?: ServiceError;
 }
@@ -104,4 +104,24 @@ export interface RetrieveLocalizationRequest extends RetrieveRequest {
     
 export interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
     Entities?: { [key: string]: TEntity };
+}
+
+export interface RequestErrorInfo {
+    status?: number;
+    statusText?: string;
+    responseText?: string;
+}
+
+export interface ServiceOptions<TResponse extends ServiceResponse> extends RequestInit {
+    allowRedirect?: boolean;
+    async?: boolean;
+    blockUI?: boolean;
+    headers?: Record<string, string>;
+    request?: any;
+    service?: string;
+    url?: string;
+    onCleanup?(): void;
+    /** Should return true if the error is handled (e.g. notification shown). Otherwise the error may be shown twice. */
+    onError?(response: TResponse, info?: RequestErrorInfo): void | boolean;
+    onSuccess?(response: TResponse): void;
 }

@@ -23,9 +23,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "ES2017",
-    "types": [
-      "jest"
-    ],
     "useDefineForClassFields": false
   },
   "include": [

@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Config, getGlobalObject, getNested, isArrayLike } from "@serenity-is/base";
+﻿import { Config, Fluent, getGlobalObject, getNested, getjQuery, isArrayLike } from "@serenity-is/base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
@@ -61,29 +60,29 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
-    let setHeight = opt?.setHeight ?? (!sQuery.isMock && (!el.classList.contains('s-DataGrid') &&
+    let setHeight = opt?.setHeight ?? (getjQuery() && (!el.classList.contains('s-DataGrid') &&
         !el.classList.contains('s-Panel')));
 
     let layout = function () {
         setHeight && layoutFillHeight(el);
-        !sQuery.isMock ? sQuery(el).triggerHandler('layout') : el.dispatchEvent(new Event('layout'));
+        Fluent.trigger(el, 'layout', { bubbles: false });
     };
 
     if (document.body.classList.contains('has-layout-event')) {
-        !sQuery.isMock ? sQuery(document.body).on('layout', layout) : el.addEventListener('layout', layout);
+        Fluent.on(document.body, 'layout', layout);
     }
     else if ((window as any).Metronic?.addResizeHandler) {
         (window as any).Metronic.addResizeHandler(layout);
     }
     else {
-        !sQuery.isMock ? sQuery(window).resize(layout) : window.addEventListener('resize', layout);
+        Fluent.on(window, 'resize', layout);
     }
 
     layout();
 
-    !sQuery.isMock && sQuery(el).one('remove', () => {
-        sQuery(window).off('resize', layout);
-        sQuery('body').off('layout', layout);
+    Fluent.one(el, 'remove', () => {
+        Fluent.off(window, 'resize', layout);
+        Fluent.off(document.body, 'layout', layout);
     });
 
     if (!opt?.noRoute &&
@@ -97,15 +96,20 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
 export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = 0;
-    sQuery(element).parent().children().not(sQuery(element)).each(function (i, e) {
-        let q = sQuery(e);
+    let $ = getjQuery();
+    element = isArrayLike(element) ? element[0] : element
+    if (!$ && element)
+        return parseInt(getComputedStyle(element).height, 10);
+
+    $(element).parent().children().not(element).each(function (i: number, e: HTMLElement) {
+        let q = $(e);
         if (q.is(':visible')) {
             h += q.outerHeight(true);
         }
     });
-    h = sQuery(element).parent().height() - h;
-    if (sQuery(element).css('box-sizing') !== 'border-box') {
-        h = h - (sQuery(element).outerHeight(true) - sQuery(element).height());
+    h = $(element).parent().height() - h;
+    if ($(element).css('box-sizing') !== 'border-box') {
+        h = h - ($(element).outerHeight(true) - $(element).height());
     }
     return h;
 }
@@ -113,9 +117,9 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
 export function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = layoutFillHeightValue(element);
     let n = Math.round(h) + 'px';
-    if (sQuery(element).css('height') != n) {
-        sQuery(element).css('height', n);
-    }
+    element = isArrayLike(element) ? element[0] : element;
+    if (element.style.height != n)
+        element.style.height = n;
 }
 
 export function isMobileView() {
@@ -134,18 +138,25 @@ function initOnLoad() {
     }
 }
 
-sQuery(initOnLoad);
+getjQuery()?.(initOnLoad);
 
 export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>) {
+    element = isArrayLike(element) ? element[0] : element;
+    if (!element)
+        return;
     executeEverytimeWhenVisible(element, function () {
-        sQuery(element).triggerHandler('layout');
+        Fluent.trigger(element as any, 'layout', { bubbles: false });
     }, true);
 }
 
 export function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>) {
-    var dlg = sQuery(el).closest(".ui-dialog");
-    (dlg as any).position?.({ at: 'center center', of: window });
-    let pos = dlg.position();
+    el = isArrayLike(el) ? el[0] : el;
+    var dlg = el.closest(".ui-dialog") as any;
+    if (!dlg)
+        return;
+    dlg = getjQuery()(dlg) as any;
+    dlg.position?.({ at: 'center center', of: window });
+    let pos = dlg.position?.();
     if (pos.left < 0)
         dlg.css("left", "0px");
     if (pos.top < 0)

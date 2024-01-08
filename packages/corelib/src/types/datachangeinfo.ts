@@ -1,6 +1,6 @@
 ﻿export {}
 
-export interface DataChangeInfo {
+export interface DataChangeInfo extends Event {
     type: string;
     entityId: any;
     entity: any;

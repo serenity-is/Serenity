@@ -1,16 +1,16 @@
-﻿import { faIcon, getTypeFullName, stringFormat } from "@serenity-is/base";
+﻿import { faIcon, getTypeFullName, getjQuery } from "@serenity-is/base";
 import { isMobileView } from "../q";
 import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
 function applyGetWidgetExtensions(jQuery: any) {
-    if (!jQuery || !jQuery.fn || jQuery.isMock)
+    if (!jQuery || !jQuery.fn)
         return;
 
-    jQuery.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: JQuery,  type?: { new (...args: any[]): TWidget }): TWidget {
+    jQuery.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new (...args: any[]): TWidget }): TWidget {
         return tryGetWidget(this[0], type);
     }
 
-    jQuery.fn.getWidget = function getWidget$<TWidget>(this: JQuery,  type?: { new (...args: any[]): TWidget }): TWidget {
+    jQuery.fn.getWidget = function getWidget$<TWidget>(this: ArrayLike<HTMLElement>,  type?: { new (...args: any[]): TWidget }): TWidget {
         if (!this?.length)
             throw new Error(`Searching for widget of type '${getTypeFullName(type)}' on a non-existent element! (${(this as any)?.selector})`);
 
@@ -78,8 +78,12 @@ function applyCleanDataPatch(jQuery: any) {
     })((jQuery as any).cleanData);
 }
 
-export function jQueryPatch(jQuery: any) {
-    !applyJQueryUIFixes(jQuery) && jQuery && jQuery(applyJQueryUIFixes);
-    applyCleanDataPatch(jQuery);
-    applyGetWidgetExtensions(jQuery);
+export function jQueryPatch(): boolean {
+    let $ = getjQuery();
+    if (!$)
+        return false;
+    applyJQueryUIFixes($);
+    applyCleanDataPatch($);
+    applyGetWidgetExtensions($);
+    return true;
 }

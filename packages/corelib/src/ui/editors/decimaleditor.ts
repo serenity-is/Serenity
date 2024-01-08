@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Culture, formatNumber, parseDecimal } from "@serenity-is/base";
+﻿import { Culture, formatNumber, getjQuery, parseDecimal } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend } from "../../q";
@@ -17,11 +16,12 @@ export interface DecimalEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
+    declare readonly domNode: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = sQuery(this.domNode);
-        input.addClass('decimalQ');
+        this.domNode.classList.add('decimalQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(), {
             vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00')),
             vMax: (this.options.maxValue ?? '999999999999.99')
@@ -35,14 +35,16 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             numericOptions.aPad = this.options.padDecimals;
         }
 
-        if ((sQuery.fn as any).autoNumeric)
-            (input as any).autoNumeric(numericOptions);
+        let $ = getjQuery();
+        if ($?.fn?.autoNumeric)
+            $(this.domNode).autoNumeric(numericOptions);
     }
 
     get_value(): number {
         var val;
-        if ((sQuery.fn as any).autoNumeric) {
-            val = (sQuery(this.domNode) as any).autoNumeric('get');
+        let $ = getjQuery();
+        if ($?.fn?.autoNumeric) {
+            val = $(this.domNode).autoNumeric('get');
 
             if (!!(val == null || val === ''))
                 return null;
@@ -50,7 +52,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             return parseFloat(val);
         }
 
-        val = sQuery(this.domNode).val() as any;
+        val = this.domNode.value;
         return parseDecimal(val);
     }
 
@@ -59,14 +61,15 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
     }
 
     set_value(value: number) {
+        let $ = getjQuery();
         if (value == null || (value as any) === '') {
-            sQuery(this.domNode).val('');
+            this.domNode.value = '';
         }
-        else if ((sQuery.fn as any).autoNumeric) {
-            (sQuery(this.domNode) as any).autoNumeric('set', value);
+        else if ($?.fn?.autoNumeric) {
+            $(this.domNode).autoNumeric('set', value);
         }
         else
-            sQuery(this.domNode).val(formatNumber(value));
+            this.domNode.value = formatNumber(value);
     }
 
     set value(v: number) {

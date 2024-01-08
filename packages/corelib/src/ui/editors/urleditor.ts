@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
+﻿import { Fluent, getjQuery } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorProps } from "../widgets/widget";
@@ -10,26 +10,30 @@ export class URLEditor<P = {}> extends StringEditor<P> {
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = sQuery(this.domNode);
-        input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
+        this.domNode.classList.add("url");
+        this.domNode.setAttribute("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
-        input.on("blur." + this.uniqueName, e => {
-            var validator = input.closest("form").data("validator") as JQueryValidation.Validator;
+        Fluent.on(this.domNode, "blur." + this.uniqueName, e => {
+            let $ = getjQuery();
+            if (!$)
+                return;
+
+            var validator = $(this.domNode).closest("form").data("validator");
             if (validator == null)
                 return;
 
-            if (!input.hasClass("error"))
+            if (!this.domNode.classList.contains("error"))
                 return;
 
-            var value = (input.val() as string)?.trim();
+            var value = this.domNode.value?.trim();
             if (!value)
                 return;
 
             value = "http://" + value;
 
-            if ($.validator.methods['url'].call(validator, value, input[0]) == true) {
-                input.val(value);
-                validator.element(input);
+            if ($.validator.methods['url'].call(validator, value, this.domNode) == true) {
+                this.domNode.value = value;
+                validator.element(this.domNode);
             }
         });
     }

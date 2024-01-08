@@ -1,26 +1,19 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, isInputLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 
-export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
-    return isInputTag(node?.nodeName);
-}
-
-export function isInputTag(tag: string) {
-    return /^(?:input|select|textarea|button)$/i.test(tag);
-}
 
 export namespace EditorUtils {
 
     export function getDisplayText(editor: Widget<any>): string {
 
-        var select2 = editor.element.data('select2');
+        let $ = getjQuery();
+        var select2 = $ && $(editor.domNode).data('select2');
 
-        if (select2 != null) {
-            var data = editor.element.select2('data');
+        if (select2) {
+            var data = $(editor.domNode).select2('data');
             if (data == null)
                 return '';
 
@@ -149,17 +142,12 @@ export namespace EditorUtils {
 
         if (isInputLike(editor.domNode)) {
             var v = source[item.name];
-            if (v == null) {
-                editor.element.val('');
-            }
-            else {
-                editor.element.val(v);
-            }
+            editor.domNode.value = v ?? '';
             return;
         }
     }
 
-    export function setReadonly(elements: HTMLElement | ArrayLike<HTMLElement>, isReadOnly: boolean) {
+    export function setReadonly(elements: Element | ArrayLike<Element>, isReadOnly: boolean) {
         elements = isArrayLike(elements) ? elements : [elements];
         for (var i = 0; i < elements.length; i++) {
             let el = elements[i];
@@ -205,59 +193,60 @@ export namespace EditorUtils {
         else if (isInputLike(widget.domNode)) {
             widget.domNode.classList.toggle('required', !!isRequired);
         }
-        var gridField = widget.element.closest('.field');
-        var hasSupItem = gridField.find('sup').get().length > 0;
+        var gridField = widget.domNode.closest('.field');
+        var hasSupItem = gridField.querySelector('sup');
         if (isRequired && !hasSupItem) {
-            sQuery('<sup>*</sup>').attr('title', localText('Controls.PropertyGrid.RequiredHint'))
-                .prependTo(gridField.find('.caption')[0]);
+            Fluent("sup").text("*").attr('title', localText('Controls.PropertyGrid.RequiredHint'))
+                .prependTo(gridField.querySelector('.caption'));
         }
         else if (!isRequired && hasSupItem) {
-            sQuery(gridField.find('sup')[0]).remove();
+            Fluent(hasSupItem).remove();
         }
     }
 
-    export function setContainerReadOnly(container: JQuery, readOnly: boolean) {
+    export function setContainerReadOnly(container: ArrayLike<HTMLElement> | HTMLElement, readOnly: boolean) {
 
+        container = isArrayLike(container) ? container[0] : container;
         if (!readOnly) {
 
-            if (!container.hasClass('readonly-container'))
+            if (!container.classList.contains('readonly-container'))
                 return;
 
-            container.removeClass('readonly-container').find(".editor.container-readonly")
-                .removeClass('container-readonly').each((i, e) => {
-                    var w = tryGetWidget(e) as any;
-                    if (w != null)
-                        EditorUtils.setReadOnly(w, false);
-                    else
-                        EditorUtils.setReadonly(sQuery(e), false);
-                });
+            container.classList.remove('readonly-container');
+            container.querySelectorAll(".editor.container-readonly").forEach(el => {
+                el.classList.remove('container-readonly');
+                var w = tryGetWidget(el) as any;
+                if (w != null)
+                    EditorUtils.setReadOnly(w, false);
+                else
+                    EditorUtils.setReadonly(el, false);
+            });
 
             return;
         }
 
-        container.addClass('readonly-container').find(".editor")
-            .not('.container-readonly')
-            .each((i, e) => {
-                var w = tryGetWidget(e) as any;
-                if (w != null) {
-
-                    if (w['get_readOnly']) {
-                        if (w['get_readOnly']())
-                            return;
-                    }
-                    else if (sQuery(e).is('[readonly]') || sQuery(e).is('[disabled]') || sQuery(e).is('.readonly') || sQuery(e).is('.disabled'))
+        container.classList.add('readonly-container');
+        container.querySelectorAll(".editor:not(.container-readonly)").forEach((el: HTMLElement) => {
+            var w = tryGetWidget(el) as any;
+            if (w != null) {
+                if (w['get_readOnly']) {
+                    if (w['get_readOnly']())
                         return;
-
-                    sQuery(e).addClass('container-readonly');
-                    EditorUtils.setReadOnly(w, true);
-
                 }
-                else {
-                    if (sQuery(e).is('[readonly]') || sQuery(e).is('[disabled]') || sQuery(e).is('.readonly') || sQuery(e).is('.disabled'))
-                        return;
+                else if (el.matches('[readonly]') || el.matches('[disabled]') || el.matches('.readonly') || el.matches('.disabled'))
+                    return;
 
-                    EditorUtils.setReadonly(sQuery(e).addClass('container-readonly'), true);
-                }
-            });
+                el.classList.add('container-readonly');
+                EditorUtils.setReadOnly(w, true);
+
+            }
+            else {
+                if (el.matches('[readonly]') || el.matches('[disabled]') || el.matches('.readonly') || el.matches('.disabled'))
+                    return;
+
+                el.classList.add('container-readonly');
+                EditorUtils.setReadonly(el, true);
+            }
+        });
     }
 }

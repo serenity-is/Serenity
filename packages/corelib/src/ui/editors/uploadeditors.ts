@@ -1,11 +1,11 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { PropertyItem, localText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { EditorProps, EditorWidget, WidgetProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
+import { ValidationHelper } from "../helpers/validationhelper";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
@@ -28,33 +28,36 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (!this.options || this.options.allowNonImage == null)
             this.options.allowNonImage = true;
 
-        let div = sQuery(this.domNode);
-        div.addClass('s-FileUploadEditor');
+        this.domNode.classList.add('s-FileUploadEditor');
 
         if (!this.options.originalNameProperty)
-            div.addClass('hide-original-name');
+            this.domNode.classList.add('hide-original-name');
 
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => sQuery(this.domNode).append(el)
+            element: el => this.domNode.appendChild(el)
         });
 
-        this.progress = sQuery('<div><div></div></div>')
+        this.progress = Fluent("div")
+            .append(Fluent("div"))
             .addClass('upload-progress')
-            .prependTo(this.toolbar.element);
+            .prependTo(this.toolbar.domNode);
 
         var uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
         if (this.options.readOnly)
             this.set_readOnly(true);
 
-        this.fileSymbols = sQuery('<ul/>').appendTo(this.domNode);
+        this.fileSymbols = Fluent("ul").appendTo(this.domNode);
 
         if (!this.domNode.getAttribute("id"))
-            sQuery(this.domNode).attr('id', this.uniqueName);
+            this.domNode.setAttribute('id', this.uniqueName);
 
-        this.hiddenInput = sQuery('<input type="text" class="s-offscreen" name="' + this.uniqueName +
-            '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '"/>')
+        this.hiddenInput = Fluent("input")
+            .attr("type", "text")
+            .addClass("s-offscreen")
+            .attr("name", this.uniqueName + "_Validator")
+            .data("vx-highlight", this.domNode.getAttribute("id"))
             .appendTo(this.domNode);
 
         this.updateInterface();
@@ -82,10 +85,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 this.populate();
                 this.updateInterface();
 
-                var validator = this.hiddenInput.closest('form').data('validator');
-                if (validator != null) {
-                    validator.element(this.hiddenInput);
-                }
+                ValidationHelper.validateElement(this.hiddenInput);
             }
         }
     }
@@ -113,10 +113,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                     this.populate();
                     this.updateInterface();
 
-                    var validator = this.hiddenInput.closest('form').data('validator');
-                    if (validator != null) {
-                        validator.element(this.hiddenInput);
-                    }
+                    ValidationHelper.validateElement(this.hiddenInput);
                 }
             }
         ];
@@ -148,7 +145,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     }
 
     get_readOnly(): boolean {
-        return this.uploadInput?.attr('disabled') != null;
+        return this.uploadInput.attr('disabled') != null;
     }
 
     set_readOnly(value: boolean): void {
@@ -223,11 +220,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         }
         this.populate();
 
-        var validator = this.hiddenInput.closest('form').data('validator');
-        if (validator != null) {
-            validator.element(this.hiddenInput);
-        }
-
+        ValidationHelper.validateElement(this.hiddenInput);
         this.updateInterface();
     }
 
@@ -264,10 +257,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
     protected entity: UploadedFile;
     protected toolbar: Toolbar;
-    protected progress: JQuery;
-    protected fileSymbols: JQuery;
-    protected uploadInput: JQuery;
-    protected hiddenInput: JQuery;
+    protected progress: Fluent;
+    protected fileSymbols: Fluent;
+    protected uploadInput: Fluent;
+    protected hiddenInput: Fluent;
 }
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
@@ -289,35 +282,35 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
 
     private entities: UploadedFile[];
     private toolbar: Toolbar;
-    private fileSymbols: JQuery;
-    private uploadInput: JQuery;
-    protected progress: JQuery;
-    protected hiddenInput: JQuery;
+    private fileSymbols: Fluent;
+    private uploadInput: Fluent;
+    protected progress: Fluent;
+    protected hiddenInput: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);
 
         this.entities = [];
-        let div = sQuery(this.domNode);
-        div.addClass('s-MultipleFileUploadEditor');
+        this.domNode.classList.add('s-MultipleFileUploadEditor');
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
-            element: el => sQuery(this.domNode).append(el)
+            element: el => this.domNode.append(el)
         });
 
-        this.progress = sQuery('<div><div></div></div>')
+        this.progress = Fluent("div").append(Fluent("div"))
             .addClass('upload-progress')
-            .prependTo(this.toolbar.element);
+            .prependTo(this.toolbar.domNode);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
-        this.fileSymbols = sQuery('<ul/>').appendTo(this.domNode);
+        this.fileSymbols = Fluent("ul").appendTo(this.domNode);
         if (!this.domNode.getAttribute("id")) {
-            sQuery(this.domNode).attr('id', this.uniqueName);
+            this.domNode.setAttribute('id', this.uniqueName);
         }
 
-        this.hiddenInput = sQuery('<input type="text" class="s-offscreen" name="' + this.uniqueName +
-            '_Validator" data-vx-highlight="' + this.domNode.getAttribute("id") + '" multiple="multiple"></input>').appendTo(this.domNode);
+        this.hiddenInput = Fluent("input").attr("type", "text").addClass("s-offscreen").attr("name", this.uniqueName + "_Validator")
+            .data("vx-highlight", this.domNode.getAttribute("id"))
+            .attr("multiple", "multiple").appendTo(this.domNode);
 
         this.updateInterface();
     }
@@ -341,10 +334,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
                 this.entities.push(newEntity);
                 this.populate();
 
-                var validator = this.hiddenInput.closest('form').data('validator');
-                if (validator != null) {
-                    validator.element(this.hiddenInput);
-                }
+                ValidationHelper.validateElement(this.hiddenInput);
 
                 this.updateInterface();
             }
@@ -369,18 +359,15 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         UploadHelper.populateFileSymbols(this.fileSymbols, this.entities,
             true, this.options.urlPrefix);
 
-        this.fileSymbols.children().each((i, e) => {
+        this.fileSymbols.children().forEach((e, i) => {
             var x = i;
-            sQuery("<a class='delete'></a>").appendTo(sQuery(e).children('.filename'))
-                .click(ev => {
+            Fluent("a").addClass("delete").appendTo(Fluent(e).children().find(x => x.matches('.filename')))
+                .on("click", ev => {
                     ev.preventDefault();
                     this.entities.splice(x, 1);
                     this.populate();
 
-                    var validator = this.hiddenInput.closest('form').data('validator');
-                    if (validator != null) {
-                        validator.element(this.hiddenInput);
-                    }
+                    ValidationHelper.validateElement(this.hiddenInput);
                 });
         });
 
@@ -390,7 +377,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
     protected updateInterface(): void {
         var addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
-        this.fileSymbols.find('a.delete').toggle(!this.get_readOnly());
+        this.fileSymbols.findAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
     }
 
     get_readOnly(): boolean {
@@ -462,7 +449,7 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         if (typeof val == "string") {
             var json = val.trim();
             if (json.startsWith('[') && json.endsWith(']')) {
-                this.set_value($.parseJSON(json));
+                this.set_value(JSON.parse(json));
             }
             else {
                 this.set_value([{

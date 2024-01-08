@@ -1,4 +1,7 @@
-﻿import { ServiceError, alertDialog, htmlEncode, notifyError } from "@serenity-is/base";
+﻿import { alertDialog, iframeDialog } from "./dialogs";
+import { htmlEncode } from "./html";
+import { notifyError } from "./notify";
+import { RequestErrorInfo, ServiceError } from "./servicetypes";
 
 export namespace ErrorHandling {
 
@@ -6,8 +9,25 @@ export namespace ErrorHandling {
      * Shows a service error as an alert dialog. If the error
      * is null, has no message or code, it shows "??ERROR??".
      */
-    export function showServiceError(error: ServiceError) {
-        alertDialog(error?.Message ?? error?.Code ?? "??ERROR??");
+    export function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo) {
+        
+        if (error || !errorInfo) {
+            alertDialog(error?.Message ?? error?.Code ?? "??ERROR??");
+            return;
+        }
+
+        if (!errorInfo?.responseText) {
+            if (!errorInfo?.status) {
+                if (errorInfo?.statusText != "abort")
+                    alertDialog("An unknown AJAX connection error occurred! Check browser console for details.");
+            }
+            else if (errorInfo?.status == 500)
+                alertDialog("HTTP 500: Connection refused! Check browser console for details.");
+            else
+                alertDialog("HTTP " + errorInfo?.status + ' error! Check browser console for details.');
+        }
+        else
+            iframeDialog({ html: errorInfo.responseText });
     }
 
     /**

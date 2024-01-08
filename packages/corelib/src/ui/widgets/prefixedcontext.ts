@@ -1,14 +1,15 @@
-﻿import sQuery from "@optionaldeps/squery";
+﻿import { Fluent } from "@serenity-is/base";
+import { getWidgetFrom } from "./widgetutils";
 
 export class PrefixedContext {
     constructor(public readonly idPrefix: string) {
     }
 
-    byId(id: string): JQuery {
-        return sQuery('#' + this.idPrefix + id);
+    byId(id: string): Fluent {
+        return Fluent(document.querySelector('#' + this.idPrefix + id));
     }
 
     w<TWidget>(id: string, type: { new (...args: any[]): TWidget }): TWidget {
-        return sQuery('#' + this.idPrefix + id).getWidget<TWidget>(type);
+        return getWidgetFrom<TWidget>('#' + this.idPrefix + id, type);
     }
 }

@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
+﻿import { Fluent, getjQuery } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
@@ -8,18 +8,22 @@ import { EditorWidget, EditorProps } from "../widgets/widget";
 @Decorators.element("<input type=\"text\"/>")
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
+    declare readonly domNode: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = sQuery(this.domNode);
-        (input as any).mask(this.options.mask || '', {
-            placeholder: (this.options.placeholder ?? '_')
-        });
+        let $ = getjQuery();
+        if ($?.fn?.mask) {
+            $(this.domNode).mask(this.options.mask || '', {
+                placeholder: (this.options.placeholder ?? '_')
+            });
+        }
     }
 
     public get value(): string {
-        sQuery(this.domNode).triggerHandler("blur.mask");
-        return sQuery(this.domNode).val() as string;
+        Fluent.trigger(this.domNode, "blur.mask");
+        return this.domNode.value;
     }
 
     protected get_value(): string {
@@ -27,7 +31,7 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
     }
 
     public set value(value: string) {
-        sQuery(this.domNode).val(value);
+        this.domNode.value = value;
     }
 
     protected set_value(value: string): void {

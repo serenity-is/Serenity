@@ -1,11 +1,9 @@
 ﻿import {
-    Lookup, getColumnsScript, getFormScript,
-    getGlobalObject,
-    getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore,
-    handleScriptDataError, peekScriptData, reloadLookupAsync, resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
+    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore,
+    handleScriptDataError, peekScriptData, reloadLookupAsync,
+    requestFinished, requestStarting,
+    resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
 } from "@serenity-is/base";
-
-import jQuery from "@optionaldeps/jquery";
 
 export namespace ScriptData {
 
@@ -30,14 +28,13 @@ export namespace ScriptData {
         var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, false);
-        typeof jQuery !== "undefined" && typeof (jQuery as any).active === "number" &&
-            ((jQuery as any).active++ === 0) && (jQuery as any).event?.trigger?.("ajaxStart");
+        requestStarting();
         try {
 
             xhr.send(null);
             if (xhr.status !== 200)
                 handleScriptDataError(name, xhr.status, xhr.statusText);
-                
+
             if (dynJS) {
                 var script = document.createElement("script");
                 script.text = xhr.responseText;
@@ -56,8 +53,7 @@ export namespace ScriptData {
             return data;
         }
         finally {
-            typeof (jQuery as any) !== "undefined" && typeof (jQuery as any).active === "number" &&
-                !(--(jQuery as any).active) && (jQuery as any).event?.trigger?.("ajaxStop");            
+            requestFinished();
         }
     }
 

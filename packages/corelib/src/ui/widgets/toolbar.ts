@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { IconClassName, htmlEncode, iconClassName } from "@serenity-is/base";
+﻿import { Fluent, IconClassName, addClass, getjQuery, htmlEncode, iconClassName, isArrayLike } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { Widget, WidgetProps } from "./widget";
 
@@ -20,7 +19,7 @@ export interface ToolButton {
 }
 
 export interface PopupMenuButtonOptions {
-    menu?: JQuery;
+    menu?: HTMLElement | ArrayLike<HTMLElement>;
     onPopup?: () => void;
     positionMy?: string;
     positionAt?: string;
@@ -33,14 +32,17 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
 
         let div = this.domNode;
         div.classList.add('s-PopupMenuButton');
-        sQuery(div).on('click', e => {
+        Fluent.on(div, 'click', e => {
             e.preventDefault();
             e.stopPropagation();
             if (this.options.onPopup != null) {
                 this.options.onPopup();
             }
 
-            var menu = this.options.menu;
+            let $ = getjQuery();
+            if (!$)
+                return;
+            var menu = $(this.options.menu);
             (menu.show() as any).position?.({
                 my: this.options.positionMy ?? 'left top',
                 at: this.options.positionAt ?? 'left bottom',
@@ -48,21 +50,26 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
             });
 
             var uq = this.uniqueName;
-            sQuery(document).one('click.' + uq, function (x) {
+            Fluent.one(document, 'click.' + uq, function (x) {
                 menu.hide();
             });
         });
 
-        (this.options.menu.hide().appendTo(document.body)
-            .addClass('s-PopupMenu') as any).menu?.();
+        // TODO: Convert to bootstrap dropdown
+        let menu = isArrayLike(this.options.menu) ? this.options.menu[0] : this.options.menu;
+        menu.style.display = 'none';
+        menu.classList.add('s-PopupMenu');
+        document.body.append(menu);
+        let $ = getjQuery();
+        $ && $(menu).menu?.();
     }
 
     destroy() {
-        if (this.options.menu != null) {
-            this.options.menu.remove();
-            this.options.menu = null;
+        let menu = isArrayLike(this.options.menu) ? this.options.menu[0] : this.options.menu;
+        if (menu) {
+            let $ = getjQuery();
+            $ ? $(menu).remove() : menu.remove();
         }
-
         super.destroy();
     }
 }
@@ -77,7 +84,7 @@ export class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonO
         super(props);
 
         this.domNode.classList.add('s-PopupToolButton');
-        sQuery('<b/>').appendTo(sQuery(this.domNode).children('.button-outer').children('span'));
+        this.domNode.querySelector(":scope > .button-outer > span").appendChild(document.createElement("b"));
     }
 }
 
@@ -100,7 +107,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     }
 
     destroy() {
-        sQuery(this.domNode).find('div.tool-button').off('click');
+        this.domNode.querySelectorAll('div.tool-button').forEach(el => Fluent.off(el, 'click'));
         if (this.mouseTrap) {
             if (!!this.mouseTrap.destroy) {
                 this.mouseTrap.destroy();
@@ -117,13 +124,17 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     protected mouseTrap: any;
 
     protected createButtons() {
-        var container = sQuery('div.buttons-inner', this.domNode).last();
+        var containers = this.domNode.querySelectorAll<HTMLElement>('div.buttons-inner');
+        var container = containers[containers.length - 1];
         var buttons = this.options.buttons || [];
         var currentCount = 0;
         for (var i = 0; i < buttons.length; i++) {
             var button = buttons[i];
             if (button.separator && currentCount > 0) {
-                container = sQuery('<div class="buttons-inner"></div>').appendTo(container.parent());
+                let parent = container.parentElement;
+                container = document.createElement("div");
+                container.classList.add("buttons-inner");
+                parent.append(container);
                 currentCount = 0;
             }
             this.createButton(container, button);
@@ -131,90 +142,101 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         }
     }
 
-    protected createButton(container: JQuery, b: ToolButton) {
-        var cssClass = b.cssClass ?? '';
+    protected createButton(container: HTMLElement, tb: ToolButton) {
+        var cssClass = tb.cssClass ?? '';
 
-        var btn = sQuery('<div class="tool-button"><div class="button-outer">' +
-            '<span class="button-inner"></span></div></div>')
-            .appendTo(container);
+        let btn = document.createElement("div");
+        btn.classList.add("tool-button");
+        let outer = btn.appendChild(document.createElement("div"));
+        outer.classList.add("button-outer");
+        let inner = outer.appendChild(document.createElement("div"));
+        inner.classList.add("button-inner");
 
-        if (b.action != null)
-            btn.attr('data-action', b.action);
+        if (tb.action != null)
+            btn.setAttribute('data-action', tb.action);
 
-        if (b.separator === 'right' || b.separator === 'both') {
-            sQuery('<div class="separator"></div>').appendTo(container);
+        if (tb.separator === 'right' || tb.separator === 'both') {
+            let sep = container.appendChild(document.createElement("div"));
+            sep.classList.add("separator");
         }
 
-        if (cssClass.length > 0) {
-            btn.addClass(cssClass);
-        }
+        if (cssClass.length > 0)
+            addClass(btn, cssClass);
 
-        if (b.hint) {
-            btn.attr('title', b.hint);
-        }
+        if (tb.hint)
+            btn.setAttribute('title', tb.hint);
 
-        btn.click(function (e) {
-            if (btn.hasClass('disabled')) {
+        Fluent.on(btn, "click", e => {
+            if (btn.classList.contains('disabled'))
                 return;
-            }
-            b.onClick(e);
+            tb.onClick(e);
         });
 
-        var text = b.title;
-        if (b.htmlEncode !== false) {
-            text = htmlEncode(b.title);
+        var text = tb.title;
+        if (tb.htmlEncode !== false) {
+            text = htmlEncode(tb.title);
         }
 
-        if (b.icon) {
-            btn.addClass('icon-tool-button');
-            text = "<i class='" + htmlEncode(iconClassName(b.icon)) + "'></i> " + text;
+        if (tb.icon) {
+            btn.classList.add('icon-tool-button');
+            text = "<i class='" + htmlEncode(iconClassName(tb.icon)) + "'></i> " + text;
         }
         if (text == null || text.length === 0) {
-            btn.addClass('no-text');
+            btn.classList.add('no-text');
         }
         else {
-            btn.find('span').html(text);
+            let span = btn.querySelector('span');
+            span && (span.innerHTML = text);
         }
 
-        if (b.visible === false)
-            btn.hide();
+        if (tb.visible === false)
+            btn.style.display = "none";
 
-        if (b.disabled != null && typeof b.disabled !== "function")
-            btn.toggleClass('disabled', !!b.disabled);
+        if (tb.disabled != null && typeof tb.disabled !== "function")
+            btn.classList.toggle('disabled', !!tb.disabled);
 
-        if (typeof b.visible === "function" || typeof b.disabled == "function") {
-            btn.on('updateInterface', () => {
-                if (typeof b.visible === "function")
-                    btn.toggle(!!b.visible());
+        if (typeof tb.visible === "function" || typeof tb.disabled == "function") {
+            Fluent.on(btn, 'updateInterface', () => {
+                if (typeof tb.visible === "function")
+                    btn.style.display = !tb.visible() ? "none" : "";
 
-                if (typeof b.disabled === "function")
-                    btn.toggleClass("disabled", !!b.disabled());
+                if (typeof tb.disabled === "function")
+                    btn.classList.toggle("disabled", !!tb.disabled());
             });
         }
 
-        if (b.hotkey && window['Mousetrap' as any] != null) {
+        if (tb.hotkey && window['Mousetrap' as any] != null) {
             this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
-                b.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
+                tb.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
 
-            this.mouseTrap.bind(b.hotkey, function () {
-                if (btn.is(':visible')) {
-                    btn.triggerHandler('click');
+            this.mouseTrap.bind(tb.hotkey, function () {
+                if (btn.style.display != "none") {
+                    Fluent.trigger(btn, "click");
                 }
-                return b.hotkeyAllowDefault;
+                return tb.hotkeyAllowDefault;
             });
         }
     }
 
-    findButton(className: string): JQuery {
+    findButton(className: string) {
         if (className != null && className.startsWith('.')) {
-            className = className.substr(1);
+            className = className.substring(1);
         }
-        return sQuery('div.tool-button.' + className, this.domNode);
+
+        return Fluent(this.domNode.querySelector<HTMLElement>('div.tool-button.' + className));
     }
 
     updateInterface() {
-        sQuery(this.domNode).find('.tool-button').each(function (_, el: Element) {
-            sQuery(el).trigger('updateInterface')
+        this.domNode.querySelectorAll('.tool-button').forEach(function (el: Element) {
+            Fluent.trigger(el, 'updateInterface', { bubbles: false });
         });
     }
+}
+
+export interface ToolButtonInstance {
+    element: HTMLElement,
+    hide(): this,
+    show(): this,
+    toggle(value?: boolean): this,
+    toggleClass(klass: string): this
 }

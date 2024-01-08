@@ -8,5 +8,5 @@
   },
   "include": [
     "src"
-  ]
+, "../corelib/src/q/services-internal.ts"  ]
 }

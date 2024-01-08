@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
 import { ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
@@ -82,15 +81,12 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     }
 
     protected initPropertyGrid() {
-        var pgDiv = this.byId('PropertyGrid');
-        if (pgDiv.length <= 0) {
+        var pgDiv = this.findById('PropertyGrid');
+        if (!pgDiv) {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if (sQuery(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
-            this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-        }
     }
 
     protected getFormKey(): string {
@@ -194,16 +190,7 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
 
     protected propertyGrid: PropertyGrid;
 
-    protected getFallbackTemplate() {
-        return `<div>
-    <div class="s-Form">
-        <form id="~_Form" action="">
-            <div class="fieldset">
-                <div id="~_PropertyGrid"></div>
-                <div class="clear"></div>
-            </div>
-        </form> 
-    </div>
-</div>`;
+    protected getTemplate() {
+        return `<div class="s-Form"><form id="~_Form" action=""><div id="~_PropertyGrid"></div></form></div>`;
     }
 }

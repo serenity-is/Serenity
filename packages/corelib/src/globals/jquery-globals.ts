@@ -1,8 +1,10 @@
 ﻿declare global {
-    interface JQueryStatic {
-        extend<T>(target: T, object1?: T, ...objectN: T[]): T;
-        toJSON(obj: any): string;
+    interface JQuery {
+        getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+        tryGetWidget<TWidget>(widgetType?: { new (...args: any[]): TWidget }): TWidget;
+        validate(...args: any[]): any;
+        valid(): boolean;
     }
 }
 
-export { }
+export {}

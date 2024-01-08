@@ -1,7 +1,10 @@
-﻿export {}
+﻿import { getjQuery, isArrayLike } from "@serenity-is/base";
+
+export {}
 
 export namespace TabsExtensions {
-    export function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean) {
+    export function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean) {
+        tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs)
             return;
 
@@ -14,14 +17,19 @@ export namespace TabsExtensions {
             return;
         }
 
-        if (isDisabled && index === (tabs as any).tabs('option', 'active')) {
-            (tabs as any).tabs?.('option', 'active', 0);
+        let $ = getjQuery();
+        if (!$)
+            return;
+
+        if (isDisabled && index === $(tabs).tabs?.('option', 'active')) {
+            $(tabs).tabs?.('option', 'active', 0);
         }
 
-        (tabs as any).tabs?.(isDisabled ? 'disable' : 'enable', index);
+        $(tabs).tabs?.(isDisabled ? 'disable' : 'enable', index);
     }
 
-    export function toggle(tabs: JQuery, tabKey: string, visible: boolean) {
+    export function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean) {
+        tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs)
             return;
 
@@ -34,17 +42,29 @@ export namespace TabsExtensions {
             return;
         }
 
-        if (!visible && index === (tabs as any).tabs?.('option', 'active')) {
-            (tabs as any).tabs?.('option', 'active', 0);
+        let $ = getjQuery();
+        if (!$)
+            return;
+
+        if (!visible && index === $(tabs).tabs?.('option', 'active')) {
+            $(tabs).tabs?.('option', 'active', 0);
         }
 
-        tabs.children('ul').children('li').eq(index).toggle(visible);
+        $(tabs).children('ul').children('li').eq(index).toggle(visible);
     }
 
-    export function activeTabKey(tabs: JQuery) {
-        var href = tabs.children('ul')
+    export function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement) {
+        tabs = isArrayLike(tabs) ? tabs[0] : tabs;
+        if (!tabs)
+            return;
+
+        let $ = getjQuery();
+        if (!$)
+            return;
+    
+        var href = $(tabs).children('ul')
             .children('li')
-            .eq((tabs as any).tabs?.('option', 'active'))
+            .eq($(tabs).tabs?.('option', 'active'))
             .children('a')
             .attr('href')
             .toString();
@@ -57,26 +77,26 @@ export namespace TabsExtensions {
         return href;
     }
 
-    export function indexByKey(tabs: JQuery): any {
-        var indexByKey = tabs.data('indexByKey');
-        if (!indexByKey) {
-            indexByKey = {};
-            tabs.children('ul').children('li').children('a').each(function (index, el) {
-                var href = el.getAttribute('href').toString();
-                var prefix = '_Tab';
-                var lastIndex = href.lastIndexOf(prefix);
-                if (lastIndex >= 0) {
-                    href = href.substr(lastIndex + prefix.length);
-                }
-                indexByKey[href] = index;
-            });
-            tabs.data('indexByKey', indexByKey);
-        }
+    export function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number> {
+        var indexByKey: Record<string, number> = {};
+        tabs = isArrayLike(tabs) ? tabs[0] : tabs;
+        if (!tabs)
+            return indexByKey;
+
+        tabs.querySelectorAll<HTMLElement>(':scope > ul > li > a').forEach(function (el, index) {
+            var href = el.getAttribute('href').toString();
+            var prefix = '_Tab';
+            var lastIndex = href.lastIndexOf(prefix);
+            if (lastIndex >= 0) {
+                href = href.substring(lastIndex + prefix.length);
+            }
+            indexByKey[href] = index;
+        });
 
         return indexByKey;
     }
     
-    export function selectTab(tabs: JQuery, tabKey: string) {
+    export function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string) {
         var ibk = indexByKey(tabs);
         if (!ibk)
             return;
@@ -84,8 +104,11 @@ export namespace TabsExtensions {
         if (index == null) {
             return;
         }
-        if (index !== (tabs as any).tabs?.('option', 'active')) {
-            (tabs as any).tabs?.('option', 'active', index);
+        var $ = getjQuery();
+        if (!$)
+            return;
+        if (index !== $(tabs).tabs?.('option', 'active')) {
+            $(tabs).tabs?.('option', 'active', index);
         }
     }
 }

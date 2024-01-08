@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem, Fluent } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
@@ -116,9 +115,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected createSlickGrid(): Grid {
-        sQuery(this.domNode).addClass('slick-no-cell-border').addClass('slick-no-odd-even');
+        this.domNode.classList.add("slick-no-cell-border", "slick-no-odd-even", "slick-hide-header");
         var result = super.createSlickGrid();
-        this.domNode.classList.add("slick-hide-header'")
         result.resizeCanvas();
         return result;
     }
@@ -177,14 +175,14 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             return;
         }
 
-        var target = sQuery(e.target);
-        if (target.hasClass('check-box')) {
+        var target = e.target as HTMLElement;
+        if (target.classList.contains('check-box')) {
             e.preventDefault();
 
             if (this._readOnly)
                 return;
 
-            var checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
+            var checkedOrPartial = target.classList.contains('checked') || target.classList.contains('partial');
             var item = this.itemAt(row);
             var anyChanged = item.isSelected !== !checkedOrPartial;
             this.view.beginUpdate();
@@ -202,7 +200,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 this.view.endUpdate();
             }
             if (anyChanged) {
-                sQuery(this.domNode).triggerHandler('change');
+                Fluent.trigger(this.domNode, "change");
             }
         }
     }
@@ -472,7 +470,7 @@ export interface CheckLookupEditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.CheckLookupEditor")
-export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
+export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
 
     private searchText: string;
     private enableUpdateItems: boolean;
@@ -512,7 +510,7 @@ export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions =
     protected createToolbarExtensions() {
         super.createToolbarExtensions();
 
-        GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
+        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (field, text) => {
             this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
             this.view.setItems(this.view.getItems(), true);
         });

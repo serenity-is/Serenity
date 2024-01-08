@@ -1,6 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import Select2 from "@optionaldeps/select2";
-import { PropertyItem, localText, stringFormat } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, isTrimmedEmpty } from "../../q";
@@ -10,6 +8,7 @@ import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
+import { ValidationHelper } from "../helpers/validationhelper";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;
@@ -65,25 +64,29 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
 
+    declare readonly domNode: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = sQuery(this.domNode);
+        let hidden = this.domNode;
 
         this._items = [];
         this._itemById = {};
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null) {
-            hidden.attr('placeholder', emptyItemText);
+            hidden.setAttribute('placeholder', emptyItemText);
         }
         var select2Options = this.getSelect2Options();
-        hidden.select2(select2Options);
-        hidden.attr('type', 'text');
+        let $ = getjQuery();
+        if ($?.fn?.select2)
+            $(hidden).select2(select2Options);
+        hidden.setAttribute('type', 'text');
 
         // for jquery validate to work
-        hidden.on('change.' + this.uniqueName, (e: any, valueSet) => {
-            if (valueSet !== true && hidden.closest('form').data('validator'))
-                hidden.valid();
+        Fluent.on(hidden, "change." + this.uniqueName, (e) => {
+            if (!(e.target as HTMLElement)?.dataset?.select2settingvalue)
+                ValidationHelper.validateElement(hidden);
         });
 
         this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
@@ -95,7 +98,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     destroy() {
         this.initSelectionPromise?.abort?.();
         this.abortPendingQuery();
-        sQuery(this.domNode)?.select2?.('destroy');
+        let $ = getjQuery();
+        $ && $(this.domNode)?.select2?.('destroy');
         super.destroy();
     }
 
@@ -206,7 +210,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
                 this.abortPendingQuery();
 
-                var select2 = sQuery(this.domNode).data('select2');
+                let $ = getjQuery();
+                var select2 = $ && $(this.domNode).data('select2');
                 select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
 
                 this.typeTimeout = setTimeout(() => {
@@ -228,7 +233,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             }
 
             opt.initSelection = (element, callback) => {
-                var val = element.val();
+                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
                 if (val == null || val == '') {
                     callback(null);
                     return;
@@ -294,7 +299,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 });
             }
             opt.initSelection = (element, callback) => {
-                var val = element.val() as string;
+                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
                 var isAutoComplete = this.isAutoComplete();
                 if (this.isMultiple()) {
                     var list = [];
@@ -393,22 +398,23 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
         editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
-        var inplaceButton = sQuery('<a><b/></a>')
+        var inplaceButton = Fluent("a").append(Fluent("b"))
             .addClass('inplace-button inplace-create')
             .attr('title', addTitle)
-            .insertAfter(this.domNode).click(function (e) {
+            .insertAfter(this.domNode).on("click", function (e) {
                 self.inplaceCreateClick(e as any);
             });
 
-        this.get_select2Container().add(this.domNode).addClass('has-inplace-button');
+        this.get_select2Container().addClass("has-inplace-button");
+        this.domNode.classList.add("has-inplace-button");
 
-        sQuery(this.domNode).change(() => {
+        Fluent(this.domNode).on("change", () => {
             var isNew = this.isMultiple() || !this.get_value();
             inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
         });
 
-        sQuery(this.domNode).change((e: any, valueSet: boolean) => {
-            if (valueSet === true)
+        Fluent(this.domNode).on("change", (e: any) => {
+            if ((e.target.dataset.select2settingvalue))
                 return;
             if (this.isMultiple()) {
                 var values = this.get_values();
@@ -425,7 +431,10 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
         if (this.isMultiple()) {
             this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
-                var q = sQuery(e3.target);
+                let $ = getjQuery();
+                if (!$)
+                    return;
+                var q = $(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
                 }
@@ -460,8 +469,6 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             if (isTrimmedEmpty(s)) {
                 return null;
             }
-
-            var isAsyncSource = false;
 
             if ((this._items || []).some((x: Select2Item) => {
                 var text = getName ? getName(x.source) : x.text;
@@ -518,8 +525,11 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         }
     }
 
-    protected get_select2Container(): JQuery {
-        return sQuery(this.domNode).prevAll('.select2-container');
+    protected get_select2Container(): Fluent {
+        let container = this.domNode.previousElementSibling;
+        while (container && !container.classList.contains("select2-container"))
+            container = container.previousElementSibling;
+        return Fluent(container);
     }
 
     protected get_items() {
@@ -554,14 +564,15 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     get_value() {
         var val;
-        if (sQuery(this.domNode).data('select2')) {
-            val = sQuery(this.domNode).select2('val');
+        let $ = getjQuery();
+        if ($ && $(this.domNode).data('select2')) {
+            val = $(this.domNode).select2('val');
             if (val != null && Array.isArray(val)) {
                 return val.join(',');
             }
         }
         else
-            val = sQuery(this.domNode).val();
+            val = this.domNode.value;
 
         return val;
     }
@@ -582,13 +593,20 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 });
             }
 
-            var el = sQuery(this.domNode);
-            el.select2('val', val);
-            el.data('select2-change-triggered', true);
+            this.domNode.dataset.select2settingvalue = "true";
             try {
-                el.triggerHandler('change', [true]); // valueSet: true
+                let $ = getjQuery();
+                if ($?.fn?.select2) {
+                    $(this.domNode).select2('val', val);
+                }
+                else {
+                    this.domNode.value = val;
+                }
+
+                Fluent.trigger(this.domNode, "change");
+
             } finally {
-                el.data('select2-change-triggered', false);
+                delete this.domNode.dataset.select2settingvalue;
             }
 
             this.updateInplaceReadOnly();
@@ -625,8 +643,13 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_values(): string[] {
+        let $ = getjQuery();
+        if ($?.fn?.select2) {
+            var val = $(this.domNode).select2('val');
+        }
+        else
+            val = this.domNode.value;
 
-        var val = sQuery(this.domNode).select2('val');
         if (val == null) {
             return [];
         }
@@ -639,7 +662,6 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         if (!str) {
             return [];
         }
-
         return [str];
     }
 
@@ -662,7 +684,12 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_text(): string {
-        return (sQuery(this.domNode).select2('data') ?? {}).text;
+        let $ = getjQuery();
+        if ($?.fn?.select2) {
+            return ($(this.domNode).select2('data') ?? {}).text;
+        }
+
+        return this.domNode.value;
     }
 
     get text(): string {
@@ -680,16 +707,19 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     private updateInplaceReadOnly(): void {
         var readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
-
-        sQuery(this.domNode).nextAll('.inplace-create')
-            .attr('disabled', (readOnly ? 'disabled' : ''))
-            .css('opacity', (readOnly ? '0.1' : ''))
-            .css('cursor', (readOnly ? 'default' : ''));
+        let el = this.domNode.nextElementSibling as HTMLElement;
+        while (el && !el.classList.contains("inplace-create"))
+            el = el.nextElementSibling as HTMLElement;
+        if (el) {
+            el.setAttribute('disabled', (readOnly ? 'disabled' : ''));
+            el.style.opacity = (readOnly ? '0.1' : '');
+            el.style.cursor = (readOnly ? 'default' : '');
+        }
     }
 
     set_readOnly(value: boolean) {
         if (value !== this.get_readOnly()) {
-            sQuery(this.domNode).attr("readonly", value ? "readonly" : null);
+            value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
             this.updateInplaceReadOnly();
         }
     }
@@ -911,7 +941,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             if (this.get_readOnly())
                 this.setEditDialogReadOnly(dialog);
 
-            SubDialogHelper.bindToDataChange(dialog, this, (x, dci) => {
+            SubDialogHelper.bindToDataChange(dialog, this, (dci) => {
                 this.editDialogDataChange();
                 this.updateItems();
                 this.lastCreateTerm = null;
@@ -975,13 +1005,14 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 }
 
 export function select2LocaleInitialization() {
-    if (typeof $ === "undefined" || !$.fn || !$.fn.select2)
+    let $ = getjQuery();
+    if (!$?.fn?.select2)
         return false;
 
     const txt = (s: string) => localText("Controls.SelectEditor." + s);
     const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
 
-    ($.fn.select2 as any).locales['current'] = {
+    $.fn.select2.locales['current'] = {
         formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
         formatNoMatches: () => txt("NoMatches"),
         formatAjaxError: () => txt("AjaxError"),
@@ -995,6 +1026,4 @@ export function select2LocaleInitialization() {
     return true;
 }
 
-if (!select2LocaleInitialization() &&
-    typeof document !== "undefined")
-    document.addEventListener?.('DOMContentLoaded', select2LocaleInitialization);
+!select2LocaleInitialization() && Fluent.ready(select2LocaleInitialization);

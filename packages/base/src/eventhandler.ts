@@ -235,23 +235,23 @@ function getTypeEvent(event: string) {
 
 export namespace EventHandler {
     export function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    export function on(element: EventTarget, type: string, listener: EventListenerOrEventListenerObject): void;
+    export function on(element: EventTarget, type: string, listener: EventListener): void;
     export function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
     export function on(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
         addHandler(element, type, handler, delegationHandler, /*oneOff*/ false);
     }
 
     export function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    export function one(element: EventTarget, type: string, listener: EventListenerOrEventListenerObject): void;
+    export function one(element: EventTarget, type: string, listener: EventListener): void;
     export function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
     export function one(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
         addHandler(element, type, handler, delegationHandler, true);
     }
 
-    export function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    export function off(element: EventTarget, type: string, listener: EventListenerOrEventListenerObject): void;
-    export function off(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    export function off(element: EventTarget, originalTypeEvent: string, handler: any, delegationHandler?: Function): void {
+    export function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    export function off(element: EventTarget, type: string, listener?: EventListener): void;
+    export function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    export function off(element: EventTarget, originalTypeEvent: string, handler?: any, delegationHandler?: Function): void {
         if (typeof originalTypeEvent !== 'string' || !element) {
             return
         }

@@ -12,7 +12,7 @@ export class FilterDialog<P = {}> extends TemplatedDialog<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.filterPanel = new FilterPanel({ element: this.byId('FilterPanel') });
+        this.filterPanel = new FilterPanel({ element: this.findById('FilterPanel') });
         this.filterPanel.set_showInitialLine(true);
         this.filterPanel.set_showSearchButton(false);
         this.filterPanel.set_updateStoreOnReset(false);

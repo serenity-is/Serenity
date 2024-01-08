@@ -1,4 +1,4 @@
-﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem, Fluent, inputLikeSelector, getjQuery } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
@@ -23,8 +23,8 @@ export interface IFiltering {
     saveState(): any;
     get_field(): PropertyItem;
     set_field(value: PropertyItem): void;
-    get_container(): JQuery;
-    set_container(value: JQuery): void;
+    get_container(): HTMLElement;
+    set_container(value: HTMLElement): void;
     get_operator(): FilterOperator;
     set_operator(value: FilterOperator): void;
 }
@@ -59,13 +59,13 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         this.field = value;
     }
 
-    private container: JQuery;
+    private container: HTMLElement;
 
-    get_container(): JQuery {
+    get_container(): HTMLElement {
         return this.container;
     }
 
-    set_container(value: JQuery) {
+    set_container(value: HTMLElement) {
         this.container = value;
     }
 
@@ -120,7 +120,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                this.get_container().html('<input type="text"/>');
+                Fluent(this.get_container()).empty().append(Fluent("input").attr("type", "text"));
                 return;
             }
         }
@@ -215,8 +215,8 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     loadState(state: any) {
-        var input = this.get_container().find(':input').first();
-        input.val(state);
+        var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector);
+        input && (input.value = state);
     }
 
     saveState() {
@@ -229,8 +229,8 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                var input = this.get_container().find(':input').first();
-                return input.val() as string;
+                var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector);
+                return input?.value;
             }
         }
         return null;
@@ -248,18 +248,20 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     getEditorValue() {
-        var input = this.get_container().find(':input').not('.select2-focusser').first();
-        if (input.length !== 1) {
+        var inputs = this.get_container().querySelectorAll<HTMLInputElement>(inputLikeSelector + ":not(.select2-focusser)");
+        if (inputs.length !== 1) {
             throw new Exception(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
         }
+        let input = inputs[0];
 
         var value;
-        if (input.data('select2') != null) {
-            value = input.select2('val');
+        let $ = getjQuery();
+        if ($ && $(input).data('select2') != null) {
+            value = $(input).select2('val');
         }
         else {
-            value = input.val();
+            value = input.value;
         }
 
         value = (value ?? '').trim();
@@ -268,16 +270,18 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     getEditorText(): string {
-        var input = this.get_container().find(':input').not('.select2-focusser').not('.select2-input').first();
-        if (input.length === 0) {
-            return this.get_container().text().trim();
+
+        var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector + ":not(.select2-focusser):not('.select2-input')");
+        if (!input) {
+            return this.get_container().textContent?.trim();
         }
         var value;
-        if (input.data('select2') != null) {
-            value = (input.select2('data') ?? {}).text;
+        let $ = getjQuery();
+        if ($ && $(input).data("select2") != null) {
+            value = ($(input).select2('data') ?? {}).text;
         }
         else {
-            value = input.val() as string;
+            value = input.value;
         }
         return value;
     }
@@ -318,7 +322,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
     createEditor() {
         if (this.useEditor()) {
             this.editor = new (this.editorType as typeof Widget<{}>)({
-                element: (el: HTMLElement) => {
+                element: el => {
                     this.get_container().append(el);
                 },
                 ...this.getEditorOptions()
@@ -556,7 +560,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
             var editorType = EditorTypeRegistry.get(this.editorType) as typeof Widget<{}>;
 
             this.editor = new editorType({
-                element: (el: HTMLElement) => this.get_container().append(el),
+                element: el => this.get_container().append(el),
                 ...this.getEditorOptions()
             });
 

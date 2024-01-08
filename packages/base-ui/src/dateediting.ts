@@ -1,5 +1,5 @@
 ﻿
-import { Culture, faIcon, formatDate, parseDate } from "@serenity-is/base";
+import { Culture, faIcon, formatDate, getjQuery, parseDate } from "@serenity-is/base";
 
 export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="currentColor"></path></svg>';
 
@@ -195,7 +195,10 @@ export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
     return i;
 }
 
-export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement, jQuery: any) {
+export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement) {
+    let $ = getjQuery();
+    if (!$)
+        return;
     let dialog = input?.closest('.ui-dialog');
     if (!dialog)
         return; 
@@ -203,7 +206,7 @@ export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement, jQuery
     if (dialogIndex == null || isNaN(dialogIndex))
         return;
     setTimeout(() => {
-        let widget = jQuery(input).datepicker('widget');
+        let widget = $(input).datepicker('widget');
         if (!widget || !widget.length)
             return;
         let zIndex = parseInt(widget.css('z-index'));
@@ -212,22 +215,23 @@ export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement, jQuery
     }, 0);
 }
 
-export function jQueryDatepickerInitialization(jQuery: any): boolean {
-    if (!jQuery?.datepicker?.regional?.en)
+export function jQueryDatepickerInitialization(): boolean {
+    let $ = getjQuery();
+    if (!$?.datepicker?.regional?.en)
         return false;
 
     let order = Culture.dateOrder;
     let s = Culture.dateSeparator;
     let culture = typeof document === "undefined" ? 'en' : (document.documentElement.lang || 'en').toLowerCase();
-    if (!jQuery.datepicker.regional[culture]) {
+    if (!$.datepicker.regional[culture]) {
         culture = culture.split('-')[0];
-        if (!jQuery.datepicker.regional[culture]) {
+        if (!$.datepicker.regional[culture]) {
             culture = 'en';
         }
     }
-    jQuery.datepicker.setDefaults(jQuery.datepicker.regional['en']);
-    jQuery.datepicker.setDefaults(jQuery.datepicker.regional[culture]);
-    jQuery.datepicker.setDefaults({
+    $.datepicker.setDefaults($.datepicker.regional['en']);
+    $.datepicker.setDefaults($.datepicker.regional[culture]);
+    $.datepicker.setDefaults({
         dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
             (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                 'dd' + s + 'mm' + s + 'yy')),
@@ -239,8 +243,8 @@ export function jQueryDatepickerInitialization(jQuery: any): boolean {
         changeYear: true
     });
 
-    if (jQuery.ui && jQuery.ui.version <= '1.12.1') {
-        jQuery.datepicker.setDefaults({
+    if ($.ui && $.ui.version <= '1.12.1') {
+        $.datepicker.setDefaults({
             buttonImage: null,
             buttonImageOnly: false,
             buttonText: `<i class="${faIcon("calendar")}"></i>`

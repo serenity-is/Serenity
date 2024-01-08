@@ -114,6 +114,8 @@ const convertModularToGlobal = (src, ns, isTS) => {
 
     var globals = [];
     src = src.replace(rxDeclareGlobal, function (x, y, m1) {
+        if (!m1)
+            return '';
         var g = m1.replace(/(\r?\n)*$/, '').split('\n')
             .map(s => s.length > 0 && s.charAt(0) == '\t' ? s.substring(1) : (s.substring(0, 4) == '    ' ? s.substring(4) : s))
             .map(s => {

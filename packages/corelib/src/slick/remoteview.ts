@@ -1,4 +1,4 @@
-﻿import { ListRequest, ListResponse, ServiceResponse, htmlEncode, localText, notifyError } from "@serenity-is/base";
+﻿import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "@serenity-is/base";
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { deepClone, extend } from "../q";
 import { AggregateFormatting } from "./aggregators";
@@ -36,7 +36,7 @@ export interface PagingInfo {
 }
 
 export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
-export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean | void;
+export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: ServiceOptions<ListResponse<TEntity>>) => boolean | void;
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 
@@ -178,7 +178,7 @@ export class RemoteView<TEntity> {
         var onRowsChanged: EventEmitter = new EventEmitter();
         var onRowsOrCountChanged: EventEmitter = new EventEmitter();
 
-        var loading: any = false;
+        var loading: AbortController | boolean = false;
         var errorMessage: string = null;
         var populateLocks = 0;
         var populateCalls = 0;
@@ -218,7 +218,7 @@ export class RemoteView<TEntity> {
                         idProperty + "' property. Object at index '" + i + "' " +
                         "has no identity value: ";
 
-                    msg += (<any>$).toJSON(items[i]);
+                    msg += JSON.stringify(items[i]);
                     throw msg;
                 }
                 idxById[id] = i;
@@ -238,7 +238,7 @@ export class RemoteView<TEntity> {
                     else
                         msg += "has repeated identity value '" + id + "': ";
 
-                    msg += (<any>$).toJSON(items[i]);
+                    msg += JSON.stringify(items[i]);
                     throw msg;
                 }
             }
@@ -313,7 +313,7 @@ export class RemoteView<TEntity> {
                 rowsPerPage: intf.rowsPerPage,
                 page: page,
                 totalCount: totalCount,
-                loading: loading,
+                loading: loading != null && loading != false,
                 error: errorMessage,
                 dataView: intf
             };
@@ -1242,7 +1242,7 @@ export class RemoteView<TEntity> {
                     setSelectedRowIds(newSelectedRowIds);
                 } else {
                     // keep the ones that are hidden
-                    var existing = $.grep(selectedRowIds, function (id) { return self.getRowById(id) === undefined; });
+                    var existing = selectedRowIds.filter((id: any) => self.getRowById(id) === undefined);
                     // add the newly selected ones
                     setSelectedRowIds(existing.concat(newSelectedRowIds));
                 }
@@ -1308,7 +1308,7 @@ export class RemoteView<TEntity> {
                 data = intf.onProcessData(data, intf) || data;
 
             errorMessage = null;
-            loading && loading.abort();
+            loading && typeof loading !== "boolean" && loading.abort();
             loading = false;
 
             if (!data) {
@@ -1341,7 +1341,7 @@ export class RemoteView<TEntity> {
 
             populateCalls = 0;
 
-            loading && loading.abort();
+            loading && typeof loading !== "boolean" && loading.abort();
 
             if (intf.onSubmit) {
                 var gh = intf.onSubmit(intf);
@@ -1379,47 +1379,36 @@ export class RemoteView<TEntity> {
                 request = extend(request, intf.params);
             }
 
-            var dt = dataType;
+            const controller = new AbortController();
 
-            var ajaxOptions = {
-                cache: false,
-                type: intf.method,
-                contentType: contentType,
-                url: intf.url,
-                data: request,
-                dataType: dt,
-                success: function (response: ServiceResponse) {
-                    loading = false;
-                    if (response.Error)
-                        notifyError(response.Error.Message || response.Error.Code);
-                    else
-                        addData(response);
-                    onDataLoaded.notify(this);
+            var serviceOptions: ServiceOptions<ListResponse<TEntity>> = {
+                allowRedirect: false,
+                cache: "no-store",
+                method: intf.method,
+                headers: {
+                    "Content-Type": contentType,
+                    "Accept": (dataType == "json" || dataType == "application/json") ? "application/json" : dataType
                 },
-                error: function (xhr: any, status: any, ev: any) {
+                request,
+                service: intf.url,
+                signal: controller.signal,
+                onSuccess: function (response: ServiceResponse) {
+                    addData(response);
+                },
+                onError: function(response: ListResponse<TEntity>, { status, statusText }) {
+                    errorMessage = response?.Error?.Message ?? response?.Error?.Code ??
+                        statusText == "abort" ? null : `HTTP ${status} ${statusText}!`;
+                    errorMessage && notifyError(errorMessage);
+                },
+                onCleanup: function() {
                     loading = false;
-
-                    if ((xhr.getResponseHeader("content-type") || '').toLowerCase().indexOf("application/json") >= 0) {
-                        var json = $.parseJSON(xhr.responseText);
-                        if (json != null && json.Error != null) {
-                            notifyError(json.Error.Message || json.Error.Code);
-                            onPagingInfoChanged.notify(getPagingInfo());
-                            onDataLoaded.notify(this);
-                            return;
-                        }
-                    }
-
-                    errorMessage = xhr.errormsg;
                     onPagingInfoChanged.notify(getPagingInfo());
                     onDataLoaded.notify(this);
-                },
-                complete: function () {
-                    loading = false;
                 }
             }
 
             if (intf.onAjaxCall) {
-                var ah = intf.onAjaxCall(this, ajaxOptions);
+                var ah = intf.onAjaxCall(this, serviceOptions);
                 if (ah === false) {
                     loading = false;
                     onPagingInfoChanged.notify(getPagingInfo());
@@ -1427,10 +1416,9 @@ export class RemoteView<TEntity> {
                 }
             }
 
-            ajaxOptions.data = (<any>$).toJSON(ajaxOptions.data);
-
+            serviceCall(serviceOptions);
             onPagingInfoChanged.notify(getPagingInfo());
-            loading = $.ajax(ajaxOptions);
+            loading = controller;
         }
 
         function populateLock() {

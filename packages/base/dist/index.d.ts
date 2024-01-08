@@ -261,6 +261,8 @@ interface CommonDialogOptions {
     dialogClass?: string;
     /** Dialog content element, or callback that will populate the content */
     element?: HTMLElement | ((element: HTMLElement) => void);
+    /** Is modal dialog, default is true, only used for jQuery UI */
+    modal?: boolean;
     /** Additional CSS class to use only for BS modals, like modal-lg etc. */
     modalClass?: string;
     /** Event handler that is called when dialog is opened */
@@ -280,7 +282,7 @@ interface ICommonDialog {
     /** Closes the dialog */
     close(result?: string): void;
     /** Sets the title of the dialog */
-    setTitle(title: string): void;
+    title: string;
     /** Dispose the dialog instance */
     dispose(): void;
     /** The result code of the button that is clicked */
@@ -316,6 +318,10 @@ interface MessageDialogOptions extends CommonDialogOptions {
     /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
 }
+/** Returns true if Bootstrap 3 is loaded */
+declare function isBS3(): boolean;
+/** Returns true if Bootstrap 5+ is loaded */
+declare function isBS5Plus(): boolean;
 declare namespace DialogTexts {
     const AlertTitle: string;
     const CancelButton: string;
@@ -433,6 +439,143 @@ declare function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?:
  * @param e The event triggering the open
  */
 declare function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string): void;
+
+interface ServiceError {
+    Code?: string;
+    Arguments?: string;
+    Message?: string;
+    Details?: string;
+    ErrorId?: string;
+}
+interface ServiceResponse {
+    Error?: ServiceError;
+}
+interface ServiceRequest {
+}
+interface SaveRequest<TEntity> extends ServiceRequest {
+    EntityId?: any;
+    Entity?: TEntity;
+    Localizations?: any;
+}
+interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
+    Attachments?: any[];
+}
+interface SaveResponse extends ServiceResponse {
+    EntityId?: any;
+}
+interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+    Localizations?: {
+        [key: string]: TEntity;
+    };
+}
+interface DeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface DeleteResponse extends ServiceResponse {
+}
+interface UndeleteRequest extends ServiceRequest {
+    EntityId?: any;
+}
+interface UndeleteResponse extends ServiceResponse {
+}
+declare enum ColumnSelection {
+    List = 0,
+    KeyOnly = 1,
+    Details = 2,
+    None = 3,
+    IdOnly = 4,
+    Lookup = 5
+}
+declare enum RetrieveColumnSelection {
+    details = 0,
+    keyOnly = 1,
+    list = 2,
+    none = 3,
+    idOnly = 4,
+    lookup = 5
+}
+interface ListRequest extends ServiceRequest {
+    Skip?: number;
+    Take?: number;
+    Sort?: string[];
+    ContainsText?: string;
+    ContainsField?: string;
+    Criteria?: any[];
+    EqualityFilter?: any;
+    IncludeDeleted?: boolean;
+    ExcludeTotalCount?: boolean;
+    ColumnSelection?: ColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+    ExportColumns?: string[];
+    DistinctFields?: string[];
+}
+interface ListResponse<TEntity> extends ServiceResponse {
+    Entities?: TEntity[];
+    Values?: any[];
+    TotalCount?: number;
+    Skip?: number;
+    Take?: number;
+}
+interface RetrieveRequest extends ServiceRequest {
+    EntityId?: any;
+    ColumnSelection?: RetrieveColumnSelection;
+    IncludeColumns?: string[];
+    ExcludeColumns?: string[];
+}
+interface RetrieveResponse<TEntity> extends ServiceResponse {
+    Entity?: TEntity;
+}
+interface RetrieveLocalizationRequest extends RetrieveRequest {
+}
+interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+    Entities?: {
+        [key: string]: TEntity;
+    };
+}
+interface RequestErrorInfo {
+    status?: number;
+    statusText?: string;
+    responseText?: string;
+}
+interface ServiceOptions<TResponse extends ServiceResponse> extends RequestInit {
+    allowRedirect?: boolean;
+    async?: boolean;
+    blockUI?: boolean;
+    headers?: Record<string, string>;
+    request?: any;
+    service?: string;
+    url?: string;
+    onCleanup?(): void;
+    /** Should return true if the error is handled (e.g. notification shown). Otherwise the error may be shown twice. */
+    onError?(response: TResponse, info?: RequestErrorInfo): void | boolean;
+    onSuccess?(response: TResponse): void;
+}
+
+declare namespace ErrorHandling {
+    /**
+     * Shows a service error as an alert dialog. If the error
+     * is null, has no message or code, it shows "??ERROR??".
+     */
+    function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo): void;
+    /**
+     * Runtime error handler that shows a runtime error as a notification
+     * by default only in development mode (@see isDevelopmentMode)
+     * This function is assigned as window.onerror handler in
+     * ScriptInit.ts for Serenity applications so that developers
+     * can notice an error without having to check the browser console.
+     */
+    function runtimeErrorHandler(message: string, filename?: string, lineno?: number, colno?: number, error?: Error): void;
+    /**
+     * Determines if the current environment is development mode.
+     * The runtimeErrorHandler (window.onerror) shows error notifications only
+     * when this function returns true. The default implementation considers
+     * the environment as development mode if the host is localhost, 127.0.0.1, ::1,
+     * or a domain name that ends with .local/.localhost.
+     * @returns true if the current environment is development mode, false otherwise.
+     */
+    function isDevelopmentMode(): boolean;
+}
 
 interface LookupOptions<TItem> {
     idField?: string;
@@ -773,6 +916,27 @@ declare function parseDate(s: string, dateOrder?: string): Date;
 declare function splitDateString(s: string): string[];
 
 /**
+ * --------------------------------------------------------------------------
+ * Adapted from: Bootstrap dom/event-handler.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ * --------------------------------------------------------------------------
+ */
+declare namespace EventHandler {
+    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function on(element: EventTarget, type: string, listener: EventListener): void;
+    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function one(element: EventTarget, type: string, listener: EventListener): void;
+    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function off(element: EventTarget, type: string, listener?: EventListener): void;
+    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    function trigger(element: EventTarget, type: string, args?: any): Event & {
+        isDefaultPrevented?(): boolean;
+    };
+}
+
+/**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String (or number etc.) to be HTML encoded
  */
@@ -784,6 +948,68 @@ declare function htmlEncode(s: any): string;
  * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
  */
 declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+declare function addClass(el: Element, cls: string): void;
+declare function removeClass(el: Element, cls: string): void;
+declare function toClassName(value: string | boolean | (string | boolean)[]): string;
+declare function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+declare const inputLikeSelector = "input,select,textarea,button";
+declare function isInputTag(tag: string): boolean;
+interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
+    addClass(value: string | boolean | (string | boolean)[]): this;
+    append(child: string | Node | Fluent<any>): this;
+    appendTo(parent: Element | Fluent<any>): this;
+    attr(name: string): string;
+    attr(name: string, value: string | number | boolean | null | undefined): this;
+    children(selector?: string): HTMLElement[];
+    closest(selector: string): Fluent<HTMLElement>;
+    data(name: string): string;
+    data(name: string, value: string): this;
+    getNode(): TElement;
+    empty(): this;
+    findFirst(selector: string): Fluent<HTMLElement>;
+    findAll(selector: string): HTMLElement[];
+    hasClass(klass: string): boolean;
+    hide(): this;
+    html(): string;
+    html(value: string): this;
+    insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    readonly [n: number]: TElement;
+    readonly length: number;
+    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    off(type: string, listener: EventListener): this;
+    off(type: string, selector: string, delegationHandler: Function): this;
+    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    on(type: string, listener: EventListener): this;
+    on(type: string, selector: string, delegationHandler: Function): this;
+    one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    one(type: string, listener: EventListener): this;
+    one(type: string, selector: string, delegationHandler: Function): this;
+    prepend(child: string | Node | Fluent<any>): this;
+    prependTo(parent: Element | Fluent<any>): this;
+    remove(): this;
+    removeAttr(name: string): this;
+    removeClass(value: string | boolean | (string | boolean)[]): this;
+    show(): this;
+    text(): string;
+    text(value: string): this;
+    toggle(flag?: boolean): this;
+    toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
+    trigger(type: string, args?: any): this;
+    val(value: string): this;
+    val(): string;
+}
+declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
+declare namespace Fluent {
+    var off: typeof EventHandler.off;
+    var on: typeof EventHandler.on;
+    var one: typeof EventHandler.on;
+    var trigger: typeof EventHandler.trigger;
+    var ready: (callback: () => void) => void;
+}
+declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
 declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 declare function localText(key: string, defaultText?: string): string;
@@ -857,100 +1083,13 @@ declare function notifyWarning(message: string, title?: string, options?: Toastr
 
 declare function resolveUrl(url: string): string;
 declare function resolveServiceUrl(url: string): string;
-
-interface ServiceError {
-    Code?: string;
-    Arguments?: string;
-    Message?: string;
-    Details?: string;
-    ErrorId?: string;
-}
-interface ServiceResponse {
-    Error?: ServiceError;
-}
-interface ServiceRequest {
-}
-interface SaveRequest<TEntity> extends ServiceRequest {
-    EntityId?: any;
-    Entity?: TEntity;
-    Localizations?: any;
-}
-interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-    Attachments?: any[];
-}
-interface SaveResponse extends ServiceResponse {
-    EntityId?: any;
-}
-interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-    Localizations?: {
-        [key: string]: TEntity;
-    };
-}
-interface DeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface DeleteResponse extends ServiceResponse {
-}
-interface UndeleteRequest extends ServiceRequest {
-    EntityId?: any;
-}
-interface UndeleteResponse extends ServiceResponse {
-}
-declare enum ColumnSelection {
-    List = 0,
-    KeyOnly = 1,
-    Details = 2,
-    None = 3,
-    IdOnly = 4,
-    Lookup = 5
-}
-declare enum RetrieveColumnSelection {
-    details = 0,
-    keyOnly = 1,
-    list = 2,
-    none = 3,
-    idOnly = 4,
-    lookup = 5
-}
-interface ListRequest extends ServiceRequest {
-    Skip?: number;
-    Take?: number;
-    Sort?: string[];
-    ContainsText?: string;
-    ContainsField?: string;
-    Criteria?: any[];
-    EqualityFilter?: any;
-    IncludeDeleted?: boolean;
-    ExcludeTotalCount?: boolean;
-    ColumnSelection?: ColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-    ExportColumns?: string[];
-    DistinctFields?: string[];
-}
-interface ListResponse<TEntity> extends ServiceResponse {
-    Entities?: TEntity[];
-    Values?: any[];
-    TotalCount?: number;
-    Skip?: number;
-    Take?: number;
-}
-interface RetrieveRequest extends ServiceRequest {
-    EntityId?: any;
-    ColumnSelection?: RetrieveColumnSelection;
-    IncludeColumns?: string[];
-    ExcludeColumns?: string[];
-}
-interface RetrieveResponse<TEntity> extends ServiceResponse {
-    Entity?: TEntity;
-}
-interface RetrieveLocalizationRequest extends RetrieveRequest {
-}
-interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-    Entities?: {
-        [key: string]: TEntity;
-    };
-}
+declare function getCookie(name: string): any;
+declare function isSameOrigin(url1: string, url2?: string): boolean;
+declare function requestStarting(): void;
+declare function requestFinished(): void;
+declare function getActiveRequests(): number;
+declare function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
+declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 
 declare function getGlobalObject(): any;
 declare function getStateStore(key?: string): any;
@@ -985,4 +1124,4 @@ declare function isArrayLike(obj: any): obj is ArrayLike<any>;
 declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
 declare function getjQuery(): any;
 
-export { type AnyIconClass, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, Enum, type ICommonDialog, type IFrameDialogOptions, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceRequest, type ServiceResponse, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createCommonDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getBaseType, getColumnsScript, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getjQuery, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, isArrayLike, isAssignableFrom, isEnum, isInstanceOfType, isPromiseLike, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, resolveServiceUrl, resolveUrl, round, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toId, toggleClass, trunc, tryGetText, warningDialog, yesDialogButton };
+export { type AnyIconClass, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, Enum, ErrorHandling, Fluent, H, type ICommonDialog, type IFrameDialogOptions, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, type RequestErrorInfo, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceOptions, type ServiceRequest, type ServiceResponse, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addClass, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createCommonDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getActiveRequests, getBaseType, getColumnsScript, getCookie, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getjQuery, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, inputLikeSelector, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInputLike, isInputTag, isInstanceOfType, isPromiseLike, isSameOrigin, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, removeClass, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, serviceCall, serviceRequest, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toClassName, toId, toggleClass, trunc, tryGetText, warningDialog, yesDialogButton };

@@ -1,9 +1,8 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { formatNumber, parseInteger } from "@serenity-is/base";
+﻿import { formatNumber, getjQuery, parseInteger } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend, isTrimmedEmpty } from "../../q";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 import { DecimalEditor } from "./decimaleditor";
 
 export interface IntegerEditorOptions {
@@ -16,11 +15,12 @@ export interface IntegerEditorOptions {
 @Decorators.element('<input type="text"/>')
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
+    declare readonly domNode: HTMLInputElement;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = sQuery(this.domNode);
-        input.addClass('integerQ');
+        this.domNode.classList.add('integerQ');
         var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(),
             {
                 vMin: (this.options.minValue ?? this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
@@ -28,26 +28,27 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
                 aSep: null
             });
 
-        if ((sQuery.fn as any).autoNumeric)
-            (input as any).autoNumeric(numericOptions);
+        let $ = getjQuery();
+        if ($?.fn?.autoNumeric)
+            $(this.domNode).autoNumeric?.(numericOptions);
     }
 
     get_value(): number {
         var val: string;
-        if ((sQuery.fn as any).autoNumeric) {
-            val = (sQuery(this.domNode) as any).autoNumeric('get') as string;
+        let $ = getjQuery();
+        if ($?.fn?.autoNumeric) {
+            val = $(this.domNode).autoNumeric('get') as string;
             if (isTrimmedEmpty(val))
                 return null;
             else
                 return parseInt(val, 10);
         }
         else {
-            val = (sQuery(this.domNode).val() as string)?.trim();
+            val = this.domNode.value?.trim();
             if (!val)
                 return null;
             return parseInteger(val)
         }
-
     }
 
     get value(): number {
@@ -55,12 +56,13 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
     }
 
     set_value(value: number) {
+        let $ = getjQuery();
         if (value == null || (value as any) === '')
-            sQuery(this.domNode).val('');
-        else if ((sQuery.fn as any).autoNumeric)
-            (sQuery(this.domNode) as any).autoNumeric('set', value);
+            this.domNode.value = '';
+        else if ($?.fn?.autoNumeric)
+            $(this.domNode).autoNumeric('set', value);
         else
-            sQuery(this.domNode).val(formatNumber(value));
+            this.domNode.value = formatNumber(value);
     }
 
     set value(v: number) {

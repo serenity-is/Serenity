@@ -1,10 +1,9 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, isInputLike, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { Authorization, Exception, ScriptData, ServiceOptions, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, serviceCall, validatorAbortHandler } from "../../q";
+import { Authorization, Exception, ScriptData, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
-import { EditorUtils, isInputLike } from "../editors/editorutils";
+import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ValidationHelper } from "../helpers/validationhelper";
@@ -22,15 +21,15 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
     protected propertyGrid: PropertyGrid;
 
     protected toolbar: Toolbar;
-    protected saveAndCloseButton: JQuery;
-    protected applyChangesButton: JQuery;
-    protected deleteButton: JQuery;
-    protected undeleteButton: JQuery;
-    protected cloneButton: JQuery;
-    protected editButton: JQuery;
+    protected saveAndCloseButton: Fluent;
+    protected applyChangesButton: Fluent;
+    protected deleteButton: Fluent;
+    protected undeleteButton: Fluent;
+    protected cloneButton: Fluent;
+    protected editButton: Fluent;
 
     protected localizationGrid: PropertyGrid;
-    protected localizationButton: JQuery;
+    protected localizationButton: Fluent;
     protected localizationPendingValue: any;
     protected localizationLastValue: any;
 
@@ -175,11 +174,12 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                 if (callback != null) {
                     callback(response);
                 }
-                self.element.triggerHandler('ondatachange', [{
+                Fluent.trigger(this.domNode, "ondatachange", {
                     entityId: request.EntityId,
                     entity: this.entity,
-                    type: 'delete'
-                }]);
+                    type: 'delete',
+                    bubbles: false
+                });
             }
         };
 
@@ -440,8 +440,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         this.loadById(entityId,
             response => window.setTimeout(() => this.dialogOpen(asPanel), 0),
             () => {
-                if (!sQuery(this.domNode).is(':visible')) {
-                    sQuery(this.domNode).remove();
+                if (!(this.domNode.offsetWidth > 0 && this.domNode.offsetHeight > 0)) {
+                    this.domNode.remove();
                 }
             });
     }
@@ -486,12 +486,12 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
     protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
         var request = serviceCall(options);
-        fail && ((request as JQueryXHR)?.fail ? (request as JQueryXHR).fail(fail) : request.then(null, fail));
+        fail && ((request as any)?.fail ? (request as any).fail(fail) : request.then(null, fail));
     }
 
     protected initLocalizationGrid(): void {
-        var pgDiv = this.byId('PropertyGrid');
-        if (pgDiv.length <= 0) {
+        var pgDiv = this.findById('PropertyGrid');
+        if (!pgDiv) {
             return;
         }
         var pgOptions = this.getPropertyGridOptions();
@@ -499,12 +499,12 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
     }
 
     protected initLocalizationGridCommon(pgOptions: PropertyGridOptions) {
-        var pgDiv = this.byId('PropertyGrid');
+        var pgDiv = this.findById('PropertyGrid');
 
         if (!pgOptions.items.some(x => x.localizable === true))
             return;
 
-        var localGridDiv = sQuery('<div/>')
+        var localGridDiv = Fluent("div")
             .attr('id', this.idPrefix + 'LocalizationGrid')
             .hide().insertAfter(pgDiv);
 
@@ -648,8 +648,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         this.localizationGrid.enumerateItems((item, widget) => {
             if (item.name.indexOf('$') < 0 && isInputLike(widget.domNode)) {
-                valueByName[item.name] = this.byId(item.name).val();
-                widget.element.val(valueByName[item.name]);
+            valueByName[item.name] = this.byId(item.name).val();
+                Fluent(widget.domNode).val(valueByName[item.name]);
             }
         });
 
@@ -658,7 +658,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             if (idx >= 0 && isInputLike(widget1.domNode)) {
                 var hint = valueByName[item1.name.substr(idx + 1)];
                 if (hint != null && hint.length > 0) {
-                    widget1.element.attr('title', hint).attr('placeholder', hint);
+                    Fluent(widget1.domNode).attr('title', hint).attr('placeholder', hint);
                 }
             }
         });
@@ -714,9 +714,6 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if (sQuery(this.domNode).closest('.ui-dialog').hasClass('s-Flexify')) {
-            this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-        }
     }
 
     protected getPropertyItems(): PropertyItem[] {
@@ -785,10 +782,11 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                 var dci = {
                     type: typ,
                     entity: ent,
-                    entityId: eid
+                    entityId: eid,
+                    bubbles: false
                 };
 
-                sQuery(this.domNode).triggerHandler('ondatachange', [dci]);
+                Fluent.trigger(this.domNode, "ondatachange", dci);
             };
 
         opt.onCleanup = () => {
@@ -1038,16 +1036,16 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         }
 
         if (this.propertyGrid != null) {
-            this.propertyGrid.element.toggle(!isLocalizationMode);
+            Fluent(this.propertyGrid.domNode).toggle(!isLocalizationMode);
         }
 
         if (this.localizationGrid != null) {
-            this.localizationGrid.element.toggle(isLocalizationMode);
+            Fluent(this.localizationGrid.domNode).toggle(isLocalizationMode);
         }
 
         if (this.localizationButton != null) {
             this.localizationButton.toggle(this.localizationGrid != null);
-            this.localizationButton.find('.button-inner')
+            this.localizationButton.findFirst('.button-inner')
                 .text((this.isLocalizationMode() ?
                     localText('Controls.EntityDialog.LocalizationBack') :
                     localText('Controls.EntityDialog.LocalizationButton')));
@@ -1056,8 +1054,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (isLocalizationMode) {
 
             if (this.toolbar != null)
-                this.toolbar.findButton('tool-button')
-                    .not('.localization-hidden')
+                this.toolbar.findButton('tool-button:not(.localization-hidden)')
                     .addClass('.localization-hidden').hide();
 
             this.localizationButton && this.localizationButton.show();
@@ -1090,11 +1087,12 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         baseOptions.request = request;
         baseOptions.onSuccess = response => {
             callback && callback(response);
-            sQuery(this.domNode).triggerHandler('ondatachange', [{
+            Fluent.trigger(this.domNode, "ondatachange", {
                 entityId: this.get_entityId(),
                 entity: this.entity,
-                type: 'undelete'
-            }]);
+                type: 'undelete',
+                bubbles: false
+            });
         };
 
         var thisOptions = this.getUndeleteOptions(callback);
@@ -1165,18 +1163,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         return false;
     }
 
-    protected getFallbackTemplate() {
-        return `<div class="s-DialogContent">
-    <div id="~_Toolbar" class="s-DialogToolbar">
-    </div>
-    <div class="s-Form">
-        <form id="~_Form" action="">
-            <div class="fieldset">
-                <div id="~_PropertyGrid"></div>
-                <div class="clear"></div>
-            </div>
-        </form> 
-    </div>
-</div>`;
+    protected getTemplate() {
+        return `<div id="~_Toolbar" class="s-DialogToolbar"></div><div class="s-Form"><form id="~_Form" action=""><div id="~_PropertyGrid"></div></form></div>`;
     }
 }

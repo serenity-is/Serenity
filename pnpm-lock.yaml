@@ -80,12 +80,6 @@ importers:
       '@serenity-is/sleekgrid':
         specifier: workspace:*
         version: link:../sleekgrid
-      '@types/jquery':
-        specifier: 3.5.29
-        version: 3.5.29
-      '@types/jquery.validation':
-        specifier: 1.16.10
-        version: 1.16.10
     devDependencies:
       '@serenity-is/base':
         specifier: workspace:*
@@ -93,6 +87,9 @@ importers:
       '@serenity-is/base-ui':
         specifier: workspace:*
         version: link:../base-ui
+      '@types/jest':
+        specifier: 29.5.11
+        version: 29.5.11
       tslib:
         specifier: 2.6.2
         version: 2.6.2
@@ -1297,18 +1294,6 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@types/jquery.validation@1.16.10:
-    resolution: {integrity: sha512-y0C9t1nOgaGtKHBMLynJYAudbm0f63h/IkWQx4mmKtkXRmYDwBY3mrF6uLR92GgAaqVSGzlxuhRnUYu06pujEg==}
-    dependencies:
-      '@types/jquery': 3.5.29
-    dev: false
-
-  /@types/jquery@3.5.29:
-    resolution: {integrity: sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==}
-    dependencies:
-      '@types/sizzle': 2.3.8
-    dev: false
-
   /@types/jsdom@20.0.1:
     resolution: {integrity: sha512-d0r18sZPmMQr1eG35u12FZfhIXNrnsPU/g5wvRKCUf/tOGilKKwYMYGqh33BNR6ba+2gkHw1EUiHoN3mn7E5IQ==}
     dependencies:
@@ -1326,10 +1311,6 @@ packages:
   /@types/resolve@1.20.2:
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
     dev: true
-
-  /@types/sizzle@2.3.8:
-    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
-    dev: false
 
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}

@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { localText, resolveUrl } from "@serenity-is/base";
+﻿import { Fluent, localText, resolveUrl } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
@@ -20,25 +19,26 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     implements IStringValue, IReadOnly {
 
     private _instanceReady: boolean;
+    declare readonly domNode: HTMLTextAreaElement;
 
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let textArea = sQuery(this.domNode);
         this._instanceReady = false;
         HtmlContentEditor.includeCKEditor();
 
-        var id = textArea.attr('id');
+        let textArea = this.domNode;
+        var id = textArea.getAttribute('id');
         if (isTrimmedEmpty(id)) {
-            textArea.attr('id', this.uniqueName);
+            textArea.setAttribute('id', this.uniqueName);
             id = this.uniqueName;
         }
 
         if (this.options.cols != null)
-            textArea.attr('cols', this.options.cols);
+            textArea.setAttribute('cols', "" + (this.options.cols ?? 0));
 
         if (this.options.rows != null)
-            textArea.attr('rows', this.options.rows);
+            textArea.setAttribute('rows', "" + (this.options.rows ?? 0));
 
         this.addValidationRule(this.uniqueName, input => {
             if (input.classList.contains('required')) {
@@ -57,11 +57,12 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected instanceReady(x: any): void {
         this._instanceReady = true;
-        sQuery(x.editor.container.$).addClass(this.domNode.getAttribute("class"));
-        sQuery(this.domNode).addClass('select2-offscreen').css('display', 'block');
+        x.editor.container.$?.addClass?.(this.domNode.getAttribute("class"));
+        this.domNode.classList.add('select2-offscreen');
+        this.domNode.style.display = 'block';
 
         // for validation to work
-        x.editor.setData(sQuery(this.domNode).val());
+        x.editor.setData(this.domNode.value);
         x.editor.setReadOnly(this.get_readOnly());
     }
 
@@ -71,7 +72,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         var CKEDITOR = (window as any)['CKEDITOR'];
 
-        var lang = sQuery('html').attr('lang')?.trim() || 'en';
+        var lang = document.documentElement.getAttribute('lang')?.trim() || 'en';
         if (!!CKEDITOR.lang.languages[lang]) {
             return lang;
         }
@@ -94,7 +95,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 instanceReady: (x: any) => this.instanceReady(x),
                 change: (x1: any) => {
                     x1.editor.updateElement();
-                    sQuery(this.domNode).triggerHandler('change');
+                    Fluent.trigger(this.domNode, "change");
                 }
             },
             toolbarGroups: [
@@ -151,7 +152,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return instance.getData();
         }
         else {
-            return sQuery(this.domNode).val() as string;
+            return this.domNode.value;
         }
     }
 
@@ -161,7 +162,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     set_value(value: string): void {
         var instance = this.getEditorInstance();
-        sQuery(this.domNode).val(value);
+        this.domNode.value = value;
         if (this._instanceReady && instance)
             instance.setData(value);
     }
@@ -178,10 +179,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         if (this.get_readOnly() !== value) {
             if (value) {
-                sQuery(this.domNode).attr('disabled', 'disabled');
+                this.domNode.setAttribute('disabled', 'disabled');
             }
             else {
-                sQuery(this.domNode).removeAttr('disabled');
+                this.domNode.removeAttribute('disabled');
             }
 
             var instance = this.getEditorInstance();
@@ -213,16 +214,16 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return;
         }
 
-        var script = sQuery('#CKEditorScript');
-        if (script.length > 0) {
+        var script = document.querySelector('#CKEditorScript');
+        if (script) {
             return;
         }
 
-        sQuery('<script/>').attr('type', 'text/javascript')
+        Fluent("script").attr('type', 'text/javascript')
             .attr('id', 'CKEditorScript')
             .attr('src', resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' +
                 HtmlContentEditor.CKEditorVer))
-            .appendTo(window.document.head);
+            .appendTo(document.head);
     };
 }
 

@@ -322,12 +322,6 @@ export namespace Decorators {
         }
     }
 
-    export function flexify(value = true) {
-        return function (target: Function) {
-            addAttribute(target, new FlexifyAttribute(value));
-        }
-    }
-
     export function itemName(value: string) {
         return function (target: Function) {
             addAttribute(target, new ItemNameAttribute(value));

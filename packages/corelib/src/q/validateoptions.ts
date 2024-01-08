@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { isBS3, localText, notifyError } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, isArrayLike, isBS3, isBS5Plus, localText, notifyError } from "@serenity-is/base";
 import { extend } from "./system-compat";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
 
@@ -8,22 +7,21 @@ let oldShowLabel: (e: HTMLElement, message: string) => void;
 function validateShowLabel(element: HTMLElement, message: string) {
     oldShowLabel.call(this, element, message);
     this.errorsFor(element).each(function (i: number, e: any) {
-        var $e = sQuery(e);
-        if ($e.parent('.vx').length) {
-            $e.attr('title', $e.text());
-            if (message && $e.hasClass('error'))
-                $e.removeClass('checked');
+        if (e.parent?.hasClass('vx')) {
+            e.setAttribute('title', e.textContent);
+            if (message && e.hasClass('error'))
+                e.removeClass('checked');
         }
     });
 };
 
-function jQueryValidationInitialization() {
+function jQueryValidationInitialization(): boolean {
 
-    if (typeof sQuery === "undefined" ||
-        !sQuery.validator)
-        return;
+    let $ = getjQuery();
+    if (!$ || !$.validator)
+        return false;
 
-    let p: any = sQuery.validator;
+    let p: any = $.validator;
     p = p.prototype;
     oldShowLabel = p.showLabel;
     p.showLabel = validateShowLabel;
@@ -48,6 +46,8 @@ function jQueryValidationInitialization() {
         this.hideErrors();
         this.elements().removeClass(this.settings.errorClass);
     };
+
+    return true;
 };
 
 export function validatorAbortHandler(validator: any) {
@@ -57,96 +57,89 @@ export function validatorAbortHandler(validator: any) {
     };
 };
 
-export function validateOptions(options?: JQueryValidation.ValidationOptions) {
+export function validateOptions(options?: any) {
     var opt = baseValidateOptions();
     delete opt.showErrors;
     return extend(extend(opt, {
         meta: 'v',
-        errorPlacement: function (error: any, element: any) {
-            let field: any = null;
-            let vx = element.attr('data-vx-id');
+        errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
+            var element = isArrayLike(elem) ?  elem[0] : elem;
+            let field: HTMLElement = null;
+            let vx = element.getAttribute('data-vx-id');
             if (vx) {
-                field = sQuery('#' + vx);
-                if (!field.length)
-                    field = null;
-                else
-                    field = field[0];
+                field = document.querySelector('#' + vx);
             }
-            if (field == null) {
-                field = element.parents('div.field');
-                if (field.length) {
-                    let inner = sQuery('div.vx', field[0]);
-                    if (inner.length)
-                        field = inner[0];
+            if (!field) {
+                field = element.closest<HTMLElement>('div.field');
+                if (field) {
+                    let inner = field.querySelector<HTMLElement>('div.vx');
+                    if (inner)
+                        field = inner;
                 }
                 else
-                    field = element.parent();
+                    field = element.parentElement;
             }
-            error.appendTo(field);
+            field?.append?.(isArrayLike(place) ? place[0] : place);
         },
         submitHandler: function () {
             return false;
         },
-        invalidHandler: function (event: any, validator: JQueryValidation.Validator) {
+        invalidHandler: function (event: any, validator: any) {
             notifyError(localText("Validation.InvalidFormMessage"));
 
-            sQuery(validator.errorList.map(x => x.element))
-                .closest('.category.collapsed')
-                .children('.category-title')
-                .each((i, x) => {
-                    sQuery(x).click();
-                });
+            validator.errorList.forEach((x: any) => {
+                let element: HTMLElement = isArrayLike(x.element) ? x.element[0] : x.element;
+                element.closest('.category.collapsed')?.querySelectorAll<HTMLAnchorElement>(
+                    ":scope > .category-title")?.forEach(el => el.click());
+            });
 
             if (validator.errorList.length)
             {
-                var el = validator.errorList[0].element;
-                if (el) {
-                    var bsPaneId = sQuery(el).closest('.tab-content>.tab-pane[id]:not(.active)').attr('id');
-                    if (bsPaneId) {
-                        let selector = 'a[href="#' + bsPaneId + '"]';
-                        sQuery(selector).click(); // bs3/bs4
-                        (document.querySelector(selector) as HTMLAnchorElement)?.click(); // bs5+
-                    }
+                var el = validator.errorList[0].element as HTMLElement;
+                if (!el)
+                    return;
+                let $ = getjQuery();
 
-                    var uiPaneId = sQuery(el).closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)').attr('id');
-                    if (uiPaneId)
-                        sQuery('a[href="#' + uiPaneId + '"]').click();
+                var bsPaneId = el.closest('.tab-content>.tab-pane[id]:not(.active)')?.getAttribute('id');
+                if (bsPaneId) {
+                    let selector = 'a[href="#' + bsPaneId + '"]';
+                    $ && $(selector).click(); // bs3/bs4
+                    (document.querySelector<HTMLAnchorElement>(selector))?.click(); // bs5+
+                }
 
-                    if ((sQuery.fn as any).tooltip) {
-                        var $el: any;
-                        var hl = getHighlightTarget(el);
-                        if (hl)
-                            $el = sQuery(hl);
-                        else
-                            $el = sQuery(el);
+                var uiPaneId = el.closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)')?.getAttribute('id');
+                if (uiPaneId) {
+                    let selector = 'a[href="#' + uiPaneId + '"]';
+                    $ ? $(selector).click() : document.querySelector<HTMLAnchorElement>(selector)?.click();
+                }
 
-                        (sQuery.fn as any).tooltip && $el.tooltip({
-                            title: validator.errorList[0].message,
-                            trigger: 'manual'
-                        }).tooltip('show');
+                var hl = getHighlightTarget(el) ?? el;
+                if ($?.fn?.tooltip) {
+                    $(hl).tooltip({
+                        title: validator.errorList[0].message,
+                        trigger: 'manual'
+                    }).tooltip('show');
 
-                        window.setTimeout(function () {
-                            $el.tooltip(isBS3() ? 'destroy' : 'dispose');
-                        }, 1500);
-                    }
+                    window.setTimeout(function () {
+                        $(hl).tooltip(isBS3() ? 'destroy' : 'dispose');
+                    }, 1500);
+                }
+                else if (isBS5Plus() && typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) {
+                    let tooltip = new (bootstrap as any).Tooltip(hl, {
+                        title: validator.errorList[0].message,
+                        trigger: 'manual'
+                    });
+                    tooltip.show();
+                    window.setTimeout(function () {
+                        tooltip.dispose();
+                    }, 1500);
                 }
             }
         },
-        success: function (label: JQuery) {
-            label.addClass('checked');
+        success: function (label: ArrayLike<HTMLElement> | HTMLElement) {
+            (isArrayLike(label) ? label[0] : label).classList.add('checked');
         }
     }), options);
 };
 
-if (typeof sQuery !== "undefined") {
-    if (sQuery.validator)
-        jQueryValidationInitialization();
-    else
-        sQuery(jQueryValidationInitialization);
-}
-else if (typeof document !== "undefined") {
-    if (document.readyState === 'loading')
-        document.addEventListener('DOMContentLoaded', jQueryValidationInitialization);
-    else
-        setTimeout(jQueryValidationInitialization, 100);
-}
+!jQueryValidationInitialization() && Fluent.ready(jQueryValidationInitialization);

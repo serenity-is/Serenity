@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Criteria, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
+﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { ArgumentNullException } from "../../q";
 import { DateEditor } from "../editors/dateeditor";
@@ -24,7 +23,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        sQuery(this.domNode).addClass('quick-filters-bar').addClass('clear');
+        this.domNode.classList.add('quick-filters-bar', 'clear');
 
         var filters = this.options.filters;
         for (var f = 0; f < filters.length; f++) {
@@ -36,7 +35,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public addSeparator(): void {
-        sQuery(this.domNode).append(sQuery('<hr/>'));
+        Fluent("hr").appendTo(this.domNode);
     }
 
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
@@ -49,9 +48,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        var item = sQuery("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
+        var quickFilter = Fluent("div").addClass("quick-filter-item")
             .appendTo(this.domNode)
-            .data('qffield', opt.field).children();
+            .data('qffield', opt.field)
 
         var title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
@@ -61,18 +60,23 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             }
         }
 
-        var quickFilter = item.text(title).parent();
+        Fluent("span")
+            .addClass("quick-filter-label")
+            .text(title)
+            .appendTo(quickFilter);
+
+        var qfElement = quickFilter.getNode() as any;
 
         if (opt.displayText != null) {
-            quickFilter.data('qfdisplaytext', opt.displayText);
+            qfElement.qfdisplaytext = opt.displayText;
         }
 
         if (opt.saveState != null) {
-            quickFilter.data('qfsavestate', opt.saveState);
+            qfElement.qfsavestate = opt.saveState;
         }
 
         if (opt.loadState != null) {
-            quickFilter.data('qfloadstate', opt.loadState);
+            qfElement.qfloadstate = opt.loadState;
         }
 
         if (opt.cssClass) {
@@ -88,7 +92,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     el.setAttribute('placeholder', ' ');
                     quickFilter.append(el);
                     if (opt.element != null) {
-                        opt.element(sQuery(el));
+                        opt.element(Fluent(el));
                     }
                 },
                 ...opt.options
@@ -133,7 +137,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         });
 
         this.add_submitHandlers(submitHandler);
-        widget.element.bind('remove.' + this.uniqueName, x => {
+        Fluent.on(widget.domNode, 'remove.' + this.uniqueName, x => {
             this.remove_submitHandlers(submitHandler);
         });
 
@@ -151,18 +155,16 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             type: DateEditor,
             title: title,
             element: function (el) {
-                end = new DateEditor({ element: el2 => sQuery(el2).insertAfter(el) });
-                end.element.change(function (x) {
-                    el.triggerHandler('change');
-                });
-                sQuery('<span/>').addClass('range-separator').text('-').insertAfter(el);
+                end = new DateEditor({ element: el2 => Fluent(el2).insertAfter(el) });
+                Fluent.on(end.domNode, "change", () => el.trigger("change"));
+                Fluent("span").addClass('range-separator').text('-').insertAfter(el);
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1.valueOf())) {
                         notifyWarning(localText('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
+                        args.widget.domNode.value = "";
                         date1 = null;
                     }
                     else {
@@ -175,7 +177,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
                         notifyWarning(localText('Validation.DateInvalid'), '', null);
-                        end.element.val('');
+                        end.domNode.value = "";
                         date2 = null;
                     }
                     else {
@@ -232,26 +234,21 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             title: title,
             element: function (el) {
                 end = new DateTimeEditor({
-                    element: el2 => sQuery(el2).insertAfter(el),
+                    element: el2 => Fluent(el2).insertAfter(el),
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
-                end.element.change(function (x) {
-                    el.triggerHandler('change');
-                });
-
-                sQuery('<span/>').addClass('range-separator').text('-').insertAfter(el);
+                Fluent.on(end.domNode, ".change", () => el.trigger("change"));
+                Fluent("span").addClass('range-separator').text('-').insertAfter(el);
             },
-            init: function (i) {
-                i.element.parent().find('.time').change(function (x1) {
-                    i.element.triggerHandler('change');
-                });
+            init: function (w) {
+                Fluent.on(w.domNode.parentElement?.querySelector('.time'), "change", () => Fluent.trigger(w.domNode, "change"));
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1?.valueOf())) {
                         notifyWarning(localText('Validation.DateInvalid'), '', null);
-                        args.widget.element.val('');
+                        args.widget.value = "";
                         date1 = null;
                     }
                     else {
@@ -264,7 +261,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
                         notifyWarning(localText('Validation.DateInvalid'), '', null);
-                        end.element.val('');
+                        end.value = "";
                         date2 = null;
                     }
                     else {

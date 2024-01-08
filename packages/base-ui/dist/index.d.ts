@@ -8,7 +8,7 @@ declare function flatPickrOptions(onChange: () => void): {
     onChange: () => void;
 };
 declare function flatPickrTrigger(input: HTMLInputElement): HTMLElement;
-declare function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement, jQuery: any): void;
-declare function jQueryDatepickerInitialization(jQuery: any): boolean;
+declare function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement): void;
+declare function jQueryDatepickerInitialization(): boolean;
 
 export { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround };

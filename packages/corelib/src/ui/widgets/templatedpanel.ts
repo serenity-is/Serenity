@@ -1,4 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
+﻿import { Fluent, getjQuery } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
@@ -27,22 +27,27 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         }
 
         if (this.validator) {
-            this.byId('Form').remove();
+            let form = this.findById('Form');
+            if (form) {
+                getjQuery()?.(form)?.remove();
+                form?.remove();
+            }
             this.validator = null;
         }
 
         super.destroy();
     }
 
-    protected tabs: JQuery;
+    protected tabs: Fluent;
     protected toolbar: Toolbar;
-    protected validator: JQueryValidation.Validator;
+    protected validator: any;
     protected isPanel: boolean;
     protected responsive: boolean;
 
     public arrange(): void {
-        sQuery(this.domNode).find('.require-layout').filter(':visible').each(function (i, e) {
-            sQuery(e).triggerHandler('layout');
+        Fluent(this.domNode).findAll('.require-layout').forEach(el => {
+            if (el.offsetWidth > 0 && el.offsetHeight > 0)
+                Fluent.trigger(el, "layout", { bubbles: false });
         });
     }
 
@@ -50,30 +55,31 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         return [];
     }
 
-    protected getValidatorOptions(): JQueryValidation.ValidationOptions {
+    protected getValidatorOptions(): any {
         return {};
     }
 
     protected initTabs(): void {
-        var tabsDiv = this.byId('Tabs');
-        if (tabsDiv.length === 0) {
+        var tabsDiv = this.findById('Tabs');
+        if (!tabsDiv) {
             return;
         }
         this.tabs = (tabsDiv as any).tabs?.({});
     }
 
     protected initToolbar(): void {
-        var toolbarDiv = this.byId('Toolbar');
-        if (!toolbarDiv.length)
+        var toolbarDiv = this.findById('Toolbar');
+        if (!toolbarDiv)
             return;
         this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv });
     }
 
     protected initValidator(): void {
-        var form = this.byId('Form');
-        if (form.length > 0) {
+        let $ = getjQuery();
+        var form = this.findById('Form');
+        if ($ && form) {
             var valOptions = this.getValidatorOptions();
-            this.validator = form.validate(validateOptions(valOptions));
+            this.validator = $(form).validate?.(validateOptions(valOptions));
         }
     }
 

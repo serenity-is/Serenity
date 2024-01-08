@@ -1,4 +1,4 @@
-﻿import { getInstanceType, getTypeFullName, isAssignableFrom, notifyError } from "@serenity-is/base";
+﻿import { Fluent, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "@serenity-is/base";
 
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
@@ -38,11 +38,13 @@ export function deassociateWidget(widget: { domNode: HTMLElement }) {
     }
 }
 
-export function tryGetWidget<TWidget>(element: Element | string, type?: { new (...args: any[]): TWidget }): TWidget {
+export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> | string, type?: { new (...args: any[]): TWidget }): TWidget {
 
     if (typeof element === "string") {
         element = document.querySelector(element);
     }
+    else if (isArrayLike(element))
+        element = element[0];
 
     if (!element)
         return null;
@@ -72,7 +74,7 @@ export function tryGetWidget<TWidget>(element: Element | string, type?: { new (.
     return null;
 }
 
-export function getWidgetFrom<TWidget>(element: Element | string, type?: { new (...args: any[]): TWidget }): TWidget {
+export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: { new (...args: any[]): TWidget }): TWidget {
     let selector: string;
     if (typeof element === "string") {
         selector = element;
@@ -95,6 +97,20 @@ export function getWidgetFrom<TWidget>(element: Element | string, type?: { new (
     return widget as TWidget;
 }
 
+declare module "@serenity-is/base" {
+    interface Fluent<TElement extends HTMLElement> {
+        getWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
+        tryGetWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
+    }
+}
+
+Fluent.prototype.getWidget = function<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget {
+    return getWidgetFrom(this.element, type);
+}
+
+Fluent.prototype.tryGetWidget = function<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget {
+    return tryGetWidget(this.element, type);
+}
 
 export type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
 
@@ -126,4 +142,10 @@ export type EditorProps<T> = WidgetProps<T> & {
     placeholder?: string;
     required?: boolean;
     readOnly?: boolean;
+}
+
+export namespace WX {
+    export function hasOriginalEvent(e: any): boolean {
+        return !!!(typeof (e.originalEvent) === 'undefined');
+    }
 }

@@ -1,5 +1,4 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Invariant, formatDate, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
+﻿import { Fluent, Invariant, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as datePickerIconSvg_, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
 import { Decorators } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
@@ -20,23 +19,24 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     private minValue: string;
     private maxValue: string;
+    declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);
 
-        var input = sQuery(this.domNode);
+        let $ = getjQuery();
         // @ts-ignore
-        if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !sQuery.fn.datepicker)) {
+        if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker)) {
             // @ts-ignore
-            flatpickr(input[0], DateEditor.flatPickrOptions(input));
+            flatpickr(this.domNode, DateEditor.flatPickrOptions(this.domNode));
         }
-        else if ((sQuery.fn as any)?.datepicker) {
-            (input as any).datepicker({
+        else if ($?.fn?.datepicker) {
+            $(this.domNode).datepicker({
                 showOn: 'button',
                 beforeShow: (inp: any, inst: any) => {
-                    if (input.hasClass('readonly') as any)
+                    if (this.domNode.classList.contains('readonly'))
                         return false as any;
-                    DateEditor.uiPickerZIndexWorkaround(input);
+                    DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
                 },
                 yearRange: (this.yearRange ?? '-100:+50')
@@ -44,14 +44,14 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
         }
         else {
-            input.attr('type', 'date');
+            this.domNode.setAttribute('type', 'date');
         }
 
-        input.on('keyup.' + this.uniqueName, e => {
-            if (e.which === 32 && !this.get_readOnly()) {
+        Fluent.on(this.domNode, "keyup." + this.uniqueName, (e: KeyboardEvent) => {
+            if (e.key === "Space" && !this.get_readOnly()) {
                 if (this.get_valueAsDate() != today()) {
                     this.set_valueAsDate(today());
-                    sQuery(this.domNode).trigger('change');
+                    Fluent.trigger(this.domNode, 'change');
                 }
             }
             else {
@@ -59,9 +59,9 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             }
         });
 
-        input.on('change.' + this.uniqueName, DateEditor.dateInputChange);
+        Fluent.on(this.domNode, 'change.' + this.uniqueName, DateEditor.dateInputChange);
 
-        addValidationRule(input, e1 => {
+        addValidationRule(this.domNode, () => {
             var value = this.get_value();
             if (!value) {
                 return null;
@@ -76,13 +76,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             }
 
             return null;
-        }, this.uniqueName);
+        });
 
         this.set_sqlMinMax(true)
     }
 
     get_value(): string {
-        var value = (sQuery(this.domNode).val() as string)?.trim();
+        var value = this.domNode.value?.trim();
         if (!value) {
             return null;
         }
@@ -96,13 +96,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     set_value(value: string) {
         if (value == null) {
-            sQuery(this.domNode).val('');
+            this.domNode.value = "";
         }
         else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
-            sQuery(this.domNode).val(formatDate(today(), this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
+            this.domNode.value = formatDate(today(), this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null);
         }
         else {
-            sQuery(this.domNode).val(formatDate(value, this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null));
+            this.domNode.value = formatDate(value, this.domNode.getAttribute("type") === 'date' ? 'yyyy-MM-dd' : null);
         }
     }
 
@@ -140,14 +140,12 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
-            if (value) {
-                sQuery(this.domNode).addClass('readonly').attr('readonly', 'readonly');
-                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
-            }
-            else {
-                sQuery(this.domNode).removeClass('readonly').removeAttr('readonly');
-                sQuery(this.domNode).nextAll('.ui-datepicker-trigger').css('opacity', '1');
-            }
+            this.domNode.classList.toggle('readonly', !!value);
+            value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
+            let trg = this.domNode.nextElementSibling;
+            while (trg && !trg.classList.contains("ui-datepicker-trigger"))
+                trg = trg.nextElementSibling;
+            trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
         }
     }
 
@@ -215,24 +213,24 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     public static useFlatpickr: boolean;
 
-    public static flatPickrOptions(input: JQuery) {
+    public static flatPickrOptions(input: HTMLElement) {
         return flatPickrOptions(function () {
-            input.triggerHandler('change');
+            Fluent.trigger(input, "change");
         });
     }
 
-    public static flatPickrTrigger(input: JQuery): JQuery {
-        if (!input.length)
+    public static flatPickrTrigger(input: HTMLInputElement): HTMLElement {
+        if (!input)
             return;
-        return sQuery(flatPickrTrigger(input[0] as HTMLInputElement)).insertAfter(input);
+        return flatPickrTrigger(Fluent(input).insertAfter(input).getNode());
     }
 
     public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
         let input = isArrayLike(el) ? el[0] : el;
         if (!input)
             return;
-        jQueryDatepickerZIndexWorkaround(input as HTMLInputElement, sQuery);
+        jQueryDatepickerZIndexWorkaround(input as HTMLInputElement);
     }
 }
 
-typeof sQuery !== "undefined" && sQuery.fn && !jQueryDatepickerInitialization(sQuery) && sQuery(jQueryDatepickerInitialization);
+!jQueryDatepickerInitialization() && Fluent.ready(jQueryDatepickerInitialization);

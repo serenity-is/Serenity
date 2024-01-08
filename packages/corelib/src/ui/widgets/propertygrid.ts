@@ -1,9 +1,8 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Culture, faIcon, getTypeShortName, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, Fluent, addClass, faIcon, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
 import { Authorization, extend, getAttributes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
-import { EditorUtils, isInputLike } from "../editors/editorutils";
+import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget, WidgetProps } from "./widget";
 
@@ -12,82 +11,63 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
     private editors: Widget<any>[];
     private items: PropertyItem[];
-    declare public readonly idPrefix: string;
 
-    constructor(props: WidgetProps<P>) {
-        super(props);
+    protected renderContents() {
 
-        let div = sQuery(this.domNode);
-        this.idPrefix = this.options.idPrefix = this.options.idPrefix ?? this.idPrefix;
+        this.domNode.classList.add('s-PropertyGrid');
 
         if (this.options.mode == null)
             this.options.mode = 1;
 
-        div.addClass('s-PropertyGrid');
         this.editors = [];
-        var items = this.options.items || [];
         this.items = [];
 
-        var useTabs = items.some(x => !!x.tab);
+        const items = this.options.items || [];
+        const useTabs = items.some(x => !!x.tab);
+        const bs3 = isBS3();
 
         if (useTabs) {
             var itemsWithoutTab = items.filter(f => !f.tab);
             if (itemsWithoutTab.length > 0) {
                 this.createItems(this.domNode, itemsWithoutTab);
-
-                sQuery("<div class='pad'></div>").appendTo(this.domNode);
+                Fluent("div").addClass("pad").appendTo(this.domNode);
             }
 
             var itemsWithTab = items.filter(f => f.tab);
 
-            var ul = sQuery("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
-                .appendTo(this.domNode);
-
-            var tc = sQuery("<div class='tab-content property-panes'></div>")
-                .appendTo(this.domNode);
+            var tabs = Fluent("ul").addClass("nav nav-tabs property-tabs").attr("role", "tablist").appendTo(this.domNode);
+            var panes = Fluent("div").addClass("tab-content property-panes").appendTo(this.domNode);
 
             var tabIndex = 0;
             var i = 0;
             while (i < itemsWithTab.length) {
-                var tab = { $: itemsWithTab[i].tab?.trim() ?? '' };
-                var tabItems = [];
+                var tabName = itemsWithTab[i].tab?.trim() ?? '';
+                var withSameTab = [];
 
                 var j = i;
                 do {
-                    tabItems.push(itemsWithTab[j]);
+                    withSameTab.push(itemsWithTab[j]);
                 } while (++j < itemsWithTab.length &&
-                    (itemsWithTab[j].tab?.trim() ?? '') === tab.$);
+                    (itemsWithTab[j].tab?.trim() ?? '') === tabName);
                 i = j;
 
-                var li = sQuery(isBS3() ? '<li><a data-toggle="tab" role="tab"></a></li>' :
-                    `<li class="nav-item"><a class="nav-link" data-${isBS5Plus() ? "bs-" : ""}toggle="tab" role="tab"></a></li>`)
-                    .appendTo(ul);
+                var tabId = this.uniqueName + '_Tab' + tabIndex;
 
-                if (tabIndex === 0) {
-                    if (isBS3())
-                        li.addClass('active');
-                    else
-                        li.children('a').addClass('active');
-                }
+                Fluent("li").addClass([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
+                    .append(Fluent("a")
+                        .addClass([!bs3 && "nav-link", !bs3 && tabIndex === 0 && "active"])
+                        .attr("role", "tab").data((isBS5Plus() ? "bs-" : "") + "toggle", "tab")
+                        .attr("href", "#" + tabId)
+                        .text(this.determineText(tabName, prefix => prefix + 'Tabs.' + tabName)))
+                    .appendTo(tabs);
 
-                var tabID = this.uniqueName + '_Tab' + tabIndex;
+                var pane = Fluent("div")
+                    .addClass(["tab-panel fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
+                    .attr("id", tabId)
+                    .attr("role", "tabpanel")
+                    .appendTo(panes);
 
-                li.children('a').attr('href', '#' + tabID)
-                    .text(this.determineText(tab.$, function (prefix: string) {
-                        return prefix + 'Tabs.' + this.tab.$;
-                    }.bind({
-                        tab: tab
-                    })));
-
-                var pane = sQuery("<div class='tab-pane fade' role='tabpanel'>")
-                    .appendTo(tc);
-
-                if (tabIndex === 0) {
-                    pane.addClass(isBS3() ? 'in active' : 'show active');
-                }
-
-                pane.attr('id', tabID);
-                this.createItems(pane[0], tabItems);
+                this.createItems(pane.getNode(), withSameTab);
                 tabIndex++;
             }
         }
@@ -99,16 +79,20 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     destroy() {
-        if (this.editors != null) {
+
+        if (this.editors) {
             for (var i = 0; i < this.editors.length; i++) {
-                this.editors[i].destroy();
+                this.editors[i]?.destroy?.();
             }
             this.editors = null;
         }
-        sQuery(this.domNode).find('a.category-link').off('click',
-            this.categoryLinkClick as any).remove();
 
-        Widget.prototype.destroy.call(this);
+        this.domNode.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
+            Fluent.off(el, 'click', this.categoryLinkClick);
+            el.remove();
+        });
+
+        super.destroy();
     }
 
     private createItems(container: HTMLElement, items: PropertyItem[]) {
@@ -118,24 +102,26 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var useCategories = this.options.useCategories !== false && items.some(x => !!x.category);
 
         if (useCategories) {
-            var linkContainer = sQuery('<div/>').addClass('category-links');
+            var linkContainer = Fluent("div").addClass("category-links").getNode();
             categoryIndexes = this.createCategoryLinks(linkContainer, items);
             if (Object.keys(categoryIndexes).length > 1) {
-                linkContainer.appendTo(container);
+                container.appendChild(linkContainer);
             }
             else {
-                linkContainer.find('a.category-link').off('click',
-                    this.categoryLinkClick as any).remove();
+                linkContainer.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
+                    Fluent.off(el, "click", this.categoryLinkClick);
+                    el.remove();
+                });
             }
         }
 
-        categoriesDiv = sQuery('<div/>').addClass('categories').appendTo(container)[0];
+        categoriesDiv = Fluent("div").addClass("categories").appendTo(container).getNode();
         var fieldContainer: HTMLElement;
         if (useCategories) {
             fieldContainer = categoriesDiv;
         }
         else {
-            fieldContainer = sQuery('<div/>').addClass('category').appendTo(categoriesDiv)[0];
+            fieldContainer = Fluent("div").addClass("category").appendTo(categoriesDiv).getNode();
         }
         var priorCategory = null;
         for (var i = 0; i < items.length; i++) {
@@ -152,7 +138,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                         item.collapsed ?? false));
 
                 if (priorCategory == null) {
-                    sQuery(categoryDiv).addClass('first-category');
+                    categoryDiv.classList.add("first-category");
                 }
                 priorCategory = category;
                 fieldContainer = categoryDiv;
@@ -163,67 +149,55 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
-    private createCategoryDiv(categoriesDiv: HTMLElement,
-        categoryIndexes: { [key: string]: number }, category: string, collapsed: boolean): HTMLElement {
+    private createCategoryDiv(categoriesDiv: HTMLElement, categoryIndexes: { [key: string]: number },
+        category: string, collapsed: boolean): HTMLElement {
 
-        var categoryDiv = sQuery('<div/>').addClass('category')
-            .appendTo(categoriesDiv)[0];
+        var categoryDiv = Fluent("div").addClass("category").appendTo(categoriesDiv);
 
-        var title = sQuery('<div/>').addClass('category-title')
-            .append(sQuery('<a/>').addClass('category-anchor')
-                .text(this.determineText(category, function (prefix) {
-                    return prefix + 'Categories.' + category;
-                }))
-                .attr('name', this.idPrefix +
-                    'Category' + categoryIndexes[category].toString()))
-            .appendTo(categoryDiv);
+        var title = Fluent("div")
+            .addClass("category-title")
+            .appendTo(categoryDiv)
+            .append(Fluent("a")
+                .addClass("category-anchor")
+                .attr('name', this.idPrefix + 'Category' + categoryIndexes[category].toString()))
+            .text(this.determineText(category, prefix => prefix + 'Categories.' + category));
 
         if (collapsed != null) {
-            sQuery(categoryDiv).addClass(((collapsed === true) ?
-                'collapsible collapsed' : 'collapsible'));
+            categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
 
-            var img = sQuery('<i/>').addClass(faIcon((collapsed === true) ? "plus" : "minus")).appendTo(title);
+            var img = Fluent("i").appendTo(title).addClass(faIcon(collapsed ? "plus" : "minus")).getNode();
+            let categoryEl = categoryDiv.getNode();
 
-            title.click(function (e) {
-                sQuery(categoryDiv).toggleClass('collapsed');
-                img.toggleClass(faIcon("plus")).toggleClass(faIcon("minus"));
+            title.on("click", function () {
+                categoryEl.classList.toggle('collapsed');
+                img.classList.toggle(faIcon("plus"));
+                img.classList.toggle(faIcon("minus"));
             });
         }
 
-        return categoryDiv;
+        return categoryDiv.getNode();
     }
 
     private categoryLinkClick = (e: Event) => {
         e.preventDefault();
 
-        var title = sQuery('a[name=' + (e.target as HTMLElement).getAttribute('href')
-            .toString().substr(1) + ']');
+        var title = document.querySelector('a[name=' + (e.target as HTMLElement).getAttribute('href')
+            .toString().substring(1) + ']');
 
-        if (title.closest('.category').hasClass('collapsed'))
-            title.closest('.category').children('.category-title').click();
+        if (title.closest('.category')?.classList.contains('collapsed'))
+            title.closest('.category').querySelector<HTMLElement>(':scope > .category-title')?.click();
 
         var animate = function () {
-            if (($.fn as any).fadeTo) {
-                title.fadeTo(100, 0.5, function () {
-                    title.fadeTo(100, 1, function () {
-                    });
+            if (getjQuery()?.fn?.fadeTo) {
+                getjQuery()(title).fadeTo(100, 0.5, function () {
+                    getjQuery()(title).fadeTo(100, 1, function () { });
                 });
             }
         };
 
-        var intoView = title.closest('.category');
-        if (($.fn as any).scrollintoview) {
-            if (intoView.closest(':scrollable(both)').length === 0)
-                animate();
-            else
-                (intoView as any).scrollintoview({
-                    duration: 'fast',
-                    direction: 'y',
-                    complete: animate
-                });
-        }
-        else if (intoView && intoView[0] && intoView[0].scrollIntoView) {
-            intoView[0].scrollIntoView();
+        let intoView = title.closest('.category');
+        if (intoView?.scrollIntoView) {
+            intoView.scrollIntoView();
             animate();
         }
     }
@@ -251,35 +225,36 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     private createField(container: HTMLElement, item: PropertyItem) {
-        var fieldDiv = sQuery('<div/>').addClass('field')
-            .addClass(item.name).data('PropertyItem', item).appendTo(container);
+
+        var fieldDiv = container.appendChild(document.createElement("div"));
+        fieldDiv.classList.add("field");
+        addClass(fieldDiv, item.name);
+        fieldDiv.dataset.itemname = item.name;
 
         if (item.cssClass) {
-            fieldDiv.addClass(item.cssClass);
+            addClass(fieldDiv, item.cssClass);
         }
 
         if (item.formCssClass) {
-            fieldDiv.addClass(item.formCssClass);
+            addClass(fieldDiv, item.formCssClass);
             if (item.formCssClass.indexOf('line-break-') >= 0) {
                 var splitted = item.formCssClass.split(String.fromCharCode(32));
+                const addLineBreak = (klass: string) => Fluent("div").addClass(klass).attr("style", "width: 100%").insertBefore(fieldDiv);
                 if (splitted.indexOf('line-break-xs') >= 0) {
-                    sQuery("<div class='line-break' style='width: 100%' />")
-                        .insertBefore(fieldDiv);
+                    addLineBreak("line-break");
                 }
                 else if (splitted.indexOf('line-break-sm') >= 0) {
-                    sQuery("<div class='line-break hidden-xs' style='width: 100%' />")
-                        .insertBefore(fieldDiv);
+                    addLineBreak("line-break hidden-xs");
                 }
                 else if (splitted.indexOf('line-break-md') >= 0) {
-                    sQuery("<div class='line-break hidden-sm' style='width: 100%' />")
-                        .insertBefore(fieldDiv);
+                    addLineBreak("line-break hidden-sm");
                 }
                 else if (splitted.indexOf('line-break-lg') >= 0) {
-                    sQuery("<div class='line-break hidden-md' style='width: 100%' />")
-                        .insertBefore(fieldDiv);
+                    addLineBreak("line-break hidden-md");
                 }
             }
         }
+
         var editorId = this.idPrefix + item.name;
         var title = this.determineText(item.title, function (prefix) {
             return prefix + item.name;
@@ -293,29 +268,26 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             return prefix2 + item.name + '_Placeholder';
         });
 
-        if (hint == null) {
-            hint = title ?? '';
-        }
-
-        var label = sQuery('<label/>')
+        var label = Fluent("label")
             .addClass('caption')
             .attr('for', editorId)
-            .attr('title', hint)
+            .attr('title', hint ?? title ?? "")
             .text(title ?? '')
             .appendTo(fieldDiv);
 
         if (item.labelWidth) {
             if (item.labelWidth === '0') {
-                label.hide();
+                label.getNode().style.display = "none";
             }
             else {
-                label.css('width', item.labelWidth);
+                label.getNode().style.width = item.labelWidth + "px";
             }
         }
 
-        if (item.required === true) {
-            sQuery('<sup>*</sup>').attr('title',
-                localText('Controls.PropertyGrid.RequiredHint'))
+        if (item.required) {
+            Fluent("sup")
+                .text("*")
+                .attr('title', localText('Controls.PropertyGrid.RequiredHint'))
                 .prependTo(label);
         }
 
@@ -340,8 +312,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             ...editorParams,
             id: editorId,
             element: el => {
-                el.classList.add("editor");
-                
+                Fluent(el).addClass("editor");
+
                 if (isInputLike(el))
                     el.setAttribute("name", item.name ?? "");
 
@@ -370,8 +342,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             ReflectionOptionsSetter.set(editor, item.editorParams);
         }
 
-        sQuery('<div/>').addClass('vx').appendTo(fieldDiv);
-        sQuery('<div/>').addClass('clear').appendTo(fieldDiv);
+        Fluent("div").addClass('vx').appendTo(fieldDiv);
+        Fluent('div').addClass('clear').appendTo(fieldDiv);
 
         return editor;
     }
@@ -407,7 +379,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return result;
     }
 
-    private createCategoryLinks(container: JQuery, items: PropertyItem[]) {
+    private createCategoryLinks(container: HTMLElement, items: PropertyItem[]) {
         var idx = 0;
         var itemIndex: Record<string, number> = {};
         var itemCategory: Record<string, string> = {};
@@ -453,27 +425,23 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var categoryIndexes: Record<string, number> = {};
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var category = { $: itemCategory[item.name] };
-            if (categoryIndexes[category.$] == null) {
+            var category = itemCategory[item.name];
+            if (categoryIndexes[category] == null) {
                 var index = Object.keys(categoryIndexes).length + 1;
-                categoryIndexes[category.$] = index;
+                categoryIndexes[category] = index;
                 if (index > 1) {
-                    sQuery('<span/>').addClass('separator').text('|').prependTo(container);
+                    Fluent("span").addClass('separator').text('|').prependTo(container);
                 }
-                sQuery('<a/>').addClass('category-link').text(
-                    this.determineText(category.$,
-                        function (prefix: string) {
-                            return prefix + 'Categories.' + this.category.$;
-                        }.bind({ category: category })))
+                Fluent("a").addClass("category-link")
+                    .text(this.determineText(category, prefix => prefix + 'Categories.' + category))
                     .attr('tabindex', '-1')
-                    .attr('href', '#' + this.idPrefix +
-                        'Category' + index.toString())
-                    .click(this.categoryLinkClick as any)
+                    .attr('href', `#${this.idPrefix}Category${index}`)
+                    .on("click", this.categoryLinkClick)
                     .prependTo(container);
             }
         }
 
-        sQuery('<div/>').addClass('clear').appendTo(container);
+        Fluent("div").addClass('clear').appendTo(container);
         return categoryIndexes;
     }
 
@@ -500,40 +468,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
-    // Obsolete
-    static loadEditorValue(editor: Widget<any>,
-        item: PropertyItem, source: any): void {
-    }
-
-    // Obsolete
-    static saveEditorValue(editor: Widget<any>,
-        item: PropertyItem, target: any): void {
-
-        EditorUtils.saveValue(editor, item, target);
-    }
-
-    // Obsolete
-    private static setReadOnly(widget: Widget<any>, isReadOnly: boolean): void {
-        EditorUtils.setReadOnly(widget, isReadOnly);
-    }
-
-    // Obsolete
-    private static setReadonly(elements: ArrayLike<HTMLElement>, isReadOnly: boolean): void {
-        EditorUtils.setReadonly(elements, isReadOnly);
-    }
-
-    // Obsolete
-    private static setRequired(widget: Widget<any>, isRequired: boolean): void {
-        EditorUtils.setRequired(widget, isRequired);
-    }
-
     private static setMaxLength(widget: Widget<any>, maxLength: number) {
         if (isInputLike(widget.domNode)) {
             if (maxLength > 0) {
                 widget.domNode.setAttribute('maxlength', (maxLength ?? 0).toString());
             }
             else {
-                widget.element.removeAttr('maxlength');
+                widget.domNode.removeAttribute('maxlength');
             }
         }
     }

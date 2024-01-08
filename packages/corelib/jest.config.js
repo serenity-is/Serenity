@@ -3,12 +3,10 @@ export default {
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    "^@mockdeps": '<rootDir>/src/globals/mockdeps',
     '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base/src/index.ts',
     '^@serenity-is/base-ui$': '<rootDir>/node_modules/@serenity-is/base-ui/src/index.ts',
-    '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts',
-    '^@optionaldeps/squery$': '<rootDir>/src/globals/squery-module',
-    '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
-    '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',
+    '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts'
   },
   "coveragePathIgnorePatterns": [
     "<rootDir>/node_modules/",

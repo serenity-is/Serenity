@@ -1,14 +1,16 @@
-﻿import validator from "@optionaldeps/jquery.validation";
-import sQuery from "@optionaldeps/squery";
-import { Config, htmlEncode, isArrayLike, isBS3, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
+﻿import { Config, Fluent, getjQuery, htmlEncode, isArrayLike, isBS3, isBS5Plus, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
 import { extend } from "./system-compat";
 
-if (validator && validator.methods && validator.addMethod) {
+function initValidatorMethods(): boolean {
+    let $ = getjQuery();
+    if (!$ || !$.validator || !$.validator.methods || !$.validator.addMethods)
+        return false;
+    let validator = $.validator;
 
-    if ((validator as any).prototype.showLabel) {
-        var orgShowLabel = (validator as any).prototype.showLabel;
-        (validator as any).prototype.showLabel = function(element: any, message: any) {
+    if (validator.prototype.showLabel) {
+        var orgShowLabel = validator.prototype.showLabel;
+        validator.prototype.showLabel = function(element: any, message: any) {
             if (message != null)
                 message = htmlEncode(message);
             orgShowLabel.call(this, element, message);
@@ -39,11 +41,11 @@ if (validator && validator.methods && validator.addMethod) {
 
         return true;
 
-    }, function (_, element: any) {
+    }, function (_: any, element: any) {
         return element?.dataset?.customvalidationmessage;
     });
 
-    validator.addMethod("dateQ", function (value, element) {
+    validator.addMethod("dateQ", function (value: string, element: any) {
         var o = this.optional(element);
         if (o)
             return o;
@@ -57,7 +59,7 @@ if (validator && validator.methods && validator.addMethod) {
         return z.getTime() === d.getTime();
     });
 
-    validator.addMethod("dateTimeQ", function (value, element) {
+    validator.addMethod("dateTimeQ", function (value: string, element: any) {
         var o = this.optional(element);
         if (o)
             return o;
@@ -69,25 +71,25 @@ if (validator && validator.methods && validator.addMethod) {
         return true;
     });        
 
-    validator.addMethod("hourAndMin", function (value, element) {
+    validator.addMethod("hourAndMin", function (value: string, element: any) {
         return this.optional(element) || !isNaN(parseHourAndMin(value));
     });
 
-    validator.addMethod("dayHourAndMin", function (value, element) {
+    validator.addMethod("dayHourAndMin", function (value: string, element: any) {
         return this.optional(element) || !isNaN(parseDayHourAndMin(value));
     });
 
-    validator.addMethod("decimalQ", function (value, element) {
+    validator.addMethod("decimalQ", function (value: string, element: any) {
         return this.optional(element) || !isNaN(parseDecimal(value));
     });
 
-    validator.addMethod("integerQ", function (value, element) {
+    validator.addMethod("integerQ", function (value: string, element: any) {
         return this.optional(element) || !isNaN(parseInteger(value));
     });
 
     let oldEmail = validator.methods['email'];
     let emailRegex: RegExp = null;
-    validator.addMethod("email", function (value, element) {
+    validator.addMethod("email", function (value: string, element: any) {
         if (Config.emailAllowOnlyAscii)
             return oldEmail.call(this, value, element);
 
@@ -106,11 +108,18 @@ if (validator && validator.methods && validator.addMethod) {
         return emailRegex.test(value);
     });
 
-    sQuery(loadValidationErrorMessages);
+    $(loadValidationErrorMessages);
+    return true;
 }
 
-export function loadValidationErrorMessages() {
+!initValidatorMethods() && Fluent.ready(initValidatorMethods);
 
+export function loadValidationErrorMessages(): boolean {
+
+    let $ = getjQuery();
+    if (!$ || !$.validator || !$.validator.methods || !$.validator.addMethods)
+        return false;
+    let validator = $.validator;    
     const addMsg = (m: string, k: string) => {
         var txt = tryGetText("Validation." + k);
         if (txt)
@@ -130,16 +139,32 @@ export function loadValidationErrorMessages() {
     addMsg("decimalQ", "Decimal");
     addMsg("integerQ", "Integer");
     addMsg("url", "Url");
+    return true;
 }
 
-function setTooltip(el: JQuery, val: string, show: boolean): JQuery {
-    if (isBS3())
-        (el.attr('data-original-title', val || '') as any)?.tooltip?.('fixTitle');
-    else
-        (el.attr('title', val || '') as any)?.tooltip?.('_fixTitle');
-    if (show != null)
-        (el as any).tooltip?.(show ? 'show' : 'hide');
-    return el;
+function setTooltip(el: ArrayLike<HTMLElement> | HTMLElement, val: string, show: boolean): void {
+    var element = isArrayLike(el) ? el[0] : el;
+    if (!element)
+        return;
+    let $ = getjQuery();
+    if (isBS3()) {
+        element.setAttribute('data-original-title', val || '');
+        $?.(element)?.tooltip?.('fixTitle');
+    }
+    else {
+        element.setAttribute('title', val || '');
+        if ($ && $.fn.tooltip) {
+            $(element)?.tooltip?.('_fixTitle');
+        }
+    }
+    if (show != null) {
+        if ($?.fn?.tooltip)
+            $(element).tooltip?.(show ? 'show' : 'hide');
+        else if (isBS5Plus() && typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) {
+            var inst = (bootstrap as any).Tooltip.getInstance?.();
+            inst && (inst[show ? "show" : "hide"])?.();
+        }
+    }
 }
 
 export function getHighlightTarget(el: HTMLElement) {
@@ -150,13 +175,13 @@ export function getHighlightTarget(el: HTMLElement) {
         return document.getElementById('s2id_' + el.id);
 }
 
-export function baseValidateOptions(): JQueryValidation.ValidationOptions {
+export function baseValidateOptions(): any {
     return <any>{
         errorClass: 'error',
         ignore: '[style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
         ignoreTitle: true,
-        normalizer: function (value: any) {
-            return sQuery.trim(value);
+        normalizer: function (value: string) {
+            return value?.trim();
         },
         highlight: function (element: HTMLElement, errorClass: string, validClass: string) {
             if ((element as any).type === "radio") {
@@ -193,38 +218,28 @@ export function baseValidateOptions(): JQueryValidation.ValidationOptions {
             }
         },
         showErrors: function () {
-            if ((sQuery?.fn as any)?.tooltip) {
+            let $ = getjQuery();
+            if ($?.fn?.tooltip) {
                 var i: number, elements: any, error: any, $el: any, hl: any;
                 for (i = 0; this.errorList[i]; i++) {
                     error = this.errorList[i];
-                    hl = getHighlightTarget(error.element);
-                    if (hl != null)
-                        $el = sQuery(hl);
-                    else
-                        $el = sQuery(error.element);
-                    if (i != 0)
-                        setTooltip($el, '', false);
-                    else
-                        setTooltip($el, error.message, true);
+                    hl = getHighlightTarget(error.element) ?? error.element;
+                    setTooltip(hl, i != 0 ? '' : error.message, false);
                 }
 
                 for (i = 0, elements = this.validElements(); elements[i]; i++) {
-                    hl = getHighlightTarget(error.element);
-                    if (hl != null)
-                        $el = sQuery(hl);
-                    else
-                        $el = sQuery(error.element);
-                    setTooltip($el, '', false);
+                    hl = getHighlightTarget(error.element) ?? error.element;
+                    setTooltip(hl, '', false);
                 }
             }
 
-            (validator as any)["prototype"].defaultShowErrors.call(this);
+            $.validator.prototype.defaultShowErrors?.call(this);
         }
     }
 }
 
-export function validateForm(form: JQuery, opt: JQueryValidation.ValidationOptions): JQueryValidation.Validator {
-    return form.validate(extend(baseValidateOptions(), opt));
+export function validateForm(form: HTMLElement | ArrayLike<HTMLElement>, opt: any): any {
+    return getjQuery()?.(isArrayLike(form) ? form[0] : form)?.validate?.(extend(baseValidateOptions(), opt));
 }
 
 let customValidateRules: WeakMap<HTMLElement, { [key: string]: ((input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string)[] }> = new WeakMap();

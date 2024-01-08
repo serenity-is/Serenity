@@ -9,7 +9,7 @@ declare global {
     }
 
     interface Select2QueryOptions {
-        element?: JQuery;
+        element?: ArrayLike<HTMLElement>;
         term?: string;
         page?: number;
         context?: any;
@@ -55,10 +55,10 @@ declare global {
         closeOnSelect?: boolean;
         openOnEnter?: boolean;
         id?: (p1: any) => string;
-        matcher?: (p1: string, p2: string, p3: JQuery) => boolean;
-        sortResults?: (p1: any, p2: JQuery, p3: any) => any;
-        formatSelection?: (p1: any, p2: JQuery, p3: (p1: string) => string) => string;
-        formatResult?: (p1: any, p2: JQuery, p3: any, p4: (p1: string) => string) => string;
+        matcher?: (p1: string, p2: string, p3: ArrayLike<HTMLElement>) => boolean;
+        sortResults?: (p1: any, p2: ArrayLike<HTMLElement>, p3: any) => any;
+        formatSelection?: (p1: any, p2: ArrayLike<HTMLElement>, p3: (p1: string) => string) => string;
+        formatResult?: (p1: any, p2: ArrayLike<HTMLElement>, p3: any, p4: (p1: string) => string) => string;
         formatResultCssClass?: (p1: any) => string;
         formatNoMatches?: (p1: string) => string;
         formatSearching?: () => string;
@@ -66,7 +66,7 @@ declare global {
         formatSelectionTooBig?: (p1: string) => string;
         createSearchChoice?: (p1: string) => any;
         createSearchChoicePosition?: string;
-        initSelection?: (p1: JQuery, p2: (p1: any) => void) => void;
+        initSelection?: (p1: ArrayLike<HTMLElement>, p2: (p1: any) => void) => void;
         tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
         tokenSeparators?: any;
         query?: (p1: Select2QueryOptions) => void;

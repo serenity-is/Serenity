@@ -1,6 +1,5 @@
 ﻿import { Config } from "./config";
-import { EventHandler } from "./eventhandler";
-import { htmlEncode, toggleClass } from "./html";
+import { Fluent, addClass, htmlEncode, toggleClass } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
 import { getjQuery, isArrayLike } from "./system";
@@ -25,6 +24,8 @@ export interface CommonDialogOptions {
     dialogClass?: string;
     /** Dialog content element, or callback that will populate the content */
     element?: HTMLElement | ((element: HTMLElement) => void);
+    /** Is modal dialog, default is true, only used for jQuery UI */
+    modal?: boolean;
     /** Additional CSS class to use only for BS modals, like modal-lg etc. */
     modalClass?: string;
     /** Event handler that is called when dialog is opened */
@@ -45,7 +46,7 @@ export interface ICommonDialog {
     /** Closes the dialog */
     close(result?: string): void;
     /** Sets the title of the dialog */
-    setTitle(title: string): void;
+    title: string;
     /** Dispose the dialog instance */
     dispose(): void;
     /** The result code of the button that is clicked */
@@ -103,12 +104,12 @@ function hasUIDialog() {
 }
 
 /** Returns true if Bootstrap 3 is loaded */
-function isBS3(): boolean {
+export function isBS3(): boolean {
     return (getjQuery()?.fn?.modal?.Constructor?.VERSION + "").charAt(0) == '3';
 }
 
 /** Returns true if Bootstrap 5+ is loaded */
-function isBS5Plus(): boolean {
+export function isBS5Plus(): boolean {
     return typeof bootstrap !== "undefined" && !!bootstrap.Modal && (bootstrap.Modal.VERSION + "").charAt(0) != '4';
 }
 
@@ -159,7 +160,7 @@ function bsCreateButton(footer: HTMLElement, x: DialogButton, close: (result: st
 
     let button = dialogButtonToBS(x);
     footer.append(button);
-    EventHandler.on(button, "click", e => {
+    Fluent.on(button, "click", e => {
         x.click && x.click.call(this, e);
         if (x.result && !((e as any)?.isDefaultPrevented?.() || e.defaultPrevented))
             close(x.result);
@@ -178,10 +179,10 @@ function createPanel(options: CommonDialogOptions): ICommonDialog {
         options.element(panelBody);
     setPanelTitle(panelBody, options.title, options.closeButton ?? true);
     if (options.onOpen) {
-        EventHandler.on(panelBody, "panelopen", options.onOpen);
+        Fluent.on(panelBody, "panelopen", options.onOpen);
     }
     if (options.onClose) {
-        EventHandler.on(panelBody, "panelclose", () => options.onClose(result));
+        Fluent.on(panelBody, "panelclose", () => options.onClose(result));
     }
     let close = (res?: string) => {
         if (res !== void 0)
@@ -202,7 +203,8 @@ function createPanel(options: CommonDialogOptions): ICommonDialog {
         open: () => panelBody && openPanel(panelBody),
         close,
         dispose: () => panelBody = null,
-        setTitle: (title: string) => panelBody && setPanelTitle(panelBody, title),
+        get title() { return panelBody?.querySelector(".panel-titlebar-text").textContent },
+        set title(value: string) { panelBody && setPanelTitle(panelBody, value) },
         get result() { return result }
     }
 }
@@ -212,7 +214,7 @@ function createUIDialog(options: CommonDialogOptions): ICommonDialog {
     let opt = {
         dialogClass: options.dialogClass,
         title: options.title,
-        modal: true,
+        modal: options.modal ?? true,
         open: function () {
             options.onOpen?.();
         },
@@ -265,9 +267,8 @@ function createUIDialog(options: CommonDialogOptions): ICommonDialog {
         },
         open: () => div && getjQuery()(div).dialog("open"),
         get result() { return result; },
-        setTitle: (title: string) => {
-            div && getjQuery()(div).dialog("option", "title", title);
-        }
+        get title() { return !div ? null : getjQuery()(div).dialog("option", "title"); },
+        set title(value: string) { div && getjQuery()(div).dialog("option", "title", value ?? ''); }
     }
 }
 
@@ -322,19 +323,15 @@ function createBS5RawModal(modalDiv: HTMLElement, options: CommonDialogOptions):
         type: "bs5",
         open: () => modal && modal.show(),
         close: close,
-        setTitle: (title) => {
-            let titleEl = modal?.querySelector('.modal-title');
-            if (!titleEl)
-                return;
-            titleEl.textContent = title ?? '';
-        },
         dispose: () => {
             if (modal) {
                 modal.dispose?.();
                 modal = null;
             }
         },
-        get result() { return result; }
+        get result() { return result; },
+        get title() { return modal?.querySelector('.modal-title')?.textContent },
+        set title(value: string) { let titleEl = modal?.querySelector('.modal-title'); titleEl && (titleEl.textContent = value ?? ''); },
     }
 }
 
@@ -375,7 +372,6 @@ function createBSModalWithJQuery(modalDiv: HTMLElement, options: CommonDialogOpt
         type: isBS5Plus ? "bs5" : (isBS3 ? "bs3" : "bs4"),
         open: () => modalDiv$ && modalDiv$.modal('show'),
         close,
-        setTitle: (title: string) => modalDiv$ && modalDiv$.find('.modal-title').first().text(title ?? ''),
         dispose: () => {
             if (!modalDiv$)
                 return;
@@ -384,7 +380,9 @@ function createBSModalWithJQuery(modalDiv: HTMLElement, options: CommonDialogOpt
             window.setTimeout(() => modalDiv$.remove(), 0);
             modalDiv$ = null;
         },
-        get result() { return result; }
+        get result() { return result; },
+        get title() { return modalDiv$?.find('.modal-title').first().text() },
+        set title(value: string) { modalDiv$?.find('.modal-title').first().text(value ?? '') }
     };
 }
 
@@ -419,7 +417,7 @@ function bsModalMarkup(title: string, modalClass?: string): HTMLDivElement {
     let div = document.createElement("div");
     div.classList.add("modal");
     if (modalClass)
-        toggleClass(div, modalClass, true);
+        addClass(div, modalClass);
     div.setAttribute("tabindex", "-1");
     div.setAttribute("role", "dialog");
     div.innerHTML = `<div class="modal-dialog" role="document">
@@ -480,8 +478,6 @@ function getMessageBodyHtml(message: string, options?: MessageDialogOptions): st
     return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
 }
 
-
-
 function createMessageDialog(opt: {
     cssClass: string,
     title: string,
@@ -515,7 +511,6 @@ function createMessageDialog(opt: {
         options.providerOptions = (type: string) => {
             if (type === "jqueryui") {
                 return {
-                    modal: true,
                     width: '40%',
                     maxWidth: 450,
                     minWidth: 180,
@@ -779,10 +774,10 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
     if (!sPanel)
         return;
 
-    let event = EventHandler.trigger(element, 'panelbeforeclose', { bubbles: false });
+    let event = Fluent.trigger(element, 'panelbeforeclose', { bubbles: false });
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
         return;
-    EventHandler.trigger(window, "panelclosing", { panel: element, bubbles: false });
+    Fluent.trigger(window, "panelclosing", { panel: element, bubbles: false });
     sPanel.classList.add("hidden");
 
     let uniqueName = sPanel.dataset.paneluniquename;
@@ -793,13 +788,13 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         });
     }
 
-    EventHandler.trigger(window, "resize", { bubbles: false });
+    Fluent.trigger(window, "resize", { bubbles: false });
     document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
         if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
-            EventHandler.trigger(rl, "layout", { bubbles: false });
+            Fluent.trigger(rl, "layout", { bubbles: false });
     });
-    EventHandler.trigger(element, "panelclose", { bubbles: false });
-    EventHandler.trigger(window, "panelclosed", { panel: element, bubbles: false });
+    Fluent.trigger(element, "panelclose", { bubbles: false });
+    Fluent.trigger(window, "panelclosed", { panel: element, bubbles: false });
 }
 
 /** 
@@ -817,7 +812,7 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
         return;
     let event: any;
 
-    EventHandler.trigger(window, 'panelopening', { panel: el, bubbles: false });
+    Fluent.trigger(window, 'panelopening', { panel: el, bubbles: false });
 
     let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
@@ -851,8 +846,8 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
     el.classList.remove("panel-hidden");
     el.classList.add("s-Panel");
 
-    EventHandler.trigger(el, "panelopen", { bubbles: false });
-    EventHandler.trigger(window, "panelopened", { panel: el, bubbles: false });
+    Fluent.trigger(el, "panelopen", { bubbles: false });
+    Fluent.trigger(window, "panelopened", { panel: el, bubbles: false });
 }
 
 function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {

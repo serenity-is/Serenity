@@ -1,7 +1,7 @@
-﻿import sQuery from "@optionaldeps/squery";
+﻿import { Fluent } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IStringValue } from "../../interfaces";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface TextAreaEditorOptions {
     cols?: number;
@@ -14,17 +14,17 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
 
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = sQuery(this.domNode);
+        let input = Fluent(this.domNode);
         if (this.options.cols !== 0) {
-            input.attr('cols', (this.options.cols ?? 80));
+            input.attr('cols', this.options.cols ?? 80);
         }
         if (this.options.rows !== 0) {
-            input.attr('rows', (this.options.rows ?? 6));
+            input.attr('rows', this.options.rows ?? 6);
         }
     }
 
     public get value(): string {
-        return sQuery(this.domNode).val() as string;
+        return Fluent(this.domNode).val() as string;
     }
 
     protected get_value(): string {
@@ -32,7 +32,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public set value(value: string) {
-        sQuery(this.domNode).val(value);
+        Fluent(this.domNode).val(value);
     }
 
     protected set_value(value: string): void {
