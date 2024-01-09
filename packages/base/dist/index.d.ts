@@ -985,6 +985,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
     one(type: string, listener: EventListener): this;
     one(type: string, selector: string, delegationHandler: Function): this;
+    parent(): Fluent<HTMLElement>;
     prepend(child: string | Node | Fluent<any>): this;
     prependTo(parent: Element | Fluent<any>): this;
     remove(): this;

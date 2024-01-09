@@ -101,6 +101,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
     one(type: string, listener: EventListener): this;
     one(type: string, selector: string, delegationHandler: Function): this;
+    parent(): Fluent<HTMLElement>;
     prepend(child: string | Node | Fluent<any>): this;
     prependTo(parent: Element | Fluent<any>): this;
     remove(): this;
@@ -189,7 +190,7 @@ Fluent.prototype.children = function (this: FluentThis, selector?: string): Elem
 }
 
 Fluent.prototype.closest = function (this: FluentThis, selector: string): Fluent<HTMLElement> {
-    return new (Fluent as any)(this.el.closest<HTMLElement>(selector));
+    return new (Fluent as any)(this.el?.closest<HTMLElement>(selector));
 }
 
 Fluent.prototype.empty = function (this: FluentThis<any>, html?: string) {
@@ -290,6 +291,10 @@ Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLEl
 Fluent.prototype.hide = function (this: FluentThis) {
     this.el && (this.el.style.display = "none");
     return this;
+}
+
+Fluent.prototype.parent = function (this: FluentThis): Fluent<HTMLElement> {
+    return new (Fluent as any)(this.el?.parentNode);
 }
 
 Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fluent<HTMLElement>) {
