@@ -4,5 +4,5 @@ import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.PasswordEditor')
 export class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return Fluent("input").attr("type", "password").getNode(); }
 }
