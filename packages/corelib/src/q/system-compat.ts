@@ -1,4 +1,4 @@
-﻿import { ISlickFormatter, Type, getBaseType, getGlobalObject, getTypeFullName, getTypeNameProp, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
+﻿import { ISlickFormatter, Type, getBaseType, getGlobalObject, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -85,18 +85,21 @@ export enum MemberType {
 
 export function getMembers(type: any, memberTypes: MemberType): TypeMember[] {
     var result: TypeMember[] = [];
-    var b = getBaseType(type);
-    if (b)
-        result = getMembers(b, memberTypes & ~1);
 
-    var members = (type as any).__metadata?.members;
-    if (members != null) {
-        for (var m of members) {
-            if (memberTypes & m.type)
-                result.push(m);
+    if (!type)
+        return [];
+
+    var result: TypeMember[] = [];
+    do {
+        let members = Object.prototype.hasOwnProperty.call(type, typeMemberListSymbol) ? type[typeMemberListSymbol] : null;
+        if (members) {
+            for (var member of members) {
+                if (member && (member.type & memberTypes) && !result.some(x => x.name === member.name))
+                    result.push(member);
+            }
         }
     }
-
+    while ((type = getBaseType(type)))
     return result;
 };
 
@@ -114,6 +117,9 @@ function merge(arr1: any[], arr2: any[]) {
 const typeMemberListSymbol = "Serenity.typeMemberList";
 
 export function addTypeMember(type: any, member: TypeMember): TypeMember {
+    if (!Object.prototype.hasOwnProperty.call(type, typeMemberListSymbol)) {
+        type[typeMemberListSymbol] = [];
+    }
     var members = type[typeMemberListSymbol];
     if (!members)
         type[typeMemberListSymbol] = members = [];
@@ -145,7 +151,7 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
 }
 
 export function getTypes(from?: any): any[] {
-    const types = {} as any;//getTypeStore();
+    const types = getTypeRegistry();
     var result = [];
     if (!from) {
         for (var t in types) {
@@ -192,19 +198,15 @@ export function safeCast(instance: any, type: Type) {
     return isInstanceOfType(instance, type) ? instance : null;
 };
 
-// has to duplicate these for now
-const typeRegistrySymbol: unique symbol = Symbol.for("Serenity.typeRegistrySymbol");
-const typeDiscriminatorSymbol: unique symbol = Symbol.for("Serenity.typeDiscriminator");
+// has to duplicate this for now
+const isInterfaceTypeSymbol: unique symbol = Symbol.for("Serenity.isInterfaceType");
 
 export function initializeTypes(root: any, pre: string, limit: number) {
 
     if (!root)
         return;
 
-    let types = getGlobalObject()[typeRegistrySymbol];
-    if (!types)
-        getGlobalObject()[types] = types = {};
-
+    let types = getTypeRegistry();
     for (var k of Object.keys(root)) {
         if (k.charAt(0) < 'A' ||
             k.charAt(0) > 'Z' ||
@@ -223,10 +225,10 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         // no explict typeName, e.g. not registered with a name,
         // a function but not an html element, or registered without name
         if (!getTypeNameProp(obj) &&
-            (obj as any)[typeDiscriminatorSymbol] !== void 0 &&
+            (obj as any)[isInterfaceTypeSymbol] !== void 0 &&
             ((typeof obj === "function" && typeof obj.nodeType !== "number") ||
-             (Object.prototype.hasOwnProperty.call(obj, typeDiscriminatorSymbol) &&
-              (obj as any)[typeDiscriminatorSymbol] !== undefined))) {
+             (Object.prototype.hasOwnProperty.call(obj, isInterfaceTypeSymbol) &&
+              (obj as any)[isInterfaceTypeSymbol] !== undefined))) {
    
             setTypeNameProp(obj, pre + k);
             types[pre + k] ??= obj;

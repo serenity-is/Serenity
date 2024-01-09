@@ -1,6 +1,5 @@
-﻿import { FormatterTypeName, PropertyItem, StringLiteral } from "@serenity-is/base";
+﻿import { FormatterTypeName, PropertyItem, StringLiteral, registerFormatter } from "@serenity-is/base";
 import { FormatterContext, Group } from "@serenity-is/sleekgrid";
-import { Decorators } from "../decorators";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
@@ -19,7 +18,7 @@ export abstract class Formatter implements Formatter {
     static typeName: string;
 
     static registerFormatter<T>(name: StringLiteral<T>, intf?: any[]): FormatterTypeName<T> {
-        Decorators.registerFormatter(name, intf);
+        registerFormatter(this, name, intf);
         return name;
     }
 }

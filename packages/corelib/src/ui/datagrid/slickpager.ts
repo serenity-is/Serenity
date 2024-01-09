@@ -6,49 +6,82 @@ import { Widget, WidgetProps } from "../widgets/widget";
 @Decorators.registerClass("Serenity.SlickPager")
 export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
 
+    private currentPage: Fluent<HTMLInputElement>;
+    private totalPages: Fluent<HTMLSpanElement>;
+    private pageSize: Fluent<HTMLSelectElement>;
+    private stat: Fluent<HTMLSpanElement>;
+
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let o = this.options;
-        o.showRowsPerPage ??= true;
-        o.rowsPerPageOptions ??= [20, 100, 500, 2000];
-        var v = o.view; if (!v) throw "SlickPager requires view option to be set!";
+        let opt = this.options;
+        opt.showRowsPerPage ??= true;
+        opt.rowsPerPageOptions ??= [20, 100, 500, 2000];
+        var v = opt.view; if (!v) throw "SlickPager requires view option to be set!";
 
         let p = "slick-pg-";
-        let grp = (t: string) => ` class="${p}grp ${p}grp-${t}"`;
-        let btn = (t: string) => `<div class="${p}${t} ${p}btn"><span class="${p}btn-span"></span></div>`;
+        let grp = (t: string) => Fluent("div").addClass(`${p}grp ${p}grp-${t}`);
+        let btn = (key: string) => Fluent("div").addClass(`${p}${key} ${p}btn`).append(Fluent("span").addClass(`${p}btn-span`));
+        let nav = (key: string) => btn(key).on("click", () => this._changePage(key));
 
-        let el = Fluent(this.domNode);
-        el.addClass('s-SlickPager slick-pg')
-            .html(`<div class="${p}in"><div${grp("firstprev")}>${btn("first")}${btn("prev")}</div>
-<div${grp("control")}><span class="${p}control"><span class="${p}pagetext">${htmlEncode(localText("Controls.Pager.Page"))}</span>
-<input id="${this.idPrefix}CurrentPage" class="${p}current" type="text" size="4" value="1" />
-<span class="${p}pagesep">/</span><span class="${p}total">1</span></span></div>
-<div${grp("nextlast")}>${btn("next")}${btn("last")}</div><div${grp("reload")}>${btn("reload")}</div><div${grp("stat")}><span class="${p}stat"></span></div></div>`);
+        let el = Fluent(this.domNode).addClass("s-SlickPager slick-pg");
 
-        ['first', 'prev', 'next', 'last'].forEach(s => el.findFirst(`.${p}${s}`).on('click', () => this._changePage(s)));
-        el.findFirst(`.${p}reload`).on('click', () => v.populate());
-        el.findFirst(`.${p}current`).on('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') this._changePage('input') });
+        this.currentPage = Fluent("input")
+            .addClass(`${p}current mx-1`).attr("type", "text")
+            .attr("size", 4).attr("value", 1)
+            .on("keydown", e => { if (e.key === "Enter") this._changePage("input"); });
+
+        this.totalPages = Fluent("span").addClass(`${p}total`).text("1");
+
+        let control = grp("control").append(Fluent("span")
+            .addClass(`${p}control`)
+            .append(Fluent("span").addClass(`${p}pagetext`).text(localText("Controls.Pager.Page")))
+            .append(this.currentPage)
+            .append(Fluent("span").addClass(`${p}pagesep px-1`).text("/"))
+            .append(this.totalPages)
+        );
+
+        this.stat = Fluent("span").addClass(`${p}stat`);
+
+        let inner = Fluent("div").addClass(p + "in").appendTo(el)
+            .append(grp("firstprev")
+                .append(nav("first"))
+                .append(nav("prev")))
+            .append(control)
+            .append(grp("nextlast")
+                .append(nav("next"))
+                .append(nav("last")))
+            .append(grp("reload")
+                .append(btn("reload")
+                    .on("click", () => v.populate())))
+            .append(grp("stat")
+                .append(this.stat));
 
         if (this.options.showRowsPerPage) {
-            var opt: string = "", sel = "";
-            for (var nx = 0; nx < o.rowsPerPageOptions.length; nx++) {
-                if (v.rowsPerPage == o.rowsPerPageOptions[nx])
-                    sel = 'selected="selected"'; else sel = '';
-                opt += "<option value='" + o.rowsPerPageOptions[nx] + "' " + sel + " >" + o.rowsPerPageOptions[nx] + "&nbsp;&nbsp;</option>";
-            };
-            el.findFirst(`.${p}in`).prepend(`<div class="${p}grp"><select class="${p}size" name="rp">${opt}</select></div>`);
-            el.findFirst(`select.${p}size`).on('change', function (this: HTMLSelectElement) {
-                if (o.onRowsPerPageChange)
-                    o.onRowsPerPageChange(+this.value);
-                else {
-                    v["newp"] = 1;
-                    v.setPagingOptions({
-                        page: 1,
-                        rowsPerPage: +this.value
-                    });
-                }
-            });
+
+            this.pageSize = Fluent("select")
+                .appendTo(grp("size").prependTo(inner))
+                .addClass(`${p}size`)
+                .attr("name", "rp")
+                .on("change", () => {
+                    if (opt.onRowsPerPageChange)
+                        opt.onRowsPerPageChange(+this.pageSize.val());
+                    else {
+                        v["newp"] = 1;
+                        v.setPagingOptions({
+                            page: 1,
+                            rowsPerPage: +this.pageSize.val()
+                        });
+                    }
+                });
+
+            for (var rowsPerPage of opt.rowsPerPageOptions) {
+                Fluent("option")
+                    .attr("value", rowsPerPage)
+                    .attr("selected", v.rowsPerPage == rowsPerPage && "selected")
+                    .text("" + rowsPerPage)
+                    .appendTo(this.pageSize);
+            }
         }
 
         v.onPagingInfoChanged.subscribe(() => this._updatePager());
@@ -72,7 +105,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt(this.domNode.querySelector<HTMLInputElement>('input.slick-pg-current')?.value);
+                var nv = parseInt(this.currentPage.val());
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)
@@ -80,8 +113,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                 else if (nv > pages)
                     nv = pages;
 
-                let cur = this.domNode.querySelector<HTMLInputElement>('.slick-pg-current');
-                cur && (cur.value = "" + nv);
+                this.currentPage.val("" + nv);
 
                 newp = nv;
                 break;
@@ -102,10 +134,9 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var view = this.options.view;
         var info = view.getPagingInfo();
         var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
-        var el = Fluent(this.domNode);
 
-        el.findFirst('.slick-pg-current').val(info.page);
-        el.findFirst('.slick-pg-total').html(pages as any);
+        this.currentPage.val(info.page);
+        this.totalPages.text("" + pages);
 
         var r1 = (info.page - 1) * info.rowsPerPage + 1;
         var r2 = r1 + info.rowsPerPage - 1;
@@ -116,21 +147,21 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var stat: string;
 
         if (info.loading) {
-            stat = htmlEncode(localText("Controls.Pager.LoadingStatus"));
+            stat = localText("Controls.Pager.LoadingStatus");
         }
         else if (info.error) {
             stat = info.error;
         }
         else if (info.totalCount > 0) {
-            stat = htmlEncode(localText("Controls.Pager.PageStatus"));
+            stat = localText("Controls.Pager.PageStatus");
             stat = stat.replace(/{from}/, <any>r1);
             stat = stat.replace(/{to}/, <any>r2);
             stat = stat.replace(/{total}/, <any>info.totalCount);
         }
         else
-            stat = htmlEncode(localText("Controls.Pager.NoRowStatus"));
+            stat = localText("Controls.Pager.NoRowStatus");
 
-        el.findFirst('.slick-pg-stat').html(stat);
-        el.findFirst('.slick-pg-size').val((info.rowsPerPage || 0).toString());
+        this.stat.text(stat);
+        this.pageSize?.val((info.rowsPerPage || 0).toString());
     }
 }

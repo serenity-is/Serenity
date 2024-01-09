@@ -1,4 +1,4 @@
-import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerInterface as regIntf } from "@serenity-is/base";
+import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf } from "@serenity-is/base";
 import { MemberType, addTypeMember } from "../q";
 
 function Attr(name: string) {
@@ -270,9 +270,13 @@ export namespace Decorators {
         registerEnum(target, enumKey ?? name, name);
     }
 
-    export function registerFormatter(nameOrIntf: string | any[] = [ISlickFormatter],
-        intf2: any[] = [ISlickFormatter]) {
-        return registerClass(nameOrIntf, intf2);
+    export function registerFormatter(nameOrIntf: string | any[] = [ISlickFormatter], intf2: any[] = [ISlickFormatter]) {
+        return function (target: Function) {
+            if (typeof nameOrIntf == "string")
+                regFormatter(target, nameOrIntf, intf2);
+            else
+                regFormatter(target, null, nameOrIntf);
+        }
     }
 
     export function enumKey(value: string) {

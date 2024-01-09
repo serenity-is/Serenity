@@ -1,4 +1,4 @@
-﻿import { typeRegistrySymbol, hookIsAssignableFromSymbol, hookIsInstanceOfTypeSymbol, typeDiscriminatorSymbol, implementedInterfacesSymbol, enumFlagsSymbol, typeAttributesSymbol } from "./symbols";
+﻿import { typeRegistrySymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol, implementedInterfacesSymbol, enumFlagsSymbol, customAttributesSymbol } from "./symbols";
 
 let globalObject: any =
     (typeof globalThis !== "undefined" && globalThis) ||
@@ -25,7 +25,7 @@ export function getNested(from: any, name: string) {
     return from;
 }
 
-function getTypeRegistry() {
+export function getTypeRegistry() {
     let typeRegistry = globalObject[typeRegistrySymbol];
     if (!typeRegistry)
         typeRegistry = globalObject[typeRegistrySymbol] = {};
@@ -86,8 +86,8 @@ export function isAssignableFrom(target: any, type: Type) {
     if (target === type || (type as any).prototype instanceof target)
         return true;
 
-    if (typeof target[hookIsAssignableFromSymbol] === 'function')
-        return target[hookIsAssignableFromSymbol](type);
+    if (typeof target[isAssignableFromSymbol] === 'function')
+        return target[isAssignableFromSymbol](type);
 
     return false;
 }
@@ -96,8 +96,8 @@ export function isInstanceOfType(instance: any, type: Type) {
     if (instance == null)
         return false;
 
-    if (typeof (type as any)[hookIsInstanceOfTypeSymbol] === 'function')
-        return (type as any)[hookIsInstanceOfTypeSymbol](instance);
+    if (typeof (type as any)[isInstanceOfTypeSymbol] === 'function')
+        return (type as any)[isInstanceOfTypeSymbol](instance);
 
     return isAssignableFrom(type, getInstanceType(instance));
 }
@@ -106,7 +106,7 @@ export function getBaseType(type: any) {
     if (type == null ||
         type === Object ||
         !type.prototype ||
-        (type as any)[typeDiscriminatorSymbol] === true)
+        (type as any)[isInterfaceTypeSymbol] === true)
         return null;
 
     return Object.getPrototypeOf(type.prototype).constructor;
@@ -129,7 +129,7 @@ function interfaceIsAssignableFrom(from: any) {
         (from as any)[implementedInterfacesSymbol].some((x: any) =>
             x === this ||
             (getTypeNameProp(this) &&
-                x[typeDiscriminatorSymbol] &&
+                x[isInterfaceTypeSymbol] &&
                 getTypeNameProp(x) === getTypeNameProp(this)));
 }
 
@@ -154,7 +154,7 @@ function registerType(type: any, name?: string, intf?: any[]) {
 
 export function registerClass(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    Object.defineProperty(type, typeDiscriminatorSymbol, { value: false, configurable: true });
+    Object.defineProperty(type, isInterfaceTypeSymbol, { value: false, configurable: true });
 }
 
 export function registerEnum(type: any, name: string, enumKey?: string) {
@@ -164,13 +164,13 @@ export function registerEnum(type: any, name: string, enumKey?: string) {
         if (!typeStore[enumKey])
             typeStore[enumKey] = type;
     }
-    Object.defineProperty(type, typeDiscriminatorSymbol, { value: null, configurable: true });
+    Object.defineProperty(type, isInterfaceTypeSymbol, { value: null, configurable: true });
 }
 
 export function registerInterface(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    Object.defineProperty(type, typeDiscriminatorSymbol, { value: true, configurable: true });
-    Object.defineProperty(type, hookIsAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
+    Object.defineProperty(type, isInterfaceTypeSymbol, { value: true, configurable: true });
+    Object.defineProperty(type, isAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
 }
 
 export namespace Enum {
@@ -221,7 +221,7 @@ export namespace Enum {
 
 export const isEnum = (type: any) => {
     return typeof type !== "function" &&
-        type[typeDiscriminatorSymbol] === null;
+        type[isInterfaceTypeSymbol] === null;
 };
 
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
@@ -280,12 +280,12 @@ export function registerEditor(type: any, name: string, intf?: any[]) {
 }
 
 export function addCustomAttribute(type: any, attr: any) {
-    if (!Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol)) {
-        type[typeAttributesSymbol] = [];
+    if (!Object.prototype.hasOwnProperty.call(type, customAttributesSymbol)) {
+        type[customAttributesSymbol] = [];
     }   
-    let attributes = type[typeAttributesSymbol];
+    let attributes = type[customAttributesSymbol];
     if (!attributes)
-        type[typeAttributesSymbol] = [attr];
+        type[customAttributesSymbol] = [attr];
     else
         attributes.push(attr);
 }
@@ -295,7 +295,7 @@ export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: an
         return null;
 
     do {
-        let attrs = Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol) ? type[typeAttributesSymbol] : null;
+        let attrs = Object.prototype.hasOwnProperty.call(type, customAttributesSymbol) ? type[customAttributesSymbol] : null;
         if (!attrs) 
             return null;
 
@@ -318,7 +318,7 @@ export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: a
 
     var result: any[] = [];
     do {
-        let attrs = Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol) ? type[typeAttributesSymbol] : null;
+        let attrs = Object.prototype.hasOwnProperty.call(type, customAttributesSymbol) ? type[customAttributesSymbol] : null;
         if (attrs) {
             for (var i = attrs.length - 1; i >= 0; i--) {
                 let attr = attrs[i];

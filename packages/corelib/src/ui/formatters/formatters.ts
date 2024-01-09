@@ -34,7 +34,7 @@ export class BooleanFormatter implements Formatter {
 }
 
 export class CheckboxFormatter extends Formatter {
-    static override typeName = super.registerFormatter("Serenity.CheckboxFormatter")
+    static override typeName = this.registerFormatter("Serenity.CheckboxFormatter")
 
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';

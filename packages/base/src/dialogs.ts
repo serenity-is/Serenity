@@ -172,9 +172,9 @@ function createPanel(options: CommonDialogOptions): ICommonDialog {
     let panelBody = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
     panelBody.classList.add("panel-body");
-    let sPanel = document.createElement("div");
-    sPanel.classList.add("s-Panel");
-    sPanel.append(panelBody);
+    let panelRoot = document.createElement("div");
+    panelRoot.classList.add("s-Panel");
+    panelRoot.append(panelBody);
     if (typeof options.element === "function")
         options.element(panelBody);
     setPanelTitle(panelBody, options.title, options.closeButton ?? true);
@@ -191,12 +191,15 @@ function createPanel(options: CommonDialogOptions): ICommonDialog {
     }
 
     if (options.buttons) {
-        let footer = sPanel.appendChild(document.createElement("div"));
+        let footer = panelRoot.appendChild(document.createElement("div"));
         footer.classList.add("panel-footer");
         for (let button of options.buttons) {
             bsCreateButton(footer, button, close);
         }
     }
+
+    if (options.title !== void 0)
+        setPanelTitle(panelBody, options.title);
 
     return {
         type: "panel",
@@ -770,17 +773,21 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
 export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
 
     element = isArrayLike(element) ? element[0] : element;
-    let sPanel = element?.closest('.s-Panel:not(.hidden)') as HTMLElement;
-    if (!sPanel)
+    if (!element)
         return;
+    let panelRoot = element?.closest('.s-Panel:not(.hidden)') as HTMLElement ??
+        element.matches(".panel-body:not(.hidden)") ? element : null;
+    if (!panelRoot)
+        return;
+    let panelBody = element.classList.contains("panel-body") ? element : panelRoot;
 
-    let event = Fluent.trigger(element, 'panelbeforeclose', { bubbles: false });
+    let event = Fluent.trigger(panelBody, 'panelbeforeclose', { bubbles: false });
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
         return;
-    Fluent.trigger(window, "panelclosing", { panel: element, bubbles: false });
-    sPanel.classList.add("hidden");
+    Fluent.trigger(window, "panelclosing", { panel: panelBody, bubbles: false });
+    panelRoot.classList.add("hidden");
 
-    let uniqueName = sPanel.dataset.paneluniquename;
+    let uniqueName = panelBody.dataset.paneluniquename;
     if (uniqueName) {
         document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
             e.classList.remove("panel-hidden")
@@ -793,8 +800,8 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
             Fluent.trigger(rl, "layout", { bubbles: false });
     });
-    Fluent.trigger(element, "panelclose", { bubbles: false });
-    Fluent.trigger(window, "panelclosed", { panel: element, bubbles: false });
+    Fluent.trigger(panelBody, "panelclose", { bubbles: false });
+    Fluent.trigger(window, "panelclosed", { panel: panelBody, bubbles: false });
 }
 
 /** 
@@ -807,18 +814,19 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
  */
 export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
-    let el = isArrayLike(element) ? element[0] : element;
-    if (!el)
+    let panelBody = isArrayLike(element) ? element[0] : element;
+    if (!panelBody)
         return;
-    let event: any;
 
-    Fluent.trigger(window, 'panelopening', { panel: el, bubbles: false });
+    let panelRoot = panelBody.closest(".s-Panel") ?? panelBody;
+
+    Fluent.trigger(window, 'panelopening', { panel: panelBody, bubbles: false });
 
     let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
-    el.dataset.paneluniquename = uniqueName ?? el.id ?? new Date().getTime().toString();
+    panelBody.dataset.paneluniquename = uniqueName ?? panelBody.id ?? new Date().getTime().toString();
     function hide(e: HTMLElement) {
-        if (e === el ||
+        if (e === panelBody ||
             e.tagName === "LINK" ||
             e.tagName === "SCRIPT" ||
             e.classList.contains('panel-hidden') ||
@@ -826,7 +834,7 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
             return;
 
         e.classList.add("panel-hidden");
-        e.setAttribute('data-panelhiddenby', el.dataset.paneluniquename);
+        e.setAttribute('data-panelhiddenby', panelBody.dataset.paneluniquename);
     }
 
     if (container) {
@@ -836,32 +844,33 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
             hide(c[i] as HTMLElement);
         }
 
-        if (el.parentElement !== container)
-            container.appendChild(el);
+        if (panelRoot.parentElement !== container)
+            container.appendChild(panelRoot);
     }
 
     document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(hide);
 
-    el.classList.remove("hidden");
-    el.classList.remove("panel-hidden");
-    el.classList.add("s-Panel");
+    panelRoot.classList.remove("hidden");
+    panelRoot.classList.remove("panel-hidden");
+    panelRoot.classList.add("s-Panel");
 
-    Fluent.trigger(el, "panelopen", { bubbles: false });
-    Fluent.trigger(window, "panelopened", { panel: el, bubbles: false });
+    Fluent.trigger(panelBody, "panelopen", { bubbles: false });
+    Fluent.trigger(window, "panelopened", { panel: panelBody, bubbles: false });
 }
 
 function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {
-    element = element?.closest('.s-Panel');
-    if (!element)
+    var panelRoot = element?.closest('.s-Panel') ?? element;
+    if (!panelRoot)
         return;
 
-    var pt = element.querySelector(':scope > .panel-titlebar');
+    var pt = panelRoot.querySelector(':scope > .panel-titlebar');
 
     if (!pt) {
         pt = document.createElement("div");
         pt.classList.add("panel-titlebar");
-        pt.appendChild(document.createElement("div"));
-        element.prepend(pt);
+        let ptt2 = pt.appendChild(document.createElement("div"));
+        ptt2.classList.add("panel-titlebar-text");
+        panelRoot.prepend(pt);
     }
 
     let ptt = pt.querySelector(".panel-titlebar-text");
@@ -872,7 +881,11 @@ function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolea
     if (closeButton && !ptc) {
         ptc = document.createElement("button");
         ptc.classList.add("panel-titlebar-close");
-        ptc.addEventListener("click", e => closePanel((e.target as any)?.closest("s-Panel")));
+        ptc.addEventListener("click", e => {
+            closePanel((e.target as HTMLElement).closest<HTMLElement>(".panel-body") ??
+                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel")?.querySelector<HTMLElement>(":scope > .panel-body") ??
+                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel"));
+        });
         pt.prepend(ptc);
     }
 }

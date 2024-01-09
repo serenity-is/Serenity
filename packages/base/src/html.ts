@@ -95,7 +95,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
     off(type: string, listener: EventListener): this;
     off(type: string, selector: string, delegationHandler: Function): this;
-    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
     on(type: string, listener: EventListener): this;
     on(type: string, selector: string, delegationHandler: Function): this;
     one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
@@ -328,7 +328,6 @@ Fluent.prototype.val = function (this: FluentThis<any>, value?: string) {
         return isInputLike(this.el) ? this.el.value : "";
     if (isInputLike(this.el))
         this.el.value = value;
-    this.el && (this.el.textContent = value ?? '');
     return this as any;
 }
 

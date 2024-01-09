@@ -1,4 +1,4 @@
-import { enumFlagsSymbol, implementedInterfacesSymbol, hookIsAssignableFromSymbol, hookIsInstanceOfTypeSymbol, typeAttributesSymbol, typeDiscriminatorSymbol } from "./symbols";
+import { enumFlagsSymbol, implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, customAttributesSymbol, isInterfaceTypeSymbol } from "./symbols";
 import { Enum, fieldsProxy, getBaseType, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, typeNameProperty } from "./system";
 
 describe("Enum.getValues", () => {
@@ -147,7 +147,7 @@ describe("registerClass", () => {
         else
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(klass[typeAttributesSymbol]).toBeUndefined();
+        expect(klass[customAttributesSymbol]).toBeUndefined();
         expect(klass[enumFlagsSymbol]).toBeUndefined();
 
         if (name != null) {
@@ -162,7 +162,7 @@ describe("registerClass", () => {
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(klass[hookIsAssignableFromSymbol]).toBeUndefined();
+        expect(klass[isAssignableFromSymbol]).toBeUndefined();
     }
 
     it('works with no name', function () {
@@ -311,7 +311,7 @@ describe("registerClass", () => {
 describe("registerEnum", () => {
     function expectTypeDetails(enumObj: any, name: string) {
         expect(isEnum(enumObj)).toBe(true);
-        expect(enumObj[typeDiscriminatorSymbol]).toBeNull();
+        expect(enumObj[isInterfaceTypeSymbol]).toBeNull();
 
         expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
         expect(enumObj[enumFlagsSymbol]).toBeUndefined();
@@ -329,7 +329,7 @@ describe("registerEnum", () => {
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(enumObj[hookIsAssignableFromSymbol]).toBeUndefined();
+        expect(enumObj[isAssignableFromSymbol]).toBeUndefined();
     }
 
     it('works with no name', function () {
@@ -380,7 +380,7 @@ describe("registerInterface", () => {
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
         expect(klass[enumFlagsSymbol]).toBeUndefined();
-        expect(klass[typeDiscriminatorSymbol]).toBe(true);
+        expect(klass[isInterfaceTypeSymbol]).toBe(true);
 
         if (name != null) {
             expect(getTypeFullName(klass)).toBe(name);
@@ -396,7 +396,7 @@ describe("registerInterface", () => {
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(typeof klass[hookIsAssignableFromSymbol]).toBe("function");
+        expect(typeof klass[isAssignableFromSymbol]).toBe("function");
     }
 
     it('works with no name', function () {
@@ -548,11 +548,11 @@ describe("isInstanceOfType", () => {
 
     it("uses isInstanceOfTypeSymbol function if available", () => {
         class Test1 {
-            static [hookIsInstanceOfTypeSymbol](type: any) { return typeof type === "string" && type.startsWith("t"); }
+            static [isInstanceOfTypeSymbol](type: any) { return typeof type === "string" && type.startsWith("t"); }
         }
 
         class Test2 {
-            static [hookIsInstanceOfTypeSymbol] = true;
+            static [isInstanceOfTypeSymbol] = true;
         }
 
         expect(isInstanceOfType("test", Test1)).toBe(true);

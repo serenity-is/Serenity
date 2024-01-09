@@ -3,7 +3,7 @@
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
 export function getWidgetName(type: Function): string {
-    return getTypeFullName(type)?.replace(/./g, '_');
+    return getTypeFullName(type)?.replace(/\./g, '_');
 }
 
 export function associateWidget(widget: { domNode: HTMLElement }) {

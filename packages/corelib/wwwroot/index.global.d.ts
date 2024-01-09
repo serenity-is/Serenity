@@ -2273,7 +2273,7 @@ declare namespace Serenity {
         off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         off(type: string, listener: EventListener): this;
         off(type: string, selector: string, delegationHandler: Function): this;
-        off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+        on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         on(type: string, listener: EventListener): this;
         on(type: string, selector: string, delegationHandler: Function): this;
         one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
@@ -2390,6 +2390,7 @@ declare namespace Serenity {
     const typeNameProperty = "typeName";
     type Type = Function | Object;
     function getNested(from: any, name: string): any;
+    function getTypeRegistry(): any;
     function getType(name: string, target?: any): Type;
     function getTypeNameProp(type: Type): string;
     function setTypeNameProp(type: Type, value: string): void;
@@ -4776,6 +4777,10 @@ declare namespace Serenity {
     }
 
     class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
+        private currentPage;
+        private totalPages;
+        private pageSize;
+        private stat;
         constructor(props: WidgetProps<P>);
         _changePage(ctype: string): boolean;
         _updatePager(): void;
