@@ -1,7 +1,7 @@
 ﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, isInputLike, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { Decorators, EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { Authorization, Exception, ScriptData, extend, getAttributes, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
+import { Authorization, Exception, ScriptData, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -192,10 +192,6 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
     protected onDeleteSuccess(response: DeleteResponse): void {
     }
 
-    protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-        return getAttributes(getInstanceType(this), attrType, true);
-    }
-
     protected getRowDefinition(): IRowDefinition {
         return null;
     }
@@ -207,10 +203,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (this._entityType != null)
             return this._entityType;
 
-        var typeAttributes = this.attrs(EntityTypeAttribute);
-
-        if (typeAttributes.length === 1)
-            return (this._entityType = typeAttributes[0].value);
+        var attr = this.getCustomAttribute(EntityTypeAttribute);
+        if (attr)
+            return (this._entityType = attr.value);
 
         // remove global namespace
         var name = getTypeFullName(getInstanceType(this));
@@ -233,10 +228,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (this._formKey != null)
             return this._formKey;
 
-        var attributes = this.attrs(FormKeyAttribute);
-
-        if (attributes.length >= 1)
-            return (this._formKey = attributes[0].value);
+        var attr = this.getCustomAttribute(FormKeyAttribute);
+        if (attr)
+            return (this._formKey = attr.value);
 
         return (this._formKey = this.getEntityType());
     }
@@ -260,10 +254,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
 
-        var attr = this.attrs(LocalTextPrefixAttribute);
-
-        if (attr.length >= 1)
-            return attr[0].value;
+        var attr = this.getCustomAttribute(LocalTextPrefixAttribute);
+        if (attr)
+            return attr.value;
 
         return this.getEntityType();
     }
@@ -274,8 +267,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (this._entitySingular != null)
             return this._entitySingular;
 
-        var attributes = this.attrs(ItemNameAttribute);
-        return (this._entitySingular = attributes.length >= 1 ? localText(attributes[0].value, attributes[0].value) :
+        var attr = this.getCustomAttribute(ItemNameAttribute);
+        return (this._entitySingular = attr ? localText(attr.value, attr.value) :
             tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
     }
 
@@ -289,10 +282,10 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (rowDefinition)
             return this._nameProperty = rowDefinition.nameProperty ?? '';
 
-        var attributes = this.attrs(NamePropertyAttribute);
+        var attr = this.getCustomAttribute(NamePropertyAttribute);
 
-        if (attributes.length >= 1)
-            return this._nameProperty = attributes[0].value ?? '';
+        if (attr)
+            return this._nameProperty = attr.value ?? '';
 
         return this._nameProperty = 'Name';
     }
@@ -307,9 +300,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
 
-        var attr = this.attrs(IdPropertyAttribute);
-        if (attr.length === 1)
-            return this._idProperty = attr[0].value ?? '';
+        var attr = this.getCustomAttribute(IdPropertyAttribute);
+        if (attr)
+            return this._idProperty = attr.value ?? '';
 
         return this._idProperty = 'ID';
     }
@@ -324,9 +317,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (rowDefinition)
             return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
 
-        var attr = this.attrs(IsActivePropertyAttribute);
-        if (attr.length === 1)
-            return this._isActiveProperty = attr[0].value ?? '';
+        var attr = this.getCustomAttribute(IsActivePropertyAttribute);
+        if (attr)
+            return this._isActiveProperty = attr.value ?? '';
 
         return this._isActiveProperty = '';
     }
@@ -341,9 +334,9 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (this._service != null)
             return this._service;
 
-        var attributes = this.attrs(ServiceAttribute);
-        if (attributes.length >= 1)
-            this._service = attributes[0].value;
+        var attr = this.getCustomAttribute(ServiceAttribute);
+        if (attr)
+            this._service = attr.value;
         else
             this._service = replaceAll(this.getEntityType(), '.', '/');
 

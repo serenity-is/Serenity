@@ -84,10 +84,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._entityType != null)
             return this._entityType;
 
-        var attr = this.attrs(EntityTypeAttribute);
-
-        if (attr.length === 1) {
-            return (this._entityType = attr[0].value);
+        var attr = this.getCustomAttribute(EntityTypeAttribute);
+        if (attr) {
+            return (this._entityType = attr.value);
         }
 
         var name = getTypeFullName(getInstanceType(this));
@@ -115,9 +114,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._displayName != null)
             return this._displayName;
 
-        var attr = this.attrs(DisplayNameAttribute);
-        if (attr.length >= 1) {
-            this._displayName = attr[0].displayName;
+        var attr = this.getCustomAttribute(DisplayNameAttribute);
+        if (attr) {
+            this._displayName = attr.displayName;
             this._displayName = localText(this._displayName, this._displayName);
         }
         else {
@@ -135,9 +134,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._itemName != null)
             return this._itemName;
 
-        var attr = this.attrs(ItemNameAttribute);
-        if (attr.length >= 1) {
-            this._itemName = attr[0].value;
+        var attr = this.getCustomAttribute(ItemNameAttribute);
+        if (attr) {
+            this._itemName = attr.value;
             this._itemName = localText(this._itemName, this._itemName);
         }
         else {
@@ -235,9 +234,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._service != null)
             return this._service;
 
-        var attr = this.attrs(ServiceAttribute);
-        if (attr.length >= 1)
-            this._service = attr[0].value;
+        var attr = this.getCustomAttribute(ServiceAttribute);
+        if (attr)
+            this._service = attr.value;
         else
             this._service = replaceAll(this.getEntityType(), '.', '/');
 
@@ -344,9 +343,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._dialogType != null)
             return this._dialogType;
 
-        var attr = this.attrs(DialogTypeAttribute);
-        if (attr.length >= 1)
-            this._dialogType = attr[0].value;
+        var attr = this.getCustomAttribute(DialogTypeAttribute);
+        if (attr)
+            this._dialogType = attr.value;
         else
             this._dialogType = DialogTypeRegistry.get(this.getEntityType());
 

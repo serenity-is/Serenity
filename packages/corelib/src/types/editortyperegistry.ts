@@ -1,12 +1,12 @@
-﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
-import { ArgumentNullException, EditorAttribute, Exception, getAttributes } from "../q";
+﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
+import { ArgumentNullException, Exception } from "../q";
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace EditorTypeRegistry {
     
     let registry = commonTypeRegistry(
-        type => !!getAttributes(type, EditorAttribute).length || isAssignableFrom(Widget, type), 
+        type => hasCustomAttribute(type, EditorAttribute, false) || isAssignableFrom(Widget, type), 
         null, "Editor");
 
     export function get(key: string): any {

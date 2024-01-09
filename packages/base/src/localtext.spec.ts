@@ -1,19 +1,13 @@
-﻿beforeEach(() => {
-    jest.resetModules();
-    jest.unmock('./system');
-});
+﻿import { localTextTableSymbol } from './symbols';
+import { getGlobalObject } from './system';
 
-const mockLocalTextStore = (localTexts: Record<string, any>) => {
-    jest.mock('./system', () => ({
-        ...jest.requireActual("./system"),
-        getStateStore: jest.fn(() => localTexts)
-    }));
-    return localTexts;
+const mockLocalTextTable = (localTexts: Record<string, any>) => {
+    return (getGlobalObject()[localTextTableSymbol] = localTexts ?? {});
 }
 
 describe('proxyTexts', () => {
     it('proxies simple object', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a.b': 'Abc',
         });
 
@@ -24,7 +18,7 @@ describe('proxyTexts', () => {
     });
 
     it('proxies nested object', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a.b.c': 'Ab12c',
             'a.c': 'A1c',
         });
@@ -41,7 +35,7 @@ describe('proxyTexts', () => {
     });
 
     it('proxies multiple nested object', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a.b.c': 'Ab12c',
             'a.c': 'A1c',
             'b.c.d': 'B1cd',
@@ -61,7 +55,7 @@ describe('proxyTexts', () => {
     });
 
     it('proxies single level object', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'Abc',
         });
 
@@ -72,7 +66,7 @@ describe('proxyTexts', () => {
     });
 
     it('returns own keys', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'Abc',
         });
         const proxyTexts = (await import('./localtext')).proxyTexts;
@@ -83,7 +77,7 @@ describe('proxyTexts', () => {
 
 describe('tryGetText', () => {
     it('returns undefined for non-existing keys', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'Abc',
         });
         const tryGetText = (await import('./localtext')).tryGetText;
@@ -96,7 +90,7 @@ describe('tryGetText', () => {
     });
 
     it('returns the value for existing keys', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'A',
             'b.c': "BC"
         });
@@ -110,7 +104,7 @@ describe('tryGetText', () => {
 
 describe('localText', () => {
     it('returns empty string for null and undefined', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'Abc',
         });
         const localText = (await import('./localtext')).localText;
@@ -119,7 +113,7 @@ describe('localText', () => {
     });
 
     it('returns the value for existing keys and the key for non existing keys', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
             'a': 'A',
             'b.c': "BC"
         });
@@ -131,7 +125,7 @@ describe('localText', () => {
     });
 
     it('returns the second parameter for non existent keys if specified and not null', async () => {
-        mockLocalTextStore({
+        mockLocalTextTable({
         });
         const localText = (await import('./localtext')).localText;
         expect(localText('a', 'X')).toEqual('X');
@@ -145,7 +139,7 @@ describe('localText', () => {
 
 describe('addLocalTexts', () => {
     it('ignores if first parameter is null or undefined', async () => {
-        const texts = mockLocalTextStore({
+        const texts = mockLocalTextTable({
             'a': 'A',
         });
         const addLocalText = (await import('./localtext')).addLocalText;
@@ -161,7 +155,7 @@ describe('addLocalTexts', () => {
     });
 
     it('adds single text if first parameter is string', async () => {
-        const texts = mockLocalTextStore({
+        const texts = mockLocalTextTable({
             'a': 'A',
         });
         const addLocalText = (await import('./localtext')).addLocalText;
@@ -173,7 +167,7 @@ describe('addLocalTexts', () => {
     });
 
     it('overrides text if first parameter is string', async () => {
-        const texts = mockLocalTextStore({
+        const texts = mockLocalTextTable({
             'a': 'A',
             'b': 'C'
         });
@@ -186,7 +180,7 @@ describe('addLocalTexts', () => {
     });
 
     it('adds text if first parameter is object', async () => {
-        const texts = mockLocalTextStore({
+        const texts = mockLocalTextTable({
             'a': 'A',
             'b.c': 'D'
         });
@@ -212,7 +206,7 @@ describe('addLocalTexts', () => {
     });
 
     it('adds text with prefix if second parameter is passed and first is object', async () => {
-        const texts = mockLocalTextStore({
+        const texts = mockLocalTextTable({
             'a': 'A',
             'b.c': 'D'
         });

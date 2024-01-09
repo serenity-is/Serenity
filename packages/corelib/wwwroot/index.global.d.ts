@@ -2028,6 +2028,7 @@ declare namespace Serenity {
      * @returns Lookup
      */
     function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+    function setRegisteredScripts(scripts: any[]): void;
     function setScriptData(name: string, value: any): void;
 
     /**
@@ -2278,6 +2279,7 @@ declare namespace Serenity {
         one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         one(type: string, listener: EventListener): this;
         one(type: string, selector: string, delegationHandler: Function): this;
+        parent(): Fluent<HTMLElement>;
         prepend(child: string | Node | Fluent<any>): this;
         prependTo(parent: Element | Fluent<any>): this;
         remove(): this;
@@ -2385,14 +2387,8 @@ declare namespace Serenity {
     function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 
     function getGlobalObject(): any;
-    function getStateStore(key?: string): any;
-    function getTypeStore(): any;
-    interface TypeMetadata {
-        enumFlags?: boolean;
-        attr?: any[];
-    }
+    const typeNameProperty = "typeName";
     type Type = Function | Object;
-    function ensureMetadata(target: Type): TypeMetadata;
     function getNested(from: any, name: string): any;
     function getType(name: string, target?: any): Type;
     function getTypeNameProp(type: Type): string;
@@ -2400,8 +2396,8 @@ declare namespace Serenity {
     function getTypeFullName(type: Type): string;
     function getTypeShortName(type: Type): string;
     function getInstanceType(instance: any): any;
-    function isAssignableFrom(target: any, type: Type): boolean;
-    function isInstanceOfType(instance: any, type: Type): boolean;
+    function isAssignableFrom(target: any, type: Type): any;
+    function isInstanceOfType(instance: any, type: Type): any;
     function getBaseType(type: any): any;
     function registerClass(type: any, name: string, intf?: any[]): void;
     function registerEnum(type: any, name: string, enumKey?: string): void;
@@ -2410,12 +2406,34 @@ declare namespace Serenity {
         let toString: (enumType: any, value: number) => string;
         let getValues: (enumType: any) => any[];
     }
-    let isEnum: (type: any) => boolean;
+    const isEnum: (type: any) => boolean;
     function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
     function isArrayLike(obj: any): obj is ArrayLike<any>;
     function isPromiseLike(obj: any): obj is PromiseLike<any>;
     function getjQuery(): any;
+    type NoInfer<T> = [T][T extends any ? 0 : never];
+    type TypeName<T> = StringLiteral<T> | (string & {});
+    type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
+    type EditorTypeName<T> = TypeName<T>;
+    type FormatterTypeName<T> = TypeName<T>;
+    type ClassTypeName<T> = TypeName<T>;
+    class EditorAttribute {
+    }
+    class ISlickFormatter {
+    }
+    function registerFormatter(type: any, name: string, intf?: any[]): void;
+    function registerEditor(type: any, name: string, intf?: any[]): void;
+    function addCustomAttribute(type: any, attr: any): void;
+    function getCustomAttribute<TAttr>(type: any, attrType: {
+        new (...args: any[]): TAttr;
+    }, inherit?: boolean): TAttr;
+    function hasCustomAttribute<TAttr>(type: any, attrType: {
+        new (...args: any[]): TAttr;
+    }, inherit?: boolean): boolean;
+    function getCustomAttributes<TAttr>(type: any, attrType: {
+        new (...args: any[]): TAttr;
+    }, inherit?: boolean): TAttr[];
 
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
@@ -2770,7 +2788,6 @@ declare namespace Serenity {
         PropertyGrid: string;
     };
     function useIdPrefix(prefix: string): IdPrefixType;
-    type NoInfer<T> = [T][T extends any ? 0 : never];
     type WidgetProps<P> = {
         id?: string;
         class?: string;
@@ -2799,11 +2816,14 @@ declare namespace Serenity {
         init?: (w: TWidget) => void;
     }
     class Widget<P = {}> {
+        static typeName: ClassTypeName<"Serenity.Widget">;
         private static nextWidgetNumber;
         protected readonly options: WidgetProps<P>;
         protected readonly uniqueName: string;
         readonly idPrefix: string;
         readonly domNode: HTMLElement;
+        static registerClass<T>(name: StringLiteral<T>, intf?: any[]): ClassTypeName<T>;
+        static registerEditor<T>(name: StringLiteral<T>, intf?: any[]): EditorTypeName<T>;
         constructor(props: WidgetProps<P>);
         destroy(): void;
         static createDefaultElement(): HTMLElement;
@@ -2821,8 +2841,10 @@ declare namespace Serenity {
         getGridField(): Fluent;
         change(handler: (e: Event) => void): void;
         changeSelect2(handler: (e: Event) => void): void;
-        protected static defaultTagName: string;
         static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
+        protected getCustomAttribute<TAttr>(attrType: {
+            new (...args: any[]): TAttr;
+        }, inherit?: boolean): TAttr;
         protected internalInit(): void;
         init(): this;
         /**
@@ -2838,6 +2860,7 @@ declare namespace Serenity {
         protected useIdPrefix(): IdPrefixType;
     }
     class EditorWidget<P> extends Widget<EditorProps<P>> {
+        static typeName: EditorTypeName<"Serenity.EditorWidget">;
         constructor(props: EditorProps<P>);
     }
 
@@ -2914,7 +2937,6 @@ declare namespace Serenity {
         function ensure<TData = any>(name: string, dynJS?: boolean): TData;
         function reload<TData = any>(name: string, dynJS?: boolean): TData;
         function reloadAsync<TData = any>(name: string): Promise<TData>;
-        function setRegisteredScripts(scripts: any[]): void;
         const set: typeof setScriptData;
     }
     /**
@@ -3049,7 +3071,6 @@ declare namespace Serenity {
         getter?: string;
         setter?: string;
     }
-    function getAttributes(type: any, attrType: any, inherit?: boolean): any[];
     enum MemberType {
         field = 4,
         property = 16
@@ -3058,14 +3079,7 @@ declare namespace Serenity {
     function addTypeMember(type: any, member: TypeMember): TypeMember;
     function getTypes(from?: any): any[];
     function clearKeys(d: any): void;
-    function prop(type: any, name: string, getter?: string, setter?: string): void;
     function keyOf<T>(prop: keyof T): keyof T;
-    function registerEditor(type: any, name: string, intf?: any[]): void;
-    function addAttribute(type: any, attr: any): void;
-    class ISlickFormatter {
-    }
-    class EditorAttribute {
-    }
     function cast(instance: any, type: Type): any;
     function safeCast(instance: any, type: Type): any;
     function initializeTypes(root: any, pre: string, limit: number): void;
@@ -3106,6 +3120,10 @@ declare namespace Serenity {
 
     interface Formatter {
         format(ctx: Slick.FormatterContext): string;
+    }
+    abstract class Formatter implements Formatter {
+        static typeName: string;
+        static registerFormatter<T>(name: StringLiteral<T>, intf?: any[]): FormatterTypeName<T>;
     }
     interface GroupInfo<TItem> {
         getter?: any;
@@ -3531,7 +3549,7 @@ declare namespace Serenity {
         }): TWidget;
     }
 
-    interface ToolButton {
+    interface ToolButtonProps {
         action?: string;
         title?: string;
         hint?: string;
@@ -3546,6 +3564,13 @@ declare namespace Serenity {
         visible?: boolean | (() => boolean);
         disabled?: boolean | (() => boolean);
     }
+    interface ToolButton extends ToolButtonProps {
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
+        hotkeyContext?: any;
+        separator?: (false | true | 'left' | 'right' | 'both');
+    }
+    function ToolbarButton(tb: ToolButtonProps): HTMLElement;
     interface PopupMenuButtonOptions {
         menu?: HTMLElement | ArrayLike<HTMLElement>;
         onPopup?: () => void;
@@ -3566,24 +3591,15 @@ declare namespace Serenity {
         hotkeyContext?: any;
     }
     class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-        constructor(props: WidgetProps<P>);
+        protected renderContents(): HTMLDivElement;
         destroy(): void;
         protected mouseTrap: any;
-        protected createButtons(): void;
-        protected createButton(container: HTMLElement, tb: ToolButton): void;
+        createButton(container: Fluent, tb: ToolButton): void;
         findButton(className: string): Fluent<HTMLElement>;
         updateInterface(): void;
     }
-    interface ToolButtonInstance {
-        element: HTMLElement;
-        hide(): this;
-        show(): this;
-        toggle(value?: boolean): this;
-        toggleClass(klass: string): this;
-    }
 
     class TemplatedWidget<P> extends Widget<P> {
-        static defaultTagName: string;
         protected byId(id: string): Fluent;
         protected findById(id: string): HTMLElement;
         protected getTemplate(): string;
@@ -3591,12 +3607,12 @@ declare namespace Serenity {
     }
 
     class TemplatedDialog<P> extends TemplatedWidget<P> {
+        static createDefaultElement(): HTMLDivElement;
         protected tabs: any;
         protected toolbar: Toolbar;
         protected validator: any;
         protected commonDialog: ICommonDialog;
         constructor(props?: WidgetProps<P>);
-        static createDefaultElement(): HTMLDivElement;
         private get isMarkedAsPanel();
         destroy(): void;
         protected addCssClass(): void;
@@ -3795,7 +3811,9 @@ declare namespace Serenity {
     }
 
     class StringEditor<P = {}> extends EditorWidget<P> {
+        static typeName: EditorTypeName<"Serenity.StringEditor">;
         readonly domNode: HTMLInputElement;
+        static createDefaultElement(): HTMLInputElement;
         get value(): string;
         protected get_value(): string;
         set value(value: string);
@@ -3803,6 +3821,7 @@ declare namespace Serenity {
     }
 
     class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
+        static createDefaultElement(): HTMLInputElement;
     }
 
     interface TextAreaEditorOptions {
@@ -3810,6 +3829,7 @@ declare namespace Serenity {
         rows?: number;
     }
     class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+        static createDefaultElement(): HTMLTextAreaElement;
         constructor(props: EditorProps<P>);
         get value(): string;
         protected get_value(): string;
@@ -3818,6 +3838,7 @@ declare namespace Serenity {
     }
 
     class BooleanEditor<P = {}> extends EditorWidget<P> {
+        static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         get value(): boolean;
         protected get_value(): boolean;
@@ -3833,6 +3854,7 @@ declare namespace Serenity {
         allowNegatives?: boolean;
     }
     class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+        static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         get_value(): number;
@@ -3849,6 +3871,7 @@ declare namespace Serenity {
         allowNegatives?: boolean;
     }
     class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+        static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         get_value(): number;
@@ -3865,9 +3888,10 @@ declare namespace Serenity {
         sqlMinMax?: boolean;
     }
     class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+        static createDefaultElement(): HTMLInputElement;
+        readonly domNode: HTMLInputElement;
         private minValue;
         private maxValue;
-        readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         get_value(): string;
         get value(): string;
@@ -3904,12 +3928,13 @@ declare namespace Serenity {
     }
 
     class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+        static createDefaultElement(): HTMLInputElement;
+        readonly domNode: HTMLInputElement;
         private minValue;
         private maxValue;
         private time;
         private lastSetValue;
         private lastSetValueGet;
-        readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         getFlatpickrOptions(): any;
         get_value(): string;
@@ -3954,8 +3979,9 @@ declare namespace Serenity {
         intervalMinutes?: any;
     }
     class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
-        private minutes;
+        static createDefaultElement(): HTMLElement;
         readonly domNode: HTMLSelectElement;
+        private minutes;
         constructor(props: EditorProps<P>);
         get value(): number;
         protected get_value(): number;
@@ -3970,6 +3996,7 @@ declare namespace Serenity {
         readOnlyDomain?: boolean;
     }
     class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+        static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         private readonly domain;
         constructor(props: EditorProps<P>);
@@ -3983,6 +4010,7 @@ declare namespace Serenity {
     }
 
     class EmailAddressEditor<P = {}> extends StringEditor<P> {
+        static createDefaultElement(): HTMLInputElement;
         constructor(props: EditorProps<P>);
     }
 
@@ -4044,10 +4072,11 @@ declare namespace Serenity {
         more: boolean;
     }
     class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+        static createDefaultElement(): HTMLInputElement;
+        readonly domNode: HTMLInputElement;
         private _items;
         private _itemById;
         protected lastCreateTerm: string;
-        readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         destroy(): void;
         protected hasAsyncSource(): boolean;
@@ -4212,11 +4241,11 @@ declare namespace Serenity {
 
     interface ServiceLookupEditorOptions extends Select2EditorOptions {
         service?: string;
-        idField: string;
-        textField: string;
+        idField?: string;
+        textField?: string;
         pageSize?: number;
         minimumResultsForSearch?: any;
-        sort: string[];
+        sort?: string[];
         columnSelection?: ColumnSelection;
         includeColumns?: string[];
         excludeColumns?: string[];
@@ -4253,6 +4282,7 @@ declare namespace Serenity {
     class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         private _instanceReady;
         readonly domNode: HTMLTextAreaElement;
+        static createDefaultElement(): HTMLTextAreaElement;
         constructor(props: EditorProps<P>);
         protected instanceReady(x: any): void;
         protected getLanguage(): string;
@@ -4278,6 +4308,7 @@ declare namespace Serenity {
     }
 
     class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
+        static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
         get value(): string;
@@ -4476,11 +4507,12 @@ declare namespace Serenity {
         fields?: QuickSearchField[];
     }
     class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
+        static createDefaultElement(): HTMLInputElement;
+        readonly domNode: HTMLInputElement;
         private lastValue;
         private field;
         private fieldChanged;
         private timer;
-        readonly domNode: HTMLInputElement;
         constructor(props: WidgetProps<P>);
         protected checkIfValueChanged(): void;
         get_value(): string;
@@ -4848,7 +4880,8 @@ declare namespace Serenity {
         falseText: string;
         trueText: string;
     }
-    class CheckboxFormatter implements Formatter {
+    class CheckboxFormatter extends Formatter {
+        static typeName: FormatterTypeName<"Serenity.CheckboxFormatter">;
         format(ctx: Slick.FormatterContext): string;
     }
     class DateFormatter implements Formatter {
@@ -4959,9 +4992,6 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         protected useLayoutTimer(): boolean;
-        protected attrs<TAttr>(attrType: {
-            new (...args: any[]): TAttr;
-        }): TAttr[];
         protected layout(): void;
         protected getInitialTitle(): string;
         protected createToolbarExtensions(): void;
@@ -5145,6 +5175,7 @@ declare namespace Serenity {
         source?: TSource;
     }
     class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
+        static createDefaultElement(): HTMLDivElement;
         private byId;
         constructor(props: EditorProps<P>);
         protected getIdProperty(): string;
@@ -5315,9 +5346,6 @@ declare namespace Serenity {
         protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
         protected doDelete(callback: (response: DeleteResponse) => void): void;
         protected onDeleteSuccess(response: DeleteResponse): void;
-        protected attrs<TAttr>(attrType: {
-            new (...args: any[]): TAttr;
-        }): TAttr[];
         protected getRowDefinition(): IRowDefinition;
         private _entityType;
         protected getEntityType(): string;
@@ -5399,105 +5427,6 @@ declare namespace Serenity {
         protected isViewMode(): boolean;
         protected useViewMode(): boolean;
         protected getTemplate(): string;
-    }
-
-    type JsxDomWidgetProps<P> = EditorProps<P> & {
-        children?: any | undefined;
-        class?: string;
-    };
-    interface JsxDomWidget<P = {}, TElement extends Element = HTMLElement> {
-        (props: JsxDomWidgetProps<P>, context?: any): TElement | null;
-    }
-    function jsxDomWidget<TWidget extends Widget<TOptions>, TOptions>(type: (new (element: ArrayLike<HTMLElement>, options?: TOptions) => Widget<TOptions>) | (new (options?: TOptions) => TWidget)): JsxDomWidget<TOptions & {
-        ref?: (r: TWidget) => void;
-    }>;
-
-    namespace Reporting {
-        interface ReportDialogOptions {
-            reportKey?: string;
-        }
-        class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends TemplatedDialog<P> {
-            constructor(props: WidgetProps<P>);
-            protected propertyGrid: PropertyGrid;
-            protected propertyItems: PropertyItem[];
-            protected reportKey: string;
-            protected createPropertyGrid(): void;
-            loadReport(reportKey: string): void;
-            executeReport(targetFrame: string, exportType: string): void;
-            protected getToolbarButtons(): {
-                title: string;
-                cssClass: string;
-                onClick: () => void;
-            }[];
-        }
-        interface ReportExecuteRequest extends ServiceRequest {
-            ExportType?: string;
-            ReportKey?: string;
-            DesignId?: string;
-            Parameters?: any;
-        }
-        class ReportPage<P = {}> extends Widget<P> {
-            constructor(props: WidgetProps<P>);
-            protected updateMatchFlags(text: string): void;
-            protected categoryClick(e: Event): void;
-            protected reportLinkClick(e: Event): void;
-        }
-        interface ReportRetrieveRequest extends ServiceRequest {
-            ReportKey?: string;
-        }
-        interface ReportRetrieveResponse extends ServiceResponse {
-            ReportKey?: string;
-            Properties?: PropertyItem[];
-            Title?: string;
-            InitialSettings?: any;
-            IsDataOnlyReport?: boolean;
-        }
-    }
-
-    interface ScriptContext {
-    }
-    class ScriptContext {
-    }
-
-    class IAsyncInit {
-    }
-
-    interface GoogleMapOptions {
-        latitude?: any;
-        longitude?: any;
-        zoom?: any;
-        mapTypeId?: any;
-        markerTitle?: string;
-        markerLatitude?: any;
-        markerLongitude?: any;
-    }
-    class GoogleMap<P extends GoogleMapOptions = GoogleMapOptions> extends EditorWidget<P> {
-        private map;
-        constructor(props: EditorProps<P>);
-        get_map(): any;
-    }
-
-    class Select2AjaxEditor<P = {}, TItem = any> extends Widget<P> implements IStringValue {
-        pageSize: number;
-        readonly domNode: HTMLInputElement;
-        constructor(props: EditorProps<P>);
-        protected emptyItemText(): string;
-        protected getService(): string;
-        protected query(request: ListRequest, callback: (p1: ListResponse<TItem>) => void): void;
-        protected executeQuery(options: ServiceOptions<ListResponse<TItem>>): void;
-        protected queryByKey(key: string, callback: (p1: any) => void): void;
-        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<TItem>>): void;
-        protected getItemKey(item: TItem): string;
-        protected getItemText(item: TItem): string;
-        protected getTypeDelay(): number;
-        protected getSelect2Options(): Select2Options;
-        protected addInplaceCreate(title: string): void;
-        protected inplaceCreateClick(e: any): void;
-        protected get_select2Container(): Fluent;
-        get_value(): string;
-        get value(): string;
-        set_value(value: string): void;
-        set value(v: string);
     }
 
     /**

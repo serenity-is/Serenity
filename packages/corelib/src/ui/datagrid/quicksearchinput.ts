@@ -18,11 +18,13 @@ export interface QuickSearchInputOptions {
 
 @Decorators.registerClass('Serenity.QuickSearchInput')
 export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    declare readonly domNode: HTMLInputElement;
+
     private lastValue: string;
     private field: QuickSearchField;
     private fieldChanged: boolean;
     private timer: number;
-    declare readonly domNode: HTMLInputElement;
 
     constructor(props: WidgetProps<P>) {
         super(props);

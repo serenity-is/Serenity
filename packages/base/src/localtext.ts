@@ -1,7 +1,11 @@
-﻿import { getGlobalObject, getStateStore } from "./system";
+﻿import { localTextTableSymbol } from "./symbols";
+import { getGlobalObject } from "./system";
 
 function getTable(): { [key: string]: string } {
-    return getStateStore("__localText");
+    let localTextTable = getGlobalObject()[localTextTableSymbol];
+    if (!localTextTable)
+        getGlobalObject()[localTextTableSymbol] = localTextTable = {};
+    return localTextTable;
 }
 
 export function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string) {

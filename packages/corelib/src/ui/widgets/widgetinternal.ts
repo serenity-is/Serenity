@@ -1,6 +1,5 @@
-﻿import { Fluent, addClass, getTypeFullName, isArrayLike, toggleClass } from "@serenity-is/base";
+﻿import { addClass, getCustomAttribute, getTypeFullName, isArrayLike } from "@serenity-is/base";
 import { ElementAttribute } from "../../decorators";
-import { getAttributes } from "../../q/system-compat";
 import { EditorUtils } from "../editors/editorutils";
 import { EditorProps, WidgetProps } from "./widgetutils";
 
@@ -30,7 +29,7 @@ export function handleElementProp(type: { createDefaultElement(): HTMLElement },
         domNode = elementProp;
     }
     else {
-        domNode = type.createDefaultElement();
+        domNode = createElementFor(type);
         if (typeof elementProp === "function")
             elementProp(domNode);
     }
@@ -38,20 +37,23 @@ export function handleElementProp(type: { createDefaultElement(): HTMLElement },
     return ensureParentOrFragment(domNode);
 }
 
-export function createDefaultElement(type: any) {
-    var elementAttr = getAttributes(type, ElementAttribute, true);
-    if (elementAttr.length) {
+export function createElementFor(type: { createDefaultElement(): HTMLElement }) {
+    var elementAttr = getCustomAttribute(type, ElementAttribute);
+    if (elementAttr) {
+        // legacy attribute, unfortunately has to take precedence
         let node: HTMLElement;
         let wrap = document.createElement("div");
-        wrap.innerHTML = elementAttr[0].value;
+        wrap.innerHTML = elementAttr.value;
         node = wrap.children[0] as HTMLElement;
-        if (!node)
-            return document.createElement(type.defaultTagName);
+        if (!node) {
+            wrap.remove();
+            return type.createDefaultElement();
+        }
         node.parentNode?.removeChild(node);
         return node;
     }
     else {
-        return document.createElement(type.defaultTagName);
+        return type.createDefaultElement();
     }
 }
 

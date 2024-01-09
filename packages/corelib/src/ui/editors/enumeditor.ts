@@ -1,6 +1,5 @@
-import { Enum, tryGetText } from "@serenity-is/base";
+import { Enum, getCustomAttribute, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { getAttributes } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
@@ -25,9 +24,9 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         var enumKey = this.options.enumKey;
 
         if (enumKey == null && enumType != null) {
-            var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
-            if (enumKeyAttr.length > 0) {
-                enumKey = enumKeyAttr[0].value;
+            var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
+            if (enumKeyAttr) {
+                enumKey = enumKeyAttr.value;
             }
         }
 

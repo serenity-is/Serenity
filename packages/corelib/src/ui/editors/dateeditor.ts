@@ -14,12 +14,13 @@ export interface DateEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
-@Decorators.element('<input type="text"/>')
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    declare readonly domNode: HTMLInputElement;
 
     private minValue: string;
     private maxValue: string;
-    declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);

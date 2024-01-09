@@ -18,7 +18,6 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-@Decorators.element('<div/>')
 export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
@@ -277,7 +276,6 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
 }
 
 @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-@Decorators.element('<div/>')
 export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 

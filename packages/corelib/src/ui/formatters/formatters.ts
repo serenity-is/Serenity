@@ -1,7 +1,7 @@
-﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
-import { ISlickFormatter, getAttributes, replaceAll } from "../../q";
+import { replaceAll } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
@@ -33,8 +33,9 @@ export class BooleanFormatter implements Formatter {
     public trueText: string;
 }
 
-@Decorators.registerFormatter('Serenity.CheckboxFormatter')
-export class CheckboxFormatter implements Formatter {
+export class CheckboxFormatter extends Formatter {
+    static override typeName = super.registerFormatter("Serenity.CheckboxFormatter")
+
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';
     }
@@ -103,8 +104,8 @@ export class EnumFormatter implements Formatter {
         }
 
         var name = Enum.toString(enumType, value);
-        var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
-        var enumKey = ((enumKeyAttr.length > 0) ? enumKeyAttr[0].value : getTypeFullName(enumType));
+        var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
+        var enumKey = enumKeyAttr ? enumKeyAttr.value : getTypeFullName(enumType);
         return EnumFormatter.getText(enumKey, name);
     }
 
@@ -123,7 +124,7 @@ export class EnumFormatter implements Formatter {
     }
 }
 
-@Decorators.registerFormatter('Serenity.FileDownloadFormatter', [ISlickFormatter, IInitializeColumn])
+@Decorators.registerFormatter('Serenity.FileDownloadFormatter', [IInitializeColumn])
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {
@@ -226,7 +227,7 @@ export class NumberFormatter {
     displayFormat: string;
 }
 
-@Decorators.registerFormatter('Serenity.UrlFormatter', [ISlickFormatter, IInitializeColumn])
+@Decorators.registerFormatter('Serenity.UrlFormatter', [IInitializeColumn])
 export class UrlFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): string {

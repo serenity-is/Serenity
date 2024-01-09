@@ -1,6 +1,5 @@
+import { PropertyItemsData, addCustomAttribute } from "@serenity-is/base";
 import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { PropertyItemsData } from "@serenity-is/base";
-import { addAttribute } from "../../q/system-compat";
 import { EntityDialog } from "./entitydialog";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {
@@ -38,7 +37,7 @@ describe('EntityDialog.getIdProperty', () => {
         class AttrDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
-        addAttribute(AttrDialog, new IdPropertyAttribute("attrId"));
+        addCustomAttribute(AttrDialog, new IdPropertyAttribute("attrId"));
 
         var Dialog = new AttrDialog({});
         expect(getIdProperty(Dialog)).toBe("attrId");
@@ -101,7 +100,7 @@ describe('EntityDialog.getIsActiveProperty', () => {
         class AttrDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
-        addAttribute(AttrDialog, new IsActivePropertyAttribute("attrIsActive"));
+        addCustomAttribute(AttrDialog, new IsActivePropertyAttribute("attrIsActive"));
 
         var Dialog = new AttrDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("attrIsActive");
@@ -153,7 +152,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
     it('returns class identifier based on typeName property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
-            static readonly __typeName = 'MyProject.TestModule.DefaultDialog';
+            static override readonly typeName = 'MyProject.TestModule.DefaultDialog';
         }
 
         var dialog = new DefaultDialog({});
@@ -194,7 +193,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
         class AttrDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
-        addAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
 
         var dialog = new AttrDialog({});
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.attrPrefix.");
@@ -245,7 +244,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeName property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static readonly __typeName = 'MyProject.TestModule.DefaultDialog';
+            static readonly typeName = 'MyProject.TestModule.DefaultDialog';
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
@@ -277,7 +276,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
         class AttrDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
-        addAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
 
         var dialog = new AttrDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("attrPrefix");

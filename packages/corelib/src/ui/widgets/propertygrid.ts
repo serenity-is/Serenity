@@ -1,6 +1,6 @@
-﻿import { Culture, Fluent, addClass, faIcon, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, Fluent, addClass, faIcon, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem, getCustomAttribute } from "@serenity-is/base";
 import { Decorators, OptionsTypeAttribute } from "../../decorators";
-import { Authorization, extend, getAttributes } from "../../q";
+import { Authorization, extend } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
@@ -295,11 +295,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
         var editorParams = item.editorParams;
         var optionsType = null;
-        var optionsAttr = getAttributes(editorType,
-            OptionsTypeAttribute, true);
+        var optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
 
-        if (optionsAttr != null && optionsAttr.length > 0) {
-            optionsType = optionsAttr[0].optionsType;
+        if (optionsAttr) {
+            optionsType = optionsAttr.value as any;
         }
         if (optionsType != null) {
             editorParams = extend(new optionsType(), item.editorParams);

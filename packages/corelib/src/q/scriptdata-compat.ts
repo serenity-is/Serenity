@@ -1,6 +1,5 @@
 ﻿import {
-    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore,
-    handleScriptDataError, peekScriptData, reloadLookupAsync,
+    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, reloadLookupAsync,
     requestFinished, requestStarting,
     resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
 } from "@serenity-is/base";
@@ -65,14 +64,6 @@ export namespace ScriptData {
 
     export async function reloadAsync<TData = any>(name: string): Promise<TData> {
         return await getScriptData(name, true);
-    }
-
-    export function setRegisteredScripts(scripts: any[]) {
-        var t = new Date().getTime().toString();
-        var store = getStateStore("__scriptHash")
-        for (var k in scripts) {
-            store[k], scripts[k] || t;
-        }
     }
 
     export const set = setScriptData;

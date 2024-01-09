@@ -95,13 +95,5 @@ export * from "./ui/datagrid/treegridmixin";
 export * from "./ui/editors/checktreeeditor";
 export * from "./ui/datagrid/entitygrid";
 export * from "./ui/dialogs/entitydialog";
-export * from "./ui/widgets/jsx";
-
-// legacy
-export * from "./ui/widgets/reporting";
-export * from "./ui/widgets/scriptcontext";
-export * from "./interfaces/iasyncinit";
-export * from "./ui/widgets/googlemap";
-export * from "./ui/editors/select2ajaxeditor";
 
 export type Constructor<T> = new (...args: any[]) => T;

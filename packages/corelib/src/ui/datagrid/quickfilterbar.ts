@@ -7,8 +7,8 @@ import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 import { Widget, WidgetProps } from "../widgets/widget";
-import { QuickFilter } from "./quickfilter";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
+import { QuickFilter } from "./quickfilter";
 
 export interface QuickFilterBarOptions {
     filters: QuickFilter<Widget<any>, any>[];
@@ -17,7 +17,6 @@ export interface QuickFilterBarOptions {
 }
 
 @Decorators.registerClass('Serenity.QuickFilterBar')
-@Decorators.element("<div/>")
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
     constructor(props: WidgetProps<P>) {

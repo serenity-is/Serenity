@@ -14,12 +14,13 @@ export interface CKEditorConfig {
 }    
 
 @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
-@Decorators.element('<textarea/>')
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
 
     private _instanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
+
+    static override createDefaultElement() { return document.createElement("textarea"); }
 
     constructor(props: EditorProps<P>) {
         super(props);

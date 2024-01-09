@@ -1,14 +1,13 @@
-﻿import { htmlEncode, isEnum, notifyError } from "@serenity-is/base";
+﻿import { getCustomAttribute, htmlEncode, isEnum, notifyError } from "@serenity-is/base";
 import { EnumKeyAttribute } from "../decorators";
-import { Exception, getAttributes } from "../q";
+import { Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace EnumTypeRegistry {
 
     let registry = commonTypeRegistry(
         isEnum, 
-        type => getAttributes(type, EnumKeyAttribute)[0]?.value,
-        null);
+        type => getCustomAttribute(type, EnumKeyAttribute, false)?.value,null);
 
     export function get(key: string): Function {
         var type = registry.tryGet(key);

@@ -1,6 +1,6 @@
-﻿import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+﻿import { addCustomAttribute } from "@serenity-is/base";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { DataGrid } from "./datagrid";
-import { addAttribute } from "../../q/system-compat";
 
 function getIdProperty(grid: DataGrid<any, any>): string {
     return grid["getIdProperty"]();
@@ -27,7 +27,7 @@ describe('DataGrid.getIdProperty', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends DataGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
+        addCustomAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
 
         var grid = new AttrGrid({});
         expect(getIdProperty(grid)).toBe("attrId");
@@ -85,7 +85,7 @@ describe('DataGrid.getIsActiveProperty', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends DataGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
+        addCustomAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
 
         var grid = new AttrGrid({});
         expect(getIsActiveProperty(grid)).toBe("attrIsActive");
@@ -152,7 +152,7 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends DataGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
         var grid = new AttrGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
@@ -210,7 +210,7 @@ describe('DataGrid.getLocalTextPrefix', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends DataGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
         var grid = new AttrGrid({});
         expect(getLocalTextPrefix(grid)).toBe("attrPrefix");

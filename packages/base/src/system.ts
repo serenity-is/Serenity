@@ -1,4 +1,6 @@
-﻿let globalObject: any =
+﻿import { typeRegistrySymbol, hookIsAssignableFromSymbol, hookIsInstanceOfTypeSymbol, typeDiscriminatorSymbol, implementedInterfacesSymbol, enumFlagsSymbol, typeAttributesSymbol } from "./symbols";
+
+let globalObject: any =
     (typeof globalThis !== "undefined" && globalThis) ||
     (typeof window !== "undefined" && window) ||
     (typeof self !== "undefined" && self) ||
@@ -9,53 +11,9 @@ export function getGlobalObject(): any {
     return globalObject;
 }
 
-export function getStateStore(key?: string): any {
-
-    if (!globalObject.Serenity)
-        globalObject.Serenity = {};
-
-    let stateStore = globalObject.Serenity.__stateStore;
-    if (!stateStore)
-        globalObject.Serenity.__stateStore = stateStore = Object.create(null);
-
-    if (key == null)
-        return stateStore;
-
-    var store = stateStore[key];
-    if (store == null)
-        stateStore[key] = store = Object.create(null);
-    return store;
-}
-
-export function getTypeStore() {
-    return getStateStore("__types");
-}
-
-interface TypeExt {
-    __interface?: boolean;
-    __interfaces?: any[];
-    __isAssignableFrom?: (from: any) => boolean;
-    __isInstanceOfType?: (instance: any) => boolean;
-    __metadata?: TypeMetadata;
-    __typeName?: string;
-}
-
-interface TypeMetadata {
-    enumFlags?: boolean;
-    attr?: any[];
-}
+export const typeNameProperty = "typeName";
 
 export type Type = Function | Object;
-
-export function ensureMetadata(target: Type): TypeMetadata {
-
-    if (!Object.prototype.hasOwnProperty.call(target, '__metadata') ||
-        !(target as TypeExt).__metadata) {
-        (target as TypeExt).__metadata = Object.create(null);
-    }
-
-    return (target as TypeExt).__metadata;
-}
 
 export function getNested(from: any, name: string) {
     var a = name.split('.');
@@ -67,11 +25,17 @@ export function getNested(from: any, name: string) {
     return from;
 }
 
+function getTypeRegistry() {
+    let typeRegistry = globalObject[typeRegistrySymbol];
+    if (!typeRegistry)
+        typeRegistry = globalObject[typeRegistrySymbol] = {};
+    return typeRegistry;
+}
+
 export function getType(name: string, target?: any): Type {
     var type: any;
     if (target == null) {
-        const types = getTypeStore();
-        type = types[name];
+        type = getTypeRegistry()[name];
         if (type != null || globalObject == void 0 || name === "Object")
             return type;
 
@@ -86,11 +50,11 @@ export function getType(name: string, target?: any): Type {
 }
 
 export function getTypeNameProp(type: Type): string {
-    return (Object.prototype.hasOwnProperty.call(type, "__typeName") && (type as TypeExt).__typeName) || void 0;
+    return Object.prototype.hasOwnProperty.call(type, typeNameProperty) && (type as any)[typeNameProperty] || void 0;
 }
 
 export function setTypeNameProp(type: Type, value: string) {
-    Object.defineProperty(type, "__typeName", { value, configurable: true });
+    Object.defineProperty(type, typeNameProperty, { value, configurable: true, writable: true });
 }
 
 export function getTypeFullName(type: Type): string {
@@ -122,27 +86,27 @@ export function isAssignableFrom(target: any, type: Type) {
     if (target === type || (type as any).prototype instanceof target)
         return true;
 
-    if (typeof (target as TypeExt).__isAssignableFrom === 'function')
-        return (target as TypeExt).__isAssignableFrom(type);
+    if (typeof target[hookIsAssignableFromSymbol] === 'function')
+        return target[hookIsAssignableFromSymbol](type);
 
     return false;
-};
+}
 
 export function isInstanceOfType(instance: any, type: Type) {
     if (instance == null)
         return false;
 
-    if (typeof (type as TypeExt).__isInstanceOfType === 'function')
-        return (type as TypeExt).__isInstanceOfType(instance);
+    if (typeof (type as any)[hookIsInstanceOfTypeSymbol] === 'function')
+        return (type as any)[hookIsInstanceOfTypeSymbol](instance);
 
     return isAssignableFrom(type, getInstanceType(instance));
-};
+}
 
 export function getBaseType(type: any) {
     if (type == null ||
         type === Object ||
         !type.prototype ||
-        (type as TypeExt).__interface === true)
+        (type as any)[typeDiscriminatorSymbol] === true)
         return null;
 
     return Object.getPrototypeOf(type.prototype).constructor;
@@ -161,49 +125,52 @@ function merge(arr1: any[], arr2: any[]) {
 
 function interfaceIsAssignableFrom(from: any) {
     return from != null &&
-        Array.isArray((from as TypeExt).__interfaces) &&
-        (from as TypeExt).__interfaces.some(x =>
+        Array.isArray((from as any)[implementedInterfacesSymbol]) &&
+        (from as any)[implementedInterfacesSymbol].some((x: any) =>
             x === this ||
-            (getTypeNameProp(this)?.length &&
-                x.__interface &&
-                getTypeNameProp(x) === this.__typeName));
+            (getTypeNameProp(this) &&
+                x[typeDiscriminatorSymbol] &&
+                getTypeNameProp(x) === getTypeNameProp(this)));
 }
 
-function registerType(type: any, name: string, intf: any[]) {
-    const types = getTypeStore();
+function registerType(type: any, name?: string, intf?: any[]) {
     if (name) {
         setTypeNameProp(type, name);
-        types[name] = type;
+        getTypeRegistry()[name] = type;
     }
-    else if (getTypeNameProp(type as TypeExt)?.length)
-        types[(type as TypeExt).__typeName] = type;
+    else {
+        name = getTypeNameProp(type);
+        if (name) {
+            getTypeRegistry()[name] = type;
+        }
+    }
 
     if (intf != null && intf.length)
-        Object.defineProperty(type, "__interfaces", {
-            value: merge((type as TypeExt).__interfaces, intf),
+        Object.defineProperty(type, implementedInterfacesSymbol, {
+            value: merge(type[implementedInterfacesSymbol], intf),
             configurable: true
         });
 }
 
 export function registerClass(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    Object.defineProperty(type, "__interface", { value: false, configurable: true });
+    Object.defineProperty(type, typeDiscriminatorSymbol, { value: false, configurable: true });
 }
 
 export function registerEnum(type: any, name: string, enumKey?: string) {
     registerType(type, name, undefined);
     if (enumKey && enumKey != name) {
-        const types = getTypeStore();
-        if (!types[enumKey])
-            types[enumKey] = type;
+        const typeStore = getTypeRegistry();
+        if (!typeStore[enumKey])
+            typeStore[enumKey] = type;
     }
-    Object.defineProperty(type, "__interface", { value: null, configurable: true });
+    Object.defineProperty(type, typeDiscriminatorSymbol, { value: null, configurable: true });
 }
 
 export function registerInterface(type: any, name: string, intf?: any[]) {
     registerType(type, name, intf);
-    Object.defineProperty(type, "__interface", { value: true, configurable: true });
-    Object.defineProperty(type, "__isAssignableFrom", { value: interfaceIsAssignableFrom, configurable: true });
+    Object.defineProperty(type, typeDiscriminatorSymbol, { value: true, configurable: true });
+    Object.defineProperty(type, hookIsAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
 }
 
 export namespace Enum {
@@ -215,7 +182,7 @@ export namespace Enum {
             return "" + value;
 
         var values = enumType;
-        if (value === 0 || !((enumType as TypeExt).__metadata?.enumFlags)) {
+        if (value === 0 || !enumType[enumFlagsSymbol]) {
             for (var i in values) {
                 if (values[i] === value) {
                     return i;
@@ -252,9 +219,9 @@ export namespace Enum {
     };
 }
 
-export let isEnum = (type: any) => {
+export const isEnum = (type: any) => {
     return typeof type !== "function" &&
-        (type as TypeExt).__interface === null;
+        type[typeDiscriminatorSymbol] === null;
 };
 
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
@@ -289,5 +256,79 @@ export function getjQuery(): any {
     // @ts-ignore
     return typeof jQuery === "function" ? jQuery : typeof $ === "function" && ($ as any).fn ? $ : undefined;
 }
+
+export type NoInfer<T> = [T][T extends any ? 0 : never];
+type TypeName<T> = StringLiteral<T> | (string & {});
+export type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
+export type EditorTypeName<T> = TypeName<T>;
+export type FormatterTypeName<T> = TypeName<T>;
+export type ClassTypeName<T> = TypeName<T>;
+
+export class EditorAttribute { }
+registerClass(EditorAttribute, 'Serenity.EditorAttribute');
+
+export class ISlickFormatter { }
+registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
+
+export function registerFormatter(type: any, name: string, intf?: any[]) {
+    return registerClass(type, name, merge([ISlickFormatter], intf));
+}
+
+export function registerEditor(type: any, name: string, intf?: any[]) {
+    registerClass(type, name, intf);
+    addCustomAttribute(type, new EditorAttribute());
+}
+
+export function addCustomAttribute(type: any, attr: any) {
+    if (!Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol)) {
+        type[typeAttributesSymbol] = [];
+    }   
+    let attributes = type[typeAttributesSymbol];
+    if (!attributes)
+        type[typeAttributesSymbol] = [attr];
+    else
+        attributes.push(attr);
+}
+
+export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
+    if (!type || attrType == null)
+        return null;
+
+    do {
+        let attrs = Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol) ? type[typeAttributesSymbol] : null;
+        if (!attrs) 
+            return null;
+
+        for (var i = attrs.length - 1; i >= 0; i--) {
+            let attr = attrs[i];
+            if (attr && isInstanceOfType(attr, attrType)) 
+                return attr;
+        }
+    }
+    while (inherit && (type = getBaseType(type)))    
+}
+
+export function hasCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): boolean {
+    return getCustomAttribute(type, attrType, inherit) != null;
+}
+
+export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr[] {
+    if (!type)
+        return [];
+
+    var result: any[] = [];
+    do {
+        let attrs = Object.prototype.hasOwnProperty.call(type, typeAttributesSymbol) ? type[typeAttributesSymbol] : null;
+        if (attrs) {
+            for (var i = attrs.length - 1; i >= 0; i--) {
+                let attr = attrs[i];
+                if (!attrType == null || (attr && isInstanceOfType(attr, attrType))) {
+                    result.push(attr);
+                }
+            }
+        }
+    }
+    while (inherit && (type = getBaseType(type)))
+};
 
 export { }

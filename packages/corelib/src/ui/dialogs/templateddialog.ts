@@ -1,7 +1,7 @@
 ﻿import { CommonDialogOptions, Config, DialogButton, Fluent, ICommonDialog, addClass, createCommonDialog, defaultNotifyOptions, getInstanceType, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { Decorators, MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../decorators";
 import { IDialog } from "../../interfaces";
-import { getAttributes, isMobileView, layoutFillHeight, validateOptions } from "../../q";
+import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { WidgetProps } from "../widgets/widget";
@@ -9,6 +9,8 @@ import { DialogExtensions } from "./dialogextensions";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<P> extends TemplatedWidget<P> {
+
+    static override createDefaultElement() { return Fluent("div").addClass("hidden").appendTo(document.body).getNode(); }
 
     protected tabs: any;
     protected toolbar: Toolbar;
@@ -25,16 +27,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.initToolbar();
     }
 
-    static override createDefaultElement() {
-        var div = document.body.appendChild(document.createElement("div"));
-        div.classList.add("hidden");
-        return div;
-    }
-
     private get isMarkedAsPanel(): boolean {
-        var panelAttr = getAttributes(getInstanceType(this),
-            PanelAttribute, true) as PanelAttribute[];
-        return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
+        var panelAttr = this.getCustomAttribute(PanelAttribute);
+        return panelAttr && panelAttr.value !== false;
     }
 
     public destroy(): void {
@@ -91,8 +86,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         var opt: any = {};
         opt.width = 920;
         applyCssSizes(opt, this.getCssClass());
-        let type = getInstanceType(this);
-        opt.resizable = getAttributes(type, ResizableAttribute, true).length > 0;
+        opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
         opt.modal = true;
         opt.position = { my: 'center', at: 'center', of: window.window };
         opt.title = this.domNode.dataset.dialogtitle ?? this.getDialogTitle() ?? '';
@@ -128,7 +122,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         });
         Fluent.on(this.domNode, "dialogopen." + this.uniqueName, this.handleResponsive.bind(this));
 
-        if (getAttributes(getInstanceType(this), MaximizableAttribute, true).length > 0) {
+        if (this.getCustomAttribute(MaximizableAttribute)?.value) {
             DialogExtensions.dialogMaximizable(element);
         }
     }

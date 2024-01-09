@@ -1,6 +1,6 @@
 ﻿import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
-import { ScriptData, getAttributes, getFormData, getFormDataAsync } from "../../q";
+import { ScriptData, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
@@ -90,10 +90,9 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     }
 
     protected getFormKey(): string {
-        var attributes = getAttributes(
-            getInstanceType(this), FormKeyAttribute, true);
-        if (attributes.length >= 1) {
-            return attributes[0].value;
+        var attr = this.getCustomAttribute(FormKeyAttribute);
+        if (attr) {
+            return attr.value;
         }
         else {
             var name = getTypeFullName(getInstanceType(this));

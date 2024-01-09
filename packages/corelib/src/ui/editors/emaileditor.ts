@@ -10,9 +10,9 @@ export interface EmailEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
-@Decorators.element('<input type="text"/>')
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }   
     declare readonly domNode: HTMLInputElement;
     private readonly domain: HTMLInputElement;
 

@@ -1,6 +1,6 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
 import { Decorators, FormKeyAttribute } from "../../decorators";
-import { getAttributes, getForm } from "../../q";
+import { getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";
 import { WidgetProps } from "./widget";
@@ -45,11 +45,9 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     }
 
     protected getFormKey(): string {
-        var attributes = getAttributes(
-            getInstanceType(this), FormKeyAttribute, true);
-
-        if (attributes.length >= 1) {
-            return attributes[0].value;
+        var attr = this.getCustomAttribute(FormKeyAttribute);
+        if (attr) {
+            return attr.value;
         }
         var name = getTypeFullName(getInstanceType(this));
         var px = name.indexOf('.');

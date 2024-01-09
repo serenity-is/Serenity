@@ -1,9 +1,9 @@
-﻿import { Enum, Fluent, tryGetText } from "@serenity-is/base";
+﻿import { Enum, Fluent, getCustomAttribute, tryGetText } from "@serenity-is/base";
 import { Decorators, EnumKeyAttribute } from "../../decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { getAttributes, getLookup } from "../../q";
+import { getLookup } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface RadioButtonEditorOptions {
     enumKey?: string;
@@ -12,7 +12,6 @@ export interface RadioButtonEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
-@Decorators.element('<div/>')
 export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P>
     implements IReadOnly {
 
@@ -39,9 +38,9 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
             var enumType = this.options.enumType || EnumTypeRegistry.get(this.options.enumKey);
             var enumKey = this.options.enumKey;
             if (enumKey == null && enumType != null) {
-                var enumKeyAttr = getAttributes(enumType, EnumKeyAttribute, false);
-                if (enumKeyAttr.length > 0) {
-                    enumKey = enumKeyAttr[0].value;
+                var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
+                if (enumKeyAttr) {
+                    enumKey = enumKeyAttr.value;
                 }
             }
 

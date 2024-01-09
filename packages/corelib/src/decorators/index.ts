@@ -1,5 +1,5 @@
-import { addAttribute, addTypeMember, MemberType, ISlickFormatter, registerEditor as regEditor, EditorAttribute } from "../q";
-import { registerClass as regClass, registerInterface as regIntf, registerEnum as regEnum } from "@serenity-is/base";
+import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerInterface as regIntf } from "@serenity-is/base";
+import { MemberType, addTypeMember } from "../q";
 
 function Attr(name: string) {
     return function (target: Function) {
@@ -263,7 +263,7 @@ export namespace Decorators {
     export function registerEnum(target: any, enumKey?: string, name?: string) {
         regEnum(target, name, enumKey);
         if (enumKey)
-            addAttribute(target, new EnumKeyAttribute(enumKey));
+            addCustomAttribute(target, new EnumKeyAttribute(enumKey));
     }
 
     export function registerEnumType(target: any, name?: string, enumKey?: string) {
@@ -277,7 +277,7 @@ export namespace Decorators {
 
     export function enumKey(value: string) {
         return function (target: Function) {
-            addAttribute(target, new EnumKeyAttribute(value));
+            addCustomAttribute(target, new EnumKeyAttribute(value));
         }
     }
 
@@ -299,68 +299,68 @@ export namespace Decorators {
 
     export function dialogType(value: any) {
         return function (target: Function) {
-            addAttribute(target, new DialogTypeAttribute(value));
+            addCustomAttribute(target, new DialogTypeAttribute(value));
         }
     }
 
     export function editor() {
         return function (target: Function) {
             var attr = new EditorAttribute();
-            addAttribute(target, attr);
+            addCustomAttribute(target, attr);
         }
     }
 
     export function element(value: string) {
         return function (target: Function) {
-            addAttribute(target, new ElementAttribute(value));
+            addCustomAttribute(target, new ElementAttribute(value));
         }
     }
 
     export function filterable(value = true) {
         return function (target: Function) {
-            addAttribute(target, new FilterableAttribute(value));
+            addCustomAttribute(target, new FilterableAttribute(value));
         }
     }
 
     export function itemName(value: string) {
         return function (target: Function) {
-            addAttribute(target, new ItemNameAttribute(value));
+            addCustomAttribute(target, new ItemNameAttribute(value));
         }
     }
 
     export function maximizable(value = true) {
         return function (target: Function) {
-            addAttribute(target, new MaximizableAttribute(value));
+            addCustomAttribute(target, new MaximizableAttribute(value));
         }
     }
 
     export function optionsType(value: Function) {
         return function (target: Function) {
-            addAttribute(target, new OptionsTypeAttribute(value));
+            addCustomAttribute(target, new OptionsTypeAttribute(value));
         }
     }
 
     export function panel(value = true) {
         return function (target: Function) {
-            addAttribute(target, new PanelAttribute(value));
+            addCustomAttribute(target, new PanelAttribute(value));
         }
     }
 
     export function resizable(value = true) {
         return function (target: Function) {
-            addAttribute(target, new ResizableAttribute(value));
+            addCustomAttribute(target, new ResizableAttribute(value));
         }
     }
 
     export function responsive(value = true) {
         return function (target: Function) {
-            addAttribute(target, new ResponsiveAttribute(value));
+            addCustomAttribute(target, new ResponsiveAttribute(value));
         }
     }
 
     export function service(value: string) {
         return function (target: Function) {
-            addAttribute(target, new ServiceAttribute(value));
+            addCustomAttribute(target, new ServiceAttribute(value));
         }
     }
 }

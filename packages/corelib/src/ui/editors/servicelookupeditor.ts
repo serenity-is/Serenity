@@ -5,11 +5,11 @@ import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2Searc
 
 export interface ServiceLookupEditorOptions extends Select2EditorOptions {
     service?: string;
-    idField: string;
-    textField: string;
+    idField?: string;
+    textField?: string;
     pageSize?: number;
     minimumResultsForSearch?: any;
-    sort: string[];
+    sort?: string[];
     columnSelection?: ColumnSelection;
     includeColumns?: string[];
     excludeColumns?: string[];

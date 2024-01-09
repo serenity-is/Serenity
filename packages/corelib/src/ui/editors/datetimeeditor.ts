@@ -7,16 +7,16 @@ import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
 
 @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
-@Decorators.element('<input type="text"/>')
 export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    declare readonly domNode: HTMLInputElement;
 
     private minValue: string;
     private maxValue: string;
     private time: HTMLSelectElement;
     private lastSetValue: string;
     private lastSetValueGet: string;
-
-    declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);

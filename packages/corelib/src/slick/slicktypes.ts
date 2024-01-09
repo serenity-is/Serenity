@@ -1,5 +1,6 @@
-﻿import { PropertyItem } from "@serenity-is/base";
+﻿import { FormatterTypeName, PropertyItem, StringLiteral } from "@serenity-is/base";
 import { FormatterContext, Group } from "@serenity-is/sleekgrid";
+import { Decorators } from "../decorators";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
 
@@ -13,7 +14,16 @@ declare module "@serenity-is/sleekgrid" {
 export interface Formatter {
     format(ctx: FormatterContext): string;
 }
-    
+
+export abstract class Formatter implements Formatter {
+    static typeName: string;
+
+    static registerFormatter<T>(name: StringLiteral<T>, intf?: any[]): FormatterTypeName<T> {
+        Decorators.registerFormatter(name, intf);
+        return name;
+    }
+}
+
 export interface GroupInfo<TItem> {
     getter?: any;
     formatter?: (p1: Group<TItem>) => string;
@@ -35,7 +45,7 @@ export interface PagerOptions {
 export interface SummaryOptions {
     aggregators: any[];
 }
-    
+
 export interface PagingOptions {
     rowsPerPage?: number;
     page?: number;

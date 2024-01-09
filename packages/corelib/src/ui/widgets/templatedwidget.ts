@@ -5,8 +5,6 @@ import { Widget } from "./widget";
 @Decorators.registerClass("Serenity.TemplatedWidget")
 export class TemplatedWidget<P> extends Widget<P> {
 
-    static override defaultTagName = "div";
-
     protected byId(id: string): Fluent {
         return Fluent(this.domNode.querySelector('#' + this.idPrefix + id));
     }

@@ -4,7 +4,8 @@ import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { PropertyItemsData } from "./propertyitem";
 import { requestFinished, requestStarting, resolveUrl } from "./services";
-import { getStateStore } from "./system";
+import { scriptDataHashSymbol, scriptDataItemSymbol } from "./symbols";
+import { getGlobalObject } from "./system";
 
 /**
  * Gets the known hash value for a given dynamic script name. They are usually
@@ -18,29 +19,29 @@ import { getStateStore } from "./system";
 export function getScriptDataHash(name: string, reload?: boolean): string {
     let json: string;
 
-    const stateStore = getStateStore();
-    if (stateStore.__scriptHash == null &&
+    let scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+    if (!scriptDataHash &&
         typeof document !== "undefined" &&
         (json = (document.querySelector('script#RegisteredScripts')?.innerHTML ?? '').trim()) &&
         json.charAt(0) == '{') {
         var regs = JSON.parse(json);
-        var store = getStateStore("__scriptHash");
+        getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
         for (var i in regs) {
-            store[i] = regs[i];
+            scriptDataHash[i] = regs[i];
         }
     }
 
-    if (stateStore.__scriptHash == null) {
+    if (!scriptDataHash) {
         if (reload)
-            stateStore.__scriptHash = {};
+            getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
         else
             return null;
     }
 
     if (reload)
-        return (stateStore.__scriptHash[name] = new Date().getTime().toString());
+        return (scriptDataHash[name] = new Date().getTime().toString());
 
-    return stateStore.__scriptHash[name];
+    return scriptDataHash[name];
 }
 
 let fetchPromises: { [key: string]: Promise<any> } = {}
@@ -210,7 +211,7 @@ export function handleScriptDataError(name: string, status?: number, statusText?
 }
 
 export function peekScriptData(name: string): any {
-    return getStateStore("__scriptData")[name];
+    return getGlobalObject()[scriptDataItemSymbol]?.[name];
 }
 
 /**
@@ -223,7 +224,21 @@ export async function reloadLookupAsync<TItem = any>(key: string): Promise<Looku
     return await getScriptData('Lookup.' + key, true);
 }
 
+export function setRegisteredScripts(scripts: any[]) {
+    var t = new Date().getTime().toString();
+    var scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+    if (!scriptDataHash)
+        getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
+    for (var k in scripts) {
+        scriptDataHash[k], scripts[k] || t;
+    }
+}
+
 export function setScriptData(name: string, value: any) {
-    getStateStore("__scriptData")[name] = value;
+    let scriptDataStore = getGlobalObject()[scriptDataItemSymbol];
+    if (!scriptDataStore)
+        getGlobalObject()[scriptDataItemSymbol] = scriptDataStore = {};
+    scriptDataStore[name] = value;
     typeof document !== "undefined" && document.dispatchEvent?.(new Event("scriptdatachange." + name));
 }
+

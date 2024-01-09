@@ -735,6 +735,7 @@ declare function peekScriptData(name: string): any;
  * @returns Lookup
  */
 declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+declare function setRegisteredScripts(scripts: any[]): void;
 declare function setScriptData(name: string, value: any): void;
 
 /**
@@ -1093,14 +1094,8 @@ declare function serviceCall<TResponse extends ServiceResponse>(options: Service
 declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 
 declare function getGlobalObject(): any;
-declare function getStateStore(key?: string): any;
-declare function getTypeStore(): any;
-interface TypeMetadata {
-    enumFlags?: boolean;
-    attr?: any[];
-}
+declare const typeNameProperty = "typeName";
 type Type = Function | Object;
-declare function ensureMetadata(target: Type): TypeMetadata;
 declare function getNested(from: any, name: string): any;
 declare function getType(name: string, target?: any): Type;
 declare function getTypeNameProp(type: Type): string;
@@ -1108,8 +1103,8 @@ declare function setTypeNameProp(type: Type, value: string): void;
 declare function getTypeFullName(type: Type): string;
 declare function getTypeShortName(type: Type): string;
 declare function getInstanceType(instance: any): any;
-declare function isAssignableFrom(target: any, type: Type): boolean;
-declare function isInstanceOfType(instance: any, type: Type): boolean;
+declare function isAssignableFrom(target: any, type: Type): any;
+declare function isInstanceOfType(instance: any, type: Type): any;
 declare function getBaseType(type: any): any;
 declare function registerClass(type: any, name: string, intf?: any[]): void;
 declare function registerEnum(type: any, name: string, enumKey?: string): void;
@@ -1118,11 +1113,33 @@ declare namespace Enum {
     let toString: (enumType: any, value: number) => string;
     let getValues: (enumType: any) => any[];
 }
-declare let isEnum: (type: any) => boolean;
+declare const isEnum: (type: any) => boolean;
 declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
 declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
 declare function isArrayLike(obj: any): obj is ArrayLike<any>;
 declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
 declare function getjQuery(): any;
+type NoInfer<T> = [T][T extends any ? 0 : never];
+type TypeName<T> = StringLiteral<T> | (string & {});
+type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
+type EditorTypeName<T> = TypeName<T>;
+type FormatterTypeName<T> = TypeName<T>;
+type ClassTypeName<T> = TypeName<T>;
+declare class EditorAttribute {
+}
+declare class ISlickFormatter {
+}
+declare function registerFormatter(type: any, name: string, intf?: any[]): void;
+declare function registerEditor(type: any, name: string, intf?: any[]): void;
+declare function addCustomAttribute(type: any, attr: any): void;
+declare function getCustomAttribute<TAttr>(type: any, attrType: {
+    new (...args: any[]): TAttr;
+}, inherit?: boolean): TAttr;
+declare function hasCustomAttribute<TAttr>(type: any, attrType: {
+    new (...args: any[]): TAttr;
+}, inherit?: boolean): boolean;
+declare function getCustomAttributes<TAttr>(type: any, attrType: {
+    new (...args: any[]): TAttr;
+}, inherit?: boolean): TAttr[];
 
-export { type AnyIconClass, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, Enum, ErrorHandling, Fluent, H, type ICommonDialog, type IFrameDialogOptions, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, type RequestErrorInfo, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceOptions, type ServiceRequest, type ServiceResponse, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addClass, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createCommonDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, ensureMetadata, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getActiveRequests, getBaseType, getColumnsScript, getCookie, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getTypeStore, getjQuery, handleScriptDataError, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, inputLikeSelector, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInputLike, isInputTag, isInstanceOfType, isPromiseLike, isSameOrigin, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEnum, registerInterface, reloadLookupAsync, removeClass, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, serviceCall, serviceRequest, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toClassName, toId, toggleClass, trunc, tryGetText, warningDialog, yesDialogButton };
+export { type AnyIconClass, type ClassTypeName, ColumnSelection, type CommonDialogOptions, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, type DialogButton, DialogTexts, type DialogType, EditorAttribute, type EditorTypeName, Enum, ErrorHandling, Fluent, type FormatterTypeName, H, type ICommonDialog, type IFrameDialogOptions, ISlickFormatter, type IconClassName, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NoInfer, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, type RequestErrorInfo, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceOptions, type ServiceRequest, type ServiceResponse, type StringLiteral, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, type Type, type UndeleteRequest, type UndeleteResponse, type UtilityColor, addClass, addCustomAttribute, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, closePanel, compareStringFactory, confirmDialog, createCommonDialog, debounce, defaultNotifyOptions, dialogButtonToBS, dialogButtonToUI, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, getActiveRequests, getBaseType, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getType, getTypeFullName, getTypeNameProp, getTypeShortName, getjQuery, handleScriptDataError, hasCustomAttribute, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, inputLikeSelector, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInputLike, isInputTag, isInstanceOfType, isPromiseLike, isSameOrigin, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, openPanel, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, reloadLookupAsync, removeClass, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, serviceCall, serviceRequest, setRegisteredScripts, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toClassName, toId, toggleClass, trunc, tryGetText, typeNameProperty, warningDialog, yesDialogButton };

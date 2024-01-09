@@ -1,4 +1,4 @@
-﻿import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem, Fluent } from "@serenity-is/base";
+﻿import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
@@ -23,9 +23,10 @@ export interface CheckTreeItem<TSource> {
 }
 
 @Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
-@Decorators.element("<div/>")
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
+
+    static override createDefaultElement() { return document.createElement("div"); }
 
     private byId: { [key: string]: TItem };
 

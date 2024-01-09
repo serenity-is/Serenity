@@ -13,11 +13,12 @@ export interface TimeEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
-@Decorators.element("<select />")
 export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
 
-    private minutes: Fluent;
+    static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
     declare readonly domNode: HTMLSelectElement;
+
+    private minutes: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);

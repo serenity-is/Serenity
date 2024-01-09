@@ -2,7 +2,7 @@
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
 import { IReadOnly } from "../../interfaces";
-import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getAttributes, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
+import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -59,7 +59,6 @@ export interface GridPersistanceFlags {
 }
 
 @Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
-@Decorators.element("<div/>")
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
     private _isDisabled: boolean;
@@ -160,10 +159,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected useLayoutTimer() {
         return true;
-    }
-
-    protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
-        return getAttributes(getInstanceType(this), attrType, true);
     }
 
     protected layout(): void {
@@ -741,8 +736,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected enableFiltering(): boolean {
-        var attr = this.attrs(FilterableAttribute);
-        return attr.length > 0 && attr[0].value;
+        return this.getCustomAttribute(FilterableAttribute)?.value;
     }
 
     protected populateWhenVisible(): boolean {
@@ -848,12 +842,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getColumnsKey(): string {
-        var attr = this.attrs(ColumnsKeyAttribute);
-        if (attr && attr.length > 0) {
-            return attr[0].value;
-        }
-
-        return null;
+        return this.getCustomAttribute(ColumnsKeyAttribute)?.value;
     }
 
     protected getPropertyItems(): PropertyItem[] {
@@ -1031,10 +1020,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
 
-        var attr = this.attrs(LocalTextPrefixAttribute);
-
-        if (attr.length >= 1)
-            return attr[0].value;
+        return this.getCustomAttribute(LocalTextPrefixAttribute)?.value;
     }
 
     private _idProperty: string;
@@ -1047,9 +1033,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
 
-        var attr = this.attrs(IdPropertyAttribute);
-        if (attr.length === 1)
-            return this._idProperty = attr[0].value ?? '';
+        var attr = this.getCustomAttribute(IdPropertyAttribute);
+        if (attr)
+            return this._idProperty = attr.value ?? '';
 
         return this._idProperty = 'ID';
     }
@@ -1068,9 +1054,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (rowDefinition)
             return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
 
-        var attr = this.attrs(IsActivePropertyAttribute);
-        if (attr.length === 1)
-            return this._isActiveProperty = attr[0].value ?? '';
+        var attr = this.getCustomAttribute(IsActivePropertyAttribute);
+        if (attr)
+            return this._isActiveProperty = attr.value ?? '';
 
         return this._isActiveProperty = '';
     }

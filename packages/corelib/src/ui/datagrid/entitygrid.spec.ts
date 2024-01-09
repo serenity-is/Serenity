@@ -1,5 +1,5 @@
+import { addCustomAttribute } from "@serenity-is/base";
 import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { addAttribute } from "../../q/system-compat";
 import { EntityGrid } from "./entitygrid";
 
 function getIdProperty(grid: EntityGrid<any, any>): string {
@@ -27,7 +27,7 @@ describe('EntityGrid.getIdProperty', () => {
     it('can be overridden in subclass', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
+        addCustomAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
 
         var grid = new AttrGrid({});
         expect(getIdProperty(grid)).toBe("attrId");
@@ -85,7 +85,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
+        addCustomAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
 
         var grid = new AttrGrid({});
         expect(getIsActiveProperty(grid)).toBe("attrIsActive");
@@ -133,7 +133,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on typeName property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly __typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeName = 'MyProject.TestModule.DefaultGrid';
         }
 
         var grid = new DefaultGrid({});
@@ -170,7 +170,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
         var grid = new AttrGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
@@ -218,7 +218,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeName property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly __typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeName = 'MyProject.TestModule.DefaultGrid';
         }
 
         var grid = new DefaultGrid({});
@@ -246,7 +246,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
         var grid = new AttrGrid({});
         expect(getLocalTextPrefix(grid)).toBe("attrPrefix");

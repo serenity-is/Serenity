@@ -351,14 +351,8 @@ Fluent.prototype.toggleClass = function (this: FluentThis, value: string | boole
     return this;
 }
 
-Object.defineProperties(Fluent.prototype, {
-    "length": {
-        get: function () { return this.el ? 1 : 0 }
-    },
-    "0": {
-        get: function () { return this.el; }
-    }
-});
+Object.defineProperty(Fluent.prototype, "length", { get: function () { return this.el ? 1 : 0 } });
+Object.defineProperty(Fluent.prototype, 0, { get: function () { return this.el; } });
 
 Fluent.off = EventHandler.off;
 Fluent.on = EventHandler.on;

@@ -1,4 +1,4 @@
-﻿import { Type, ensureMetadata, getBaseType, getInstanceType, getTypeFullName, getTypeNameProp, getTypeStore, isInstanceOfType, registerClass, registerInterface, setTypeNameProp } from "@serenity-is/base";
+﻿import { ISlickFormatter, Type, getBaseType, getGlobalObject, getTypeFullName, getTypeNameProp, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -78,35 +78,6 @@ export interface TypeMember {
     setter?: string;
 }
 
-export function getAttributes(type: any, attrType: any, inherit?: boolean) {
-    var result = [];
-    if (inherit) {
-        var b = getBaseType(type);
-        if (b) {
-            var a: any = getAttributes(b, attrType, true);
-            for (var i = 0; i < a.length; i++) {
-                var t = getInstanceType(a[i]);
-                result.push(a[i]);
-            }
-        }
-    }
-    var attr = (type as any).__metadata?.attr;
-    if (attr != null) {
-        for (var i = 0; i < attr.length; i++) {
-            var a: any = attr[i];
-            if (attrType == null || isInstanceOfType(a, attrType)) {
-                var t = getInstanceType(a);
-                for (var j = result.length - 1; j >= 0; j--) {
-                    if (isInstanceOfType(result[j], t))
-                        result.splice(j, 1);
-                }
-                result.push(a);
-            }
-        }
-    }
-    return result;
-};
-
 export enum MemberType {
     field = 4,
     property = 16
@@ -135,19 +106,21 @@ function merge(arr1: any[], arr2: any[]) {
 
     function distinct(arr: any[]) {
         return arr.filter((item, pos) => arr.indexOf(item) === pos);
-    }        
+    }
 
     return distinct(arr1.concat(arr2));
 }
 
-export function addTypeMember(type: any, member: TypeMember): TypeMember {
+const typeMemberListSymbol = "Serenity.typeMemberList";
 
+export function addTypeMember(type: any, member: TypeMember): TypeMember {
+    var members = type[typeMemberListSymbol];
+    if (!members)
+        type[typeMemberListSymbol] = members = [];
     var name = member.name;
-    var md = ensureMetadata(type) as any;
-    md.members = md.members || [];
 
     let existing: TypeMember;
-    for (var m of md.members) {
+    for (var m of members) {
         if (m.name == name) {
             existing = m;
             break;
@@ -166,13 +139,13 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
         return existing;
     }
     else {
-        md.members.push(member);
+        members.push(member);
         return member;
     }
 }
 
 export function getTypes(from?: any): any[] {
-    const types = getTypeStore();
+    const types = {} as any;//getTypeStore();
     var result = [];
     if (!from) {
         for (var t in types) {
@@ -203,46 +176,9 @@ export function clearKeys(d: any) {
     }
 }
 
-export function prop(type: any, name: string, getter?: string, setter?: string) {
-    getter = getter || "get_" + name;
-    setter = setter || "set_" + name;
-
-    Object.defineProperty(type.prototype, name, {
-        get: function () {
-            return this[getter]();
-        },
-        set: function (value) {
-            return this[setter](value);
-        },
-        configurable: true,
-        enumerable: true
-    });
-}
-
 export function keyOf<T>(prop: keyof T) {
     return prop;
 }
-
-export function registerEditor(type: any, name: string, intf?: any[]) {
-    registerClass(type, name, intf);
-    addAttribute(type, new EditorAttribute());
-}
-
-export function addAttribute(type: any, attr: any) {
-    var md = ensureMetadata(type);
-    md.attr = md.attr || [];
-    md.attr.push(attr);
-}
-
-export class ISlickFormatter {
-}
-
-registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
-
-export class EditorAttribute {
-}
-
-registerClass(EditorAttribute, 'Serenity.EditorAttribute');
 
 export function cast(instance: any, type: Type) {
     if (instance == null)
@@ -256,17 +192,23 @@ export function safeCast(instance: any, type: Type) {
     return isInstanceOfType(instance, type) ? instance : null;
 };
 
+// has to duplicate these for now
+const typeRegistrySymbol: unique symbol = Symbol.for("Serenity.typeRegistrySymbol");
+const typeDiscriminatorSymbol: unique symbol = Symbol.for("Serenity.typeDiscriminator");
+
 export function initializeTypes(root: any, pre: string, limit: number) {
 
     if (!root)
         return;
 
-    const types = getTypeStore();
+    let types = getGlobalObject()[typeRegistrySymbol];
+    if (!types)
+        getGlobalObject()[types] = types = {};
 
     for (var k of Object.keys(root)) {
-        if (k.charAt(0) < 'A' || 
-            k.charAt(0) > 'Z' || 
-            k.indexOf('$') >= 0 || 
+        if (k.charAt(0) < 'A' ||
+            k.charAt(0) > 'Z' ||
+            k.indexOf('$') >= 0 ||
             !Object.prototype.hasOwnProperty.call(root, k))
             continue;
 
@@ -275,35 +217,22 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (obj == void 0 ||
             Array.isArray(obj) ||
             obj instanceof Date ||
-            (typeof obj != "function" &&
-             typeof obj != "object"))
+            (typeof obj != "function" && typeof obj != "object"))
             continue;
 
-        // no explict __typeName, e.g. not registered with a name,
+        // no explict typeName, e.g. not registered with a name,
         // a function but not an html element, or registered without name
-        if (!getTypeNameProp(obj) && 
-            ((typeof obj === "function" && typeof obj.nodeType !== "number") || 
-             (Object.prototype.hasOwnProperty.call(obj, "__interface") &&
-              (obj as any).__interface !== undefined))) {
+        if (!getTypeNameProp(obj) &&
+            (obj as any)[typeDiscriminatorSymbol] !== void 0 &&
+            ((typeof obj === "function" && typeof obj.nodeType !== "number") ||
+             (Object.prototype.hasOwnProperty.call(obj, typeDiscriminatorSymbol) &&
+              (obj as any)[typeDiscriminatorSymbol] !== undefined))) {
    
-            // legacy formatter with registerClass
-            if (typeof obj == "function" && 
-                !obj.__interfaces && 
-                obj.prototype?.format &&
-                k.substr(-9) === "Formatter") {
-                if ((obj as any).__interface === undefined)
-                    Object.defineProperty(obj, "__interface", { value: false, configurable: true });
-                (obj as any).__interfaces = [ISlickFormatter]
-            }
-
-            // only register types that should
-            if ((obj as any).__interface !== undefined) {
-                setTypeNameProp(obj, pre + k);
-                types[pre + k] = obj;
-            }
+            setTypeNameProp(obj, pre + k);
+            types[pre + k] ??= obj;
         }
-        
-        if (limit > 0) 
+
+        if (limit > 0)
             initializeTypes(obj, pre + k + ".", limit - 1);
     }
 }
@@ -329,4 +258,4 @@ export class InvalidCastException extends Exception {
     }
 }
 
-export {}
+export { };

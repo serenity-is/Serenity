@@ -1,9 +1,8 @@
-﻿import { Config, Fluent, addClass, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+﻿import { ClassTypeName, Config, EditorTypeName, Fluent, StringLiteral, addClass, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerClass, registerEditor, toggleClass } from "@serenity-is/base";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
 import { addValidationRule, appendChild, replaceAll } from "../../q";
-import { createDefaultElement, ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
+import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type EditorProps, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type EditorProps, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
@@ -18,13 +17,25 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
 let initialized = Symbol();
 let renderContentsCalled = Symbol();
 
-@Decorators.registerClass('Serenity.Widget')
 export class Widget<P = {}> {
+
+    static typeName = this.registerClass("Serenity.Widget");
+
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
     declare protected readonly uniqueName: string;
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
+
+    static registerClass<T>(name: StringLiteral<T>, intf?: any[]): ClassTypeName<T> {
+        registerClass(this, name, intf);
+        return name;
+    }
+
+    static registerEditor<T>(name: StringLiteral<T>, intf?: any[]): EditorTypeName<T> {
+        registerEditor(this, name, intf);
+        return name;
+    }
 
     constructor(props: WidgetProps<P>) {
         if (isArrayLike(props)) {
@@ -67,7 +78,7 @@ export class Widget<P = {}> {
     }
 
     static createDefaultElement(): HTMLElement {
-        return createDefaultElement(this);
+        return document.createElement("div");
     }
 
     /**
@@ -133,8 +144,6 @@ export class Widget<P = {}> {
         });
     }
 
-    protected static defaultTagName: string = "div";
-
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
         let node = handleElementProp(params.type as any, props);
@@ -146,7 +155,11 @@ export class Widget<P = {}> {
         params.init?.(widget);
         return widget;
     }
-    
+
+    protected getCustomAttribute<TAttr>(attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
+        return getCustomAttribute(getInstanceType(this), attrType, inherit);
+    }
+
     protected internalInit() {
         getInstanceType(this).deferRenderContents && this.internalRenderContents();
 
@@ -171,7 +184,7 @@ export class Widget<P = {}> {
         let el = this.init().domNode;
         let parent = el?.parentNode;
         if (parent instanceof DocumentFragment &&
-            parent.childNodes.length > 1 && 
+            parent.childNodes.length > 1 &&
             (parent as any)[isFragmentWorkaround])
             return parent;
         return el;
@@ -204,12 +217,15 @@ export class Widget<P = {}> {
     protected useIdPrefix(): IdPrefixType {
         return useIdPrefix(this.idPrefix);
     }
-}
 
+}
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
+
+    static override typeName = this.registerEditor("Serenity.EditorWidget");
+
     constructor(props: EditorProps<P>) {
         super(props);
     }

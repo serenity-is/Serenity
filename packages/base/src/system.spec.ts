@@ -1,4 +1,5 @@
-import { Enum, ensureMetadata, fieldsProxy, getBaseType, getInstanceType, getStateStore, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface } from "./system";
+import { enumFlagsSymbol, implementedInterfacesSymbol, hookIsAssignableFromSymbol, hookIsInstanceOfTypeSymbol, typeAttributesSymbol, typeDiscriminatorSymbol } from "./symbols";
+import { Enum, fieldsProxy, getBaseType, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, typeNameProperty } from "./system";
 
 describe("Enum.getValues", () => {
     it('returns correct values', function () {
@@ -40,7 +41,7 @@ describe("Enum.toString", () => {
     it('returns the value as string if value is not a number', () => {
         expect(Enum.toString(Test, "test" as any)).toBe("test");
         expect(Enum.toString(Test, "0" as any)).toBe("0");
-    });    
+    });
 
     it('returns names', function () {
         expect(Enum.toString(Test, 1)).toBe("Some");
@@ -60,115 +61,9 @@ describe("Enum.toString", () => {
             Another = 4
         }
 
-        ensureMetadata(Test2 as any).enumFlags = true;
+        (Test2 as any)[enumFlagsSymbol] = true;
         expect(Enum.toString(Test2, Test2.Some + Test2.Another)).toBe("Some | Another");
         expect(Enum.toString(Test2, Test2.Some + Test2.Another + 16)).toBe("Some | Another | 16");
-    });
-});
-
-describe("getStateStore", () => {
-    it('if globalThis.Serenity is null, it can assign it', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            expect((globalThis as any).Serenity).toBeUndefined();
-            var stateStore = getStateStore();
-            expect((globalThis as any).Serenity).toBeTruthy();
-            expect(stateStore).toBe((globalThis as any).Serenity.__stateStore);
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
-    });
-
-    it('if globalThis.Serenity is not null, it can create __stateStore', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            expect((globalThis as any).Serenity).toBeUndefined();
-            var newQ = (globalThis as any).Serenity = Object.create(null);
-            expect(newQ.__stateStore).toBeUndefined();
-            var stateStore = getStateStore();
-            expect((globalThis as any).Serenity).toBeTruthy();
-            expect((globalThis as any).Serenity === newQ).toBe(true);
-            expect(typeof (globalThis as any).Serenity.__stateStore == "object").toBe(true);
-            expect(Object.keys((globalThis as any).Serenity.__stateStore).length).toBe(0);
-            expect(stateStore === (globalThis as any).Serenity.__stateStore).toBe(true);
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
-    });
-
-    it('if globalThis.Serenity.__stateStore is not null, it returns that', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            expect((globalThis as any).Serenity).toBeUndefined();
-            var newQ = (globalThis as any).Serenity = Object.create(null);
-            var newStore = newQ.__stateStore = Object.create(null);
-            newStore.__myKey = "theKey";
-            var stateStore = getStateStore();
-            expect((globalThis as any).Serenity).toBeTruthy();
-            expect((globalThis as any).Serenity === newQ).toBe(true);
-            expect(stateStore === newStore).toBe(true);
-            expect((globalThis as any).Serenity.__stateStore === newStore).toBe(true);
-            expect(Object.keys((globalThis as any).Serenity.__stateStore).length).toBe(1);
-            expect((globalThis as any).Serenity.__stateStore.__myKey).toBe("theKey");
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
-    });
-
-    it('if a new store key is provided, it auto initializes it to empty object and returns', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            var newStore = {};
-            (globalThis as any).Serenity = { __stateStore: newStore };
-            var sub = getStateStore("sub");
-            expect(typeof sub).toBe("object");
-            expect(Object.keys(sub).length).toBe(0);
-            expect((globalThis as any).Serenity.__stateStore === newStore).toBe(true);
-            expect(Object.keys(newStore).length).toBe(1);
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
-    });
-
-    it('if returns same sub store instance every time', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            (globalThis as any).Serenity = { __stateStore: {} };
-            var sub1 = getStateStore("sub");
-            sub1.test = "A";
-            var sub2 = getStateStore("sub");
-            expect(sub1 === sub2).toBe(true);
-            expect(sub2.test).toBe("A");
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
-    });
-
-    it('if does not return same sub store for different keys', function () {
-        var s = (globalThis as any).Serenity;
-        try {
-            delete (globalThis as any).Serenity;
-            (globalThis as any).Serenity = { __stateStore: {} };
-            var sub1 = getStateStore("sub1");
-            sub1.test = "A";
-            var sub2 = getStateStore("sub2");
-            expect(sub1 !== sub2).toBe(true);
-            expect(sub1.test).toBe("A");
-            expect(sub2.test).toBeUndefined();
-        }
-        finally {
-            (globalThis as any).Serenity = s;
-        }
     });
 });
 
@@ -232,26 +127,28 @@ describe("isAssignableFrom", () => {
     });
 
     it("returns true for sub class", function () {
-        class A {}
-        class B extends A {}
+        class A { }
+        class B extends A { }
         expect(isAssignableFrom(A, B)).toBe(true);
         expect(isAssignableFrom(B, A)).toBe(false);
     });
 
 });
 
+
+
 describe("registerClass", () => {
     function expectClassDetails(klass: any, name: string, intf?: any[]) {
         expect(isEnum(klass)).toBe(false);
 
         if (intf != null) {
-            expect(klass.__interfaces).toStrictEqual(intf);
+            expect(klass[implementedInterfacesSymbol]).toStrictEqual(intf);
         }
         else
-            expect(klass.__interfaces).toBeUndefined();
+            expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(klass.__metadata).toBeUndefined();
-        expect(klass.__interface).toBe(false);
+        expect(klass[typeAttributesSymbol]).toBeUndefined();
+        expect(klass[enumFlagsSymbol]).toBeUndefined();
 
         if (name != null) {
             expect(getTypeFullName(klass)).toBe(name);
@@ -265,7 +162,7 @@ describe("registerClass", () => {
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(klass.__isAssignableFrom).toBeUndefined();
+        expect(klass[hookIsAssignableFromSymbol]).toBeUndefined();
     }
 
     it('works with no name', function () {
@@ -341,7 +238,7 @@ describe("registerClass", () => {
         registerClass(Derived, nameDerived, null);
         expectClassDetails(Derived, nameDerived, [Intf1, Intf2]);
         // should be the same reference
-        expect((Derived as any).__interfaces === (Test as any).__interfaces).toBe(true);
+        expect((Derived as any)[implementedInterfacesSymbol] === (Test as any)[implementedInterfacesSymbol]).toBe(true);
     });
 
     it('works with derived class with empty interface list derives interfaces as a copy', function () {
@@ -366,7 +263,7 @@ describe("registerClass", () => {
         registerClass(Derived, nameDerived, []);
         expectClassDetails(Derived, nameDerived, [Intf1, Intf2]);
         // should be the same reference
-        expect((Derived as any).__interfaces === (Test as any).__interfaces).toBe(true);
+        expect((Derived as any)[implementedInterfacesSymbol] === (Test as any)[implementedInterfacesSymbol]).toBe(true);
     });
 
     it('works with derived class with extra interface list derives interfaces as a copy', function () {
@@ -395,15 +292,15 @@ describe("registerClass", () => {
         expectClassDetails(Derived, nameDerived, [Intf1, Intf2, Intf3]);
 
         // should not be the same reference
-        expect((Derived as any).__interfaces !== (Test as any).__interfaces).toBe(true);
+        expect((Derived as any)[implementedInterfacesSymbol] !== (Test as any)[implementedInterfacesSymbol]).toBe(true);
 
         // check base class again to make sure its interfaces are not modified
         expectClassDetails(Test, nameTest, [Intf1, Intf2]);
     });
 
-    it("works with types that already have a static __typeName property", () => {
+    it("works with types that already have a static [typeName] property", () => {
         class MyClass {
-            static __typeName = "MyClassName";
+            static [typeNameProperty] = "MyClassName";
         }
 
         registerClass(MyClass, null);
@@ -414,26 +311,25 @@ describe("registerClass", () => {
 describe("registerEnum", () => {
     function expectTypeDetails(enumObj: any, name: string) {
         expect(isEnum(enumObj)).toBe(true);
-        expect(enumObj.__interface).toBeNull();
+        expect(enumObj[typeDiscriminatorSymbol]).toBeNull();
 
-        expect(enumObj.__interfaces).toBeUndefined();
-        expect(enumObj.__metadata).toBeUndefined();
+        expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
+        expect(enumObj[enumFlagsSymbol]).toBeUndefined();
+        expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
 
         if (name != null) {
             expect(getTypeFullName(enumObj)).toBe(name);
-            expect(enumObj.__typeName).toBe(name);
-            expect(enumObj.__typeName$).toBe(name);
+            expect(enumObj[fullName]).toBe(name);
             expect(getType(name)).toStrictEqual(enumObj);
         }
         else {
             var fullName = getTypeFullName(enumObj);
             expect(fullName).toBe('Object');
-            expect(enumObj.__typeName).toBeUndefined();
-            expect(enumObj.__typeName$).toBeUndefined();
+            expect(enumObj[fullName]).toBeUndefined();
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(enumObj.__isAssignableFrom).toBeUndefined();
+        expect(enumObj[hookIsAssignableFromSymbol]).toBeUndefined();
     }
 
     it('works with no name', function () {
@@ -470,7 +366,7 @@ describe("registerEnum", () => {
         registerEnum(Test, name, key);
         expect(getType(name)).toBe(Test);
         expect(getType(key)).toBe(Test);
-    });    
+    });
 });
 
 describe("registerInterface", () => {
@@ -478,13 +374,13 @@ describe("registerInterface", () => {
         expect(isEnum(klass)).toBe(false);
 
         if (intf != null) {
-            expect(klass.__interfaces).toStrictEqual(intf);
+            expect(klass[implementedInterfacesSymbol]).toStrictEqual(intf);
         }
         else
-            expect(klass.__interfaces).toBeUndefined();
+            expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(klass.__metadata).toBeUndefined();
-        expect(klass.__interface).toBe(true);
+        expect(klass[enumFlagsSymbol]).toBeUndefined();
+        expect(klass[typeDiscriminatorSymbol]).toBe(true);
 
         if (name != null) {
             expect(getTypeFullName(klass)).toBe(name);
@@ -500,7 +396,7 @@ describe("registerInterface", () => {
             expect(getType(fullName) == null).toBe(true);
         }
 
-        expect(typeof klass.__isAssignableFrom).toBe("function");
+        expect(typeof klass[hookIsAssignableFromSymbol]).toBe("function");
     }
 
     it('works with no name', function () {
@@ -577,13 +473,13 @@ describe("registerInterface", () => {
         registerInterface(IDerived, nameDerived, null);
         expectTypeDetails(IDerived, nameDerived, [Intf1, Intf2]);
         // should be the same reference
-        expect((IDerived as any).__interfaces === (ITest as any).__interfaces).toBe(true);
+        expect((IDerived as any)[implementedInterfacesSymbol] === (ITest as any)[implementedInterfacesSymbol]).toBe(true);
     });
 
     it('works with derived class with empty interface list derives interfaces as a copy', function () {
 
         // NOTE: interfaces are not supposed to be derived classes
-        // just testing copy of __interfaces here
+        // just testing copy of [implementedInterfacesSymbol] here
 
         class Intf1 {
         }
@@ -605,13 +501,13 @@ describe("registerInterface", () => {
         registerInterface(IDerived, nameDerived, []);
         expectTypeDetails(IDerived, nameDerived, [Intf1, Intf2]);
         // should be the same reference
-        expect((IDerived as any).__interfaces === (ITest as any).__interfaces).toBe(true);
+        expect((IDerived as any)[implementedInterfacesSymbol] === (ITest as any)[implementedInterfacesSymbol]).toBe(true);
     });
 
     it('works with derived class with extra interface list derives interfaces as a copy', function () {
 
         // NOTE: interfaces are not supposed to be derived classes
-        // just testing copy of __interfaces here
+        // just testing copy of [implementedInterfacesSymbol] here
 
         class Intf1 {
         }
@@ -637,30 +533,10 @@ describe("registerInterface", () => {
         expectTypeDetails(IDerived, nameDerived, [Intf1, Intf2, Intf3]);
 
         // should not be the same reference
-        expect((IDerived as any).__interfaces !== (ITest as any).__interfaces).toBe(true);
+        expect((IDerived as any)[implementedInterfacesSymbol] !== (ITest as any)[implementedInterfacesSymbol]).toBe(true);
 
         // check base class again to make sure its interfaces are not modified
         expectTypeDetails(ITest, nameTest, [Intf1, Intf2]);
-    });
-});
-
-describe("ensureMetadata", () => {
-    it("returns existing __metadata if available", () => {
-        class Test {
-        }
-        var existing = (Test as any)["__metadata"] = { y: 3 };
-        expect(ensureMetadata(Test)).toBe(existing);
-    });
-
-    it("does not return existing __metadata from base class", () => {
-        class Test {
-        }
-
-        class Sub {
-
-        }
-        var existing = (Test as any)["__metadata"] = { y: 3 };
-        expect(ensureMetadata(Sub)).not.toBe(existing);
     });
 });
 
@@ -670,13 +546,13 @@ describe("isInstanceOfType", () => {
         expect(isInstanceOfType(undefined, Object)).toBe(false);
     });
 
-    it("uses __isInstanceOfType function if available", () => {
+    it("uses isInstanceOfTypeSymbol function if available", () => {
         class Test1 {
-            static __isInstanceOfType(type: any) { return typeof type === "string" && type.startsWith("t"); }
+            static [hookIsInstanceOfTypeSymbol](type: any) { return typeof type === "string" && type.startsWith("t"); }
         }
 
         class Test2 {
-            static __isInstanceOfType = true;
+            static [hookIsInstanceOfTypeSymbol] = true;
         }
 
         expect(isInstanceOfType("test", Test1)).toBe(true);
@@ -763,7 +639,7 @@ describe("fieldsProxy", () => {
         expect(proxy.A).toBe("A");
         expect(proxy.B).toBe("B");
 
-    });    
+    });
 });
 
 describe("getType", () => {
@@ -784,7 +660,7 @@ describe("getTypeShortName", () => {
         class Test {
         }
         registerClass(Test, "NamespaceOf.C.IsD")
-    
+
         expect(getTypeShortName(Test)).toBe("IsD");
     });
 
@@ -792,7 +668,7 @@ describe("getTypeShortName", () => {
         class Test {
         }
         registerClass(Test, "Me")
-    
+
         expect(getTypeShortName(Test)).toBe("Me");
     });
 });

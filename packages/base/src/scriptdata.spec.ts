@@ -1,45 +1,43 @@
 import { Lookup } from "./lookup";
 import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData } from "./scriptdata";
-import { getStateStore } from "./system";
+import { scriptDataHashSymbol, scriptDataItemSymbol } from "./symbols";
+import { getGlobalObject } from "./system";
 
 jest.mock("./notify", () => ({
     notifyError: jest.fn()
 }));
 
-const __scriptData = "__scriptData";
-const __scriptHash = "__scriptHash";
 
 beforeEach(() => {
     jest.clearAllMocks();
-    let store = getStateStore();
-    delete store[__scriptHash];
-    delete store[__scriptData];
+    delete getGlobalObject()[scriptDataHashSymbol];
+    delete getGlobalObject()[scriptDataItemSymbol];
 });
 
 describe("getScriptDataHash", () => {
-    it("returns null if __scriptHash is null", () => {
+    it("returns null if scriptDataHash is null", () => {
         expect(getScriptDataHash("test")).toBe(null);
     });
 
-    it("returns a new random string if reload is true and existing __scriptHash is null", () => {
+    it("returns a new random string if reload is true and existing scriptDataHash is null", () => {
         let hash = getScriptDataHash("test", true);
         expect(typeof hash).toBe("string");
         expect(hash.length).toBeGreaterThan(1);
-        let store = getStateStore(__scriptHash);
+        let store = getGlobalObject()[scriptDataHashSymbol];
         expect(store).toEqual({
             test: hash
         });
     });
 
     it("returns a new random string if reload is true", () => {
-        getStateStore()[__scriptHash] = {
+        getGlobalObject()[scriptDataHashSymbol] = {
             test: "1357",
             some: "2468"
         }
         let hash = getScriptDataHash("test", true);
         expect(typeof hash).toBe("string");
         expect(hash.length).toBeGreaterThan(1);
-        let store = getStateStore(__scriptHash);
+        let store = getGlobalObject()[scriptDataHashSymbol];
         expect(store).toEqual({
             test: hash,
             some: "2468"
@@ -51,10 +49,10 @@ describe("getScriptDataHash", () => {
             test: "1357",
             some: "2468"
         };
-        getStateStore()[__scriptHash] = hashes;
+        getGlobalObject()[scriptDataHashSymbol] = hashes;
         let hash = getScriptDataHash("test");
         expect(hash).toBe("1357");
-        let store = getStateStore(__scriptHash);
+        let store = getGlobalObject()[scriptDataHashSymbol];
         expect(store).toBe(hashes);
     });
 
@@ -66,7 +64,7 @@ describe("getScriptDataHash", () => {
         try {
             let hash = getScriptDataHash("test");
             expect(hash).toBe(null);
-            expect(getStateStore()[__scriptHash]).toBeUndefined();
+            expect(getGlobalObject()[scriptDataHashSymbol]).toBeUndefined();
         }
         finally {
             script.remove();
@@ -83,7 +81,7 @@ describe("getScriptDataHash", () => {
         try {
             let hash = getScriptDataHash("test");
             expect(hash).toBe(null);
-            expect(getStateStore()[__scriptHash]).toBeUndefined();
+            expect(getGlobalObject()[scriptDataHashSymbol]).toBeUndefined();
         }
         finally {
             script.remove();
@@ -99,7 +97,7 @@ describe("getScriptDataHash", () => {
         try {
             let hash = getScriptDataHash("test");
             expect(hash).toBe("555");
-            expect(getStateStore(__scriptHash)).toEqual({
+            expect(getGlobalObject()[scriptDataHashSymbol]).toEqual({
                 test: "555",
                 some: "333"
             });
@@ -112,7 +110,7 @@ describe("getScriptDataHash", () => {
 
 describe("fetchScriptData", () => {
     it("uses fetch and DynamicData endpoint with current hash", async () => {
-        getStateStore(__scriptHash)["RemoteData.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -139,7 +137,7 @@ describe("fetchScriptData", () => {
     });
 
     it("returns the same promise for successive calls", async () => {
-        getStateStore(__scriptHash)["RemoteData.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -179,7 +177,7 @@ describe("fetchScriptData", () => {
     });
 
     it("converts response to a lookup for name that starts with Lookup.", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -216,7 +214,7 @@ describe("fetchScriptData", () => {
     });
 
     it("throws if fetch is not available", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         delete window["fetch"];
         try {
@@ -230,7 +228,7 @@ describe("fetchScriptData", () => {
     });
 
     it("returns a rejected promise if response.ok is false", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -260,8 +258,8 @@ describe("fetchScriptData", () => {
 });
 
 describe("getScriptData", () => {
-    it("returns data from __scriptData if available and reload is not true", async () => {
-        getStateStore(__scriptData)["RemoteData.Test"] = "357";
+    it("returns data from scriptDataItem if available and reload is not true", async () => {
+        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
         let mockFetch = jest.fn();
         window["fetch"] = mockFetch as any;
@@ -276,7 +274,7 @@ describe("getScriptData", () => {
     });
 
     it("uses fetch and DynamicData endpoint with current hash", async () => {
-        getStateStore(__scriptHash)["RemoteData.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -302,8 +300,8 @@ describe("getScriptData", () => {
     });
 
     it("reloads data if second argument is true", async () => {
-        getStateStore(__scriptHash)["RemoteData.Test"] = "123";
-        getStateStore(__scriptData)["RemoteData.Test"] = "old";
+        getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
+        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "old" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -332,7 +330,7 @@ describe("getScriptData", () => {
     });
 
     it("calls fetch once for successive calls", async () => {
-        getStateStore(__scriptHash)["RemoteData.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -368,7 +366,7 @@ describe("getScriptData", () => {
     });
 
     it("converts response to a lookup for name that starts with Lookup.", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -405,7 +403,7 @@ describe("getScriptData", () => {
     });
 
     it("throws if fetch is not available", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         delete window["fetch"];
         try {
@@ -419,7 +417,7 @@ describe("getScriptData", () => {
     });
 
     it("returns a rejected promise if response.ok is false", async () => {
-        getStateStore(__scriptHash)["Lookup.Test"] = "123";
+        getGlobalObject()[scriptDataHashSymbol] = { ["Lookup.Test"]: "123" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -449,8 +447,8 @@ describe("getScriptData", () => {
 });
 
 describe("peekScriptData", () => {
-    it("returns data from __stateStore if available", () => {
-        getStateStore(__scriptData)["RemoteData.Test"] = "357";
+    it("returns data from scriptDataItem if available", () => {
+        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
         let mockFetch = jest.fn();
         window["fetch"] = mockFetch as any;

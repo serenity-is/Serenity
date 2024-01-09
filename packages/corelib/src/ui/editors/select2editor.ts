@@ -5,10 +5,10 @@ import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
+import { ValidationHelper } from "../helpers/validationhelper";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
-import { ValidationHelper } from "../helpers/validationhelper";
 
 export interface Select2CommonOptions {
     allowClear?: boolean;
@@ -56,15 +56,15 @@ export interface Select2SearchResult<TItem> {
 
 @Decorators.registerClass('Serenity.Select2Editor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
-@Decorators.element("<input type=\"hidden\"/>")
 export class Select2Editor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+
+    static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
+    declare readonly domNode: HTMLInputElement;
 
     private _items: Select2Item[];
     private _itemById: { [key: string]: Select2Item };
     protected lastCreateTerm: string;
-
-    declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);

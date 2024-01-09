@@ -5,9 +5,9 @@ import { EditorWidget, EditorProps } from "../widgets/widget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
 @Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
-@Decorators.element("<input type=\"text\"/>")
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {

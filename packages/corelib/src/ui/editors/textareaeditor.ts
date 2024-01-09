@@ -9,8 +9,9 @@ export interface TextAreaEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
-@Decorators.element("<textarea />")
 export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+
+    static override createDefaultElement() { return document.createElement("textarea"); }
 
     constructor(props: EditorProps<P>) {
         super(props);

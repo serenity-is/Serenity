@@ -1,4 +1,4 @@
-﻿import { Fluent, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "@serenity-is/base";
+﻿import { Fluent, NoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "@serenity-is/base";
 
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
@@ -126,8 +126,6 @@ const idPrefixHandler = {
         return target._ + p;
     }
 };
-
-export type NoInfer<T> = [T][T extends any ? 0 : never];
 
 export type WidgetProps<P> = {
     id?: string;

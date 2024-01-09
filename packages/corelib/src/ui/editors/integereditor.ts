@@ -1,4 +1,4 @@
-﻿import { formatNumber, getjQuery, parseInteger } from "@serenity-is/base";
+﻿import { Fluent, formatNumber, getjQuery, parseInteger } from "@serenity-is/base";
 import { Decorators } from "../../decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend, isTrimmedEmpty } from "../../q";
@@ -12,9 +12,9 @@ export interface IntegerEditorOptions {
 }
 
 @Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
-@Decorators.element('<input type="text"/>')
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
+    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
