@@ -142,8 +142,3 @@ export type EditorProps<T> = WidgetProps<T> & {
     readOnly?: boolean;
 }
 
-export namespace WX {
-    export function hasOriginalEvent(e: any): boolean {
-        return !!!(typeof (e.originalEvent) === 'undefined');
-    }
-}

@@ -2821,9 +2821,6 @@ declare namespace Serenity {
         required?: boolean;
         readOnly?: boolean;
     };
-    namespace WX {
-        function hasOriginalEvent(e: any): boolean;
-    }
 
     class Widget<P = {}> {
         static typeInfo: ClassTypeInfo<"Serenity.Widget">;
