@@ -191,10 +191,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         document.dispatchEvent(new Event('click'));
 
         window.setTimeout(() => {
+            let domNode = this.domNode
             this.destroy();
-            if (this.domNode) {
-                let $ = getjQuery();
-                $ ? $(this.domNode).remove() : this.domNode.remove();
+            if (domNode) {
+                Fluent(this.domNode).remove();
             }
             positionToastContainer(defaultNotifyOptions, false);
         }, 0);

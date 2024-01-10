@@ -173,7 +173,7 @@ function createPanel(options: DialogOptions): ICommonDialog {
     let result: string;
     let panelBody = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
-    panelBody.classList.add("panel-body");
+    panelBody.classList.add("s-PanelBody");
     let panelRoot = document.createElement("div");
     panelRoot.classList.add("s-Panel");
     panelRoot.append(panelBody);
@@ -207,7 +207,14 @@ function createPanel(options: DialogOptions): ICommonDialog {
         type: "panel",
         open: () => panelBody && openPanel(panelBody),
         close,
-        dispose: () => panelBody = null,
+        dispose: () => {
+            if (!panelBody)
+                return;
+            let panelRoot = panelBody?.closest(".s-Panel");
+            if (panelRoot && panelRoot !== panelBody)
+                Fluent(panelRoot).remove();
+            panelBody = null;
+        },
         get title() { return panelBody?.querySelector(".panel-titlebar-text").textContent },
         set title(value: string) { panelBody && setPanelTitle(panelBody, value) },
         get result() { return result }
@@ -309,7 +316,7 @@ function createBS5RawModal(modalDiv: HTMLElement, options: DialogOptions): IComm
             options.onClose?.(result);
         }
         finally {
-            modalDiv.remove();
+            Fluent(modalDiv).remove();
         }
     });
 
@@ -336,6 +343,7 @@ function createBS5RawModal(modalDiv: HTMLElement, options: DialogOptions): IComm
         dispose: () => {
             if (modal) {
                 modal.dispose?.();
+                Fluent(modal).remove();
                 modal = null;
             }
         },
@@ -358,7 +366,7 @@ function createBSModalWithJQuery(modalDiv: HTMLElement, options: DialogOptions):
             options.onClose?.(result);
         }
         finally {
-            modalDiv$.remove();
+            Fluent(modalDiv$).remove();
         }
     });
 
@@ -387,7 +395,8 @@ function createBSModalWithJQuery(modalDiv: HTMLElement, options: DialogOptions):
                 return;
             modalDiv$.data('bs.modal', null);
             modalDiv$.find(".modal-body").removeClass("modal-body");
-            window.setTimeout(() => modalDiv$.remove(), 0);
+            window.setTimeout(() => Fluent(modalDiv$).remove(), 0);
+            Fluent(modalDiv$).remove();
             modalDiv$ = null;
         },
         get result() { return result; },
@@ -782,11 +791,11 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
     element = isArrayLike(element) ? element[0] : element;
     if (!element)
         return;
-    let panelRoot = element?.closest('.s-Panel:not(.hidden)') as HTMLElement ??
-        element.matches(".panel-body:not(.hidden)") ? element : null;
-    if (!panelRoot)
+    let panelRoot = element?.closest('.s-Panel') as HTMLElement ??
+        element?.closest(".s-PanelBody") as HTMLElement;
+    if (!panelRoot || panelRoot.classList.contains("hidden"))
         return;
-    let panelBody = element.classList.contains("panel-body") ? element : panelRoot;
+    let panelBody = element.classList.contains("s-PanelBody") ? element : panelRoot;
 
     let event = Fluent.trigger(panelBody, 'panelbeforeclose', { bubbles: false });
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
@@ -889,8 +898,8 @@ function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolea
         ptc = document.createElement("button");
         ptc.classList.add("panel-titlebar-close");
         ptc.addEventListener("click", e => {
-            closePanel((e.target as HTMLElement).closest<HTMLElement>(".panel-body") ??
-                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel")?.querySelector<HTMLElement>(":scope > .panel-body") ??
+            closePanel((e.target as HTMLElement).closest<HTMLElement>(".s-PanelBody") ??
+                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel")?.querySelector<HTMLElement>(":scope > .s-PanelBody") ??
                 (e.target as HTMLElement).closest<HTMLElement>(".s-Panel"));
         });
         pt.prepend(ptc);

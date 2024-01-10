@@ -1,4 +1,4 @@
-﻿import { faIcon, getTypeFullName, getjQuery } from "@serenity-is/base";
+﻿import { Fluent, faIcon, getTypeFullName, getjQuery } from "@serenity-is/base";
 import { isMobileView } from "../q";
 import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
@@ -68,7 +68,7 @@ function applyCleanDataPatch(jQuery: any) {
                         // html collection might change during remove event, so clone it!
                         if (cloned === elems)
                             cloned = Array.prototype.slice.call(elems);
-                        jQuery(elem).triggerHandler("remove");
+                        Fluent.trigger(elem, "remove", { bubbles: false});
                         delete events.remove;
                     }
                 } catch (e) { }

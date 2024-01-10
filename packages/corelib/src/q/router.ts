@@ -76,7 +76,7 @@ export namespace Router {
     }
 
     function visibleDialogs() {
-        var dialogs = document.querySelectorAll(".ui-dialog-content, .ui-dialog.panel-hidden>.ui-dialog-content, .panel-body");
+        var dialogs = document.querySelectorAll(".ui-dialog-content, .ui-dialog.panel-hidden>.ui-dialog-content, .s-PanelBody");
         var visibleDialogs: HTMLElement[] = [];
         dialogs.forEach((el: HTMLElement) => {
             if (!el.classList.contains(".ui-dialog-content") ||
@@ -95,8 +95,8 @@ export namespace Router {
         var route = [];
         owner = isArrayLike(owner) ? owner[0] : owner;
         element = isArrayLike(element) ? element[0] : element;
-        var isDialog = owner.classList.contains(".ui-dialog-content") || owner.classList.contains('panel-body');
-        var dialog = isDialog ? owner : owner.closest('.ui-dialog-content, .panel-body') as HTMLElement;
+        var isDialog = owner.classList.contains(".ui-dialog-content") || owner.classList.contains('s-PanelBody');
+        var dialog = isDialog ? owner : owner.closest('.ui-dialog-content, .s-PanelBody') as HTMLElement;
         var value = hash();
 
         var idPrefix: string;
@@ -191,7 +191,7 @@ export namespace Router {
                 var d = dialogs[i];
                 if (d.classList.contains('ui-dialog-content'))
                     getjQuery()(d as any).dialog?.('close');
-                else if (d.classList.contains('panel-body'))
+                else if (d.classList.contains('s-PanelBody'))
                     closePanel(d);
             }
 
@@ -281,6 +281,6 @@ export namespace Router {
         }
 
         Fluent.on(document, "dialogopen", ".ui-dialog-content", handler);
-        Fluent.on(document, "panelopen", ".panel-body", handler);
+        Fluent.on(document, "panelopen", ".s-PanelBody", handler);
     }
 }
