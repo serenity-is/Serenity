@@ -946,7 +946,10 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 this.updateItems();
                 this.lastCreateTerm = null;
 
-                if ((dci.type === 'create' || dci.type === 'update') &&
+                if (!dci.operationType && (dci as any).originalEvent?.operationType)
+                    dci = (dci as any).originalEvent;
+
+                if ((dci.operationType === 'create' || dci.operationType === 'update') &&
                     dci.entityId != null) {
                     var id = dci.entityId.toString();
 
@@ -963,7 +966,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                         this.set_value(id);
                     }
                 }
-                else if (this.isMultiple() && dci.type === 'delete' &&
+                else if (this.isMultiple() && dci.operationType === 'delete' &&
                     dci.entityId != null) {
                     var id1 = dci.entityId.toString();
                     var values1 = this.get_values().slice();

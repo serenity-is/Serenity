@@ -47,7 +47,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     public arrange(): void {
         Fluent(this.domNode).findAll('.require-layout').forEach(el => {
             if (el.offsetWidth > 0 && el.offsetHeight > 0)
-                Fluent.trigger(el, "layout", { bubbles: false });
+                Fluent.trigger(el, "layout");
         });
     }
 

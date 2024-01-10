@@ -133,10 +133,7 @@ export class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonO
 
     destroy() {
         let menu = isArrayLike(this.options.menu) ? this.options.menu[0] : this.options.menu;
-        if (menu) {
-            let $ = getjQuery();
-            $ ? $(menu).remove() : menu.remove();
-        }
+        Fluent(menu).remove();
         super.destroy();
     }
 }

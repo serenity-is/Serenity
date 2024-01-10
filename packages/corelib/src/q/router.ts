@@ -1,7 +1,6 @@
 ﻿import { Fluent, closePanel, getjQuery, isArrayLike } from "@serenity-is/base";
 
 export interface HandleRouteEvent extends Event {
-    handled: boolean,
     route: string,
     parts: string[],
     index: number
@@ -138,8 +137,8 @@ export namespace Router {
             var prhash = el.dataset.qprhash;
             var tryBack = e.target.closest('.s-MessageDialog') || (e && e.originalEvent &&
                 ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
-                    e.originalEvent.target.hasClass("ui-dialog-titlebar-close") ||
-                    e.originalEvent.target.hasClass("panel-titlebar-close")));
+                    e.originalEvent.target?.hasClass?.("ui-dialog-titlebar-close") ||
+                    e.originalEvent.target?.hasClass?.("panel-titlebar-close")));
             if (prhash != null)
                 replace(prhash, tryBack);
             else
@@ -224,8 +223,6 @@ export namespace Router {
                 }
 
                 Fluent.trigger(handler, "handleroute", <HandleRouteEvent>{
-                    bubbles: false,
-                    handled: false,
                     route: route,
                     parts: newParts,
                     index: i

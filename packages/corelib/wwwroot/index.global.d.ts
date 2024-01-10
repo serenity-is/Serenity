@@ -2935,7 +2935,6 @@ declare namespace Serenity {
     }
 
     interface HandleRouteEvent extends Event {
-        handled: boolean;
         route: string;
         parts: string[];
         index: number;
@@ -3487,7 +3486,7 @@ declare namespace Serenity {
     }
 
     interface DataChangeInfo extends Event {
-        type: string;
+        operationType: string;
         entityId: any;
         entity: any;
     }
@@ -3779,7 +3778,9 @@ declare namespace Serenity {
         function triggerDataChange(dialog: Widget<any>): any;
         function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void;
         function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-        function cascade(cascadedDialog: any, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
+        function cascade(cascadedDialog: {
+            domNode: HTMLElement;
+        }, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
         function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
     }
 
@@ -5296,7 +5297,7 @@ declare namespace Serenity {
 
     class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         constructor(props: WidgetProps<P>);
-        protected handleRoute(ev: HandleRouteEvent): void;
+        protected handleRoute(e: HandleRouteEvent): void;
         protected usePager(): boolean;
         protected createToolbarExtensions(): void;
         protected getInitialTitle(): string;

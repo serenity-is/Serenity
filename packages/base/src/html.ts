@@ -56,8 +56,12 @@ export function removeClass(el: Element, cls: string) {
 }
 
 export function toClassName(value: string | boolean | (string | boolean)[]): string {
-    return Array.isArray(value) ? value.map(x => value != null && typeof value !== "boolean" ? value : "").filter(Boolean).join(" ") :
-        typeof value != null && typeof value !== "boolean" ? value : "";
+    if (Array.isArray(value))
+        return value.map(toClassName).filter(Boolean).join(" ");
+    else if (typeof value !== "boolean" && value != null)
+        return "" + value;
+    else
+        return "";
 }
 
 export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {

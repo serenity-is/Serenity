@@ -68,7 +68,7 @@ function applyCleanDataPatch(jQuery: any) {
                         // html collection might change during remove event, so clone it!
                         if (cloned === elems)
                             cloned = Array.prototype.slice.call(elems);
-                        Fluent.trigger(elem, "remove", { bubbles: false});
+                        Fluent.trigger(elem, "remove");
                         delete events.remove;
                     }
                 } catch (e) { }

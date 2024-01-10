@@ -63,7 +63,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                     .appendTo(tabs);
 
                 var pane = Fluent("div")
-                    .addClass(["tab-panel fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
+                    .addClass(["tab-pane fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
                     .attr("id", tabId)
                     .attr("role", "tabpanel")
                     .appendTo(panes);

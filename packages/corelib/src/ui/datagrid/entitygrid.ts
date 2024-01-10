@@ -21,37 +21,43 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         Fluent.on(this.domNode, "handleroute." + this.uniqueName, this.handleRoute.bind(this));
     }
 
-    protected handleRoute(ev: HandleRouteEvent): void {
-        if (!!ev.handled)
+    protected handleRoute(e: HandleRouteEvent): void {
+
+        let route = (!e.route && (e as any).originalEvent?.route) || e.route;
+        if (typeof route !== "string")
             return;
 
-        if (!!(ev.route === 'new')) {
-            ev.handled = true;
+        if (route === 'new') {
+            e.preventDefault();
             this.addButtonClick();
             return;
         }
 
         var oldRequests = getActiveRequests();
 
-        var parts = ev.route.split('/');
+        var parts = route.split('/');
         if (!!(parts.length === 2 && parts[0] === 'edit')) {
-            ev.handled = true;
+            e.preventDefault();
             this.editItem(decodeURIComponent(parts[1]));
         }
         else if (!!(parts.length === 2 && parts[1] === 'new')) {
-            ev.handled = true;
+            e.preventDefault();
             this.editItemOfType(parts[0], null);
         }
         else if (!!(parts.length === 3 && parts[1] === 'edit')) {
-            ev.handled = true;
+            e.preventDefault();
             this.editItemOfType(parts[0], decodeURIComponent(parts[2]));
         }
         else
             return;
 
-        if (getActiveRequests() > oldRequests && ev.handled && ev.index >= 0 && ev.index < ev.parts.length - 1) {
+        let evParts = (!e.parts && (e as any).oroginalEvent?.parts) || e.parts;
+        let evIndex = (e.index == null && (e as any).oroginalEvent?.index) || e.index;
+        
+        if (getActiveRequests() > oldRequests && evParts && evIndex &&
+            (e.defaultPrevented || (e as any)?.isDefaultPrevented?.()) && evIndex >= 0 && evIndex < parts?.length - 1) {
             Fluent.one(document, "ajaxStop", () => {
-                setTimeout(() => Router.resolve('#' + ev.parts.join('/+/')), 1);
+                setTimeout(() => Router.resolve('#' + parts.join('/+/')), 1);
             });
         }
     }
@@ -285,7 +291,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     }
 
     protected initDialog(dialog: Widget<any>): void {
-        SubDialogHelper.bindToDataChange(dialog, this, (dci) => {
+        SubDialogHelper.bindToDataChange(dialog, this, (_) => {
             this.subDialogDataChange();
         }, true);
 
@@ -299,7 +305,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             return;
         }
 
-        SubDialogHelper.bindToDataChange(dialog, this, (dci) => {
+        SubDialogHelper.bindToDataChange(dialog, this, (_) => {
             this.subDialogDataChange();
         }, true);
 

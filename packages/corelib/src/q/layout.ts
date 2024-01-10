@@ -65,7 +65,7 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
     let layout = function () {
         setHeight && layoutFillHeight(el);
-        Fluent.trigger(el, 'layout', { bubbles: false });
+        Fluent.trigger(el, 'layout');
     };
 
     if (document.body.classList.contains('has-layout-event')) {
@@ -145,7 +145,7 @@ export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement
     if (!element)
         return;
     executeEverytimeWhenVisible(element, function () {
-        Fluent.trigger(element as any, 'layout', { bubbles: false });
+        Fluent.trigger(element as any, 'layout');
     }, true);
 }
 

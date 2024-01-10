@@ -147,7 +147,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected initToolbar(): void {
-        var toolbarDiv = this.byId('Toolbar');
+        var toolbarDiv = this.findById('Toolbar');
         if (!toolbarDiv)
             return;
 
@@ -183,7 +183,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     public arrange(): void {
         this.domNode.querySelectorAll(".require-layout").forEach((el: HTMLElement) => {
             if (el.offsetWidth > 0 && el.offsetHeight > 0)
-                Fluent.trigger(el, 'layout', { bubbles: false });
+                Fluent.trigger(el, 'layout');
         });
     }
 

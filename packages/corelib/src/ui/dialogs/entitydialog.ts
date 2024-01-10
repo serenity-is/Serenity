@@ -12,6 +12,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
+import { DataChangeInfo } from "../../types";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
@@ -178,9 +179,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                 Fluent.trigger(this.domNode, "ondatachange", {
                     entityId: request.EntityId,
                     entity: this.entity,
-                    type: 'delete',
-                    bubbles: false
-                });
+                    operationType: 'delete'
+                } satisfies Partial<DataChangeInfo>);
             }
         };
 
@@ -774,11 +774,10 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
                     (response == null ? null : response.EntityId);
 
                 var dci = {
-                    type: typ,
+                    operationType: typ,
                     entity: ent,
-                    entityId: eid,
-                    bubbles: false
-                };
+                    entityId: eid
+                } satisfies Partial<DataChangeInfo>;
 
                 Fluent.trigger(this.domNode, "ondatachange", dci);
             };
@@ -1084,8 +1083,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             Fluent.trigger(this.domNode, "ondatachange", {
                 entityId: this.get_entityId(),
                 entity: this.entity,
-                type: 'undelete',
-                bubbles: false
+                operationType: 'undelete'
             });
         };
 

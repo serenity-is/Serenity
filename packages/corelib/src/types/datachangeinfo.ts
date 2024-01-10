@@ -1,7 +1,7 @@
 ﻿export {}
 
 export interface DataChangeInfo extends Event {
-    type: string;
+    operationType: string;
     entityId: any;
     entity: any;
 }

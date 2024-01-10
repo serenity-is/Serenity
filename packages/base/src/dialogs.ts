@@ -797,10 +797,10 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         return;
     let panelBody = element.classList.contains("s-PanelBody") ? element : panelRoot;
 
-    let event = Fluent.trigger(panelBody, 'panelbeforeclose', { bubbles: false });
+    let event = Fluent.trigger(panelBody, 'panelbeforeclose');
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
         return;
-    Fluent.trigger(window, "panelclosing", { panel: panelBody, bubbles: false });
+    Fluent.trigger(window, "panelclosing", { panel: panelBody });
     panelRoot.classList.add("hidden");
 
     let uniqueName = panelBody.dataset.paneluniquename;
@@ -811,13 +811,13 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         });
     }
 
-    Fluent.trigger(window, "resize", { bubbles: false });
+    Fluent.trigger(window, "resize");
     document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
         if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
-            Fluent.trigger(rl, "layout", { bubbles: false });
+            Fluent.trigger(rl, "layout");
     });
-    Fluent.trigger(panelBody, "panelclose", { bubbles: false });
-    Fluent.trigger(window, "panelclosed", { panel: panelBody, bubbles: false });
+    Fluent.trigger(panelBody, "panelclose");
+    Fluent.trigger(window, "panelclosed", { panel: panelBody });
 }
 
 /** 
@@ -836,7 +836,7 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
 
     let panelRoot = panelBody.closest(".s-Panel") ?? panelBody;
 
-    Fluent.trigger(window, 'panelopening', { panel: panelBody, bubbles: false });
+    Fluent.trigger(window, 'panelopening', { panel: panelBody });
 
     let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
 
@@ -870,8 +870,8 @@ export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueN
     panelRoot.classList.remove("panel-hidden");
     panelRoot.classList.add("s-Panel");
 
-    Fluent.trigger(panelBody, "panelopen", { bubbles: false });
-    Fluent.trigger(window, "panelopened", { panel: panelBody, bubbles: false });
+    Fluent.trigger(panelBody, "panelopen");
+    Fluent.trigger(window, "panelopened", { panel: panelBody });
 }
 
 function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {

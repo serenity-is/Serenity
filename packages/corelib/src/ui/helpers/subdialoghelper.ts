@@ -1,4 +1,4 @@
-﻿import { Fluent, isArrayLike } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, isArrayLike } from "@serenity-is/base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";
 
@@ -36,9 +36,12 @@ export namespace SubDialogHelper {
         }, useTimeout);
     }
 
-    export function cascade(cascadedDialog: any, ofElement: HTMLElement | ArrayLike<HTMLElement>): any {
+    export function cascade(cascadedDialog: { domNode: HTMLElement }, ofElement: HTMLElement | ArrayLike<HTMLElement>): any {
         Fluent.one(cascadedDialog.domNode, 'dialogopen', function (e: Event) {
-            cascadedDialog.element.dialog().dialog('option', 'position', cascadedDialogOffset(ofElement));
+            var $ = getjQuery();
+            if ($ && $.fn && $.fn.dialog) {
+                $(cascadedDialog.domNode).dialog('option', 'position', cascadedDialogOffset(ofElement));
+            }
         });
         return cascadedDialog;
     }
