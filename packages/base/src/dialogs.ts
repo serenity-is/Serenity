@@ -624,9 +624,9 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
         cssClass: "s-ConfirmDialog",
         title: DialogTexts.ConfirmationTitle,
         getButtons: () => {
-            let buttons = [yesDialogButton({ click: onYes }), noDialogButton({ click: options.onNo })];
-            if (options.cancelButton)
-                buttons.push(cancelDialogButton({ click: options.onCancel }));
+            let buttons = [yesDialogButton({ click: onYes }), noDialogButton({ click: options?.onNo })];
+            if (options?.cancelButton)
+                buttons.push(cancelDialogButton({ click: options?.onCancel }));
             return buttons;
         },
         native: (msg) => {

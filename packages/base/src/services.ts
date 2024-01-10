@@ -233,13 +233,10 @@ function handleError(response: any, errorInfo: RequestErrorInfo, options?: Servi
         return;
     }
 
-    if (options.onError?.(response, errorInfo))
+    if (options?.onError?.(response, errorInfo))
         return;
 
-    if (response?.Error) {
-        ErrorHandling.showServiceError(response.Error, errorInfo);
-        return;
-    }
+    ErrorHandling.showServiceError(response.Error, errorInfo);
 };
 
 function handleRedirect(getHeader: (key: string) => string): boolean {
@@ -258,13 +255,13 @@ function handleRedirect(getHeader: (key: string) => string): boolean {
 
 async function handleFetchError(response: Response, options: ServiceOptions<any>): Promise<void> {
 
-    if (response.status !== 403 || !options.allowRedirect || !handleRedirect(response.headers.get))
+    if (response.status === 403 && options.allowRedirect && handleRedirect(response.headers.get))
         return;
 
     if ((response.headers.get('content-type') || '').toLowerCase().indexOf('json') >= 0) {
         var json = (await response.json()) as ServiceResponse;
         if (json && json.Error) {
-            handleError(json.Error, {
+            handleError(json, {
                 status: response.status,
                 statusText: response.statusText
             });
@@ -280,7 +277,7 @@ async function handleFetchError(response: Response, options: ServiceOptions<any>
 }
 
 function handleXHRError(xhr: XMLHttpRequest, options: ServiceOptions<any>) {
-    if (xhr.status !== 403 || !options.allowRedirect || handleRedirect(xhr.getResponseHeader))
+    if (xhr.status === 403 && options.allowRedirect && handleRedirect(xhr.getResponseHeader))
         return;
 
     if ((xhr.getResponseHeader('content-type') || '')
