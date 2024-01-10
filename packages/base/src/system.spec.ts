@@ -1,5 +1,6 @@
-import { enumFlagsSymbol, implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, customAttributesSymbol, isInterfaceTypeSymbol } from "./symbols";
-import { Enum, fieldsProxy, getBaseType, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, typeNameProperty } from "./system";
+import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
+import { Enum, addCustomAttribute, classTypeInfo, fieldsProxy, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, typeInfoProperty } from "./system";
+import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
 
 describe("Enum.getValues", () => {
     it('returns correct values', function () {
@@ -61,7 +62,7 @@ describe("Enum.toString", () => {
             Another = 4
         }
 
-        (Test2 as any)[enumFlagsSymbol] = true;
+        ensureTypeInfo(Test2 as any).enumFlags = true;
         expect(Enum.toString(Test2, Test2.Some + Test2.Another)).toBe("Some | Another");
         expect(Enum.toString(Test2, Test2.Some + Test2.Another + 16)).toBe("Some | Another | 16");
     });
@@ -147,8 +148,8 @@ describe("registerClass", () => {
         else
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(klass[customAttributesSymbol]).toBeUndefined();
-        expect(klass[enumFlagsSymbol]).toBeUndefined();
+        expect(peekTypeInfo(klass)?.customAttributes).toBeUndefined();
+        expect(peekTypeInfo(klass)?.enumFlags).toBeUndefined();
 
         if (name != null) {
             expect(getTypeFullName(klass)).toBe(name);
@@ -298,9 +299,9 @@ describe("registerClass", () => {
         expectClassDetails(Test, nameTest, [Intf1, Intf2]);
     });
 
-    it("works with types that already have a static [typeName] property", () => {
+    it("works with types that already have a static typeInfo property with typeName", () => {
         class MyClass {
-            static [typeNameProperty] = "MyClassName";
+            static [typeInfoProperty] = classTypeInfo("MyClassName");
         }
 
         registerClass(MyClass, null);
@@ -314,7 +315,7 @@ describe("registerEnum", () => {
         expect(enumObj[isInterfaceTypeSymbol]).toBeNull();
 
         expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
-        expect(enumObj[enumFlagsSymbol]).toBeUndefined();
+        expect(peekTypeInfo(enumObj)?.enumFlags).toBeUndefined();
         expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
 
         if (name != null) {
@@ -379,7 +380,7 @@ describe("registerInterface", () => {
         else
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(klass[enumFlagsSymbol]).toBeUndefined();
+        expect(peekTypeInfo(klass)?.enumFlags).toBeUndefined();
         expect(klass[isInterfaceTypeSymbol]).toBe(true);
 
         if (name != null) {
@@ -670,5 +671,51 @@ describe("getTypeShortName", () => {
         registerClass(Test, "Me")
 
         expect(getTypeShortName(Test)).toBe("Me");
+    });
+});
+
+describe("addCustomAttribute", () => {
+    it("can add custom attribute", () => {
+        class MyAttribute {
+        }
+        registerClass(MyAttribute, "MyAttribute");
+        class MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(MyClass, MyAttribute)).toBe(attr);
+    });
+
+    it("can add multiple attribute", () => {
+        class MyAttribute1 {
+        }
+        class MyAttribute2 {
+        }
+        class MyClass {
+        }
+        const attr1 = new MyAttribute1();
+        addCustomAttribute(MyClass, attr1);
+        const attr2 = new MyAttribute2();
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttribute(MyClass, MyAttribute1)).toBe(attr1);
+        expect(getCustomAttribute(MyClass, MyAttribute2)).toBe(attr2);
+    });
+
+    it("can add multiple attribute of same type", () => {
+        class MyAttribute {
+            constructor(public value: boolean) {
+            }
+        }
+        class MyClass {
+        }
+        const attr1 = new MyAttribute(false);
+        addCustomAttribute(MyClass, attr1);
+        const attr2 = new MyAttribute(true);
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttribute(MyClass, MyAttribute)).toBe(attr2); // returns last added one
+        let attrs = getCustomAttributes(MyClass, MyAttribute);
+        expect(attrs?.length).toBe(2);
+        expect(attrs[0]).toBe(attr2); // returns last added one first
+        expect(attrs[1]).toBe(attr1);
     });
 });

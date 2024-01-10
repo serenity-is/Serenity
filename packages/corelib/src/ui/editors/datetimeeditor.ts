@@ -1,5 +1,5 @@
 ﻿import { Culture, Fluent, Invariant, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, addValidationRule, today } from "../../q";
 import { EditorProps, EditorWidget } from "../widgets/widget";

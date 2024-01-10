@@ -1,6 +1,7 @@
 ﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { Decorators, EnumKeyAttribute } from "../../decorators";
+import { EnumKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { replaceAll } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
@@ -33,8 +34,9 @@ export class BooleanFormatter implements Formatter {
     public trueText: string;
 }
 
-export class CheckboxFormatter extends Formatter {
-    static override typeName = this.registerFormatter("Serenity.CheckboxFormatter")
+@Decorators.registerType()
+export class CheckboxFormatter implements Formatter {
+    static typeInfo = Decorators.formatterType("Serenity.CheckboxFormatter")
 
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';

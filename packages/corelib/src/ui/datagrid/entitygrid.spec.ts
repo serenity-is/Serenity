@@ -1,5 +1,6 @@
-import { addCustomAttribute } from "@serenity-is/base";
-import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+import { addCustomAttribute, classTypeInfo } from "@serenity-is/base";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";
 
 function getIdProperty(grid: EntityGrid<any, any>): string {
@@ -131,9 +132,9 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
         expect(getLocalTextDbPrefix(grid)).toBe("Db.Default.");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -216,9 +217,9 @@ describe('EntityGrid.getLocalTextPrefix', () => {
         expect(getLocalTextPrefix(grid)).toBe("Default");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

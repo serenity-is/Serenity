@@ -1,6 +1,6 @@
-﻿import { Culture, DialogButton, DialogTexts, Fluent, faIcon, htmlEncode, localText } from "@serenity-is/base";
+﻿import { Culture, DialogButton, DialogTexts, Fluent, faIcon, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { Authorization, Router, centerDialog } from "../../q";
 import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";

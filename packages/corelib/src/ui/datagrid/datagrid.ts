@@ -1,6 +1,7 @@
 ﻿import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { ColumnsKeyAttribute, Decorators, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";

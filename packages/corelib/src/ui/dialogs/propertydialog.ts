@@ -1,5 +1,6 @@
 ﻿import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
-import { Decorators, FormKeyAttribute } from "../../decorators";
+import { FormKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { ScriptData, getFormData, getFormDataAsync } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";

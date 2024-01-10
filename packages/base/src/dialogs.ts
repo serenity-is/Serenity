@@ -9,7 +9,7 @@ export type DialogType = "bs3" | "bs4" | "bs5" | "jqueryui" | "panel";
 /**
  * Options that apply to all dialog types
  */
-export interface CommonDialogOptions {
+export interface DialogOptions {
     /** True to open dialog as panel */
     asPanel?: boolean;
     /** True to auto open. Ignored for message dialogs. */
@@ -33,9 +33,11 @@ export interface CommonDialogOptions {
     /** Event handler that is called when dialog is closed */
     onClose?: (result: string) => void;
     /** Callback to get options specific to the dialog provider type */
-    providerOptions?: (type: DialogType, opt: CommonDialogOptions) => any;
+    providerOptions?: (type: DialogType, opt: DialogOptions) => any;
     /** Dialog title */
     title?: string;
+    /** Dialog width. Only used for jQuery UI dialogs */
+    width?: number;
 }
 
 export interface ICommonDialog {
@@ -78,7 +80,7 @@ export interface DialogButton {
 /**
  * Options that apply to all message dialog types
  */
-export interface MessageDialogOptions extends CommonDialogOptions {
+export interface MessageDialogOptions extends DialogOptions {
     /** HTML encode the message, default is true */
     htmlEncode?: boolean;
     /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
@@ -167,7 +169,7 @@ function bsCreateButton(footer: HTMLElement, x: DialogButton, close: (result: st
     });
 }
 
-function createPanel(options: CommonDialogOptions): ICommonDialog {
+function createPanel(options: DialogOptions): ICommonDialog {
     let result: string;
     let panelBody = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
@@ -212,7 +214,7 @@ function createPanel(options: CommonDialogOptions): ICommonDialog {
     }
 }
 
-function createUIDialog(options: CommonDialogOptions): ICommonDialog {
+function createUIDialog(options: DialogOptions): ICommonDialog {
     var result: string;
     let opt = {
         dialogClass: options.dialogClass,
@@ -223,11 +225,16 @@ function createUIDialog(options: CommonDialogOptions): ICommonDialog {
         },
         close: function () {
             options.onClose?.(result);
-        }
+        },
+        width: options.width
     } as any;
 
     let div = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
+
+    // templated dialog hides its content element before first open
+    if (div.classList.contains("hidden"))
+        div.classList.remove("hidden");
 
     if (typeof options.element === "function")
         options.element(div);
@@ -275,7 +282,7 @@ function createUIDialog(options: CommonDialogOptions): ICommonDialog {
     }
 }
 
-function createBSModal(options: CommonDialogOptions): ICommonDialog {
+function createBSModal(options: DialogOptions): ICommonDialog {
     let modalDiv = bsModalMarkup(options.title, options.dialogClass + (options.modalClass ? ' ' + options.modalClass : ''));
     if (options.element) {
         if (typeof options.element === "function")
@@ -290,7 +297,7 @@ function createBSModal(options: CommonDialogOptions): ICommonDialog {
     return createBSModalWithJQuery(modalDiv, options);
 }
 
-function createBS5RawModal(modalDiv: HTMLElement, options: CommonDialogOptions): ICommonDialog {
+function createBS5RawModal(modalDiv: HTMLElement, options: DialogOptions): ICommonDialog {
     let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
     let result: string;
     document.body.appendChild(modalDiv);
@@ -338,7 +345,7 @@ function createBS5RawModal(modalDiv: HTMLElement, options: CommonDialogOptions):
     }
 }
 
-function createBSModalWithJQuery(modalDiv: HTMLElement, options: CommonDialogOptions): ICommonDialog {
+function createBSModalWithJQuery(modalDiv: HTMLElement, options: DialogOptions): ICommonDialog {
     let result: string;
     let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
     let modalDiv$ = getjQuery()(modalDiv).appendTo(document.body);
@@ -389,7 +396,7 @@ function createBSModalWithJQuery(modalDiv: HTMLElement, options: CommonDialogOpt
     };
 }
 
-export function createCommonDialog(options: CommonDialogOptions): ICommonDialog {
+export function createCommonDialog(options: DialogOptions): ICommonDialog {
 
     let dialogLike: ICommonDialog;
 

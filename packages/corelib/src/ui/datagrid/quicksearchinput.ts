@@ -1,5 +1,5 @@
 ﻿import { Fluent, localText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 

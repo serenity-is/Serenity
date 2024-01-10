@@ -1,4 +1,4 @@
-import { Config } from "@serenity-is/base";
+import { Config, classTypeInfo } from "@serenity-is/base";
 import { Widget, useIdPrefix } from "./widget";
 
 test('Serenity Widget must return class name without root namespace', function() {
@@ -6,7 +6,7 @@ test('Serenity Widget must return class name without root namespace', function()
     Config.rootNamespaces = [];
     var generatedClassNames = Widget.prototype["getCssClass"].call({ 
         constructor : { 
-            typeName : "Serenity.Demo.Northwind.CustomerGrid" 
+            typeInfo : classTypeInfo("Serenity.Demo.Northwind.CustomerGrid") 
         }
     });
     Config.rootNamespaces = oldNamespaces;
@@ -16,7 +16,7 @@ test('Serenity Widget must return class name without root namespace', function()
 test('Serenity Widget must work with serenity root namespaces', function() {
     var generatedClassNames = Widget.prototype["getCssClass"].call({ 
         constructor : { 
-            typeName : "Serenity.Demo.Northwind.CustomerGrid" 
+            typeInfo : classTypeInfo("Serenity.Demo.Northwind.CustomerGrid") 
         }
     });
 
@@ -26,7 +26,7 @@ test('Serenity Widget must work with serenity root namespaces', function() {
 test('Project Widget must work with serenity root namespaces', function() {
     var generatedClassNames = Widget.prototype["getCssClass"].call({ 
         constructor : { 
-            typeName : "StartSharp.Demo.Northwind.CustomerGrid" 
+            typeInfo : classTypeInfo("StartSharp.Demo.Northwind.CustomerGrid")
         }
     });
 
@@ -38,7 +38,7 @@ test('Project Widget must work with project root namespaces', function() {
     Config.rootNamespaces.push("StartSharp");
     var generatedClassNames = Widget.prototype["getCssClass"].call({ 
         constructor : { 
-            typeName : "StartSharp.Demo.Northwind.CustomerGrid" 
+            typeInfo : classTypeInfo("StartSharp.Demo.Northwind.CustomerGrid") 
         }
     });
     Config.rootNamespaces = oldNamespaces;
@@ -51,7 +51,7 @@ test('Project Widget must work without root namespaces', function() {
     Config.rootNamespaces = [];
     var generatedClassNames = Widget.prototype["getCssClass"].call({ 
         constructor : { 
-            typeName : "StartSharp.Demo.Northwind.CustomerGrid" 
+            typeInfo : classTypeInfo("StartSharp.Demo.Northwind.CustomerGrid") 
         }
     });
     Config.rootNamespaces = oldNamespaces;

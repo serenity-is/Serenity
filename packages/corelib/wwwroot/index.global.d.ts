@@ -1539,7 +1539,7 @@ declare namespace Serenity {
     /**
      * Options that apply to all dialog types
      */
-    interface CommonDialogOptions {
+    interface DialogOptions {
         /** True to open dialog as panel */
         asPanel?: boolean;
         /** True to auto open. Ignored for message dialogs. */
@@ -1563,9 +1563,11 @@ declare namespace Serenity {
         /** Event handler that is called when dialog is closed */
         onClose?: (result: string) => void;
         /** Callback to get options specific to the dialog provider type */
-        providerOptions?: (type: DialogType, opt: CommonDialogOptions) => any;
+        providerOptions?: (type: DialogType, opt: DialogOptions) => any;
         /** Dialog title */
         title?: string;
+        /** Dialog width. Only used for jQuery UI dialogs */
+        width?: number;
     }
     interface ICommonDialog {
         /** Gets dialog provider type used */
@@ -1605,7 +1607,7 @@ declare namespace Serenity {
     /**
      * Options that apply to all message dialog types
      */
-    interface MessageDialogOptions extends CommonDialogOptions {
+    interface MessageDialogOptions extends DialogOptions {
         /** HTML encode the message, default is true */
         htmlEncode?: boolean;
         /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
@@ -1629,7 +1631,7 @@ declare namespace Serenity {
         const WarningTitle: string;
         const YesButton: string;
     }
-    function createCommonDialog(options: CommonDialogOptions): ICommonDialog;
+    function createCommonDialog(options: DialogOptions): ICommonDialog;
     /** Converts a `DialogButton` declaration to Bootstrap button element
      * @param x Dialog button declaration
      * @returns Bootstrap button element
@@ -2386,14 +2388,24 @@ declare namespace Serenity {
     function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse>;
     function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 
+    const typeInfoProperty = "typeInfo";
+    type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
+    type TypeInfo<T> = {
+        typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
+        typeName: StringLiteral<T> | (string & {});
+        interfaces?: any[];
+        customAttributes?: any[];
+        enumFlags?: boolean;
+        registered?: boolean;
+    };
+    function getTypeRegistry(): any;
+    function getTypeNameProp(type: any): string;
+    function setTypeNameProp(type: any, value: string): void;
+
     function getGlobalObject(): any;
-    const typeNameProperty = "typeName";
     type Type = Function | Object;
     function getNested(from: any, name: string): any;
-    function getTypeRegistry(): any;
     function getType(name: string, target?: any): Type;
-    function getTypeNameProp(type: Type): string;
-    function setTypeNameProp(type: Type, value: string): void;
     function getTypeFullName(type: Type): string;
     function getTypeShortName(type: Type): string;
     function getInstanceType(instance: any): any;
@@ -2414,11 +2426,6 @@ declare namespace Serenity {
     function isPromiseLike(obj: any): obj is PromiseLike<any>;
     function getjQuery(): any;
     type NoInfer<T> = [T][T extends any ? 0 : never];
-    type TypeName<T> = StringLiteral<T> | (string & {});
-    type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
-    type EditorTypeName<T> = TypeName<T>;
-    type FormatterTypeName<T> = TypeName<T>;
-    type ClassTypeName<T> = TypeName<T>;
     class EditorAttribute {
     }
     class ISlickFormatter {
@@ -2435,6 +2442,18 @@ declare namespace Serenity {
     function getCustomAttributes<TAttr>(type: any, attrType: {
         new (...args: any[]): TAttr;
     }, inherit?: boolean): TAttr[];
+    type ClassTypeInfo<T> = TypeInfo<T>;
+    type EditorTypeInfo<T> = TypeInfo<T>;
+    type FormatterTypeInfo<T> = TypeInfo<T>;
+    type InterfaceTypeInfo<T> = TypeInfo<T>;
+    function classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
+    function editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
+    function formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
+    function interfaceTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): InterfaceTypeInfo<T>;
+    function registerType(type: {
+        [typeInfoProperty]: TypeInfo<any>;
+        name: string;
+    }): void;
 
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
@@ -2806,25 +2825,13 @@ declare namespace Serenity {
         function hasOriginalEvent(e: any): boolean;
     }
 
-    interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-        type?: {
-            new (options?: P): TWidget;
-            prototype: TWidget;
-        };
-        options?: P & WidgetProps<{}>;
-        container?: HTMLElement | ArrayLike<HTMLElement>;
-        element?: (e: Fluent) => void;
-        init?: (w: TWidget) => void;
-    }
     class Widget<P = {}> {
-        static typeName: ClassTypeName<"Serenity.Widget">;
+        static typeInfo: ClassTypeInfo<"Serenity.Widget">;
         private static nextWidgetNumber;
         protected readonly options: WidgetProps<P>;
         protected readonly uniqueName: string;
         readonly idPrefix: string;
         readonly domNode: HTMLElement;
-        static registerClass<T>(name: StringLiteral<T>, intf?: any[]): ClassTypeName<T>;
-        static registerEditor<T>(name: StringLiteral<T>, intf?: any[]): EditorTypeName<T>;
         constructor(props: WidgetProps<P>);
         destroy(): void;
         static createDefaultElement(): HTMLElement;
@@ -2861,8 +2868,18 @@ declare namespace Serenity {
         protected useIdPrefix(): IdPrefixType;
     }
     class EditorWidget<P> extends Widget<EditorProps<P>> {
-        static typeName: EditorTypeName<"Serenity.EditorWidget">;
+        static typeInfo: ClassTypeInfo<"Serenity.EditorWidget">;
         constructor(props: EditorProps<P>);
+    }
+    interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+        type?: {
+            new (options?: P): TWidget;
+            prototype: TWidget;
+        };
+        options?: P & WidgetProps<{}>;
+        container?: HTMLElement | ArrayLike<HTMLElement>;
+        element?: (e: Fluent) => void;
+        init?: (w: TWidget) => void;
     }
 
     function GridPageInit<TGrid extends Widget<P>, P>({ type, props }: {
@@ -3122,10 +3139,6 @@ declare namespace Serenity {
     interface Formatter {
         format(ctx: Slick.FormatterContext): string;
     }
-    abstract class Formatter implements Formatter {
-        static typeName: string;
-        static registerFormatter<T>(name: StringLiteral<T>, intf?: any[]): FormatterTypeName<T>;
-    }
     interface GroupInfo<TItem> {
         getter?: any;
         formatter?: (p1: Slick.Group<TItem>) => string;
@@ -3321,55 +3334,6 @@ declare namespace Serenity {
     class IValidateRequired {
     }
 
-    enum CaptureOperationType {
-        Before = 0,
-        Delete = 1,
-        Insert = 2,
-        Update = 3
-    }
-
-    interface DataChangeInfo extends Event {
-        type: string;
-        entityId: any;
-        entity: any;
-    }
-
-    namespace ReflectionUtils {
-        function getPropertyValue(o: any, property: string): any;
-        function setPropertyValue(o: any, property: string, value: any): void;
-        function makeCamelCase(s: string): string;
-    }
-
-    namespace DialogTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-        function tryGet(key: string): any;
-    }
-
-    namespace EditorTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-        function tryGet(key: string): any;
-    }
-
-    namespace EnumTypeRegistry {
-        function get(key: string): Function;
-        function reset(): void;
-        function tryGet(key: string): any;
-    }
-
-    interface IRowDefinition {
-        readonly deletePermission?: string;
-        readonly idProperty?: string;
-        readonly insertPermission?: string;
-        readonly isActiveProperty?: string;
-        readonly isDeletedProperty?: string;
-        readonly localTextPrefix?: string;
-        readonly nameProperty?: string;
-        readonly readPermission?: string;
-        readonly updatePermission?: string;
-    }
-
     class EnumKeyAttribute {
         value: string;
         constructor(value: string);
@@ -3514,7 +3478,28 @@ declare namespace Serenity {
         value: boolean;
         constructor(value?: boolean);
     }
+
+    enum CaptureOperationType {
+        Before = 0,
+        Delete = 1,
+        Insert = 2,
+        Update = 3
+    }
+
+    interface DataChangeInfo extends Event {
+        type: string;
+        entityId: any;
+        entity: any;
+    }
+
     namespace Decorators {
+        const classType: typeof classTypeInfo;
+        const editorType: typeof editorTypeInfo;
+        const interfaceType: typeof interfaceTypeInfo;
+        const formatterType: typeof formatterTypeInfo;
+        function registerType(): (target: Function & {
+            [typeInfoProperty]: any;
+        }) => void;
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
@@ -3534,6 +3519,42 @@ declare namespace Serenity {
         function resizable(value?: boolean): (target: Function) => void;
         function responsive(value?: boolean): (target: Function) => void;
         function service(value: string): (target: Function) => void;
+    }
+
+    namespace DialogTypeRegistry {
+        function get(key: string): any;
+        function reset(): void;
+        function tryGet(key: string): any;
+    }
+
+    namespace EditorTypeRegistry {
+        function get(key: string): any;
+        function reset(): void;
+        function tryGet(key: string): any;
+    }
+
+    namespace EnumTypeRegistry {
+        function get(key: string): Function;
+        function reset(): void;
+        function tryGet(key: string): any;
+    }
+
+    namespace ReflectionUtils {
+        function getPropertyValue(o: any, property: string): any;
+        function setPropertyValue(o: any, property: string, value: any): void;
+        function makeCamelCase(s: string): string;
+    }
+
+    interface IRowDefinition {
+        readonly deletePermission?: string;
+        readonly idProperty?: string;
+        readonly insertPermission?: string;
+        readonly isActiveProperty?: string;
+        readonly isDeletedProperty?: string;
+        readonly localTextPrefix?: string;
+        readonly nameProperty?: string;
+        readonly readPermission?: string;
+        readonly updatePermission?: string;
     }
 
     namespace LazyLoadHelper {
@@ -3617,13 +3638,13 @@ declare namespace Serenity {
         private get isMarkedAsPanel();
         destroy(): void;
         protected addCssClass(): void;
-        protected getDialogTitle(): string;
-        protected getCommonDialogOptions(asPanel?: boolean): CommonDialogOptions;
-        /** This one returns jQuery UI Dialog specific options */
-        protected getDialogOptions(): any;
+        protected getInitialDialogTitle(): string;
+        protected getDialogOptions(asPanel?: boolean): DialogOptions;
+        /** Gets jQuery UI Dialog options */
+        protected getUIDialogOptions(): any;
         protected preferBSModal(): boolean;
         protected getModalOptions(): any;
-        protected initCommonDialog(): void;
+        protected initDialog(): void;
         protected initUIDialog(): void;
         dialogOpen(asPanel?: boolean): void;
         protected onDialogOpen(): void;
@@ -3776,7 +3797,7 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
-        protected getDialogOptions(): any;
+        protected getUIDialogOptions(): any;
         protected getDialogButtons(): DialogButton[];
         protected okClick(): void;
         protected okClickValidated(): void;
@@ -3812,7 +3833,7 @@ declare namespace Serenity {
     }
 
     class StringEditor<P = {}> extends EditorWidget<P> {
-        static typeName: EditorTypeName<"Serenity.StringEditor">;
+        static typeInfo: EditorTypeInfo<"Serenity.StringEditor">;
         readonly domNode: HTMLInputElement;
         static createDefaultElement(): HTMLInputElement;
         get value(): string;
@@ -3822,6 +3843,7 @@ declare namespace Serenity {
     }
 
     class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
+        static typeInfo: EditorTypeInfo<"Serenity.PasswordEditor">;
         static createDefaultElement(): HTMLInputElement;
     }
 
@@ -4885,8 +4907,8 @@ declare namespace Serenity {
         falseText: string;
         trueText: string;
     }
-    class CheckboxFormatter extends Formatter {
-        static typeName: FormatterTypeName<"Serenity.CheckboxFormatter">;
+    class CheckboxFormatter implements Formatter {
+        static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
         format(ctx: Slick.FormatterContext): string;
     }
     class DateFormatter implements Formatter {
@@ -5131,7 +5153,7 @@ declare namespace Serenity {
         protected renderContents(): Fluent<HTMLDivElement>;
         static createToolButton(grid: IDataGrid): ToolButton;
         protected getDialogButtons(): DialogButton[];
-        protected getDialogOptions(): any;
+        protected getUIDialogOptions(): any;
         private getTitle;
         private allowHide;
         private createLI;

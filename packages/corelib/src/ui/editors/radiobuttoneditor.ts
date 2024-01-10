@@ -1,5 +1,6 @@
 ﻿import { Enum, Fluent, getCustomAttribute, tryGetText } from "@serenity-is/base";
-import { Decorators, EnumKeyAttribute } from "../../decorators";
+import { EnumKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getLookup } from "../../q";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";

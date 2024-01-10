@@ -1,5 +1,6 @@
-﻿import { Culture, Fluent, addClass, faIcon, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem, getCustomAttribute } from "@serenity-is/base";
-import { Decorators, OptionsTypeAttribute } from "../../decorators";
+﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { OptionsTypeAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { Authorization, extend } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";

@@ -1,4 +1,4 @@
-﻿import { FormatterTypeName, PropertyItem, StringLiteral, registerFormatter } from "@serenity-is/base";
+﻿import { PropertyItem, StringLiteral, registerFormatter } from "@serenity-is/base";
 import { FormatterContext, Group } from "@serenity-is/sleekgrid";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
@@ -12,15 +12,6 @@ declare module "@serenity-is/sleekgrid" {
 
 export interface Formatter {
     format(ctx: FormatterContext): string;
-}
-
-export abstract class Formatter implements Formatter {
-    static typeName: string;
-
-    static registerFormatter<T>(name: StringLiteral<T>, intf?: any[]): FormatterTypeName<T> {
-        registerFormatter(this, name, intf);
-        return name;
-    }
 }
 
 export interface GroupInfo<TItem> {

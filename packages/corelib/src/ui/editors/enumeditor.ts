@@ -1,5 +1,6 @@
 import { Enum, getCustomAttribute, tryGetText } from "@serenity-is/base";
-import { Decorators, EnumKeyAttribute } from "../../decorators";
+import { EnumKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";

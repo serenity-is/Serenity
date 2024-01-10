@@ -4,8 +4,8 @@ jest.mock("@serenity-is/base", () => ({
     tryGetText: jest.fn().mockImplementation((key: string) => key)
 }));
 
-import { addCustomAttribute, registerEnum, tryGetText } from "@serenity-is/base";
-import { EnumKeyAttribute } from "../../decorators";
+import { addCustomAttribute, registerEnum } from "@serenity-is/base";
+import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
 

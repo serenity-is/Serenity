@@ -1,5 +1,5 @@
 ﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText, stringFormat } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";

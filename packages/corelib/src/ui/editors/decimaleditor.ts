@@ -1,5 +1,5 @@
 ﻿import { Culture, Fluent, formatNumber, getjQuery, parseDecimal } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IDoubleValue } from "../../interfaces";
 import { extend } from "../../q";
 import { EditorWidget, EditorProps } from "../widgets/widget";

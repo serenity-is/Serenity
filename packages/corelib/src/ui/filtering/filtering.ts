@@ -1,5 +1,5 @@
 ﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem, Fluent, inputLikeSelector, getjQuery } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";

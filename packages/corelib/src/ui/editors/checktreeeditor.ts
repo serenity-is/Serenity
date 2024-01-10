@@ -1,6 +1,6 @@
 ﻿import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
 import { ReflectionUtils } from "../../types/reflectionutils";

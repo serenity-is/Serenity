@@ -1,5 +1,5 @@
 ﻿import { Fluent, localText, resolveUrl } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";

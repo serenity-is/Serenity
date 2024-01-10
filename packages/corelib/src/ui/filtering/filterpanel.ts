@@ -1,5 +1,5 @@
 ﻿import { Fluent, PropertyItem, getjQuery, localText, tryGetText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { Select2Editor } from "../editors/select2editor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { WidgetProps, getWidgetFrom } from "../widgets/widget";

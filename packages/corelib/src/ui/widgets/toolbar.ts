@@ -1,5 +1,5 @@
 ﻿import { Fluent, IconClassName, getjQuery, htmlEncode, iconClassName, isArrayLike } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "./widget";
 
 export interface ToolButtonProps {

@@ -1,5 +1,5 @@
 ﻿import { Fluent, getjQuery, tryGetText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
 import { ValidationHelper } from "../helpers/validationhelper";

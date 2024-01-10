@@ -1,5 +1,5 @@
 ﻿import { Criteria, Culture, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { ArgumentNullException } from "../../q";
 import { FilterLine } from "./filterline";
 

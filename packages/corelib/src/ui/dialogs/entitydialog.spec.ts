@@ -1,5 +1,6 @@
-import { PropertyItemsData, addCustomAttribute } from "@serenity-is/base";
-import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+import { PropertyItemsData, addCustomAttribute, classTypeInfo } from "@serenity-is/base";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { EntityDialog } from "./entitydialog";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {
@@ -149,10 +150,11 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.Default.");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
+        @Decorators.registerType()
         class DefaultDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
-            static override readonly typeName = 'MyProject.TestModule.DefaultDialog';
+            static override readonly typeInfo = Decorators.classType('MyProject.TestModule.DefaultDialog');
         }
 
         var dialog = new DefaultDialog({});
@@ -242,9 +244,9 @@ describe('EntityDialog.getLocalTextPrefix', () => {
         expect(getLocalTextPrefix(dialog)).toBe("Default");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static readonly typeName = 'MyProject.TestModule.DefaultDialog';
+            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 

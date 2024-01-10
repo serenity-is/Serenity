@@ -1,6 +1,6 @@
 ﻿import { Culture, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem, Fluent } from "@serenity-is/base";
 import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";

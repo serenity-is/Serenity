@@ -1,5 +1,5 @@
 ﻿import { localText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IStringValue } from "../../interfaces";
 import { addValidationRule } from "../../q";
 import { EditorProps, EditorWidget } from "../widgets/widget";

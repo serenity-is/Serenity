@@ -1,41 +1,21 @@
-﻿import { ClassTypeName, Config, EditorTypeName, Fluent, StringLiteral, addClass, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerClass, registerEditor, toggleClass } from "@serenity-is/base";
+﻿import { Config, Fluent, addClass, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
 import { addValidationRule, appendChild, replaceAll } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type EditorProps, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type EditorProps, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
-export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: { new(options?: P): TWidget, prototype: TWidget };
-    options?: P & WidgetProps<{}>;
-    container?: HTMLElement | ArrayLike<HTMLElement>;
-    element?: (e: Fluent) => void;
-    init?: (w: TWidget) => void;
-}
-
-let initialized = Symbol();
-let renderContentsCalled = Symbol();
-
+@Decorators.registerType()
 export class Widget<P = {}> {
-
-    static typeName = this.registerClass("Serenity.Widget");
+    static typeInfo = Decorators.classType("Serenity.Widget");
 
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
     declare protected readonly uniqueName: string;
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
-
-    static registerClass<T>(name: StringLiteral<T>, intf?: any[]): ClassTypeName<T> {
-        registerClass(this, name, intf);
-        return name;
-    }
-
-    static registerEditor<T>(name: StringLiteral<T>, intf?: any[]): EditorTypeName<T> {
-        registerEditor(this, name, intf);
-        return name;
-    }
 
     constructor(props: WidgetProps<P>) {
         if (isArrayLike(props)) {
@@ -217,19 +197,29 @@ export class Widget<P = {}> {
     protected useIdPrefix(): IdPrefixType {
         return useIdPrefix(this.idPrefix);
     }
-
 }
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
+@Decorators.registerType()
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
-
-    static override typeName = this.registerEditor("Serenity.EditorWidget");
+    static override typeInfo = Decorators.classType("Serenity.EditorWidget");
 
     constructor(props: EditorProps<P>) {
         super(props);
     }
 }
+
+export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+    type?: { new(options?: P): TWidget, prototype: TWidget };
+    options?: P & WidgetProps<{}>;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
+    element?: (e: Fluent) => void;
+    init?: (w: TWidget) => void;
+}
+
+const initialized = Symbol();
+const renderContentsCalled = Symbol();
 
 !jQueryPatch() && Fluent.ready(jQueryPatch);
 reactPatch();

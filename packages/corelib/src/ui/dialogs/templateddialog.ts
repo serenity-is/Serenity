@@ -1,7 +1,8 @@
-﻿import { CommonDialogOptions, Config, DialogButton, Fluent, ICommonDialog, addClass, createCommonDialog, defaultNotifyOptions, getInstanceType, getjQuery, positionToastContainer } from "@serenity-is/base";
-import { Decorators, MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../decorators";
+﻿import { Config, DialogButton, DialogOptions, Fluent, ICommonDialog, addClass, createCommonDialog, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
+import { MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { WidgetProps } from "../widgets/widget";
@@ -55,7 +56,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return "";
     }
 
-    protected getDialogOptions(asPanel?: boolean): CommonDialogOptions {
+    protected getDialogOptions(asPanel?: boolean): DialogOptions {
         return {
             asPanel: asPanel ?? this.isMarkedAsPanel,
             autoOpen: false,
@@ -88,7 +89,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         applyCssSizes(opt, this.getCssClass());
         opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
         opt.modal = true;
-        opt.position = { my: 'center', at: 'center', of: window.window };
+        opt.position = { my: 'center', at: 'center', of: window };
         return opt;
     }
 
@@ -249,7 +250,7 @@ function applyCssSizes(opt: any, dialogClass: string) {
     let size: number;
     let dialog = document.createElement("div");
     try {
-        dialog.style.visibility = "hidden !important";
+        dialog.style.display = "none";
         addClass(dialog, dialogClass);
         document.body.append(dialog);
 

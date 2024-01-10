@@ -1,5 +1,5 @@
 ﻿import { addCustomAttribute } from "@serenity-is/base";
-import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { DataGrid } from "./datagrid";
 
 function getIdProperty(grid: DataGrid<any, any>): string {

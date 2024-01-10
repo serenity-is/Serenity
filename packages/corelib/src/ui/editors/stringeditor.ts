@@ -1,9 +1,11 @@
 ﻿import { Fluent } from "@serenity-is/base";
 import { IStringValue } from "../../interfaces";
 import { EditorWidget } from "../widgets/widget";
+import { Decorators } from "../../types/decorators";
 
+@Decorators.registerType()
 export class StringEditor<P={}> extends EditorWidget<P> {
-    static override typeName = this.registerEditor("Serenity.StringEditor", [IStringValue])
+    static override typeInfo = Decorators.editorType("Serenity.StringEditor", [IStringValue])
     
     declare readonly domNode: HTMLInputElement;
 

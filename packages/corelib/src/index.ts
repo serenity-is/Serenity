@@ -29,7 +29,6 @@ export * from "./interfaces";
 export * from "./types";
 export * from "./ui/datagrid/irowdefinition";
 export * from "./ui/datagrid/islickformatter";
-export * from "./decorators";
 export * from "./ui/helpers/lazyloadhelper";
 export * from "./ui/widgets/prefixedcontext";
 export * from "./ui/widgets/widgetutils";

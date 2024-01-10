@@ -1,4 +1,4 @@
-import { Decorators } from "../decorators";
+import { Decorators } from "./decorators";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 
 describe("EnumTypeRegistry", () => {

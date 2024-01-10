@@ -1,4 +1,4 @@
-﻿import { ISlickFormatter, Type, getBaseType, getGlobalObject, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
+﻿import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -206,7 +206,6 @@ export function initializeTypes(root: any, pre: string, limit: number) {
     if (!root)
         return;
 
-    let types = getTypeRegistry();
     for (var k of Object.keys(root)) {
         if (k.charAt(0) < 'A' ||
             k.charAt(0) > 'Z' ||
@@ -231,7 +230,6 @@ export function initializeTypes(root: any, pre: string, limit: number) {
               (obj as any)[isInterfaceTypeSymbol] !== undefined))) {
    
             setTypeNameProp(obj, pre + k);
-            types[pre + k] ??= obj;
         }
 
         if (limit > 0)

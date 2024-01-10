@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../decorators";
+﻿import { Decorators } from "../types/decorators";
 
 @Decorators.registerInterface('Serenity.IDialog')
 export class IDialog {

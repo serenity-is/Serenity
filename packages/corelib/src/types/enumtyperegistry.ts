@@ -1,5 +1,5 @@
 ﻿import { getCustomAttribute, htmlEncode, isEnum, notifyError } from "@serenity-is/base";
-import { EnumKeyAttribute } from "../decorators";
+import { EnumKeyAttribute } from "./attributes";
 import { Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
 

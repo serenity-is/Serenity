@@ -1,5 +1,5 @@
 ﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";

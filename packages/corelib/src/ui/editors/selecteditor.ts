@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
 import { Select2CommonOptions, Select2Editor } from "./select2editor";
 

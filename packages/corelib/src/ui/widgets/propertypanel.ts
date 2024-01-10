@@ -1,5 +1,6 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
-import { Decorators, FormKeyAttribute } from "../../decorators";
+import { FormKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { getForm } from "../../q";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
 import { TemplatedPanel } from "./templatedpanel";

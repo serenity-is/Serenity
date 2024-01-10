@@ -1,5 +1,5 @@
 ﻿import { Fluent, getjQuery } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+import { Decorators } from "../../types/decorators";
 import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";

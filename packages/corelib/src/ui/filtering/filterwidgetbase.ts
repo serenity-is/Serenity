@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../decorators";
+﻿import { Decorators } from "../../types/decorators";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";

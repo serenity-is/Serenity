@@ -1,6 +1,7 @@
 ﻿import { getInstanceType, isInstanceOfType } from "@serenity-is/base";
-import { DisplayNameAttribute, OptionAttribute } from "../../decorators";
-import { getMembers, MemberType } from "../../q";
+import { MemberType, TypeMember, getMembers } from "../../q";
+import { DisplayNameAttribute } from "../../types/attributes";
+import { OptionAttribute } from "../../types/decorators";
 import { ReflectionUtils } from "../../types/reflectionutils";
 
 export namespace ReflectionOptionsSetter {
@@ -15,42 +16,33 @@ export namespace ReflectionOptionsSetter {
             return;
         }
 
-        var propByName = type.__propByName;
-        var fieldByName = type.__fieldByName;
-        if (propByName == null) {
-            var props = getMembers(type, MemberType.property);
-            var propList = props.filter(function (x: any) {
-                return !!x.setter && ((x.attr || []).filter(function (a: any) {
-                    return isInstanceOfType(a, OptionAttribute);
-                }).length > 0 || (x.attr || []).filter(function (a: any) {
-                    return isInstanceOfType(a, DisplayNameAttribute);
-                }).length > 0);
-            });
+        var props = getMembers(type, MemberType.property);
+        var propList = props.filter(function (x: any) {
+            return !!x.setter && ((x.attr || []).filter(function (a: any) {
+                return isInstanceOfType(a, OptionAttribute);
+            }).length > 0 || (x.attr || []).filter(function (a: any) {
+                return isInstanceOfType(a, DisplayNameAttribute);
+            }).length > 0);
+        });
 
-            propByName = {};
-            for (var k of propList) {
-                propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
-            }
-
-            type.__propByName = propByName;
+        var propByName: Record<string, TypeMember> = {};
+        for (var k of propList) {
+            propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
         }
 
-        if (fieldByName == null) {
-            var fields = getMembers(type, MemberType.field);
-            var fieldList = fields.filter(function (x1: any) {
-                return (x1.attr || []).filter(function (a: any) {
-                    return isInstanceOfType(a, OptionAttribute);
-                }).length > 0 || (x1.attr || []).filter(function (a: any) {
-                    return isInstanceOfType(a, DisplayNameAttribute);
-                }).length > 0;
-            });
+        var fields = getMembers(type, MemberType.field);
+        var fieldList = fields.filter(function (x1: any) {
+            return (x1.attr || []).filter(function (a: any) {
+                return isInstanceOfType(a, OptionAttribute);
+            }).length > 0 || (x1.attr || []).filter(function (a: any) {
+                return isInstanceOfType(a, DisplayNameAttribute);
+            }).length > 0;
+        });
 
-            fieldByName = {};
-            for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
-                var k1 = fieldList[$t2];
-                fieldByName[ReflectionUtils.makeCamelCase(k1.name)] = k1;
-            }
-            type.__fieldByName = fieldByName;
+        var fieldByName: Record<string, TypeMember> = {};
+        for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
+            var k1 = fieldList[$t2];
+            fieldByName[ReflectionUtils.makeCamelCase(k1.name)] = k1;
         }
 
         var keys = Object.keys(options);
