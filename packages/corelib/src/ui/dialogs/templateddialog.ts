@@ -51,11 +51,11 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         // class goes to dialog / modal / panel element
     }
 
-    protected getDialogTitle() {
+    protected getInitialDialogTitle() {
         return "";
     }
 
-    protected getCommonDialogOptions(asPanel?: boolean): CommonDialogOptions {
+    protected getDialogOptions(asPanel?: boolean): CommonDialogOptions {
         return {
             asPanel: asPanel ?? this.isMarkedAsPanel,
             autoOpen: false,
@@ -75,21 +75,20 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                     return this.getModalOptions();
 
                 if (type === "jqueryui")
-                    return this.getDialogOptions();
+                    return this.getUIDialogOptions();
             },
-            title: this.domNode.getAttribute('data-dialogtitle') ?? this.getDialogTitle() ?? ''
+            title: this.dialogTitle ?? this.getInitialDialogTitle() ?? ''
         }
     }
 
-    /** This one returns jQuery UI Dialog specific options */
-    protected getDialogOptions(): any {
+    /** Gets jQuery UI Dialog options */
+    protected getUIDialogOptions(): any {
         var opt: any = {};
         opt.width = 920;
         applyCssSizes(opt, this.getCssClass());
         opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
         opt.modal = true;
         opt.position = { my: 'center', at: 'center', of: window.window };
-        opt.title = this.domNode.dataset.dialogtitle ?? this.getDialogTitle() ?? '';
         return opt;
     }
 
@@ -104,7 +103,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         }
     }
 
-    protected initCommonDialog(): void {
+    protected initDialog(): void {
         this.domNode.classList.remove("hidden");
 
         if (this.commonDialog?.type == "jqueryui") {
@@ -129,8 +128,8 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public dialogOpen(asPanel?: boolean): void {
         if (!this.commonDialog) {
-            this.commonDialog = createCommonDialog(this.getCommonDialogOptions(asPanel));
-            this.initCommonDialog();
+            this.commonDialog = createCommonDialog(this.getDialogOptions(asPanel));
+            this.initDialog();
         }
         this.commonDialog.open();
     }

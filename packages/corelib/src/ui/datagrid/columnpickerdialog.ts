@@ -177,8 +177,8 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         ];
     }
 
-    protected getDialogOptions() {
-        var opt = super.getDialogOptions();
+    protected getUIDialogOptions() {
+        var opt = super.getUIDialogOptions();
         opt.width = 600;
         return opt;
     }
