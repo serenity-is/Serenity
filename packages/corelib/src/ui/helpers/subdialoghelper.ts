@@ -5,8 +5,8 @@ import { Widget } from "../widgets/widget";
 export namespace SubDialogHelper {
     export function bindToDataChange(dialog: any, owner: Widget<any>,
         dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any {
-        var widgetName = (owner as any).widgetName;
-        Fluent(dialog.domNode).on('ondatachange.' + widgetName, function (e: DataChangeInfo) {
+        var uniqueName = (owner as Widget<any>)["uniqueName"];
+        Fluent(dialog.domNode).on('ondatachange.' + uniqueName, function (e: DataChangeInfo) {
             if (useTimeout) {
                 window.setTimeout(function () {
                     dataChange(e);
@@ -15,8 +15,8 @@ export namespace SubDialogHelper {
             else {
                 dataChange(e);
             }
-        }).on('remove.' + widgetName, function () {
-            Fluent.off(dialog.domNode, 'ondatachange.' + widgetName);
+        }).one('remove.' + uniqueName, function () {
+            Fluent.off(dialog.domNode, 'ondatachange.' + uniqueName);
         });
         return dialog;
     }

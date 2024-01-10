@@ -35,7 +35,7 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        Fluent.on(this.domNode, 'remove.' + widgetName, e => {
+        Fluent.one(this.domNode, 'remove.' + widgetName, e => {
             if (e.bubbles || e.cancelable)
                 return;
             this.destroy();

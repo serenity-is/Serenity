@@ -294,8 +294,10 @@ function createBSModal(options: DialogOptions): ICommonDialog {
     if (options.element) {
         if (typeof options.element === "function")
             options.element(modalDiv.querySelector(".modal-body"));
-        else
-            options.element.querySelector(".modal-body").replaceWith(options.element);
+        else {
+            modalDiv.querySelector(".modal-body")?.replaceWith(options.element);
+            options.element.classList.add("modal-body");
+        }
     }
 
     if (!getjQuery() && isBS5Plus())
@@ -343,7 +345,7 @@ function createBS5RawModal(modalDiv: HTMLElement, options: DialogOptions): IComm
         dispose: () => {
             if (modal) {
                 modal.dispose?.();
-                Fluent(modal).remove();
+                Fluent(modalDiv).remove();
                 modal = null;
             }
         },

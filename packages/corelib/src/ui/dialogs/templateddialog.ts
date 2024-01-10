@@ -21,7 +21,6 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.domNode.classList.add("s-TemplatedDialog");
         this.domNode.setAttribute("id", this.domNode.getAttribute("id") || this.uniqueName);
         this.initValidator();
         this.initTabs();

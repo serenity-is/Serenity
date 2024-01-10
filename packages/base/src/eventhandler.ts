@@ -7,10 +7,6 @@
 
 import { getjQuery } from "./system"
 
-/**
- * Constants
- */
-
 const namespaceRegex = /[^.]*(?=\..*)\.|.*/
 const stripNameRegex = /\..*/
 const stripUidRegex = /::\d+$/
@@ -20,55 +16,6 @@ const customEvents: Record<string, string> = {
     mouseleave: 'mouseout'
 }
 
-const nativeEvents = new Set([
-    'click',
-    'dblclick',
-    'mouseup',
-    'mousedown',
-    'contextmenu',
-    'mousewheel',
-    'DOMMouseScroll',
-    'mouseover',
-    'mouseout',
-    'mousemove',
-    'selectstart',
-    'selectend',
-    'keydown',
-    'keypress',
-    'keyup',
-    'orientationchange',
-    'touchstart',
-    'touchmove',
-    'touchend',
-    'touchcancel',
-    'pointerdown',
-    'pointermove',
-    'pointerup',
-    'pointerleave',
-    'pointercancel',
-    'gesturestart',
-    'gesturechange',
-    'gestureend',
-    'focus',
-    'blur',
-    'change',
-    'reset',
-    'select',
-    'submit',
-    'focusin',
-    'focusout',
-    'load',
-    'unload',
-    'beforeunload',
-    'resize',
-    'move',
-    'DOMContentLoaded',
-    'readystatechange',
-    'error',
-    'abort',
-    'scroll'
-])
-
 function makeEventUid(prefix: string): string {
     return `${prefix}::${uidEvent++}`;
 }
@@ -77,7 +24,7 @@ const eventRegistry: WeakMap<EventTarget, any> = new WeakMap();
 
 function getElementEvents(element: EventTarget): any {
     var events = eventRegistry.get(element);
-    if (!events) 
+    if (!events)
         eventRegistry.set(element, events = {});
     return events;
 }
@@ -140,14 +87,8 @@ function findHandler(events: any, callable: any, delegationSelector: any = null)
 
 function normalizeParameters(originalTypeEvent: string, handler: any, delegationFunction: any) {
     const isDelegated = typeof handler === 'string'
-    // TODO: tooltip passes `false` instead of selector, so we need to check
     const callable = isDelegated ? delegationFunction : (handler || delegationFunction)
     let typeEvent = getTypeEvent(originalTypeEvent)
-
-    if (!nativeEvents.has(typeEvent)) {
-        typeEvent = originalTypeEvent
-    }
-
     return [isDelegated, callable, typeEvent]
 }
 
@@ -156,20 +97,20 @@ function addHandler(element: EventTarget, originalTypeEvent: string, handler: Fu
         return;
     }
 
-    //const $ = getjQuery();
-    //if ($) {
-    //    let $element = $(element);
-    //    if (oneOff)
-    //        $element.one(originalTypeEvent, handler, delegationFunction);
-    //    else
-    //        $element.on(originalTypeEvent, handler, delegationFunction);
-    //    return;
-    //}
+    const $ = getjQuery();
+    if ($) {
+        let $element = $(element);
+        if (oneOff)
+            $element.one(originalTypeEvent, handler, delegationFunction);
+        else
+            $element.on(originalTypeEvent, handler, delegationFunction);
+        return;
+    }
+    
+    let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
+    if (!callable)
+        return;
 
-    let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction)
-
-    // in case of mouseenter or mouseleave wrap the handler within a function that checks for its DOM position
-    // this prevents the handler from being dispatched the same way as mouseover or mouseout does
     if (originalTypeEvent in customEvents) {
         const wrapFunction = (fn: Function) => {
             return function (event: Event & { relatedTarget?: any, delegateTarget: any }) {
@@ -182,25 +123,24 @@ function addHandler(element: EventTarget, originalTypeEvent: string, handler: Fu
         callable = wrapFunction(callable)
     }
 
-    const events = getElementEvents(element)
-    const handlers = events[typeEvent] || (events[typeEvent] = {})
-    const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null)
+    const events = getElementEvents(element);
+    const handlers = events[typeEvent] || (events[typeEvent] = {});
+    const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null);
 
     if (previousFunction) {
         (previousFunction as any).oneOff = (previousFunction as any).oneOff && oneOff
-
-        return
+        return;
     }
 
     const uid = makeEventUid(originalTypeEvent.replace(namespaceRegex, ''))
     const fn: any = isDelegated ?
         delegationHandler(element, handler as string, callable) :
-        baseHandler(element, callable)
+        baseHandler(element, callable);
 
-    fn.delegationSelector = isDelegated ? handler : null
-    fn.callable = callable
-    fn.oneOff = oneOff
-    fn.uidEvent = uid
+    fn.delegationSelector = isDelegated ? handler : null;
+    fn.callable = callable;
+    fn.oneOff = oneOff;
+    fn.uidEvent = uid;
     handlers[uid] = fn;
 
     element.addEventListener(typeEvent, fn, isDelegated);
@@ -218,11 +158,11 @@ function removeHandler(element: EventTarget, events: any, typeEvent: string, han
 }
 
 function removeNamespacedHandlers(element: EventTarget, events: any, typeEvent: string, namespace: string) {
-    const storeElementEvent = events[typeEvent] || {}
+    const storeElementEvent = events[typeEvent] || {};
 
     for (const [handlerKey, event] of Object.entries(storeElementEvent)) {
         if (handlerKey.includes(namespace)) {
-            removeHandler(element, events, typeEvent, (event as any).callable, (event as any).delegationSelector)
+            removeHandler(element, events, typeEvent, (event as any).callable, (event as any).delegationSelector);
         }
     }
 }
@@ -262,45 +202,44 @@ export namespace EventHandler {
             return;
         }
 
-        const [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationHandler)
-        const inNamespace = typeEvent !== originalTypeEvent
-        const events = getElementEvents(element)
-        const storeElementEvent = events[typeEvent] || {}
-        const isNamespace = originalTypeEvent.startsWith('.')
+        const [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationHandler);
+        const inNamespace = typeEvent !== originalTypeEvent;
+        const events = getElementEvents(element);
+        const storeElementEvent = events[typeEvent] || {};
+        const isNamespace = originalTypeEvent.startsWith('.');
 
         if (typeof callable !== 'undefined') {
-            // Simplest case: handler is passed, remove that listener ONLY.
             if (!Object.keys(storeElementEvent).length) {
-                return
+                return;
             }
 
-            removeHandler(element, events, typeEvent, callable, isDelegated ? handler : null)
+            removeHandler(element, events, typeEvent, callable, isDelegated ? handler : null);
             return
         }
 
         if (isNamespace) {
             for (const elementEvent of Object.keys(events)) {
-                removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1))
+                removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
             }
         }
 
         for (const [keyHandlers, event] of Object.entries(storeElementEvent)) {
-            const handlerKey = keyHandlers.replace(stripUidRegex, '')
+            const handlerKey = keyHandlers.replace(stripUidRegex, '');
 
             if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
-                removeHandler(element, events, typeEvent, (event as any).callable, (event as any).delegationSelector)
+                removeHandler(element, events, typeEvent, (event as any).callable, (event as any).delegationSelector);
             }
         }
     }
 
     export function trigger(element: EventTarget, type: string, args?: any): Event & { isDefaultPrevented?(): boolean } {
         if (typeof type !== 'string' || !element) {
-            return null
+            return null;
         }
 
         const $ = getjQuery();
-        const typeEvent = getTypeEvent(type)
-        const inNamespace = type !== typeEvent
+        const typeEvent = getTypeEvent(type);
+        const inNamespace = type !== typeEvent;
 
         let jQueryEvent = null;
         let bubbles = true;
@@ -315,18 +254,18 @@ export namespace EventHandler {
             defaultPrevented = jQueryEvent.isDefaultPrevented();
         }
 
-        const evt = hydrateObj(new Event(type, { bubbles, cancelable: true }), args)
+        const evt = hydrateObj(new Event(type, { bubbles, cancelable: true }), args);
 
         if (defaultPrevented) {
-            evt.preventDefault()
+            evt.preventDefault();
         }
 
         if (nativeDispatch) {
-            element.dispatchEvent(evt)
+            element.dispatchEvent(evt);
         }
 
         if (evt.defaultPrevented && jQueryEvent) {
-            jQueryEvent.preventDefault()
+            jQueryEvent.preventDefault();
         }
 
         return evt

@@ -2289,7 +2289,7 @@ Slick._ = (() => {
     scrollTo(y) {
       const vpi = this._viewportInfo;
       y = Math.max(y, 0);
-      y = Math.min(y, vpi.virtualHeight - Math.round(this._jQuery(this._layout.getScrollContainerY()).height()) + (vpi.hasHScroll || this.hasFrozenColumns() ? this._scrollDims.height : 0));
+      y = Math.min(y, vpi.virtualHeight - Math.round(this._layout.getScrollContainerY().clientHeight) + (vpi.hasHScroll || this.hasFrozenColumns() ? this._scrollDims.height : 0));
       var oldOffset = this._pageOffset;
       this._page = Math.min(this._numberOfPages - 1, Math.floor(y / this._pageHeight));
       this._pageOffset = Math.round(this._page * this._jumpinessCoefficient);
@@ -3243,8 +3243,9 @@ Slick._ = (() => {
       }
     }
     handleClick(e) {
+      var _a, _b, _c;
       if (!this._currentEditor) {
-        if (e.target != document.activeElement || this._jQuery(e.target).hasClass("slick-cell")) {
+        if (e.target != document.activeElement || ((_c = (_b = (_a = e.target) == null ? void 0 : _a.classList) == null ? void 0 : _b.contains) == null ? void 0 : _c.call(_b, "slick-cell"))) {
           this.setFocus();
         }
       }

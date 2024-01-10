@@ -4,8 +4,10 @@ import { validatorAbortHandler } from "../../q";
 export namespace ValidationHelper {
     export function asyncSubmit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
         let $ = getjQuery();
-        if (!$ || !$.validator)
-            return false;
+        if (!$ || !$.validator) {
+            submitHandler?.();
+            return true;
+        }
         var validator = $(form).validate();
         var valSettings = validator.settings;
         if ((valSettings as any).abortHandler) {
@@ -16,9 +18,7 @@ export namespace ValidationHelper {
         }
         (valSettings as any)['abortHandler'] = validatorAbortHandler;
         valSettings['submitHandler'] = function () {
-            if (submitHandler != null) {
-                submitHandler();
-            }
+            submitHandler?.();
             return false;
         };
         Fluent.trigger(isArrayLike(form) ? form[0] : form , 'submit');
@@ -27,8 +27,10 @@ export namespace ValidationHelper {
 
     export function submit(form: ArrayLike<HTMLElement> | HTMLElement,  validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
         let $ = getjQuery();
-        if (!$ || !$.validator)
-            return false;        
+        if (!$ || !$.validator) {
+            submitHandler?.();
+            return true;        
+        }
         var validator = $(form).validate();
         var valSettings = validator.settings;
         if ((valSettings as any).abortHandler != null) {
@@ -40,9 +42,7 @@ export namespace ValidationHelper {
         if (!validator.form()) {
             return false;
         }
-        if (submitHandler != null) {
-            submitHandler();
-        }
+        submitHandler?.();
         return true;
     }
 
