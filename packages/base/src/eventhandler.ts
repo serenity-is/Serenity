@@ -22,6 +22,27 @@ function makeEventUid(prefix: string): string {
 
 const eventRegistry: WeakMap<EventTarget, any> = new WeakMap();
 
+export function triggerRemoveAndClearAll(element: EventTarget): void {
+    let events = eventRegistry.get(element);
+    if (!events)
+        return;
+
+    var removeEvents = events["remove"];
+    if (removeEvents) {
+        for (const [_, event] of Object.entries(removeEvents)) {
+            if (typeof (event as any).callable === "function") {
+                try {
+                    (event as any).callable.call(element, { target: element });
+                }
+                catch {
+                }
+            }
+        }
+    }
+
+    eventRegistry.delete(element);
+}
+
 function getElementEvents(element: EventTarget): any {
     var events = eventRegistry.get(element);
     if (!events)

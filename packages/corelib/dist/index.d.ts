@@ -920,12 +920,6 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
-/**
- * --------------------------------------------------------------------------
- * Adapted from: Bootstrap dom/event-handler.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 declare namespace EventHandler {
     function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
     function on(element: EventTarget, type: string, listener: EventListener): void;

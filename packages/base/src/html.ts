@@ -1,4 +1,4 @@
-﻿import { EventHandler } from "./eventhandler";
+﻿import { EventHandler, triggerRemoveAndClearAll } from "./eventhandler";
 import { getjQuery } from "./system";
 
 const esc: Record<string, string> = {
@@ -209,16 +209,25 @@ Fluent.prototype.hasClass = function (this: FluentThis<any>, klass: string) {
     return !!this.el?.classList.contains(klass);
 }
 
-Fluent.prototype.html = function (this: FluentThis<any>, html?: string) {
-    if (html === void 0 && !arguments.length)
+Fluent.prototype.html = function (this: FluentThis<any>, value?: string) {
+    if (value === void 0 && !arguments.length)
         return this.el?.innerHTML;
-    if (this.el) {
+    
+    if (!this.el)
+        return this;
+
+    if (this.el.hasChildNodes()) {
         let $ = getjQuery();
         if ($)
-            $(this.el).html(html ?? '');
-        else
-            this.el.innerHTML = html ?? '';
+            $(this.el).html(value ?? "");
+        else {
+            cleanContents(this.el);
+            this.el.innerHTML = value ?? "";
+        }
     }
+    else
+        this.el.innerHTML = value ?? "";
+
     return this;
 }
 
@@ -306,14 +315,21 @@ Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fl
     return this;
 }
 
+function cleanContents(element: HTMLElement) {
+    element.querySelectorAll("*").forEach(node => triggerRemoveAndClearAll(node));
+}
+
 Fluent.prototype.remove = function (this: FluentThis<any>) {
     if (!this.el)
         return;
     let $ = getjQuery();
     if ($)
         $(this.el).remove();
-    else
+    else {
+        cleanContents(this.el);
+        triggerRemoveAndClearAll(this.el);
         this.el.remove();
+    }
     return this;
 }
 
@@ -338,7 +354,22 @@ Fluent.prototype.val = function (this: FluentThis<any>, value?: string) {
 Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
     if (value === void 0 && !arguments.length)
         return this.el?.textContent;
-    this.el && (this.el.textContent = value ?? '');
+
+    if (!this.el)
+        return this;
+
+    if (this.el.hasChildNodes()) {
+        let $ = getjQuery();
+        if ($)
+            $(this.el).text(value ?? "");
+        else {
+            cleanContents(this.el);
+            this.el.textContent = value ?? "";
+        }
+    }
+    else
+        this.el.textContent = value ?? "";
+
     return this;
 }
 
