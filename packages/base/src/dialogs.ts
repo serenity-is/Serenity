@@ -786,7 +786,7 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
  * @param element The panel element
  * @param e  The event triggering the close
  */
-export function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
+export function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
     let panel = getDialogRootElement(el);
     if (!panel || panel.classList.contains("hidden"))
@@ -916,7 +916,7 @@ export function getDialogBodyElement(element: HTMLElement | ArrayLike<HTMLElemen
 }
 
 /** Returns .s-Panel, .modal, .ui-dialog-content */
-export function getDialogEventSource(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+export function getDialogEventTarget(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
     if (isArrayLike(element))
         element = element[0];
     if (!element)
@@ -928,17 +928,48 @@ export function getDialogEventSource(element: HTMLElement | ArrayLike<HTMLElemen
 
 /** Tries to close a ui-dialog, panel or modal */
 export function closeDialog(element: HTMLElement | ArrayLike<HTMLElement>): void {
-    element = getDialogEventSource(element);
+    element = getDialogEventTarget(element);
     if (!element)
         return;
     if (element.classList.contains("ui-dialog-content")) {
         getjQuery()?.(element)?.dialog?.("close");
     }
     else if (element.classList.contains("modal")) {
-
+        let $ = getjQuery();
+        if ($ && $.fn && $.fn.modal)
+            $(element).modal('hide');
+        else if (isBS5Plus()) {
+            (bootstrap as any).Modal?.getInstance?.(element)?.hide?.();
+        }
     }
     else if (element.classList.contains("s-Panel")) {
         closePanel(element);
     }
 
+}
+
+export function attachToDialogBeforeCloseEvent(element: HTMLElement | ArrayLike<HTMLElement>, handler: (e: Event) => void) {
+    element = getDialogEventTarget(element);
+    if (!element)
+        return;
+
+    if (element.classList.contains("ui-dialog-content"))
+        Fluent.on(element, "dialogbeforeclose", handler);
+    else if (element.classList.contains("s-Panel"))
+        Fluent.on(element, "panelbeforeclose", handler);
+    else if (element.classList.contains("modal"))
+        Fluent.on(element, "hide.bs.modal", handler);
+}
+
+export function attachToDialogCloseEvent(element: HTMLElement | ArrayLike<HTMLElement>, handler: (e: Event) => void) {
+    element = getDialogEventTarget(element);
+    if (!element)
+        return;
+
+    if (element.classList.contains("ui-dialog-content"))
+        Fluent.on(element, "dialogclose", handler);
+    else if (element.classList.contains("s-Panel"))
+        Fluent.on(element, "panelclose", handler);
+    else if (element.classList.contains("modal"))
+        Fluent.on(element, "hidden.bs.modal", handler);
 }
