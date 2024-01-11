@@ -734,6 +734,37 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     }
 
     /// <summary>
+    /// Executes the query sets values / entities and total count.
+    /// </summary>
+    /// <param name="query">Query</param>
+    private void ExecuteQuery(SqlQuery query)
+    {
+        try
+        {
+            Response.TotalCount = query.ForEach(Connection, delegate()
+            {
+                var clone = ProcessEntity(Row.Clone());
+
+                if (clone == null) return;
+                if (DistinctFields != null)
+                {
+                    foreach (var field in DistinctFields)
+                        Response.Values.Add(field.AsObject(clone));
+                }
+                else
+                    Response.Entities.Add(clone);
+            });
+        }
+        catch (Exception exception)
+        {
+            foreach (var behavior in behaviors.Value.OfType<IListExceptionBehavior>())
+                behavior.OnException(this, exception);
+
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Processes the list request. This is the entry point for the handler.
     /// </summary>
     /// <param name="connection">Connection</param>
@@ -781,21 +812,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         if (DistinctFields == null || DistinctFields.Length > 0)
         {
-            Response.TotalCount = query.ForEach(Connection, delegate ()
-            {
-                var clone = ProcessEntity(Row.Clone());
-
-                if (clone != null)
-                {
-                    if (DistinctFields != null)
-                    {
-                        foreach (var field in DistinctFields)
-                            Response.Values.Add(field.AsObject(clone));
-                    }
-                    else
-                        Response.Entities.Add(clone);
-                }
-            });
+            ExecuteQuery(query);
         }
         else
         {
@@ -811,7 +828,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         return Response;
     }
-    
+
     IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
     {
         return Process(connection, (TListRequest)request);
