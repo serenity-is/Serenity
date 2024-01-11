@@ -181,15 +181,15 @@ function createPanel(options: DialogOptions): ICommonDialog {
         options.element(panelBody);
     setPanelTitle(panel, options.title, options.closeButton ?? true);
     if (options.onOpen) {
-        Fluent.on(panelBody, "panelopen", options.onOpen);
+        Fluent.on(panel, "panelopen", options.onOpen);
     }
     if (options.onClose) {
-        Fluent.on(panelBody, "panelclose", () => options.onClose(result));
+        Fluent.on(panel, "panelclose", () => options.onClose(result));
     }
     let close = (res?: string) => {
         if (res !== void 0)
             result = res;
-        panelBody && closePanel(panelBody);
+        panel && closePanel(panel);
     }
 
     if (options.buttons) {
@@ -201,22 +201,20 @@ function createPanel(options: DialogOptions): ICommonDialog {
     }
 
     if (options.title !== void 0)
-        setPanelTitle(panelBody, options.title);
+        setPanelTitle(panel, options.title);
 
     return {
         type: "panel",
-        open: () => panelBody && openPanel(panelBody),
+        open: () => panel && openPanel(panel),
         close,
         dispose: () => {
-            if (!panelBody)
+            if (!panel)
                 return;
-            let panelRoot = panelBody?.closest(".s-Panel");
-            if (panelRoot && panelRoot !== panelBody)
-                Fluent(panelRoot).remove();
-            panelBody = null;
+            Fluent(panel).remove();
+            panel = null;
         },
-        get title() { return panelBody?.querySelector(".panel-titlebar-text").textContent },
-        set title(value: string) { panelBody && setPanelTitle(panelBody, value) },
+        get title() { return panel?.querySelector(".panel-titlebar-text").textContent },
+        set title(value: string) { panel && setPanelTitle(panel, value) },
         get result() { return result }
     }
 }
