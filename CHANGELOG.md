@@ -363,7 +363,6 @@ Bugfixes:
 Features:
   - added ExtensionBlacklistInclude, ExtensionBlacklistExclude, ExtensionWhitelistInclude and ExtensionWhitelistExclude that allows including, excluding extensions from defaults without having to write all the extensions again
   - update bootstrap icons to 1.10.5
-  - trigger panelopening, panelopened, panelclosing, panelclosed events on window while a panel is closing / opening
 
 Bugfixes:
   - email client now working due to preact not included in appsettings.bundles.json `(StartSharp)`

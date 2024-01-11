@@ -1724,7 +1724,7 @@ declare namespace Serenity {
      * @param element The panel element
      * @param e  The event triggering the close
      */
-    function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event): void;
+    function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>), e?: Event): void;
     /**
      * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
      * and panelopening and panelopened events on the window.
@@ -1734,6 +1734,14 @@ declare namespace Serenity {
      * @param e The event triggering the open
      */
     function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string): void;
+    /** Returns .s-Panel, .modal, .ui-dialog */
+    function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement;
+    /** Returns .panel-body, .modal-body, .ui-dialog-content */
+    function getDialogBodyElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement;
+    /** Returns .s-Panel, .modal, .ui-dialog-content */
+    function getDialogEventSource(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement;
+    /** Tries to close a ui-dialog, panel or modal */
+    function closeDialog(element: HTMLElement | ArrayLike<HTMLElement>): void;
 
     interface ServiceError {
         Code?: string;

@@ -4,7 +4,7 @@ import { extend } from "./system-compat";
 
 function initValidatorMethods(): boolean {
     let $ = getjQuery();
-    if (!$ || !$.validator || !$.validator.methods || !$.validator.addMethods)
+    if (!$ || !$.validator || !$.validator.methods || !$.validator.addMethod)
         return false;
     let validator = $.validator;
 

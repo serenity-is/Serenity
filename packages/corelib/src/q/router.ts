@@ -1,4 +1,4 @@
-﻿import { Fluent, closePanel, getjQuery, isArrayLike } from "@serenity-is/base";
+﻿import { Fluent, closeDialog, closePanel, getjQuery, isArrayLike } from "@serenity-is/base";
 
 export interface HandleRouteEvent extends Event {
     route: string,
@@ -57,7 +57,7 @@ export namespace Router {
 
         var current = window.location.hash || '';
         if (current.charAt(0) == '#')
-            current = current.substr(1, current.length - 1);
+            current = current.substring(1, current.length - 1);
 
         var parts = current.split('/+/');
 
@@ -74,16 +74,14 @@ export namespace Router {
         replace(hash, tryBack);
     }
 
-    function visibleDialogs() {
-        var dialogs = document.querySelectorAll(".ui-dialog-content, .ui-dialog.panel-hidden>.ui-dialog-content, .s-PanelBody");
-        var visibleDialogs: HTMLElement[] = [];
-        dialogs.forEach((el: HTMLElement) => {
-            if (!el.classList.contains(".ui-dialog-content") ||
-                el.closest(".ui-dialog.panel-hidden"))
-                visibleDialogs.push(el);
-            if (el.offsetWidth > 0 && el.offsetHeight > 0)
-                visibleDialogs.push(el);
-        });
+    function isVisibleOrHiddenBy(el: HTMLElement): boolean {
+        return (el.offsetWidth > 0 && el.offsetHeight > 0) ||  // if visible
+            !!(!el.closest(".hidden") && el.closest("[data-hiddenby]")) // or temporarily hidden by another panel
+    }
+
+    function getVisibleOrHiddenByDialogs(): HTMLElement[] {
+        var visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .s-Panel, .ui-dialog-content"))
+            .filter(isVisibleOrHiddenBy);
         visibleDialogs.sort((a: any, b: any) => {
             return parseInt(a.dataset.qrouterorder || "0", 10) - parseInt(b.dataset.qrouterorder || "0", 10);
         });
@@ -94,13 +92,13 @@ export namespace Router {
         var route = [];
         owner = isArrayLike(owner) ? owner[0] : owner;
         element = isArrayLike(element) ? element[0] : element;
-        var isDialog = owner.classList.contains(".ui-dialog-content") || owner.classList.contains('s-PanelBody');
-        var dialog = isDialog ? owner : owner.closest('.ui-dialog-content, .s-PanelBody') as HTMLElement;
+        var isDialog = owner.classList.contains(".ui-dialog-content") || owner.classList.contains('s-Panel');
+        var dialog = isDialog ? owner : owner.closest('.ui-dialog-content, .panel-body') as HTMLElement;
         var value = hash();
 
         var idPrefix: string;
         if (dialog) {
-            var dialogs = visibleDialogs();
+            var dialogs = getVisibleOrHiddenByDialogs();
             var index = dialogs.indexOf(dialog);
 
             for (var i = 0; i <= index; i++) {
@@ -129,24 +127,6 @@ export namespace Router {
         route.push(value);
         element.dataset.qroute = value;
         replace(route.join("/+/"));
-
-        var el = element;
-        var handler = (e: any) => {
-            el.dataset.qroute = null;
-            Fluent.off(el, ".qrouter");
-            var prhash = el.dataset.qprhash;
-            var tryBack = e.target.closest('.s-MessageDialog') || (e && e.originalEvent &&
-                ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
-                    e.originalEvent.target?.hasClass?.("ui-dialog-titlebar-close") ||
-                    e.originalEvent.target?.hasClass?.("panel-titlebar-close")));
-            if (prhash != null)
-                replace(prhash, tryBack);
-            else
-                replaceLast('', tryBack);
-        }
-
-        Fluent.on(element, "dialogclose.qrouter", handler);
-        Fluent.on(element, "panelclose.qrouter", handler);
     }
 
     export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
@@ -156,13 +136,6 @@ export namespace Router {
         var el = isArrayLike(element) ? element[0] : element;
         if (!el)
             return;
-
-        function handler() {
-            dialogOpen(owner, el, hash);
-        }
-
-        Fluent.on(el, "dialogopen.qrouter", handler);
-        Fluent.on(el, "panelopen.qrouter", handler);
     }
 
     export function resolve(hash?: string) {
@@ -173,9 +146,9 @@ export namespace Router {
         try {
             hash = hash ?? window.location.hash ?? '';
             if (hash.charAt(0) == '#')
-                hash = hash.substr(1, hash.length - 1);
+                hash = hash.substring(1, hash.length - 1);
 
-            var dialogs = visibleDialogs();
+            var dialogs = getVisibleOrHiddenByDialogs();
             var newParts = hash.split("/+/");
             var oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
@@ -188,10 +161,7 @@ export namespace Router {
 
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
-                if (d.classList.contains('ui-dialog-content'))
-                    getjQuery()(d as any).dialog?.('close');
-                else if (d.classList.contains('s-PanelBody'))
-                    closePanel(d);
+                closeDialog(d);
             }
 
             for (var i = same; i < newParts.length; i++) {
@@ -257,7 +227,7 @@ export namespace Router {
     let routerOrder = 1;
 
     if (typeof document !== "undefined") {
-        function handler(event: any) {
+        function openHandler(event: any) {
             if (!enabled)
                 return;
 
@@ -268,7 +238,7 @@ export namespace Router {
                 return;
 
             dlg.dataset.qprhash = window.location.hash;
-            var owner = visibleDialogs().filter(x => x !== dlg).pop();
+            var owner = getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
             if (!owner)
                 owner = document.documentElement;
 
@@ -277,7 +247,45 @@ export namespace Router {
             });
         }
 
-        Fluent.on(document, "dialogopen", ".ui-dialog-content", handler);
-        Fluent.on(document, "panelopen", ".s-PanelBody", handler);
+        Fluent.on(document, "dialogopen", ".ui-dialog-content", openHandler);
+        Fluent.on(document, "modalshown", ".modal", openHandler);
+        Fluent.on(document, "panelopen", ".panel-body", openHandler);
+
+        function shouldTryBack(e: Event) {
+            if ((e.target as HTMLElement)?.closest?.(".s-MessageDialog") ||
+                (e as any).key === "Escape")
+                return true;
+
+            let orgEvent = ((e as any).originalEvent ?? e) as KeyboardEvent;
+            if (!orgEvent)
+                return false;
+
+            if (orgEvent.key === "Escape" ||
+                (orgEvent.target as HTMLElement)?.matches?.(".close, .panel-titlebar-close, .ui-dialog-titlebar-close"))
+                return true;
+
+            return false;
+        }
+
+        function closeHandler(e: any) {
+            var dlg = e.target as HTMLElement;
+            if (!dlg)
+                return;
+            delete dlg.dataset.qroute;
+            var prhash = dlg.dataset.qprhash;
+
+            let tryBack = shouldTryBack(e);
+
+            if (prhash != null)
+                replace(prhash, tryBack);
+            else
+                replaceLast('', tryBack);
+        }
+
+        Fluent.on(document, "dialogclose.qrouter", closeHandler);
+        Fluent.on(document, "modalhidden.qrouter", closeHandler);
+        Fluent.on(document, "panelclose.qrouter", closeHandler);
     }
+
+    
 }

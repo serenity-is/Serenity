@@ -6,11 +6,11 @@ let oldShowLabel: (e: HTMLElement, message: string) => void;
 
 function validateShowLabel(element: HTMLElement, message: string) {
     oldShowLabel.call(this, element, message);
-    this.errorsFor(element).each(function (i: number, e: any) {
-        if (e.parent?.hasClass('vx')) {
-            e.setAttribute('title', e.textContent);
-            if (message && e.hasClass('error'))
-                e.removeClass('checked');
+    this.errorsFor(element).each(function (i: number, element: HTMLElement) {
+        if ((element?.parentNode as HTMLElement)?.classList?.contains('vx')) {
+            element.setAttribute('title', element.textContent);
+            if (message && element.classList.contains('error'))
+                element.classList.remove('checked');
         }
     });
 };

@@ -173,13 +173,13 @@ function createPanel(options: DialogOptions): ICommonDialog {
     let result: string;
     let panelBody = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
-    panelBody.classList.add("s-PanelBody");
-    let panelRoot = document.createElement("div");
-    panelRoot.classList.add("s-Panel");
-    panelRoot.append(panelBody);
+    panelBody.classList.add("panel-body");
+    let panel = document.createElement("div");
+    panel.classList.add("s-Panel");
+    panel.append(panelBody);
     if (typeof options.element === "function")
         options.element(panelBody);
-    setPanelTitle(panelBody, options.title, options.closeButton ?? true);
+    setPanelTitle(panel, options.title, options.closeButton ?? true);
     if (options.onOpen) {
         Fluent.on(panelBody, "panelopen", options.onOpen);
     }
@@ -193,8 +193,8 @@ function createPanel(options: DialogOptions): ICommonDialog {
     }
 
     if (options.buttons) {
-        let footer = panelRoot.appendChild(document.createElement("div"));
-        footer.classList.add("panel-footer");
+        let footer = panel.appendChild(document.createElement("div"));
+        footer.classList.add("s-panel-footer");
         for (let button of options.buttons) {
             bsCreateButton(footer, button, close);
         }
@@ -236,21 +236,21 @@ function createUIDialog(options: DialogOptions): ICommonDialog {
         width: options.width
     } as any;
 
-    let div = options.element && typeof options.element !== "function" ? options.element :
+    let content = options.element && typeof options.element !== "function" ? options.element :
         document.createElement("div");
 
     // templated dialog hides its content element before first open
-    if (div.classList.contains("hidden"))
-        div.classList.remove("hidden");
+    if (content.classList.contains("hidden"))
+        content.classList.remove("hidden");
 
     if (typeof options.element === "function")
-        options.element(div);
+        options.element(content);
 
     let $ = getjQuery();
     let close = (res?: string) => {
         if (res !== "void 0")
             result = res;
-        div && $(div).dialog("close");
+        content && $(content).dialog("close");
     }
 
     if (options.buttons) {
@@ -269,23 +269,23 @@ function createUIDialog(options: DialogOptions): ICommonDialog {
     if (options.providerOptions)
         opt = Object.assign(opt, options.providerOptions("jqueryui", options));
 
-    $(div).dialog(opt);
+    $(content).dialog(opt);
 
     return {
         type: "jqueryui",
         close,
         dispose: () => {
-            if (div) {
-                getjQuery()(div)?.dialog?.('destroy');
-                (div.querySelector('.ui-dialog-content') as HTMLElement)?.classList.remove('ui-dialog-content');
-                div.remove();
-                div = null;
+            if (content) {
+                getjQuery()(content)?.dialog?.('destroy');
+                (content.querySelector('.ui-dialog-content') as HTMLElement)?.classList.remove('ui-dialog-content');
+                content.remove();
+                content = null;
             }
         },
-        open: () => div && getjQuery()(div).dialog("open"),
+        open: () => content && getjQuery()(content).dialog("open"),
         get result() { return result; },
-        get title() { return !div ? null : getjQuery()(div).dialog("option", "title"); },
-        set title(value: string) { div && getjQuery()(div).dialog("option", "title", value ?? ''); }
+        get title() { return !content ? null : getjQuery()(content).dialog("option", "title"); },
+        set title(value: string) { content && getjQuery()(content).dialog("option", "title", value ?? ''); }
     }
 }
 
@@ -788,28 +788,21 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
  * @param element The panel element
  * @param e  The event triggering the close
  */
-export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
+export function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>), e?: Event) {
 
-    element = isArrayLike(element) ? element[0] : element;
-    if (!element)
+    let panel = getDialogRootElement(el);
+    if (!panel || panel.classList.contains("hidden"))
         return;
-    let panelRoot = element?.closest('.s-Panel') as HTMLElement ??
-        element?.closest(".s-PanelBody") as HTMLElement;
-    if (!panelRoot || panelRoot.classList.contains("hidden"))
-        return;
-    let panelBody = element.classList.contains("s-PanelBody") ? element : panelRoot;
 
-    let event = Fluent.trigger(panelBody, 'panelbeforeclose');
+    let event = Fluent.trigger(panel, "panelbeforeclose", { bubbles: true });
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
         return;
-    Fluent.trigger(window, "panelclosing", { panel: panelBody });
-    panelRoot.classList.add("hidden");
+    panel.classList.add("hidden");
 
-    let uniqueName = panelBody.dataset.paneluniquename;
+    let uniqueName = panel.dataset.paneluniquename;
     if (uniqueName) {
-        document.querySelectorAll(`[data-panelhiddenby="${uniqueName}"]`).forEach(e => {
-            e.classList.remove("panel-hidden")
-            e.removeAttribute("data-panelhiddenby");
+        document.querySelectorAll(`[data-hiddenby="${uniqueName}"]`).forEach(hiddenBy => {
+            hiddenBy.removeAttribute("data-hiddenby");
         });
     }
 
@@ -818,8 +811,7 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
         if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
             Fluent.trigger(rl, "layout");
     });
-    Fluent.trigger(panelBody, "panelclose");
-    Fluent.trigger(window, "panelclosed", { panel: panelBody });
+    Fluent.trigger(panel, "panelclose", { bubbles: true });
 }
 
 /** 
@@ -832,48 +824,46 @@ export function closePanel(element: (HTMLElement | ArrayLike<HTMLElement>), e?: 
  */
 export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
-    let panelBody = isArrayLike(element) ? element[0] : element;
-    if (!panelBody)
+    let panel = getDialogRootElement(element);
+    if (!panel)
         return;
 
-    let panelRoot = panelBody.closest(".s-Panel") ?? panelBody;
-
-    Fluent.trigger(window, 'panelopening', { panel: panelBody });
-
     let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
+    if (panel.parentElement !== container)
+        container.appendChild(panel);
 
-    panelBody.dataset.paneluniquename = uniqueName ?? panelBody.id ?? new Date().getTime().toString();
-    function hide(e: HTMLElement) {
-        if (e === panelBody ||
+    let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
+    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
+        return;
+        
+    panel.dataset.paneluniquename = uniqueName || panel.id || new Date().getTime().toString();
+    function setHideBy(e: HTMLElement) {
+        if (e === panel ||
             e.tagName === "LINK" ||
             e.tagName === "SCRIPT" ||
-            e.classList.contains('panel-hidden') ||
-            ((e.classList.contains("ui-dialog") || e.classList.contains("ui-widget-overlay")) && e.offsetWidth <= 0 && e.offsetHeight <= 0))
+            e.classList.contains("hidden") ||
+            e.dataset.hiddenby ||
+            (container && e.parentElement !== container) && (e.offsetWidth <= 0 && e.offsetHeight <= 0))
             return;
 
-        e.classList.add("panel-hidden");
-        e.setAttribute('data-panelhiddenby', panelBody.dataset.paneluniquename);
+        e.dataset.hiddenby = panel.dataset.paneluniquename;
     }
 
     if (container) {
         let c = container.children;
         const cl = c.length;
         for (let i = 0; i < cl; i++) {
-            hide(c[i] as HTMLElement);
+            setHideBy(c[i] as HTMLElement);
         }
-
-        if (panelRoot.parentElement !== container)
-            container.appendChild(panelRoot);
     }
 
-    document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(hide);
+    document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(setHideBy);
 
-    panelRoot.classList.remove("hidden");
-    panelRoot.classList.remove("panel-hidden");
-    panelRoot.classList.add("s-Panel");
+    panel.classList.remove("hidden");
+    delete panel.dataset.hiddenby;
+    panel.classList.add("s-Panel");
 
-    Fluent.trigger(panelBody, "panelopen");
-    Fluent.trigger(window, "panelopened", { panel: panelBody });
+    Fluent.trigger(panel, "panelopen", { bubbles: true });
 }
 
 function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {
@@ -900,10 +890,57 @@ function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolea
         ptc = document.createElement("button");
         ptc.classList.add("panel-titlebar-close");
         ptc.addEventListener("click", e => {
-            closePanel((e.target as HTMLElement).closest<HTMLElement>(".s-PanelBody") ??
-                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel")?.querySelector<HTMLElement>(":scope > .s-PanelBody") ??
-                (e.target as HTMLElement).closest<HTMLElement>(".s-Panel"));
+            closePanel((e.target as HTMLElement).closest<HTMLElement>(".s-Panel"));
         });
         pt.prepend(ptc);
     }
+}
+
+/** Returns .s-Panel, .modal, .ui-dialog */
+export function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest(".modal, .s-Panel, .ui-dialog");
+
+}
+
+/** Returns .panel-body, .modal-body, .ui-dialog-content */
+export function getDialogBodyElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest(".modal-body, .panel-body, .ui-dialog-content") as HTMLElement ??
+        getDialogRootElement(element)?.querySelector(":scope > .ui-dialog-content, .modal-body, :scope > .panel-body");
+
+}
+
+/** Returns .s-Panel, .modal, .ui-dialog-content */
+export function getDialogEventSource(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest(".modal, .s-Panel, .ui-dialog-content") as HTMLElement ??
+        element.closest(".ui-dialog")?.querySelector(":scope > .ui-dialog-content");
+
+}
+
+/** Tries to close a ui-dialog, panel or modal */
+export function closeDialog(element: HTMLElement | ArrayLike<HTMLElement>): void {
+    element = getDialogEventSource(element);
+    if (!element)
+        return;
+    if (element.classList.contains("ui-dialog-content")) {
+        getjQuery()?.(element)?.dialog?.("close");
+    }
+    else if (element.classList.contains("modal")) {
+
+    }
+    else if (element.classList.contains("s-Panel")) {
+        closePanel(element);
+    }
+
 }
