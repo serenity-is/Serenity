@@ -194,7 +194,7 @@ function createPanel(options: DialogOptions): ICommonDialog {
 
     if (options.buttons) {
         let footer = panel.appendChild(document.createElement("div"));
-        footer.classList.add("s-panel-footer");
+        footer.classList.add("panel-footer");
         for (let button of options.buttons) {
             bsCreateButton(footer, button, close);
         }
