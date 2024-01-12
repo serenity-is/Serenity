@@ -292,6 +292,8 @@ interface DialogOptions {
     fade?: boolean;
     /** Sets one of modal-fullscreen{-...-down} classes. Only used for bootstrap modals */
     fullScreen?: boolean | "sm-down" | "md-down" | "lg-down" | "xl-down" | "xxl-down";
+    /** Modal option for jQuery UI dialog compatibility only. Not to be confused with Bootstrap modal. */
+    modal?: boolean;
     /** Event handler that is called when dialog is opened */
     onOpen?: (e?: Event) => void;
     /** Event handler that is called when dialog is closed */

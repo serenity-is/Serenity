@@ -1,6 +1,6 @@
 import { coalesce, isValue, today } from "./system-compat";
 
-describe("Q.coalesce", () => {
+describe("coalesce", () => {
     it('returns first value if not null', function () {
         expect(coalesce(1, 2)).toBe(1);
     });
@@ -18,7 +18,7 @@ describe("Q.coalesce", () => {
     });
 });
 
-describe("Q.isValue", () => {
+describe("isValue", () => {
     it('isValue returns false for null or undefined', function () {
         expect(isValue(null)).toBe(false);
         expect(isValue(undefined)).toBe(false);
@@ -31,7 +31,7 @@ describe("Q.isValue", () => {
     });
 });
 
-describe("Q.today", () => {
+describe("today", () => {
     it('returns a date without time part', function () {
         var d = today();
         expect(d.getHours()).toBe(0);

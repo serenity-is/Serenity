@@ -21,7 +21,7 @@ describe("confirmDialog", () => {
     });
 });
 
-describe("Q.successDialog", () => {
+describe("successDialog", () => {
     it('is aliased by obsolete success', async function () {
         const dialogs = (await import("./dialogs-compat"));
         expect(dialogs.success).toBe(successDialog);
