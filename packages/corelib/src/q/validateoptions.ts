@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery, isArrayLike, isBS3, isBS5Plus, localText, notifyError } from "@serenity-is/base";
+﻿import { Fluent, Tooltip, getjQuery, isArrayLike, localText, notifyError } from "@serenity-is/base";
 import { extend } from "./system-compat";
 import { baseValidateOptions, getHighlightTarget } from "./validation";
 
@@ -113,27 +113,8 @@ export function validateOptions(options?: any) {
                     $ ? $(selector).click() : document.querySelector<HTMLAnchorElement>(selector)?.click();
                 }
 
-                var hl = getHighlightTarget(el) ?? el;
-                if ($?.fn?.tooltip) {
-                    $(hl).tooltip({
-                        title: validator.errorList[0].message,
-                        trigger: 'manual'
-                    }).tooltip('show');
-
-                    window.setTimeout(function () {
-                        $(hl).tooltip(isBS3() ? 'destroy' : 'dispose');
-                    }, 1500);
-                }
-                else if (isBS5Plus() && typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) {
-                    let tooltip = new (bootstrap as any).Tooltip(hl, {
-                        title: validator.errorList[0].message,
-                        trigger: 'manual'
-                    });
-                    tooltip.show();
-                    window.setTimeout(function () {
-                        tooltip.dispose();
-                    }, 1500);
-                }
+                new Tooltip(getHighlightTarget(el) ?? el, { title: validator.errorList[0].message })
+                    .show().delayedDispose();
             }
         },
         success: function (label: ArrayLike<HTMLElement> | HTMLElement) {

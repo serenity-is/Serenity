@@ -1,59 +1,9 @@
 ﻿import { Config } from "./config";
-import { Fluent, addClass, htmlEncode, toggleClass } from "./html";
+import { getjQuery, isBS3, isBS5Plus } from "./environment";
+import { Fluent, addClass, htmlEncode } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
-import { getjQuery, isArrayLike } from "./system";
-
-export type DialogType = "bs3" | "bs4" | "bs5" | "jqueryui" | "panel";
-
-/**
- * Options that apply to all dialog types
- */
-export interface DialogOptions {
-    /** True to open dialog as panel */
-    asPanel?: boolean;
-    /** True to auto open. Ignored for message dialogs. */
-    autoOpen?: boolean;
-    /** Prefer Bootstrap modals to jQuery UI dialogs when both are available */
-    bootstrap?: boolean;
-    /** List of buttons to show on the dialog */
-    buttons?: DialogButton[];
-    /** Show close button, default is true */
-    closeButton?: boolean;
-    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
-    dialogClass?: string;
-    /** Dialog content element, or callback that will populate the content */
-    element?: HTMLElement | ((element: HTMLElement) => void);
-    /** Is modal dialog, default is true, only used for jQuery UI */
-    modal?: boolean;
-    /** Additional CSS class to use only for BS modals, like modal-lg etc. */
-    modalClass?: string;
-    /** Event handler that is called when dialog is opened */
-    onOpen?: () => void;
-    /** Event handler that is called when dialog is closed */
-    onClose?: (result: string) => void;
-    /** Callback to get options specific to the dialog provider type */
-    providerOptions?: (type: DialogType, opt: DialogOptions) => any;
-    /** Dialog title */
-    title?: string;
-    /** Dialog width. Only used for jQuery UI dialogs */
-    width?: number;
-}
-
-export interface ICommonDialog {
-    /** Gets dialog provider type used */
-    readonly type: DialogType;
-    /** Opens the dialog */
-    open(): void;
-    /** Closes the dialog */
-    close(result?: string): void;
-    /** Sets the title of the dialog */
-    title: string;
-    /** Dispose the dialog instance */
-    dispose(): void;
-    /** The result code of the button that is clicked */
-    readonly result?: string;
-}
+import { isArrayLike, omitUndefined } from "./system";
 
 /**
  * Options for a message dialog button
@@ -77,14 +27,425 @@ export interface DialogButton {
     result?: string;
 }
 
+export type DialogType = "bsmodal" | "uidialog" | "panel";
+
 /**
- * Options that apply to all message dialog types
+ * Options that apply to all dialog types
  */
-export interface MessageDialogOptions extends DialogOptions {
-    /** HTML encode the message, default is true */
-    htmlEncode?: boolean;
-    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
-    preWrap?: boolean;
+export interface DialogOptions {
+    /** Auto dispose dialog on close, default is true */
+    autoDispose?: boolean;
+    /** True to auto open dialog */
+    autoOpen?: boolean;
+    /** Backdrop type, static to make it modal, e.g. can't be closed by clicking outside */
+    backdrop?: boolean | "static"
+    /** List of buttons to show on the dialog */
+    buttons?: DialogButton[];
+    /** Vertically center modal */
+    centered?: boolean;
+    /** Show close button, default is true */
+    closeButton?: boolean;
+    /** Close dialog on escape key. Default is true for message dialogs. */
+    closeOnEscape?: boolean;
+    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
+    dialogClass?: string;
+    /** Dialog content element, or callback that will populate the content */
+    element?: HTMLElement | ArrayLike<HTMLElement> | ((element: HTMLElement) => void);
+    /** Enable / disable animation. Default is false for message dialogs, true for other dialogs */
+    fade?: boolean;
+    /** Sets one of modal-fullscreen{-...-down} classes. Only used for bootstrap modals */
+    fullScreen?: boolean | "sm-down" | "md-down" | "lg-down" | "xl-down" | "xxl-down",
+    /** Event handler that is called when dialog is opened */
+    onOpen?: (e?: Event) => void;
+    /** Event handler that is called when dialog is closed */
+    onClose?: (result: string, e?: Event) => void;
+    /** Prefer Bootstrap modals to jQuery UI dialogs when both are available */
+    preferBSModal?: boolean;
+    /** Prefer Panel even when Modal / jQuery UI is available */
+    preferPanel?: boolean;
+    /** Callback to get options specific to the dialog provider type */
+    providerOptions?: (type: DialogType, opt: DialogOptions) => any;
+    /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
+    scrollable?: boolean;
+    /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
+    size?: "sm" | "lg" | "xl";
+    /** Dialog title */
+    title?: string;
+    /** Only used for jQuery UI dialogs for backwards compatibility */
+    width?: number;
+}
+
+export class Dialog {
+
+    private el: HTMLElement;
+    private dialogResult: string;
+
+    constructor(opt?: DialogOptions);
+    constructor(opt?: DialogOptions, create = true) {
+
+        if (isArrayLike(opt?.element))
+            this.el = opt.element[0];
+        else if (typeof opt?.element !== "function")
+            this.el = opt?.element;
+        this.dialogResult = this.el?.dataset.dialogResult;
+
+        if (!create) {
+            return;
+        }
+
+        this.el ??= document.createElement("div");
+        opt = Object.assign({}, Dialog.defaults, omitUndefined(opt));
+        if (typeof opt.element === "function")
+            opt.element(this.el);
+
+        if (opt.preferPanel || (!hasBSModal() && !hasUIDialog))
+            this.createPanel(opt);
+        else if (hasUIDialog() && (!hasBSModal() || !opt.preferBSModal))
+            this.createUIDialog(opt);
+        else {
+            this.createBSModal(opt);
+        }
+
+        if (opt.onOpen)
+            this.onOpen(opt.onOpen);
+
+        if (opt.onClose)
+            this.onClose(opt.onClose);
+
+        if (opt.autoDispose)
+            this.onClose(this.dispose.bind(this));
+
+        if (this.el.classList.contains("hidden") &&
+            typeof opt.element !== "function")
+            this.el.classList.remove("hidden");
+
+        if (opt.title !== void 0) {
+            this.title(opt.title);
+        }
+
+        if (opt.autoOpen)
+            this.open();
+    }
+
+    static defaults: DialogOptions = {
+        autoDispose: true,
+        backdrop: false,
+        closeButton: true,
+        closeOnEscape: false,
+        fade: false,
+        fullScreen: "sm-down",
+        preferBSModal: Config.bootstrapDialogs,
+        size: "lg"
+    }
+
+    static getInstance(el: HTMLElement): Dialog {
+        el = getDialogEventTarget(el);
+        return new (Dialog as any)({ element: el }, false);
+    }
+
+    /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
+    get result(): string {
+        return this.el ? this.el.dataset.dialogResult : this.dialogResult;
+    }
+
+    /** Closes dialog */
+    close(): this;
+    /** Closes dialog with the result set to value */
+    close(result: string): this;
+    close(result?: string): this {
+        if (result != void 0 || arguments.length) {
+            this.el && (this.el.dataset.dialogResult = result);
+            this.dialogResult = result;
+        }
+
+        var target = getDialogEventTarget(this.el);
+        if (!target)
+            return;
+
+        if (target.classList.contains("s-Panel"))
+            closePanel(this.el);
+        else if (target.classList.contains("ui-dialog-content"))
+            getjQuery()?.(this.el).dialog?.("close");
+        else if (target.classList.contains("modal")) {
+            if (isBS5Plus()) {
+                bootstrap?.Modal?.getInstance?.(target)?.hide?.();
+            } else {
+                let $ = getjQuery();
+                if ($?.fn?.modal)
+                    $(target).modal?.("close");
+            }
+        }
+
+        return this;
+    }
+
+    onClose(handler: (result?: string, e?: Event) => void, before = false) {
+        var target = getDialogEventTarget(this.el);
+        if (!target)
+            return;
+        if (target.classList.contains("s-Panel"))
+            Fluent.on(target, before ? "panelbeforeclose" : "panelclose", e => handler(this.result, e));
+        else if (target.classList.contains("ui-dialog-content"))
+            Fluent.on(target, before ? "dialogbeforeclose" : "dialogclose", e => handler(this.result, e));
+        else if (target.classList.contains("modal"))
+            Fluent.on(target, before ? "hide.bs.modal" : "hidden.bs.modal", e => handler(this.result, e));
+    }
+
+    onOpen(handler: (e?: Event) => void, before = false): this {
+        var target = getDialogEventTarget(this.el);
+        if (!target)
+            return;
+        if (target.classList.contains("s-Panel"))
+            Fluent.on(target, before ? "panelbeforeopen" : "panelopen", handler);
+        else if (target.classList.contains("ui-dialog-content"))
+            Fluent.on(target, before ? "dialogbeforeopen" : "dialogopen", handler);
+        else if (target.classList.contains("modal"))
+            Fluent.on(target, before ? "show.bs.modal" : "shown.bs.modal", handler);
+        return this;
+    }
+
+    /** Closes dialog */
+    open() {
+        var target = getDialogEventTarget(this.el);
+        if (!target)
+            return;
+        if (target.classList.contains("s-Panel"))
+            openPanel(this.el);
+        else if (target.classList.contains("ui-dialog-content"))
+            getjQuery()?.(target).dialog("open");
+        else if (target.classList.contains("modal")) {
+            if (isBS5Plus()) {
+                bootstrap?.Modal?.getInstance?.(target)?.show?.();
+            } else {
+                let $ = getjQuery();
+                if ($?.fn?.modal)
+                    $(target).modal?.("show");
+            }
+        }
+
+        return this;
+    }
+
+    /** Gets the title text of the dialog */
+    title(): string;
+    /** Sets the title text of the dialog. */
+    title(value: string): this;
+    title(value?: string): string | this {
+        let title = this.header()?.querySelector(".modal-title, .panel-title-text, .ui-dialog-title");
+        if (value === void 0 && !arguments.length)
+            return title?.textContent;
+
+        title && (title.textContent = value);
+        return this;
+    }
+
+    get type(): DialogType {
+        var root = getDialogRootElement(this.el);
+        if (!root)
+            return null;
+        if (root.classList.contains("modal"))
+            return "bsmodal";
+        if (root.classList.contains("ui-dialog"))
+            return "uidialog";
+        if (root.classList.contains("s-Panel"))
+            return "panel";
+        return null;
+    }
+
+    /** Gets the body element of the dialog */
+    body(): HTMLElement {
+        var root = getDialogRootElement(this.el);
+        return root?.querySelector(".modal-body, .panel-body, .ui-dialog-content");
+    }
+
+    /** Gets the footer element of the dialog */
+    footer(): HTMLElement {
+        var root = getDialogRootElement(this.el);
+        return root?.querySelector(".modal-footer, .panel-footer, .ui-dialog-footer");
+    }
+
+    /** Gets the header element of the dialog */
+    header(): HTMLElement {
+        var root = getDialogRootElement(this.el);
+        return root?.querySelector(".modal-header, .panel-titlebar, .ui-dialog-titlebar");
+    }  
+
+    private onButtonClick(e: MouseEvent, btn: DialogButton) {
+        e ??= new Event("click") as MouseEvent;
+        btn.click && btn.click(e);
+        if (btn.result && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented))
+            this.close(btn.result);
+    }
+
+    private createBSButtons(footer: Fluent, buttons: DialogButton[]) {
+        for (let btn of buttons) {
+            Fluent(dialogButtonToBS(btn))
+                .appendTo(footer)
+                .on("click", e => this.onButtonClick(e, btn));
+        }
+    }
+
+    createBSModal(opt: DialogOptions): void {
+
+        var modal = Fluent("div")
+            .addClass("modal")
+            .addClass(opt.dialogClass)
+            .addClass(opt.fade && "fade")
+            .attr("tabindex", "-1")
+            .appendTo(document.body);
+
+        let header = Fluent("div")
+            .addClass("modal-header")
+            .append(Fluent("h5")
+                .addClass("modal-title"));
+
+        let bs5 = isBS5Plus();
+        if (opt.closeButton) {
+            let closeButton = Fluent("button")
+                .addClass(bs5 ? "btn-close" : "close")
+                .attr("type", "button")
+                .data(`${bs5 ? "bs-" : ""}dismiss`, "modal")
+                .attr("aria-label", DialogTexts.CloseButton);
+
+            if (bs5) {
+                closeButton.append(Fluent("span").attr("aria-hidden", "true").html("&times;"));
+            }
+
+            if (isBS3()) {
+                closeButton.prependTo(header);
+            } else {
+                closeButton.appendTo(header);
+            }
+        }
+
+        this.el.classList.add("modal-body");
+
+        let footer = Fluent("div")
+            .addClass("modal-footer");
+
+        Fluent("div")
+            .addClass("modal-dialog")
+            .addClass(opt.scrollable && "modal-scrollable")
+            .addClass(opt.size && "modal-" + opt.size)
+            .addClass(opt.fullScreen && "modal-full-screen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}-down` : ""))
+            .append(Fluent("div")
+                .addClass("modal-content")
+                .append(header)
+                .append(this.el)
+                .append(footer))
+            .appendTo(modal);
+
+
+        if (opt.buttons) {
+            this.createBSButtons(footer, opt.buttons);
+        }
+
+        let modalOpt = {
+            backdrop: opt.backdrop,
+            keyboard: opt.closeOnEscape
+        };
+
+        if (opt.providerOptions)
+            Object.assign(modalOpt, opt.providerOptions("bsmodal", opt));
+
+        if (bs5 && bootstrap.Modal) {
+            new bootstrap.Modal(modal.getNode(), modalOpt);
+        }
+        else {
+            getjQuery()?.(modal.getNode())?.modal?.(modalOpt);
+        };
+    }
+
+    private createPanel(opt: DialogOptions) {
+
+        let titlebar = Fluent("div")
+            .addClass("panel-titlebar")
+            .append(Fluent("div")
+                .addClass("panel-titlebar-text"));
+
+        let panel = Fluent("div")
+            .addClass("s-Panel")
+            .append(titlebar)
+            .append(Fluent(this.el).addClass("panel-body"));
+
+        if (opt.closeButton) {
+            Fluent("button")
+                .addClass("panel-titlebar-close")
+                .on("click", this.close.bind(this))
+                .appendTo(titlebar);
+        }
+
+        opt.buttons && this.createBSButtons(Fluent("div")
+            .addClass("panel-footer")
+            .appendTo(panel), opt.buttons);
+
+    }
+
+    createUIDialog(opt: DialogOptions): void {
+
+        let dlgOpt = {
+            dialogClass: opt.dialogClass,
+            title: opt.title,
+            modal: opt.backdrop !== true,
+            width: opt.width
+        } as any;
+
+        if (opt.buttons) {
+            dlgOpt.buttons = opt.buttons.map(btn => {
+                let uiButton = dialogButtonToUI(btn);
+                uiButton.click = (e: MouseEvent) => this.onButtonClick(e, btn);
+                return uiButton;
+            });
+        }
+
+        if (opt.providerOptions)
+            dlgOpt = Object.assign(dlgOpt, opt.providerOptions("uidialog", opt));
+
+        getjQuery()?.(this.el).dialog(dlgOpt);
+    }
+
+
+    dispose(): void {
+        try {
+            let target = getDialogEventTarget(this.el);
+            if (!target)
+                return;
+
+            try {
+                if (target.classList.contains("ui-dialog-content")) {
+                    getjQuery?.()(target)?.dialog?.('destroy');
+                    target.classList.remove("ui-dialog-content");
+                    target = target.closest(".ui-dialog");
+                }
+                else if (target.classList.contains("modal")) {
+                    if (!getjQuery() && isBS5Plus()) {
+                        if (typeof bootstrap !== "undefined")
+                            bootstrap.Modal?.getInstance(target)?.dispose?.();
+                    }
+                    else {
+                        getjQuery()?.(target)?.modal?.(isBS3() ? "destroy" : "dispose");
+                    }
+                    this.el?.classList.remove("modal-body");
+                }
+                else
+                    this.el?.classList.remove("panel-body");
+            }
+            finally {
+                Fluent(target).remove();
+            }
+        }
+        finally {
+            this.el = null;
+        }
+    }
+}
+
+export function hasBSModal() {
+    return isBS5Plus() || !!(getjQuery()?.fn?.modal);
+}
+
+export function hasUIDialog() {
+    return !!(getjQuery()?.ui?.dialog);
 }
 
 (function () {
@@ -96,23 +457,69 @@ export interface MessageDialogOptions extends DialogOptions {
     }
 })();
 
-
-function hasBSModal() {
-    return isBS5Plus() || !!(getjQuery()?.fn?.modal);
+function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
+    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let iconClass = iconClassName(x.icon);
+    if (iconClass)
+        html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
+    let button = document.createElement("button");
+    button.classList.add("btn");
+    if (x.cssClass)
+        addClass(button, x.cssClass);
+    if (x.hint)
+        button.setAttribute("title", x.hint);
+    button.innerHTML = html;
+    return button;
 }
 
-function hasUIDialog() {
-    return !!(getjQuery()?.ui?.dialog);
+function dialogButtonToUI(x: DialogButton): any {
+    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let iconClass = iconClassName(x.icon);
+    if (iconClass)
+        html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
+    let button = {
+        text: html,
+        click: x.click
+    } as any;
+    if (x.cssClass)
+        button.cssClass = x.cssClass;
+    return button;
 }
 
-/** Returns true if Bootstrap 3 is loaded */
-export function isBS3(): boolean {
-    return (getjQuery()?.fn?.modal?.Constructor?.VERSION + "").charAt(0) == '3';
+export function okDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.OkButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-info',
+        result: opt?.result != void 0 ? opt.result : 'ok',
+        click: opt?.click
+    }
 }
 
-/** Returns true if Bootstrap 5+ is loaded */
-export function isBS5Plus(): boolean {
-    return typeof bootstrap !== "undefined" && !!bootstrap.Modal && (bootstrap.Modal.VERSION + "").charAt(0) != '4';
+export function yesDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.YesButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-primary',
+        result: opt?.result != void 0 ? opt.result : 'yes',
+        click: opt?.click
+    }
+}
+
+export function noDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.NoButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-danger' : 'btn-default',
+        result: opt?.result != void 0 ? opt.result : 'no',
+        click: opt?.click
+    }
+}
+
+export function cancelDialogButton(opt?: DialogButton): DialogButton {
+    return {
+        text: opt?.text != void 0 ? opt.text : DialogTexts.CancelButton,
+        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-secondary' : 'btn-default',
+        result: 'cancel',
+        click: opt?.click
+    }
 }
 
 export namespace DialogTexts {
@@ -155,338 +562,115 @@ export namespace DialogTexts {
     }
 }
 
-function bsCreateButton(footer: HTMLElement, x: DialogButton, close: (result: string) => void) {
+function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
-    if (!footer)
+    let panel = getDialogRootElement(el);
+    if (!panel || panel.classList.contains("hidden"))
         return;
 
-    let button = dialogButtonToBS(x);
-    footer.append(button);
-    Fluent.on(button, "click", e => {
-        x.click && x.click.call(this, e);
-        if (x.result && !((e as any)?.isDefaultPrevented?.() || e.defaultPrevented))
-            close(x.result);
-    });
-}
+    let event = Fluent.trigger(panel, "panelbeforeclose", { bubbles: true });
+    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
+        return;
+    panel.classList.add("hidden");
 
-function createPanel(options: DialogOptions): ICommonDialog {
-    let result: string;
-    let panelBody = options.element && typeof options.element !== "function" ? options.element :
-        document.createElement("div");
-    panelBody.classList.add("panel-body");
-    let panel = document.createElement("div");
-    panel.classList.add("s-Panel");
-    panel.append(panelBody);
-    if (typeof options.element === "function")
-        options.element(panelBody);
-    setPanelTitle(panel, options.title, options.closeButton ?? true);
-    if (options.onOpen) {
-        Fluent.on(panel, "panelopen", options.onOpen);
-    }
-    if (options.onClose) {
-        Fluent.on(panel, "panelclose", () => options.onClose(result));
-    }
-    let close = (res?: string) => {
-        if (res !== void 0)
-            result = res;
-        panel && closePanel(panel);
-    }
-
-    if (options.buttons) {
-        let footer = panel.appendChild(document.createElement("div"));
-        footer.classList.add("panel-footer");
-        for (let button of options.buttons) {
-            bsCreateButton(footer, button, close);
-        }
-    }
-
-    if (options.title !== void 0)
-        setPanelTitle(panel, options.title);
-
-    return {
-        type: "panel",
-        open: () => panel && openPanel(panel),
-        close,
-        dispose: () => {
-            if (!panel)
-                return;
-            Fluent(panel).remove();
-            panel = null;
-        },
-        get title() { return panel?.querySelector(".panel-titlebar-text").textContent },
-        set title(value: string) { panel && setPanelTitle(panel, value) },
-        get result() { return result }
-    }
-}
-
-function createUIDialog(options: DialogOptions): ICommonDialog {
-    var result: string;
-    let opt = {
-        dialogClass: options.dialogClass,
-        title: options.title,
-        modal: options.modal ?? true,
-        open: function () {
-            options.onOpen?.();
-        },
-        close: function () {
-            options.onClose?.(result);
-        },
-        width: options.width
-    } as any;
-
-    let content = options.element && typeof options.element !== "function" ? options.element :
-        document.createElement("div");
-
-    // templated dialog hides its content element before first open
-    if (content.classList.contains("hidden"))
-        content.classList.remove("hidden");
-
-    if (typeof options.element === "function")
-        options.element(content);
-
-    let $ = getjQuery();
-    let close = (res?: string) => {
-        if (res !== "void 0")
-            result = res;
-        content && $(content).dialog("close");
-    }
-
-    if (options.buttons) {
-        opt.buttons = options.buttons.map(x => {
-            let btn = dialogButtonToUI(x);
-            btn.click = function (e: Event) {
-                e ??= new Event("click", {});
-                x.click && x.click.call(this, e);
-                if (x.result && !((e as any).isDefaultPrevented?.() || e.defaultPrevented))
-                    close(x.result);
-            }
-            return btn;
+    let uniqueName = panel.dataset.paneluniquename;
+    if (uniqueName) {
+        document.querySelectorAll(`[data-hiddenby="${uniqueName}"]`).forEach(hiddenBy => {
+            hiddenBy.removeAttribute("data-hiddenby");
         });
     }
 
-    if (options.providerOptions)
-        opt = Object.assign(opt, options.providerOptions("jqueryui", options));
-
-    $(content).dialog(opt);
-
-    return {
-        type: "jqueryui",
-        close,
-        dispose: () => {
-            if (content) {
-                getjQuery()(content)?.dialog?.('destroy');
-                (content.querySelector('.ui-dialog-content') as HTMLElement)?.classList.remove('ui-dialog-content');
-                content.remove();
-                content = null;
-            }
-        },
-        open: () => content && getjQuery()(content).dialog("open"),
-        get result() { return result; },
-        get title() { return !content ? null : getjQuery()(content).dialog("option", "title"); },
-        set title(value: string) { content && getjQuery()(content).dialog("option", "title", value ?? ''); }
-    }
-}
-
-function createBSModal(options: DialogOptions): ICommonDialog {
-    let modalDiv = bsModalMarkup(options.title, options.dialogClass + (options.modalClass ? ' ' + options.modalClass : ''));
-    if (options.element) {
-        if (typeof options.element === "function")
-            options.element(modalDiv.querySelector(".modal-body"));
-        else {
-            modalDiv.querySelector(".modal-body")?.replaceWith(options.element);
-            options.element.classList.add("modal-body");
-        }
-    }
-
-    if (!getjQuery() && isBS5Plus())
-        return createBS5RawModal(modalDiv, options);
-
-    return createBSModalWithJQuery(modalDiv, options);
-}
-
-function createBS5RawModal(modalDiv: HTMLElement, options: DialogOptions): ICommonDialog {
-    let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
-    let result: string;
-    document.body.appendChild(modalDiv);
-    if (options.onOpen)
-        modalDiv.addEventListener("shown.bs.modal", options.onOpen);
-
-    modalDiv.addEventListener('hidden.bs.modal', e => {
-        try {
-            options.onClose?.(result);
-        }
-        finally {
-            Fluent(modalDiv).remove();
-        }
+    Fluent.trigger(window, "resize");
+    document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
+        if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
+            Fluent.trigger(rl, "layout");
     });
-
-    var modal = new bootstrap.Modal(modalDiv, {
-        backdrop: false
-    });
-
-    let close = (res: string) => {
-        if (res !== void 0)
-            result = res;
-        modal && modal.hide();
-    }
-
-    if (options.buttons) {
-        for (let button of options.buttons) {
-            bsCreateButton(footer, button, close);
-        }
-    }
-
-    return {
-        type: "bs5",
-        open: () => modal && modal.show(),
-        close: close,
-        dispose: () => {
-            if (modal) {
-                modal.dispose?.();
-                Fluent(modalDiv).remove();
-                modal = null;
-            }
-        },
-        get result() { return result; },
-        get title() { return modal?.querySelector('.modal-title')?.textContent },
-        set title(value: string) { let titleEl = modal?.querySelector('.modal-title'); titleEl && (titleEl.textContent = value ?? ''); },
-    }
+    Fluent.trigger(panel, "panelclose", { bubbles: true });
 }
 
-function createBSModalWithJQuery(modalDiv: HTMLElement, options: DialogOptions): ICommonDialog {
-    let result: string;
-    let footer = modalDiv.querySelector('.modal-footer') as HTMLElement;
-    let modalDiv$ = getjQuery()(modalDiv).appendTo(document.body);
+function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
-    if (options.onOpen)
-        modalDiv$.one('shown.bs.modal', options.onOpen);
+    let panel = getDialogRootElement(element);
+    if (!panel)
+        return;
 
-    modalDiv$.one('hidden.bs.modal', (e: any) => {
-        try {
-            options.onClose?.(result);
-        }
-        finally {
-            Fluent(modalDiv$).remove();
-        }
-    });
+    let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
+    if (panel.parentElement !== container)
+        container.appendChild(panel);
 
-    modalDiv$.modal({
-        backdrop: false
-    });
+    let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
+    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
+        return;
 
-    let close = (res?: string) => {
-        if (res !== void 0)
-            result = res;
-        modalDiv$ && modalDiv$.modal('hide');
+    panel.dataset.paneluniquename = uniqueName || panel.id || new Date().getTime().toString();
+    function setHideBy(e: HTMLElement) {
+        if (e === panel ||
+            e.tagName === "LINK" ||
+            e.tagName === "SCRIPT" ||
+            e.classList.contains("hidden") ||
+            e.dataset.hiddenby ||
+            (container && e.parentElement !== container) && (e.offsetWidth <= 0 && e.offsetHeight <= 0))
+            return;
+
+        e.dataset.hiddenby = panel.dataset.paneluniquename;
     }
 
-    if (options.buttons) {
-        for (let button of options.buttons) {
-            bsCreateButton(footer, button, close);
+    if (container) {
+        let c = container.children;
+        const cl = c.length;
+        for (let i = 0; i < cl; i++) {
+            setHideBy(c[i] as HTMLElement);
         }
     }
 
-    return {
-        type: isBS5Plus ? "bs5" : (isBS3 ? "bs3" : "bs4"),
-        open: () => modalDiv$ && modalDiv$.modal('show'),
-        close,
-        dispose: () => {
-            if (!modalDiv$)
-                return;
-            modalDiv$.data('bs.modal', null);
-            modalDiv$.find(".modal-body").removeClass("modal-body");
-            window.setTimeout(() => Fluent(modalDiv$).remove(), 0);
-            Fluent(modalDiv$).remove();
-            modalDiv$ = null;
-        },
-        get result() { return result; },
-        get title() { return modalDiv$?.find('.modal-title').first().text() },
-        set title(value: string) { modalDiv$?.find('.modal-title').first().text(value ?? '') }
-    };
+    document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(setHideBy);
+
+    panel.classList.remove("hidden");
+    delete panel.dataset.hiddenby;
+    panel.classList.add("s-Panel");
+
+    Fluent.trigger(panel, "panelopen", { bubbles: true });
 }
 
-export function createCommonDialog(options: DialogOptions): ICommonDialog {
+/** Returns .s-Panel, .modal, .ui-dialog */
+function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest(".modal, .s-Panel, .ui-dialog");
 
-    let dialogLike: ICommonDialog;
-
-    if (options.asPanel || (!hasBSModal() && !hasUIDialog))
-        dialogLike = createPanel(options);
-    else if (hasUIDialog() && (!hasBSModal() || !options.bootstrap))
-        dialogLike = createUIDialog(options);
-    else
-        dialogLike = createBSModal(options);
-
-    if (options.autoOpen)
-        dialogLike.open();
-
-    return dialogLike;
 }
 
-/** 
- * Builds HTML DIV element for a Bootstrap modal dialog
- * @param title Modal title
- * @param body Modal body, it will not be HTML encoded, so make sure it is encoded 
- * @param modalClass Optional class to add to the modal element
- * @param escapeHtml True to html encode body, default is true
- * @returns 
+/** Returns .s-Panel, .modal, .ui-dialog-content */
+function getDialogEventTarget(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest(".modal, .s-Panel, .ui-dialog-content") as HTMLElement ??
+        element.closest(".ui-dialog")?.querySelector(":scope > .ui-dialog-content");
+}
+
+
+/**
+ * Options that apply to all message dialog types
  */
-function bsModalMarkup(title: string, modalClass?: string): HTMLDivElement {
-    let closeButton = `<button type="button" class="${isBS5Plus() ? "btn-" : ""}close" data-${isBS5Plus() ? "bs-" : ""}dismiss="modal" aria-label="${DialogTexts.CloseButton}">` +
-        `${isBS5Plus() ? "" : '<span aria-hidden="true">&times;</span>'}</button>`;
-    let div = document.createElement("div");
-    div.classList.add("modal");
-    if (modalClass)
-        addClass(div, modalClass);
-    div.setAttribute("tabindex", "-1");
-    div.setAttribute("role", "dialog");
-    div.innerHTML = `<div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            ${(isBS3() ? closeButton : "")}<h5 class="modal-title">${htmlEncode(title)}</h5>${(isBS3() ? "" : closeButton)}
-        </div>
-        <div class="modal-body"></div>
-        <div class="modal-footer"></div>
-    </div>
-</div>`;
-    return div;
+export interface MessageDialogOptions extends DialogOptions {
+    /** HTML encode the message, default is true */
+    htmlEncode?: boolean;
+    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
+    preWrap?: boolean;
 }
 
-/** Converts a `DialogButton` declaration to Bootstrap button element 
- * @param x Dialog button declaration
- * @returns Bootstrap button element
-*/
-export function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
-    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    let iconClass = iconClassName(x.icon);
-    if (iconClass)
-        html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
-    let button = document.createElement("button");
-    button.classList.add("btn");
-    if (x.cssClass)
-        toggleClass(button, x.cssClass, true);
-    if (x.hint)
-        button.setAttribute("title", x.hint);
-    button.innerHTML = html;
-    return button;
-}
+(function () {
+    const $ = getjQuery();
 
-/** Converts a `DialogButton` declaration to jQuery UI button type
- * @param x Dialog button declaration
- * @returns jQuery UI button type
- */
-export function dialogButtonToUI(x: DialogButton): any {
-    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
-    let iconClass = iconClassName(x.icon);
-    if (iconClass)
-        html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
-    let button = {
-        text: html,
-        click: x.click
-    } as any;
-    if (x.cssClass)
-        button.cssClass = x.cssClass;
-    return button;
-}
+    // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
+    if ($ && $.fn?.button?.noConflict && $.ui?.button) {
+        $.fn.btn = $.fn.button.noConflict();
+    }
+})();
 
 function getMessageBodyHtml(message: string, options?: MessageDialogOptions): string {
     let encode = options == null || options.htmlEncode == null || options.htmlEncode;
@@ -504,21 +688,22 @@ function createMessageDialog(opt: {
     native: (msg: string) => string,
     message: string,
     options: MessageDialogOptions
-}) {
+}): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
         var result = opt.native(opt.message);
         opt.options?.onClose(result);
         return {
-            result: result
+            result
         }
     }
 
     let options: MessageDialogOptions = Object.assign({
         autoOpen: true,
-        bootstrap: Config.bootstrapMessages,
+        closeOnEscape: true,
         dialogClass: "s-MessageDialog" + (opt.cssClass ? " " + opt.cssClass : ""),
         htmlEncode: true,
+        preferBSModal: Config.bootstrapMessages,
         title: opt.title
     } satisfies MessageDialogOptions, opt.options);
 
@@ -527,8 +712,8 @@ function createMessageDialog(opt: {
     }
 
     if (options.providerOptions === void 0) {
-        options.providerOptions = (type: string) => {
-            if (type === "jqueryui") {
+        options.providerOptions = (type) => {
+            if (type === "uidialog") {
                 return {
                     width: '40%',
                     maxWidth: 450,
@@ -543,44 +728,7 @@ function createMessageDialog(opt: {
         options.element = el => el.innerHTML = getMessageBodyHtml(opt.message, options);
     }
 
-    return createCommonDialog(options);
-}
-
-
-export function okDialogButton(opt?: DialogButton): DialogButton {
-    return {
-        text: opt?.text != void 0 ? opt.text : DialogTexts.OkButton,
-        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-info',
-        result: opt?.result != void 0 ? opt.result : 'ok',
-        click: opt?.click
-    }
-}
-
-export function yesDialogButton(opt?: DialogButton): DialogButton {
-    return {
-        text: opt?.text != void 0 ? opt.text : DialogTexts.YesButton,
-        cssClass: opt?.cssClass != void 0 ? opt.cssClass : 'btn-primary',
-        result: opt?.result != void 0 ? opt.result : 'yes',
-        click: opt?.click
-    }
-}
-
-export function noDialogButton(opt?: DialogButton): DialogButton {
-    return {
-        text: opt?.text != void 0 ? opt.text : DialogTexts.NoButton,
-        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-danger' : 'btn-default',
-        result: opt?.result != void 0 ? opt.result : 'no',
-        click: opt?.click
-    }
-}
-
-export function cancelDialogButton(opt?: DialogButton): DialogButton {
-    return {
-        text: opt?.text != void 0 ? opt.text : DialogTexts.CancelButton,
-        cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-secondary' : 'btn-default',
-        result: 'cancel',
-        click: opt?.click
-    }
+    return new Dialog(options);
 }
 
 /** 
@@ -591,7 +739,7 @@ export function cancelDialogButton(opt?: DialogButton): DialogButton {
  * @example 
  * alertDialog("An error occured!"); }
  */
-export function alertDialog(message: string, options?: MessageDialogOptions): Partial<ICommonDialog> {
+export function alertDialog(message: string, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -626,7 +774,7 @@ export interface ConfirmDialogOptions extends MessageDialogOptions {
  *     // do something when yes is clicked
  * }
  */
-export function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<ICommonDialog> {
+export function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -663,7 +811,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
  *     // do something when OK is clicked
  * }
  */
-export function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<ICommonDialog> {
+export function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -689,7 +837,7 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
  *     // do something when OK is clicked
  * }
  */
-export function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<ICommonDialog> {
+export function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -712,7 +860,7 @@ export function successDialog(message: string, onOk?: () => void, options?: Mess
  * @example 
  * warningDialog("Something is odd!");
  */
-export function warningDialog(message: string, options?: MessageDialogOptions): Partial<ICommonDialog> {
+export function warningDialog(message: string, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -735,7 +883,7 @@ export interface IFrameDialogOptions {
  * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
  * @param options The options
  */
-export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialog> {
+export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
         window.alert(options.html);
@@ -758,10 +906,10 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
         }
     }
 
-    return createCommonDialog({
+    return new Dialog({
         title: DialogTexts.AlertTitle,
         dialogClass: "s-IFrameDialog",
-        modalClass: "modal-lg",
+        size: "lg",
         autoOpen: true,
         element: el => {
             let div = document.createElement("div");
@@ -770,7 +918,7 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
             onOpen(div);
         },
         providerOptions: (type) => {
-            if (type == "jqueryui") {
+            if (type == "uidialog") {
                 return {
                     width: '60%',
                     height: '400'
@@ -778,198 +926,4 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<ICommonDialo
             }
         }
     });
-}
-
-/** 
- * Closes a panel, triggering panelbeforeclose and panelclose events on the panel element.
- * If the panelbeforeclose prevents the default, the operation is cancelled.
- * @param element The panel element
- * @param e  The event triggering the close
- */
-export function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
-
-    let panel = getDialogRootElement(el);
-    if (!panel || panel.classList.contains("hidden"))
-        return;
-
-    let event = Fluent.trigger(panel, "panelbeforeclose", { bubbles: true });
-    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
-        return;
-    panel.classList.add("hidden");
-
-    let uniqueName = panel.dataset.paneluniquename;
-    if (uniqueName) {
-        document.querySelectorAll(`[data-hiddenby="${uniqueName}"]`).forEach(hiddenBy => {
-            hiddenBy.removeAttribute("data-hiddenby");
-        });
-    }
-
-    Fluent.trigger(window, "resize");
-    document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
-        if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
-            Fluent.trigger(rl, "layout");
-    });
-    Fluent.trigger(panel, "panelclose", { bubbles: true });
-}
-
-/** 
- * Opens a panel, triggering panelbeforeopen and panelopen events on the panel element,
- * and panelopening and panelopened events on the window.
- * If the panelbeforeopen prevents the default, the operation is cancelled.
- * @param element The panel element
- * @param uniqueName A unique name for the panel. If not specified, the panel id is used. If the panel has no id, a timestamp is used.
- * @param e The event triggering the open
- */
-export function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
-
-    let panel = getDialogRootElement(element);
-    if (!panel)
-        return;
-
-    let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
-    if (panel.parentElement !== container)
-        container.appendChild(panel);
-
-    let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
-    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
-        return;
-        
-    panel.dataset.paneluniquename = uniqueName || panel.id || new Date().getTime().toString();
-    function setHideBy(e: HTMLElement) {
-        if (e === panel ||
-            e.tagName === "LINK" ||
-            e.tagName === "SCRIPT" ||
-            e.classList.contains("hidden") ||
-            e.dataset.hiddenby ||
-            (container && e.parentElement !== container) && (e.offsetWidth <= 0 && e.offsetHeight <= 0))
-            return;
-
-        e.dataset.hiddenby = panel.dataset.paneluniquename;
-    }
-
-    if (container) {
-        let c = container.children;
-        const cl = c.length;
-        for (let i = 0; i < cl; i++) {
-            setHideBy(c[i] as HTMLElement);
-        }
-    }
-
-    document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(setHideBy);
-
-    panel.classList.remove("hidden");
-    delete panel.dataset.hiddenby;
-    panel.classList.add("s-Panel");
-
-    Fluent.trigger(panel, "panelopen", { bubbles: true });
-}
-
-function setPanelTitle(element: HTMLElement, title: string, closeButton?: boolean) {
-    var panelRoot = element?.closest('.s-Panel') ?? element;
-    if (!panelRoot)
-        return;
-
-    var pt = panelRoot.querySelector(':scope > .panel-titlebar');
-
-    if (!pt) {
-        pt = document.createElement("div");
-        pt.classList.add("panel-titlebar");
-        let ptt2 = pt.appendChild(document.createElement("div"));
-        ptt2.classList.add("panel-titlebar-text");
-        panelRoot.prepend(pt);
-    }
-
-    let ptt = pt.querySelector(".panel-titlebar-text");
-    if (ptt)
-        ptt.textContent = title ?? "";
-
-    let ptc = pt.querySelector(".panel-titlebar-close");
-    if (closeButton && !ptc) {
-        ptc = document.createElement("button");
-        ptc.classList.add("panel-titlebar-close");
-        ptc.addEventListener("click", e => {
-            closePanel((e.target as HTMLElement).closest<HTMLElement>(".s-Panel"));
-        });
-        pt.prepend(ptc);
-    }
-}
-
-/** Returns .s-Panel, .modal, .ui-dialog */
-export function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
-    if (isArrayLike(element))
-        element = element[0];
-    if (!element)
-        return null;
-    return element.closest(".modal, .s-Panel, .ui-dialog");
-
-}
-
-/** Returns .panel-body, .modal-body, .ui-dialog-content */
-export function getDialogBodyElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
-    if (isArrayLike(element))
-        element = element[0];
-    if (!element)
-        return null;
-    return element.closest(".modal-body, .panel-body, .ui-dialog-content") as HTMLElement ??
-        getDialogRootElement(element)?.querySelector(":scope > .ui-dialog-content, .modal-body, :scope > .panel-body");
-
-}
-
-/** Returns .s-Panel, .modal, .ui-dialog-content */
-export function getDialogEventTarget(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
-    if (isArrayLike(element))
-        element = element[0];
-    if (!element)
-        return null;
-    return element.closest(".modal, .s-Panel, .ui-dialog-content") as HTMLElement ??
-        element.closest(".ui-dialog")?.querySelector(":scope > .ui-dialog-content");
-
-}
-
-/** Tries to close a ui-dialog, panel or modal */
-export function closeDialog(element: HTMLElement | ArrayLike<HTMLElement>): void {
-    element = getDialogEventTarget(element);
-    if (!element)
-        return;
-    if (element.classList.contains("ui-dialog-content")) {
-        getjQuery()?.(element)?.dialog?.("close");
-    }
-    else if (element.classList.contains("modal")) {
-        let $ = getjQuery();
-        if ($ && $.fn && $.fn.modal)
-            $(element).modal('hide');
-        else if (isBS5Plus()) {
-            (bootstrap as any).Modal?.getInstance?.(element)?.hide?.();
-        }
-    }
-    else if (element.classList.contains("s-Panel")) {
-        closePanel(element);
-    }
-
-}
-
-export function attachToDialogBeforeCloseEvent(element: HTMLElement | ArrayLike<HTMLElement>, handler: (e: Event) => void) {
-    element = getDialogEventTarget(element);
-    if (!element)
-        return;
-
-    if (element.classList.contains("ui-dialog-content"))
-        Fluent.on(element, "dialogbeforeclose", handler);
-    else if (element.classList.contains("s-Panel"))
-        Fluent.on(element, "panelbeforeclose", handler);
-    else if (element.classList.contains("modal"))
-        Fluent.on(element, "hide.bs.modal", handler);
-}
-
-export function attachToDialogCloseEvent(element: HTMLElement | ArrayLike<HTMLElement>, handler: (e: Event) => void) {
-    element = getDialogEventTarget(element);
-    if (!element)
-        return;
-
-    if (element.classList.contains("ui-dialog-content"))
-        Fluent.on(element, "dialogclose", handler);
-    else if (element.classList.contains("s-Panel"))
-        Fluent.on(element, "panelclose", handler);
-    else if (element.classList.contains("modal"))
-        Fluent.on(element, "hidden.bs.modal", handler);
 }

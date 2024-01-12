@@ -47,8 +47,8 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
         super.destroy();
     }
 
-    protected getUIDialogOptions() {
-        var opt = super.getUIDialogOptions();
+    protected getDialogOptions() {
+        var opt = super.getDialogOptions();
         opt.width = 400;
         return opt;
     }

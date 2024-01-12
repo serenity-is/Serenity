@@ -1,4 +1,4 @@
-﻿import { Fluent, closeDialog, closePanel, getjQuery, isArrayLike } from "@serenity-is/base";
+﻿import { Dialog, Fluent, isArrayLike } from "@serenity-is/base";
 
 export interface HandleRouteEvent extends Event {
     route: string,
@@ -161,7 +161,7 @@ export namespace Router {
 
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
-                closeDialog(d);
+                Dialog.getInstance(d)?.close();
             }
 
             for (var i = same; i < newParts.length; i++) {

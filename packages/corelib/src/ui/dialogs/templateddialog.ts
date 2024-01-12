@@ -1,4 +1,4 @@
-﻿import { Config, DialogButton, DialogOptions, Fluent, ICommonDialog, addClass, createCommonDialog, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
+﻿import { Config, Dialog, DialogButton, DialogOptions, Fluent, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../types/attributes";
@@ -16,7 +16,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected tabs: any;
     protected toolbar: Toolbar;
     protected validator: any;
-    protected commonDialog: ICommonDialog;
+    protected dialog: Dialog;
 
     constructor(props?: WidgetProps<P>) {
         super(props);
@@ -39,9 +39,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.toolbar = null;
         this.validator && this.byId('Form').remove();
         this.validator = null;
-        if (this.commonDialog) {
-            this.commonDialog.dispose();
-            this.commonDialog = null;
+        if (this.dialog) {
+            this.dialog.dispose();
+            this.dialog = null;
         }
         Fluent.off(window, '.' + this.uniqueName);
         super.destroy();
@@ -57,13 +57,13 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected getDialogOptions(asPanel?: boolean): DialogOptions {
         return {
-            asPanel: asPanel ?? this.isMarkedAsPanel,
+            preferPanel: asPanel ?? this.isMarkedAsPanel,
             autoOpen: false,
-            bootstrap: this.preferBSModal(),
+            preferBSModal: this.preferBSModal(),
             buttons: this.getDialogButtons(),
             dialogClass: (this.getCssClass() ?? "") + " flex-layout",
             element: this.domNode,
-            modalClass: "modal-lg",
+            size: "lg",
             onClose: (result) => {
                 this.onDialogClose(result)
             },
@@ -71,42 +71,27 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                 this.onDialogOpen()
             },
             providerOptions: (type) => {
-                if (type?.startsWith("bs"))
-                    return this.getModalOptions();
-
-                if (type === "jqueryui")
-                    return this.getUIDialogOptions();
+                if (type === "uidialog") {
+                    var opt: any = {};
+                    opt.width = Math.min(window.innerWidth, 920);
+                    applyCssSizes(opt, this.getCssClass());
+                    opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
+                    opt.position = { my: 'center', at: 'center', of: window };
+                    return opt;                    
+                }
             },
             title: this.dialogTitle ?? this.getInitialDialogTitle() ?? ''
         }
-    }
-
-    /** Gets jQuery UI Dialog options */
-    protected getUIDialogOptions(): any {
-        var opt: any = {};
-        opt.width = 920;
-        applyCssSizes(opt, this.getCssClass());
-        opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
-        opt.modal = true;
-        opt.position = { my: 'center', at: 'center', of: window };
-        return opt;
     }
 
     protected preferBSModal() {
         return Config.bootstrapDialogs;
     }
 
-    protected getModalOptions(): any {
-        return {
-            backdrop: false,
-            keyboard: false
-        }
-    }
-
     protected initDialog(): void {
         this.domNode.classList.remove("hidden");
 
-        if (this.commonDialog?.type == "jqueryui") {
+        if (this.dialog?.type == "uidialog") {
             this.initUIDialog();
             Fluent.on(this.domNode.closest(".ui-dialog"), "resize." + this.uniqueName, this.arrange.bind(this));
         }
@@ -127,11 +112,11 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     public dialogOpen(asPanel?: boolean): void {
-        if (!this.commonDialog) {
-            this.commonDialog = createCommonDialog(this.getDialogOptions(asPanel));
+        if (!this.dialog) {
+            this.dialog = new Dialog(this.getDialogOptions(asPanel));
             this.initDialog();
         }
-        this.commonDialog.open();
+        this.dialog.open();
     }
 
     protected onDialogOpen(): void {
@@ -204,16 +189,16 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     public dialogClose(): void {
-        this.commonDialog?.close();
+        this.dialog?.close();
     }
 
     public get dialogTitle(): string {
-        return this.commonDialog?.title ?? this.domNode.dataset.dialogtitle;
+        return this.dialog?.title() ?? this.domNode.dataset.dialogtitle;
     }
 
     public set dialogTitle(value: string) {
         this.domNode.dataset.dialogtitle = value;
-        this.commonDialog && (this.commonDialog.title = value ?? '');
+        this.dialog?.title(value ?? '');
     }
 
     protected initTabs(): void {

@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { getjQuery } from "./system"
+import { getjQuery } from "./environment"
 
 const namespaceRegex = /[^.]*(?=\..*)\.|.*/
 const stripNameRegex = /\..*/
@@ -108,8 +108,10 @@ function findHandler(events: any, callable: any, delegationSelector: any = null)
 
 function normalizeParameters(originalTypeEvent: string, handler: any, delegationFunction: any) {
     const isDelegated = typeof handler === 'string'
-    const callable = isDelegated ? delegationFunction : (handler || delegationFunction)
+    const callable = isDelegated ? delegationFunction : (handler || delegationFunction);
     let typeEvent = getTypeEvent(originalTypeEvent)
+    if (originalTypeEvent.indexOf(".bs.") >= 0)
+        typeEvent = originalTypeEvent;
     return [isDelegated, callable, typeEvent]
 }
 

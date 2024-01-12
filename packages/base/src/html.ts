@@ -1,5 +1,5 @@
-﻿import { EventHandler, triggerRemoveAndClearAll } from "./eventhandler";
-import { getjQuery } from "./system";
+﻿import { getjQuery } from "./environment";
+import { EventHandler, triggerRemoveAndClearAll } from "./eventhandler";
 
 const esc: Record<string, string> = {
     '<': '&lt;',

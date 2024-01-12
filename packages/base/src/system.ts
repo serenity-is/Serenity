@@ -6,6 +6,14 @@ export function getGlobalObject(): any {
     return globalObject;
 }
 
+export function omitUndefined(x: { [key: string]: any }) {
+    if (x == null)
+        return x;
+    let obj = Object.create(null);
+    Object.entries(x).forEach(([key, value]) => value !== void 0 && (obj[key] = value));
+    return obj;
+}
+
 export type Type = Function | Object;
 
 export function getNested(from: any, name: string) {
@@ -200,11 +208,6 @@ export function isPromiseLike(obj: any): obj is PromiseLike<any> {
     return obj instanceof Promise || ((typeof obj === "object" && obj != null && typeof obj.then === "function" && typeof obj.catch === "function"));
 }
 
-export function getjQuery(): any {
-    // @ts-ignore
-    return typeof jQuery === "function" ? jQuery : typeof $ === "function" && ($ as any).fn ? $ : undefined;
-}
-
 export type NoInfer<T> = [T][T extends any ? 0 : never];
 
 export class EditorAttribute { }
@@ -286,7 +289,7 @@ export function editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]
 }
 
 export function formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
-    return { typeKind: "formatter", typeName, interfaces:  merge([ISlickFormatter], interfaces) }
+    return { typeKind: "formatter", typeName, interfaces: merge([ISlickFormatter], interfaces) }
 }
 
 export function interfaceTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): InterfaceTypeInfo<T> {

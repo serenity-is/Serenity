@@ -1,8 +1,8 @@
 ﻿import { blockUI, blockUndo } from "./blockui";
 import { Config } from "./config";
+import { getjQuery } from "./environment";
 import { ErrorHandling } from "./errorhandling";
 import { RequestErrorInfo, ServiceOptions, ServiceResponse } from "./servicetypes";
-import { getjQuery } from "./system";
 
 export function resolveUrl(url: string) {
     if (url != null && url.charAt(0) == '~' && url.charAt(1) == '/')

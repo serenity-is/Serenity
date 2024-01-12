@@ -1,4 +1,4 @@
-﻿import { Config, Fluent, getjQuery, htmlEncode, isArrayLike, isBS3, isBS5Plus, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
+﻿import { Config, Fluent, Tooltip, getjQuery, htmlEncode, isArrayLike, parseDate, parseDecimal, parseInteger, tryGetText } from "@serenity-is/base";
 import { parseDayHourAndMin, parseHourAndMin } from "./formatting-compat";
 import { extend } from "./system-compat";
 
@@ -142,31 +142,6 @@ export function loadValidationErrorMessages(): boolean {
     return true;
 }
 
-function setTooltip(el: ArrayLike<HTMLElement> | HTMLElement, val: string, show: boolean): void {
-    var element = isArrayLike(el) ? el[0] : el;
-    if (!element)
-        return;
-    let $ = getjQuery();
-    if (isBS3()) {
-        element.setAttribute('data-original-title', val || '');
-        $?.(element)?.tooltip?.('fixTitle');
-    }
-    else {
-        element.setAttribute('title', val || '');
-        if ($ && $.fn.tooltip) {
-            $(element)?.tooltip?.('_fixTitle');
-        }
-    }
-    if (show != null) {
-        if ($?.fn?.tooltip)
-            $(element).tooltip?.(show ? 'show' : 'hide');
-        else if (isBS5Plus() && typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) {
-            var inst = (bootstrap as any).Tooltip.getInstance?.();
-            inst && (inst[show ? "show" : "hide"])?.();
-        }
-    }
-}
-
 export function getHighlightTarget(el: HTMLElement) {
     var hl = el.dataset.vxHighlight;
     if (hl)
@@ -224,12 +199,12 @@ export function baseValidateOptions(): any {
                 for (i = 0; this.errorList[i]; i++) {
                     error = this.errorList[i];
                     hl = getHighlightTarget(error.element) ?? error.element;
-                    setTooltip(hl, i != 0 ? '' : error.message, false);
+                    new Tooltip(hl).setTitle(i ? '' : error.message).toggle(!i);
                 }
 
                 for (i = 0, elements = this.validElements(); elements[i]; i++) {
                     hl = getHighlightTarget(error.element) ?? error.element;
-                    setTooltip(hl, '', false);
+                    Tooltip.getInstance(hl)?.setTitle('').hide();
                 }
             }
 
