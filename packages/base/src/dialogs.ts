@@ -138,7 +138,7 @@ export class Dialog {
         size: "lg"
     }
 
-    static getInstance(el: HTMLElement): Dialog {
+    static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
         el = getDialogEventTarget(el);
         return new (Dialog as any)({ element: el }, false);
     }
