@@ -314,7 +314,7 @@ declare class Dialog {
     private dialogResult;
     constructor(opt?: DialogOptions);
     static defaults: DialogOptions;
-    static getInstance(el: HTMLElement): Dialog;
+    static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog;
     /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
     get result(): string;
     /** Closes dialog */
