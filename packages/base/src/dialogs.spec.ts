@@ -777,7 +777,7 @@ describe("iframeDialog", () => {
         expect(x.width).toBe("60%");
         expect(x.height).toBe("400");
         expect(x.modal).toBe(true);
-        expect(x.resizable).toBeUndefined();
+        expect(x.resizable).toBe(false);
     });
 
     it('returns expected bootstrap.Modal markup', async function () {

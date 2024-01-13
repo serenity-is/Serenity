@@ -5,8 +5,6 @@
         const config = (await import("./config")).Config;
         expect(config.applicationPath).toBe("/");
         expect(config.emailAllowOnlyAscii).toBe(true);
-        expect(config.responsiveDialogs).toBe(true);
-        expect(config.bootstrapMessages).toBe(false);
         expect(config.rootNamespaces).toEqual(["Serenity"]);
         expect(config.notLoggedInHandler).toBeNull();
     });
