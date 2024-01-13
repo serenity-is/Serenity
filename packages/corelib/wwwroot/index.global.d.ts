@@ -2469,6 +2469,28 @@ declare namespace Serenity {
         show(): Tooltip;
     }
 
+    /** Inspired from https://github.com/silverwind/uppie and https://github.com/GoogleChromeLabs/file-drop/blob/master/lib/filedrop.ts */
+    interface UploaderOptions {
+        accept?: string;
+        callback: (e: Event, fd?: FormData, files?: string[]) => void;
+        dropZone?: HTMLElement | ArrayLike<HTMLElement>;
+        input?: HTMLInputElement;
+        multiple?: boolean;
+        name?: string;
+    }
+    class Uploader {
+        private opt;
+        constructor(opt: UploaderOptions);
+        static defaults: Partial<UploaderOptions>;
+        private isMultiple;
+        private getTypePredicate;
+        private getMatchingItems;
+        private watchInput;
+        private watchDropZone;
+        private arrayApi;
+        private entriesApi;
+    }
+
     /**
      * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
      * @param array Array to test.
@@ -3640,7 +3662,7 @@ declare namespace Serenity {
 
     class TemplatedDialog<P> extends TemplatedWidget<P> {
         static createDefaultElement(): HTMLDivElement;
-        protected tabs: any;
+        protected tabs: ArrayLike<HTMLElement>;
         protected toolbar: Toolbar;
         protected validator: any;
         protected dialog: Dialog;

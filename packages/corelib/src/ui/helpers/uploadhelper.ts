@@ -1,4 +1,4 @@
-import { Fluent, ServiceResponse, alertDialog, blockUI, blockUndo, getjQuery, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { Fluent, ServiceResponse, Uploader, alertDialog, blockUI, blockUndo, getjQuery, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
 import { replaceAll } from "../../q";
 
 export namespace UploadHelper {
@@ -6,7 +6,9 @@ export namespace UploadHelper {
     export function addUploadInput(options: UploadInputOptions): Fluent {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
         let progress = isArrayLike(options.progress) ? options.progress[0] : options.progress;
-        container.classList.add('fileinput-button');
+        //container.classList.add('fileinput-button');
+        var button = container.closest(".tool-button") ?? container.closest("button") ?? container;
+        button.classList.add("fileinput-button");
 
         var uploadUrl = options.uploadUrl || '~/File/TemporaryUpload';
         if (options.uploadIntent) {
@@ -28,6 +30,16 @@ export namespace UploadHelper {
         }
 
         let $ = getjQuery();
+
+        if (!$?.fn?.fileupload) {
+            new Uploader({
+                callback: (e, fd, files ) => console.log(files),
+                input: uploadInput.getNode() as HTMLInputElement,
+                dropZone: options.zone
+            });
+            return uploadInput;
+        }
+
         $ && $(uploadInput).fileupload?.({
             dataType: 'json',
             dropZone: options.zone,

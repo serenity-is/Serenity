@@ -13,7 +13,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     static override createDefaultElement() { return Fluent("div").addClass("hidden").appendTo(document.body).getNode(); }
 
-    protected tabs: any;
+    protected tabs: ArrayLike<HTMLElement>;
     protected toolbar: Toolbar;
     protected validator: any;
     protected dialog: Dialog;
@@ -198,10 +198,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         if (!tabsDiv)
             return;
         let $ = getjQuery();
-        if (!$)
+        if (!$?.fn?.tabs)
             return;
         this.tabs = $(tabsDiv).tabs?.({});
-        this.tabs.on('tabsactivate', () => this.arrange());
+        (this.tabs as any)?.on('tabsactivate', () => this.arrange());
     }
 
     protected handleResponsive(): void {
