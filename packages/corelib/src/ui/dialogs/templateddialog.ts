@@ -54,7 +54,6 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return {
             preferPanel: this.getCustomAttribute(PanelAttribute)?.value,
             autoOpen: false,
-            preferBSModal: this.preferBSModal(),
             buttons: this.getDialogButtons(),
             dialogClass: (this.getCssClass() ?? "") + " flex-layout",
             element: this.domNode,
@@ -76,10 +75,6 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             },
             title: this.dialogTitle ?? this.getInitialDialogTitle() ?? ''
         }
-    }
-
-    protected preferBSModal() {
-        return Config.bootstrapDialogs;
     }
 
     protected initDialog(): void {

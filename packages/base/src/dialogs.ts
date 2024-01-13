@@ -132,15 +132,32 @@ export class Dialog {
 
     static defaults: DialogOptions = {
         autoDispose: true,
+        autoOpen: false,
         backdrop: false,
         centered: true,
         closeButton: true,
         closeOnEscape: false,
         fade: false,
-        fullScreen: "sm-down",
+        fullScreen: "md-down",
         modal: true,
-        preferBSModal: Config.bootstrapDialogs,
+        preferBSModal: true,
         size: "lg"
+    }
+
+    static messageDefaults: MessageDialogOptions = {
+        autoDispose: true,
+        autoOpen: true,
+        backdrop: false,
+        centered: true,
+        closeButton: true,
+        closeOnEscape: true,
+        fade: true,
+        fullScreen: null,
+        htmlEncode: true,
+        modal: true,
+        preferBSModal: true,
+        preWrap: true,
+        size: "sm"
     }
 
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
@@ -312,7 +329,7 @@ export class Dialog {
                 .data(`${bs5 ? "bs-" : ""}dismiss`, "modal")
                 .attr("aria-label", DialogTexts.CloseButton);
 
-            if (bs5) {
+            if (!bs5) {
                 closeButton.append(Fluent("span").attr("aria-hidden", "true").html("&times;"));
             }
 
@@ -331,7 +348,7 @@ export class Dialog {
         Fluent("div")
             .addClass("modal-dialog")
             .addClass(opt.size && "modal-" + opt.size)
-            .addClass(opt.fullScreen && "modal-full-screen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}-down` : ""))
+            .addClass(opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""))
             .addClass(opt.centered && "modal-dialog-centered")
             .addClass(opt.scrollable && "modal-scrollable")
             .append(Fluent("div")
@@ -389,7 +406,7 @@ export class Dialog {
 
     createUIDialog(opt: DialogOptions): void {
 
-        let dlgOpt: any = {
+        let uiOpt: any = {
             autoOpen: opt.autoOpen,
             dialogClass: opt.dialogClass,
             title: opt.title,
@@ -399,10 +416,10 @@ export class Dialog {
         } as any;
 
         if (opt.centered)
-            dlgOpt.position = { my: 'center', at: 'center', of: window };
+            uiOpt.position = { my: 'center', at: 'center', of: window };
 
         if (opt.buttons) {
-            dlgOpt.buttons = opt.buttons.map(btn => {
+            uiOpt.buttons = opt.buttons.map(btn => {
                 let uiButton = dialogButtonToUI(btn);
                 uiButton.click = (e: MouseEvent) => this.onButtonClick(e, btn);
                 return uiButton;
@@ -410,9 +427,9 @@ export class Dialog {
         }
 
         if (opt.providerOptions)
-            dlgOpt = Object.assign(dlgOpt, opt.providerOptions("uidialog", omitUndefined(opt)));
+            uiOpt = Object.assign(uiOpt, opt.providerOptions("uidialog", omitUndefined(opt)));
 
-        getjQuery()?.(this.el).dialog(dlgOpt);
+        getjQuery()?.(this.el).dialog(uiOpt);
     }
 
 
@@ -709,13 +726,8 @@ function createMessageDialog(opt: {
         }
     }
 
-    let options: MessageDialogOptions = Object.assign({
-        autoOpen: true,
-        centered: true,
-        closeOnEscape: true,
+    let options: MessageDialogOptions = Object.assign({}, Dialog.messageDefaults, {
         dialogClass: "s-MessageDialog" + (opt.cssClass ? " " + opt.cssClass : ""),
-        htmlEncode: true,
-        preferBSModal: Config.bootstrapMessages,
         title: opt.title
     } satisfies MessageDialogOptions, opt.options);
 

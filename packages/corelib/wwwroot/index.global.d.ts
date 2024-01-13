@@ -1315,18 +1315,6 @@ declare namespace Serenity {
          */
         emailAllowOnlyAscii: boolean;
         /**
-         * @Obsolete defaulted to false before for backward compatibility, now it is true by default
-         */
-        responsiveDialogs: boolean;
-        /**
-         * Set this to true, to prefer bootstrap modals over jQuery UI dialogs by default for general dialogs
-         */
-        bootstrapDialogs: boolean;
-        /**
-         * Set this to true, to prefer bootstrap modals over jQuery UI dialogs by default for message dialogs
-         */
-        bootstrapMessages: boolean;
-        /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
          * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
@@ -1609,6 +1597,7 @@ declare namespace Serenity {
         private dialogResult;
         constructor(opt?: DialogOptions);
         static defaults: DialogOptions;
+        static messageDefaults: MessageDialogOptions;
         static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog;
         /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
         get result(): string;
@@ -3660,7 +3649,6 @@ declare namespace Serenity {
         protected addCssClass(): void;
         protected getInitialDialogTitle(): string;
         protected getDialogOptions(): DialogOptions;
-        protected preferBSModal(): boolean;
         protected initDialog(): void;
         protected initUIDialog(): void;
         dialogOpen(asPanel?: boolean): void;
