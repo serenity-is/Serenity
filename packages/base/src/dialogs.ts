@@ -253,7 +253,7 @@ export class Dialog {
     /** Sets the title text of the dialog. */
     title(value: string): this;
     title(value?: string): string | this {
-        let title = this.header()?.querySelector(".modal-title, .panel-title-text, .ui-dialog-title");
+        let title = this.header()?.querySelector(".modal-title, .panel-titlebar-text, .ui-dialog-title");
         if (value === void 0 && !arguments.length)
             return title?.textContent;
 
