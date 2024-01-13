@@ -2484,11 +2484,10 @@ declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected validator: any;
     protected dialog: Dialog;
     constructor(props?: WidgetProps<P>);
-    private get isMarkedAsPanel();
     destroy(): void;
     protected addCssClass(): void;
     protected getInitialDialogTitle(): string;
-    protected getDialogOptions(asPanel?: boolean): DialogOptions;
+    protected getDialogOptions(): DialogOptions;
     protected preferBSModal(): boolean;
     protected initDialog(): void;
     protected initUIDialog(): void;

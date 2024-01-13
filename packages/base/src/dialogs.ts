@@ -100,6 +100,11 @@ export class Dialog {
         if (typeof opt.element === "function")
             opt.element(this.el);
 
+
+        if (this.el.classList.contains("hidden") &&
+            typeof opt.element !== "function")
+            this.el.classList.remove("hidden");
+
         if (opt.preferPanel || (!hasBSModal() && !hasUIDialog))
             this.createPanel(opt);
         else if (hasUIDialog() && (!hasBSModal() || !opt.preferBSModal))
@@ -117,10 +122,6 @@ export class Dialog {
         if (opt.autoDispose)
             this.onClose(this.dispose.bind(this));
 
-        if (this.el.classList.contains("hidden") &&
-            typeof opt.element !== "function")
-            this.el.classList.remove("hidden");
-
         if (opt.title !== void 0) {
             this.title(opt.title);
         }
@@ -132,6 +133,7 @@ export class Dialog {
     static defaults: DialogOptions = {
         autoDispose: true,
         backdrop: false,
+        centered: true,
         closeButton: true,
         closeOnEscape: false,
         fade: false,
@@ -328,9 +330,10 @@ export class Dialog {
 
         Fluent("div")
             .addClass("modal-dialog")
-            .addClass(opt.scrollable && "modal-scrollable")
             .addClass(opt.size && "modal-" + opt.size)
             .addClass(opt.fullScreen && "modal-full-screen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}-down` : ""))
+            .addClass(opt.centered && "modal-dialog-centered")
+            .addClass(opt.scrollable && "modal-scrollable")
             .append(Fluent("div")
                 .addClass("modal-content")
                 .append(header)
@@ -386,12 +389,17 @@ export class Dialog {
 
     createUIDialog(opt: DialogOptions): void {
 
-        let dlgOpt = {
+        let dlgOpt: any = {
+            autoOpen: opt.autoOpen,
             dialogClass: opt.dialogClass,
             title: opt.title,
             modal: opt.modal,
-            width: opt.width
+            width: opt.width,
+            resizable: false
         } as any;
+
+        if (opt.centered)
+            dlgOpt.position = { my: 'center', at: 'center', of: window };
 
         if (opt.buttons) {
             dlgOpt.buttons = opt.buttons.map(btn => {
@@ -402,7 +410,7 @@ export class Dialog {
         }
 
         if (opt.providerOptions)
-            dlgOpt = Object.assign(dlgOpt, opt.providerOptions("uidialog", opt));
+            dlgOpt = Object.assign(dlgOpt, opt.providerOptions("uidialog", omitUndefined(opt)));
 
         getjQuery()?.(this.el).dialog(dlgOpt);
     }
@@ -703,6 +711,7 @@ function createMessageDialog(opt: {
 
     let options: MessageDialogOptions = Object.assign({
         autoOpen: true,
+        centered: true,
         closeOnEscape: true,
         dialogClass: "s-MessageDialog" + (opt.cssClass ? " " + opt.cssClass : ""),
         htmlEncode: true,

@@ -27,11 +27,6 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.initToolbar();
     }
 
-    private get isMarkedAsPanel(): boolean {
-        var panelAttr = this.getCustomAttribute(PanelAttribute);
-        return panelAttr && panelAttr.value !== false;
-    }
-
     public destroy(): void {
         (this.tabs as any)?.tabs?.('destroy');
         this.tabs = null;
@@ -55,9 +50,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return "";
     }
 
-    protected getDialogOptions(asPanel?: boolean): DialogOptions {
+    protected getDialogOptions(): DialogOptions {
         return {
-            preferPanel: asPanel ?? this.isMarkedAsPanel,
+            preferPanel: this.getCustomAttribute(PanelAttribute)?.value,
             autoOpen: false,
             preferBSModal: this.preferBSModal(),
             buttons: this.getDialogButtons(),
@@ -70,13 +65,12 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             onOpen: () => {
                 this.onDialogOpen()
             },
-            providerOptions: (type) => {
+            width: Math.min(window.innerWidth, 920),
+            providerOptions: (type, options) => {
                 if (type === "uidialog") {
                     var opt: any = {};
-                    opt.width = Math.min(window.innerWidth, 920);
                     applyCssSizes(opt, this.getCssClass());
-                    opt.resizable = !!this.getCustomAttribute(ResizableAttribute)?.value;
-                    opt.position = { my: 'center', at: 'center', of: window };
+                    opt.resizable = this.getCustomAttribute(ResizableAttribute)?.value;
                     return opt;                    
                 }
             },
@@ -113,7 +107,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public dialogOpen(asPanel?: boolean): void {
         if (!this.dialog) {
-            this.dialog = new Dialog(this.getDialogOptions(asPanel));
+            let opt = this.getDialogOptions();
+            if (asPanel != null)
+                opt.preferPanel = asPanel;
+            this.dialog = new Dialog(opt);
             this.initDialog();
         }
         this.dialog.open();
