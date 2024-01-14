@@ -571,7 +571,11 @@ public class TSTypeListerAST
                 continue;
 
             var name = (member.Name as ILiteralLikeNode)?.Text ??
-                (member.Name as Identifier).Text;
+                (member.Name as Identifier)?.Text;
+
+            if (string.IsNullOrEmpty(name))
+                continue;
+
             if (!used.Add(name))
                 continue;
 
