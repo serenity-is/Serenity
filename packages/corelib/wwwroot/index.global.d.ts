@@ -1586,7 +1586,7 @@ declare namespace Serenity {
         /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
         scrollable?: boolean;
         /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
-        size?: "sm" | "lg" | "xl";
+        size?: "sm" | "md" | "lg" | "xl";
         /** Dialog title */
         title?: string;
         /** Only used for jQuery UI dialogs for backwards compatibility */
@@ -2471,17 +2471,82 @@ declare namespace Serenity {
 
     /** Inspired from https://github.com/silverwind/uppie and https://github.com/GoogleChromeLabs/file-drop/blob/master/lib/filedrop.ts */
     interface UploaderOptions {
+        /** Accept. If not specified, read from the passed input  */
         accept?: string;
-        callback: (e: Event, fd?: FormData, files?: string[]) => void;
+        /** Auto clear input value after selection, so when same file selected it works. Default is true */
+        autoClear?: boolean;
+        /** Only used for multiple, default is 1 to upload multiple files in batches of size 1 */
+        batchSize?: number;
+        /** An optional list of dropzones. */
         dropZone?: HTMLElement | ArrayLike<HTMLElement>;
+        /** Progress event that is called when a batch is about to be uploaded */
+        batchStart?: (data: {
+            batch: UploaderBatch;
+        }) => void;
+        /** Progress event that is called when a batch is ended uploading or failed */
+        batchStop?: (data: {
+            batch: UploaderBatch;
+        }) => void;
+        /** Called after batch is uploaded successfully */
+        batchSuccess?: (data: UploaderSuccessData) => void;
+        /** Progress event that is called during upload */
+        batchProgress?: (data: {
+            batch: UploaderBatch;
+            loaded: number;
+            total: number;
+        }) => void;
+        /** Callback to handle a batch. If not specified, a default handler is used. */
+        batchHandler?: (batch: UploaderBatch, uploader: Uploader) => void | Promise<void>;
+        /** Only called when a change/drop event occurs, but files can't be determined */
+        changeCallback?: (e: Event) => void;
+        /** Error handler, if not specified Uploader.errorHandler is used */
+        errorHandler?: (data: UploaderErrorData) => void;
+        /** Ignore file types, e.g. don't check accept property of input or this options */
+        ignoreType?: boolean;
+        /** Target input. If null, dropZone should be specified. */
         input?: HTMLInputElement;
+        /** Allow multiple files. If not specified is read from the input */
         multiple?: boolean;
+        /** The field name to use in FormData object. Default is files[] */
         name?: string;
+    }
+    interface UploaderRequest {
+        /** A function that will return headers to be sent with request, or static set of headers */
+        headers?: Record<string, string>;
+        /** Response type expected from the server. Default is json */
+        responseType?: "json" | "text";
+        /** URL to send the request to. Default is ~/File/TemporaryUpload */
+        url?: string;
+    }
+    interface UploaderBatch {
+        event?: Event;
+        filePaths?: string[];
+        formData: FormData;
+    }
+    interface UploaderSuccessData {
+        batch: UploaderBatch;
+        request: UploaderRequest;
+        event: ProgressEvent;
+        xhr: XMLHttpRequest;
+        response: any;
+    }
+    interface UploaderErrorData {
+        batch?: UploaderBatch;
+        event?: ProgressEvent;
+        exception?: any;
+        request?: UploaderRequest;
+        response?: any;
+        xhr?: XMLHttpRequest;
     }
     class Uploader {
         private opt;
+        private batch;
         constructor(opt: UploaderOptions);
+        private newBatch;
+        private addToBatch;
+        private endBatch;
         static defaults: Partial<UploaderOptions>;
+        static requestDefaults: Partial<UploaderRequest>;
         private isMultiple;
         private getTypePredicate;
         private getMatchingItems;
@@ -2489,6 +2554,8 @@ declare namespace Serenity {
         private watchDropZone;
         private arrayApi;
         private entriesApi;
+        uploadBatch(batch: UploaderBatch, request?: UploaderRequest): Promise<void>;
+        static errorHandler: (data: UploaderErrorData) => void;
     }
 
     /**
@@ -4319,6 +4386,7 @@ declare namespace Serenity {
         protected getListRequest(query: Select2SearchQuery): ListRequest;
         protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>>;
         protected hasAsyncSource(): boolean;
+        protected canSearch(byId: boolean): boolean;
         protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
     }
     class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {

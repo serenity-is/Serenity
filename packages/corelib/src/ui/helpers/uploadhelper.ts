@@ -5,7 +5,7 @@ export namespace UploadHelper {
 
     export function addUploadInput(options: UploadInputOptions): Fluent {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
-        let progress = isArrayLike(options.progress) ? options.progress[0] : options.progress;
+        let progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
         //container.classList.add('fileinput-button');
         var button = container.closest(".tool-button") ?? container.closest("button") ?? container;
         button.classList.add("fileinput-button");
@@ -29,87 +29,34 @@ export namespace UploadHelper {
             uploadInput.attr('multiple', 'multiple');
         }
 
-        let $ = getjQuery();
-
-        if (!$?.fn?.fileupload) {
-            new Uploader({
-                callback: (e, fd, files ) => console.log(files),
-                input: uploadInput.getNode() as HTMLInputElement,
-                dropZone: options.zone
-            });
-            return uploadInput;
+        const setProgress = (percent: number) => {
+            let bar = progress.children()[0];
+            bar && (bar.style.width = (percent ?? 0).toString() + '%');
         }
 
-        $ && $(uploadInput).fileupload?.({
-            dataType: 'json',
+        new Uploader({
+            batchSize: 1,
+            batchSuccess: data => options.fileDone?.(data.response ?? {}, data.batch?.filePaths?.[0], data),
+            input: uploadInput.getNode() as HTMLInputElement,
             dropZone: options.zone,
-            pasteZone: options.zone,
-            done: function (e: Event, data: any) {
-                var response = data.result;
-                if (response.Error) {
-                    notifyError(response.Error.Message);
-                    return;
-                } 
-
-                if (options.fileDone != null) {
-                    options.fileDone(response, data.files[0].name, data);
-                }
-            },
-            fail: function(e: Event, opt: any) {
-                var xhr = opt?._response?.jqXHR;
-                if (!xhr) {
-                    notifyError('An error occurred during file upload.');
-                    return;
-                }
-
-                if ((xhr.getResponseHeader('content-type') || '')
-                    .toLowerCase().indexOf('application/json') >= 0) {
-                    var json = JSON.parse(xhr.responseText);
-                    if (json && json.Error && json.Error.Message) {
-                        notifyError(json.Error.Message);
-                        return;
-                    }
-                }
-
-                var html = xhr.responseText;
-                if (html) {
-                    iframeDialog({ html: html });
-                    return;
-                }
-
-                if (!xhr.status) {
-                    if (xhr.statusText != "abort")
-                        notifyError("An unknown connection error occurred! Check browser console for details.");
-                    return;
-                }
-
-                if (xhr.status == 500) {
-                    notifyError("HTTP 500: Connection refused! Check browser console for details.");
-                    return;
-                }
-
-                notifyError("HTTP " + xhr.status + ' error! Check browser console for details.');
-            },
-            start: function () {
+            batchStart: () => {
                 blockUI(null);
-                if (progress) {
-                    Fluent(progress).show();
-                }
+                progress.show();
+                setProgress(0);
             },
-            stop: function () {
+            batchStop: () => {
                 blockUndo();
-                if (progress) {
-                    Fluent(progress).hide();
-                }
+                setProgress(100);
+                progress.hide();
             },
-            progress: function (e: Event, data1: any) {
-                if (progress) {
-                    var percent = data1.loaded / data1.total * 100;
-                    var bar = progress.firstElementChild as HTMLElement;
-                    bar && (bar.style.width = percent.toString() + '%');
+            batchProgress: data => {
+                if (typeof data.loaded == "number" && data.total > 0) {
+                    var percent = data.loaded / data.total * 100;
+                    setProgress(percent);
                 }
             }
         });
+
         return uploadInput;
     }
 
@@ -117,16 +64,16 @@ export namespace UploadHelper {
         opt: FileUploadConstraints): boolean {
 
         if (!file.IsImage && !opt.allowNonImage) {
-            alertDialog(localText('Controls.ImageUpload.NotAnImageFile'));
+            notifyError(localText('Controls.ImageUpload.NotAnImageFile'));
             return false;
         }
         if (opt.minSize > 0 && file.Size < opt.minSize) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooSmall'),
+            notifyError(stringFormat(localText('Controls.ImageUpload.UploadFileTooSmall'),
                 fileSizeDisplay(opt.minSize)));
             return false;
         }
         if (opt.maxSize > 0 && file.Size > opt.maxSize) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.UploadFileTooBig'),
+            notifyError(stringFormat(localText('Controls.ImageUpload.UploadFileTooBig'),
                 fileSizeDisplay(opt.maxSize)));
             return false;
         }
@@ -134,19 +81,19 @@ export namespace UploadHelper {
             return true;
         }
         if (opt.minWidth > 0 && file.Width < opt.minWidth) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
+            notifyError(stringFormat(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
             return false;
         }
         if (opt.maxWidth > 0 && file.Width > opt.maxWidth) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
+            notifyError(stringFormat(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
             return false;
         }
         if (opt.minHeight > 0 && file.Height < opt.minHeight) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
+            notifyError(stringFormat(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
             return false;
         }
         if (opt.maxHeight > 0 && file.Height > opt.maxHeight) {
-            alertDialog(stringFormat(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
+            notifyError(stringFormat(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
             return false;
         }
         return true;
