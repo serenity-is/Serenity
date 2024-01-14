@@ -78,7 +78,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
                 (checks[0] as HTMLInputElement).checked = false;
             }
             if (value) {
-                checks = inputs.filter(x => x.matches('[value=' + value + ']'));
+                checks = inputs.filter(x => (x as HTMLInputElement).value === value);
                 if (checks.length > 0) {
                     (checks[0] as HTMLInputElement).checked = true;
                 }
