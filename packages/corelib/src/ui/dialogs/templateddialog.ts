@@ -1,4 +1,4 @@
-﻿import { Config, Dialog, DialogButton, DialogOptions, Fluent, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
+import { Config, Dialog, DialogButton, DialogOptions, Fluent, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../types/attributes";
@@ -194,14 +194,54 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected initTabs(): void {
-        var tabsDiv = this.byId('Tabs');
+        var tabsDiv = this.findById('Tabs');
         if (!tabsDiv)
             return;
         let $ = getjQuery();
-        if (!$?.fn?.tabs)
-            return;
-        this.tabs = $(tabsDiv).tabs?.({});
-        (this.tabs as any)?.on('tabsactivate', () => this.arrange());
+        if ($?.fn?.tabs) {
+            this.tabs = $(tabsDiv).tabs?.({});
+            (this.tabs as any)?.on('tabsactivate', () => this.arrange());
+        }
+        else {
+            // emulate UI tabs with bootstrap
+            let ul = tabsDiv.querySelector(":scope > ul");
+            if (!ul.classList.contains("nav-tabs")) {
+                ul.classList.add("nav", "nav-tabs");
+
+                let activeLink: HTMLLinkElement;
+
+                ul.querySelectorAll(":scope > li").forEach(li => {
+                    li.classList.add("nav-item");
+                    let a = li.querySelector(":scope > a") as HTMLLinkElement;
+                    if (a) {
+                        a.classList.add("nav-link");
+                        a.dataset.bsToggle = "tab";
+                        a.setAttribute("role", "tab");
+                        if (a.classList.contains("ui-tabs-active")) {
+                            a.classList.add("active");
+                            a.classList.remove("ui-tabs-active");
+                            activeLink = a;
+                        }
+                    }
+                });
+
+                if (!activeLink) {
+                    activeLink = ul.querySelector(":scope > li > a");
+                    if (activeLink) {
+                        activeLink.classList.add("active");
+                    }
+                }
+
+                let container = Fluent("div").addClass("tab-content").appendTo(tabsDiv);
+                tabsDiv.querySelectorAll(":scope>.tab-pane").forEach(pane => {
+                    pane.classList.add("pt-3");
+                    container.append(pane);
+                    if (activeLink && activeLink.getAttribute("href") === "#" + pane.id) {
+                        pane.classList.add("show", "active");
+                    }
+                });
+            }
+        }
     }
 
     protected handleResponsive(): void {
