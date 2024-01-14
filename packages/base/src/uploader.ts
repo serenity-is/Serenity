@@ -233,6 +233,16 @@ export class Uploader {
                 this.opt.changeCallback(e);
             }
         });
+
+        node.addEventListener("paste", (e) => {
+            if (e.clipboardData.items?.[0]?.webkitGetAsEntry()) {
+                this.entriesApi(e, e.clipboardData.items);
+            } else if (e.clipboardData.files) {
+                this.arrayApi(e, e.clipboardData.files);
+            } else {
+                this.opt.changeCallback(e);
+            }
+        });
     }
 
     private async arrayApi(e: Event, fileList: FileList): Promise<void> {
@@ -305,7 +315,7 @@ export class Uploader {
                 await new Promise(async (resolve) => {
                     if (entry.isFile) {
                         (entry as FileSystemFileEntry).file(async (file) => {
-                            if (!skipRest && predicate(file.type))
+                            if (!skipRest() && predicate(file.type))
                                 await this.addToBatch(file, file.name);
                             resolve(void 0);
                         }, resolve.bind(void 0));
