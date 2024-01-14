@@ -7,6 +7,7 @@ import { WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
+@Decorators.panel(false)
 export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     protected entity: TItem;
     protected entityId: any;

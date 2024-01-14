@@ -15,6 +15,7 @@ import { TemplatedDialog } from "./templateddialog";
 import { DataChangeInfo } from "../../types";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
+@Decorators.panel(true)
 export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
 
     protected entity: TItem;
