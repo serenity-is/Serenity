@@ -1,11 +1,9 @@
-﻿import { Culture, DialogButton, DialogTexts, Fluent, faIcon, localText } from "@serenity-is/base";
+﻿import { Culture, Dialog, DialogButton, DialogTexts, Fluent, faIcon, localText } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../types/decorators";
 import { Authorization, Router, centerDialog } from "../../q";
-import { QuickSearchInput } from "../datagrid/quicksearchinput";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { ToolButton } from "../widgets/toolbar";
-import { WidgetProps } from "../widgets/widget";
 import { IDataGrid } from "./idatagrid";
 
 @Decorators.registerClass('Serenity.ColumnPickerDialog')
@@ -22,28 +20,8 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     public defaultColumns: string[];
     public done: () => void;
 
-    constructor(props: WidgetProps<P>) {
-        super(props);
-
-    }
-
     protected renderContents() {
         this.dialogTitle = localText("Controls.ColumnPickerDialog.Title");
-
-        var quickSearchInput = Fluent("input")
-            .attr("type", "text")
-            .attr("disabled", true);
-
-        new QuickSearchInput({
-            element: quickSearchInput,
-            onSearch: (fld, txt, done) => {
-                txt = Select2.util.stripDiacritics((txt ?? '').trim().toLowerCase());
-                this.domNode.querySelectorAll('li').forEach(e => {
-                    Fluent(e).toggle(!txt || Select2.util.stripDiacritics((e.textContent ?? '').toLowerCase()).indexOf(txt) >= 0);
-                });
-                done && done(true);
-            }
-        });
 
         var visibles = Fluent("div")
             .addClass("column-list visible-list bg-success")
@@ -61,15 +39,10 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                 .append(localText(localText("Controls.ColumnPickerDialog.HiddenColumns"))))
             .append(this.ulHidden = Fluent("ul"))
 
-        var content = Fluent("div")
-            .addClass("search")
-            .append(quickSearchInput)
-            .append(Fluent("div")
-                .addClass("columns-container")
-                .append(visibles)
-                .append(hiddens));
-
-        return content;
+        return Fluent("div")
+            .addClass("columns-container")
+            .append(visibles)
+            .append(hiddens);
     }
 
     public static createToolButton(grid: IDataGrid): ToolButton {
@@ -112,7 +85,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         return [
             {
                 text: localText("Controls.ColumnPickerDialog.RestoreDefaults"),
-                cssClass: "restore-defaults",
+                cssClass: "btn btn-secondary restore-defaults",
                 click: () => {
                     let liByKey: { [key: string]: HTMLElement } = {};
                     this.ulVisible.children().concat(...this.ulHidden.children())
@@ -301,13 +274,13 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     }
 
     protected onDialogOpen(): void {
+        this.setupColumns();
+
         super.onDialogOpen();
-        this.domNode.querySelectorAll("input").forEach(x => x.removeAttribute("disabled"));
-        var restoreButton = this.domNode.closest('.ui-dialog, .s-Panel, .modal')?.querySelector(".ui-dialog-buttonpane button.restore-defaults");
+
+        var restoreButton = Dialog.getInstance(this.domNode).footer()?.querySelector(".restore-defaults");
         if (restoreButton)
             (restoreButton.nextElementSibling as HTMLElement)?.focus?.();
 
-        this.setupColumns();
-        centerDialog(this.domNode);
     }
 }
