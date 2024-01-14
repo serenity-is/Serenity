@@ -123,16 +123,16 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
                 if (!fetchResponse.ok) {
                     await handleFetchError(fetchResponse, options);
-                    return Promise.reject(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}!`);
+                    return Promise.reject({ description: `HTTP ${fetchResponse.status}: ${fetchResponse.statusText}!`, fetchResponse });
                 }
 
                 let response = await fetchResponse.json() as TResponse;
                 if (!response)
-                    return Promise.reject(`Empty response received!`);
+                    return Promise.reject({ description: `Empty response received!`, fetchResponse });
 
                 if (response.Error) {
                     handleError(response ?? {}, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
-                    return Promise.reject(`Error: ${response?.Error?.Code} ${response?.Error.Message} ${response?.Error?.Arguments}!`);
+                    return Promise.reject({ description: response?.Error.Message ?? response.Error.Code, response, fetchResponse });
                 }
 
                 options.onSuccess?.(response);
@@ -154,64 +154,68 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
     if (options?.async ?? true)
         return serviceFetch(options);
 
-    let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(options.method, url, false);
-
-    if (options.cache == "no-store")
-        options.headers["Cache-Control"] ??= "no-cache, no-store, max-age=0";
-    else if (options.cache === "no-cache")
-        options.headers["Cache-Control"] ??= "no-cache";
-
-    for (var x in options.headers) {
-        xhr.setRequestHeader(x, options.headers[x]);
-    }
-
-    if (isSameOrigin(url)) {
-        var token = getCookie('CSRF-TOKEN');
-        if (token)
-            xhr.setRequestHeader('X-CSRF-TOKEN', token);
-    }
-
-    requestStarting();
-    try {
-        if (options.signal) {
-            options.signal.addEventListener("abort", () => {
-                xhr.abort();
-            }, { once: true });
-        }
-
-        xhr.send(JSON.stringify(options.request));
+    return new Promise((resolve, reject) => {
         try {
-            if (xhr.status !== 200) {
-                handleXHRError(xhr, options);
-                return Promise.reject(`HTTP ${xhr.status}: ${xhr.statusText}!`);
+            let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open(options.method, url, false);
+
+            if (options.cache == "no-store")
+                options.headers["Cache-Control"] ??= "no-cache, no-store, max-age=0";
+            else if (options.cache === "no-cache")
+                options.headers["Cache-Control"] ??= "no-cache";
+
+            for (var x in options.headers) {
+                xhr.setRequestHeader(x, options.headers[x]);
             }
 
-            let response = JSON.parse(xhr.responseText) as TResponse;
-            if (!response)
-                return Promise.reject(`Empty response received!`);
-
-            if (response.Error) {
-                handleError(response, { status: xhr.status, statusText: xhr.statusText }, options);
-                return Promise.reject(`Error: ${response?.Error?.Code} ${response?.Error.Message} ${response?.Error?.Arguments}!`);
+            if (isSameOrigin(url)) {
+                var token = getCookie('CSRF-TOKEN');
+                if (token)
+                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
             }
 
-            options.onSuccess?.(response);
-            return Promise.resolve(response);
+            requestStarting();
+            try {
+                if (options.signal) {
+                    options.signal.addEventListener("abort", () => {
+                        xhr.abort();
+                    }, { once: true });
+                }
+
+                xhr.send(JSON.stringify(options.request));
+                try {
+                    if (xhr.status !== 200) {
+                        handleXHRError(xhr, options);
+                        return reject({ xhr, description: `HTTP ${xhr.status}: ${xhr.statusText}!` });
+                    }
+
+                    let response = JSON.parse(xhr.responseText) as TResponse;
+                    if (!response)
+                        return reject({ xhr, description: `Empty response received!` });
+
+                    if (response.Error) {
+                        handleError(response, { status: xhr.status, statusText: xhr.statusText }, options);
+                        return reject({ xhr, description: response.Error.Message ?? response.Error.Code, response });
+                    }
+
+                    options.onSuccess?.(response);
+                    return resolve(response);
+                }
+                finally {
+                    options.blockUI && blockUndo();
+                    options.onCleanup && options.onCleanup();
+                }
+            }
+            finally {
+                requestFinished();
+            }
         }
-        finally {
-            options.blockUI && blockUndo();
-            options.onCleanup && options.onCleanup();
+        catch (exception) {
+            reject({ description: exception?.toString(), exception });
         }
-    }
-    catch (e) {
-        return Promise.reject(e);
-    }
-    finally {
-        requestFinished();
-    }
+    });
 }
 
 export function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any,
