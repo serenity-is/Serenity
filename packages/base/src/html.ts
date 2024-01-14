@@ -94,6 +94,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     html(value: string): this;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    [Symbol.iterator]: TElement[];
     readonly [n: number]: TElement;
     readonly length: number;
     off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
@@ -389,6 +390,7 @@ Fluent.prototype.toggleClass = function (this: FluentThis, value: string | boole
 
 Object.defineProperty(Fluent.prototype, "length", { get: function () { return this.el ? 1 : 0 } });
 Object.defineProperty(Fluent.prototype, 0, { get: function () { return this.el; } });
+Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { return (this.el ? [this.el] : [])[Symbol.iterator]; } });
 
 Fluent.off = EventHandler.off;
 Fluent.on = EventHandler.on;

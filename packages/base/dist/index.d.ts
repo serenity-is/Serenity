@@ -971,6 +971,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     html(value: string): this;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    [Symbol.iterator]: TElement[];
     readonly [n: number]: TElement;
     readonly length: number;
     off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
