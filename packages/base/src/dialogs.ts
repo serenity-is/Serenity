@@ -494,8 +494,7 @@ function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     let button = document.createElement("button");
     button.classList.add("btn");
-    if (x.cssClass)
-        addClass(button, x.cssClass);
+    addClass(button, x.cssClass ?? "btn-secondary");
     if (x.hint)
         button.setAttribute("title", x.hint);
     button.innerHTML = html;
