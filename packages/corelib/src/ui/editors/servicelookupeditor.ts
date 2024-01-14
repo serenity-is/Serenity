@@ -161,7 +161,25 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return true;
     }
 
+    protected canSearch(byId: boolean) {
+        if (!byId && this.get_cascadeField()) {
+            var val = this.get_cascadeValue();
+            if (val == null || val === '')
+                return false;
+        }
+
+        return true;
+    }
+
     protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
+        if (!this.canSearch(query.idList != null)) {
+            results({
+                items: [],
+                more: false
+            });
+            return Promise.resolve();
+        }
+
         var opt = this.getServiceCallOptions(query, results);
         return serviceCall(opt) as Select2SearchPromise;
     }
