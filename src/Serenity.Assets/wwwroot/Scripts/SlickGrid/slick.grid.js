@@ -859,7 +859,7 @@ Slick._ = (() => {
   }
 
   // src/grid/grid.ts
-  var Grid = class {
+  var Grid = class _Grid {
     constructor(container, data, columns, options) {
       this._activeCellNode = null;
       this._cellCssClasses = {};
@@ -1546,6 +1546,7 @@ Slick._ = (() => {
           name.textContent = (_b = m.name) != null ? _b : "";
         var header = H("div", {
           class: "slick-header-column" + (this._options.useLegacyUI ? " ui-state-default " : ""),
+          ["data-id"]: m.id,
           id: "" + this._uid + m.id,
           title: m.toolTip || "",
           style: "width: " + (m.width - this._headerColumnWidthDiff) + "px"
@@ -1651,86 +1652,76 @@ Slick._ = (() => {
           el.addEventListener("click", handler);
       });
     }
+    static offset(el) {
+      if (!el || !el.getBoundingClientRect)
+        return;
+      const box = el.getBoundingClientRect();
+      const docElem = document.documentElement;
+      return {
+        top: box.top + window.scrollY - docElem.clientTop,
+        left: box.left + window.scrollX - docElem.clientLeft
+      };
+    }
     setupColumnReorder() {
       var _a;
-      const jQuerySortable = this._jQuery && ((_a = this._jQuery.fn) == null ? void 0 : _a.sortable);
-      if (jQuerySortable)
-        this._jQuery(this._layout.getHeaderCols()).filter(":ui-sortable").sortable("destroy");
-      var columnScrollTimer = null;
-      var scrollColumnsRight = () => {
-        this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft + 10;
-      };
-      var scrollColumnsLeft = () => {
-        this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft - 10;
-      };
-      var canDragScroll;
-      var hasGrouping = this._options.groupingPanel;
-      jQuerySortable && this._jQuery([this._layout.getHeaderCols()]).sortable({
-        containment: hasGrouping ? void 0 : "parent",
-        distance: 3,
-        axis: hasGrouping ? void 0 : "x",
-        cursor: "default",
-        tolerance: "intersection",
-        helper: "clone",
-        placeholder: "slick-sortable-placeholder" + (this._options.useLegacyUI ? " ui-state-default" : "") + " slick-header-column",
-        forcePlaceholderSize: hasGrouping ? true : void 0,
-        appendTo: hasGrouping ? "body" : void 0,
-        start: (_, ui) => {
-          ui.placeholder.outerHeight(ui.helper.outerHeight());
-          ui.placeholder.outerWidth(ui.helper.outerWidth());
-          canDragScroll = !this.hasFrozenColumns() || ui.placeholder.offset()[this._options.rtl ? "right" : "left"] + Math.round(ui.placeholder.width()) > this._jQuery(this._layout.getScrollContainerX()).offset()[this._options.rtl ? "right" : "left"];
-          this._jQuery(ui.helper).addClass("slick-header-column-active");
-        },
-        beforeStop: (_, ui) => {
-          this._jQuery(ui.helper).removeClass("slick-header-column-active");
-          if (hasGrouping) {
-            var headerDraggableGroupBy = this._jQuery(this.getGroupingPanel());
-            var hasDroppedColumn = headerDraggableGroupBy.find(".slick-dropped-grouping").length;
-            if (hasDroppedColumn > 0) {
-              headerDraggableGroupBy.find(".slick-dropped-placeholder").hide();
-              headerDraggableGroupBy.find(".slick-dropped-grouping").show();
-            }
-          }
-        },
-        sort: (e) => {
-          if (canDragScroll && e.originalEvent.pageX > this._container.clientWidth) {
+      if (typeof Sortable === "undefined")
+        return;
+      (_a = this.sortableColInstances) == null ? void 0 : _a.forEach((x) => x.destroy());
+      let columnScrollTimer = null;
+      const scrollColumnsLeft = () => this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft + 10;
+      const scrollColumnsRight = () => this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft - 10;
+      let canDragScroll;
+      const sortableOptions = {
+        animation: 50,
+        direction: "horizontal",
+        chosenClass: "slick-header-column-active",
+        ghostClass: "slick-sortable-placeholder",
+        draggable: ".slick-header-column",
+        dragoverBubble: false,
+        revertClone: true,
+        scroll: !this.hasFrozenColumns(),
+        // enable auto-scroll
+        onStart: (e) => {
+          canDragScroll = !this.hasFrozenColumns() || _Grid.offset(e.item).left > _Grid.offset(this._layout.getScrollContainerX()).left;
+          if (canDragScroll && e.originalEvent && e.originalEvent.pageX > this._container.clientWidth) {
             if (!columnScrollTimer) {
-              columnScrollTimer = setInterval(
-                scrollColumnsRight,
-                100
-              );
+              columnScrollTimer = setInterval(scrollColumnsRight, 100);
             }
-          } else if (canDragScroll && e.originalEvent.pageX < this._jQuery(this._layout.getScrollContainerX()).offset().left) {
+          } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < _Grid.offset(this._layout.getScrollContainerX()).left) {
             if (!columnScrollTimer) {
-              columnScrollTimer = setInterval(
-                scrollColumnsLeft,
-                100
-              );
+              columnScrollTimer = setInterval(scrollColumnsLeft, 100);
             }
           } else {
             clearInterval(columnScrollTimer);
             columnScrollTimer = null;
           }
         },
-        stop: (e) => {
-          var cancel = false;
+        onEnd: (e) => {
+          var _a2;
+          const cancel = false;
           clearInterval(columnScrollTimer);
           columnScrollTimer = null;
-          if (cancel || !this.getEditorLock().commitCurrentEdit()) {
-            this._jQuery(e.target).sortable("cancel");
+          if (cancel || !((_a2 = this.getEditorLock()) == null ? void 0 : _a2.commitCurrentEdit())) {
             return;
           }
           var reorderedCols;
-          this._layout.getHeaderCols().forEach((el) => reorderedCols = sortToDesiredOrderAndKeepRest(
-            this._initCols,
-            this._jQuery(el).sortable("toArray").map((x) => x.substring(this._uid.length))
-          ));
+          this._layout.getHeaderCols().forEach((el, i) => {
+            var _a3, _b, _c;
+            return reorderedCols = sortToDesiredOrderAndKeepRest(
+              this._initCols,
+              (_c = (_b = (_a3 = this.sortableColInstances[i]) == null ? void 0 : _a3.toArray) == null ? void 0 : _b.call(_a3)) != null ? _c : []
+            );
+          });
           this.setColumns(reorderedCols);
           this.trigger(this.onColumnsReordered, {});
           e.stopPropagation();
           this.setupColumnResize();
+          if (this._activeCellNode) {
+            this.setFocus();
+          }
         }
-      });
+      };
+      this.sortableColInstances = this._layout.getHeaderCols().map((x) => Sortable.create(x, sortableOptions));
     }
     setupColumnResize() {
       var minPageX, pageX, maxPageX, cols = this._cols;
@@ -2976,8 +2967,9 @@ Slick._ = (() => {
       return this._options.groupTotalsFormatter ? this._options.groupTotalsFormatter(p1, p2, grid != null ? grid : this) : "";
     }
     handleMouseWheel(e, delta, deltaX, deltaY) {
-      deltaX = (typeof deltaX == "undefined" ? e.originalEvent.deltaX : deltaX) || 0;
-      deltaY = (typeof deltaY == "undefined" ? e.originalEvent.deltaY : deltaY) || 0;
+      var _a, _b;
+      deltaX = (typeof deltaX == "undefined" ? (_a = e.originalEvent) == null ? void 0 : _a.deltaX : deltaX) || 0;
+      deltaY = (typeof deltaY == "undefined" ? (_b = e.originalEvent) == null ? void 0 : _b.deltaY : deltaY) || 0;
       this._scrollTop = Math.max(0, this._layout.getScrollContainerY().scrollTop - deltaY * this._options.rowHeight);
       this._scrollLeft = this._layout.getScrollContainerX().scrollLeft + deltaX * 10;
       this.handleScroll(true);
