@@ -70,7 +70,7 @@ export interface DialogOptions {
     /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
     scrollable?: boolean;
     /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
-    size?: "sm" | "lg" | "xl";
+    size?: "sm" | "md" | "lg" | "xl";
     /** Dialog title */
     title?: string;
     /** Only used for jQuery UI dialogs for backwards compatibility */
@@ -97,6 +97,8 @@ export class Dialog {
 
         this.el ??= document.createElement("div");
         opt = Object.assign({}, Dialog.defaults, omitUndefined(opt));
+        if (opt.closeOnEscape === void 0 && opt.closeButton)
+            opt.closeOnEscape = true;
         if (typeof opt.element === "function")
             opt.element(this.el);
 
@@ -136,7 +138,6 @@ export class Dialog {
         backdrop: false,
         centered: true,
         closeButton: true,
-        closeOnEscape: false,
         fade: false,
         fullScreen: "md-down",
         modal: true,
@@ -157,7 +158,7 @@ export class Dialog {
         modal: true,
         preferBSModal: true,
         preWrap: true,
-        size: "sm"
+        size: "md"
     }
 
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
