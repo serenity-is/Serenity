@@ -238,7 +238,8 @@ Fluent.prototype.insertAfter = function (this: FluentThis, referenceNode: HTMLEl
     let parent = referenceNode?.parentNode;
     if (!parent)
         this.el.remove();
-    parent.insertBefore(this.el, referenceNode.nextSibling);
+    else
+        parent.insertBefore(this.el, referenceNode.nextSibling);
     return this;
 }
 
@@ -249,7 +250,8 @@ Fluent.prototype.insertBefore = function (this: FluentThis, referenceNode: HTMLE
     let parent = referenceNode?.parentElement;
     if (!parent)
         this.el.remove();
-    parent.insertBefore(this.el, referenceNode);
+    else
+        parent.insertBefore(this.el, referenceNode);
     return this;
 }
 
