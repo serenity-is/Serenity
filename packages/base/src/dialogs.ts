@@ -389,6 +389,7 @@ export class Dialog {
 
         let panel = Fluent("div")
             .addClass("s-Panel")
+            .addClass(opt.dialogClass)
             .append(titlebar)
             .append(Fluent(this.el).addClass("panel-body"));
 
