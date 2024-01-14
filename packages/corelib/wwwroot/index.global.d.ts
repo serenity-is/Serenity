@@ -4000,7 +4000,6 @@ declare namespace Serenity {
         get_isValid(): boolean;
     }
 
-    const datePickerIconSvg: string;
     interface DateEditorOptions {
         yearRange?: string;
         minValue?: string;

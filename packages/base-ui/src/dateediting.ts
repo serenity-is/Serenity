@@ -1,7 +1,5 @@
 ﻿
-import { Culture, faIcon, formatDate, getjQuery, parseDate } from "@serenity-is/base";
-
-export let datePickerIconSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M14 2v-1h-3v1h-5v-1h-3v1h-3v15h17v-15h-3zM12 2h1v2h-1v-2zM4 2h1v2h-1v-2zM16 16h-15v-8.921h15v8.921zM1 6.079v-3.079h2v2h3v-2h5v2h3v-2h2v3.079h-15z" fill="currentColor"></path></svg>';
+import { Culture, formatDate, getjQuery, parseDate } from "@serenity-is/base";
 
 export function dateInputChangeHandler(e: Event) {
     if (Culture.dateOrder !== 'dmy')
@@ -185,14 +183,13 @@ export function flatPickrOptions(onChange: () => void) {
 }
 
 export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
-    var i = document.createElement("i");
-    i.classList.add("ui-datepicker-trigger");
-    i.innerHTML = datePickerIconSvg;
-    i.addEventListener("click", () => {
+    var button = document.createElement("button");
+    button.classList.add("ui-datepicker-trigger");
+    button.addEventListener("click", () => {
         if (!input.classList.contains('readonly'))
             (input as any)._flatpickr?.open?.();
     });
-    return i;
+    return button;
 }
 
 export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement) {
@@ -235,21 +232,14 @@ export function jQueryDatepickerInitialization(): boolean {
         dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
             (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                 'dd' + s + 'mm' + s + 'yy')),
-        buttonImage: 'data:image/svg+xml,' + encodeURIComponent(datePickerIconSvg),
-        buttonImageOnly: true,
+        buttonText: "",
+        buttonImage: null,
+        buttonImageOnly: false,
         showOn: 'both',
         showButtonPanel: true,
         changeMonth: true,
         changeYear: true
     });
-
-    if ($.ui && $.ui.version <= '1.12.1') {
-        $.datepicker.setDefaults({
-            buttonImage: null,
-            buttonImageOnly: false,
-            buttonText: `<i class="${faIcon("calendar")}"></i>`
-        });
-    }
 
     return true;
 }

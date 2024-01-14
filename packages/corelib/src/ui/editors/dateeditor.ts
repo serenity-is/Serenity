@@ -1,11 +1,9 @@
 ﻿import { Fluent, Invariant, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
-import { dateInputChangeHandler, dateInputKeyupHandler, datePickerIconSvg as datePickerIconSvg_, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
-import { Decorators } from "../../types/decorators";
+import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "@serenity-is/base-ui";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addValidationRule, today } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
-
-export const datePickerIconSvg = datePickerIconSvg_;
 
 export interface DateEditorOptions {
     yearRange?: string;
