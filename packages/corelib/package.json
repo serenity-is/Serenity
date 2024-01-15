@@ -10,7 +10,6 @@
   "devDependencies": {
     "@types/jest": "29.5.11",
     "@serenity-is/base": "workspace:*",
-    "@serenity-is/base-ui": "workspace:*",
     "tslib": "2.6.2"
   },
   "exports": {

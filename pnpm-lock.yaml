@@ -69,12 +69,6 @@ importers:
 
   packages/base: {}
 
-  packages/base-ui:
-    dependencies:
-      '@serenity-is/base':
-        specifier: workspace:*
-        version: link:../base
-
   packages/corelib:
     dependencies:
       '@serenity-is/sleekgrid':
@@ -84,9 +78,6 @@ importers:
       '@serenity-is/base':
         specifier: workspace:*
         version: link:../base
-      '@serenity-is/base-ui':
-        specifier: workspace:*
-        version: link:../base-ui
       '@types/jest':
         specifier: 29.5.11
         version: 29.5.11

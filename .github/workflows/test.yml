@@ -69,10 +69,6 @@ jobs:
       run: pnpm test
       working-directory: "packages/base"
 
-    - name: base-ui tests
-      run: pnpm test
-      working-directory: "packages/base-ui"
-
     - name: corelib tests
       run: pnpm test
       working-directory: "packages/corelib"

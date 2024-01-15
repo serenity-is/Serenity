@@ -1,1 +1,0 @@
-export * from "jsx-dom/min";
