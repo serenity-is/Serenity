@@ -2297,11 +2297,18 @@ declare namespace Serenity {
     function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
     function Fluent(element: EventTarget): Fluent<HTMLElement>;
     namespace Fluent {
-        var off: typeof EventHandler.off;
-        var on: typeof EventHandler.on;
-        var one: typeof EventHandler.on;
-        var trigger: typeof EventHandler.trigger;
         var ready: (callback: () => void) => void;
+    }
+    namespace Fluent {
+        const off: typeof EventHandler.off;
+        const on: typeof EventHandler.on;
+        const one: typeof EventHandler.on;
+        const trigger: typeof EventHandler.trigger;
+        function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+        function empty(el: Element): void;
+        function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+        function toggle(el: Element, flag?: boolean): void;
+        function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
     }
     function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 

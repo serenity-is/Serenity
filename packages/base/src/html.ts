@@ -135,6 +135,49 @@ export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | 
     return this;
 }
 
+
+const toggleClass_ = toggleClass;
+
+export namespace Fluent {
+    export const off = EventHandler.off;
+    export const on = EventHandler.on;
+    export const one = EventHandler.on;
+    export const trigger = EventHandler.trigger;    
+
+    export function addClass(el: Element, value: string | boolean | (string | boolean)[]) {
+        toggleClass_(el, toClassName(value), true);
+    }
+
+    export function empty(el: Element) {
+        if (!el)
+            return;
+    
+        if (el.hasChildNodes()) {
+            let $ = getjQuery();
+            if ($)
+                $(el).empty();
+            else {
+                cleanContents(el);
+                el.innerHTML = "";
+            }
+        }
+        else
+            el.innerHTML = "";
+    }
+    
+    export function removeClass(el: Element, value: string | boolean | (string | boolean)[]) {
+        toggleClass_(el, toClassName(value), false);
+    }
+
+    export function toggle(el: Element, flag?: boolean): void {
+        el && (el as any).style && ((el as any).style.display = flag ? "" : (flag != null && !flag) ? "none" : (el as any).style.display == "none" ? "" : "none");
+    }
+
+    export function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void {
+        el && toggleClass_(el, toClassName(value), add);
+    }
+}
+
 type FluentThis<TElement extends HTMLElement = HTMLElement> = Fluent<TElement> & {
     el?: HTMLElement;
 }
@@ -197,21 +240,7 @@ Fluent.prototype.closest = function (this: FluentThis, selector: string): Fluent
 }
 
 Fluent.prototype.empty = function (this: FluentThis<any>) {
-    if (!this.el)
-        return this;
-
-    if (this.el.hasChildNodes()) {
-        let $ = getjQuery();
-        if ($)
-            $(this.el).empty();
-        else {
-            cleanContents(this.el);
-            this.el.innerHTML = "";
-        }
-    }
-    else
-        this.el.innerHTML = "";
-
+    Fluent.empty(this.el);
     return this;
 }
 
@@ -309,7 +338,7 @@ Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fl
     return this;
 }
 
-function cleanContents(element: HTMLElement) {
+function cleanContents(element: Element) {
     element.querySelectorAll("*").forEach(node => triggerRemoveAndClearAll(node));
 }
 
@@ -368,14 +397,12 @@ Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
 }
 
 Fluent.prototype.toggle = function (this: FluentThis, flag?: boolean) {
-    if (!this.el)
-        return;
-    this.el.style.display = flag ? "" : (flag != null && !flag) ? "none" : (this.el.style.display == "none" ? "" : "none");
+    Fluent.toggle(this.el);
     return this;
 }
 
 Fluent.prototype.toggleClass = function (this: FluentThis, value: string | boolean | (string | boolean)[], add?: boolean) {
-    this.el && toggleClass(this.el, toClassName(value), add);
+    Fluent.toggleClass(this.el, value, add);
     return this;
 }
 
@@ -383,10 +410,6 @@ Object.defineProperty(Fluent.prototype, "length", { get: function () { return th
 Object.defineProperty(Fluent.prototype, 0, { get: function () { return this.el; } });
 Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { return (this.el ? [this.el] : [])[Symbol.iterator]; } });
 
-Fluent.off = EventHandler.off;
-Fluent.on = EventHandler.on;
-Fluent.one = EventHandler.on;
-Fluent.trigger = EventHandler.trigger;
 
 Fluent.ready = function (callback: () => void) {
     let $ = getjQuery();
