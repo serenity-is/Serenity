@@ -331,7 +331,7 @@ export class Dialog {
                 .attr("aria-label", DialogTexts.CloseButton);
 
             if (!bs5) {
-                closeButton.append(Fluent("span").attr("aria-hidden", "true").html("&times;"));
+                closeButton.append(Fluent("span").attr("aria-hidden", "true").text("\u2715"));
             }
 
             if (isBS3()) {

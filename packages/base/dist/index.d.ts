@@ -967,8 +967,6 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     findAll(selector: string): HTMLElement[];
     hasClass(klass: string): boolean;
     hide(): this;
-    html(): string;
-    html(value: string): this;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     [Symbol.iterator]: TElement[];

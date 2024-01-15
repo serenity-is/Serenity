@@ -9,7 +9,6 @@ export interface ToolButtonProps {
     cssClass?: string;
     icon?: IconClassName;
     onClick?: any;
-    htmlEncode?: any;
     hotkey?: string;
     hotkeyAllowDefault?: boolean;
     hotkeyContext?: any;
@@ -51,21 +50,16 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
         tb.onClick(e);
     });
 
-    var text = tb.title;
-    if (tb.htmlEncode !== false) {
-        text = htmlEncode(tb.title);
-    }
-
     if (tb.icon) {
         btn.addClass('icon-tool-button');
-        text = "<i class='" + htmlEncode(iconClassName(tb.icon)) + "'></i> " + text;
+        span.append(Fluent("i").addClass(iconClassName(tb.icon)));
+        tb.title && span.append(" ").append(tb.title);
     }
-    if (text == null || text.length === 0) {
+    else if (tb.title)
+        span.append(tb.title);
+
+    if (!tb.title)
         btn.addClass('no-text');
-    }
-    else {
-        span.html(text);
-    }
 
     if (tb.visible === false)
         btn.getNode().style.display = "none";

@@ -90,8 +90,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     findAll(selector: string): HTMLElement[];
     hasClass(klass: string): boolean;
     hide(): this;
-    html(): string;
-    html(value: string): this;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     [Symbol.iterator]: TElement[];
@@ -198,8 +196,23 @@ Fluent.prototype.closest = function (this: FluentThis, selector: string): Fluent
     return new (Fluent as any)(this.el?.closest<HTMLElement>(selector));
 }
 
-Fluent.prototype.empty = function (this: FluentThis<any>, html?: string) {
-    return this.html("");
+Fluent.prototype.empty = function (this: FluentThis<any>) {
+    if (!this.el)
+        return this;
+
+    if (this.el.hasChildNodes()) {
+        let $ = getjQuery();
+        if ($)
+            $(this.el).empty();
+        else {
+            cleanContents(this.el);
+            this.el.innerHTML = "";
+        }
+    }
+    else
+        this.el.innerHTML = "";
+
+    return this;
 }
 
 Fluent.prototype.getNode = function (this: FluentThis<any>) {
@@ -208,28 +221,6 @@ Fluent.prototype.getNode = function (this: FluentThis<any>) {
 
 Fluent.prototype.hasClass = function (this: FluentThis<any>, klass: string) {
     return !!this.el?.classList.contains(klass);
-}
-
-Fluent.prototype.html = function (this: FluentThis<any>, value?: string) {
-    if (value === void 0 && !arguments.length)
-        return this.el?.innerHTML;
-    
-    if (!this.el)
-        return this;
-
-    if (this.el.hasChildNodes()) {
-        let $ = getjQuery();
-        if ($)
-            $(this.el).html(value ?? "");
-        else {
-            cleanContents(this.el);
-            this.el.innerHTML = value ?? "";
-        }
-    }
-    else
-        this.el.innerHTML = value ?? "";
-
-    return this;
 }
 
 Fluent.prototype.insertAfter = function (this: FluentThis, referenceNode: HTMLElement | Fluent<HTMLElement>) {
