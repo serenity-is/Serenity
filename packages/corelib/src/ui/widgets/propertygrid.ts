@@ -1,7 +1,7 @@
-﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getTypeShortName, getjQuery, isBS3, isBS5Plus, isInputLike, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getTypeShortName, getjQuery, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { Authorization, extend } from "../../q";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
@@ -314,7 +314,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             element: el => {
                 Fluent(el).addClass("editor");
 
-                if (isInputLike(el))
+                if (Fluent.isInputLike(el))
                     el.setAttribute("name", item.name ?? "");
 
                 if (placeHolder)
@@ -469,7 +469,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     private static setMaxLength(widget: Widget<any>, maxLength: number) {
-        if (isInputLike(widget.domNode)) {
+        if (Fluent.isInputLike(widget.domNode)) {
             if (maxLength > 0) {
                 widget.domNode.setAttribute('maxlength', (maxLength ?? 0).toString());
             }

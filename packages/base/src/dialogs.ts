@@ -1,6 +1,6 @@
-﻿import { Config } from "./config";
-import { getjQuery, isBS3, isBS5Plus } from "./environment";
-import { Fluent, addClass, htmlEncode } from "./html";
+﻿import { getjQuery, isBS3, isBS5Plus } from "./environment";
+import { Fluent } from "./fluent";
+import { htmlEncode } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
 import { isArrayLike, omitUndefined } from "./system";
@@ -19,8 +19,6 @@ export interface DialogButton {
     click?: (e: MouseEvent) => void;
     /** CSS class for button */
     cssClass?: string;
-    /** HTML encode button text. Default is true. */
-    htmlEncode?: boolean;
     /** The code that is returned from message dialog function when this button is clicked.
      *  If this is set, and click event will not be defaultPrevented dialog will close.
      */
@@ -497,13 +495,13 @@ export function hasUIDialog() {
 })();
 
 function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
-    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let html = htmlEncode(x.text);
     let iconClass = iconClassName(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     let button = document.createElement("button");
     button.classList.add("btn");
-    addClass(button, x.cssClass ?? "btn-secondary");
+    Fluent.addClass(button, x.cssClass ?? "btn-secondary");
     if (x.hint)
         button.setAttribute("title", x.hint);
     button.innerHTML = html;
@@ -511,7 +509,7 @@ function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
 }
 
 function dialogButtonToUI(x: DialogButton): any {
-    let html = x.htmlEncode == null || x.htmlEncode ? htmlEncode(x.text) : x.text;
+    let html = htmlEncode(x.text);
     let iconClass = iconClassName(x.icon);
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
@@ -619,10 +617,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
     }
 
     Fluent.trigger(window, "resize");
-    document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => {
-        if (rl.offsetWidth > 0 || rl.offsetHeight > 0)
-            Fluent.trigger(rl, "layout");
-    });
+    document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => Fluent.isVisibleLike(rl) && Fluent.trigger(rl, "layout"));
     Fluent.trigger(panel, "panelclose", { bubbles: true });
 }
 
@@ -647,7 +642,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
             e.tagName === "SCRIPT" ||
             e.classList.contains("hidden") ||
             e.dataset.hiddenby ||
-            (container && e.parentElement !== container) && (e.offsetWidth <= 0 && e.offsetHeight <= 0))
+            (container && e.parentElement !== container) && !Fluent.isVisibleLike(e))
             return;
 
         e.dataset.hiddenby = panel.dataset.paneluniquename;

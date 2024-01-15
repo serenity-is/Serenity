@@ -163,7 +163,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected layout(): void {
-        if (!this.domNode || !this.domNode.offsetWidth || !this.domNode.offsetHeight || !this.slickContainer || !this.slickGrid)
+        if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this.slickGrid)
             return;
 
         var responsiveHeight = this.domNode.classList.contains('responsive-height');
@@ -424,7 +424,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             LazyLoadHelper.executeEverytimeWhenShown(this.domNode, function () {
                 self.refreshIfNeeded();
             }, false);
-            if (this.domNode.offsetWidth > 0 && this.domNode.offsetHeight > 0 && this.view) {
+            if (Fluent.isVisibleLike(this.domNode) && this.view) {
                 this.view.populate();
             }
         }
@@ -942,8 +942,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             this.internalRefresh();
             return;
         }
-        if (this.slickContainer.getNode().offsetWidth &&
-            this.slickContainer.getNode().offsetHeight) {
+        if (Fluent.isVisibleLike(this.slickContainer.getNode())) {
             this.slickContainer.data("needsRefresh", null);
             this.internalRefresh();
             return;

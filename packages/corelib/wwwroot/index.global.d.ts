@@ -1537,8 +1537,6 @@ declare namespace Serenity {
         click?: (e: MouseEvent) => void;
         /** CSS class for button */
         cssClass?: string;
-        /** HTML encode button text. Default is true. */
-        htmlEncode?: boolean;
         /** The code that is returned from message dialog function when this button is clicked.
          *  If this is set, and click event will not be defaultPrevented dialog will close.
          */
@@ -2037,6 +2035,91 @@ declare namespace Serenity {
     function setRegisteredScripts(scripts: any[]): void;
     function setScriptData(name: string, value: any): void;
 
+    namespace EventHandler {
+        function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+        function on(element: EventTarget, type: string, listener: EventListener): void;
+        function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+        function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+        function one(element: EventTarget, type: string, listener: EventListener): void;
+        function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+        function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+        function off(element: EventTarget, type: string, listener?: EventListener): void;
+        function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+        function trigger(element: EventTarget, type: string, args?: any): Event & {
+            isDefaultPrevented?(): boolean;
+        };
+    }
+
+    interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
+        addClass(value: string | boolean | (string | boolean)[]): this;
+        append(child: string | Node | Fluent<any>): this;
+        appendTo(parent: Element | Fluent<any>): this;
+        attr(name: string): string;
+        attr(name: string, value: string | number | boolean | null | undefined): this;
+        children(selector?: string): HTMLElement[];
+        closest(selector: string): Fluent<HTMLElement>;
+        data(name: string): string;
+        data(name: string, value: string): this;
+        getNode(): TElement;
+        empty(): this;
+        findFirst(selector: string): Fluent<HTMLElement>;
+        findAll(selector: string): HTMLElement[];
+        hasClass(klass: string): boolean;
+        hide(): this;
+        insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+        insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+        [Symbol.iterator]: TElement[];
+        readonly [n: number]: TElement;
+        readonly length: number;
+        off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+        off(type: string, listener: EventListener): this;
+        off(type: string, selector: string, delegationHandler: Function): this;
+        on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+        on(type: string, listener: EventListener): this;
+        on(type: string, selector: string, delegationHandler: Function): this;
+        one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+        one(type: string, listener: EventListener): this;
+        one(type: string, selector: string, delegationHandler: Function): this;
+        parent(): Fluent<HTMLElement>;
+        prepend(child: string | Node | Fluent<any>): this;
+        prependTo(parent: Element | Fluent<any>): this;
+        remove(): this;
+        removeAttr(name: string): this;
+        removeClass(value: string | boolean | (string | boolean)[]): this;
+        show(): this;
+        text(): string;
+        text(value: string): this;
+        toggle(flag?: boolean): this;
+        toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
+        trigger(type: string, args?: any): this;
+        val(value: string): this;
+        val(): string;
+    }
+    function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+    function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+    function Fluent(element: EventTarget): Fluent<HTMLElement>;
+    namespace Fluent {
+        var ready: (callback: () => void) => void;
+    }
+    namespace Fluent {
+        const off: typeof EventHandler.off;
+        const on: typeof EventHandler.on;
+        const one: typeof EventHandler.on;
+        const trigger: typeof EventHandler.trigger;
+        function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+        function empty(el: Element): void;
+        /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
+        function isVisibleLike(el: Element): boolean;
+        function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+        function toggle(el: Element, flag?: boolean): void;
+        function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
+        function toClassName(value: string | boolean | (string | boolean)[]): string;
+        function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+        const inputLikeSelector = "input,select,textarea,button";
+        function isInputTag(tag: string): boolean;
+    }
+    function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+
     /**
      * Interface for number formatting, similar to .NET's NumberFormatInfo
      */
@@ -2215,21 +2298,6 @@ declare namespace Serenity {
      */
     function splitDateString(s: string): string[];
 
-    namespace EventHandler {
-        function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-        function on(element: EventTarget, type: string, listener: EventListener): void;
-        function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-        function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-        function one(element: EventTarget, type: string, listener: EventListener): void;
-        function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-        function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-        function off(element: EventTarget, type: string, listener?: EventListener): void;
-        function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
-        function trigger(element: EventTarget, type: string, args?: any): Event & {
-            isDefaultPrevented?(): boolean;
-        };
-    }
-
     /**
      * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
      * @param s String (or number etc.) to be HTML encoded
@@ -2244,73 +2312,6 @@ declare namespace Serenity {
     function toggleClass(el: Element, cls: string, add?: boolean): void;
     function addClass(el: Element, cls: string): void;
     function removeClass(el: Element, cls: string): void;
-    function toClassName(value: string | boolean | (string | boolean)[]): string;
-    function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
-    const inputLikeSelector = "input,select,textarea,button";
-    function isInputTag(tag: string): boolean;
-    interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
-        addClass(value: string | boolean | (string | boolean)[]): this;
-        append(child: string | Node | Fluent<any>): this;
-        appendTo(parent: Element | Fluent<any>): this;
-        attr(name: string): string;
-        attr(name: string, value: string | number | boolean | null | undefined): this;
-        children(selector?: string): HTMLElement[];
-        closest(selector: string): Fluent<HTMLElement>;
-        data(name: string): string;
-        data(name: string, value: string): this;
-        getNode(): TElement;
-        empty(): this;
-        findFirst(selector: string): Fluent<HTMLElement>;
-        findAll(selector: string): HTMLElement[];
-        hasClass(klass: string): boolean;
-        hide(): this;
-        insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-        insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-        [Symbol.iterator]: TElement[];
-        readonly [n: number]: TElement;
-        readonly length: number;
-        off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-        off(type: string, listener: EventListener): this;
-        off(type: string, selector: string, delegationHandler: Function): this;
-        on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-        on(type: string, listener: EventListener): this;
-        on(type: string, selector: string, delegationHandler: Function): this;
-        one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-        one(type: string, listener: EventListener): this;
-        one(type: string, selector: string, delegationHandler: Function): this;
-        parent(): Fluent<HTMLElement>;
-        prepend(child: string | Node | Fluent<any>): this;
-        prependTo(parent: Element | Fluent<any>): this;
-        remove(): this;
-        removeAttr(name: string): this;
-        removeClass(value: string | boolean | (string | boolean)[]): this;
-        show(): this;
-        text(): string;
-        text(value: string): this;
-        toggle(flag?: boolean): this;
-        toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
-        trigger(type: string, args?: any): this;
-        val(value: string): this;
-        val(): string;
-    }
-    function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
-    function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
-    function Fluent(element: EventTarget): Fluent<HTMLElement>;
-    namespace Fluent {
-        var ready: (callback: () => void) => void;
-    }
-    namespace Fluent {
-        const off: typeof EventHandler.off;
-        const on: typeof EventHandler.on;
-        const one: typeof EventHandler.on;
-        const trigger: typeof EventHandler.trigger;
-        function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-        function empty(el: Element): void;
-        function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-        function toggle(el: Element, flag?: boolean): void;
-        function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
-    }
-    function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
     function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;

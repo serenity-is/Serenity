@@ -246,8 +246,6 @@ interface DialogButton {
     click?: (e: MouseEvent) => void;
     /** CSS class for button */
     cssClass?: string;
-    /** HTML encode button text. Default is true. */
-    htmlEncode?: boolean;
     /** The code that is returned from message dialog function when this button is clicked.
      *  If this is set, and click event will not be defaultPrevented dialog will close.
      */
@@ -746,6 +744,91 @@ declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TIt
 declare function setRegisteredScripts(scripts: any[]): void;
 declare function setScriptData(name: string, value: any): void;
 
+declare namespace EventHandler {
+    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function on(element: EventTarget, type: string, listener: EventListener): void;
+    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function one(element: EventTarget, type: string, listener: EventListener): void;
+    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function off(element: EventTarget, type: string, listener?: EventListener): void;
+    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    function trigger(element: EventTarget, type: string, args?: any): Event & {
+        isDefaultPrevented?(): boolean;
+    };
+}
+
+interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
+    addClass(value: string | boolean | (string | boolean)[]): this;
+    append(child: string | Node | Fluent<any>): this;
+    appendTo(parent: Element | Fluent<any>): this;
+    attr(name: string): string;
+    attr(name: string, value: string | number | boolean | null | undefined): this;
+    children(selector?: string): HTMLElement[];
+    closest(selector: string): Fluent<HTMLElement>;
+    data(name: string): string;
+    data(name: string, value: string): this;
+    getNode(): TElement;
+    empty(): this;
+    findFirst(selector: string): Fluent<HTMLElement>;
+    findAll(selector: string): HTMLElement[];
+    hasClass(klass: string): boolean;
+    hide(): this;
+    insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    [Symbol.iterator]: TElement[];
+    readonly [n: number]: TElement;
+    readonly length: number;
+    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    off(type: string, listener: EventListener): this;
+    off(type: string, selector: string, delegationHandler: Function): this;
+    on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    on(type: string, listener: EventListener): this;
+    on(type: string, selector: string, delegationHandler: Function): this;
+    one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    one(type: string, listener: EventListener): this;
+    one(type: string, selector: string, delegationHandler: Function): this;
+    parent(): Fluent<HTMLElement>;
+    prepend(child: string | Node | Fluent<any>): this;
+    prependTo(parent: Element | Fluent<any>): this;
+    remove(): this;
+    removeAttr(name: string): this;
+    removeClass(value: string | boolean | (string | boolean)[]): this;
+    show(): this;
+    text(): string;
+    text(value: string): this;
+    toggle(flag?: boolean): this;
+    toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
+    trigger(type: string, args?: any): this;
+    val(value: string): this;
+    val(): string;
+}
+declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
+declare namespace Fluent {
+    var ready: (callback: () => void) => void;
+}
+declare namespace Fluent {
+    const off: typeof EventHandler.off;
+    const on: typeof EventHandler.on;
+    const one: typeof EventHandler.on;
+    const trigger: typeof EventHandler.trigger;
+    function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+    function empty(el: Element): void;
+    /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
+    function isVisibleLike(el: Element): boolean;
+    function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+    function toggle(el: Element, flag?: boolean): void;
+    function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
+    function toClassName(value: string | boolean | (string | boolean)[]): string;
+    function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+    const inputLikeSelector = "input,select,textarea,button";
+    function isInputTag(tag: string): boolean;
+}
+declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+
 /**
  * Interface for number formatting, similar to .NET's NumberFormatInfo
  */
@@ -924,21 +1007,6 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
-declare namespace EventHandler {
-    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function on(element: EventTarget, type: string, listener: EventListener): void;
-    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function one(element: EventTarget, type: string, listener: EventListener): void;
-    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function off(element: EventTarget, type: string, listener?: EventListener): void;
-    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
-    function trigger(element: EventTarget, type: string, args?: any): Event & {
-        isDefaultPrevented?(): boolean;
-    };
-}
-
 /**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String (or number etc.) to be HTML encoded
@@ -953,73 +1021,6 @@ declare function htmlEncode(s: any): string;
 declare function toggleClass(el: Element, cls: string, add?: boolean): void;
 declare function addClass(el: Element, cls: string): void;
 declare function removeClass(el: Element, cls: string): void;
-declare function toClassName(value: string | boolean | (string | boolean)[]): string;
-declare function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
-declare const inputLikeSelector = "input,select,textarea,button";
-declare function isInputTag(tag: string): boolean;
-interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
-    addClass(value: string | boolean | (string | boolean)[]): this;
-    append(child: string | Node | Fluent<any>): this;
-    appendTo(parent: Element | Fluent<any>): this;
-    attr(name: string): string;
-    attr(name: string, value: string | number | boolean | null | undefined): this;
-    children(selector?: string): HTMLElement[];
-    closest(selector: string): Fluent<HTMLElement>;
-    data(name: string): string;
-    data(name: string, value: string): this;
-    getNode(): TElement;
-    empty(): this;
-    findFirst(selector: string): Fluent<HTMLElement>;
-    findAll(selector: string): HTMLElement[];
-    hasClass(klass: string): boolean;
-    hide(): this;
-    insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-    insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-    [Symbol.iterator]: TElement[];
-    readonly [n: number]: TElement;
-    readonly length: number;
-    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    off(type: string, listener: EventListener): this;
-    off(type: string, selector: string, delegationHandler: Function): this;
-    on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    on(type: string, listener: EventListener): this;
-    on(type: string, selector: string, delegationHandler: Function): this;
-    one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    one(type: string, listener: EventListener): this;
-    one(type: string, selector: string, delegationHandler: Function): this;
-    parent(): Fluent<HTMLElement>;
-    prepend(child: string | Node | Fluent<any>): this;
-    prependTo(parent: Element | Fluent<any>): this;
-    remove(): this;
-    removeAttr(name: string): this;
-    removeClass(value: string | boolean | (string | boolean)[]): this;
-    show(): this;
-    text(): string;
-    text(value: string): this;
-    toggle(flag?: boolean): this;
-    toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
-    trigger(type: string, args?: any): this;
-    val(value: string): this;
-    val(): string;
-}
-declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
-declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
-declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
-declare namespace Fluent {
-    var ready: (callback: () => void) => void;
-}
-declare namespace Fluent {
-    const off: typeof EventHandler.off;
-    const on: typeof EventHandler.on;
-    const one: typeof EventHandler.on;
-    const trigger: typeof EventHandler.trigger;
-    function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-    function empty(el: Element): void;
-    function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-    function toggle(el: Element, flag?: boolean): void;
-    function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
-}
-declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
 declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 declare function localText(key: string, defaultText?: string): string;
@@ -4413,4 +4414,4 @@ declare class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements 
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, ValidationHelper, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, inputLikeSelector, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInputLike, isInputTag, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toClassName, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };
+export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, ValidationHelper, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };

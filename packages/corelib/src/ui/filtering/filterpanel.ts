@@ -433,8 +433,8 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     protected onRowOperatorChange(e: Event) {
         var row = (e.target as HTMLElement).closest('div.filter-line');
         this.rowOperatorChange(row as any);
-        var firstInput = row.querySelectorAll<HTMLElement>('div.v input, div.v textarea, div.v select').forEach(el => {
-            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+        row.querySelectorAll<HTMLElement>('div.v input, div.v textarea, div.v select').forEach(el => {
+            if (Fluent.isVisibleLike(el)) {
                 try { el.focus(); } catch { }
             }
             return false;

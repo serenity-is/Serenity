@@ -1,5 +1,5 @@
 import type { MessageDialogOptions } from "./dialogs";
-import { Fluent } from "./html";
+import { Fluent } from "./fluent";
 
 jest.mock("./localtext", () => ({
     ...jest.requireActual("./localtext"),

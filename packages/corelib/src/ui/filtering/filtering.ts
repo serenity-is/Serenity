@@ -1,6 +1,6 @@
-﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem, Fluent, inputLikeSelector, getjQuery } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, getjQuery, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { DateEditor } from "../editors/dateeditor";
@@ -215,7 +215,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     loadState(state: any) {
-        var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector);
+        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
         input && (input.value = state);
     }
 
@@ -229,7 +229,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector);
+                var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
                 return input?.value;
             }
         }
@@ -248,7 +248,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     getEditorValue() {
-        var inputs = this.get_container().querySelectorAll<HTMLInputElement>(inputLikeSelector + ":not(.select2-focusser)");
+        var inputs = this.get_container().querySelectorAll<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser)");
         if (inputs.length !== 1) {
             throw new Exception(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
@@ -271,7 +271,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
     getEditorText(): string {
 
-        var input = this.get_container().querySelector<HTMLInputElement>(inputLikeSelector + ":not(.select2-focusser):not('.select2-input')");
+        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not('.select2-input')");
         if (!input) {
             return this.get_container().textContent?.trim();
         }

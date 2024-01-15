@@ -70,7 +70,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
                     var opt: any = {};
                     applyCssSizes(opt, this.getCssClass());
                     opt.resizable = this.getCustomAttribute(ResizableAttribute)?.value;
-                    return opt;                    
+                    return opt;
                 }
             },
             title: this.dialogTitle ?? this.getInitialDialogTitle() ?? ''
@@ -158,8 +158,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     public arrange(): void {
         this.domNode.querySelectorAll(".require-layout").forEach((el: HTMLElement) => {
-            if (el.offsetWidth > 0 && el.offsetHeight > 0)
-                Fluent.trigger(el, 'layout');
+            Fluent.isVisibleLike(el) && Fluent.trigger(el, 'layout');
         });
     }
 

@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, isInputLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "@serenity-is/base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
@@ -76,7 +76,7 @@ export namespace EditorUtils {
             return;
         }
 
-        if (isInputLike(editor.domNode)) {
+        if (Fluent.isInputLike(editor.domNode)) {
             target[item.name] = editor.domNode.value;
             return;
         }
@@ -140,7 +140,7 @@ export namespace EditorUtils {
             return;
         }
 
-        if (isInputLike(editor.domNode)) {
+        if (Fluent.isInputLike(editor.domNode)) {
             var v = source[item.name];
             editor.domNode.value = v ?? '';
             return;
@@ -180,7 +180,7 @@ export namespace EditorUtils {
         if (readOnly != null) {
             readOnly.set_readOnly(isReadOnly);
         }
-        else if (isInputLike(widget.domNode)) {
+        else if (Fluent.isInputLike(widget.domNode)) {
             setReadonly(widget.domNode, isReadOnly);
         }
     }
@@ -190,7 +190,7 @@ export namespace EditorUtils {
         if (req != null) {
             req.set_required(isRequired);
         }
-        else if (isInputLike(widget.domNode)) {
+        else if (Fluent.isInputLike(widget.domNode)) {
             widget.domNode.classList.toggle('required', !!isRequired);
         }
         var gridField = widget.domNode.closest('.field');

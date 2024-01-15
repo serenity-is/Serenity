@@ -28,6 +28,7 @@ export * from "./dialogs";
 export * from "./environment";
 export * from "./errorhandling";
 export * from "./scriptdata";
+export * from "./fluent";
 export * from "./formatting";
 export * from "./html";
 export * from "./icons";

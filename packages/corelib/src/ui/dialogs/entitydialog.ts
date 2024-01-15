@@ -1,4 +1,4 @@
-﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, isInputLike, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { IEditDialog, IReadOnly } from "../../interfaces";
@@ -435,7 +435,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         this.loadById(entityId,
             response => window.setTimeout(() => this.dialogOpen(asPanel), 0),
             () => {
-                if (!(this.domNode.offsetWidth > 0 && this.domNode.offsetHeight > 0)) {
+                if (!Fluent.isVisibleLike(this.domNode)) {
                     this.domNode.remove();
                 }
             });
@@ -642,7 +642,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         var valueByName: Record<string, any> = {};
 
         this.localizationGrid.enumerateItems((item, widget) => {
-            if (item.name.indexOf('$') < 0 && isInputLike(widget.domNode)) {
+            if (item.name.indexOf('$') < 0 && Fluent.isInputLike(widget.domNode)) {
             valueByName[item.name] = this.byId(item.name).val();
                 Fluent(widget.domNode).val(valueByName[item.name]);
             }
@@ -650,7 +650,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         this.localizationGrid.enumerateItems((item1, widget1) => {
             var idx = item1.name.indexOf('$');
-            if (idx >= 0 && isInputLike(widget1.domNode)) {
+            if (idx >= 0 && Fluent.isInputLike(widget1.domNode)) {
                 var hint = valueByName[item1.name.substr(idx + 1)];
                 if (hint != null && hint.length > 0) {
                     Fluent(widget1.domNode).attr('title', hint).attr('placeholder', hint);

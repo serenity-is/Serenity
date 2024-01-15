@@ -244,8 +244,6 @@ interface DialogButton {
     click?: (e: MouseEvent) => void;
     /** CSS class for button */
     cssClass?: string;
-    /** HTML encode button text. Default is true. */
-    htmlEncode?: boolean;
     /** The code that is returned from message dialog function when this button is clicked.
      *  If this is set, and click event will not be defaultPrevented dialog will close.
      */
@@ -744,6 +742,91 @@ declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TIt
 declare function setRegisteredScripts(scripts: any[]): void;
 declare function setScriptData(name: string, value: any): void;
 
+declare namespace EventHandler {
+    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function on(element: EventTarget, type: string, listener: EventListener): void;
+    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function one(element: EventTarget, type: string, listener: EventListener): void;
+    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function off(element: EventTarget, type: string, listener?: EventListener): void;
+    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    function trigger(element: EventTarget, type: string, args?: any): Event & {
+        isDefaultPrevented?(): boolean;
+    };
+}
+
+interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
+    addClass(value: string | boolean | (string | boolean)[]): this;
+    append(child: string | Node | Fluent<any>): this;
+    appendTo(parent: Element | Fluent<any>): this;
+    attr(name: string): string;
+    attr(name: string, value: string | number | boolean | null | undefined): this;
+    children(selector?: string): HTMLElement[];
+    closest(selector: string): Fluent<HTMLElement>;
+    data(name: string): string;
+    data(name: string, value: string): this;
+    getNode(): TElement;
+    empty(): this;
+    findFirst(selector: string): Fluent<HTMLElement>;
+    findAll(selector: string): HTMLElement[];
+    hasClass(klass: string): boolean;
+    hide(): this;
+    insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+    [Symbol.iterator]: TElement[];
+    readonly [n: number]: TElement;
+    readonly length: number;
+    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    off(type: string, listener: EventListener): this;
+    off(type: string, selector: string, delegationHandler: Function): this;
+    on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    on(type: string, listener: EventListener): this;
+    on(type: string, selector: string, delegationHandler: Function): this;
+    one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    one(type: string, listener: EventListener): this;
+    one(type: string, selector: string, delegationHandler: Function): this;
+    parent(): Fluent<HTMLElement>;
+    prepend(child: string | Node | Fluent<any>): this;
+    prependTo(parent: Element | Fluent<any>): this;
+    remove(): this;
+    removeAttr(name: string): this;
+    removeClass(value: string | boolean | (string | boolean)[]): this;
+    show(): this;
+    text(): string;
+    text(value: string): this;
+    toggle(flag?: boolean): this;
+    toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
+    trigger(type: string, args?: any): this;
+    val(value: string): this;
+    val(): string;
+}
+declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
+declare namespace Fluent {
+    var ready: (callback: () => void) => void;
+}
+declare namespace Fluent {
+    const off: typeof EventHandler.off;
+    const on: typeof EventHandler.on;
+    const one: typeof EventHandler.on;
+    const trigger: typeof EventHandler.trigger;
+    function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+    function empty(el: Element): void;
+    /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
+    function isVisibleLike(el: Element): boolean;
+    function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
+    function toggle(el: Element, flag?: boolean): void;
+    function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
+    function toClassName(value: string | boolean | (string | boolean)[]): string;
+    function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+    const inputLikeSelector = "input,select,textarea,button";
+    function isInputTag(tag: string): boolean;
+}
+declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+
 /**
  * Interface for number formatting, similar to .NET's NumberFormatInfo
  */
@@ -922,21 +1005,6 @@ declare function parseDate(s: string, dateOrder?: string): Date;
  */
 declare function splitDateString(s: string): string[];
 
-declare namespace EventHandler {
-    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function on(element: EventTarget, type: string, listener: EventListener): void;
-    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function one(element: EventTarget, type: string, listener: EventListener): void;
-    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function off(element: EventTarget, type: string, listener?: EventListener): void;
-    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
-    function trigger(element: EventTarget, type: string, args?: any): Event & {
-        isDefaultPrevented?(): boolean;
-    };
-}
-
 /**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String (or number etc.) to be HTML encoded
@@ -951,73 +1019,6 @@ declare function htmlEncode(s: any): string;
 declare function toggleClass(el: Element, cls: string, add?: boolean): void;
 declare function addClass(el: Element, cls: string): void;
 declare function removeClass(el: Element, cls: string): void;
-declare function toClassName(value: string | boolean | (string | boolean)[]): string;
-declare function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
-declare const inputLikeSelector = "input,select,textarea,button";
-declare function isInputTag(tag: string): boolean;
-interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
-    addClass(value: string | boolean | (string | boolean)[]): this;
-    append(child: string | Node | Fluent<any>): this;
-    appendTo(parent: Element | Fluent<any>): this;
-    attr(name: string): string;
-    attr(name: string, value: string | number | boolean | null | undefined): this;
-    children(selector?: string): HTMLElement[];
-    closest(selector: string): Fluent<HTMLElement>;
-    data(name: string): string;
-    data(name: string, value: string): this;
-    getNode(): TElement;
-    empty(): this;
-    findFirst(selector: string): Fluent<HTMLElement>;
-    findAll(selector: string): HTMLElement[];
-    hasClass(klass: string): boolean;
-    hide(): this;
-    insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-    insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
-    [Symbol.iterator]: TElement[];
-    readonly [n: number]: TElement;
-    readonly length: number;
-    off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    off(type: string, listener: EventListener): this;
-    off(type: string, selector: string, delegationHandler: Function): this;
-    on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    on(type: string, listener: EventListener): this;
-    on(type: string, selector: string, delegationHandler: Function): this;
-    one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
-    one(type: string, listener: EventListener): this;
-    one(type: string, selector: string, delegationHandler: Function): this;
-    parent(): Fluent<HTMLElement>;
-    prepend(child: string | Node | Fluent<any>): this;
-    prependTo(parent: Element | Fluent<any>): this;
-    remove(): this;
-    removeAttr(name: string): this;
-    removeClass(value: string | boolean | (string | boolean)[]): this;
-    show(): this;
-    text(): string;
-    text(value: string): this;
-    toggle(flag?: boolean): this;
-    toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
-    trigger(type: string, args?: any): this;
-    val(value: string): this;
-    val(): string;
-}
-declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
-declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
-declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
-declare namespace Fluent {
-    var ready: (callback: () => void) => void;
-}
-declare namespace Fluent {
-    const off: typeof EventHandler.off;
-    const on: typeof EventHandler.on;
-    const one: typeof EventHandler.on;
-    const trigger: typeof EventHandler.trigger;
-    function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-    function empty(el: Element): void;
-    function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-    function toggle(el: Element, flag?: boolean): void;
-    function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
-}
-declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
 declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 declare function localText(key: string, defaultText?: string): string;
@@ -1275,4 +1276,4 @@ declare class Uploader {
     static errorHandler: (data: UploaderErrorData) => void;
 }
 
-export { type AnyIconClass, type ClassTypeInfo, ColumnSelection, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, type DialogOptions, DialogTexts, type DialogType, EditorAttribute, type EditorTypeInfo, Enum, ErrorHandling, Fluent, type FormatterTypeInfo, H, type IFrameDialogOptions, ISlickFormatter, type IconClassName, type InterfaceTypeInfo, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NoInfer, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, type RequestErrorInfo, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceOptions, type ServiceRequest, type ServiceResponse, type StringLiteral, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, Tooltip, type TooltipOptions, type Type, type UndeleteRequest, type UndeleteResponse, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, type UtilityColor, addClass, addCustomAttribute, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, classTypeInfo, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, editorTypeInfo, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getjQuery, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, inputLikeSelector, interfaceTypeInfo, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInputLike, isInputTag, isInstanceOfType, isPromiseLike, isSameOrigin, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookupAsync, removeClass, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, serviceCall, serviceRequest, setRegisteredScripts, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toClassName, toId, toggleClass, trunc, tryGetText, typeInfoProperty, warningDialog, yesDialogButton };
+export { type AnyIconClass, type ClassTypeInfo, ColumnSelection, Config, type ConfirmDialogOptions, Criteria, CriteriaBuilder, CriteriaOperator, Culture, type DateFormat, type DebouncedFunction, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, type DialogOptions, DialogTexts, type DialogType, EditorAttribute, type EditorTypeInfo, Enum, ErrorHandling, Fluent, type FormatterTypeInfo, H, type IFrameDialogOptions, ISlickFormatter, type IconClassName, type InterfaceTypeInfo, Invariant, type KnownIconClass, type ListRequest, type ListResponse, type Locale, Lookup, type LookupOptions, type MessageDialogOptions, type NoInfer, type NotifyMap, type NumberFormat, type PropertyItem, type PropertyItemsData, type RequestErrorInfo, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, type ServiceError, type ServiceOptions, type ServiceRequest, type ServiceResponse, type StringLiteral, SummaryType, type TextColor, type ToastContainerOptions, Toastr, type ToastrOptions, Tooltip, type TooltipOptions, type Type, type UndeleteRequest, type UndeleteResponse, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, type UtilityColor, addClass, addCustomAttribute, addLocalText, alertDialog, bgColor, blockUI, blockUndo, cancelDialogButton, classTypeInfo, compareStringFactory, confirmDialog, debounce, defaultNotifyOptions, editorTypeInfo, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, formatDate, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getFormScript, getGlobalObject, getInstanceType, getLookupAsync, getNested, getRemoteDataAsync, getScriptData, getScriptDataHash, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getjQuery, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, informationDialog, initFormType, interfaceTypeInfo, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEnum, isInstanceOfType, isPromiseLike, isSameOrigin, localText, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, parseCriteria, parseDate, parseDecimal, parseISODateTime, parseInteger, peekScriptData, positionToastContainer, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookupAsync, removeClass, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, serviceCall, serviceRequest, setRegisteredScripts, setScriptData, setTypeNameProp, splitDateString, stringFormat, stringFormatLocale, successDialog, textColor, toId, toggleClass, trunc, tryGetText, typeInfoProperty, warningDialog, yesDialogButton };
