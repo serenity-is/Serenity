@@ -14,8 +14,8 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     data(name: string, value: string): this;
     getNode(): TElement;
     empty(): this;
-    findFirst(selector: string): Fluent<HTMLElement>;
-    findAll(selector: string): HTMLElement[];
+    findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
+    findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     hasClass(klass: string): boolean;
     hide(): this;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
@@ -92,7 +92,7 @@ export namespace Fluent {
 
     /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
     export function isVisibleLike(el: Element) {
-        return !!(el && (el as any).offsetWidth || (el as any).offsetHeight || el.getClientRects().length);
+        return !!(el && ((el as any).offsetWidth || (el as any).offsetHeight || el.getClientRects().length));
     }
 
     export function removeClass(el: Element, value: string | boolean | (string | boolean)[]) {
@@ -350,7 +350,7 @@ Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
 }
 
 Fluent.prototype.toggle = function (this: FluentThis, flag?: boolean) {
-    Fluent.toggle(this.el);
+    Fluent.toggle(this.el, flag);
     return this;
 }
 
