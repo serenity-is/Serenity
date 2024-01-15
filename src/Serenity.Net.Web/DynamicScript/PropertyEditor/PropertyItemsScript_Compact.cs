@@ -272,7 +272,7 @@ public abstract partial class PropertyItemsScript
             }
             sb.Append(']');
         }
-        sb.Append("].forEach(d=>Serenity.ScriptData.set(d[0],{items:d[1],additionalItems:(d[2]||[])}))})();");
+        sb.Append("].forEach(d=>((typeof Serenity!=='undefined'&&Serenity.setScriptData)||(function(k,v){var s=Symbol.for('Serenity.scriptData');var g=globalThis[s];if(!g)g=globalThis[s]={};g[k]=v}))(d[0],{items:d[1],additionalItems:(d[2]||[])}))})();");
         return "(function(){var " + string.Join(",", strMap.OrderBy(x => x.Value.Length).ThenBy(x => x.Value, StringComparer.Ordinal)
                 .Select((x, i) => $"{((i % 30) == 1 ? "\n" : "")}{x.Value}={StringHelper.ToSingleQuoted(x.Key)}")) + ";\n" +
             sb.ToString();

@@ -4,7 +4,7 @@ import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { PropertyItemsData } from "./propertyitem";
 import { requestFinished, requestStarting, resolveUrl } from "./services";
-import { scriptDataHashSymbol, scriptDataItemSymbol } from "./symbols";
+import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
 /**
@@ -211,7 +211,7 @@ export function handleScriptDataError(name: string, status?: number, statusText?
 }
 
 export function peekScriptData(name: string): any {
-    return getGlobalObject()[scriptDataItemSymbol]?.[name];
+    return getGlobalObject()[scriptDataSymbol]?.[name];
 }
 
 /**
@@ -235,9 +235,9 @@ export function setRegisteredScripts(scripts: any[]) {
 }
 
 export function setScriptData(name: string, value: any) {
-    let scriptDataStore = getGlobalObject()[scriptDataItemSymbol];
+    let scriptDataStore = getGlobalObject()[scriptDataSymbol];
     if (!scriptDataStore)
-        getGlobalObject()[scriptDataItemSymbol] = scriptDataStore = {};
+        getGlobalObject()[scriptDataSymbol] = scriptDataStore = {};
     scriptDataStore[name] = value;
     typeof document !== "undefined" && document.dispatchEvent?.(new Event("scriptdatachange." + name));
 }

@@ -157,9 +157,9 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
         jw.WriteEndObject();
         jw.Flush();
 
-        return "(function(l){var s=Symbol.for('Serenity.localTextTable');var g=globalThis[s];if(!g)g=globalThis[s]={};" + 
+        return "((typeof Serenity!=='undefined'&&Serenity.addLocalText)||(function(l){var s=Symbol.for('Serenity.localTextTable');var g=globalThis[s];if(!g)g=globalThis[s]={};" + 
             "function a(t,p){p||='';for (var k of Object.keys(t)){var u=p+k,o=t[k];if(typeof o==='object'){a(o,u+'.')}else{g[u]=o}}}" + 
-            "a(l);})(" +  Encoding.UTF8.GetString(ms.ToArray()) + ");";
+            "a(l);}))(" +  Encoding.UTF8.GetString(ms.ToArray()) + ");";
     }
 
     /// <inheritdoc/>

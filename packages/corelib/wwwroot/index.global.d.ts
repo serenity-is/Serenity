@@ -4057,7 +4057,6 @@ declare namespace Serenity {
             allowInput: boolean;
             dateFormat: string;
             onChange: () => void;
-            trigger: boolean;
         };
         static flatPickrTrigger(input: HTMLInputElement): HTMLElement;
         static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;

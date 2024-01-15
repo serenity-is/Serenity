@@ -1,6 +1,6 @@
 import { Lookup } from "./lookup";
 import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData } from "./scriptdata";
-import { scriptDataHashSymbol, scriptDataItemSymbol } from "./symbols";
+import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
 jest.mock("./notify", () => ({
@@ -11,7 +11,7 @@ jest.mock("./notify", () => ({
 beforeEach(() => {
     jest.clearAllMocks();
     delete getGlobalObject()[scriptDataHashSymbol];
-    delete getGlobalObject()[scriptDataItemSymbol];
+    delete getGlobalObject()[scriptDataSymbol];
 });
 
 describe("getScriptDataHash", () => {
@@ -258,8 +258,8 @@ describe("fetchScriptData", () => {
 });
 
 describe("getScriptData", () => {
-    it("returns data from scriptDataItem if available and reload is not true", async () => {
-        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "357" };
+    it("returns data from Serenity.scriptData symbol if available and reload is not true", async () => {
+        getGlobalObject()[scriptDataSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
         let mockFetch = jest.fn();
         window["fetch"] = mockFetch as any;
@@ -301,7 +301,7 @@ describe("getScriptData", () => {
 
     it("reloads data if second argument is true", async () => {
         getGlobalObject()[scriptDataHashSymbol] = { ["RemoteData.Test"]: "123" };
-        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "old" };
+        getGlobalObject()[scriptDataSymbol] = { ["RemoteData.Test"]: "old" };
         let orgFetch = window["fetch"];
         let calls = 0;
         let mockFetch = async (url: string, init: RequestInit) => {
@@ -448,7 +448,7 @@ describe("getScriptData", () => {
 
 describe("peekScriptData", () => {
     it("returns data from scriptDataItem if available", () => {
-        getGlobalObject()[scriptDataItemSymbol] = { ["RemoteData.Test"]: "357" };
+        getGlobalObject()[scriptDataSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
         let mockFetch = jest.fn();
         window["fetch"] = mockFetch as any;
