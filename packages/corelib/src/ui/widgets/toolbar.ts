@@ -57,9 +57,9 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
     }
     else if (tb.title)
         span.append(tb.title);
-
+    
     if (!tb.title)
-        btn.addClass('no-text');
+        span.addClass('no-text');
 
     if (tb.visible === false)
         btn.getNode().style.display = "none";
