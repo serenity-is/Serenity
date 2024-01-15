@@ -812,7 +812,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         if (DistinctFields == null || DistinctFields.Length > 0)
         {
-            ExecuteQuery(query);
+            ExecuteQuery();
         }
         else
         {
