@@ -762,10 +762,7 @@ declare namespace Slick {
     	readonly onSort: EventEmitter<ArgsSort, IEventData>;
     	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
     	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
-    	constructor(container: HTMLElement | {
-    		jquery: string;
-    		length: number;
-    	}, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+    	constructor(container: HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
     	private createGroupingPanel;
     	private bindAncestorScroll;
     	init(): void;
@@ -808,6 +805,8 @@ declare namespace Slick {
     	private createColumnFooters;
     	private createColumnHeaders;
     	private setupColumnSort;
+    	private static offset;
+    	private sortableColInstances;
     	private setupColumnReorder;
     	private setupColumnResize;
     	private setOverflow;
@@ -819,8 +818,13 @@ declare namespace Slick {
     	private trigger;
     	getEditorLock(): EditorLock;
     	getEditController(): EditController;
+    	/** Gets a column by its ID. May also return non visible columns */
+    	getColumnById(id: string): Column<TItem>;
+    	/** Returns a columns index in the visible columns list by its column ID */
     	getColumnIndex(id: string): number;
     	getInitialColumnIndex(id: string): number;
+    	/** Gets a view (e.g. visible) column by its column ID */
+    	getVisibleColumnById(id: string): Column<TItem>;
     	autosizeColumns(): void;
     	private applyColumnHeaderWidths;
     	setSortColumn(columnId: string, ascending: boolean): void;

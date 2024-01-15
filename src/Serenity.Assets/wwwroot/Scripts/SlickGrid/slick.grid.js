@@ -1977,11 +1977,20 @@ Slick._ = (() => {
     getEditController() {
       return this._editController;
     }
+    /** Gets a column by its ID. May also return non visible columns */
+    getColumnById(id) {
+      return this._cols[this._colById[id]];
+    }
+    /** Returns a columns index in the visible columns list by its column ID */
     getColumnIndex(id) {
       return this._colById[id];
     }
     getInitialColumnIndex(id) {
       return this._initColById[id];
+    }
+    /** Gets a view (e.g. visible) column by its column ID */
+    getVisibleColumnById(id) {
+      return this._cols[this._colById[id]];
     }
     autosizeColumns() {
       var vpi = this._viewportInfo, availWidth = vpi.hasVScroll ? vpi.width - this._scrollDims.width : vpi.width;
