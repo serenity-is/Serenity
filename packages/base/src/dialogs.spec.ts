@@ -954,7 +954,7 @@ describe("Dialog.close", () => {
         let div = document.createElement("div");
         div.className = "test";
         let dialogs = (await import("./dialogs"));
-        dialogs.Dialog.getInstance(div).close();
+        dialogs.Dialog.getInstance(div)?.close();
         expect(div.classList.contains("test")).toBe(true);
         expect(div.classList.contains("hidden")).toBe(false);
     });
@@ -1167,9 +1167,8 @@ describe("Dialog.close", () => {
 describe("openPanel", () => {
     it("ignores when element is null or undefined", async function () {
         let dialogs = (await import("./dialogs"));
-        dialogs.Dialog.getInstance(null).open();
-        expect(true).toBe(true);
-        dialogs.Dialog.getInstance(undefined).open();
+        expect(dialogs.Dialog.getInstance(null) == null).toBe(true);
+        expect(dialogs.Dialog.getInstance(undefined) == null).toBe(true);
         expect(true).toBe(true);
     });
 

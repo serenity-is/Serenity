@@ -272,7 +272,7 @@ interface DialogOptions {
     closeOnEscape?: boolean;
     /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
     dialogClass?: string;
-    /** Dialog content element, or callback that will populate the content */
+    /** Dialog content/body element, or callback that will populate the content element */
     element?: HTMLElement | ArrayLike<HTMLElement> | ((element: HTMLElement) => void);
     /** Enable / disable animation. Default is false for message dialogs, true for other dialogs */
     fade?: boolean;
@@ -321,12 +321,16 @@ declare class Dialog {
     /** Sets the title text of the dialog. */
     title(value: string): this;
     get type(): DialogType;
-    /** Gets the body element of the dialog */
-    body(): HTMLElement;
+    /** Gets the body/content element of the dialog */
+    getContentNode(): HTMLElement;
+    /** Gets the dialog element of the dialog */
+    getDialogNode(): HTMLElement;
+    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .s-Panel */
+    getEventsNode(): HTMLElement;
     /** Gets the footer element of the dialog */
-    footer(): HTMLElement;
+    getFooterNode(): HTMLElement;
     /** Gets the header element of the dialog */
-    header(): HTMLElement;
+    getHeaderNode(): HTMLElement;
     private onButtonClick;
     private createBSButtons;
     createBSModal(opt: DialogOptions): void;

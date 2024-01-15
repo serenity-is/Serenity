@@ -278,7 +278,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
         super.onDialogOpen();
 
-        var restoreButton = Dialog.getInstance(this.domNode).footer()?.querySelector(".restore-defaults");
+        var restoreButton = Dialog.getInstance(this.domNode)?.getFooterNode()?.querySelector(".restore-defaults");
         if (restoreButton)
             (restoreButton.nextElementSibling as HTMLElement)?.focus?.();
 

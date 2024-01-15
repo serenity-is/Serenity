@@ -49,7 +49,7 @@ export interface DialogOptions {
     closeOnEscape?: boolean;
     /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
     dialogClass?: string;
-    /** Dialog content element, or callback that will populate the content */
+    /** Dialog content/body element, or callback that will populate the content element */
     element?: HTMLElement | ArrayLike<HTMLElement> | ((element: HTMLElement) => void);
     /** Enable / disable animation. Default is false for message dialogs, true for other dialogs */
     fade?: boolean;
@@ -162,7 +162,9 @@ export class Dialog {
     }
 
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
-        el = getDialogEventTarget(el);
+        el = getDialogEventsNode(el);
+        if (!el)
+            return null;
         return new (Dialog as any)({ element: el }, false);
     }
 
@@ -181,7 +183,7 @@ export class Dialog {
             this.dialogResult = result;
         }
 
-        var target = getDialogEventTarget(this.el);
+        var target = getDialogEventsNode(this.el);
         if (!target)
             return;
 
@@ -203,7 +205,7 @@ export class Dialog {
     }
 
     onClose(handler: (result?: string, e?: Event) => void, before = false) {
-        var target = getDialogEventTarget(this.el);
+        var target = getDialogEventsNode(this.el);
         if (!target)
             return;
         if (target.classList.contains("s-Panel"))
@@ -215,7 +217,7 @@ export class Dialog {
     }
 
     onOpen(handler: (e?: Event) => void, before = false): this {
-        var target = getDialogEventTarget(this.el);
+        var target = getDialogEventsNode(this.el);
         if (!target)
             return;
         if (target.classList.contains("s-Panel"))
@@ -229,7 +231,7 @@ export class Dialog {
 
     /** Closes dialog */
     open() {
-        var target = getDialogEventTarget(this.el);
+        var target = getDialogEventsNode(this.el);
         if (!target)
             return;
         if (target.classList.contains("s-Panel"))
@@ -254,7 +256,7 @@ export class Dialog {
     /** Sets the title text of the dialog. */
     title(value: string): this;
     title(value?: string): string | this {
-        let title = this.header()?.querySelector(".modal-title, .panel-titlebar-text, .ui-dialog-title");
+        let title = this.getHeaderNode()?.querySelector(".modal-title, .panel-titlebar-text, .ui-dialog-title");
         if (value === void 0 && !arguments.length)
             return title?.textContent;
 
@@ -263,7 +265,7 @@ export class Dialog {
     }
 
     get type(): DialogType {
-        var root = getDialogRootElement(this.el);
+        var root = getDialogNode(this.el);
         if (!root)
             return null;
         if (root.classList.contains("modal"))
@@ -275,22 +277,29 @@ export class Dialog {
         return null;
     }
 
-    /** Gets the body element of the dialog */
-    body(): HTMLElement {
-        var root = getDialogRootElement(this.el);
-        return root?.querySelector(".modal-body, .panel-body, .ui-dialog-content");
+    /** Gets the body/content element of the dialog */
+    getContentNode(): HTMLElement {
+        return this.el;
+    }
+
+    /** Gets the dialog element of the dialog */
+    getDialogNode(): HTMLElement {
+        return getDialogNode(this.el);
+    }
+
+    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .s-Panel */
+    getEventsNode(): HTMLElement {
+        return getDialogEventsNode(this.el);
     }
 
     /** Gets the footer element of the dialog */
-    footer(): HTMLElement {
-        var root = getDialogRootElement(this.el);
-        return root?.querySelector(".modal-footer, .panel-footer, .ui-dialog-footer");
+    getFooterNode(): HTMLElement {
+        return this.getDialogNode()?.querySelector(".modal-footer, .panel-footer, .ui-dialog-footer");
     }
 
     /** Gets the header element of the dialog */
-    header(): HTMLElement {
-        var root = getDialogRootElement(this.el);
-        return root?.querySelector(".modal-header, .panel-titlebar, .ui-dialog-titlebar");
+    getHeaderNode(): HTMLElement {
+        return this.getDialogNode()?.querySelector(".modal-header, .panel-titlebar, .ui-dialog-titlebar");
     }  
 
     private onButtonClick(e: MouseEvent, btn: DialogButton) {
@@ -437,7 +446,7 @@ export class Dialog {
 
     dispose(): void {
         try {
-            let target = getDialogEventTarget(this.el);
+            let target = getDialogEventsNode(this.el);
             if (!target)
                 return;
 
@@ -593,7 +602,7 @@ export namespace DialogTexts {
 
 function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
-    let panel = getDialogRootElement(el);
+    let panel = getDialogNode(el);
     if (!panel || panel.classList.contains("hidden"))
         return;
 
@@ -619,7 +628,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
 function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
 
-    let panel = getDialogRootElement(element);
+    let panel = getDialogNode(element);
     if (!panel)
         return;
 
@@ -662,7 +671,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
 }
 
 /** Returns .s-Panel, .modal, .ui-dialog */
-function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+function getDialogNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
     if (isArrayLike(element))
         element = element[0];
     if (!element)
@@ -672,7 +681,7 @@ function getDialogRootElement(element: HTMLElement | ArrayLike<HTMLElement>): HT
 }
 
 /** Returns .s-Panel, .modal, .ui-dialog-content */
-function getDialogEventTarget(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+function getDialogEventsNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
     if (isArrayLike(element))
         element = element[0];
     if (!element)
