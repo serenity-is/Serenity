@@ -254,7 +254,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     /// Executes the query and sets the response entity if found.
     /// </summary>
     /// <exception cref="ValidationError">If entity is not found</exception>
-    private void ExecuteQuery()
+    protected virtual void ExecuteQuery()
     {
         try
         {

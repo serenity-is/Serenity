@@ -736,16 +736,16 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <summary>
     /// Executes the query sets values / entities and total count.
     /// </summary>
-    /// <param name="query">Query</param>
-    private void ExecuteQuery(SqlQuery query)
+    protected virtual void ExecuteQuery()
     {
         try
         {
-            Response.TotalCount = query.ForEach(Connection, delegate()
+            Response.TotalCount = Query.ForEach(Connection, delegate()
             {
                 var clone = ProcessEntity(Row.Clone());
+                if (clone == null)
+                    return;
 
-                if (clone == null) return;
                 if (DistinctFields != null)
                 {
                     foreach (var field in DistinctFields)
