@@ -26,8 +26,10 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         let $ = getjQuery();
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker)) {
+            var options = DateEditor.flatPickrOptions(this.domNode);
             // @ts-ignore
-            flatpickr(this.domNode, DateEditor.flatPickrOptions(this.domNode));
+            flatpickr(this.domNode, options);
+            Fluent(flatPickrTrigger(this.domNode)).insertAfter(this.domNode);
         }
         else if ($?.fn?.datepicker) {
             $(this.domNode).datepicker({
