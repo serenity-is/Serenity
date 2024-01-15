@@ -1979,18 +1979,19 @@ Slick._ = (() => {
     }
     /** Gets a column by its ID. May also return non visible columns */
     getColumnById(id) {
-      return this._cols[this._colById[id]];
+      return id ? this._cols[this._colById[id]] : null;
     }
-    /** Returns a columns index in the visible columns list by its column ID */
+    /** Returns a column's index in the visible columns list by its column ID */
     getColumnIndex(id) {
-      return this._colById[id];
+      return id ? this._colById[id] : null;
     }
+    /** Gets index of a column in the initial column list passed to the grid, or setColumns method. May include invisible cols and index does not have to match visible column order. */
     getInitialColumnIndex(id) {
-      return this._initColById[id];
+      return id ? this._initColById[id] : null;
     }
     /** Gets a view (e.g. visible) column by its column ID */
     getVisibleColumnById(id) {
-      return this._cols[this._colById[id]];
+      return id ? this._cols[this._colById[id]] : null;
     }
     autosizeColumns() {
       var vpi = this._viewportInfo, availWidth = vpi.hasVScroll ? vpi.width - this._scrollDims.width : vpi.width;
@@ -2048,9 +2049,11 @@ Slick._ = (() => {
     getSortColumns() {
       return this._sortColumns;
     }
+    /** Returns visible columns in order */
     getColumns() {
       return this._cols;
     }
+    /** Returns list of columns passed to the grid constructor, or setColumns method. May include invisible columns and order does not match visible column order. */
     getInitialColumns() {
       return this._initCols;
     }

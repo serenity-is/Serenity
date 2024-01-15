@@ -820,8 +820,9 @@ declare namespace Slick {
     	getEditController(): EditController;
     	/** Gets a column by its ID. May also return non visible columns */
     	getColumnById(id: string): Column<TItem>;
-    	/** Returns a columns index in the visible columns list by its column ID */
+    	/** Returns a column's index in the visible columns list by its column ID */
     	getColumnIndex(id: string): number;
+    	/** Gets index of a column in the initial column list passed to the grid, or setColumns method. May include invisible cols and index does not have to match visible column order. */
     	getInitialColumnIndex(id: string): number;
     	/** Gets a view (e.g. visible) column by its column ID */
     	getVisibleColumnById(id: string): Column<TItem>;
@@ -831,7 +832,9 @@ declare namespace Slick {
     	setSortColumns(cols: ColumnSort[]): void;
     	getSortColumns(): ColumnSort[];
     	private handleSelectedRangesChanged;
+    	/** Returns visible columns in order */
     	getColumns(): Column<TItem>[];
+    	/** Returns list of columns passed to the grid constructor, or setColumns method. May include invisible columns and order does not match visible column order. */
     	getInitialColumns(): Column<TItem>[];
     	private updateViewColLeftRight;
     	private setInitialCols;
