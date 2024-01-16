@@ -36,7 +36,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
             var itemsWithTab = items.filter(f => f.tab);
 
-            var tabs = Fluent("ul").addClass("nav nav-tabs property-tabs").attr("role", "tablist").appendTo(this.domNode);
+            var tabs = Fluent("ul").addClass("nav nav-underline property-tabs").attr("role", "tablist").appendTo(this.domNode);
             var panes = Fluent("div").addClass("tab-content property-panes").appendTo(this.domNode);
 
             var tabIndex = 0;

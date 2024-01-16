@@ -209,7 +209,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         else {
             // emulate UI tabs with bootstrap
             let ul = tabsDiv.querySelector(":scope > ul");
-            if (!ul.classList.contains("nav-tabs")) {
+            if (!ul.classList.contains("nav-tabs") && !ul.classList.contains("nav-underline")) {
                 ul.classList.add("nav", "nav-tabs");
 
                 let activeLink: HTMLLinkElement;
