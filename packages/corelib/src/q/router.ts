@@ -161,7 +161,7 @@ export namespace Router {
 
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
-                Dialog.getInstance(d)?.close();
+                Dialog.getInstance(d)?.close("router");
             }
 
             for (var i = same; i < newParts.length; i++) {

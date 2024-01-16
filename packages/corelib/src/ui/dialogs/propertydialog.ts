@@ -75,11 +75,11 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     }
 
     protected okClickValidated() {
-        this.dialogClose();
+        this.dialogClose("ok");
     }
 
     protected cancelClick() {
-        this.dialogClose();
+        this.dialogClose("cancel");
     }
 
     protected initPropertyGrid() {

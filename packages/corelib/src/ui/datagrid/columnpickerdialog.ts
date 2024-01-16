@@ -1,4 +1,4 @@
-﻿import { Culture, Dialog, DialogButton, DialogTexts, Fluent, faIcon, localText } from "@serenity-is/base";
+﻿import { Culture, Dialog, DialogButton, DialogTexts, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "@serenity-is/base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Decorators } from "../../types/decorators";
 import { Authorization, Router, centerDialog } from "../../q";
@@ -115,8 +115,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
                     this.updateListStates();
                 }
             },
-            {
-                text: DialogTexts.OkButton,
+            okDialogButton({
                 click: () => {
                     let newColumns: Column[] = [];
 
@@ -138,15 +137,9 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
 
                     this.allColumns = newColumns;
                     this.done && this.done();
-                    this.dialogClose()
                 }
-            },
-            {
-                text: DialogTexts.CancelButton,
-                click: () => {
-                    this.dialogClose()
-                }
-            }
+            }),
+            cancelDialogButton()
         ];
     }
 

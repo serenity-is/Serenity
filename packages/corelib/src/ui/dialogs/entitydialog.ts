@@ -879,8 +879,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             icon: faIcon("check-circle", "purple"),
             hotkey: 'alt+s',
             onClick: () => {
-                this.save(response => {
-                    this.dialogClose();
+                this.save(() => {
+                    this.dialogClose("save-and-close");
                 });
             },
             visible: () => !this.isDeleted() && !this.isViewMode(),
@@ -917,12 +917,13 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         list.push({
             title: localText('Controls.EntityDialog.DeleteButton'),
+            action: "delete",
             cssClass: 'delete-button',
             icon: faIcon("trash-o", "danger"),
             hotkey: 'alt+x',
             onClick: () => {
                 confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'), () => {
-                    this.doDelete(() => this.dialogClose());
+                    this.doDelete(() => this.dialogClose("delete"));
                 });
             },
             visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),

@@ -306,7 +306,7 @@ declare class Dialog {
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog;
     /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
     get result(): string;
-    /** Closes dialog */
+    /** Closes dialog setting the result to null */
     close(): this;
     /** Closes dialog with the result set to value */
     close(result: string): this;

@@ -1606,7 +1606,7 @@ declare namespace Serenity {
         static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog;
         /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
         get result(): string;
-        /** Closes dialog */
+        /** Closes dialog setting the result to null */
         close(): this;
         /** Closes dialog with the result set to value */
         close(result: string): this;
@@ -3768,7 +3768,7 @@ declare namespace Serenity {
         arrange(): void;
         protected onDialogClose(result?: string): void;
         protected getDialogButtons(): DialogButton[];
-        dialogClose(): void;
+        dialogClose(result?: string): void;
         get dialogTitle(): string;
         set dialogTitle(value: string);
         protected initTabs(): void;
@@ -4900,10 +4900,7 @@ declare namespace Serenity {
         constructor(props: WidgetProps<P>);
         get_filterPanel(): FilterPanel;
         protected getTemplate(): string;
-        protected getDialogButtons(): {
-            text: string;
-            click: () => void;
-        }[];
+        protected getDialogButtons(): DialogButton[];
     }
 
     class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {

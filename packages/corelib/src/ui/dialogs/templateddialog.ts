@@ -179,8 +179,8 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         return [];
     }
 
-    public dialogClose(): void {
-        this.dialog?.close();
+    public dialogClose(result?: string): void {
+        this.dialog?.close(result ?? null);
     }
 
     public get dialogTitle(): string {

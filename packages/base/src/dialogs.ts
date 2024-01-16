@@ -100,7 +100,6 @@ export class Dialog {
         if (typeof opt.element === "function")
             opt.element(this.el);
 
-
         if (this.el.classList.contains("hidden") &&
             typeof opt.element !== "function")
             this.el.classList.remove("hidden");
@@ -160,7 +159,7 @@ export class Dialog {
     }
 
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
-        el = getDialogEventsNode(el);
+        el = getDialogContentNode(el);
         if (!el)
             return null;
         return new (Dialog as any)({ element: el }, false);
@@ -171,15 +170,13 @@ export class Dialog {
         return this.el ? this.el.dataset.dialogResult : this.dialogResult;
     }
 
-    /** Closes dialog */
+    /** Closes dialog setting the result to null */
     close(): this;
     /** Closes dialog with the result set to value */
     close(result: string): this;
     close(result?: string): this {
-        if (result != void 0 || arguments.length) {
-            this.el && (this.el.dataset.dialogResult = result);
-            this.dialogResult = result;
-        }
+        this.el && (this.el.dataset.dialogResult = result ?? null);
+        this.dialogResult = result ?? null;
 
         var target = getDialogEventsNode(this.el);
         if (!target)
@@ -403,7 +400,7 @@ export class Dialog {
         if (opt.closeButton) {
             Fluent("button")
                 .addClass("panel-titlebar-close")
-                .on("click", this.close.bind(this))
+                .on("click", this.close.bind(this, null))
                 .appendTo(titlebar);
         }
 
@@ -685,6 +682,15 @@ function getDialogEventsNode(element: HTMLElement | ArrayLike<HTMLElement>): HTM
         element.closest(".ui-dialog")?.querySelector(":scope > .ui-dialog-content");
 }
 
+/** Returns .s-Panel, .modal, .ui-dialog-content */
+function getDialogContentNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
+    if (isArrayLike(element))
+        element = element[0];
+    if (!element)
+        return null;
+    return element.closest<HTMLElement>(".modal-body, .panel-body, .ui-dialog-content") ??
+        getDialogNode(element)?.querySelector(".modal-body, .panel-body, .ui-dialog-content");
+}
 
 /**
  * Options that apply to all message dialog types
