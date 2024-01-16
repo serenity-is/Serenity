@@ -31,9 +31,7 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
     let span = Fluent("span").addClass("button-inner");
     let btn = Fluent("div")
         .addClass("tool-button")
-        .append(Fluent("div")
-            .addClass("button-outer")
-            .append(span));
+        .append(span);
 
     if (tb.action != null)
         btn.attr('data-action', tb.action);
@@ -154,31 +152,27 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     protected renderContents() {
 
-        let outer = Fluent("div").addClass("buttons-outer");
-
-        let container = Fluent("div")
-            .addClass("buttons-inner")
-            .appendTo(outer);
+        let group = Fluent("div").addClass("tool-group");
 
         Fluent(this.domNode)
             .addClass("s-Toolbar clearfix")
-            .append(outer);
+            .append(group);
 
         var buttons = this.options.buttons || [];
         var currentCount = 0;
         for (var i = 0; i < buttons.length; i++) {
             var button = buttons[i];
             if (button.separator && currentCount > 0) {
-                container = Fluent("div")
-                    .addClass("buttons-inner")
-                    .appendTo(outer);
+                group = Fluent("div")
+                    .addClass("tool-group")
+                    .appendTo(group.parent());
                 currentCount = 0;
             }
-            this.createButton(container, button);
+            this.createButton(group, button);
             currentCount++;
         }
 
-        return outer.getNode();
+        return group.getNode();
     }
 
     destroy() {
