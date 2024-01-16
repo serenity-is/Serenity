@@ -216,7 +216,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     public static flatPickrOptions(input: HTMLElement) {
         return flatPickrOptions(function () {
-            Fluent.trigger(input, "change");
+            //Fluent.trigger(input, "change");
         });
     }
 
