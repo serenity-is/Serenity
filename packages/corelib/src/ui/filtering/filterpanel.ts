@@ -196,7 +196,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     }
 
     search() {
-        this.rowsDiv.querySelector(":scope > div.v > span.error").remove();
+        this.rowsDiv.querySelectorAll(":scope > div.v > span.error").forEach(x => x.remove());
 
         var filterLines = [];
         var errorText = null;
@@ -241,7 +241,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (errorText != null) {
             Fluent("span").addClass('error')
                 .attr('title', errorText).appendTo(row.querySelector<HTMLElement>('div.v'));
-            row.querySelector<HTMLElement>('div.v input:first').focus();
+            row.querySelector<HTMLElement>('div.v input')?.focus();
             return;
         }
 
@@ -386,7 +386,6 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (filtering == null)
             return;
 
-        opDiv.innerHTML = ('<input/>')
         var hidden = Fluent("input").attr("type", 'hidden').addClass('op-select').appendTo(opDiv);
 
         var operators = filtering.getOperators();
