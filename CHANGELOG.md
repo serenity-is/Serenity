@@ -120,7 +120,7 @@
   ```xml
   <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
   <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
-  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
   ```
 
   Next, update Serenity and Pro packages to version 8.0. This should be enough to transition to .NET 8 as there aren't many breaking changes affecting Serenity-based applications.
