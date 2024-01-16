@@ -119,7 +119,7 @@ export class Dialog {
             this.onClose(opt.onClose);
 
         if (opt.autoDispose)
-            this.onClose(this.dispose.bind(this));
+            this.onClose(() => setTimeout(this.dispose.bind(this), 0));
 
         if (opt.title !== void 0) {
             this.title(opt.title);
