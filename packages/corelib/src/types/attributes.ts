@@ -30,6 +30,12 @@ export class ColumnsKeyAttribute {
     }
 }
 
+@attr('CloseButton')
+export class CloseButtonAttribute {
+    constructor(public value = true) {
+    }
+}
+
 @attr('CssClass')
 export class CssClassAttribute {
     constructor(public cssClass: string) {
@@ -220,6 +226,12 @@ export class ResponsiveAttribute {
 @attr('Service')
 export class ServiceAttribute {
     constructor(public value: string) {
+    }
+}
+
+@attr('StaticPanel')
+export class StaticPanelAttribute {
+    constructor(public value = true) {
     }
 }
 

@@ -1,7 +1,7 @@
 import { Config, Dialog, DialogButton, DialogOptions, Fluent, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
-import { MaximizableAttribute, PanelAttribute, ResizableAttribute } from "../../types/attributes";
+import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
@@ -49,12 +49,17 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     protected getInitialDialogTitle() {
         return "";
     }
+    
+    protected isStaticPanel() {
+        return this.getCustomAttribute(StaticPanelAttribute)?.value === true;
+    }
 
     protected getDialogOptions(): DialogOptions {
         return {
-            preferPanel: this.getCustomAttribute(PanelAttribute)?.value,
+            preferPanel: this.isStaticPanel() ? true : this.getCustomAttribute(PanelAttribute)?.value,
             autoOpen: false,
             buttons: this.getDialogButtons(),
+            closeButton: this.isStaticPanel() ? false : this.getCustomAttribute(CloseButtonAttribute)?.value,
             dialogClass: (this.getCssClass() ?? "") + " flex-layout",
             element: this.domNode,
             size: "lg",

@@ -1,7 +1,7 @@
-﻿import { DialogButton, DialogTexts, PropertyItem, PropertyItemsData, getInstanceType, getTypeFullName } from "@serenity-is/base";
-import { FormKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
+﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "@serenity-is/base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../q";
+import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
@@ -12,6 +12,8 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
+    protected isClosable() { return !this.isStatic(); }
+    protected isStatic() { return false; }
 
     constructor(props?: WidgetProps<P>) {
         super(props);
@@ -28,7 +30,7 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     }
 
     protected afterInit() {
-    }    
+    }
 
     protected useAsync() {
         return false;
@@ -55,15 +57,19 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
     }
 
     protected getDialogButtons() {
-        super.getDialogButtons();
-        return <DialogButton[]>[{
-            text: DialogTexts.OkButton,
-            cssClass: "btn btn-primary",
-            click: () => this.okClick()
-        }, {
-            text: DialogTexts.CancelButton,
-            click: () => this.cancelClick()
-        }];
+
+        if (this.getCustomAttribute(StaticPanelAttribute)?.value === true)
+            return [];
+
+        return [
+            okDialogButton({
+                click: (e) => {
+                    e.preventDefault();
+                    this.okClick();
+                }
+            }),
+            cancelDialogButton()
+        ];
     }
 
     protected okClick() {

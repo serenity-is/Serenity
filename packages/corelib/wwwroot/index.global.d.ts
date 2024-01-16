@@ -3467,6 +3467,10 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    class CloseButtonAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
     class CssClassAttribute {
         cssClass: string;
         constructor(cssClass: string);
@@ -3591,6 +3595,10 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    class StaticPanelAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
     class UpdatableAttribute {
         value: boolean;
         constructor(value?: boolean);
@@ -3625,6 +3633,7 @@ declare namespace Serenity {
         function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
         function enumKey(value: string): (target: Function) => void;
         function option(): (target: Object, propertyKey: string) => void;
+        function closeButton(value?: boolean): (target: Function) => void;
         function dialogType(value: any): (target: Function) => void;
         function editor(): (target: Function) => void;
         function element(value: string): (target: Function) => void;
@@ -3636,6 +3645,7 @@ declare namespace Serenity {
         function resizable(value?: boolean): (target: Function) => void;
         function responsive(value?: boolean): (target: Function) => void;
         function service(value: string): (target: Function) => void;
+        function staticPanel(value?: boolean): (target: Function) => void;
     }
 
     namespace DialogTypeRegistry {
@@ -3754,6 +3764,7 @@ declare namespace Serenity {
         destroy(): void;
         protected addCssClass(): void;
         protected getInitialDialogTitle(): string;
+        protected isStaticPanel(): boolean;
         protected getDialogOptions(): DialogOptions;
         protected initDialog(): void;
         protected initUIDialog(): void;
@@ -3905,6 +3916,8 @@ declare namespace Serenity {
         protected entity: TItem;
         protected entityId: any;
         protected propertyItemsData: PropertyItemsData;
+        protected isClosable(): boolean;
+        protected isStatic(): boolean;
         constructor(props?: WidgetProps<P>);
         protected propertyItemsReady(itemsData: PropertyItemsData): void;
         protected afterInit(): void;

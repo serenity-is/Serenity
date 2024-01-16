@@ -1,6 +1,6 @@
 import { EditorAttribute, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, formatterTypeInfo, interfaceTypeInfo, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "@serenity-is/base";
 import { MemberType, addTypeMember } from "../q";
-import { DialogTypeAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute } from "./attributes";
+import { CloseButtonAttribute, DialogTypeAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
     export const classType = classTypeInfo;
@@ -83,6 +83,12 @@ export namespace Decorators {
         }
     }
 
+    export function closeButton(value = true) {
+        return function (target: Function) {
+            addCustomAttribute(target, new CloseButtonAttribute(value));
+        }
+    }
+
     export function dialogType(value: any) {
         return function (target: Function) {
             addCustomAttribute(target, new DialogTypeAttribute(value));
@@ -147,6 +153,12 @@ export namespace Decorators {
     export function service(value: string) {
         return function (target: Function) {
             addCustomAttribute(target, new ServiceAttribute(value));
+        }
+    }
+
+    export function staticPanel(value: boolean = true) {
+        return function (target: Function) {
+            addCustomAttribute(target, new StaticPanelAttribute(value));
         }
     }
 }
