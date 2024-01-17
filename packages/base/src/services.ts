@@ -227,7 +227,7 @@ export function serviceRequest<TResponse extends ServiceResponse>(service: strin
     }, options));
 }
 
-function handleError(response: any, errorInfo: RequestErrorInfo, options?: ServiceOptions<any>) {
+function handleError(response: any, errorInfo: RequestErrorInfo, options: ServiceOptions<any>) {
 
     if (Config.notLoggedInHandler != null &&
         response &&
@@ -268,7 +268,7 @@ async function handleFetchError(response: Response, options: ServiceOptions<any>
             handleError(json, {
                 status: response.status,
                 statusText: response.statusText
-            });
+            }, options);
             return;
         }
     }
@@ -288,7 +288,7 @@ function handleXHRError(xhr: XMLHttpRequest, options: ServiceOptions<any>) {
         .toLowerCase().indexOf('application/json') >= 0) {
         var json = JSON.parse(xhr.responseText);
         if (json && json.Error) {
-            handleError(json, { status: xhr.status, statusText: xhr.statusText });
+            handleError(json, { status: xhr.status, statusText: xhr.statusText }, options);
             return;
         }
     }
