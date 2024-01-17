@@ -1677,6 +1677,8 @@ Slick._ = (() => {
         chosenClass: "slick-header-column-active",
         ghostClass: "slick-sortable-placeholder",
         draggable: ".slick-header-column",
+        filter: ".slick-resizable-handle",
+        preventOnFilter: false,
         dragoverBubble: false,
         revertClone: true,
         scroll: !this.hasFrozenColumns(),
@@ -1801,9 +1803,7 @@ Slick._ = (() => {
               this.invalidateAllRows();
             }
           }
-          this.updateCanvasWidth(true);
-          this.render();
-          this.trigger(this.onColumnsResized);
+          this.columnsResized(false);
         };
         if (noJQueryDrag) {
           handle.addEventListener("dragstart", dragStart);
@@ -1817,6 +1817,14 @@ Slick._ = (() => {
           this._jQuery(handle).on("dragstart", dragStart).on("drag", drag).on("dragend", dragEnd);
         }
       });
+    }
+    columnsResized(invalidate = true) {
+      this.applyColumnHeaderWidths();
+      this._layout.applyColumnWidths();
+      invalidate && this.invalidateAllRows();
+      this.updateCanvasWidth(true);
+      this.render();
+      this.trigger(this.onColumnsResized);
     }
     setOverflow() {
       this._layout.setOverflow();
@@ -2049,7 +2057,7 @@ Slick._ = (() => {
     getSortColumns() {
       return this._sortColumns;
     }
-    /** Returns visible columns in order */
+    /** Returns only the visible columns in order */
     getColumns() {
       return this._cols;
     }
@@ -2101,6 +2109,13 @@ Slick._ = (() => {
     }
     setColumns(columns) {
       var _a, _b;
+      if (columns && this._initCols && this._cols && columns.length === this._cols.length && this._initCols.length > this._cols.length && !columns.some((x) => this._cols.indexOf(x) < 0) && !this._cols.some((x) => columns.indexOf(x) < 0)) {
+        sortToDesiredOrderAndKeepRest(
+          this._initCols,
+          columns.map((x) => x.id)
+        );
+        columns = this._initCols;
+      }
       this.setInitialCols(columns);
       this.updateViewColLeftRight();
       if (this._initialized) {

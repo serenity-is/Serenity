@@ -809,6 +809,7 @@ declare namespace Slick {
     	private sortableColInstances;
     	private setupColumnReorder;
     	private setupColumnResize;
+    	columnsResized(invalidate?: boolean): void;
     	private setOverflow;
     	private measureCellPaddingAndBorder;
     	private createCssRules;
