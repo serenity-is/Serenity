@@ -1305,7 +1305,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             if (settings.includeDeleted != null &&
                 flags.includeDeleted !== false) {
                 var includeDeletedToggle = this.domNode.querySelector('.s-IncludeDeletedToggle');
-                if (!!settings.includeDeleted !== includeDeletedToggle?.classList.contains('pressed')) {
+                if (includeDeletedToggle && !!settings.includeDeleted !== includeDeletedToggle.classList.contains('pressed')) {
                     Fluent.trigger(includeDeletedToggle.querySelector('a'), "click");
                 }
             }
