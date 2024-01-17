@@ -1,4 +1,4 @@
-﻿import { localText } from "@serenity-is/base";
+﻿import { Fluent, localText } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { IStringValue } from "../../interfaces";
 import { addValidationRule } from "../../q";
@@ -30,7 +30,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
         }
 
         var valInput = document.createElement("input");
-        this.domNode.prepend(valInput);
+        Fluent(valInput).insertBefore(this.domNode);
         valInput.setAttribute('id', this.uniqueName + '_validate');
         valInput.value = 'x';
 
