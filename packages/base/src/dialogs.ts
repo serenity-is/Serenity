@@ -395,7 +395,15 @@ export class Dialog {
             .addClass("s-Panel")
             .addClass(opt.dialogClass)
             .append(titlebar)
-            .append(Fluent(this.el).addClass("panel-body"));
+
+        this.el.classList.add("panel-body");
+
+        if (this.el.parentElement && 
+            this.el.parentElement !== document.body) {
+            this.el.parentElement.insertBefore(panel.getNode(), this.el);
+        }
+
+        panel.append(this.el);
 
         if (opt.closeButton) {
             Fluent("button")
@@ -624,9 +632,12 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
     if (!panel)
         return;
 
-    let container = document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement;
-    if (panel.parentElement !== container)
+    let container = panel.parentElement && panel.parentElement !== document.body ? panel.parentElement : 
+        (document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement ?? panel.parentElement ?? document.body);
+
+    if (panel.parentElement !== container) {
         container.appendChild(panel);
+    }
 
     let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
     if (event?.defaultPrevented || event?.isDefaultPrevented?.())
