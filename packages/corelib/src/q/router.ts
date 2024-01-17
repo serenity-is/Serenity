@@ -57,7 +57,7 @@ export namespace Router {
 
         var current = window.location.hash || '';
         if (current.charAt(0) == '#')
-            current = current.substring(1, current.length - 1);
+            current = current.substring(1);
 
         var parts = current.split('/+/');
 
@@ -146,7 +146,7 @@ export namespace Router {
         try {
             hash = hash ?? window.location.hash ?? '';
             if (hash.charAt(0) == '#')
-                hash = hash.substring(1, hash.length - 1);
+                hash = hash.substring(1);
 
             var dialogs = getVisibleOrHiddenByDialogs();
             var newParts = hash.split("/+/");
