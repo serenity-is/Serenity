@@ -156,10 +156,11 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
 
     return new Promise((resolve, reject) => {
         try {
-            let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+            let uri = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+            options = serviceOptions(uri, options);
 
             var xhr = new XMLHttpRequest();
-            xhr.open(options.method, url, false);
+            xhr.open(options.method, uri, false);
 
             if (options.cache == "no-store")
                 options.headers["Cache-Control"] ??= "no-cache, no-store, max-age=0";
@@ -168,12 +169,6 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
 
             for (var x in options.headers) {
                 xhr.setRequestHeader(x, options.headers[x]);
-            }
-
-            if (isSameOrigin(url)) {
-                var token = getCookie('CSRF-TOKEN');
-                if (token)
-                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
             }
 
             requestStarting();

@@ -26,7 +26,6 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         super(props);
 
         this._instanceReady = false;
-        HtmlContentEditor.includeCKEditor();
 
         let textArea = this.domNode;
         var id = textArea.getAttribute('id');
@@ -50,9 +49,11 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return null;
         });
 
-        LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
-            var config = this.getConfig();
-            (window as any)['CKEDITOR'] && (window as any)['CKEDITOR'].replace(id, config);
+        HtmlContentEditor.includeCKEditor(() => {
+            LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
+                var config = this.getConfig();
+                (window as any)['CKEDITOR'] && (window as any)['CKEDITOR'].replace(id, config);
+            });
         });
     }
 
@@ -138,7 +139,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected getEditorInstance() {
         var id = this.domNode.getAttribute("id");
-        return (window as any)['CKEDITOR'].instances[id];
+        return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
     destroy(): void {
@@ -163,9 +164,9 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     set_value(value: string): void {
         var instance = this.getEditorInstance();
-        this.domNode.value = value;
+        this.domNode.value = value ?? '';
         if (this._instanceReady && instance)
-            instance.setData(value);
+            instance.setData(value ?? '');
     }
 
     set value(v: string) {
@@ -210,18 +211,20 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return path + '/';
     }
 
-    static includeCKEditor(): void {
+    static includeCKEditor(then: () => void): void {
         if ((window as any)['CKEDITOR']) {
-            return;
+            return then();
         }
 
         var script = document.querySelector('#CKEditorScript');
         if (script) {
-            return;
+            return script.addEventListener("load", then);
         }
 
         Fluent("script").attr('type', 'text/javascript')
             .attr('id', 'CKEditorScript')
+            .on("load", then)
+            .attr("async", "false")
             .attr('src', resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' +
                 HtmlContentEditor.CKEditorVer))
             .appendTo(document.head);

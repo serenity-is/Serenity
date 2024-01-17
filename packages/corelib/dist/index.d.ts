@@ -3268,7 +3268,7 @@ declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContent
     static CKEditorVer: string;
     static CKEditorBasePath: string;
     static getCKEditorBasePath(): string;
-    static includeCKEditor(): void;
+    static includeCKEditor(then: () => void): void;
 }
 declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     protected getConfig(): CKEditorConfig;

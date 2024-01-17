@@ -4448,7 +4448,7 @@ declare namespace Serenity {
         static CKEditorVer: string;
         static CKEditorBasePath: string;
         static getCKEditorBasePath(): string;
-        static includeCKEditor(): void;
+        static includeCKEditor(then: () => void): void;
     }
     class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
         protected getConfig(): CKEditorConfig;
