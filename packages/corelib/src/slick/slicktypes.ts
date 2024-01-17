@@ -1,7 +1,7 @@
-﻿import { PropertyItem, StringLiteral, registerFormatter } from "@serenity-is/base";
-import { FormatterContext, Group } from "@serenity-is/sleekgrid";
+﻿import { PropertyItem } from "@serenity-is/base";
+import { FormatterContext, FormatterResult, Group } from "@serenity-is/sleekgrid";
 
-export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 
 declare module "@serenity-is/sleekgrid" {
     export interface Column<TItem = any> {
@@ -11,7 +11,7 @@ declare module "@serenity-is/sleekgrid" {
 }
 
 export interface Formatter {
-    format(ctx: FormatterContext): string;
+    format(ctx: FormatterContext): FormatterResult;
 }
 
 export interface GroupInfo<TItem> {

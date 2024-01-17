@@ -1100,7 +1100,7 @@ Slick._ = (() => {
           }
         }
       };
-      var _a, _b;
+      var _a, _b, _c, _d;
       this._data = data;
       this._colDefaults = Object.assign({}, columnDefaults);
       this._options = options = Object.assign({}, gridDefaults, options);
@@ -1117,6 +1117,16 @@ Slick._ = (() => {
         throw new Error("SleekGrid requires a valid container, " + container + " does not exist in the DOM.");
       }
       this._container.classList.add("slick-container");
+      this._emptyNode = (_a = options.emptyNode) != null ? _a : this._jQuery ? function(node) {
+        this(node).empty();
+      }.bind(this._jQuery) : function(node) {
+        node.innerHTML = "";
+      };
+      this._removeNode = (_b = options.removeNode) != null ? _b : this._jQuery ? function(node) {
+        this(node).remove();
+      }.bind(this._jQuery) : function(node) {
+        node.remove();
+      };
       if (options == null ? void 0 : options.createPreHeaderPanel) {
         if (options.groupingPanel == null)
           options.groupingPanel = true;
@@ -1125,7 +1135,7 @@ Slick._ = (() => {
         if (options.showGroupingPanel == null && options.showPreHeaderPanel != null)
           options.showGroupingPanel = options.showPreHeaderPanel;
       }
-      this._options.rtl = (_a = this._options.rtl) != null ? _a : document.body.classList.contains("rtl") || typeof getComputedStyle != "undefined" && getComputedStyle(this._container).direction == "rtl";
+      this._options.rtl = (_c = this._options.rtl) != null ? _c : document.body.classList.contains("rtl") || typeof getComputedStyle != "undefined" && getComputedStyle(this._container).direction == "rtl";
       if (this._options.rtl)
         this._container.classList.add("rtl");
       else
@@ -1154,7 +1164,7 @@ Slick._ = (() => {
         style: "position:fixed;width:0!important;height:0!important;top:0;left:0;outline:0!important;",
         tabIndex: "0"
       }));
-      this._layout = (_b = options.layoutEngine) != null ? _b : new BasicLayout();
+      this._layout = (_d = options.layoutEngine) != null ? _d : new BasicLayout();
       this.setInitialCols(columns);
       this._scrollDims = getScrollBarDimensions();
       if (options.groupingPanel) {
@@ -1509,11 +1519,7 @@ Slick._ = (() => {
             });
           }
         });
-        if (this._jQuery) {
-          this._jQuery(hc).empty();
-        } else {
-          hc.innerHTML = "";
-        }
+        this._emptyNode(hc);
       });
       this._layout.updateHeadersWidth();
       const headerRowCols = this._layout.getHeaderRowCols();
@@ -1734,8 +1740,8 @@ Slick._ = (() => {
       var j, c, pageX, minPageX, maxPageX, firstResizable, lastResizable, cols = this._cols;
       var firstResizable, lastResizable;
       columnElements.forEach((el, i) => {
-        var _a;
-        (_a = el.querySelector(".slick-resizable-handle")) == null ? void 0 : _a.remove();
+        var handle = el.querySelector(".slick-resizable-handle");
+        handle && this._removeNode(handle);
         if (cols[i].resizable) {
           if (firstResizable === void 0) {
             firstResizable = i;
@@ -1959,7 +1965,7 @@ Slick._ = (() => {
       if (this._jQuery)
         this._jQuery(canvasNodes).off("draginit dragstart dragend drag");
       else
-        canvasNodes.forEach((el) => el.remove());
+        canvasNodes.forEach((el) => this._removeNode(el));
       for (var k in this) {
         if (!Object.prototype.hasOwnProperty.call(this, k))
           continue;
@@ -2146,7 +2152,7 @@ Slick._ = (() => {
       if (args.groupingPanel && !this._options.groupingPanel)
         this.createGroupingPanel();
       else if (args.groupingPanel != void 0 && !args.groupingPanel && this._groupingPanel)
-        this._groupingPanel.remove();
+        this._removeNode(this._groupingPanel);
       if (args.showColumnHeader !== void 0) {
         this.setColumnHeaderVisibility(args.showColumnHeader);
       }
@@ -2463,7 +2469,7 @@ Slick._ = (() => {
           klass += " " + this._cellCssClasses[key][row][column.id];
         }
       }
-      var html;
+      var formatResult;
       const ctx = {
         cell,
         column,
@@ -2474,7 +2480,7 @@ Slick._ = (() => {
       };
       if (item) {
         ctx.value = this.getDataItemValueForColumn(item, column);
-        html = this.getFormatter(row, column)(ctx);
+        formatResult = this.getFormatter(row, column)(ctx);
       }
       klass = escape(klass);
       if (((_a = ctx.addClass) == null ? void 0 : _a.length) || ((_b = ctx.addAttrs) == null ? void 0 : _b.length) || ((_c = ctx.tooltip) == null ? void 0 : _c.length)) {
@@ -2495,15 +2501,17 @@ Slick._ = (() => {
         var toolTip = ctx.tooltip;
         if (toolTip != null && toolTip.length)
           sb.push('tooltip="' + escape(toolTip) + '"');
-        if (html != null)
-          sb.push(">" + html + "</div>");
+        if (formatResult != null)
+          sb.push(">" + formatResult + "</div>");
         else
           sb.push("></div>");
-      } else if (html != null)
-        sb.push('<div class="' + klass + '">' + html + "</div>");
+      } else if (formatResult != null && !(formatResult instanceof Node))
+        sb.push('<div class="' + klass + '">' + formatResult + "</div>");
       else
         sb.push('<div class="' + klass + '"></div>');
-      this._rowsCache[row].cellRenderQueue.push(cell);
+      var cache = this._rowsCache[row];
+      cache.cellRenderQueue.push(cell);
+      cache.cellRenderContent.push(formatResult instanceof Node ? formatResult : void 0);
       this._rowsCache[row].cellColSpans[cell] = colspan;
     }
     cleanupRows(rangeToKeep) {
@@ -2560,7 +2568,7 @@ Slick._ = (() => {
         columnIdx,
         rowIdx
       });
-      this._jQuery ? this._jQuery(cellnode).remove() : cellnode.remove();
+      cellnode.remove();
     }
     removeRowFromCache(row) {
       var _a, _b, _c, _d;
@@ -2608,11 +2616,12 @@ Slick._ = (() => {
       }
     }
     updateCellWithFormatter(cellNode, row, cell) {
-      var html;
+      var formatResult;
       const ctx = this.getFormatterContext(row, cell);
       if (ctx.item)
-        html = this.getFormatter(row, ctx.column)(ctx);
-      applyFormatterResultToCellNode(ctx, html, cellNode);
+        formatResult = this.getFormatter(row, ctx.column)(ctx);
+      this._emptyNode(cellNode);
+      applyFormatterResultToCellNode(ctx, formatResult, cellNode);
     }
     updateRow(row) {
       var cacheEntry = this._rowsCache[row];
@@ -2775,7 +2784,10 @@ Slick._ = (() => {
           var lastChild = (_c = (_a = cacheEntry.rowNodeR) == null ? void 0 : _a.lastElementChild) != null ? _c : (_b = cacheEntry.rowNodeL) == null ? void 0 : _b.lastElementChild;
           while (lastChild && cacheEntry.cellRenderQueue.length) {
             var columnIdx = cacheEntry.cellRenderQueue.pop();
+            var element = cacheEntry.cellRenderContent.pop();
             cacheEntry.cellNodesByColumnIdx[columnIdx] = lastChild;
+            if (element instanceof Node)
+              lastChild.appendChild(element);
             lastChild = lastChild.previousElementSibling;
             if (lastChild == null)
               lastChild = (_d = cacheEntry.rowNodeL) == null ? void 0 : _d.lastElementChild;
@@ -2807,7 +2819,7 @@ Slick._ = (() => {
         if (this._postCleanupActive && this._postProcessedRows[row] && this._postProcessedRows[row][cellToRemove]) {
           this.queuePostProcessedCellForCleanup(node, cellToRemove, row);
         } else {
-          node.parentElement.removeChild(node);
+          this._removeNode(node);
         }
         delete cacheEntry.cellColSpans[cellToRemove];
         delete cacheEntry.cellNodesByColumnIdx[cellToRemove];
@@ -2823,6 +2835,7 @@ Slick._ = (() => {
       var cellsAdded;
       var colspan;
       var cols = this._cols;
+      var cellContents = [];
       for (var row = range.top, btm = range.bottom; row <= btm; row++) {
         cacheEntry = this._rowsCache[row];
         if (!cacheEntry) {
@@ -2872,7 +2885,10 @@ Slick._ = (() => {
         cacheEntry = this._rowsCache[processedRow];
         var columnIdx;
         while ((columnIdx = cacheEntry.cellRenderQueue.pop()) != null) {
+          var element = cacheEntry.cellRenderContent.pop();
           node = x.lastElementChild;
+          if (element instanceof Node)
+            node.appendChild(element);
           if (frozenCols > 0 && columnIdx >= frozenCols) {
             cacheEntry.rowNodeR.appendChild(node);
           } else {
@@ -2900,7 +2916,8 @@ Slick._ = (() => {
           // Column indices of cell nodes that have been rendered, but not yet indexed in
           // cellNodesByColumnIdx.  These are in the same order as cell nodes added at the
           // end of the row.
-          cellRenderQueue: []
+          cellRenderQueue: [],
+          cellRenderContent: []
         };
         this.appendRowHtml(stringArrayL, stringArrayR, i, range, dataLength);
         if (this._activeCellNode && this._activeRow === i) {
@@ -2916,10 +2933,12 @@ Slick._ = (() => {
       const layout = this._layout;
       for (var i = 0, ii = rows.length; i < ii; i++) {
         var row = rows[i];
-        var item = this._rowsCache[row];
-        item.rowNodeL = l.firstElementChild;
-        item.rowNodeR = r.firstElementChild;
-        layout.appendCachedRow(row, item.rowNodeL, item.rowNodeR);
+        var cache = this._rowsCache[row];
+        cache.rowNodeL = l.firstElementChild;
+        cache.rowNodeR = r.firstElementChild;
+        layout.appendCachedRow(row, cache.rowNodeL, cache.rowNodeR);
+        if (cache.cellRenderContent.some((x) => x instanceof Node))
+          this.ensureCellNodesInRowsCache(row);
       }
       if (needToReselectCell) {
         this._activeCellNode = this.getCellNode(this._activeRow, this._activeCell);
@@ -3065,7 +3084,7 @@ Slick._ = (() => {
             var column = cols[entry.columnIdx];
             if (column && column.asyncPostRenderCleanup) {
               column.asyncPostRenderCleanup(entry.cellNode, entry.rowIdx, column);
-              entry.cellNode.remove();
+              this._removeNode(entry.cellNode);
             }
           }
         }

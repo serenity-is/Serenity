@@ -817,6 +817,7 @@ declare namespace Fluent {
     function empty(el: Element): void;
     /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
     function isVisibleLike(el: Element): boolean;
+    function remove(el: Element): any;
     function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
     function toggle(el: Element, flag?: boolean): void;
     function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;

@@ -95,6 +95,20 @@ export namespace Fluent {
         return !!(el && ((el as any).offsetWidth || (el as any).offsetHeight || el.getClientRects().length));
     }
 
+    export function remove(el: Element) {
+        if (!el)
+            return;
+        let $ = getjQuery();
+        if ($)
+            $(el).remove();
+        else {
+            cleanContents(el);
+            triggerRemoveAndClearAll(el);
+            el.remove();
+        }
+        return this;
+    }
+
     export function removeClass(el: Element, value: string | boolean | (string | boolean)[]) {
         toggleCls(el, toClassName(value), false);
     }
@@ -296,16 +310,7 @@ function cleanContents(element: Element) {
 }
 
 Fluent.prototype.remove = function (this: FluentThis<any>) {
-    if (!this.el)
-        return;
-    let $ = getjQuery();
-    if ($)
-        $(this.el).remove();
-    else {
-        cleanContents(this.el);
-        triggerRemoveAndClearAll(this.el);
-        this.el.remove();
-    }
+    Fluent.remove(this.el);
     return this;
 }
 

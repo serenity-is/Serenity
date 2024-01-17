@@ -1,8 +1,8 @@
-﻿import { Culture, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem, Fluent } from "@serenity-is/base";
-import { Column, FormatterContext, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
-import { Decorators } from "../../types/decorators";
+﻿import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Column, FormatterContext, FormatterResult, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
+import { Decorators } from "../../types/decorators";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -604,11 +604,13 @@ export namespace SlickFormatting {
 
     export function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any,
         formatter: Format): Format {
-        return function (ctx: FormatterContext) {
+        return function (ctx: FormatterContext): FormatterResult {
             var text = formatter(ctx);
             var view = getView();
             var indent = (ctx.item as any)._indent ?? 0;
-            var spacer = '<span class="s-TreeIndent" style="width:' + 15 * indent + 'px"></span>';
+            var spacer = Fluent("span").addClass("s-TreeIndent");
+            spacer.getNode().style.width = (15 * indent) + 'px';
+            var toggle = Fluent("span").addClass("s-TreeToggle");
             var id = getId(ctx.item);
             var idx = view.getIdxById(id);
             var next = view.getItemByIdx(idx + 1);
@@ -616,14 +618,27 @@ export namespace SlickFormatting {
                 var nextIndent = next._indent ?? 0;
                 if (nextIndent > indent) {
                     if (!!!!(ctx.item as any)._collapsed) {
-                        return spacer + '<span class="s-TreeToggle s-TreeExpand"></span>' + text;
+                        toggle.addClass("s-TreeExpand");
                     }
                     else {
-                        return spacer + '<span class="s-TreeToggle s-TreeCollapse"></span>' + text;
+                        toggle.addClass("s-TreeCollapse");
                     }
                 }
             }
-            return spacer + '<span class="s-TreeToggle"></span>' + text;
+
+            if (text instanceof Element) {
+                var fragment = document.createDocumentFragment();
+                fragment.appendChild(spacer.getNode());
+                fragment.appendChild(toggle.getNode());
+                return fragment;
+            }
+            else if (text instanceof DocumentFragment) {
+                text.prepend(toggle.getNode());
+                text.prepend(spacer.getNode());
+                return text;
+            }
+            else
+                return (spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
         };
     }
 
@@ -667,27 +682,40 @@ export namespace SlickFormatting {
         return value == null ? null : value.toString();
     }
 
-    export function itemLinkText(itemType: string, id: any, text: any,
-        extraClass: string, encode: boolean): string {
-        return '<a' + (id != null ? (' href="#' + htmlEncode(replaceAll(itemType, '.', '-')) +
-            '/' + htmlEncode(id) + '"') : '') + ' data-item-type="' +
-            htmlEncode(itemType) + '"' + ' data-item-id="' +
-            htmlEncode(id) + '"' + ' class="s-EditLink s-' +
-            htmlEncode(replaceAll(itemType, '.', '-')) + 'Link' +
-            (!extraClass ? '' : (' ' + htmlEncode(extraClass))) + '">' +
-            (encode ? htmlEncode(text ?? '') : text ?? '') + '</a>';
+    export function itemLinkText(itemType: string, id: any, text: FormatterResult,
+        extraClass: string, encode: boolean): FormatterResult {
+        var link = Fluent("a")
+            .attr("href", id != null ? "#" + replaceAll(itemType, '.', '-') +
+                '/' + id : '')
+            .data("item-type", itemType)
+            .data("item-id", "" + id)
+            .addClass([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass]);
+
+        if (text instanceof Node) {
+            link.append(text);
+            return link.getNode();
+        }
+        else if (text == null || text === "") {
+            return link.getNode().outerHTML;
+        }
+        else if (encode) {
+            return link.text(text).getNode().outerHTML;
+        }
+        else {
+            link.getNode().innerHTML = text;
+            return link.getNode().outerHTML;
+        }
     }
 
     export function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>,
-        cssClass?: Format<TItem>, encode?: boolean): Format<TItem> {
+        cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem> {
         return function (ctx: FormatterContext<TItem>) {
-            var text = (getText == null ? ctx.value : getText(ctx)) ?? '';
+            var text: FormatterResult = (getText == null ? ctx.value : getText(ctx)) ?? '';
             if ((ctx.item as any)?.__nonDataRow) {
-                return encode ? htmlEncode(text) : text;
+                return text instanceof Node ? text : encode ? htmlEncode(text) : text;
             }
 
-            return itemLinkText(itemType, (ctx.item as any)[idField],
-                (getText == null ? ctx.value : getText(ctx)),
+            return itemLinkText(itemType, (ctx.item as any)[idField], text,
                 (cssClass == null ? '' : cssClass(ctx)), encode);
         };
     }

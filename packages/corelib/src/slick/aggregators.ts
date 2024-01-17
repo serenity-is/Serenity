@@ -163,7 +163,12 @@ export namespace AggregateFormatting {
             var item = new NonDataRow();
             (item as any)[column.field] = value;
             try {
-                return formatter({ column, escape, item, value });
+                var result = formatter({ column, escape, item, value });
+                if (result instanceof Element)
+                    return result.outerHTML;
+                else if (result instanceof DocumentFragment)
+                    return Array.from((result as any as DocumentFragment).children).map(x => x.outerHTML).join("")
+                return result;
             }
             catch (e) {
             }

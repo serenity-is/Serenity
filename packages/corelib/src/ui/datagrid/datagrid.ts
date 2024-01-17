@@ -1,4 +1,4 @@
-﻿import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+﻿import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData, getjQuery } from "@serenity-is/base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -828,7 +828,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return 'Item';
     }
 
-    protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string,
+    protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>,
         cssClass?: (ctx: FormatterContext) => string, encode: boolean = true): Format<TItem> {
 
         if (itemType == null) {
@@ -889,20 +889,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             var item = propertyItems[i];
             var column = columns[i];
             if (item.editLink === true) {
-                var oldFormat = { $: column.format };
-                var css = { $: (item.editLinkCssClass) != null ? item.editLinkCssClass : null };
+                var oldFormat = column.format;
+                var css = item.editLinkCssClass != null ? item.editLinkCssClass : null;
                 column.format = this.itemLink(
                     item.editLinkItemType != null ? item.editLinkItemType : null,
                     item.editLinkIdField != null ? item.editLinkIdField : null,
                     function (ctx: FormatterContext) {
-                        if (this.oldFormat.$ != null) {
-                            return this.oldFormat.$(ctx);
+                        if (oldFormat != null) {
+                            return oldFormat(ctx);
                         }
                         return htmlEncode(ctx.value);
-                    }.bind({ oldFormat: oldFormat }),
+                    },
                     function (ctx1: FormatterContext) {
-                        return (this.css.$ ?? '');
-                    }.bind({ css: css }), false);
+                        return css;
+                    }, false);
 
                 if (item.editLinkIdField) {
                     column.referencedFields = column.referencedFields || [];
@@ -918,6 +918,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         opt.multiSelect = false;
         opt.multiColumnSort = true;
         opt.enableCellNavigation = false;
+        if (!getjQuery()) {
+            opt.emptyNode = Fluent.empty;
+            opt.removeNode = Fluent.remove;
+        }
         if (DataGrid.defaultHeaderHeight)
             opt.headerRowHeight = DataGrid.defaultHeaderHeight;
         if (DataGrid.defaultRowHeight)

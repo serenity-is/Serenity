@@ -21,13 +21,14 @@ declare namespace Slick {
     	item?: TItem;
     	row?: number;
     	tooltip?: string;
-    	/** when returning a formatter result, prefer ctx.escape() to avoid html injection attacks! */
+    	/** when returning a formatter result, prefer ctx.escape() to avoid script injection attacks! */
     	value?: any;
     }
-    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+    export type FormatterResult = (string | Element | DocumentFragment);
+    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
     interface CompatFormatterResult {
     	addClasses?: string;
-    	text?: string;
+    	text?: FormatterResult;
     	toolTip?: string;
     }
     export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
@@ -44,7 +45,7 @@ declare namespace Slick {
     };
     function defaultColumnFormat(ctx: FormatterContext): any;
     function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
-    function applyFormatterResultToCellNode(ctx: FormatterContext, html: string, node: HTMLElement): void;
+    function applyFormatterResultToCellNode(ctx: FormatterContext, html: FormatterResult, node: HTMLElement): void;
     /***
      * Information about a group of rows.
      */
@@ -589,6 +590,7 @@ declare namespace Slick {
     	autoHeight?: boolean;
     	cellFlashingCssClass?: string;
     	cellHighlightCssClass?: string;
+    	emptyNode?: (node: Element) => void;
     	columns?: Column<TItem>[];
     	createPreHeaderPanel?: boolean;
     	dataItemColumnValueExtractor?: (item: TItem, column: Column<TItem>) => void;
@@ -634,6 +636,7 @@ declare namespace Slick {
     	multiSelect?: boolean;
     	preHeaderPanelHeight?: number;
     	renderAllCells?: boolean;
+    	removeNode?: (node: Element) => void;
     	rowHeight?: number;
     	rtl?: boolean;
     	selectedCellCssClass?: string;
@@ -675,6 +678,7 @@ declare namespace Slick {
     	private _currentEditor;
     	private _data;
     	private _editController;
+    	private _emptyNode;
     	private _headerColumnWidthDiff;
     	private _hEditorLoader;
     	private _hPostRender;
@@ -703,6 +707,7 @@ declare namespace Slick {
     	private _postProcessGroupId;
     	private _postProcessToRow;
     	private _postRenderActive;
+    	private _removeNode;
     	private _rowsCache;
     	private _scrollDims;
     	private _scrollLeft;
@@ -833,7 +838,7 @@ declare namespace Slick {
     	setSortColumns(cols: ColumnSort[]): void;
     	getSortColumns(): ColumnSort[];
     	private handleSelectedRangesChanged;
-    	/** Returns visible columns in order */
+    	/** Returns only the visible columns in order */
     	getColumns(): Column<TItem>[];
     	/** Returns list of columns passed to the grid constructor, or setColumns method. May include invisible columns and order does not match visible column order. */
     	getInitialColumns(): Column<TItem>[];
@@ -2118,6 +2123,7 @@ declare namespace Serenity {
         function empty(el: Element): void;
         /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
         function isVisibleLike(el: Element): boolean;
+        function remove(el: Element): any;
         function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
         function toggle(el: Element, flag?: boolean): void;
         function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
@@ -3252,10 +3258,10 @@ declare namespace Serenity {
         function groupTotalsFormatter<TItem = any>(totals: Slick.GroupTotals, column: Slick.Column<TItem>): string;
     }
 
-    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => string;
+    type Format<TItem = any> = (ctx: Slick.FormatterContext<TItem>) => Slick.FormatterResult;
 
     interface Formatter {
-        format(ctx: Slick.FormatterContext): string;
+        format(ctx: Slick.FormatterContext): Slick.FormatterResult;
     }
     interface GroupInfo<TItem> {
         getter?: any;
@@ -5002,8 +5008,8 @@ declare namespace Serenity {
         function number(format: string): Format;
         function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
         function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
-        function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
+        function itemLinkText(itemType: string, id: any, text: Slick.FormatterResult, extraClass: string, encode: boolean): Slick.FormatterResult;
+        function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: Slick.FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
     }
     namespace SlickHelper {
         function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
@@ -5206,7 +5212,7 @@ declare namespace Serenity {
         getTitle(): string;
         setTitle(value: string): void;
         protected getItemType(): string;
-        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
+        protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): Format<TItem>;
         protected getColumnsKey(): string;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsData(): PropertyItemsData;

@@ -1,4 +1,4 @@
-import { GroupTotals, Column, FormatterContext, Group, GroupItemMetadataProvider, EventEmitter, Grid, GridOptions } from '@serenity-is/sleekgrid';
+import { GroupTotals, Column, FormatterContext, FormatterResult, Group, GroupItemMetadataProvider, EventEmitter, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 /**
  * Tries to block the page
@@ -819,6 +819,7 @@ declare namespace Fluent {
     function empty(el: Element): void;
     /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
     function isVisibleLike(el: Element): boolean;
+    function remove(el: Element): any;
     function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
     function toggle(el: Element, flag?: boolean): void;
     function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
@@ -1962,7 +1963,7 @@ declare namespace AggregateFormatting {
     function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string;
 }
 
-type Format<TItem = any> = (ctx: FormatterContext<TItem>) => string;
+type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {
     interface Column<TItem = any> {
         referencedFields?: string[];
@@ -1970,7 +1971,7 @@ declare module "@serenity-is/sleekgrid" {
     }
 }
 interface Formatter {
-    format(ctx: FormatterContext): string;
+    format(ctx: FormatterContext): FormatterResult;
 }
 interface GroupInfo<TItem> {
     getter?: any;
@@ -3822,8 +3823,8 @@ declare namespace SlickFormatting {
     function number(format: string): Format;
     function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
     function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
-    function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-    function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: Format<TItem>, encode?: boolean): Format<TItem>;
+    function itemLinkText(itemType: string, id: any, text: FormatterResult, extraClass: string, encode: boolean): FormatterResult;
+    function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
 }
 declare namespace SlickHelper {
     function setDefaults(columns: Column[], localTextPrefix?: string): any;
@@ -4026,7 +4027,7 @@ declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IR
     getTitle(): string;
     setTitle(value: string): void;
     protected getItemType(): string;
-    protected itemLink(itemType?: string, idField?: string, text?: (ctx: FormatterContext) => string, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
+    protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
     protected getColumnsKey(): string;
     protected getPropertyItems(): PropertyItem[];
     protected getPropertyItemsData(): PropertyItemsData;

@@ -448,7 +448,9 @@ Slick._ = (() => {
       node.setAttribute("tooltip", ctx.tooltip);
     if (html == void 0)
       node.innerHTML = "";
-    else
+    else if (html instanceof Node) {
+      node.appendChild(html);
+    } else
       node.innerHTML = "" + html;
     if (ctx.addAttrs != null) {
       var keys = Object.keys(ctx.addAttrs);
