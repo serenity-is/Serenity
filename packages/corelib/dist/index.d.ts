@@ -2578,7 +2578,7 @@ declare class TemplatedWidget<P> extends Widget<P> {
 
 declare class TemplatedDialog<P> extends TemplatedWidget<P> {
     static createDefaultElement(): HTMLDivElement;
-    protected tabs: ArrayLike<HTMLElement>;
+    protected tabs: Fluent<HTMLElement>;
     protected toolbar: Toolbar;
     protected validator: any;
     protected dialog: Dialog;
@@ -2650,9 +2650,11 @@ declare class CascadedWidgetLink<TParent extends Widget<any>> {
 declare namespace TabsExtensions {
     function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean): void;
     function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean): void;
-    function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement): any;
+    function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement): string;
     function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number>;
-    function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string): void;
+    function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number): void;
+    function initialize(tabs: HTMLElement | ArrayLike<HTMLElement>, activeChange: () => void): Fluent<HTMLElement>;
+    function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void;
 }
 
 declare namespace ReflectionOptionsSetter {

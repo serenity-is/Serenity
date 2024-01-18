@@ -1026,9 +1026,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         this.toolbar.updateInterface();
 
-        if (this.tabs != null) {
-            TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
-        }
+        TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
 
         if (this.propertyGrid != null) {
             Fluent(this.propertyGrid.domNode).toggle(!isLocalizationMode);

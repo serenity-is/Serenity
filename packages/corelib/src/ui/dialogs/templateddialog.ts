@@ -7,13 +7,14 @@ import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { WidgetProps } from "../widgets/widget";
 import { DialogExtensions } from "./dialogextensions";
+import { TabsExtensions } from "../helpers/tabsextensions";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     static override createDefaultElement() { return Fluent("div").addClass("hidden").appendTo(document.body).getNode(); }
 
-    protected tabs: ArrayLike<HTMLElement>;
+    protected tabs: Fluent<HTMLElement>;
     protected toolbar: Toolbar;
     protected validator: any;
     protected dialog: Dialog;
@@ -28,7 +29,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     public destroy(): void {
-        (this.tabs as any)?.tabs?.('destroy');
+        TabsExtensions.destroy(this.tabs);
         this.tabs = null;
         (this.toolbar as any)?.toolbar?.destroy?.();
         this.toolbar = null;
@@ -120,7 +121,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         if (!isMobileView())
             (this.domNode.querySelector('input:not([type=hidden]), textarea, select') as HTMLElement)?.focus();
         this.arrange();
-        this.tabs && (this.tabs as any).tabs?.('option', 'active', 0);
+        TabsExtensions.selectTab(this.tabs, 0);
     }
 
     protected getToolbarButtons(): ToolButton[] {
@@ -201,51 +202,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         var tabsDiv = this.findById('Tabs');
         if (!tabsDiv)
             return;
-        let $ = getjQuery();
-        if ($?.fn?.tabs) {
-            this.tabs = $(tabsDiv).tabs?.({});
-            (this.tabs as any)?.on('tabsactivate', () => this.arrange());
-        }
-        else {
-            // emulate UI tabs with bootstrap
-            let ul = tabsDiv.querySelector(":scope > ul");
-            if (!ul.classList.contains("nav-tabs") && !ul.classList.contains("nav-underline")) {
-                ul.classList.add("nav", "nav-tabs");
-
-                let activeLink: HTMLLinkElement;
-
-                ul.querySelectorAll(":scope > li").forEach(li => {
-                    li.classList.add("nav-item");
-                    let a = li.querySelector(":scope > a") as HTMLLinkElement;
-                    if (a) {
-                        a.classList.add("nav-link");
-                        a.dataset.bsToggle = "tab";
-                        a.setAttribute("role", "tab");
-                        if (a.classList.contains("ui-tabs-active")) {
-                            a.classList.add("active");
-                            a.classList.remove("ui-tabs-active");
-                            activeLink = a;
-                        }
-                    }
-                });
-
-                if (!activeLink) {
-                    activeLink = ul.querySelector(":scope > li > a");
-                    if (activeLink) {
-                        activeLink.classList.add("active");
-                    }
-                }
-
-                let container = Fluent("div").addClass("tab-content").appendTo(tabsDiv);
-                tabsDiv.querySelectorAll(":scope>.tab-pane").forEach(pane => {
-                    pane.classList.add("pt-3");
-                    container.append(pane);
-                    if (activeLink && activeLink.getAttribute("href") === "#" + pane.id) {
-                        pane.classList.add("show", "active");
-                    }
-                });
-            }
-        }
+        this.tabs = TabsExtensions.initialize(tabsDiv, this.arrange.bind(this));
     }
 
     protected handleResponsive(): void {

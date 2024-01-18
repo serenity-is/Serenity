@@ -4,6 +4,7 @@ import { validateOptions } from "../../q";
 import { TemplatedWidget } from "./templatedwidget";
 import { Toolbar, ToolButton } from "./toolbar";
 import { WidgetProps } from "./widget";
+import { TabsExtensions } from "../helpers/tabsextensions";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
@@ -16,10 +17,8 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     }
 
     destroy() {
-        if (this.tabs) {
-            (this.tabs as any).tabs?.('destroy');
-            this.tabs = null;
-        }
+        TabsExtensions.destroy(this.tabs);
+        this.tabs = null;
 
         if (this.toolbar) {
             this.toolbar.destroy();
@@ -60,10 +59,9 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
 
     protected initTabs(): void {
         var tabsDiv = this.findById('Tabs');
-        if (!tabsDiv) {
+        if (!tabsDiv)
             return;
-        }
-        this.tabs = (tabsDiv as any).tabs?.({});
+        this.tabs = TabsExtensions.initialize(tabsDiv, null);
     }
 
     protected initToolbar(): void {
