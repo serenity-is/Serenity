@@ -43,7 +43,7 @@ public class GeneratorConfig
     /// When true, enables RowTemplate class generation. This should
     /// only be used when Serenity.Pro.Coder is enabled in the project.
     /// Has no effect when EnableGenerateFields is true.
-    /// EnableGenerateFields should be preffered over this as 
+    /// EnableGenerateFields should be preferred over this as 
     /// RowTemplate might cause some issues.
     /// </summary>
     public bool? EnableRowTemplates { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// IFileSystem extensions to reduce dependency on System.IO, in case these methods are also added to IFileSystem in the future
@@ -54,7 +54,7 @@ public static class FileSystemExtensions
     /// </summary>
     /// <param name="fileSystem">File system</param>
     /// <param name="sourceFileName">Source file name</param>
-    /// <param name="destFileName">Destion</param>
+    /// <param name="destFileName">Destination</param>
     /// <param name="overwrite"></param>
     public static void Copy(this IFileSystem fileSystem, string sourceFileName, string destFileName, bool overwrite)
     {

@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -19,7 +19,7 @@ public class ServiceError
 
     /// <summary>
     /// The error message. In non-development mode the message 
-    /// might be something generic like "some error occured" if the
+    /// might be something generic like "some error occurred" if the
     /// error itself is not a <see cref="ValidationError"/>.
     /// The detailed error can be seen in exception log.
     /// </summary>

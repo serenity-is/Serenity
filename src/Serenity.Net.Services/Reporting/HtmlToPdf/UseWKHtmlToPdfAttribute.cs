@@ -1,8 +1,8 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Marks a report to determine if it should use WKHTML instead
-/// of another converter, e.g. Puppeeteer etc. (only if configured
+/// of another converter, e.g. Puppeteer etc. (only if configured
 /// in service provider).
 /// </summary>
 /// <remarks>

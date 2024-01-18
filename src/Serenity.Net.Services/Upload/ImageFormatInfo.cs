@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Information about an image format
@@ -11,7 +11,7 @@ public class ImageFormatInfo
     public string MimeType { get; set; }
 
     /// <summary>
-    /// List of expecteed file extensions
+    /// List of expected file extensions
     /// </summary>
     public IEnumerable<string> FileExtensions { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Data;
 
@@ -144,7 +144,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
             }
             catch
             {
-                // swallow exceptions for backward compability
+                // swallow exceptions for backward compatibility
             }
 
         return base.VisitBinary(criteria);

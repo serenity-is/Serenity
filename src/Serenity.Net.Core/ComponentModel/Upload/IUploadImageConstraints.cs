@@ -1,7 +1,7 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Contstraints for the uploaded image.
+/// Constraints for the uploaded image.
 /// </summary>
 public interface IUploadImageContrains : IUploadOptions
 {

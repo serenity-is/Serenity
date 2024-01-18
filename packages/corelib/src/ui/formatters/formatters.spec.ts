@@ -157,7 +157,7 @@ describe("FileDownloadFormatter", () => {
     });
 
 
-    it("replaces all backward slashes to foward", () => {
+    it("replaces all backward slashes to forward", () => {
         var formatter = new FileDownloadFormatter();
         expect(formatter.format({ value: "file\\with\\backward\\slashes", escape: (s) => s })).toContain("file/with/backward/slashes");
     });

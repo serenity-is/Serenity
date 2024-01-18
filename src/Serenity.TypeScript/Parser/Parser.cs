@@ -690,7 +690,7 @@ public class Parser
 
 
     // Provides a better error message than the generic "';' expected" if possible for
-    // known common variants of a missing semicolon, such as from a mispelled names.
+    // known common variants of a missing semicolon, such as from a misspelled names.
     // 
     // @param node Node preceding the expected semicolon location.
     void ParseErrorForMissingSemicolonAfter(INode node)

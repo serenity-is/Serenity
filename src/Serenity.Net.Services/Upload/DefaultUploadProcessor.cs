@@ -86,7 +86,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
             {
                 result.ErrorMessage = ex.Message;
                 result.Success = false;
-                logger?.LogError(ex, "Error occured while processing upload!");
+                logger?.LogError(ex, "Error occurred while processing upload!");
             }
         }
         finally

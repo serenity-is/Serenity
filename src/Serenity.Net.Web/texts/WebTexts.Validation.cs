@@ -17,7 +17,7 @@ public static partial class WebTexts
         public static readonly LocalText Integer = "Please enter a valid integer value.";
         public static readonly LocalText MaxLength = "Please enter no more than {0} characters.";
         public static readonly LocalText MinLength = "Please enter no less than {0} characters.";
-        public static readonly LocalText PasswordConfirm = "Password entered don't match.";
+        public static readonly LocalText PasswordConfirm = "Passwords entered don't match.";
         public static readonly LocalText Required = "This field is required.";
         public static readonly LocalText Range = "Please enter a value between {0} and {1}.";
         public static readonly LocalText Url = "Please enter a valid URL (e.g. http://www.site.com).";

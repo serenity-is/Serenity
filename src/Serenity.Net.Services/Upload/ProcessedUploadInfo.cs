@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Web;
 
 /// <summary>
@@ -32,7 +32,7 @@ public class ProcessedUploadInfo
     public long FileSize { get; set; }
 
     /// <summary>
-    /// True if upload and all validations were successfull
+    /// True if upload and all validations were successful
     /// </summary>
     public bool Success { get; set; }
 

@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Abstractions;
 
 /// <summary>
@@ -10,7 +10,7 @@ public interface ISiteAbsoluteUrl
 {
     /// <summary>
     /// Returns the absolute internal/local url of the current site,
-    /// used to generate URLs for report tools like WKHTML, Puppeeteer etc.
+    /// used to generate URLs for report tools like WKHTML, Puppeteer etc.
     /// The default implementation builds it from one of these in this order: 
     /// 1) EnvironmentSettings:SiteInternalUrl setting, 
     /// 2) The current http request base url if available, 

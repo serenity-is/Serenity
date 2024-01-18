@@ -61,7 +61,7 @@ describe("LookupEditor", () => {
         expect(editor.domNode.getAttribute("placeholder")).toBe("Controls.SelectEditor.EmptyItemText");
     });
 
-    test('doesnt set placeholder if its not null', () => {
+    test('doesn\'t set placeholder if its not null', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });

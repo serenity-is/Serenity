@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -8,7 +8,7 @@ namespace Serenity.Services;
 /// <remarks>
 /// Creates an instance of the class.
 /// </remarks>
-/// <param name="implicitBehaviors">Registry for implict behaviors.</param>
+/// <param name="implicitBehaviors">Registry for implicit behaviors.</param>
 /// <param name="behaviorFactory">Behavior factory</param>
 /// <exception cref="ArgumentNullException"></exception>
 public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
