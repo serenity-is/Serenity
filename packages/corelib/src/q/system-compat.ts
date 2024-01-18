@@ -1,4 +1,4 @@
-﻿import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
+import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -221,7 +221,7 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             (typeof obj != "function" && typeof obj != "object"))
             continue;
 
-        // no explict typeName, e.g. not registered with a name,
+        // no explicit typeName, e.g. not registered with a name,
         // a function but not an html element, or registered without name
         if (!getTypeNameProp(obj) &&
             (obj as any)[isInterfaceTypeSymbol] !== void 0 &&

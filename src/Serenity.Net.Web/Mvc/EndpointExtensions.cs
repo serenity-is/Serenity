@@ -40,7 +40,7 @@ public static class EndpointExtensions
         ITextLocalizer localizer, bool showDetails)
         where TResponse: ServiceResponse, new()
     {
-        logger?.LogError(exception, "Error occured during service request!");
+        logger?.LogError(exception, "Error occurred during service request!");
 
         var response = new TResponse();
         

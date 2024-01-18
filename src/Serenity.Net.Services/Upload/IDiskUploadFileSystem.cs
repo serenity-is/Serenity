@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Extension for <see cref="IFileSystem"/> with disk upload storage specific methods.
@@ -18,7 +18,7 @@ public interface IDiskUploadFileSystem : IFileSystem
     /// <param name="directoryToClean">Directory to clean</param>
     /// <param name="autoExpireTime">Auto expire old files timespan</param>
     /// <param name="maxFilesInDirectory">Max files to keep in directory</param>
-    /// <param name="checkFileName">A filename to check existance to confirm the target is a temporary directory.
+    /// <param name="checkFileName">A filename to check existence to confirm the target is a temporary directory.
     /// By default it is ".temporary"</param>
     void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string checkFileName = null);
 

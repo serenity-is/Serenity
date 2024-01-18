@@ -1,7 +1,7 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
-/// Abstaction for the registry that cobtains default
+/// Abstraction for the registry that contains default
 /// handler types.
 /// </summary>
 public interface IDefaultHandlerRegistry

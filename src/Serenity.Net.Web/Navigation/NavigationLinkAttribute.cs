@@ -67,7 +67,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <param name="controller">Controller</param>
     /// <param name="action">Action name</param>
     /// <returns></returns>
-    /// <exception cref="ArgumentNullException">Controll or action is null</exception>
+    /// <exception cref="ArgumentNullException">Controller or action is null</exception>
     /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
     /// <exception cref="InvalidOperationException">Route attribute is not found</exception>
     public static string GetUrlFromController(Type controller, string action)

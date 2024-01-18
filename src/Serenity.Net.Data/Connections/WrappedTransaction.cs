@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Wraps a transaction instance to add current transaction support for the wrapped connection.
@@ -48,7 +48,7 @@ public class WrappedTransaction : IDbTransaction, IHasActualTransaction
     }
 
     /// <summary>
-    ///   Rolbacks actual transaction and sets wrapped transaction for related connection to null.</summary>
+    ///   Rollbacks actual transaction and sets wrapped transaction for related connection to null.</summary>
     public void Dispose()
     {
         actualTransaction.Dispose();

@@ -400,7 +400,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         TypingsUtils.GetAttr(fromType, "Serenity.Extensibility", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                         TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes) != null ||
                         ((TypingsUtils.Contains(baseClasses, "Microsoft.AspNetCore.Mvc", "ControllerBase") ||
-                          TypingsUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compability
+                          TypingsUtils.Contains(baseClasses, "System.Web.Mvc", "Controller")) && // backwards compatibility
                          fromType.NamespaceOf()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true))
                     {
                         EnqueueType(fromType);

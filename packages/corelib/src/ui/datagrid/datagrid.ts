@@ -1,4 +1,4 @@
-﻿import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData, getjQuery } from "@serenity-is/base";
+import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData, getjQuery } from "@serenity-is/base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -1271,8 +1271,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
                     sortColumns.sort(function (a, b) {
                         // sort holds two informations:
-                        // absoulte value: order of sorting
-                        // sign: positive = ascending, negativ = descending
+                        // absolute value: order of sorting
+                        // sign: positive = ascending, negative = descending
                         // so we have to compare absolute values here
                         return Math.abs(a.sort) - Math.abs(b.sort);
                     });
