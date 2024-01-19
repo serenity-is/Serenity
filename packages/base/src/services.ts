@@ -235,7 +235,7 @@ function handleError(response: any, errorInfo: RequestErrorInfo, options: Servic
     if (options?.onError?.(response, errorInfo))
         return;
 
-    ErrorHandling.showServiceError(response.Error, errorInfo);
+    ErrorHandling.showServiceError(response?.Error, errorInfo);
 };
 
 function handleRedirect(getHeader: (key: string) => string): boolean {
