@@ -1,3 +1,28 @@
+## 8.2.1 (2024-01-20)
+
+- This release incorporates significant changes, notably the removal of jQuery UI dependency from our libraries. Although jQuery is still employed for select2, validation, and a few other widgets, these will also be replaced or removed in the near future. Please refer to the release notes at [https://serenity.is/docs](https://serenity.is/docs) for guidance on migrating your code.
+- Introducing a `Fluent` object/function, similar to `jQuery` but designed for a single element, offering a subset of functions. Its aim is not 100%, not even half compatibility, and it serves to simplify the migration of existing code. The Widget's `element` property now returns a `Fluent` object instead of a `jQuery` object. It is recommended to use `.domNode` instead of the `.element` property where possible, with the latter marked as deprecated for easier identification of its usage.
+- Serenity widgets can now be seamlessly used with jsx-dom without requiring wrapping. Widget components can be created without passing a jQuery element, as the component will automatically create its element, akin to calling `Widget.create`.
+- The TypeScript scanner and parser are entirely rewritten based on the latest TypeScript source code, passing over 12,000 test cases and resulting in the same set of tokens/AST nodes.
+- **`[Breaking Change]`** SleekGrid scripts (e.g., `slick.core.js`, `slick.grid.js`, etc.) will now be shipped via the new `Serenity.SleekGrid` package instead of `Serenity.Assets`. Update all references from `~/Serenity.Assets/Scripts/slick.*` to a single reference of `~/Serenity.SleekGrid/index.global.js` containing all those scripts bundled together.
+- The outdated `jquery.fileupload.js`, which had a jQuery UI dependency, is no longer required as we now have a custom uploader component. Remove it from `appsettings.bundles.json`.
+- Introducing `~/Serenity.Assets/Scripts/jquery-ui-datepicker.js`, which should replace `~/Serenity.Assets/Scripts/jquery-ui.js`. It exclusively contains the jQuery DatePicker widget. StartSharp users should refer to the latest source code to integrate flatpicker instead.
+- SleekGrid column formatters now support returning HTML elements, either through `document.createElement` or jsx-dom. This feature is currently experimental.
+- Merged the `jQuery.dialogExtendQ` plugin into corelib. Remove the inclusion in `appsettings.bundles.json`.
+- Implemented a compact version of the column/property script bundle, reducing uncompressed script size by about 65%.
+- Introducing `faIcon` and `fabIcon` helpers providing autocompletion for `Line Awesome` (Font Awesome) icons.
+- Added `gridPageInit` and `panelPageInit` functions for use in GridPage and PanelPage, replacing `initFullHeightGridPage`.
+- Sergen now has limited support for type literals and intersection types for options/props in addition to simple type aliases and interfaces.
+- Introduced `IPasswordStrengthValidator` interface for abstraction of password strength rules and validation (#7054).
+- To obtain widgets directly from an HTML element, use the new `tryGetWidget` and `getWidgetFrom` helpers instead of their jQuery counterparts.
+- **`[Breaking Change]`** All dialogs deriving from `EntityDialog` are panels by default. Add `@Decorators.panel(false)` to make one open as a modal/dialog. All those deriving from `GridEditorDialog`/`PropertyDialog` are modal/dialog by default.
+- Panels can now have dialog buttons. Use `@Decorators.staticPanel` to remove dialog buttons inherited from `PropertyDialog`, along with the close button.
+- Adjusted `TabExtensions` to handle Bootstrap tabs when jQuery UI is not available.
+- Ensure that if another reset password token is requested, the prior one becomes invalid by updating the `LastUpdateDate` of the user.
+- Also handle `SingleField` in Pro.Coder `RowFields` source generator.
+- Hide category links by default. Use CSS `.category-links { display: flex }` if you want to bring them back.
+- Improved wrapping behavior of toolbar buttons. The extra divs with `.buttons-outer`, `.buttons-inner`, `.button-outer` are all removed.
+
 ## 8.1.5 (2023-12-14)
 
 ### Features:
