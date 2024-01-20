@@ -131,7 +131,7 @@ export class Dialog {
 
     static defaults: DialogOptions = {
         autoDispose: true,
-        autoOpen: false,
+        autoOpen: true,
         backdrop: false,
         centered: true,
         closeButton: true,
