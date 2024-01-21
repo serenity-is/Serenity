@@ -241,7 +241,7 @@ interface DialogButton {
     /** Button icon */
     icon?: IconClassName;
     /** Click handler */
-    click?: (e: MouseEvent) => void;
+    click?: (e: MouseEvent) => void | false | Promise<void | false>;
     /** CSS class for button */
     cssClass?: string;
     /** The code that is returned from message dialog function when this button is clicked.

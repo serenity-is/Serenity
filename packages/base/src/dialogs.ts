@@ -3,7 +3,7 @@ import { Fluent } from "./fluent";
 import { htmlEncode } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
-import { isArrayLike, omitUndefined } from "./system";
+import { isArrayLike, isPromiseLike, omitUndefined } from "./system";
 
 /**
  * Options for a message dialog button
@@ -16,7 +16,7 @@ export interface DialogButton {
     /** Button icon */
     icon?: IconClassName;
     /** Click handler */
-    click?: (e: MouseEvent) => void;
+    click?: (e: MouseEvent) => void | false | Promise<void | false>;
     /** CSS class for button */
     cssClass?: string;
     /** The code that is returned from message dialog function when this button is clicked.
@@ -299,8 +299,19 @@ export class Dialog {
 
     private onButtonClick(e: MouseEvent, btn: DialogButton) {
         e ??= new Event("click") as MouseEvent;
-        btn.click && btn.click(e);
-        if (btn.result && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented))
+        if (!btn.click) {
+            if (btn.result)
+                this.close(btn.result);
+            return;
+        }
+
+        var value = btn.click(e);
+        if (!btn.result)
+            return;
+
+        if (isPromiseLike(value))
+            value.then(value => value !== false && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented) && this.close(btn.result));
+        else if (value !== false && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented))
             this.close(btn.result);
     }
 
