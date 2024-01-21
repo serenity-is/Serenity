@@ -1,3 +1,13 @@
+## 8.2.2 (2024-01-21)
+
+### Features:
+
+- Change autoOpen to true for Dialog class (not TemplatedDialog/EntityDialog etc.)
+- Support returning false or a promise that return false from Dialog button click event to prevent closing for dialog with buttons that have a "result"
+
+### Bugfixes:
+- Wrong check for getting readonly state in select2editor
+
 ## 8.2.1 (2024-01-20)
 
 - This release incorporates significant changes, notably the removal of jQuery UI dependency from our libraries. Although jQuery is still employed for select2, validation, and a few other widgets, these will also be replaced or removed in the near future. Please refer to the release notes at [https://serenity.is/docs](https://serenity.is/docs) for guidance on migrating your code.
