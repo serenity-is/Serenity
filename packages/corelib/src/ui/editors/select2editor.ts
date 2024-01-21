@@ -697,7 +697,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     get_readOnly(): boolean {
-        return !!this.domNode.getAttribute("readonly");
+        return this.domNode.getAttribute("readonly") != null;
     }
 
     get readOnly(): boolean {
