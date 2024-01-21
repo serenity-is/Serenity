@@ -16,6 +16,10 @@ export class IInitializeColumn {
 
 @Decorators.registerFormatter('Serenity.BooleanFormatter')
 export class BooleanFormatter implements Formatter {
+    constructor(public readonly props: { falseText?: string, trueText?: string } = {}) {
+        this.props ??= {};
+    }
+
     format(ctx: FormatterContext) {
 
         if (ctx.value == null)
@@ -27,11 +31,11 @@ export class BooleanFormatter implements Formatter {
         return ctx.escape(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
     }
 
-    @Decorators.option()
-    public falseText: string;
+    public get falseText() { return this.props.falseText; }
+    public set falseText(value) { this.props.falseText = value; }
 
-    @Decorators.option()
-    public trueText: string;
+    public get trueText() { return this.props.trueText; }
+    public set trueText(value) { this.props.trueText = value; }
 }
 
 @Decorators.registerType()
@@ -45,8 +49,9 @@ export class CheckboxFormatter implements Formatter {
 
 @Decorators.registerFormatter('Serenity.DateFormatter')
 export class DateFormatter implements Formatter {
-    constructor() {
-        this.displayFormat = Culture.dateFormat;
+    constructor(public readonly props: { displayFormat?: string } = {}) {
+        this.props ??= {};
+        this.props.displayFormat ??= Culture.dateFormat;
     }
 
     static format(value: any, format?: string) {
@@ -73,8 +78,8 @@ export class DateFormatter implements Formatter {
         return htmlEncode(formatDate(date, format));
     }
 
-    @Decorators.option()
-    public displayFormat: string;
+    public get displayFormat() { return this.props.displayFormat; }
+    public set displayFormat(value) { this.props.displayFormat = value; }
 
     format(ctx: FormatterContext): string {
         return DateFormatter.format(ctx.value, this.displayFormat);
@@ -92,12 +97,16 @@ export class DateTimeFormatter extends DateFormatter {
 @Decorators.registerFormatter('Serenity.EnumFormatter')
 export class EnumFormatter implements Formatter {
 
+    constructor(public readonly props: { enumKey?: string } = {}) {
+        this.props ??= {};
+    }
+
     format(ctx: FormatterContext): string {
         return EnumFormatter.format(EnumTypeRegistry.get(this.enumKey), ctx.value);
     }
 
-    @Decorators.option()
-    enumKey: string;
+    get enumKey() { return this.props.enumKey; }
+    set enumKey(value: string) { this.props.enumKey = value; }
 
     static format(enumType: any, value: any) {
 
@@ -128,6 +137,10 @@ export class EnumFormatter implements Formatter {
 
 @Decorators.registerFormatter('Serenity.FileDownloadFormatter', [IInitializeColumn])
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
+
+    constructor(public readonly props: { displayFormat?: string, originalNameProperty?: string, iconClass?: string } = {}) {
+        this.props ??= {};
+    }
 
     format(ctx: FormatterContext): string {
         var dbFile = ctx.value as string;
@@ -161,14 +174,14 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         }
     }
 
-    @Decorators.option()
-    displayFormat: string;
+    get displayFormat() { return this.props.displayFormat; }
+    set displayFormat(value) { this.props.displayFormat = value; }
 
-    @Decorators.option()
-    originalNameProperty: string;
+    get originalNameProperty() { return this.props.originalNameProperty; }
+    set originalNameProperty(value) { this.props.originalNameProperty = value; }
 
-    @Decorators.option()
-    iconClass: string;
+    get iconClass() { return this.props.iconClass; }
+    set iconClass(value) { this.props.iconClass = value; }
 }
 
 @Decorators.registerFormatter('Serenity.MinuteFormatter')
@@ -202,6 +215,10 @@ export class MinuteFormatter implements Formatter {
 
 @Decorators.registerFormatter('Serenity.NumberFormatter')
 export class NumberFormatter {
+    constructor(public readonly props: { displayFormat?: string } = {}) {
+        this.props ??= {};
+    }
+
     format(ctx: FormatterContext): string {
         return NumberFormatter.format(ctx.value, this.displayFormat);
     }
@@ -225,12 +242,16 @@ export class NumberFormatter {
         return htmlEncode(formatNumber(dbl, format));
     }
 
-    @Decorators.option()
-    displayFormat: string;
+    get displayFormat() { return this.props.displayFormat; }
+    set displayFormat(value) { this.props.displayFormat = value; }
 }
 
 @Decorators.registerFormatter('Serenity.UrlFormatter', [IInitializeColumn])
 export class UrlFormatter implements Formatter, IInitializeColumn {
+
+    constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
+        this.props ??= {};
+    }
 
     format(ctx: FormatterContext): string {
         var url = (this.urlProperty ?
@@ -273,18 +294,18 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         }
     }
 
-    @Decorators.option()
-    displayProperty: string;
+    get displayProperty() { return this.props.displayProperty }
+    set displayProperty(value) { this.props.displayProperty = value }
 
-    @Decorators.option()
-    displayFormat: string;
+    get displayFormat() { return this.props.displayFormat }
+    set displayFormat(value) { this.props.displayFormat = value }
 
-    @Decorators.option()
-    urlProperty: string;
+    get urlProperty() { return this.props.urlProperty }
+    set urlProperty(value) { this.props.urlProperty = value }
 
-    @Decorators.option()
-    urlFormat: string;
+    get urlFormat() { return this.props.urlFormat }
+    set urlFormat(value) { this.props.urlFormat = value }
 
-    @Decorators.option()
-    target: string;
+    get target() { return this.props.target }
+    set target(value) { this.props.target = value }
 }

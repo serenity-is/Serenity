@@ -2857,13 +2857,12 @@ declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOption
 interface DateEditorOptions {
     yearRange?: string;
     minValue?: string;
+    maxValue?: string;
     sqlMinMax?: boolean;
 }
 declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     static createDefaultElement(): HTMLInputElement;
     readonly domNode: HTMLInputElement;
-    private minValue;
-    private maxValue;
     constructor(props: EditorProps<P>);
     get_value(): string;
     get value(): string;
@@ -2875,7 +2874,6 @@ declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extend
     set valueAsDate(v: Date);
     get_readOnly(): boolean;
     set_readOnly(value: boolean): void;
-    yearRange: string;
     get_minValue(): string;
     set_minValue(value: string): void;
     get_maxValue(): string;
@@ -2902,8 +2900,6 @@ declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extend
 declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     static createDefaultElement(): HTMLInputElement;
     readonly domNode: HTMLInputElement;
-    private minValue;
-    private maxValue;
     private time;
     private lastSetValue;
     private lastSetValueGet;
@@ -2938,6 +2934,8 @@ interface DateTimeEditorOptions {
     startHour?: any;
     endHour?: any;
     intervalMinutes?: any;
+    minValue?: string;
+    maxValue?: string;
     yearRange?: string;
     useUtc?: boolean;
     seconds?: boolean;
@@ -3382,7 +3380,10 @@ declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdi
 declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
     constructor(props: EditorProps<P>);
 }
-declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
+    jsonEncodeValue?: boolean;
+}
+declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     private entities;
     private toolbar;
     private fileSymbols;
@@ -3405,7 +3406,8 @@ declare class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileU
     set value(v: UploadedFile[]);
     getEditValue(property: PropertyItem, target: any): void;
     setEditValue(source: any, property: PropertyItem): void;
-    jsonEncodeValue: boolean;
+    get jsonEncodeValue(): boolean;
+    set jsonEncodeValue(value: boolean);
 }
 declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
     constructor(props: EditorProps<P>);
@@ -3610,8 +3612,8 @@ declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    editorType: any;
-    constructor(editorType: any);
+    editorTypeRef: any;
+    constructor(editorTypeRef: any);
     protected useEditor(): boolean;
     protected editor: TEditor;
     createEditor(): void;
@@ -3640,10 +3642,22 @@ declare class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
     getOperators(): FilterOperator[];
 }
 declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-    constructor();
-    editorType: string;
-    useRelative: boolean;
-    useLike: boolean;
+    readonly props: {
+        editorType?: string;
+        useRelative?: boolean;
+        useLike?: boolean;
+    };
+    constructor(props?: {
+        editorType?: string;
+        useRelative?: boolean;
+        useLike?: boolean;
+    });
+    get editorType(): string;
+    set editorType(value: string);
+    get useRelative(): boolean;
+    set useRelative(value: boolean);
+    get useLike(): boolean;
+    set useLike(value: boolean);
     getOperators(): FilterOperator[];
     protected useEditor(): boolean;
     getEditorOptions(): any;
@@ -3850,55 +3864,117 @@ interface IInitializeColumn {
 declare class IInitializeColumn {
 }
 declare class BooleanFormatter implements Formatter {
+    readonly props: {
+        falseText?: string;
+        trueText?: string;
+    };
+    constructor(props?: {
+        falseText?: string;
+        trueText?: string;
+    });
     format(ctx: FormatterContext): string;
-    falseText: string;
-    trueText: string;
+    get falseText(): string;
+    set falseText(value: string);
+    get trueText(): string;
+    set trueText(value: string);
 }
 declare class CheckboxFormatter implements Formatter {
     static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
     format(ctx: FormatterContext): string;
 }
 declare class DateFormatter implements Formatter {
-    constructor();
+    readonly props: {
+        displayFormat?: string;
+    };
+    constructor(props?: {
+        displayFormat?: string;
+    });
     static format(value: any, format?: string): any;
-    displayFormat: string;
+    get displayFormat(): string;
+    set displayFormat(value: string);
     format(ctx: FormatterContext): string;
 }
 declare class DateTimeFormatter extends DateFormatter {
     constructor();
 }
 declare class EnumFormatter implements Formatter {
+    readonly props: {
+        enumKey?: string;
+    };
+    constructor(props?: {
+        enumKey?: string;
+    });
     format(ctx: FormatterContext): string;
-    enumKey: string;
+    get enumKey(): string;
+    set enumKey(value: string);
     static format(enumType: any, value: any): string;
     static getText(enumKey: string, name: string): string;
     static getName(enumType: any, value: any): string;
 }
 declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
+    readonly props: {
+        displayFormat?: string;
+        originalNameProperty?: string;
+        iconClass?: string;
+    };
+    constructor(props?: {
+        displayFormat?: string;
+        originalNameProperty?: string;
+        iconClass?: string;
+    });
     format(ctx: FormatterContext): string;
     static dbFileUrl(filename: string): string;
     initializeColumn(column: Column): void;
-    displayFormat: string;
-    originalNameProperty: string;
-    iconClass: string;
+    get displayFormat(): string;
+    set displayFormat(value: string);
+    get originalNameProperty(): string;
+    set originalNameProperty(value: string);
+    get iconClass(): string;
+    set iconClass(value: string);
 }
 declare class MinuteFormatter implements Formatter {
     format(ctx: FormatterContext): string;
     static format(value: number): string;
 }
 declare class NumberFormatter {
+    readonly props: {
+        displayFormat?: string;
+    };
+    constructor(props?: {
+        displayFormat?: string;
+    });
     format(ctx: FormatterContext): string;
     static format(value: any, format?: string): string;
-    displayFormat: string;
+    get displayFormat(): string;
+    set displayFormat(value: string);
 }
 declare class UrlFormatter implements Formatter, IInitializeColumn {
+    readonly props: {
+        displayProperty?: string;
+        displayFormat?: string;
+        urlProperty?: string;
+        urlFormat?: string;
+        target?: string;
+    };
+    constructor(props?: {
+        displayProperty?: string;
+        displayFormat?: string;
+        urlProperty?: string;
+        urlFormat?: string;
+        target?: string;
+    });
     format(ctx: FormatterContext): string;
     initializeColumn(column: Column): void;
-    displayProperty: string;
-    displayFormat: string;
-    urlProperty: string;
-    urlFormat: string;
-    target: string;
+    get displayProperty(): string;
+    set displayProperty(value: string);
+    get displayFormat(): string;
+    set displayFormat(value: string);
+    get urlProperty(): string;
+    set urlProperty(value: string);
+    get urlFormat(): string;
+    set urlFormat(value: string);
+    get target(): string;
+    set target(value: string);
 }
 
 declare namespace FormatterTypeRegistry {
@@ -4427,4 +4503,4 @@ declare class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements 
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, CloseButtonAttribute, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StaticPanelAttribute, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, ValidationHelper, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };
+export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, CloseButtonAttribute, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, type MultipleFileUploadEditorOptions, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StaticPanelAttribute, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, ValidationHelper, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };

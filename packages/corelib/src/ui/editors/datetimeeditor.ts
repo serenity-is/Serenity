@@ -12,8 +12,6 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private minValue: string;
-    private maxValue: string;
     private time: HTMLSelectElement;
     private lastSetValue: string;
     private lastSetValueGet: string;
@@ -254,22 +252,20 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_valueAsDate(value);
     }
 
-    @Decorators.option()
     get_minValue(): string {
-        return this.minValue;
+        return this.options.minValue;
     }
 
     set_minValue(value: string) {
-        this.minValue = value;
+        this.options.minValue = value;
     }
 
-    @Decorators.option()
     get_maxValue(): string {
-        return this.maxValue;
+        return this.options.maxValue;
     }
 
     set_maxValue(value: string): void {
-        this.maxValue = value;
+        this.options.maxValue = value;
     }
 
     get_minDate(): Date {
@@ -280,7 +276,6 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_minValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
     }
 
-    @Decorators.option()
     get_maxDate(): Date {
         return parseISODateTime(this.get_maxValue());
     }
@@ -289,7 +284,6 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_maxValue(formatDate(value, 'yyyy-MM-ddTHH:mm:ss'));
     }
 
-    @Decorators.option()
     get_sqlMinMax(): boolean {
         return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
     }
@@ -371,6 +365,8 @@ export interface DateTimeEditorOptions {
     startHour?: any;
     endHour?: any;
     intervalMinutes?: any;
+    minValue?: string;
+    maxValue?: string;
     yearRange?: string;
     useUtc?: boolean;
     seconds?: boolean;

@@ -4042,13 +4042,12 @@ declare namespace Serenity {
     interface DateEditorOptions {
         yearRange?: string;
         minValue?: string;
+        maxValue?: string;
         sqlMinMax?: boolean;
     }
     class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
-        private minValue;
-        private maxValue;
         constructor(props: EditorProps<P>);
         get_value(): string;
         get value(): string;
@@ -4060,7 +4059,6 @@ declare namespace Serenity {
         set valueAsDate(v: Date);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        yearRange: string;
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -4087,8 +4085,6 @@ declare namespace Serenity {
     class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
-        private minValue;
-        private maxValue;
         private time;
         private lastSetValue;
         private lastSetValueGet;
@@ -4123,6 +4119,8 @@ declare namespace Serenity {
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
+        minValue?: string;
+        maxValue?: string;
         yearRange?: string;
         useUtc?: boolean;
         seconds?: boolean;
@@ -4567,7 +4565,10 @@ declare namespace Serenity {
     class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
         constructor(props: EditorProps<P>);
     }
-    class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
+        jsonEncodeValue?: boolean;
+    }
+    class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
         private entities;
         private toolbar;
         private fileSymbols;
@@ -4590,7 +4591,8 @@ declare namespace Serenity {
         set value(v: UploadedFile[]);
         getEditValue(property: PropertyItem, target: any): void;
         setEditValue(source: any, property: PropertyItem): void;
-        jsonEncodeValue: boolean;
+        get jsonEncodeValue(): boolean;
+        set jsonEncodeValue(value: boolean);
     }
     class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
         constructor(props: EditorProps<P>);
@@ -4795,8 +4797,8 @@ declare namespace Serenity {
         initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
     }
     abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-        editorType: any;
-        constructor(editorType: any);
+        editorTypeRef: any;
+        constructor(editorTypeRef: any);
         protected useEditor(): boolean;
         protected editor: TEditor;
         createEditor(): void;
@@ -4825,10 +4827,22 @@ declare namespace Serenity {
         getOperators(): FilterOperator[];
     }
     class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-        constructor();
-        editorType: string;
-        useRelative: boolean;
-        useLike: boolean;
+        readonly props: {
+            editorType?: string;
+            useRelative?: boolean;
+            useLike?: boolean;
+        };
+        constructor(props?: {
+            editorType?: string;
+            useRelative?: boolean;
+            useLike?: boolean;
+        });
+        get editorType(): string;
+        set editorType(value: string);
+        get useRelative(): boolean;
+        set useRelative(value: boolean);
+        get useLike(): boolean;
+        set useLike(value: boolean);
         getOperators(): FilterOperator[];
         protected useEditor(): boolean;
         getEditorOptions(): any;
@@ -5035,55 +5049,117 @@ declare namespace Serenity {
     class IInitializeColumn {
     }
     class BooleanFormatter implements Formatter {
+        readonly props: {
+            falseText?: string;
+            trueText?: string;
+        };
+        constructor(props?: {
+            falseText?: string;
+            trueText?: string;
+        });
         format(ctx: Slick.FormatterContext): string;
-        falseText: string;
-        trueText: string;
+        get falseText(): string;
+        set falseText(value: string);
+        get trueText(): string;
+        set trueText(value: string);
     }
     class CheckboxFormatter implements Formatter {
         static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
         format(ctx: Slick.FormatterContext): string;
     }
     class DateFormatter implements Formatter {
-        constructor();
+        readonly props: {
+            displayFormat?: string;
+        };
+        constructor(props?: {
+            displayFormat?: string;
+        });
         static format(value: any, format?: string): any;
-        displayFormat: string;
+        get displayFormat(): string;
+        set displayFormat(value: string);
         format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
         constructor();
     }
     class EnumFormatter implements Formatter {
+        readonly props: {
+            enumKey?: string;
+        };
+        constructor(props?: {
+            enumKey?: string;
+        });
         format(ctx: Slick.FormatterContext): string;
-        enumKey: string;
+        get enumKey(): string;
+        set enumKey(value: string);
         static format(enumType: any, value: any): string;
         static getText(enumKey: string, name: string): string;
         static getName(enumType: any, value: any): string;
     }
     class FileDownloadFormatter implements Formatter, IInitializeColumn {
+        readonly props: {
+            displayFormat?: string;
+            originalNameProperty?: string;
+            iconClass?: string;
+        };
+        constructor(props?: {
+            displayFormat?: string;
+            originalNameProperty?: string;
+            iconClass?: string;
+        });
         format(ctx: Slick.FormatterContext): string;
         static dbFileUrl(filename: string): string;
         initializeColumn(column: Slick.Column): void;
-        displayFormat: string;
-        originalNameProperty: string;
-        iconClass: string;
+        get displayFormat(): string;
+        set displayFormat(value: string);
+        get originalNameProperty(): string;
+        set originalNameProperty(value: string);
+        get iconClass(): string;
+        set iconClass(value: string);
     }
     class MinuteFormatter implements Formatter {
         format(ctx: Slick.FormatterContext): string;
         static format(value: number): string;
     }
     class NumberFormatter {
+        readonly props: {
+            displayFormat?: string;
+        };
+        constructor(props?: {
+            displayFormat?: string;
+        });
         format(ctx: Slick.FormatterContext): string;
         static format(value: any, format?: string): string;
-        displayFormat: string;
+        get displayFormat(): string;
+        set displayFormat(value: string);
     }
     class UrlFormatter implements Formatter, IInitializeColumn {
+        readonly props: {
+            displayProperty?: string;
+            displayFormat?: string;
+            urlProperty?: string;
+            urlFormat?: string;
+            target?: string;
+        };
+        constructor(props?: {
+            displayProperty?: string;
+            displayFormat?: string;
+            urlProperty?: string;
+            urlFormat?: string;
+            target?: string;
+        });
         format(ctx: Slick.FormatterContext): string;
         initializeColumn(column: Slick.Column): void;
-        displayProperty: string;
-        displayFormat: string;
-        urlProperty: string;
-        urlFormat: string;
-        target: string;
+        get displayProperty(): string;
+        set displayProperty(value: string);
+        get displayFormat(): string;
+        set displayFormat(value: string);
+        get urlProperty(): string;
+        set urlProperty(value: string);
+        get urlFormat(): string;
+        set urlFormat(value: string);
+        get target(): string;
+        set target(value: string);
     }
 
     namespace FormatterTypeRegistry {

@@ -134,7 +134,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected getTitle(field: PropertyItem) {
-        return tryGetText(field.title) ??(field.title ?? field.name);
+        return tryGetText(field.title) ?? (field.title ?? field.name);
     }
 
     protected displayText(op: FilterOperator, values?: any[]) {
@@ -300,7 +300,7 @@ function Filtering(name: string) {
 
 @Filtering('BaseEditor')
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    constructor(public editorType: any) {
+    constructor(public editorTypeRef: any) {
         super();
     }
 
@@ -321,7 +321,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
 
     createEditor() {
         if (this.useEditor()) {
-            this.editor = new (this.editorType as typeof Widget<{}>)({
+            this.editor = new (this.editorTypeRef as typeof Widget<{}>)({
                 element: el => {
                     this.get_container().append(el);
                 },
@@ -391,7 +391,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
     initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
         super.initQuickFilter(filter);
 
-        filter.type = this.editorType;
+        filter.type = this.editorTypeRef;
         filter.options = extend(extend({}, deepClone(this.getEditorOptions())), deepClone(this.get_field().quickFilterParams));
     }
 }
@@ -498,18 +498,19 @@ export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
 @Filtering('Editor')
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 
-    constructor() {
-        super(Widget)
+    constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
+        super(Widget);
+        this.props ??= {};
     }
 
-    @Decorators.option()
-    editorType: string;
+    get editorType() { return this.props.editorType }
+    set editorType(value) { this.props.editorType = value }
 
-    @Decorators.option()
-    useRelative: boolean;
+    get useRelative() { return this.props.useRelative }
+    set useRelative(value) { this.props.useRelative = value }
 
-    @Decorators.option()
-    useLike: boolean;
+    get useLike() { return this.props.useLike }
+    set useLike(value) { this.props.useLike = value }
 
     getOperators(): FilterOperator[] {
         var list = [];
@@ -669,8 +670,8 @@ export class StringFiltering extends BaseFiltering {
 
     getOperators(): FilterOperator[] {
         var ops = [
-            { key: FilterOperators.contains }, 
-            { key: FilterOperators.startsWith }, 
+            { key: FilterOperators.contains },
+            { key: FilterOperators.startsWith },
             { key: FilterOperators.EQ },
             { key: FilterOperators.NE }
         ];
@@ -694,13 +695,13 @@ export namespace FilteringTypeRegistry {
 
         if (knownTypes != null)
             return;
-        
+
         knownTypes = {};
 
         for (var type of getTypes()) {
             if (!isAssignableFrom(IFiltering, type))
                 continue;
-                
+
             var fullName = getTypeFullName(type).toLowerCase();
 
             knownTypes[fullName] = type;
@@ -721,18 +722,18 @@ export namespace FilteringTypeRegistry {
 
     function setTypeKeysWithoutFilterHandlerSuffix() {
         var suffix = 'filtering';
-        
+
         for (var k of Object.keys(knownTypes)) {
             if (!k.endsWith(suffix))
                 continue;
-            
+
             var p = k.substring(0, k.length - suffix.length);
             if (!p)
                 continue;
 
             if (knownTypes[p] != null)
                 continue;
-            
+
             knownTypes[p] = knownTypes[k];
         }
     }

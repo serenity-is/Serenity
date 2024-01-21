@@ -8,6 +8,7 @@ import { EditorProps, EditorWidget } from "../widgets/widget";
 export interface DateEditorOptions {
     yearRange?: string;
     minValue?: string;
+    maxValue?: string;
     sqlMinMax?: boolean;
 }
 
@@ -16,9 +17,6 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
-
-    private minValue: string;
-    private maxValue: string;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -40,7 +38,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
                     DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
                 },
-                yearRange: (this.yearRange ?? '-100:+50')
+                yearRange: (this.options?.yearRange ?? '-100:+50')
             });
 
         }
@@ -150,25 +148,20 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         }
     }
 
-    @Decorators.option()
-    public yearRange: string;
-
-    @Decorators.option()
     get_minValue(): string {
-        return this.minValue;
+        return this.options.minValue;
     }
 
     set_minValue(value: string) {
-        this.minValue = value;
+        this.options.minValue = value;
     }
 
-    @Decorators.option()
     get_maxValue(): string {
-        return this.maxValue;
+        return this.options.maxValue;
     }
 
     set_maxValue(value: string): void {
-        this.maxValue = value;
+        this.options.maxValue = value;
     }
 
     get_minDate(): Date {
@@ -179,7 +172,6 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         this.set_minValue(formatDate(value, 'yyyy-MM-dd'));
     }
 
-    @Decorators.option()
     get_maxDate(): Date {
         return parseISODateTime(this.get_maxValue());
     }
@@ -188,7 +180,6 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         this.set_maxValue(formatDate(value, 'yyyy-MM-dd'));
     }
 
-    @Decorators.option()
     get_sqlMinMax(): boolean {
         return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
     }

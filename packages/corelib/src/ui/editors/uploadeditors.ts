@@ -275,8 +275,12 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
     }
 }
 
+export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
+    jsonEncodeValue?: boolean;
+}
+
 @Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
-export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
+export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
     private entities: UploadedFile[];
@@ -463,8 +467,8 @@ export class MultipleFileUploadEditor<P extends FileUploadEditorOptions = FileUp
         }
     }
 
-    @Decorators.option()
-    public jsonEncodeValue: boolean;
+    public get jsonEncodeValue() { return this.options.jsonEncodeValue }
+    public set jsonEncodeValue(value) { this.options.jsonEncodeValue = value }
 }
 
 @Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
