@@ -22,6 +22,7 @@
 - Also handle `SingleField` in Pro.Coder `RowFields` source generator.
 - Hide category links by default. Use CSS `.category-links { display: flex }` if you want to bring them back.
 - Improved wrapping behavior of toolbar buttons. The extra divs with `.buttons-outer`, `.buttons-inner`, `.button-outer` are all removed.
+- - **`[Breaking Change]`** Templates, e.g. `.Template.html` or `.ts.html` files are deprecated. Use tsx and `renderContents`. Even though it is still possible to use `getTemplate()` method for now, it will be removed in the next version. TemplatedDialog, TemplatedPanel etc. classes will be removed or replaced with versions that does not use templates.
 
 ## 8.1.5 (2023-12-14)
 
