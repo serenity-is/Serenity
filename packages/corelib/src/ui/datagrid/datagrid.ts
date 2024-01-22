@@ -265,7 +265,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             quick = QuickFilterBar.boolean(name, title, trueText, falseText);
         }
         else {
-            var filtering = new (filteringType as any)() as IFiltering;
+            var filtering = new (filteringType as any)(item.filteringParams ?? {}) as IFiltering;
             if (filtering && isInstanceOfType(filtering, IQuickFiltering)) {
                 ReflectionOptionsSetter.set(filtering, item.filteringParams);
                 filtering.set_field(item);

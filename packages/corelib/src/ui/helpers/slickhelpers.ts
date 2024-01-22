@@ -579,7 +579,7 @@ export namespace PropertyItemSlickConverter {
         if (item.formatterType != null && item.formatterType.length > 0) {
 
             var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
-            var formatter = new formatterType() as Formatter;
+            var formatter = new formatterType(item.formatterParams ?? {}) as Formatter;
 
             if (item.formatterParams != null) {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);

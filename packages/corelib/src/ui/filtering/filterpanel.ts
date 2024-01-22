@@ -421,7 +421,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             (field.filteringType ?? 'String'));
 
         var editorDiv = row.querySelector<HTMLElement>('div.v');
-        filtering = new (filteringType as any)() as IFiltering;
+        filtering = new (filteringType as any)(field.filteringParams ?? {}) as IFiltering;
         ReflectionOptionsSetter.set(filtering, field.filteringParams);
         filtering.set_container(editorDiv);
         filtering.set_field(field);
