@@ -1,6 +1,6 @@
 ﻿import { Fluent, PropertyItem, getjQuery, localText, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
-import { Select2Editor } from "../editors/select2editor";
+import { ComboboxEditor } from "../editors/comboboxeditor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { WidgetProps, getWidgetFrom } from "../widgets/widget";
 import { FilteringTypeRegistry, IFiltering } from "./filtering";
@@ -13,7 +13,7 @@ export interface FilterFieldSelectOptions {
 }
 
 @Decorators.registerClass('Serenity.FilterFieldSelect')
-class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends Select2Editor<P, PropertyItem> {
+class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -39,7 +39,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
 }
 
 @Decorators.registerClass('Serenity.FilterOperatorSelect')
-class FilterOperatorSelect extends Select2Editor<any, FilterOperator> {
+class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
 

@@ -1,9 +1,9 @@
 ﻿import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
-import { Select2CommonOptions, Select2Editor } from "./select2editor";
+import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
 
 @Decorators.registerClass('Serenity.SelectEditor')
-export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
+export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, Select2Item> {
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -36,7 +36,7 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
     }
 }
 
-export interface SelectEditorOptions extends Select2CommonOptions {
+export interface SelectEditorOptions extends ComboboxCommonOptions {
     items?: any[];
     emptyOptionText?: string;
 }

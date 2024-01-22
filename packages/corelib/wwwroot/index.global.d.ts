@@ -4459,44 +4459,40 @@ declare namespace Serenity {
         set_readOnly(value: boolean): void;
     }
 
-    interface Select2CommonOptions {
+    interface ComboboxCommonOptions {
         allowClear?: boolean;
         delimited?: boolean;
         minimumResultsForSearch?: any;
         multiple?: boolean;
     }
-    interface Select2FilterOptions {
+    interface ComboboxFilterOptions {
         cascadeFrom?: string;
         cascadeField?: string;
         cascadeValue?: any;
         filterField?: string;
         filterValue?: any;
     }
-    interface Select2InplaceAddOptions {
+    interface ComboboxInplaceAddOptions {
         inplaceAdd?: boolean;
         inplaceAddPermission?: string;
         dialogType?: string;
         autoComplete?: boolean;
     }
-    interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+    interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
     }
-    interface Select2SearchPromise extends PromiseLike<any> {
-        abort?(): void;
-        catch?(callback: () => void): void;
-        fail?(callback: () => void): void;
-    }
-    interface Select2SearchQuery {
+    interface ComboboxSearchQuery {
         searchTerm?: string;
         idList?: string[];
         skip?: number;
         take?: number;
         checkMore?: boolean;
+        signal?: AbortSignal;
     }
-    interface Select2SearchResult<TItem> {
+    interface ComboboxSearchResult<TItem> {
         items: TItem[];
         more: boolean;
     }
-    class Select2Editor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+    class ComboboxEditor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         private _items;
@@ -4505,7 +4501,7 @@ declare namespace Serenity {
         constructor(props: EditorProps<P>);
         destroy(): void;
         protected hasAsyncSource(): boolean;
-        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
+        protected asyncSearch(query: ComboboxSearchQuery): PromiseLike<ComboboxSearchResult<TItem>>;
         protected getTypeDelay(): any;
         protected emptyItemText(): string;
         protected getPageSize(): number;
@@ -4518,8 +4514,8 @@ declare namespace Serenity {
         protected mapItems(items: TItem[]): Select2Item[];
         protected allowClear(): boolean;
         protected isMultiple(): boolean;
-        private initSelectionPromise;
-        private queryPromise;
+        private initSelectionLoading;
+        private queryLoading;
         private typeTimeout;
         protected abortPendingQuery(): void;
         protected getSelect2Options(): Select2Options;
@@ -4603,15 +4599,14 @@ declare namespace Serenity {
         protected inplaceCreateClick(e: Event): void;
         openDialogAsPanel: boolean;
     }
-    function select2LocaleInitialization(): boolean;
 
-    class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends Select2Editor<P, Select2Item> {
+    class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, Select2Item> {
         constructor(props: EditorProps<P>);
         getItems(): any[];
         protected emptyItemText(): string;
         updateItems(): void;
     }
-    interface SelectEditorOptions extends Select2CommonOptions {
+    interface SelectEditorOptions extends ComboboxCommonOptions {
         items?: any[];
         emptyOptionText?: string;
     }
@@ -4626,21 +4621,21 @@ declare namespace Serenity {
         descending?: boolean;
     }
 
-    interface EnumEditorOptions extends Select2CommonOptions {
+    interface EnumEditorOptions extends ComboboxCommonOptions {
         enumKey?: string;
         enumType?: any;
     }
-    class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends Select2Editor<P, Select2Item> {
+    class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, Select2Item> {
         constructor(props: EditorProps<P>);
         protected updateItems(): void;
         protected allowClear(): boolean;
     }
 
-    interface LookupEditorOptions extends Select2EditorOptions {
+    interface LookupEditorOptions extends ComboboxEditorOptions {
         lookupKey?: string;
         async?: boolean;
     }
-    abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+    abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
         private lookupChangeUnbind;
         constructor(props: EditorProps<P>);
         hasAsyncSource(): boolean;
@@ -4655,7 +4650,7 @@ declare namespace Serenity {
         protected mapItem(item: TItem): Select2Item;
         protected getItemDisabled(item: TItem, lookup: Lookup<TItem>): boolean;
         updateItems(): void;
-        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
+        protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
         protected getDialogTypeKey(): string;
         protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
         protected editDialogDataChange(): void;
@@ -4664,7 +4659,7 @@ declare namespace Serenity {
         constructor(props: EditorProps<P>);
     }
 
-    interface ServiceLookupEditorOptions extends Select2EditorOptions {
+    interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
         service?: string;
         idField?: string;
         textField?: string;
@@ -4679,7 +4674,7 @@ declare namespace Serenity {
         equalityFilter?: any;
         criteria?: any[];
     }
-    abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+    abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
         protected getDialogTypeKey(): string;
         protected getService(): string;
         protected getServiceUrl(): string;
@@ -4688,12 +4683,12 @@ declare namespace Serenity {
         protected getCascadeCriteria(): any[];
         protected getFilterCriteria(): any[];
         protected getIdListCriteria(idList: any[]): any[];
-        protected getCriteria(query: Select2SearchQuery): any[];
-        protected getListRequest(query: Select2SearchQuery): ListRequest;
-        protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>>;
+        protected getCriteria(query: ComboboxSearchQuery): any[];
+        protected getListRequest(query: ComboboxSearchQuery): ListRequest;
+        protected getServiceCallOptions(query: ComboboxSearchQuery): ServiceOptions<ListResponse<TItem>>;
         protected hasAsyncSource(): boolean;
         protected canSearch(byId: boolean): boolean;
-        protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise;
+        protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
     }
     class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
         constructor(props: EditorProps<P>);

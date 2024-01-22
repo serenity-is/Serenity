@@ -1,7 +1,7 @@
-﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText, stringFormat } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText } from "@serenity-is/base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -9,14 +9,14 @@ import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
 
-export interface Select2CommonOptions {
+export interface ComboboxCommonOptions {
     allowClear?: boolean;
     delimited?: boolean;
     minimumResultsForSearch?: any;
     multiple?: boolean;
 }
 
-export interface Select2FilterOptions {
+export interface ComboboxFilterOptions {
     cascadeFrom?: string;
     cascadeField?: string;
     cascadeValue?: any;
@@ -24,38 +24,33 @@ export interface Select2FilterOptions {
     filterValue?: any;
 }
 
-export interface Select2InplaceAddOptions {
+export interface ComboboxInplaceAddOptions {
     inplaceAdd?: boolean;
     inplaceAddPermission?: string;
     dialogType?: string;
     autoComplete?: boolean;
 }
 
-export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
 
-export interface Select2SearchPromise extends PromiseLike<any> {
-    abort?(): void;
-    catch?(callback: () => void): void;
-    fail?(callback: () => void): void;
-}
-
-export interface Select2SearchQuery {
+export interface ComboboxSearchQuery {
     searchTerm?: string;
     idList?: string[];
     skip?: number;
     take?: number;
     checkMore?: boolean;
+    signal?: AbortSignal;
 }
 
-export interface Select2SearchResult<TItem> {
+export interface ComboboxSearchResult<TItem> {
     items: TItem[];
     more: boolean;
 }
 
-@Decorators.registerClass('Serenity.Select2Editor',
+@Decorators.registerClass('Serenity.ComboboxEditor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
-export class Select2Editor<P, TItem> extends Widget<P> implements
+export class ComboboxEditor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
     static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
@@ -88,14 +83,14 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 ValidationHelper.validateElement(hidden);
         });
 
-        this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
+        this.setCascadeFrom((this.options as ComboboxEditorOptions).cascadeFrom);
 
         if (this.useInplaceAdd())
             this.addInplaceCreate(localText('Controls.SelectEditor.InplaceAdd'), null);
     }
 
     destroy() {
-        this.initSelectionPromise?.abort?.();
+        this.initSelectionLoading && this.initSelectionLoading?.abort?.();
         this.abortPendingQuery();
         let $ = getjQuery();
         $ && $(this.domNode)?.select2?.('destroy');
@@ -106,12 +101,11 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         return false;
     }
 
-    protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
-        results({
+    protected asyncSearch(query: ComboboxSearchQuery): PromiseLike<ComboboxSearchResult<TItem>> {
+        return Promise.resolve({
             items: [],
             more: false
         });
-        return null;
     }
 
     protected getTypeDelay() {
@@ -167,21 +161,21 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected allowClear() {
-        return (this.options as Select2EditorOptions).allowClear != null ?
-            !!(this.options as Select2EditorOptions).allowClear : this.emptyItemText() != null;
+        return (this.options as ComboboxEditorOptions).allowClear != null ?
+            !!(this.options as ComboboxEditorOptions).allowClear : this.emptyItemText() != null;
     }
 
     protected isMultiple() {
-        return !!(this.options as Select2EditorOptions).multiple;
+        return !!(this.options as ComboboxEditorOptions).multiple;
     }
 
-    private initSelectionPromise: Select2SearchPromise;
-    private queryPromise: Select2SearchPromise;
+    private initSelectionLoading: false | AbortController;
+    private queryLoading: false | AbortController;
     private typeTimeout: number;
 
     protected abortPendingQuery() {
-        this.queryPromise?.abort?.();
-        this.queryPromise = null;
+        this.queryLoading && this.queryLoading?.abort?.();
+        this.queryLoading = false;
         if (this.typeTimeout) {
             clearTimeout(this.typeTimeout);
             this.typeTimeout = null;
@@ -200,7 +194,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         if (this.hasAsyncSource()) {
             opt.query = query => {
                 var pageSize = this.getPageSize();
-                var searchQuery: Select2SearchQuery = {
+                var searchQuery: ComboboxSearchQuery = {
                     searchTerm: query.term?.trim() || null,
                     skip: (query.page - 1) * pageSize,
                     take: pageSize,
@@ -216,16 +210,17 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 this.typeTimeout = setTimeout(() => {
                     this.abortPendingQuery();
                     select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
-                    this.queryPromise = this.asyncSearch(searchQuery, result => {
+                    this.queryLoading = new AbortController();
+                    searchQuery.signal = this.queryLoading.signal;
+                    this.asyncSearch(searchQuery).then(result => {
+                        this.queryLoading = false;
                         select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                        this.queryPromise = null;
                         query.callback({
                             results: this.mapItems(result.items),
                             more: result.more
                         });
-                    });
-                    (this.queryPromise?.catch || this.queryPromise?.fail)?.call(this.queryPromise, () => {
-                        this.queryPromise = null;
+                    }, () => {
+                        this.queryLoading = false;
                         select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
                     });
                 }, !query.term ? 0 : this.getTypeDelay());
@@ -240,13 +235,15 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
                 var isMultiple = this.isMultiple();
                 var idList = isMultiple ? (val as string).split(',') : [val as string];
-                var searchQuery = {
+                var searchQuery: ComboboxSearchQuery = {
                     idList: idList
                 }
 
-                this.initSelectionPromise?.abort?.();
-                this.initSelectionPromise = this.asyncSearch(searchQuery, result => {
-                    this.initSelectionPromise = null;
+                this.initSelectionLoading && this.initSelectionLoading?.abort?.();
+                this.initSelectionLoading = new AbortController();
+                searchQuery.signal = this.initSelectionLoading.signal;
+                this.asyncSearch(searchQuery).then(result => {
+                    this.initSelectionLoading = false;
                     if (isMultiple) {
                         var items = (result.items || []).map(x => this.mapItem(x));
                         this._itemById = this._itemById || {};
@@ -281,16 +278,15 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                         this._itemById[item.id] = item;
                         callback(item);
                     }
-                });
-                (this.initSelectionPromise.catch || this.initSelectionPromise.fail)?.call(this.initSelectionPromise, () => {
-                    this.initSelectionPromise = null;
+                }, () => {
+                    this.initSelectionLoading = false;
                 });
             }
         }
         else {
             opt.data = this._items;
             opt.query = (query) => {
-                var items = Select2Editor.filterByText(this._items, x => x.text, query.term);
+                var items = ComboboxEditor.filterByText(this._items, x => x.text, query.term);
                 var pageSize = this.getPageSize();
                 query.callback({
                     results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
@@ -324,8 +320,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             }
         }
 
-        if ((this.options as Select2EditorOptions).minimumResultsForSearch != null)
-            opt.minimumResultsForSearch = (this.options as Select2EditorOptions).minimumResultsForSearch;
+        if ((this.options as ComboboxEditorOptions).minimumResultsForSearch != null)
+            opt.minimumResultsForSearch = (this.options as ComboboxEditorOptions).minimumResultsForSearch;
 
         if (this.isAutoComplete() || this.useInplaceAdd())
             opt.createSearchChoice = this.getCreateSearchChoice(null);
@@ -334,7 +330,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     get_delimited() {
-        return !!(this.options as Select2EditorOptions).delimited;
+        return !!(this.options as ComboboxEditorOptions).delimited;
     }
 
     public get items(): Select2Item[] {
@@ -450,13 +446,13 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     protected useInplaceAdd(): boolean {
         return !this.isAutoComplete() &&
-            (this.options as Select2EditorOptions).inplaceAdd &&
-            ((this.options as Select2EditorOptions).inplaceAddPermission == null ||
-                Authorization.hasPermission((this.options as Select2EditorOptions).inplaceAddPermission));
+            (this.options as ComboboxEditorOptions).inplaceAdd &&
+            ((this.options as ComboboxEditorOptions).inplaceAddPermission == null ||
+                Authorization.hasPermission((this.options as ComboboxEditorOptions).inplaceAddPermission));
     }
 
     protected isAutoComplete(): boolean {
-        return !!(this.options as Select2EditorOptions).autoComplete;
+        return !!(this.options as ComboboxEditorOptions).autoComplete;
     }
 
     public getCreateSearchChoice(getName: (z: any) => string) {
@@ -740,7 +736,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 this.cascadeLink.set_parentID(null);
                 this.cascadeLink = null;
             }
-            (this.options as Select2EditorOptions).cascadeFrom = null;
+            (this.options as ComboboxEditorOptions).cascadeFrom = null;
             return;
         }
 
@@ -749,11 +745,11 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         });
 
         this.cascadeLink.set_parentID(value);
-        (this.options as Select2EditorOptions).cascadeFrom = value;
+        (this.options as ComboboxEditorOptions).cascadeFrom = value;
     }
 
     protected get_cascadeFrom(): string {
-        return (this.options as Select2EditorOptions).cascadeFrom;
+        return (this.options as ComboboxEditorOptions).cascadeFrom;
     }
 
     get cascadeFrom(): string {
@@ -761,7 +757,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeFrom(value: string) {
-        if (value !== (this.options as Select2EditorOptions).cascadeFrom) {
+        if (value !== (this.options as ComboboxEditorOptions).cascadeFrom) {
             this.setCascadeFrom(value);
             this.updateItems();
         }
@@ -772,7 +768,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_cascadeField() {
-        return ((this.options as Select2EditorOptions).cascadeField ?? (this.options as Select2EditorOptions).cascadeFrom);
+        return ((this.options as ComboboxEditorOptions).cascadeField ?? (this.options as ComboboxEditorOptions).cascadeFrom);
     }
 
     get cascadeField(): string {
@@ -780,7 +776,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeField(value: string) {
-        (this.options as Select2EditorOptions).cascadeField = value;
+        (this.options as ComboboxEditorOptions).cascadeField = value;
     }
 
     set cascadeField(value: string) {
@@ -788,7 +784,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_cascadeValue(): any {
-        return (this.options as Select2EditorOptions).cascadeValue;
+        return (this.options as ComboboxEditorOptions).cascadeValue;
     }
 
     get cascadeValue(): any {
@@ -796,8 +792,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeValue(value: any) {
-        if ((this.options as Select2EditorOptions).cascadeValue !== value) {
-            (this.options as Select2EditorOptions).cascadeValue = value;
+        if ((this.options as ComboboxEditorOptions).cascadeValue !== value) {
+            (this.options as ComboboxEditorOptions).cascadeValue = value;
             this.set_value(null);
             this.updateItems();
         }
@@ -808,7 +804,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_filterField() {
-        return (this.options as Select2EditorOptions).filterField;
+        return (this.options as ComboboxEditorOptions).filterField;
     }
 
     get filterField(): string {
@@ -816,7 +812,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_filterField(value: string) {
-        (this.options as Select2EditorOptions).filterField = value;
+        (this.options as ComboboxEditorOptions).filterField = value;
     }
 
     set filterField(value: string) {
@@ -824,7 +820,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_filterValue(): any {
-        return (this.options as Select2EditorOptions).filterValue;
+        return (this.options as ComboboxEditorOptions).filterValue;
     }
 
     get filterValue(): any {
@@ -832,8 +828,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_filterValue(value: any) {
-        if ((this.options as Select2EditorOptions).filterValue !== value) {
-            (this.options as Select2EditorOptions).filterValue = value;
+        if ((this.options as ComboboxEditorOptions).filterValue !== value) {
+            (this.options as ComboboxEditorOptions).filterValue = value;
             this.set_value(null);
             this.updateItems();
         }
@@ -885,8 +881,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected getDialogTypeKey() {
-        if ((this.options as Select2EditorOptions).dialogType != null) {
-            return (this.options as Select2EditorOptions).dialogType;
+        if ((this.options as ComboboxEditorOptions).dialogType != null) {
+            return (this.options as ComboboxEditorOptions).dialogType;
         }
 
         return null;
@@ -1006,26 +1002,3 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     public openDialogAsPanel: boolean;
 }
 
-export function select2LocaleInitialization() {
-    let $ = getjQuery();
-    if (!$?.fn?.select2)
-        return false;
-
-    const txt = (s: string) => localText("Controls.SelectEditor." + s);
-    const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
-
-    $.fn.select2.locales['current'] = {
-        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
-        formatNoMatches: () => txt("NoMatches"),
-        formatAjaxError: () => txt("AjaxError"),
-        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
-        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
-        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
-        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
-        formatSearching: () => txt("Searching")
-    };
-    $.extend(($.fn.select2 as any).defaults, ($.fn.select2 as any).locales['current']);
-    return true;
-}
-
-!select2LocaleInitialization() && Fluent.ready(select2LocaleInitialization);

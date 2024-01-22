@@ -60,7 +60,7 @@ export * from "./ui/editors/emaileditor";
 export * from "./ui/editors/emailaddresseditor";
 export * from "./ui/editors/urleditor";
 export * from "./ui/editors/radiobuttoneditor";
-export * from "./ui/editors/select2editor";
+export * from "./ui/editors/comboboxeditor";
 export * from "./ui/editors/selecteditor";
 export * from "./ui/editors/dateyeareditor";
 export * from "./ui/editors/enumeditor";
