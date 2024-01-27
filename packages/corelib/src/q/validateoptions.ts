@@ -19,6 +19,7 @@ export function validatorAbortHandler(validator: any) {
 
 export function validateOptions(options?: any) {
     var opt = baseValidateOptions();
+    delete opt.showErrors;
     return extend(extend(opt, {
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
             var element = isArrayLike(elem) ?  elem[0] : elem;

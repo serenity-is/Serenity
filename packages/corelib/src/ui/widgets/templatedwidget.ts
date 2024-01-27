@@ -5,8 +5,8 @@ import { Widget } from "./widget";
 @Decorators.registerClass("Serenity.TemplatedWidget")
 export class TemplatedWidget<P> extends Widget<P> {
 
-    protected byId(id: string): Fluent {
-        return Fluent(this.domNode.querySelector('#' + this.idPrefix + id));
+    protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement> {
+        return Fluent<TElement>(this.domNode.querySelector('#' + this.idPrefix + id));
     }
 
     protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {

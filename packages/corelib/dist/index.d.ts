@@ -1182,6 +1182,7 @@ declare class Tooltip {
     static defaults: TooltipOptions;
     dispose(): void;
     delayedDispose(delay?: number): void;
+    delayedHide(delay?: number): void;
     private static existingInstance;
     static getInstance(el: ArrayLike<HTMLElement> | HTMLElement): Tooltip;
     setTitle(value: string): Tooltip;
@@ -1359,11 +1360,9 @@ interface ValidatorOptions {
     ignore?: string | undefined;
     /**
      * Callback for custom code when an invalid form is submitted. Called with an event object as the first argument, and the validator
-     * as in the event.
+     * as in the second.
      */
-    invalidHandler?(event: Event & {
-        validator: Validator;
-    }): void;
+    invalidHandler?(event: Event, validator: Validator): void;
     /**
      * Key/value pairs defining custom messages. Key is the name of an element, value the message to display for that element. Instead
      * of a plain message, another map with specific messages for each rule can be used. Overrides the title attribute of an element or
@@ -2844,7 +2843,7 @@ declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<
 }
 
 declare class TemplatedWidget<P> extends Widget<P> {
-    protected byId(id: string): Fluent;
+    protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement>;
     protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement;
     protected getTemplate(): string;
     protected renderContents(): void;
@@ -2903,7 +2902,7 @@ declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
 declare namespace ValidationHelper {
     function asyncSubmit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
     function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-    function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): any;
+    function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): Validator;
     function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
 }
 

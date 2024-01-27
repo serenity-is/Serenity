@@ -52,6 +52,10 @@ interface ValidationRulesMap {
 
 type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
 
+function messageKey(method: string) {
+    return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()    
+}
+
 interface ValidatorOptions {
     /** True for logging debug info */
     debug?: boolean;
@@ -102,9 +106,9 @@ interface ValidatorOptions {
 
     /**
      * Callback for custom code when an invalid form is submitted. Called with an event object as the first argument, and the validator
-     * as in the event.
+     * as in the second.
      */
-    invalidHandler?(event: Event & { validator: Validator }): void;
+    invalidHandler?(event: Event, validator: Validator): void;
     /**
      * Key/value pairs defining custom messages. Key is the name of an element, value the message to display for that element. Instead
      * of a plain message, another map with specific messages for each rule can be used. Overrides the title attribute of an element or
@@ -397,15 +401,13 @@ export class Validator {
                     if (typeof handler === "function") {
                         let message = handler(element);
                         if (message != null) {
-                            element.dataset.customvalidationmessage = message;
-                            return false;
+                            return message;
                         }
                     }
                 }
             }
 
             return true;
-
         },
 
         dateQ: function (value: string, element: any) {
@@ -651,7 +653,7 @@ export class Validator {
         Fluent.on(this.currentForm, "click.validator", "select, option, [type='radio'], [type='checkbox']", validatorEventDelegate);
 
         if (this.settings.invalidHandler) {
-            Fluent.on(this.currentForm, "invalid-form.validator", this.settings.invalidHandler);
+            Fluent.on(this.currentForm, "invalid-form.validator", (e) => this.settings.invalidHandler(e, this));
         }
     }
 
@@ -909,19 +911,6 @@ export class Validator {
         if (this.settings.showErrors) {
             this.settings.showErrors(this.errorMap, this.errorList, this);
         } else {
-            var error: any, hl: any;
-            for (var i = 0; this.errorList[i]; i++) {
-                error = this.errorList[i];
-                hl = getHighlightTarget(error.element) ?? error.element;
-                new Tooltip(hl).setTitle(i ? '' : error.message).toggle(!i);
-            }
-
-            var valids = this.validElements();
-            for (var element of valids) {
-                hl = getHighlightTarget(element) ?? element;
-                Tooltip.getInstance(hl)?.setTitle('').hide();
-            }
-
             this.defaultShowErrors();
         }
     }
@@ -1143,6 +1132,11 @@ export class Validator {
                     return;
                 }
 
+                if (typeof result === "string") {
+                    element.dataset[messageKey(method)] = result;
+                    result = false;
+                }
+
                 if (!result) {
                     this.formatAndAdd(element, rule);
                     return false;
@@ -1171,14 +1165,13 @@ export class Validator {
     // specified in the element's HTML5 data attribute
     // return the generic message if present and no method specific message is present
     customDataMessage(element: ValidatableElement, method: string) {
-        return element.dataset["msg" + method.charAt(0).toUpperCase() +
-            method.substring(1).toLowerCase()] || element.dataset.msg;
+        return element.dataset[messageKey(method)] || element.dataset.msg;
     }
 
     // Return the custom message for the given element name and validation method
     customMessage(name: string, method: string) {
         var m = this.settings.messages[name];
-        return m && (m.constructor === String ? m : (m as any)[method]);
+        return m && (typeof m == "string" ? m : (m as any)[method]);
     }
 
     // Return the first defined argument, allowing empty strings
@@ -1458,7 +1451,8 @@ export class Validator {
         dateISO: { dateISO: true },
         number: { number: true },
         digits: { digits: true },
-        creditcard: { creditcard: true }
+        creditcard: { creditcard: true },
+        customValidate: { customValidate: true }
     }
 
     static addClassRules(className: (string | any), rules: ValidationRules) {

@@ -20,7 +20,7 @@ export class Tooltip {
             }
             else {
                 opt ??= {};
-                opt.trigger ??= "click hover";
+                opt.trigger ??= "hover focus";
 
                 let $ = getjQuery();
                 if ($?.fn?.tooltip)
@@ -46,6 +46,10 @@ export class Tooltip {
 
     delayedDispose(delay: number = 5000) {
         setTimeout(this.dispose.bind(this), delay);
+    }
+
+    delayedHide(delay: number = 5000): void {
+        setTimeout(this.hide.bind(this), delay);
     }
 
     private static existingInstance(el: HTMLElement): any {

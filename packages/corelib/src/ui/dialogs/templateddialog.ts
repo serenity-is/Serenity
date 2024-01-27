@@ -1,4 +1,4 @@
-import { Dialog, DialogButton, DialogOptions, Fluent, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
+import { Dialog, DialogButton, DialogOptions, Fluent, Validator, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
@@ -144,13 +144,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
     }
 
     protected initValidator(): void {
-        var form = this.byId('Form');
-        if (form) {
-            let $ = getjQuery();
-            if ($?.fn?.validate) {
-                var valOptions = this.getValidatorOptions();
-                this.validator = $(form).validate(validateOptions(valOptions));
-            }
+        var form = this.findById('Form');
+        if (form instanceof HTMLFormElement) {
+            var valOptions = this.getValidatorOptions();
+            this.validator = new Validator(form, validateOptions(valOptions));
         }
     }
 
