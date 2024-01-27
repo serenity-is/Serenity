@@ -1,10 +1,10 @@
-﻿import { Fluent, getjQuery } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, Validator, getjQuery } from "@serenity-is/base";
 import { validateOptions } from "../../q";
-import { TemplatedWidget } from "./templatedwidget";
-import { Toolbar, ToolButton } from "./toolbar";
-import { WidgetProps } from "./widget";
+import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
+import { TemplatedWidget } from "./templatedwidget";
+import { ToolButton, Toolbar } from "./toolbar";
+import { WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.TemplatedPanel")
 export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
@@ -72,11 +72,10 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     }
 
     protected initValidator(): void {
-        let $ = getjQuery();
-        var form = this.findById('Form');
-        if ($ && form) {
+        var form = this.findById<HTMLFormElement>('Form');
+        if (form) {
             var valOptions = this.getValidatorOptions();
-            this.validator = $(form).validate?.(validateOptions(valOptions));
+            this.validator = new Validator(form, validateOptions(valOptions));
         }
     }
 

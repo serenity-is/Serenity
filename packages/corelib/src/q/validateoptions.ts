@@ -1,54 +1,14 @@
-﻿import { Fluent, Tooltip, getjQuery, isArrayLike, localText, notifyError } from "@serenity-is/base";
+﻿import { Tooltip, getjQuery, isArrayLike, localText, notifyError } from "@serenity-is/base";
 import { extend } from "./system-compat";
-import { baseValidateOptions, getHighlightTarget } from "./validation";
+import { baseValidateOptions } from "./validation";
 
-let oldShowLabel: (e: HTMLElement, message: string) => void;
-
-function validateShowLabel(element: HTMLElement, message: string) {
-    oldShowLabel.call(this, element, message);
-    this.errorsFor(element).each(function (i: number, element: HTMLElement) {
-        if ((element?.parentNode as HTMLElement)?.classList?.contains('vx')) {
-            element.setAttribute('title', element.textContent);
-            if (message && element.classList.contains('error'))
-                element.classList.remove('checked');
-        }
-    });
-};
-
-function jQueryValidationInitialization(): boolean {
-
-    let $ = getjQuery();
-    if (!$ || !$.validator)
-        return false;
-
-    let p: any = $.validator;
-    p = p.prototype;
-    oldShowLabel = p.showLabel;
-    p.showLabel = validateShowLabel;
-
-    p.oldfocusInvalid = p.focusInvalid;
-    p.focusInvalid = function () {
-        if (this.settings.abortHandler)
-            this.settings.abortHandler(this);
-        this.oldfocusInvalid.call(this);
-    };
-    p.oldstopRequest = p.focusInvalid;
-    p.stopRequest = function (element: any, valid: boolean) {
-        let formSubmitted = this.formSubmitted;
-        this.oldfocusInvalid.call(this, [element, valid]);
-        if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
-            this.settings.abortHandler(this);
-        }
-    };
-    p.resetAll = function () {
-        this.submitted = {};
-        this.prepareForm();
-        this.hideErrors();
-        this.elements().removeClass(this.settings.errorClass);
-    };
-
-    return true;
-};
+function getHighlightTarget(el: HTMLElement) {
+    var hl = el.dataset.vxHighlight;
+    if (hl)
+        return document.getElementById(hl);
+    else if (el.classList.contains("select2-offscreen") && el.id)
+        return document.getElementById('s2id_' + el.id);
+}
 
 export function validatorAbortHandler(validator: any) {
     validator.settings.abortHandler = null;
@@ -59,9 +19,7 @@ export function validatorAbortHandler(validator: any) {
 
 export function validateOptions(options?: any) {
     var opt = baseValidateOptions();
-    delete opt.showErrors;
     return extend(extend(opt, {
-        meta: 'v',
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
             var element = isArrayLike(elem) ?  elem[0] : elem;
             let field: HTMLElement = null;
@@ -118,9 +76,8 @@ export function validateOptions(options?: any) {
             }
         },
         success: function (label: ArrayLike<HTMLElement> | HTMLElement) {
-            (isArrayLike(label) ? label[0] : label).classList.add('checked');
+            label = isArrayLike(label) ? label[0] : label;
+            label && label.classList.add('checked');
         }
     }), options);
 };
-
-!jQueryValidationInitialization() && Fluent.ready(jQueryValidationInitialization);

@@ -1279,6 +1279,284 @@ declare class Uploader {
     static errorHandler: (data: UploaderErrorData) => void;
 }
 
+/*!
+ * Serenity validator implementation inspired from:
+ * jQuery Validation Plugin, https://jqueryvalidation.org/)
+ * - and -
+ * https://raw.githubusercontent.com/haacked/aspnet-client-validation
+ */
+/**
+ * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or [contenteditable).
+ */
+interface ValidatableElement extends HTMLElement {
+    form?: HTMLFormElement;
+    name?: string;
+    type?: string;
+    value?: string;
+}
+type ValidationValue = string | string[] | number | boolean;
+/**
+ * Validation plugin signature with multitype return.
+ * Boolean return signifies the validation result, which uses the default validation error message read from the element attribute.
+ * String return signifies failed validation, which then will be used as the validation error message.
+ * Promise return signifies asynchronous plugin behavior, with same behavior as Boolean or String.
+ */
+type ValidationProvider = (value: ValidationValue, element: ValidatableElement, params?: any) => boolean | string | Promise<boolean | string>;
+interface ValidationErrorMap {
+    [name: string]: (string | boolean);
+}
+interface ValidationErrorItem {
+    message: string;
+    element: ValidatableElement;
+    method?: string;
+}
+type ValidationErrorList = ValidationErrorItem[];
+type ValidationRules = Record<string, any>;
+interface ValidationRulesMap {
+    [name: string]: ValidationRules;
+}
+type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
+interface ValidatorOptions {
+    /** True for logging debug info */
+    debug?: boolean;
+    /**
+     * Use this class to create error labels, to look for existing error labels and to add it to invalid elements.
+     *
+     * default: "error"
+     */
+    errorClass?: string | undefined;
+    /**
+     * Use this element type to create error messages and to look for existing error messages. The default, "label",
+     * has the advantage of creating a meaningful link between error message and invalid field using the for attribute (which is always used, regardless of element type).
+     *
+     * default: "label"
+     */
+    errorElement?: string | undefined;
+    /**
+     * Customize placement of created error labels. First argument: The created error label. Second argument: The invalid element.
+     *
+     * default: Places the error label after the invalid element
+     */
+    errorPlacement?(error: HTMLElement, element: ValidatableElement, validator: Validator): void;
+    /**
+     * Focus the last active or first invalid element on submit via validator.focusInvalid(). The last active element is the one
+     * that had focus when the form was submitted, avoiding stealing its focus. If there was no element focused, the first one
+     * in the form gets it, unless this option is turned off.
+     *
+     * default: true
+     */
+    focusInvalid?: boolean | undefined;
+    /**
+     * How to highlight invalid fields. Override to decide which fields and how to highlight.
+     *
+     * default: Adds errorClass (see the option) to the element
+     */
+    highlight?(element: ValidatableElement, errorClass: string, validClass: string): void;
+    /**
+     * Elements to ignore when validating, simply filtering them out. CSS not-method is used, therefore everything that is
+     * accepted by not() can be passed as this option. Inputs of type submit and reset are always ignored, so are disabled elements.
+     */
+    ignore?: string | undefined;
+    /**
+     * Callback for custom code when an invalid form is submitted. Called with an event object as the first argument, and the validator
+     * as in the event.
+     */
+    invalidHandler?(event: Event & {
+        validator: Validator;
+    }): void;
+    /**
+     * Key/value pairs defining custom messages. Key is the name of an element, value the message to display for that element. Instead
+     * of a plain message, another map with specific messages for each rule can be used. Overrides the title attribute of an element or
+     * the default message for the method (in that order). Each message can be a String or a Callback. The callback is called in the scope
+     * of the validator, with the rule's parameters as the first argument and the element as the second, and must return a String to display
+     * as the message.
+     *
+     * default: the default message for the method used
+     */
+    messages?: Record<string, string> | undefined;
+    normalizer?: (val: ValidationValue, element: ValidatableElement) => string;
+    /**
+     * Boolean or Function. Validate checkboxes and radio buttons on click. Set to false to disable.
+     *
+     * Set to a Function to decide for yourself when to run validation.
+     * A boolean true is not a valid value.
+     */
+    onclick?: ValidateEventDelegate | boolean | undefined;
+    /**
+     * Function. Validate elements when user focuses in. If omitted hides all other fields marked as invalid.
+     *
+     * Set to a custom Function to decide for yourself when to run validation.
+     */
+    onfocusin?: ValidateEventDelegate | undefined;
+    /**
+     * Boolean or Function. Validate elements (except checkboxes/radio buttons) on blur. If nothing is entered, all rules are skipped, except when the field was already marked as invalid.
+     *
+     * Set to a Function to decide for yourself when to run validation.
+     * A boolean true is not a valid value.
+     */
+    onfocusout?: ValidateEventDelegate | undefined;
+    /**
+     * Boolean or Function. Validate elements on keyup. As long as the field is not marked as invalid, nothing happens.
+     * Otherwise, all rules are checked on each key up event. Set to false to disable.
+     *
+     * Set to a Function to decide for yourself when to run validation.
+     * A boolean true is not a valid value.
+     */
+    onkeyup?: ValidateEventDelegate | undefined;
+    /**
+     * Validate the form on submit. Set to false to use only other events for validation.
+     * Set to a Function to decide for yourself when to run validation.
+     * A boolean true is not a valid value.
+     *
+     * default: true
+     */
+    onsubmit?: boolean | undefined;
+    /**
+     * Pending class
+     * default: "pending"
+     */
+    pendingClass?: string | undefined;
+    /**
+     * A custom message display handler. Gets the map of errors as the first argument and an array of errors as the second,
+     * called in the context of the validator object. The arguments contain only those elements currently validated,
+     * which can be a single element when doing validation onblur/keyup. You can trigger (in addition to your own messages)
+     * the default behaviour by calling this.defaultShowErrors().
+     */
+    rules?: ValidationRulesMap | undefined;
+    /**
+     * A custom message display handler. Gets the map of errors as the first argument and an array of errors as the second,
+     * called in the context of the validator object. The arguments contain only those elements currently validated, which can
+     * be a single element when doing validation onblur/keyup. You can trigger (in addition to your own messages) the default
+     * behaviour by calling this.defaultShowErrors().
+     */
+    showErrors?(errorMap: ValidationErrorMap, errorList: ValidationErrorList, validator: Validator): void;
+    abortHandler?(form: HTMLFormElement, validator: Validator): void;
+    /**
+     * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit.
+     * The right place to submit a form via Ajax after it is validated.
+     */
+    submitHandler?(form: HTMLFormElement, event: Event, validator: Validator): void;
+    /**
+     * String or Function. If specified, the error label is displayed to show a valid element. If a String is given, it is added as
+     * a class to the label. If a Function is given, it is called with the label and the validated input (as a DOM element).
+     * The label can be used to add a text like "ok!".
+     */
+    success?: string | ((label: HTMLElement, validatedInput: ValidatableElement) => void) | undefined;
+    /**
+     * Called to revert changes made by option highlight, same arguments as highlight.
+     *
+     * default: Removes the errorClass
+     */
+    unhighlight?(element: ValidatableElement, errorClass: string, validClass: string, validator: Validator): void;
+    /**
+     * This class is added to an element after it was validated and considered valid.
+     *
+     * default: "valid"
+     */
+    validClass?: string | undefined;
+}
+declare class Validator {
+    static optional(element: ValidatableElement): "" | "dependency-mismatch";
+    static autoCreateRanges: boolean;
+    static defaults: ValidatorOptions;
+    static readonly messages: Record<string, string | Function>;
+    static readonly methods: Record<string, ValidationProvider>;
+    readonly settings: ValidatorOptions;
+    lastActive: ValidatableElement;
+    private cancelSubmit;
+    private currentElements;
+    private currentForm;
+    private errorMap;
+    private errorList;
+    private formSubmitted;
+    private submitted;
+    private submitButton;
+    private pendingRequest;
+    private invalid;
+    private pending;
+    private successList;
+    private toHide;
+    private toShow;
+    constructor(form: HTMLFormElement, options: ValidatorOptions);
+    static getInstance(element: HTMLFormElement | Node | ArrayLike<HTMLElement>): Validator;
+    private init;
+    /**
+     * Checks if `element` is validatable (`input`, `select`, `textarea`).
+     * @param element The element to check.
+     * @returns `true` if validatable, otherwise `false`.
+     */
+    static isValidatableElement(element: EventTarget): element is ValidatableElement;
+    static isCheckOrRadio(element: Node): element is HTMLInputElement;
+    static getLength(value: ValidationValue, element: HTMLElement): number;
+    static isContentEditable(element: HTMLElement): boolean;
+    static elementValue(element: HTMLElement): string | number | string[];
+    static valid(element: HTMLFormElement | ValidatableElement | ArrayLike<ValidatableElement>): boolean;
+    static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): Record<string, any>;
+    form(): boolean;
+    checkForm(): boolean;
+    element(element: ValidatableElement): boolean;
+    showErrors(errors?: ValidationErrorMap): void;
+    resetForm(): void;
+    resetElements(elements: ValidatableElement[]): void;
+    numberOfInvalids(): number;
+    private static objectLength;
+    hideErrors(): void;
+    hideThese(errors: HTMLElement[]): void;
+    valid(): boolean;
+    size(): number;
+    focusInvalid(): void;
+    findLastActive(): ValidatableElement;
+    elements(): ValidatableElement[];
+    errors(): HTMLElement[];
+    resetInternals(): void;
+    reset(): void;
+    resetAll(): void;
+    prepareForm(): void;
+    prepareElement(element: ValidatableElement): void;
+    check(element: ValidatableElement): boolean;
+    customDataMessage(element: ValidatableElement, method: string): string;
+    customMessage(name: string, method: string): any;
+    findDefined(...args: any[]): any;
+    defaultMessage(element: ValidatableElement, rule: {
+        method: string;
+        parameters?: any;
+    }): any;
+    formatAndAdd(element: ValidatableElement, rule: {
+        method: string;
+        parameters: any;
+    }): void;
+    defaultShowErrors(): void;
+    validElements(): ValidatableElement[];
+    invalidElements(): ValidatableElement[];
+    showLabel(element: ValidatableElement, message?: string): void;
+    errorsFor(element: ValidatableElement): HTMLElement[];
+    idOrName(element: ValidatableElement): string;
+    validationTargetFor(element: ValidatableElement): ValidatableElement;
+    findByName(name: string): ValidatableElement[];
+    dependTypes: {
+        boolean: (param: any) => any;
+        string: (param: any, element: ValidatableElement) => boolean;
+        function: (param: any, element: ValidatableElement) => any;
+    };
+    depend(param: any, element: ValidatableElement): any;
+    startRequest(element: ValidatableElement): void;
+    stopRequest(element: ValidatableElement, valid: boolean): void;
+    abortRequest(element: ValidatableElement): void;
+    previousValue(element: ValidatableElement, method: string): any;
+    destroy(): void;
+    static classRuleSettings: Record<string, ValidationRules>;
+    static addClassRules(className: (string | any), rules: ValidationRules): void;
+    static classRules(element: ValidatableElement): ValidationRules;
+    static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue): void;
+    static attributeRules(element: ValidatableElement): ValidationRules;
+    static dataRules(element: ValidatableElement): {};
+    static staticRules(element: ValidatableElement): ValidationRules;
+    static normalizeRules(rules: ValidationRules, element: ValidatableElement): ValidationRules;
+    static addMethod(name: string, method: ValidationProvider, message?: string): void;
+}
+declare function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
+declare function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
+
 /**
  * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
  * @param array Array to test.
@@ -1943,12 +2221,8 @@ declare class InvalidCastException extends Exception {
 declare function validatorAbortHandler(validator: any): void;
 declare function validateOptions(options?: any): any;
 
-declare function loadValidationErrorMessages(): boolean;
-declare function getHighlightTarget(el: HTMLElement): HTMLElement;
 declare function baseValidateOptions(): any;
 declare function validateForm(form: HTMLElement | ArrayLike<HTMLElement>, opt: any): any;
-declare function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
-declare function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
 
 declare namespace Aggregators {
     function Avg(field: string): void;
@@ -2571,7 +2845,7 @@ declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<
 
 declare class TemplatedWidget<P> extends Widget<P> {
     protected byId(id: string): Fluent;
-    protected findById(id: string): HTMLElement;
+    protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement;
     protected getTemplate(): string;
     protected renderContents(): void;
 }
@@ -4503,4 +4777,4 @@ declare class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements 
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, CloseButtonAttribute, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, type MultipleFileUploadEditorOptions, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StaticPanelAttribute, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, ValidationHelper, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getHighlightTarget, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, loadValidationErrorMessages, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };
+export { AggregateFormatting, Aggregators, type AnyIconClass, ArgumentNullException, Authorization, BaseEditorFiltering, BaseFiltering, BooleanEditor, BooleanFiltering, BooleanFormatter, type CKEditorConfig, type CancellableViewCallback, CaptureOperationType, CascadedWidgetLink, CategoryAttribute, CheckLookupEditor, type CheckLookupEditorOptions, CheckTreeEditor, type CheckTreeItem, CheckboxFormatter, type ClassTypeInfo, CloseButtonAttribute, ColumnPickerDialog, ColumnSelection, ColumnsBase, ColumnsKeyAttribute, Config, type ConfirmDialogOptions, type Constructor, type CreateWidgetParams, Criteria, CriteriaBuilder, CriteriaOperator, type CriteriaWithText, CssClassAttribute, Culture, type DataChangeInfo, DataGrid, DateEditor, type DateEditorOptions, DateFiltering, type DateFormat, DateFormatter, DateTimeEditor, type DateTimeEditorOptions, DateTimeFiltering, DateTimeFormatter, DateYearEditor, type DateYearEditorOptions, type DebouncedFunction, DecimalEditor, type DecimalEditorOptions, DecimalFiltering, Decorators, DefaultValueAttribute, type DeleteRequest, type DeleteResponse, Dialog, type DialogButton, DialogExtensions, type DialogOptions, DialogTexts, type DialogType, DialogTypeAttribute, DialogTypeRegistry, type Dictionary, DisplayNameAttribute, EditorAttribute, EditorFiltering, EditorOptionAttribute, type EditorProps, EditorTypeAttribute, EditorTypeAttributeBase, type EditorTypeInfo, EditorTypeRegistry, EditorUtils, EditorWidget, ElementAttribute, EmailAddressEditor, EmailEditor, type EmailEditorOptions, EntityDialog, EntityGrid, EntityTypeAttribute, Enum, EnumEditor, type EnumEditorOptions, EnumFiltering, EnumFormatter, EnumKeyAttribute, EnumTypeRegistry, ErrorHandling, Exception, FileDownloadFormatter, type FileUploadConstraints, FileUploadEditor, type FileUploadEditorOptions, FilterDialog, FilterDisplayBar, type FilterFieldSelectOptions, type FilterLine, type FilterOperator, FilterOperators, FilterPanel, FilterStore, FilterWidgetBase, FilterableAttribute, FilteringTypeRegistry, FlexifyAttribute, Fluent, FormKeyAttribute, type Format, type Formatter, type FormatterTypeInfo, FormatterTypeRegistry, GeneratedCodeAttribute, GridPageInit, type GridPersistanceFlags, GridRadioSelectionMixin, type GridRadioSelectionMixinOptions, GridRowSelectionMixin, type GridRowSelectionMixinOptions, GridSelectAllButtonHelper, GridUtils, type GroupByElement, type GroupByResult, type GroupInfo, type Grouping, H, type HandleRouteEvent, HiddenAttribute, HintAttribute, HtmlContentEditor, type HtmlContentEditorOptions, HtmlNoteContentEditor, HtmlReportContentEditor, IBooleanValue, type IDataGrid, IDialog, IDoubleValue, IEditDialog, IFiltering, type IFrameDialogOptions, IGetEditValue, IInitializeColumn, IQuickFiltering, IReadOnly, type IRowDefinition, ISetEditValue, ISlickFormatter, IStringValue, IValidateRequired, type IconClassName, type IdPrefixType, IdPropertyAttribute, ImageUploadEditor, type ImageUploadEditorOptions, InsertableAttribute, IntegerEditor, type IntegerEditorOptions, IntegerFiltering, type InterfaceTypeInfo, InvalidCastException, Invariant, IsActivePropertyAttribute, ItemNameAttribute, type KnownIconClass, LT, LayoutTimer, LazyLoadHelper, type ListRequest, type ListResponse, LocalTextPrefixAttribute, type Locale, Lookup, LookupEditor, LookupEditorBase, type LookupEditorOptions, LookupFiltering, type LookupOptions, MaskedEditor, type MaskedEditorOptions, MaxLengthAttribute, MaximizableAttribute, MemberType, type MessageDialogOptions, MinuteFormatter, MultipleFileUploadEditor, type MultipleFileUploadEditorOptions, MultipleImageUploadEditor, NamePropertyAttribute, type NoInfer, type NotifyMap, type NumberFormat, NumberFormatter, OneWayAttribute, OptionAttribute, OptionsTypeAttribute, type PagerOptions, type PagingInfo, type PagingOptions, PanelAttribute, PanelPageInit, PasswordEditor, type PersistedGridColumn, type PersistedGridSettings, PlaceholderAttribute, PopupMenuButton, type PopupMenuButtonOptions, PopupToolButton, type PopupToolButtonOptions, type PostToServiceOptions, type PostToUrlOptions, PrefixedContext, PropertyDialog, PropertyGrid, PropertyGridMode, type PropertyGridOptions, type PropertyItem, PropertyItemSlickConverter, type PropertyItemsData, PropertyPanel, type QuickFilter, type QuickFilterArgs, QuickFilterBar, type QuickFilterBarOptions, type QuickSearchField, QuickSearchInput, type QuickSearchInputOptions, RadioButtonEditor, type RadioButtonEditorOptions, ReadOnlyAttribute, Recaptcha, type RecaptchaOptions, ReflectionOptionsSetter, ReflectionUtils, RemoteView, type RemoteViewAjaxCallback, type RemoteViewFilter, type RemoteViewOptions, type RemoteViewProcessCallback, type RequestErrorInfo, RequiredAttribute, ResizableAttribute, ResponsiveAttribute, RetrieveColumnSelection, type RetrieveLocalizationRequest, type RetrieveLocalizationResponse, type RetrieveRequest, type RetrieveResponse, Router, type SaveRequest, type SaveRequestWithAttachment, type SaveResponse, type SaveWithLocalizationRequest, ScriptData, type Select2CommonOptions, Select2Editor, type Select2EditorOptions, type Select2FilterOptions, type Select2InplaceAddOptions, type Select2SearchPromise, type Select2SearchQuery, type Select2SearchResult, SelectEditor, type SelectEditorOptions, ServiceAttribute, type ServiceError, ServiceLookupEditor, ServiceLookupEditorBase, type ServiceLookupEditorOptions, ServiceLookupFiltering, type ServiceOptions, type ServiceRequest, type ServiceResponse, type SettingStorage, SlickFormatting, SlickHelper, SlickPager, SlickTreeHelper, StaticPanelAttribute, StringEditor, StringFiltering, type StringLiteral, SubDialogHelper, type SummaryOptions, SummaryType, TabsExtensions, TemplatedDialog, TemplatedPanel, TemplatedWidget, TextAreaEditor, type TextAreaEditorOptions, type TextColor, TimeEditor, type TimeEditorOptions, type ToastContainerOptions, Toastr, type ToastrOptions, type ToolButton, type ToolButtonProps, Toolbar, ToolbarButton, type ToolbarOptions, Tooltip, type TooltipOptions, TreeGridMixin, type TreeGridMixinOptions, type Type, type TypeMember, URLEditor, type UndeleteRequest, type UndeleteResponse, UpdatableAttribute, UploadHelper, type UploadInputOptions, type UploadResponse, type UploadedFile, Uploader, type UploaderBatch, type UploaderErrorData, type UploaderOptions, type UploaderRequest, type UploaderSuccessData, UrlFormatter, type UserDefinition, type UtilityColor, type ValidatableElement, ValidationHelper, type ValidationProvider, type ValidationValue, Validator, Widget, type WidgetProps, addClass, addCustomAttribute, addEmptyOption, addLocalText, addOption, addTypeMember, addValidationRule, alert, alertDialog, any, appendChild, associateWidget, attrEncode, baseValidateOptions, bgColor, blockUI, blockUndo, canLoadScriptData, cancelDialogButton, cast, centerDialog, classTypeInfo, clearKeys, clearOptions, coalesce, compareStringFactory, confirm, confirmDialog, count, dbText, dbTryText, deassociateWidget, debounce, deepClone, defaultNotifyOptions, delegateCombine, delegateContains, delegateRemove, editorTypeInfo, endsWith, executeEverytimeWhenVisible, executeOnceWhenVisible, extend, faIcon, type faIconKey, fabIcon, type fabIconKey, fetchScriptData, fieldsProxy, findElementWithRelativeId, first, format, formatDate, formatDayHourAndMin, formatISODateTimeUTC, formatNumber, formatterTypeInfo, getActiveRequests, getBaseType, getColumns, getColumnsAsync, getColumnsData, getColumnsDataAsync, getColumnsScript, getCookie, getCustomAttribute, getCustomAttributes, getForm, getFormAsync, getFormData, getFormDataAsync, getFormScript, getGlobalObject, getInstanceType, getLookup, getLookupAsync, getMembers, getNested, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash, getTemplate, getType, getTypeFullName, getTypeNameProp, getTypeRegistry, getTypeShortName, getTypes, getWidgetFrom, getWidgetName, getjQuery, gridPageInit, groupBy, handleScriptDataError, hasBSModal, hasCustomAttribute, hasUIDialog, htmlEncode, iconClassName, iframeDialog, indexOf, information, informationDialog, initFormType, initFullHeightGridPage, initializeTypes, insert, interfaceTypeInfo, isArray, isArrayLike, isAssignableFrom, isBS3, isBS5Plus, isEmptyOrNull, isEnum, isInstanceOfType, isMobileView, isPromiseLike, isSameOrigin, isTrimmedEmpty, isValue, keyOf, layoutFillHeight, layoutFillHeightValue, localText, localeFormat, newBodyDiv, noDialogButton, notifyError, notifyInfo, notifySuccess, notifyWarning, okDialogButton, omitUndefined, outerHtml, padLeft, panelPageInit, parseCriteria, parseDate, parseDayHourAndMin, parseDecimal, parseHourAndMin, parseISODateTime, parseInteger, parseQueryString, peekScriptData, positionToastContainer, postToService, postToUrl, prefixedText, proxyTexts, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, reloadLookup, reloadLookupAsync, removeClass, removeValidationRule, replaceAll, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, round, safeCast, select2LocaleInitialization, serviceCall, serviceRequest, setEquality, setRegisteredScripts, setScriptData, setTypeNameProp, single, splitDateString, startsWith, stringFormat, stringFormatLocale, success, successDialog, text, textColor, toGrouping, toId, toSingleLine, today, toggleClass, triggerLayoutOnShow, trim, trimEnd, trimStart, trimToEmpty, trimToNull, trunc, tryFirst, tryGetText, tryGetWidget, turkishLocaleCompare, turkishLocaleToLower, turkishLocaleToUpper, typeInfoProperty, useIdPrefix, validateForm, validateOptions, validatorAbortHandler, warning, warningDialog, yesDialogButton, zeroPad };

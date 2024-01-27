@@ -1,8 +1,8 @@
-﻿import { Fluent, Invariant, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
-import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
+﻿import { Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, today } from "../../q";
+import { today } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface DateEditorOptions {

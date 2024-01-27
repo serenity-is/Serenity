@@ -9,8 +9,8 @@ export class TemplatedWidget<P> extends Widget<P> {
         return Fluent(this.domNode.querySelector('#' + this.idPrefix + id));
     }
 
-    protected findById(id: string): HTMLElement {
-        return this.domNode.querySelector('#' + this.idPrefix + id) as HTMLElement;
+    protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {
+        return this.domNode.querySelector<TElement>('#' + this.idPrefix + id);
     }
 
     protected getTemplate(): string {
