@@ -108,7 +108,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 return;
 
             if (this.time) {
-                if (e.key === "Space") {
+                if (e.key === " ") {
                     if (this.get_valueAsDate() !== new Date()) {
                         this.set_valueAsDate(new Date());
                         Fluent.trigger(this.domNode, 'change');

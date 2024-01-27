@@ -47,7 +47,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         }
 
         Fluent.on(this.domNode, "keyup." + this.uniqueName, (e: KeyboardEvent) => {
-            if (e.key === "Space" && !this.get_readOnly()) {
+            if (e.key === " " && !this.get_readOnly()) {
                 if (this.get_valueAsDate() != today()) {
                     this.set_valueAsDate(today());
                     Fluent.trigger(this.domNode, 'change');
