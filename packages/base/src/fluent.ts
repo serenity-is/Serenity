@@ -181,7 +181,9 @@ Fluent.prototype.attr = function (this: FluentThis<any>, name: string, value?: s
     if (this.el) {
         if (name === "class")
             name = "className";
-        if (typeof value === "string")
+        if (value == null)
+            this.el.removeAttribute(name);
+        else if (typeof value === "string")
             this.el.setAttribute(name, value);
         else if (typeof value === "number")
             this.el.setAttribute(name, "" + value);
@@ -328,7 +330,7 @@ Fluent.prototype.val = function (this: FluentThis<any>, value?: string) {
     if (value === void 0 && !arguments.length)
         return Fluent.isInputLike(this.el) ? this.el.value : "";
     if (Fluent.isInputLike(this.el))
-        this.el.value = value;
+        this.el.value = value ?? "";
     return this as any;
 }
 

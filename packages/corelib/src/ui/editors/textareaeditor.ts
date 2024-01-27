@@ -33,7 +33,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public set value(value: string) {
-        Fluent(this.domNode).val(value);
+        Fluent(this.domNode).val(value ?? "");
     }
 
     protected set_value(value: string): void {
