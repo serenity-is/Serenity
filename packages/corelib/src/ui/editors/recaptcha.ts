@@ -1,7 +1,6 @@
-﻿import { Fluent, localText } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, addValidationRule, localText } from "@serenity-is/base";
 import { IStringValue } from "../../interfaces";
-import { addValidationRule } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface RecaptchaOptions {

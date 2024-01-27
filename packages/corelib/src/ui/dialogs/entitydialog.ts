@@ -1,18 +1,17 @@
 ﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+import { IEditDialog, IReadOnly } from "../../interfaces";
+import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
+import { DataChangeInfo } from "../../types";
 import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { IEditDialog, IReadOnly } from "../../interfaces";
-import { Authorization, Exception, ScriptData, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
-import { ValidationHelper } from "../helpers/validationhelper";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { TemplatedDialog } from "./templateddialog";
-import { DataChangeInfo } from "../../types";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 @Decorators.panel(true)

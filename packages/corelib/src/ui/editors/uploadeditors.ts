@@ -1,11 +1,10 @@
 ﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { extend, isTrimmedEmpty, replaceAll } from "../../q";
+import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { EditorProps, EditorWidget } from "../widgets/widget";
-import { ValidationHelper } from "../helpers/validationhelper";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;

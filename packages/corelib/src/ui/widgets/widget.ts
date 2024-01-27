@@ -1,7 +1,7 @@
-﻿import { Config, Fluent, addClass, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
+﻿import { Config, Fluent, addClass, addValidationRule, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
-import { addValidationRule, appendChild, replaceAll } from "../../q";
+import { appendChild, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type EditorProps, type WidgetProps } from "./widgetutils";

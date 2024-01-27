@@ -1,7 +1,7 @@
-﻿import { Culture, Fluent, Invariant, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addOption, addValidationRule, today } from "../../q";
+import { addOption, today } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
@@ -108,7 +108,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 return;
 
             if (this.time) {
-                if (e.key === "Space") {
+                if (e.key === " ") {
                     if (this.get_valueAsDate() !== new Date()) {
                         this.set_valueAsDate(new Date());
                         Fluent.trigger(this.domNode, 'change');

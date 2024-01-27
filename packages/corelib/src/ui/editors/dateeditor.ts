@@ -1,8 +1,8 @@
-﻿import { Fluent, Invariant, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
-import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
+﻿import { Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { addValidationRule, today } from "../../q";
+import { today } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface DateEditorOptions {
@@ -47,7 +47,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         }
 
         Fluent.on(this.domNode, "keyup." + this.uniqueName, (e: KeyboardEvent) => {
-            if (e.key === "Space" && !this.get_readOnly()) {
+            if (e.key === " " && !this.get_readOnly()) {
                 if (this.get_valueAsDate() != today()) {
                     this.set_valueAsDate(today());
                     Fluent.trigger(this.domNode, 'change');

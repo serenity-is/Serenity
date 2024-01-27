@@ -1,11 +1,10 @@
 ﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText, stringFormat } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { Authorization, isTrimmedEmpty } from "../../q";
+import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { ValidationHelper } from "../helpers/validationhelper";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";

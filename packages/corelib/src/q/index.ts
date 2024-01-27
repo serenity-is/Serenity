@@ -12,5 +12,4 @@ export * from "./services-compat";
 export * from "./strings-compat";
 export * from "./system-compat";
 export * from "./userdefinition";
-export * from "./validateoptions";
 export * from "./validation";

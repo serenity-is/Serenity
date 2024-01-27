@@ -184,6 +184,7 @@ export function flatPickrOptions(onChange: () => void) {
 
 export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
     var button = document.createElement("button");
+    button.type = "button";
     button.classList.add("ui-datepicker-trigger");
     button.addEventListener("click", () => {
         if (!input.classList.contains('readonly'))
