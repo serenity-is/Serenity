@@ -2733,7 +2733,7 @@ declare namespace Serenity {
          * behaviour by calling this.defaultShowErrors().
          */
         showErrors?(errorMap: ValidationErrorMap, errorList: ValidationErrorList, validator: Validator): void;
-        abortHandler?(form: HTMLFormElement, validator: Validator): void;
+        abortHandler?(validator: Validator): void;
         /**
          * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit.
          * The right place to submit a form via Ajax after it is validated.
@@ -2856,6 +2856,7 @@ declare namespace Serenity {
         static staticRules(element: ValidatableElement): ValidationRules;
         static normalizeRules(rules: ValidationRules, element: ValidatableElement): ValidationRules;
         static addMethod(name: string, method: ValidationProvider, message?: string): void;
+        static getHighlightTarget(el: HTMLElement): HTMLElement;
     }
     function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
     function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
@@ -3512,11 +3513,14 @@ declare namespace Serenity {
         constructor(message: string);
     }
 
-    function validatorAbortHandler(validator: any): void;
-    function validateOptions(options?: any): any;
-
-    function baseValidateOptions(): any;
-    function validateForm(form: HTMLElement | ArrayLike<HTMLElement>, opt: any): any;
+    function validatorAbortHandler(validator: Validator): void;
+    function validateOptions(options?: ValidatorOptions): ValidatorOptions;
+    namespace ValidationHelper {
+        function asyncSubmit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): Validator;
+        function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
+    }
 
     namespace Aggregators {
         function Avg(field: string): void;
@@ -4082,13 +4086,6 @@ declare namespace Serenity {
         protected initValidator(): void;
         protected resetValidation(): void;
         protected validateForm(): boolean;
-    }
-
-    namespace ValidationHelper {
-        function asyncSubmit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): Validator;
-        function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
     }
 
     class CascadedWidgetLink<TParent extends Widget<any>> {

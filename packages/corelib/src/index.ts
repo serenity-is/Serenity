@@ -38,7 +38,6 @@ export * from "./ui/widgets/toolbar";
 export * from "./ui/widgets/templatedwidget";
 export * from "./ui/dialogs/templateddialog";
 export * from "./ui/widgets/templatedpanel";
-export * from "./ui/helpers/validationhelper";
 export * from "./ui/editors/cascadedwidgetlink";
 export * from "./ui/helpers/tabsextensions";
 export * from "./ui/widgets/reflectionoptionssetter";

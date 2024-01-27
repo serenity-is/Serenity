@@ -10,7 +10,6 @@ import { Fluent } from "./fluent";
 import { parseDate, parseDecimal, parseInteger, stringFormat } from "./formatting";
 import { localText } from "./localtext";
 import { isArrayLike } from "./system";
-import { Tooltip } from "./tooltip";
 
 /**
  * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or [contenteditable).
@@ -56,7 +55,7 @@ function messageKey(method: string) {
     return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()    
 }
 
-interface ValidatorOptions {
+export interface ValidatorOptions {
     /** True for logging debug info */
     debug?: boolean;
 
@@ -185,7 +184,7 @@ interface ValidatorOptions {
      */
     showErrors?(errorMap: ValidationErrorMap, errorList: ValidationErrorList, validator: Validator): void;
 
-    abortHandler?(form: HTMLFormElement, validator: Validator): void;
+    abortHandler?(validator: Validator): void;
 
     /**
      * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit.
@@ -250,14 +249,6 @@ function validatorEventDelegate(event: Event) {
 
 let customValidateRules: WeakMap<ValidatableElement, { [key: string]: ((input: ValidatableElement) => string)[] }> = new WeakMap();
 
-function getHighlightTarget(el: HTMLElement) {
-    var hl = el.dataset.vxHighlight;
-    if (hl)
-        return document.getElementById(hl);
-    else if (el.classList.contains("select2-offscreen") && el.id)
-        return document.getElementById('s2id_' + el.id);
-}
-
 export class Validator {
 
     static optional(element: ValidatableElement) {
@@ -319,7 +310,7 @@ export class Validator {
                     element.classList.add(errorClass);
                 if (validClass != null && validClass.length)
                     element.classList.remove(validClass);
-                var hl = getHighlightTarget(element);
+                var hl = Validator.getHighlightTarget(element);
                 if (hl && hl.classList) {
                     if (errorClass != null && errorClass.length)
                         hl.classList.add(errorClass);
@@ -336,7 +327,7 @@ export class Validator {
                     element.classList.remove(errorClass);
                 if (validClass != null && validClass.length)
                     element.classList.add(validClass);
-                var hl = getHighlightTarget(element);
+                var hl = Validator.getHighlightTarget(element);
                 if (hl && hl.classList) {
                     if (errorClass != null && errorClass.length)
                         hl.classList.remove(errorClass);
@@ -985,7 +976,7 @@ export class Validator {
 
     focusInvalid() {
         if (this.settings.abortHandler)
-            this.settings.abortHandler(this.currentForm, this);
+            this.settings.abortHandler(this);
 
         if (this.settings.focusInvalid) {
             try {
@@ -1132,7 +1123,7 @@ export class Validator {
                     return;
                 }
 
-                if (typeof result === "string") {
+                if (typeof result === "string" && result !== "dependency-mismatch" && result !== "pending") {
                     element.dataset[messageKey(method)] = result;
                     result = false;
                 }
@@ -1406,7 +1397,7 @@ export class Validator {
         }
 
         if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
-            this.settings.abortHandler(this.currentForm, this);
+            this.settings.abortHandler(this);
         }
     }
 
@@ -1644,6 +1635,14 @@ export class Validator {
         if (method.length < 3) {
             Validator.addClassRules(name, { [name]: true });
         }
+    }
+
+    static getHighlightTarget(el: HTMLElement) {
+        var hl = el.dataset.vxHighlight;
+        if (hl)
+            return document.getElementById(hl);
+        else if (el.classList.contains("select2-offscreen") && el.id)
+            return document.getElementById('s2id_' + el.id);
     }
 }
 
