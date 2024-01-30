@@ -3,6 +3,7 @@ import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EditorProps } from "../widgets/widget";
+import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
 
 export interface EnumEditorOptions extends ComboboxCommonOptions {
@@ -11,7 +12,7 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
 }
 
 @Decorators.registerEditor('Serenity.EnumEditor')
-export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, Select2Item> {
+export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
     constructor(props: EditorProps<P>) {
         super(props);
 

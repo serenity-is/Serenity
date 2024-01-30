@@ -31,8 +31,8 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
         return null;
     }
 
-    getSelect2Options() {
-        var opt = super.getSelect2Options();
+    getComboboxOptions() {
+        var opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
     }
@@ -57,8 +57,8 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
         return null;
     }
 
-    getSelect2Options() {
-        var opt = super.getSelect2Options();
+    getComboboxOptions() {
+        var opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
     }

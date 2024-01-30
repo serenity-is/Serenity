@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -7,6 +7,7 @@ import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
+import { Combobox, ComboboxItem, ComboboxOptions, ComboboxSearchQuery, ComboboxSearchResult, stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 
 export interface ComboboxCommonOptions {
@@ -34,20 +35,6 @@ export interface ComboboxInplaceAddOptions {
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
 
-export interface ComboboxSearchQuery {
-    searchTerm?: string;
-    idList?: string[];
-    skip?: number;
-    take?: number;
-    checkMore?: boolean;
-    signal?: AbortSignal;
-}
-
-export interface ComboboxSearchResult<TItem> {
-    items: TItem[];
-    more: boolean;
-}
-
 @Decorators.registerClass('Serenity.ComboboxEditor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
 export class ComboboxEditor<P, TItem> extends Widget<P> implements
@@ -56,8 +43,9 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private _items: Select2Item[];
-    private _itemById: { [key: string]: Select2Item };
+    private combobox: Combobox;
+    private _items: ComboboxItem<TItem>[];
+    private _itemById: { [key: string]: ComboboxItem<TItem> };
     protected lastCreateTerm: string;
 
     constructor(props: EditorProps<P>) {
@@ -71,15 +59,14 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         if (emptyItemText != null) {
             hidden.setAttribute('placeholder', emptyItemText);
         }
-        var select2Options = this.getSelect2Options();
-        let $ = getjQuery();
-        if ($?.fn?.select2)
-            $(hidden).select2(select2Options);
+        var comboboxOptions = this.getComboboxOptions();
+        comboboxOptions.element = hidden;
+        this.combobox = new Combobox(comboboxOptions);
         hidden.setAttribute('type', 'text');
 
         // for jquery validate to work
         Fluent.on(hidden, "change." + this.uniqueName, (e) => {
-            if (!(e.target as HTMLElement)?.dataset?.select2settingvalue)
+            if (!(e.target as HTMLElement)?.dataset?.comboboxsettingvalue)
                 ValidationHelper.validateElement(hidden);
         });
 
@@ -90,10 +77,8 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     }
 
     destroy() {
-        this.initSelectionLoading && this.initSelectionLoading?.abort?.();
-        this.abortPendingQuery();
-        let $ = getjQuery();
-        $ && $(this.domNode)?.select2?.('destroy');
+        this.combobox?.dispose();
+        this.combobox = null;
         super.destroy();
     }
 
@@ -147,7 +132,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return false;
     }
 
-    protected mapItem(item: TItem): Select2Item {
+    protected mapItem(item: TItem): ComboboxItem {
         return {
             id: this.itemId(item),
             text: this.itemText(item),
@@ -156,7 +141,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         };
     }
 
-    protected mapItems(items: TItem[]): Select2Item[] {
+    protected mapItems(items: TItem[]): ComboboxItem[] {
         return items.map(this.mapItem.bind(this));
     }
 
@@ -169,155 +154,77 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return !!(this.options as ComboboxEditorOptions).multiple;
     }
 
-    private initSelectionLoading: false | AbortController;
-    private queryLoading: false | AbortController;
-    private typeTimeout: number;
-
     protected abortPendingQuery() {
-        this.queryLoading && this.queryLoading?.abort?.();
-        this.queryLoading = false;
-        if (this.typeTimeout) {
-            clearTimeout(this.typeTimeout);
-            this.typeTimeout = null;
-        }
+        this.combobox?.abortPendingQuery();
     }
 
-    protected getSelect2Options(): Select2Options {
+    protected getComboboxOptions(): ComboboxOptions {
         var emptyItemText = this.emptyItemText();
-        var opt: Select2Options = {
+        var opt: ComboboxOptions = {
             multiple: this.isMultiple(),
-            placeHolder: emptyItemText || null,
+            placeholder: emptyItemText || null,
             allowClear: this.allowClear(),
-            createSearchChoicePosition: 'bottom'
+            arbitraryValues: this.isAutoComplete()
         }
 
         if (this.hasAsyncSource()) {
-            opt.query = query => {
-                var pageSize = this.getPageSize();
-                var searchQuery: ComboboxSearchQuery = {
-                    searchTerm: query.term?.trim() || null,
-                    skip: (query.page - 1) * pageSize,
-                    take: pageSize,
-                    checkMore: true
-                }
+            opt.search = query => this.asyncSearch(query).then(result => {
+                var items = this.mapItems(result.items || []);
+                var mappedResult = {
+                    items,
+                    more: result.more
+                };
 
-                this.abortPendingQuery();
-
-                let $ = getjQuery();
-                var select2 = $ && $(this.domNode).data('select2');
-                select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-
-                this.typeTimeout = setTimeout(() => {
-                    this.abortPendingQuery();
-                    select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
-                    this.queryLoading = new AbortController();
-                    searchQuery.signal = this.queryLoading.signal;
-                    this.asyncSearch(searchQuery).then(result => {
-                        this.queryLoading = false;
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                        query.callback({
-                            results: this.mapItems(result.items),
-                            more: result.more
-                        });
-                    }, () => {
-                        this.queryLoading = false;
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                    });
-                }, !query.term ? 0 : this.getTypeDelay());
-            }
-
-            opt.initSelection = (element, callback) => {
-                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
-                if (val == null || val == '') {
-                    callback(null);
-                    return;
-                }
-
-                var isMultiple = this.isMultiple();
-                var idList = isMultiple ? (val as string).split(',') : [val as string];
-                var searchQuery: ComboboxSearchQuery = {
-                    idList: idList
-                }
-
-                this.initSelectionLoading && this.initSelectionLoading?.abort?.();
-                this.initSelectionLoading = new AbortController();
-                searchQuery.signal = this.initSelectionLoading.signal;
-                this.asyncSearch(searchQuery).then(result => {
-                    this.initSelectionLoading = false;
-                    if (isMultiple) {
-                        var items = (result.items || []).map(x => this.mapItem(x));
-                        this._itemById = this._itemById || {};
-                        for (var item of items)
-                            this._itemById[item.id] = item;
-                        if (this.isAutoComplete &&
-                            items.length != idList.length) {
-                            for (var v of idList) {
-                                if (!items.some(z => z.id == v)) {
-                                    items.push({
-                                        id: v,
-                                        text: v
-                                    });
-                                }
-                            }
-                        }
-                        callback(items);
-                    }
-                    else if (!result.items || !result.items.length) {
-                        if (this.isAutoComplete) {
-                            callback({
-                                id: val,
-                                text: val
+                if (this.isAutoComplete() && query.idList &&
+                    items.length < query.idList.length) {
+                    for (var v of query.idList) {
+                        if (!items.some(z => z.id == v)) {
+                            items.push({
+                                id: v,
+                                text: v
                             });
                         }
-                        else
-                            callback(null);
                     }
-                    else {
-                        var item = this.mapItem(result.items[0]);
-                        this._itemById = this._itemById || {};
-                        this._itemById[item.id] = item;
-                        callback(item);
-                    }
-                }, () => {
-                    this.initSelectionLoading = false;
-                });
-            }
+                }
+
+                this._itemById ??= {};
+                for (var x of items)
+                    this._itemById[x.id] = x;
+
+                return mappedResult;
+            });
         }
         else {
             opt.data = this._items;
-            opt.query = (query) => {
-                var items = ComboboxEditor.filterByText(this._items, x => x.text, query.term);
-                var pageSize = this.getPageSize();
-                query.callback({
-                    results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
-                    more: items.length >= query.page * pageSize
-                });
-            }
-            opt.initSelection = (element, callback) => {
-                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
-                var isAutoComplete = this.isAutoComplete();
-                if (this.isMultiple()) {
-                    var list = [];
-                    for (var z of (val as string).split(',')) {
-                        var item2 = this._itemById[z];
-                        if (item2 == null && isAutoComplete) {
-                            item2 = { id: z, text: z };
-                            this.addItem(item2);
-                        }
-                        if (item2 != null) {
-                            list.push(item2);
+            opt.search = (query) => {
+                var items;
+                if (query.initSelection) {
+                    items = this._items.filter(x => query.idList?.includes(x.id))
+                }
+                else {
+                    items = ComboboxEditor.filterByText(this._items, x => x.text, query.searchTerm);
+                }
+
+                if (this.isAutoComplete() && query.idList &&
+                    items.length < query.idList.length) {
+                    this._itemById ??= {};
+                    for (var v of query.idList) {
+                        if (!items.some(z => z.id == v)) {
+                            var item = {
+                                id: v,
+                                text: v
+                            };
+                            items.push(item);
+                            this._itemById[item.id] = item;
                         }
                     }
-                    callback(list);
-                    return;
                 }
-                var it = this._itemById[val];
-                if (it == null && isAutoComplete) {
-                    it = { id: val, text: val };
-                    this.addItem(it);
-                }
-                callback(it);
-            }
+
+                return {
+                    items: items.slice(query.skip, query.take ? items.length : query.take),
+                    more: query.take && items.length >= query.skip + query.take
+                };
+            };
         }
 
         if ((this.options as ComboboxEditorOptions).minimumResultsForSearch != null)
@@ -333,14 +240,14 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return !!(this.options as ComboboxEditorOptions).delimited;
     }
 
-    public get items(): Select2Item[] {
+    public get items(): ComboboxItem<TItem>[] {
         if (this.hasAsyncSource())
             throw new Error("Can't read items property of an async select editor!");
 
         return this._items || [];
     }
 
-    public set items(value: Select2Item[]) {
+    public set items(value: ComboboxItem<TItem>[]) {
         if (this.hasAsyncSource())
             throw new Error("Can't set items of an async select editor!");
 
@@ -350,14 +257,14 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
             this._itemById[item.id] = item;
     }
 
-    protected get itemById(): { [key: string]: Select2Item } {
+    protected get itemById(): { [key: string]: ComboboxItem<TItem> } {
         if (this.hasAsyncSource())
             throw new Error("Can't read items property of an async select editor!");
 
         return this._itemById;
     }
 
-    protected set itemById(value: { [key: string]: Select2Item }) {
+    protected set itemById(value: { [key: string]: ComboboxItem<TItem> }) {
         if (this.hasAsyncSource())
             throw new Error("Can't set itemById of an async select editor!");
 
@@ -372,7 +279,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         this._itemById = {};
     }
 
-    public addItem(item: Select2Item) {
+    public addItem(item: ComboboxItem<TItem>) {
         if (this.hasAsyncSource())
             throw new Error("Can't add item to an async select editor!");
 
@@ -409,7 +316,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         });
 
         Fluent(this.domNode).on("change", (e: any) => {
-            if ((e.target.dataset.select2settingvalue))
+            if ((e.target.dataset.comboboxsettingvalue))
                 return;
             if (this.isMultiple()) {
                 var values = this.get_values();
@@ -459,20 +366,20 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return (s: string) => {
 
             this.lastCreateTerm = s;
-            s = (Select2.util.stripDiacritics(s) ?? '').toLowerCase();
+            s = (stripDiacritics(s) ?? '').toLowerCase();
 
             if (isTrimmedEmpty(s)) {
                 return null;
             }
 
-            if ((this._items || []).some((x: Select2Item) => {
+            if ((this._items || []).some((x: ComboboxItem<TItem>) => {
                 var text = getName ? getName(x.source) : x.text;
-                return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
+                return stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
 
             if (!(this._items || []).some(x1 => {
-                return (Select2.util.stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
+                return (stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
             })) {
                 if (this.isAutoComplete()) {
                     return {
@@ -539,14 +446,14 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         if (term == null || term.length == 0)
             return items;
 
-        term = Select2.util.stripDiacritics(term).toUpperCase();
+        term = stripDiacritics(term).toUpperCase();
 
         var contains: TItem[] = [];
         function filter(item: TItem): boolean {
             var text = getText(item);
             if (text == null || !text.length)
                 return false;
-            text = Select2.util.stripDiacritics(text).toUpperCase();
+            text = stripDiacritics(text).toUpperCase();
             if (text.startsWith(term))
                 return true;
             if (text.indexOf(term) >= 0)
@@ -558,18 +465,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     }
 
     get_value() {
-        var val;
-        let $ = getjQuery();
-        if ($ && $(this.domNode).data('select2')) {
-            val = $(this.domNode).select2('val');
-            if (val != null && Array.isArray(val)) {
-                return val.join(',');
-            }
-        }
-        else
-            val = this.domNode.value;
-
-        return val;
+        return this.combobox ? this.combobox.getValue() : this.domNode?.value;
     }
 
     get value(): string {
@@ -578,34 +474,13 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
 
     set_value(value: string) {
 
-        if (value != this.get_value()) {
-            var val: any = value;
-            if (value && this.isMultiple()) {
-                val = value.split(String.fromCharCode(44)).map(function (x) {
-                    return x?.trim() || null;
-                }).filter(function (x1) {
-                    return x1 != null;
-                });
-            }
-
-            this.domNode.dataset.select2settingvalue = "true";
-            try {
-                let $ = getjQuery();
-                if ($?.fn?.select2) {
-                    $(this.domNode).select2('val', val);
-                }
-                else {
-                    this.domNode.value = val;
-                }
-
-                Fluent.trigger(this.domNode, "change");
-
-            } finally {
-                delete this.domNode.dataset.select2settingvalue;
-            }
-
-            this.updateInplaceReadOnly();
+        if (this.combobox) {
+            this.combobox.setValue(value, /*triggerChange*/ true);
+        } else if (this.domNode) {
+            this.domNode.value = value;
         }
+
+        this.updateInplaceReadOnly();
     }
 
     set value(v: string) {
@@ -638,26 +513,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     }
 
     protected get_values(): string[] {
-        let $ = getjQuery();
-        if ($?.fn?.select2) {
-            var val = $(this.domNode).select2('val');
-        }
-        else
-            val = this.domNode.value;
-
-        if (val == null) {
-            return [];
-        }
-
-        if (Array.isArray(val)) {
-            return val;
-        }
-
-        var str = val;
-        if (!str) {
-            return [];
-        }
-        return [str];
+        return this.combobox?.getValues();
     }
 
     get values(): string[] {
@@ -665,13 +521,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     }
 
     protected set_values(value: string[]) {
-
-        if (value == null || value.length === 0) {
-            this.set_value(null);
-            return;
-        }
-
-        this.set_value(value.join(','));
+        this.combobox?.setValues(value);
     }
 
     set values(value: string[]) {

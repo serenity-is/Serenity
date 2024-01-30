@@ -4459,6 +4459,64 @@ declare namespace Serenity {
         set_readOnly(value: boolean): void;
     }
 
+    type ComboboxType = "native" | "select2" | "tomselect";
+    interface ComboboxItem<TSource = any> {
+        id: string;
+        text: string;
+        source?: TSource;
+        disabled?: boolean;
+    }
+    interface ComboboxSearchQuery {
+        searchTerm?: string;
+        idList?: string[];
+        skip?: number;
+        take?: number;
+        checkMore?: boolean;
+        initSelection?: boolean;
+        signal?: AbortSignal;
+    }
+    interface ComboboxSearchResult<TItem> {
+        items: TItem[];
+        more: boolean;
+    }
+    interface ComboboxOptions<TSource = any> {
+        createSearchChoice?: (s: string) => ComboboxItem<TSource>;
+        data?: ComboboxItem<TSource>[];
+        element?: HTMLInputElement | HTMLSelectElement | Element[];
+        placeholder?: string;
+        search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
+        minimumResultsForSearch?: number;
+        multiple?: boolean;
+        allowClear?: boolean;
+        /** Allow arbitrary values for items */
+        arbitraryValues?: boolean;
+        /** Page size to use while loading or displaying results */
+        pageSize?: number;
+        /** True to prefer select2 over tomselect when both are available, default is false */
+        preferSelect2?: boolean;
+        /** Callback to get options specific to the combobox provider type */
+        providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
+        /** Type delay for searching, default is 200 */
+        typeDelay?: number;
+    }
+    class Combobox<TItem = any> {
+        private el;
+        static defaults: ComboboxOptions;
+        constructor(opt: ComboboxOptions);
+        abortPendingQuery(): void;
+        abortInitSelection(): void;
+        dispose(): void;
+        get type(): ComboboxType;
+        get isMultiple(): boolean;
+        getValue(): string;
+        getValues(): string[];
+        setValue(value: string, triggerChange?: boolean): void;
+        setValues(value: string[], triggerChange?: boolean): void;
+        static getInstance(el: Element | ArrayLike<Element>): Combobox;
+    }
+    function stripDiacritics(str: string): string;
+    function select2LocaleInitialization(): boolean;
+
     interface ComboboxCommonOptions {
         allowClear?: boolean;
         delimited?: boolean;
@@ -4480,21 +4538,10 @@ declare namespace Serenity {
     }
     interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
     }
-    interface ComboboxSearchQuery {
-        searchTerm?: string;
-        idList?: string[];
-        skip?: number;
-        take?: number;
-        checkMore?: boolean;
-        signal?: AbortSignal;
-    }
-    interface ComboboxSearchResult<TItem> {
-        items: TItem[];
-        more: boolean;
-    }
     class ComboboxEditor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
+        private combobox;
         private _items;
         private _itemById;
         protected lastCreateTerm: string;
@@ -4510,26 +4557,23 @@ declare namespace Serenity {
         protected getTextField(): any;
         protected itemText(item: TItem): string;
         protected itemDisabled(item: TItem): boolean;
-        protected mapItem(item: TItem): Select2Item;
-        protected mapItems(items: TItem[]): Select2Item[];
+        protected mapItem(item: TItem): ComboboxItem;
+        protected mapItems(items: TItem[]): ComboboxItem[];
         protected allowClear(): boolean;
         protected isMultiple(): boolean;
-        private initSelectionLoading;
-        private queryLoading;
-        private typeTimeout;
         protected abortPendingQuery(): void;
-        protected getSelect2Options(): Select2Options;
+        protected getComboboxOptions(): ComboboxOptions;
         get_delimited(): boolean;
-        get items(): Select2Item[];
-        set items(value: Select2Item[]);
+        get items(): ComboboxItem<TItem>[];
+        set items(value: ComboboxItem<TItem>[]);
         protected get itemById(): {
-            [key: string]: Select2Item;
+            [key: string]: ComboboxItem<TItem>;
         };
         protected set itemById(value: {
-            [key: string]: Select2Item;
+            [key: string]: ComboboxItem<TItem>;
         });
         clearItems(): void;
-        addItem(item: Select2Item): void;
+        addItem(item: ComboboxItem<TItem>): void;
         addOption(key: string, text: string, source?: any, disabled?: boolean): void;
         protected addInplaceCreate(addTitle: string, editTitle: string): void;
         protected useInplaceAdd(): boolean;
@@ -4541,12 +4585,12 @@ declare namespace Serenity {
         setEditValue(source: any, property: PropertyItem): void;
         getEditValue(property: PropertyItem, target: any): void;
         protected get_select2Container(): Fluent;
-        protected get_items(): Select2Item[];
+        protected get_items(): ComboboxItem<TItem>[];
         protected get_itemByKey(): {
-            [key: string]: Select2Item;
+            [key: string]: ComboboxItem<TItem>;
         };
         static filterByText<TItem>(items: TItem[], getText: (item: TItem) => string, term: string): TItem[];
-        get_value(): any;
+        get_value(): string;
         get value(): string;
         set_value(value: string): void;
         set value(v: string);
@@ -4600,7 +4644,7 @@ declare namespace Serenity {
         openDialogAsPanel: boolean;
     }
 
-    class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, Select2Item> {
+    class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
         constructor(props: EditorProps<P>);
         getItems(): any[];
         protected emptyItemText(): string;
@@ -4625,7 +4669,7 @@ declare namespace Serenity {
         enumKey?: string;
         enumType?: any;
     }
-    class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, Select2Item> {
+    class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
         constructor(props: EditorProps<P>);
         protected updateItems(): void;
         protected allowClear(): boolean;
@@ -4647,7 +4691,7 @@ declare namespace Serenity {
         protected getItems(lookup: Lookup<TItem>): TItem[];
         protected getIdField(): any;
         protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
-        protected mapItem(item: TItem): Select2Item;
+        protected mapItem(item: TItem): ComboboxItem<TItem>;
         protected getItemDisabled(item: TItem, lookup: Lookup<TItem>): boolean;
         updateItems(): void;
         protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
@@ -5952,95 +5996,6 @@ declare namespace Serenity {
      */
 
     type Constructor<T> = new (...args: any[]) => T;
-}
-declare namespace Select2 {
-    namespace util {
-        function stripDiacritics(input: string): string;
-    }
-}
-interface Select2QueryOptions {
-    element?: ArrayLike<HTMLElement>;
-    term?: string;
-    page?: number;
-    context?: any;
-    callback?: (p1: Select2Result) => void;
-}
-interface Select2Item {
-    id: string;
-    text: string;
-    source?: any;
-    disabled?: boolean;
-}
-interface Select2Result {
-    results: any;
-    more: boolean;
-    context?: any;
-}
-interface Select2AjaxOptions {
-    transport?: any;
-    url?: any;
-    dataType?: string;
-    quietMillis?: number;
-    cache?: boolean;
-    jsonpCallback?: any;
-    data?: (p1: string, p2: number, p3: any) => any;
-    results?: (p1: any, p2: number, p3: any) => any;
-    params?: any;
-}
-interface Select2Options {
-    width?: any;
-    minimumInputLength?: number;
-    maximumInputLength?: number;
-    minimumResultsForSearch?: number;
-    maximumSelectionSize?: any;
-    placeHolder?: string;
-    placeHolderOption?: any;
-    separator?: string;
-    allowClear?: boolean;
-    multiple?: boolean;
-    closeOnSelect?: boolean;
-    openOnEnter?: boolean;
-    id?: (p1: any) => string;
-    matcher?: (p1: string, p2: string, p3: ArrayLike<HTMLElement>) => boolean;
-    sortResults?: (p1: any, p2: ArrayLike<HTMLElement>, p3: any) => any;
-    formatSelection?: (p1: any, p2: ArrayLike<HTMLElement>, p3: (p1: string) => string) => string;
-    formatResult?: (p1: any, p2: ArrayLike<HTMLElement>, p3: any, p4: (p1: string) => string) => string;
-    formatResultCssClass?: (p1: any) => string;
-    formatNoMatches?: (p1: string) => string;
-    formatSearching?: () => string;
-    formatInputTooShort?: (p1: string, p2: number) => string;
-    formatSelectionTooBig?: (p1: string) => string;
-    createSearchChoice?: (p1: string) => any;
-    createSearchChoicePosition?: string;
-    initSelection?: (p1: ArrayLike<HTMLElement>, p2: (p1: any) => void) => void;
-    tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
-    tokenSeparators?: any;
-    query?: (p1: Select2QueryOptions) => void;
-    ajax?: Select2AjaxOptions;
-    data?: any;
-    tags?: any;
-    containerCss?: any;
-    containerCssClass?: any;
-    dropdownCss?: any;
-    dropdownCssClass?: any;
-    dropdownAutoWidth?: boolean;
-    adaptContainerCssClass?: (p1: string) => string;
-    adaptDropdownCssClass?: (p1: string) => string;
-    escapeMarkup?: (p1: string) => string;
-    selectOnBlur?: boolean;
-    loadMorePadding?: number;
-    nextSearchTerm?: (p1: any, p2: string) => string;
-}
-interface Select2Data {
-    text?: string;
-}
-interface JQuery {
-    select2(options: Select2Options): JQuery;
-    select2(cmd: 'focus' | 'open'): JQuery;
-    select2(cmd: 'destroy'): void;
-    select2(cmd: 'val'): any;
-    select2(cmd: 'val', value: string | string[]): JQuery;
-    select2(cmd: 'data'): Select2Data;
 }
 interface JQuery {
     getWidget<TWidget>(widgetType: {

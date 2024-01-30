@@ -2,7 +2,8 @@
 import { getLookup, reloadLookup, ScriptData } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
-import { ComboboxEditor, ComboboxEditorOptions, ComboboxSearchQuery, ComboboxSearchResult } from "./comboboxeditor";
+import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
+import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 
 export interface LookupEditorOptions extends ComboboxEditorOptions {
     lookupKey?: string;
@@ -81,7 +82,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return textValue == null ? '' : textValue.toString();
     }
 
-    protected mapItem(item: TItem): Select2Item {
+    protected mapItem(item: TItem): ComboboxItem<TItem> {
         return {
             id: this.itemId(item),
             text: this.getItemText(item, this.lookup),

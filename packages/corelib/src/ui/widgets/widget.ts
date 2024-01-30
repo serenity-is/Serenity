@@ -118,7 +118,7 @@ export class Widget<P = {}> {
 
     public changeSelect2(handler: (e: Event) => void) {
         Fluent.on(this.domNode, "change." + this.uniqueName, e => {
-            if ((e.target as HTMLElement)?.dataset?.select2settingvalue)
+            if ((e.target as HTMLElement)?.dataset?.comboboxsettingvalue)
                 return;
             handler(e);
         });

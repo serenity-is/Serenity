@@ -10,6 +10,7 @@ import { ToolButton } from "../widgets/toolbar";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { EditorUtils } from "./editorutils";
+import { stripDiacritics } from "./combobox";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;
@@ -512,7 +513,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         super.createToolbarExtensions();
 
         GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (field, text) => {
-            this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
+            this.searchText = stripDiacritics(text || '').toUpperCase();
             this.view.setItems(this.view.getItems(), true);
         });
     }
@@ -578,7 +579,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
 
     protected onViewFilter(item: CheckTreeItem<TItem>) {
         return super.onViewFilter(item) &&
-            (!this.searchText || Select2.util.stripDiacritics(item.text || '')
+            (!this.searchText || stripDiacritics(item.text || '')
                 .toUpperCase().indexOf(this.searchText) >= 0);
     }
 
