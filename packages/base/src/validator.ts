@@ -1257,7 +1257,7 @@ export class Validator {
             errors.forEach(x => { x.classList.remove(this.settings.validClass); x.classList.add(this.settings.errorClass) });
 
             // Replace message on existing label
-            errors.forEach(x => x.textContent = message || "");
+            errors.forEach(x => { x.textContent = message || ""; });
         } else {
 
             // Create error element
@@ -1300,14 +1300,18 @@ export class Validator {
             errors = [error];
         }
         if (!message && this.settings.success) {
-            errors.forEach(x => x.textContent = "");
+            errors.forEach(x => {
+                x.textContent = "";
+            });
             if (typeof this.settings.success === "string") {
-                errors.forEach(x => x.classList.add(this.settings.success as string));
+                errors.forEach(x => {
+                    x.classList.add(this.settings.success as string);
+                });
             } else {
                 this.settings.success(error, element);
             }
         }
-        this.toShow.push(error);
+        errors.forEach(x => { this.toShow.push(x); });
 
         this.errorsFor(element).forEach((element: HTMLElement) => {
             if ((element?.parentNode as HTMLElement)?.classList?.contains('vx')) {
