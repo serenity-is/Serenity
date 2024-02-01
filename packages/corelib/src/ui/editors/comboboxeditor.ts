@@ -195,7 +195,6 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
             });
         }
         else {
-            opt.data = this._items;
             opt.search = (query) => {
                 var items;
                 if (query.initSelection) {

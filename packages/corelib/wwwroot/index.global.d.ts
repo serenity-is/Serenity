@@ -4481,7 +4481,6 @@ declare namespace Serenity {
     }
     interface ComboboxOptions<TSource = any> {
         createSearchChoice?: (s: string) => ComboboxItem<TSource>;
-        data?: ComboboxItem<TSource>[];
         element?: HTMLInputElement | HTMLSelectElement | Element[];
         placeholder?: string;
         search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
@@ -4503,6 +4502,8 @@ declare namespace Serenity {
         private el;
         static defaults: ComboboxOptions;
         constructor(opt: ComboboxOptions);
+        private createTomselect;
+        private createSelect2;
         abortPendingQuery(): void;
         abortInitSelection(): void;
         dispose(): void;

@@ -3204,7 +3204,6 @@ interface ComboboxSearchResult<TItem> {
 }
 interface ComboboxOptions<TSource = any> {
     createSearchChoice?: (s: string) => ComboboxItem<TSource>;
-    data?: ComboboxItem<TSource>[];
     element?: HTMLInputElement | HTMLSelectElement | Element[];
     placeholder?: string;
     search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
@@ -3226,6 +3225,8 @@ declare class Combobox<TItem = any> {
     private el;
     static defaults: ComboboxOptions;
     constructor(opt: ComboboxOptions);
+    private createTomselect;
+    private createSelect2;
     abortPendingQuery(): void;
     abortInitSelection(): void;
     dispose(): void;

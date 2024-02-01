@@ -26,7 +26,6 @@ export interface ComboboxSearchResult<TItem> {
 
 export interface ComboboxOptions<TSource = any> {
     createSearchChoice?: (s: string) => ComboboxItem<TSource>;
-    data?: ComboboxItem<TSource>[];
     element?: HTMLInputElement | HTMLSelectElement | Element[];
     placeholder?: string;
     search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
@@ -78,134 +77,215 @@ export class Combobox<TItem = any> {
         let tomSelect = getTomSelect();
 
         if (tomSelect && (!opt?.preferSelect2 || !getSelect2())) {
+            this.createTomselect(opt);
         }
         else if (getSelect2()) {
-            var select2Opt: any = {
-                multiple: opt.multiple,
-                placeholder: opt.placeholder || null,
-                allowClear: opt.allowClear,
-                createSearchChoicePosition: 'bottom'
+            this.createSelect2(opt);
+        }
+        else {
+        }
+    }
+
+    private createTomselect(opt: ComboboxOptions) {
+        const ts = getTomSelect();
+
+        var settings: any = {
+            create: opt.createSearchChoice ? opt.createSearchChoice : false,
+            persist: false,
+            placeholder: opt.placeholder,
+            maxItems: opt.multiple ? null : 1,
+            valueField: "id",
+            hidePlaceholder: true,            
+            loadThrottle: null,
+            shouldLoad: (query: string) => {
+                if (!query) {
+                    var tomselect = (this.el as any).tomselect;
+                    if (!tomselect.loading && !tomselect.initialemptyload) {
+                        tomselect.initialemptyload = true;
+                        tomselect.load();
+                    }
+
+                }
+                return true;
+            }
+        }
+
+        settings.load = (query: string, callback: (items?: ComboboxItem<TItem>[]) => void) => {
+            var pageSize = opt.pageSize;
+            var searchQuery: ComboboxSearchQuery = {
+                searchTerm: query?.trim() || null,
+                skip: 0,
+                take: Math.min(pageSize, 1000), // tomselect does not support paging by default
+                checkMore: true
             }
 
-            select2Opt.query = (query: any) => {
-                var pageSize = opt.pageSize;
-                var searchQuery: ComboboxSearchQuery = {
-                    searchTerm: query.term?.trim() || null,
-                    skip: (query.page - 1) * pageSize,
-                    take: pageSize,
-                    checkMore: true
-                }
+            var tomselect = (this.el as any).tomselect;
+            this.abortPendingQuery();
 
+            //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+
+            (this.el as any).typeTimeout = setTimeout(() => {
                 this.abortPendingQuery();
+                //select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
+                searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
 
-                let $ = getjQuery();
-                var select2 = $ && $(this.el).data('select2');
-                select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-
-                (this.el as any).typeTimeout = setTimeout(() => {
-                    this.abortPendingQuery();
-                    select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
-                    searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
-
-                    const cleanup = () => {
-                        delete (this.el as any).queryLoading;
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                    }
-
-                    try {
-                        const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
-                            delete (this.el as any).queryLoading;
-                            select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                            query.callback({
-                                results: result.items,
-                                more: result.more
-                            });
-                        }
-
-                        var searchResult = opt.search(searchQuery);
-                        if (isPromiseLike(searchResult)) {
-                            searchResult.then(then, cleanup);
-                        }
-                        else {
-                            cleanup();
-                            searchResult && then(searchResult);
-                        }
-                    }
-                    catch (e) {
-                        cleanup();
-                        throw e;
-                    }
-                }, !query.term ? 0 : opt.typeDelay);
-            }
-
-            select2Opt.initSelection = (element: ArrayLike<HTMLElement> | HTMLElement, callback: any) => {
-                var el = isArrayLike(element) ? element[0] : element;
-                var val = (el as any).value;
-                if (val == null || val == '') {
-                    callback(null);
-                    return;
+                const cleanup = () => {
+                    //tomselect.clearOptions();
+                    callback();
+                    delete (this.el as any).queryLoading;
+                    //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
                 }
 
-                var isMultiple = opt.multiple;
-                var idList = isMultiple ? (val as string).split(',') : [val as string];
-                var searchQuery: ComboboxSearchQuery = {
-                    idList: idList,
-                    initSelection: true
-                };
-
-                const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
-                    cleanup();
-                    if (isMultiple) {
+                try {
+                    const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
+                        delete (this.el as any).queryLoading;
+                        //tomselect.clearOptions();
+                        //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
                         callback(result.items);
                     }
-                    else if (!result.items || !result.items.length) {
-                        if (opt.arbitraryValues) {
-                            callback({
-                                id: val,
-                                text: val
-                            });
-                        }
-                        else
-                            callback(null);
-                    }
-                    else {
-                        var item = result.items[0];
-                        callback(item);
-                    }
-                }
 
-                const cleanup = () => { delete (el as any).initSelectionLoading; }
-
-                (el as any).initSelectionLoading && (el as any).initSelectionLoading?.abort?.();
-                searchQuery.signal = ((el as any).initSelectionLoading = new AbortController()).signal;
-                try {
-                    let searchResult = opt.search(searchQuery);
+                    var searchResult = opt.search(searchQuery);
                     if (isPromiseLike(searchResult)) {
                         searchResult.then(then, cleanup);
                     }
                     else {
                         cleanup();
-                        if (searchResult)
-                            then(searchResult);
+                        searchResult && then(searchResult);
                     }
                 }
                 catch (e) {
                     cleanup();
                     throw e;
                 }
+            }, !query ? 0 : opt.typeDelay);
+        }
+
+        new ts(this.el, settings);
+    }
+
+    private createSelect2(opt: ComboboxOptions) {
+        var select2Opt: any = {
+            multiple: opt.multiple,
+            placeholder: opt.placeholder || null,
+            allowClear: opt.allowClear,
+            createSearchChoicePosition: 'bottom'
+        }
+
+        select2Opt.query = (query: any) => {
+            var pageSize = opt.pageSize;
+            var searchQuery: ComboboxSearchQuery = {
+                searchTerm: query.term?.trim() || null,
+                skip: (query.page - 1) * pageSize,
+                take: pageSize,
+                checkMore: true
             }
 
-            if (opt.createSearchChoice)
-                select2Opt.createSearchChoice = opt.createSearchChoice;
+            this.abortPendingQuery();
 
-            if (opt.providerOptions)
-                select2Opt = Object.assign(select2Opt, opt.providerOptions("select2", opt));
+            let $ = getjQuery();
+            var select2 = $ && $(this.el).data('select2');
+            select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
 
-            getjQuery()(this.el).select2(select2Opt);
+            (this.el as any).typeTimeout = setTimeout(() => {
+                this.abortPendingQuery();
+                select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
+                searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
 
+                const cleanup = () => {
+                    delete (this.el as any).queryLoading;
+                    select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+                }
+
+                try {
+                    const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
+                        delete (this.el as any).queryLoading;
+                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+                        query.callback({
+                            results: result.items,
+                            more: result.more
+                        });
+                    }
+
+                    var searchResult = opt.search(searchQuery);
+                    if (isPromiseLike(searchResult)) {
+                        searchResult.then(then, cleanup);
+                    }
+                    else {
+                        cleanup();
+                        searchResult && then(searchResult);
+                    }
+                }
+                catch (e) {
+                    cleanup();
+                    throw e;
+                }
+            }, !query.term ? 0 : opt.typeDelay);
         }
-        else {
+
+        select2Opt.initSelection = (element: ArrayLike<HTMLElement> | HTMLElement, callback: any) => {
+            var el = isArrayLike(element) ? element[0] : element;
+            var val = (el as any).value;
+            if (val == null || val == '') {
+                callback(null);
+                return;
+            }
+
+            var isMultiple = opt.multiple;
+            var idList = isMultiple ? (val as string).split(',') : [val as string];
+            var searchQuery: ComboboxSearchQuery = {
+                idList: idList,
+                initSelection: true
+            };
+
+            const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
+                cleanup();
+                if (isMultiple) {
+                    callback(result.items);
+                }
+                else if (!result.items || !result.items.length) {
+                    if (opt.arbitraryValues) {
+                        callback({
+                            id: val,
+                            text: val
+                        });
+                    }
+                    else
+                        callback(null);
+                }
+                else {
+                    var item = result.items[0];
+                    callback(item);
+                }
+            }
+
+            const cleanup = () => { delete (el as any).initSelectionLoading; }
+
+            (el as any).initSelectionLoading && (el as any).initSelectionLoading?.abort?.();
+            searchQuery.signal = ((el as any).initSelectionLoading = new AbortController()).signal;
+            try {
+                let searchResult = opt.search(searchQuery);
+                if (isPromiseLike(searchResult)) {
+                    searchResult.then(then, cleanup);
+                }
+                else {
+                    cleanup();
+                    if (searchResult)
+                        then(searchResult);
+                }
+            }
+            catch (e) {
+                cleanup();
+                throw e;
+            }
         }
+
+        if (opt.createSearchChoice)
+            select2Opt.createSearchChoice = opt.createSearchChoice;
+
+        if (opt.providerOptions)
+            select2Opt = Object.assign(select2Opt, opt.providerOptions("select2", opt));
+
+        getjQuery()(this.el).select2(select2Opt);        
     }
 
     abortPendingQuery() {
@@ -242,7 +322,7 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return "native";
 
-        if (this.el.classList.contains("tomselected"))
+        if ((this.el as any).tomselect)
             return "tomselect";
 
         if (getjQuery()?.(this.el)?.data()?.select2)
@@ -255,7 +335,7 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return false;
 
-        if (this.el.classList.contains("tomselected"))
+        if ((this.el as any).tomselect)
             return false;
 
         var select2 = getjQuery()?.(this.el)?.data()?.select2;
@@ -269,7 +349,7 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return null;
 
-        if (this.el.classList.contains("tomselected"))
+        if ((this.el as any).tomselect)
             return null;
 
         let $ = getjQuery();
@@ -288,7 +368,7 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return [];
 
-        if (this.el.classList.contains("tomselected"))
+        if ((this.el as any).tomselect)
             return [];
 
         let $ = getjQuery();
@@ -323,7 +403,7 @@ export class Combobox<TItem = any> {
 
         this.el.dataset.comboboxsettingvalue = "true";
         try {
-            if (this.el.classList.contains("tomselected"))
+            if ((this.el as any).tomselect)
                 return;
 
             let $ = getjQuery();
