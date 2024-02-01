@@ -4342,13 +4342,8 @@ declare namespace Serenity {
         static dateInputChange: (e: Event) => void;
         static dateInputKeyup(e: KeyboardEvent): void;
         static useFlatpickr: boolean;
-        static flatPickrOptions(input: HTMLElement): {
-            clickOpens: boolean;
-            allowInput: boolean;
-            dateFormat: string;
-            onChange: () => void;
-        };
-        static flatPickrTrigger(input: HTMLInputElement): HTMLElement;
+        flatPickrOptions(input: HTMLElement): any;
+        createFlatPickrTrigger(): HTMLElement;
         static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
     }
 
@@ -4360,6 +4355,7 @@ declare namespace Serenity {
         private lastSetValueGet;
         constructor(props: EditorProps<P>);
         getFlatpickrOptions(): any;
+        createFlatPickrTrigger(): HTMLElement;
         get_value(): string;
         get value(): string;
         set_value(value: string): void;

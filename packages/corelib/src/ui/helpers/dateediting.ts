@@ -1,4 +1,3 @@
-﻿
 import { Culture, formatDate, getjQuery, parseDate } from "@serenity-is/base";
 
 export function dateInputChangeHandler(e: Event) {
@@ -173,22 +172,15 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
     input.value = val + Culture.dateSeparator;
 }
 
-export function flatPickrOptions(onChange: () => void) {
-    return {
-        clickOpens: true,
-        allowInput: true,
-        dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y'),
-        onChange: onChange
-    }
-}
-
 export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
     var button = document.createElement("button");
     button.type = "button";
     button.classList.add("ui-datepicker-trigger");
     button.addEventListener("click", () => {
-        if (!input.classList.contains('readonly'))
+        if (!input.classList.contains('readonly') && input.getAttribute('readonly') == null) {
             (input as any)._flatpickr?.open?.();
+            (input as any)._flatpickr?.calendarContainer?.focus?.();
+        }
     });
     return button;
 }
