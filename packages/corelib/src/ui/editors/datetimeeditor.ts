@@ -1,7 +1,8 @@
-﻿import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
+import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, today } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { flatPickrTrigger } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
@@ -31,6 +32,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             this.domNode.classList.add('dateTimeQ');
             // @ts-ignore
             flatpickr(this.domNode, this.getFlatpickrOptions());
+            this.createFlatPickrTrigger();
         }
         else if ($?.fn?.datepicker) {
             this.domNode.classList.add('dateQ');
@@ -38,12 +40,12 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             let $ = getjQuery();
             $(this.domNode).datepicker({
                 showOn: 'button',
-                beforeShow: function () {
-                    if (this.domNode.classList.contains('readonly'))
+                beforeShow: () => {
+                    if (this.get_readOnly())
                         return false as any;
                     DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
-                } as any,
+                },
                 yearRange: (this.options.yearRange ?? '-100:+50')
             });
 
@@ -142,7 +144,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
     getFlatpickrOptions(): any {
         return {
-            clickOpens: true,
+            clickOpens: false,
             allowInput: true,
             enableTime: true,
             time_24hr: true,
@@ -151,9 +153,18 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y') + " H:i" + (this.options.seconds ? ":S" : ""),
             onChange: () => {
                 this.lastSetValue = null;
-                this.domNode && Fluent.trigger(this.domNode, 'change');
-            }
+                //this.domNode && Fluent.trigger(this.domNode, 'change');
+            },
+            disable: [
+                () => this.get_readOnly()
+            ]
         }
+    }
+
+    public createFlatPickrTrigger(): HTMLElement {
+        if (!this.domNode)
+            return;
+        return Fluent(flatPickrTrigger(this.domNode)).insertAfter(this.domNode).getNode();
     }
 
     get_value(): string {
@@ -300,7 +311,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     }
 
     get_readOnly(): boolean {
-        return this.domNode.classList.contains('readonly');
+        return this.domNode.classList.contains('readonly') || this.domNode.getAttribute('readonly') != null;
     }
 
     set_readOnly(value: boolean): void {

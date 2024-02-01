@@ -1,8 +1,8 @@
-﻿import { Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
+import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { today } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrOptions, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
+import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface DateEditorOptions {
@@ -24,16 +24,16 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         let $ = getjQuery();
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker)) {
-            var options = DateEditor.flatPickrOptions(this.domNode);
+            var options = this.flatPickrOptions(this.domNode);
             // @ts-ignore
             flatpickr(this.domNode, options);
-            Fluent(flatPickrTrigger(this.domNode)).insertAfter(this.domNode);
+            this.createFlatPickrTrigger();
         }
         else if ($?.fn?.datepicker) {
             $(this.domNode).datepicker({
                 showOn: 'button',
                 beforeShow: (inp: any, inst: any) => {
-                    if (this.domNode.classList.contains('readonly'))
+                    if (this.get_readOnly())
                         return false as any;
                     DateEditor.uiPickerZIndexWorkaround(this.domNode);
                     return true;
@@ -133,7 +133,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }
 
     get_readOnly(): boolean {
-        return this.domNode.classList.contains('readonly');
+        return this.domNode.classList.contains('readonly') || this.domNode.getAttribute('readonly') != null;
     }
 
     set_readOnly(value: boolean): void {
@@ -205,16 +205,24 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     public static useFlatpickr: boolean;
 
-    public static flatPickrOptions(input: HTMLElement) {
-        return flatPickrOptions(function () {
-            //Fluent.trigger(input, "change");
-        });
+    public flatPickrOptions(input: HTMLElement): any {
+        return {
+            clickOpens: false,
+            allowInput: true,
+            dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y'),
+            onChange: () => {
+                //this.domNode && Fluent.trigger(this.domNode, 'change');
+            },
+            disable: [
+                () => this.get_readOnly()
+            ]
+        };
     }
 
-    public static flatPickrTrigger(input: HTMLInputElement): HTMLElement {
-        if (!input)
+    public createFlatPickrTrigger(): HTMLElement {
+        if (!this.domNode)
             return;
-        return flatPickrTrigger(Fluent(input).insertAfter(input).getNode());
+        return Fluent(flatPickrTrigger(this.domNode)).insertAfter(this.domNode).getNode();
     }
 
     public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
