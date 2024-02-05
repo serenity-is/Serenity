@@ -1,9 +1,10 @@
 ﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
-import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
+import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
+import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 
-export interface ServiceLookupEditorOptions extends Select2EditorOptions {
+export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
     service?: string;
     idField?: string;
     textField?: string;
@@ -20,7 +21,7 @@ export interface ServiceLookupEditorOptions extends Select2EditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
-export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
     protected getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
@@ -110,13 +111,13 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return Criteria(idField).in(idList);
     }
 
-    protected getCriteria(query: Select2SearchQuery): any[] {
+    protected getCriteria(query: ComboboxSearchQuery): any[] {
         return Criteria.and(
             Criteria.and(this.getIdListCriteria(query.idList), this.options.criteria),
             Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
     }
 
-    protected getListRequest(query: Select2SearchQuery): ListRequest {
+    protected getListRequest(query: ComboboxSearchQuery): ListRequest {
 
         var request: ListRequest = {};
 
@@ -138,22 +139,12 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return request;
     }
 
-    protected getServiceCallOptions(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): ServiceOptions<ListResponse<TItem>> {
+    protected getServiceCallOptions(query: ComboboxSearchQuery): ServiceOptions<ListResponse<TItem>> {
         return {
             blockUI: false,
             service: this.getServiceUrl(),
             request: this.getListRequest(query),
-            onSuccess: response => {
-                var items = response.Entities || [];
-
-                if (items && query.take && query.checkMore && response.Entities.length > items.length)
-                    items = items.slice(0, query.take);
-
-                results({
-                    items: items.slice(0, query.take),
-                    more: query.checkMore && query.take && items.length > query.take
-                });
-            }
+            signal: query.signal
         }
     }
 
@@ -171,17 +162,25 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return true;
     }
 
-    protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
+    protected override async asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>> {
         if (!this.canSearch(query.idList != null)) {
-            results({
+            return Promise.resolve({
                 items: [],
                 more: false
             });
-            return Promise.resolve();
         }
 
-        var opt = this.getServiceCallOptions(query, results);
-        return serviceCall(opt) as Select2SearchPromise;
+        var opt = this.getServiceCallOptions(query);
+        var response = await serviceCall(opt);
+        var items = response.Entities || [];
+
+        if (items && query.take && query.checkMore && response.Entities.length > items.length)
+            items = items.slice(0, query.take);
+
+        return {
+            items: items.slice(0, query.take),
+            more: query.checkMore && query.take && items.length > query.take
+        };
     }
 }
 

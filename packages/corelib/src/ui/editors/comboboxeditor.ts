@@ -1,22 +1,23 @@
-﻿import { Fluent, PropertyItem, getjQuery, isArrayLike, localText, stringFormat } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { EditorProps, Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
+import { Combobox, ComboboxItem, ComboboxOptions, ComboboxSearchQuery, ComboboxSearchResult, stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 
-export interface Select2CommonOptions {
+export interface ComboboxCommonOptions {
     allowClear?: boolean;
     delimited?: boolean;
     minimumResultsForSearch?: any;
     multiple?: boolean;
 }
 
-export interface Select2FilterOptions {
+export interface ComboboxFilterOptions {
     cascadeFrom?: string;
     cascadeField?: string;
     cascadeValue?: any;
@@ -24,45 +25,27 @@ export interface Select2FilterOptions {
     filterValue?: any;
 }
 
-export interface Select2InplaceAddOptions {
+export interface ComboboxInplaceAddOptions {
     inplaceAdd?: boolean;
     inplaceAddPermission?: string;
     dialogType?: string;
     autoComplete?: boolean;
 }
 
-export interface Select2EditorOptions extends Select2FilterOptions, Select2InplaceAddOptions, Select2CommonOptions {
+export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
 
-export interface Select2SearchPromise extends PromiseLike<any> {
-    abort?(): void;
-    catch?(callback: () => void): void;
-    fail?(callback: () => void): void;
-}
-
-export interface Select2SearchQuery {
-    searchTerm?: string;
-    idList?: string[];
-    skip?: number;
-    take?: number;
-    checkMore?: boolean;
-}
-
-export interface Select2SearchResult<TItem> {
-    items: TItem[];
-    more: boolean;
-}
-
-@Decorators.registerClass('Serenity.Select2Editor',
+@Decorators.registerClass('Serenity.ComboboxEditor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
-export class Select2Editor<P, TItem> extends Widget<P> implements
+export class ComboboxEditor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
     static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private _items: Select2Item[];
-    private _itemById: { [key: string]: Select2Item };
+    private combobox: Combobox;
+    private _items: ComboboxItem<TItem>[];
+    private _itemById: { [key: string]: ComboboxItem<TItem> };
     protected lastCreateTerm: string;
 
     constructor(props: EditorProps<P>) {
@@ -76,29 +59,26 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         if (emptyItemText != null) {
             hidden.setAttribute('placeholder', emptyItemText);
         }
-        var select2Options = this.getSelect2Options();
-        let $ = getjQuery();
-        if ($?.fn?.select2)
-            $(hidden).select2(select2Options);
+        var comboboxOptions = this.getComboboxOptions();
+        comboboxOptions.element = hidden;
+        this.combobox = new Combobox(comboboxOptions);
         hidden.setAttribute('type', 'text');
 
         // for jquery validate to work
         Fluent.on(hidden, "change." + this.uniqueName, (e) => {
-            if (!(e.target as HTMLElement)?.dataset?.select2settingvalue)
+            if (!(e.target as HTMLElement)?.dataset?.comboboxsettingvalue)
                 ValidationHelper.validateElement(hidden);
         });
 
-        this.setCascadeFrom((this.options as Select2EditorOptions).cascadeFrom);
+        this.setCascadeFrom((this.options as ComboboxEditorOptions).cascadeFrom);
 
         if (this.useInplaceAdd())
             this.addInplaceCreate(localText('Controls.SelectEditor.InplaceAdd'), null);
     }
 
     destroy() {
-        this.initSelectionPromise?.abort?.();
-        this.abortPendingQuery();
-        let $ = getjQuery();
-        $ && $(this.domNode)?.select2?.('destroy');
+        this.combobox?.dispose();
+        this.combobox = null;
         super.destroy();
     }
 
@@ -106,12 +86,11 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         return false;
     }
 
-    protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
-        results({
+    protected asyncSearch(query: ComboboxSearchQuery): PromiseLike<ComboboxSearchResult<TItem>> {
+        return Promise.resolve({
             items: [],
             more: false
         });
-        return null;
     }
 
     protected getTypeDelay() {
@@ -153,7 +132,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         return false;
     }
 
-    protected mapItem(item: TItem): Select2Item {
+    protected mapItem(item: TItem): ComboboxItem {
         return {
             id: this.itemId(item),
             text: this.itemText(item),
@@ -162,170 +141,93 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         };
     }
 
-    protected mapItems(items: TItem[]): Select2Item[] {
+    protected mapItems(items: TItem[]): ComboboxItem[] {
         return items.map(this.mapItem.bind(this));
     }
 
     protected allowClear() {
-        return (this.options as Select2EditorOptions).allowClear != null ?
-            !!(this.options as Select2EditorOptions).allowClear : this.emptyItemText() != null;
+        return (this.options as ComboboxEditorOptions).allowClear != null ?
+            !!(this.options as ComboboxEditorOptions).allowClear : this.emptyItemText() != null;
     }
 
     protected isMultiple() {
-        return !!(this.options as Select2EditorOptions).multiple;
+        return !!(this.options as ComboboxEditorOptions).multiple;
     }
-
-    private initSelectionPromise: Select2SearchPromise;
-    private queryPromise: Select2SearchPromise;
-    private typeTimeout: number;
 
     protected abortPendingQuery() {
-        this.queryPromise?.abort?.();
-        this.queryPromise = null;
-        if (this.typeTimeout) {
-            clearTimeout(this.typeTimeout);
-            this.typeTimeout = null;
-        }
+        this.combobox?.abortPendingQuery();
     }
 
-    protected getSelect2Options(): Select2Options {
+    protected getComboboxOptions(): ComboboxOptions {
         var emptyItemText = this.emptyItemText();
-        var opt: Select2Options = {
+        var opt: ComboboxOptions = {
             multiple: this.isMultiple(),
-            placeHolder: emptyItemText || null,
+            placeholder: emptyItemText || null,
             allowClear: this.allowClear(),
-            createSearchChoicePosition: 'bottom'
+            arbitraryValues: this.isAutoComplete()
         }
 
         if (this.hasAsyncSource()) {
-            opt.query = query => {
-                var pageSize = this.getPageSize();
-                var searchQuery: Select2SearchQuery = {
-                    searchTerm: query.term?.trim() || null,
-                    skip: (query.page - 1) * pageSize,
-                    take: pageSize,
-                    checkMore: true
-                }
+            opt.search = query => this.asyncSearch(query).then(result => {
+                var items = this.mapItems(result.items || []);
+                var mappedResult = {
+                    items,
+                    more: result.more
+                };
 
-                this.abortPendingQuery();
-
-                let $ = getjQuery();
-                var select2 = $ && $(this.domNode).data('select2');
-                select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-
-                this.typeTimeout = setTimeout(() => {
-                    this.abortPendingQuery();
-                    select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
-                    this.queryPromise = this.asyncSearch(searchQuery, result => {
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                        this.queryPromise = null;
-                        query.callback({
-                            results: this.mapItems(result.items),
-                            more: result.more
-                        });
-                    });
-                    (this.queryPromise?.catch || this.queryPromise?.fail)?.call(this.queryPromise, () => {
-                        this.queryPromise = null;
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                    });
-                }, !query.term ? 0 : this.getTypeDelay());
-            }
-
-            opt.initSelection = (element, callback) => {
-                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
-                if (val == null || val == '') {
-                    callback(null);
-                    return;
-                }
-
-                var isMultiple = this.isMultiple();
-                var idList = isMultiple ? (val as string).split(',') : [val as string];
-                var searchQuery = {
-                    idList: idList
-                }
-
-                this.initSelectionPromise?.abort?.();
-                this.initSelectionPromise = this.asyncSearch(searchQuery, result => {
-                    this.initSelectionPromise = null;
-                    if (isMultiple) {
-                        var items = (result.items || []).map(x => this.mapItem(x));
-                        this._itemById = this._itemById || {};
-                        for (var item of items)
-                            this._itemById[item.id] = item;
-                        if (this.isAutoComplete &&
-                            items.length != idList.length) {
-                            for (var v of idList) {
-                                if (!items.some(z => z.id == v)) {
-                                    items.push({
-                                        id: v,
-                                        text: v
-                                    });
-                                }
-                            }
-                        }
-                        callback(items);
-                    }
-                    else if (!result.items || !result.items.length) {
-                        if (this.isAutoComplete) {
-                            callback({
-                                id: val,
-                                text: val
+                if (this.isAutoComplete() && query.idList &&
+                    items.length < query.idList.length) {
+                    for (var v of query.idList) {
+                        if (!items.some(z => z.id == v)) {
+                            items.push({
+                                id: v,
+                                text: v
                             });
                         }
-                        else
-                            callback(null);
                     }
-                    else {
-                        var item = this.mapItem(result.items[0]);
-                        this._itemById = this._itemById || {};
-                        this._itemById[item.id] = item;
-                        callback(item);
-                    }
-                });
-                (this.initSelectionPromise.catch || this.initSelectionPromise.fail)?.call(this.initSelectionPromise, () => {
-                    this.initSelectionPromise = null;
-                });
-            }
+                }
+
+                this._itemById ??= {};
+                for (var x of items)
+                    this._itemById[x.id] = x;
+
+                return mappedResult;
+            });
         }
         else {
-            opt.data = this._items;
-            opt.query = (query) => {
-                var items = Select2Editor.filterByText(this._items, x => x.text, query.term);
-                var pageSize = this.getPageSize();
-                query.callback({
-                    results: items.slice((query.page - 1) * pageSize, query.page * pageSize),
-                    more: items.length >= query.page * pageSize
-                });
-            }
-            opt.initSelection = (element, callback) => {
-                var val = isArrayLike(element) ? (element[0] as any)?.value : (element as any).value;
-                var isAutoComplete = this.isAutoComplete();
-                if (this.isMultiple()) {
-                    var list = [];
-                    for (var z of (val as string).split(',')) {
-                        var item2 = this._itemById[z];
-                        if (item2 == null && isAutoComplete) {
-                            item2 = { id: z, text: z };
-                            this.addItem(item2);
-                        }
-                        if (item2 != null) {
-                            list.push(item2);
+            opt.search = (query) => {
+                var items;
+                if (query.initSelection) {
+                    items = this._items.filter(x => query.idList?.includes(x.id))
+                }
+                else {
+                    items = ComboboxEditor.filterByText(this._items, x => x.text, query.searchTerm);
+                }
+
+                if (this.isAutoComplete() && query.idList &&
+                    items.length < query.idList.length) {
+                    this._itemById ??= {};
+                    for (var v of query.idList) {
+                        if (!items.some(z => z.id == v)) {
+                            var item = {
+                                id: v,
+                                text: v
+                            };
+                            items.push(item);
+                            this._itemById[item.id] = item;
                         }
                     }
-                    callback(list);
-                    return;
                 }
-                var it = this._itemById[val];
-                if (it == null && isAutoComplete) {
-                    it = { id: val, text: val };
-                    this.addItem(it);
-                }
-                callback(it);
-            }
+
+                return {
+                    items: items.slice(query.skip, query.take ? items.length : query.take),
+                    more: query.take && items.length >= query.skip + query.take
+                };
+            };
         }
 
-        if ((this.options as Select2EditorOptions).minimumResultsForSearch != null)
-            opt.minimumResultsForSearch = (this.options as Select2EditorOptions).minimumResultsForSearch;
+        if ((this.options as ComboboxEditorOptions).minimumResultsForSearch != null)
+            opt.minimumResultsForSearch = (this.options as ComboboxEditorOptions).minimumResultsForSearch;
 
         if (this.isAutoComplete() || this.useInplaceAdd())
             opt.createSearchChoice = this.getCreateSearchChoice(null);
@@ -334,17 +236,17 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     get_delimited() {
-        return !!(this.options as Select2EditorOptions).delimited;
+        return !!(this.options as ComboboxEditorOptions).delimited;
     }
 
-    public get items(): Select2Item[] {
+    public get items(): ComboboxItem<TItem>[] {
         if (this.hasAsyncSource())
             throw new Error("Can't read items property of an async select editor!");
 
         return this._items || [];
     }
 
-    public set items(value: Select2Item[]) {
+    public set items(value: ComboboxItem<TItem>[]) {
         if (this.hasAsyncSource())
             throw new Error("Can't set items of an async select editor!");
 
@@ -354,14 +256,14 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
             this._itemById[item.id] = item;
     }
 
-    protected get itemById(): { [key: string]: Select2Item } {
+    protected get itemById(): { [key: string]: ComboboxItem<TItem> } {
         if (this.hasAsyncSource())
             throw new Error("Can't read items property of an async select editor!");
 
         return this._itemById;
     }
 
-    protected set itemById(value: { [key: string]: Select2Item }) {
+    protected set itemById(value: { [key: string]: ComboboxItem<TItem> }) {
         if (this.hasAsyncSource())
             throw new Error("Can't set itemById of an async select editor!");
 
@@ -376,7 +278,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         this._itemById = {};
     }
 
-    public addItem(item: Select2Item) {
+    public addItem(item: ComboboxItem<TItem>) {
         if (this.hasAsyncSource())
             throw new Error("Can't add item to an async select editor!");
 
@@ -413,7 +315,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         });
 
         Fluent(this.domNode).on("change", (e: any) => {
-            if ((e.target.dataset.select2settingvalue))
+            if ((e.target.dataset.comboboxsettingvalue))
                 return;
             if (this.isMultiple()) {
                 var values = this.get_values();
@@ -450,33 +352,33 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     protected useInplaceAdd(): boolean {
         return !this.isAutoComplete() &&
-            (this.options as Select2EditorOptions).inplaceAdd &&
-            ((this.options as Select2EditorOptions).inplaceAddPermission == null ||
-                Authorization.hasPermission((this.options as Select2EditorOptions).inplaceAddPermission));
+            (this.options as ComboboxEditorOptions).inplaceAdd &&
+            ((this.options as ComboboxEditorOptions).inplaceAddPermission == null ||
+                Authorization.hasPermission((this.options as ComboboxEditorOptions).inplaceAddPermission));
     }
 
     protected isAutoComplete(): boolean {
-        return !!(this.options as Select2EditorOptions).autoComplete;
+        return !!(this.options as ComboboxEditorOptions).autoComplete;
     }
 
     public getCreateSearchChoice(getName: (z: any) => string) {
         return (s: string) => {
 
             this.lastCreateTerm = s;
-            s = (Select2.util.stripDiacritics(s) ?? '').toLowerCase();
+            s = (stripDiacritics(s) ?? '').toLowerCase();
 
             if (isTrimmedEmpty(s)) {
                 return null;
             }
 
-            if ((this._items || []).some((x: Select2Item) => {
+            if ((this._items || []).some((x: ComboboxItem<TItem>) => {
                 var text = getName ? getName(x.source) : x.text;
-                return Select2.util.stripDiacritics((text ?? '')).toLowerCase() == s;
+                return stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
 
             if (!(this._items || []).some(x1 => {
-                return (Select2.util.stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
+                return (stripDiacritics(x1.text) ?? '').toLowerCase().indexOf(s) !== -1;
             })) {
                 if (this.isAutoComplete()) {
                     return {
@@ -543,14 +445,14 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         if (term == null || term.length == 0)
             return items;
 
-        term = Select2.util.stripDiacritics(term).toUpperCase();
+        term = stripDiacritics(term).toUpperCase();
 
         var contains: TItem[] = [];
         function filter(item: TItem): boolean {
             var text = getText(item);
             if (text == null || !text.length)
                 return false;
-            text = Select2.util.stripDiacritics(text).toUpperCase();
+            text = stripDiacritics(text).toUpperCase();
             if (text.startsWith(term))
                 return true;
             if (text.indexOf(term) >= 0)
@@ -562,18 +464,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     get_value() {
-        var val;
-        let $ = getjQuery();
-        if ($ && $(this.domNode).data('select2')) {
-            val = $(this.domNode).select2('val');
-            if (val != null && Array.isArray(val)) {
-                return val.join(',');
-            }
-        }
-        else
-            val = this.domNode.value;
-
-        return val;
+        return this.combobox ? this.combobox.getValue() : this.domNode?.value;
     }
 
     get value(): string {
@@ -582,34 +473,13 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
 
     set_value(value: string) {
 
-        if (value != this.get_value()) {
-            var val: any = value;
-            if (value && this.isMultiple()) {
-                val = value.split(String.fromCharCode(44)).map(function (x) {
-                    return x?.trim() || null;
-                }).filter(function (x1) {
-                    return x1 != null;
-                });
-            }
-
-            this.domNode.dataset.select2settingvalue = "true";
-            try {
-                let $ = getjQuery();
-                if ($?.fn?.select2) {
-                    $(this.domNode).select2('val', val);
-                }
-                else {
-                    this.domNode.value = val;
-                }
-
-                Fluent.trigger(this.domNode, "change");
-
-            } finally {
-                delete this.domNode.dataset.select2settingvalue;
-            }
-
-            this.updateInplaceReadOnly();
+        if (this.combobox) {
+            this.combobox.setValue(value, /*triggerChange*/ true);
+        } else if (this.domNode) {
+            this.domNode.value = value;
         }
+
+        this.updateInplaceReadOnly();
     }
 
     set value(v: string) {
@@ -642,26 +512,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_values(): string[] {
-        let $ = getjQuery();
-        if ($?.fn?.select2) {
-            var val = $(this.domNode).select2('val');
-        }
-        else
-            val = this.domNode.value;
-
-        if (val == null) {
-            return [];
-        }
-
-        if (Array.isArray(val)) {
-            return val;
-        }
-
-        var str = val;
-        if (!str) {
-            return [];
-        }
-        return [str];
+        return this.combobox?.getValues();
     }
 
     get values(): string[] {
@@ -669,13 +520,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_values(value: string[]) {
-
-        if (value == null || value.length === 0) {
-            this.set_value(null);
-            return;
-        }
-
-        this.set_value(value.join(','));
+        this.combobox?.setValues(value);
     }
 
     set values(value: string[]) {
@@ -740,7 +585,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
                 this.cascadeLink.set_parentID(null);
                 this.cascadeLink = null;
             }
-            (this.options as Select2EditorOptions).cascadeFrom = null;
+            (this.options as ComboboxEditorOptions).cascadeFrom = null;
             return;
         }
 
@@ -749,11 +594,11 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
         });
 
         this.cascadeLink.set_parentID(value);
-        (this.options as Select2EditorOptions).cascadeFrom = value;
+        (this.options as ComboboxEditorOptions).cascadeFrom = value;
     }
 
     protected get_cascadeFrom(): string {
-        return (this.options as Select2EditorOptions).cascadeFrom;
+        return (this.options as ComboboxEditorOptions).cascadeFrom;
     }
 
     get cascadeFrom(): string {
@@ -761,7 +606,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeFrom(value: string) {
-        if (value !== (this.options as Select2EditorOptions).cascadeFrom) {
+        if (value !== (this.options as ComboboxEditorOptions).cascadeFrom) {
             this.setCascadeFrom(value);
             this.updateItems();
         }
@@ -772,7 +617,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_cascadeField() {
-        return ((this.options as Select2EditorOptions).cascadeField ?? (this.options as Select2EditorOptions).cascadeFrom);
+        return ((this.options as ComboboxEditorOptions).cascadeField ?? (this.options as ComboboxEditorOptions).cascadeFrom);
     }
 
     get cascadeField(): string {
@@ -780,7 +625,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeField(value: string) {
-        (this.options as Select2EditorOptions).cascadeField = value;
+        (this.options as ComboboxEditorOptions).cascadeField = value;
     }
 
     set cascadeField(value: string) {
@@ -788,7 +633,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_cascadeValue(): any {
-        return (this.options as Select2EditorOptions).cascadeValue;
+        return (this.options as ComboboxEditorOptions).cascadeValue;
     }
 
     get cascadeValue(): any {
@@ -796,8 +641,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_cascadeValue(value: any) {
-        if ((this.options as Select2EditorOptions).cascadeValue !== value) {
-            (this.options as Select2EditorOptions).cascadeValue = value;
+        if ((this.options as ComboboxEditorOptions).cascadeValue !== value) {
+            (this.options as ComboboxEditorOptions).cascadeValue = value;
             this.set_value(null);
             this.updateItems();
         }
@@ -808,7 +653,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_filterField() {
-        return (this.options as Select2EditorOptions).filterField;
+        return (this.options as ComboboxEditorOptions).filterField;
     }
 
     get filterField(): string {
@@ -816,7 +661,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_filterField(value: string) {
-        (this.options as Select2EditorOptions).filterField = value;
+        (this.options as ComboboxEditorOptions).filterField = value;
     }
 
     set filterField(value: string) {
@@ -824,7 +669,7 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected get_filterValue(): any {
-        return (this.options as Select2EditorOptions).filterValue;
+        return (this.options as ComboboxEditorOptions).filterValue;
     }
 
     get filterValue(): any {
@@ -832,8 +677,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected set_filterValue(value: any) {
-        if ((this.options as Select2EditorOptions).filterValue !== value) {
-            (this.options as Select2EditorOptions).filterValue = value;
+        if ((this.options as ComboboxEditorOptions).filterValue !== value) {
+            (this.options as ComboboxEditorOptions).filterValue = value;
             this.set_value(null);
             this.updateItems();
         }
@@ -885,8 +730,8 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     }
 
     protected getDialogTypeKey() {
-        if ((this.options as Select2EditorOptions).dialogType != null) {
-            return (this.options as Select2EditorOptions).dialogType;
+        if ((this.options as ComboboxEditorOptions).dialogType != null) {
+            return (this.options as ComboboxEditorOptions).dialogType;
         }
 
         return null;
@@ -1006,26 +851,3 @@ export class Select2Editor<P, TItem> extends Widget<P> implements
     public openDialogAsPanel: boolean;
 }
 
-export function select2LocaleInitialization() {
-    let $ = getjQuery();
-    if (!$?.fn?.select2)
-        return false;
-
-    const txt = (s: string) => localText("Controls.SelectEditor." + s);
-    const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
-
-    $.fn.select2.locales['current'] = {
-        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
-        formatNoMatches: () => txt("NoMatches"),
-        formatAjaxError: () => txt("AjaxError"),
-        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
-        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
-        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
-        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
-        formatSearching: () => txt("Searching")
-    };
-    $.extend(($.fn.select2 as any).defaults, ($.fn.select2 as any).locales['current']);
-    return true;
-}
-
-!select2LocaleInitialization() && Fluent.ready(select2LocaleInitialization);

@@ -1,16 +1,17 @@
 ﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { getLookup, reloadLookup, ScriptData } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
-import { Select2Editor, Select2EditorOptions, Select2SearchPromise, Select2SearchQuery, Select2SearchResult } from "./select2editor";
+import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
+import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 
-export interface LookupEditorOptions extends Select2EditorOptions {
+export interface LookupEditorOptions extends ComboboxEditorOptions {
     lookupKey?: string;
     async?: boolean;
 }
 
 @Decorators.registerEditor("Serenity.LookupEditorBase")
-export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends Select2Editor<P, TItem> {
+export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
     private lookupChangeUnbind: any; 
 
@@ -81,7 +82,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return textValue == null ? '' : textValue.toString();
     }
 
-    protected mapItem(item: TItem): Select2Item {
+    protected mapItem(item: TItem): ComboboxItem<TItem> {
         return {
             id: this.itemId(item),
             text: this.getItemText(item, this.lookup),
@@ -105,27 +106,24 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
             this.addItem(this.mapItem(item));
     }
 
-    protected asyncSearch(query: Select2SearchQuery, results: (result: Select2SearchResult<TItem>) => void): Select2SearchPromise {
-        return this.getLookupAsync().then(lookup => {
-            this.lookup = lookup;
+    protected override async asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>> {
+        this.lookup = await this.getLookupAsync();
+        var items = this.getItems(this.lookup);
 
-            var items = this.getItems(this.lookup);
+        if (query.idList != null) {
+            items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
+        }
 
-            if (query.idList != null) {
-                items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
-            }
+        function getText(item: TItem) {
+            return this.getItemText(item, this.lookup);
+        }
 
-            function getText(item: TItem) {
-                return this.getItemText(item, this.lookup);
-            }
+        items = ComboboxEditor.filterByText(items, getText.bind(this), query.searchTerm);
 
-            items = Select2Editor.filterByText(items, getText.bind(this), query.searchTerm);
-
-            results({
-                items: items.slice(query.skip, query.take),
-                more: items.length >= query.take
-            });
-        }) as any;
+        return {
+            items: items.slice(query.skip, query.take),
+            more: items.length >= query.take
+        };
     }
 
     protected getDialogTypeKey() {
