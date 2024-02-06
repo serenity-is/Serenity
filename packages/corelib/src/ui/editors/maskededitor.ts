@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, notifyError } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { IStringValue } from "../../interfaces";
 import { EditorWidget, EditorProps } from "../widgets/widget";
@@ -18,6 +18,9 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
             $(this.domNode).mask(this.options.mask || '', {
                 placeholder: (this.options.placeholder ?? '_')
             });
+        }
+        else {
+            notifyError('MaskedInput requires jQuery masked input plugin ("~/Serenity.Assets/Scripts/jquery.maskedinput.js") to be loaded in the page along with jQuery!');
         }
     }
 
