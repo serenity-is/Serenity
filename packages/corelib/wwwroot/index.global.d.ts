@@ -4455,10 +4455,10 @@ declare namespace Serenity {
         set_readOnly(value: boolean): void;
     }
 
-    type ComboboxType = "native" | "select2" | "tomselect";
+    type ComboboxType = "select2";
     interface ComboboxItem<TSource = any> {
-        id: string;
-        text: string;
+        id?: string;
+        text?: string;
         source?: TSource;
         disabled?: boolean;
     }
@@ -4487,8 +4487,6 @@ declare namespace Serenity {
         arbitraryValues?: boolean;
         /** Page size to use while loading or displaying results */
         pageSize?: number;
-        /** True to prefer select2 over tomselect when both are available, default is false */
-        preferSelect2?: boolean;
         /** Callback to get options specific to the combobox provider type */
         providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
         /** Type delay for searching, default is 200 */
@@ -4498,21 +4496,24 @@ declare namespace Serenity {
         private el;
         static defaults: ComboboxOptions;
         constructor(opt: ComboboxOptions);
-        private createTomselect;
         private createSelect2;
         abortPendingQuery(): void;
         abortInitSelection(): void;
         dispose(): void;
+        get container(): HTMLElement;
         get type(): ComboboxType;
         get isMultiple(): boolean;
+        getSelectedItem(): ComboboxItem;
+        getSelectedItems(): ComboboxItem[];
         getValue(): string;
         getValues(): string[];
         setValue(value: string, triggerChange?: boolean): void;
         setValues(value: string[], triggerChange?: boolean): void;
+        closeDropdown(): void;
+        openDropdown(): void;
         static getInstance(el: Element | ArrayLike<Element>): Combobox;
     }
     function stripDiacritics(str: string): string;
-    function select2LocaleInitialization(): boolean;
 
     interface ComboboxCommonOptions {
         allowClear?: boolean;
@@ -4581,7 +4582,7 @@ declare namespace Serenity {
         };
         setEditValue(source: any, property: PropertyItem): void;
         getEditValue(property: PropertyItem, target: any): void;
-        protected get_select2Container(): Fluent;
+        protected getComboboxContainer(): HTMLElement;
         protected get_items(): ComboboxItem<TItem>[];
         protected get_itemByKey(): {
             [key: string]: ComboboxItem<TItem>;
@@ -4638,6 +4639,7 @@ declare namespace Serenity {
         protected editDialogDataChange(): void;
         protected setTermOnNewEntity(entity: TItem, term: string): void;
         protected inplaceCreateClick(e: Event): void;
+        openDropdown(): void;
         openDialogAsPanel: boolean;
     }
 
@@ -4650,6 +4652,126 @@ declare namespace Serenity {
     interface SelectEditorOptions extends ComboboxCommonOptions {
         items?: any[];
         emptyOptionText?: string;
+    }
+
+    /**
+     * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
+     */
+    type Select2Element = HTMLInputElement | HTMLSelectElement;
+    type Select2FormatResult = string | Element | DocumentFragment;
+    interface Select2QueryOptions {
+        element?: Select2Element;
+        term?: string;
+        page?: number;
+        context?: any;
+        callback?: (p1: Select2Result) => void;
+        matcher?: (p1: any, p2: any, p3?: any) => boolean;
+    }
+    interface Select2Item {
+        id?: string;
+        text?: string;
+        source?: any;
+        children?: Select2Item[];
+        disabled?: boolean;
+        locked?: boolean;
+    }
+    interface Select2Result {
+        hasError?: boolean;
+        errorInfo?: any;
+        results: Select2Item[];
+        more?: boolean;
+        context?: any;
+    }
+    interface Select2AjaxOptions extends RequestInit {
+        headers?: Record<string, string>;
+        url?: string | ((term: string, page: number, context: any) => string);
+        quietMillis?: number;
+        data?: (p1: string, p2: number, p3: any) => any;
+        results?: (p1: any, p2: number, p3: any) => any;
+        params?: (() => any) | any;
+        onError?(response: any, info?: any): void | boolean;
+        onSuccess?(response: any): void;
+    }
+    interface Select2Options {
+        element?: Select2Element;
+        width?: any;
+        minimumInputLength?: number;
+        maximumInputLength?: number;
+        minimumResultsForSearch?: number;
+        maximumSelectionSize?: any;
+        placeholder?: string;
+        placeholderOption?: any;
+        separator?: string;
+        allowClear?: boolean;
+        multiple?: boolean;
+        closeOnSelect?: boolean;
+        openOnEnter?: boolean;
+        id?: (p1: any) => string;
+        matcher?: (p1: string, p2: string, p3: HTMLElement) => boolean;
+        sortResults?: (p1: any, p2: HTMLElement, p3: any) => any;
+        formatAjaxError?: (p1: any, p2: any) => Select2FormatResult;
+        formatMatches?: (matches: number) => Select2FormatResult;
+        formatSelection?: (p1: any, p2: HTMLElement, p3: (p1: string) => string) => Select2FormatResult;
+        formatResult?: (p1: any, p2: HTMLElement, p3: any, p4: (p1: string) => string) => Select2FormatResult;
+        formatResultCssClass?: (p1: any) => string;
+        formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
+        formatNoMatches?: (input: string) => Select2FormatResult;
+        formatLoadMore?: (pageNumber: number) => Select2FormatResult;
+        formatSearching?: () => Select2FormatResult;
+        formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
+        formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
+        formatSelectionTooBig?: (p1: number) => Select2FormatResult;
+        createSearchChoice?: (p1: string) => Select2Item;
+        createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
+        initSelection?: (p1: HTMLElement, p2: (p1: any) => void) => void;
+        tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+        tokenSeparators?: any;
+        query?: (p1: Select2QueryOptions) => void;
+        ajax?: Select2AjaxOptions;
+        data?: any;
+        tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
+        containerCss?: any;
+        containerCssClass?: any;
+        dropdownCss?: any;
+        dropdownCssClass?: any;
+        dropdownAutoWidth?: boolean;
+        adaptContainerCssClass?: (p1: string) => string;
+        adaptDropdownCssClass?: (p1: string) => string;
+        escapeMarkup?: (p1: string) => string;
+        searchInputPlaceholder?: string;
+        selectOnBlur?: boolean;
+        blurOnChange?: boolean;
+        loadMorePadding?: number;
+        nextSearchTerm?: (p1: any, p2: string) => string;
+        populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
+        shouldFocusInput?: (p1: any) => boolean;
+    }
+    class Select2 {
+        private el;
+        constructor(opts?: Select2Options);
+        private get instance();
+        close(): void;
+        get container(): HTMLElement;
+        get dropdown(): HTMLElement;
+        destroy(): void;
+        get data(): (Select2Item | Select2Item[]);
+        set data(value: Select2Item | Select2Item[]);
+        disable(): void;
+        enable(enabled?: boolean): void;
+        focus(): void;
+        get isFocused(): boolean;
+        get isMultiple(): boolean;
+        get opened(): boolean;
+        open(): void;
+        positionDropdown(): void;
+        readonly(value?: boolean): void;
+        get search(): HTMLInputElement;
+        get val(): (string | string[]);
+        set val(value: string[]);
+        static getInstance(el: Select2Element): Select2;
+        static readonly ajaxDefaults: Select2AjaxOptions;
+        static readonly defaults: Select2Options;
+        static stripDiacritics(str: string): string;
     }
 
     class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {

@@ -306,7 +306,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
                 self.inplaceCreateClick(e as any);
             });
 
-        this.get_select2Container().addClass("has-inplace-button");
+        this.getComboboxContainer()?.classList.add("has-inplace-button");
         this.domNode.classList.add("has-inplace-button");
 
         Fluent(this.domNode).on("change", () => {
@@ -331,7 +331,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         });
 
         if (this.isMultiple()) {
-            this.get_select2Container().on('dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
+            Fluent.on(this.getComboboxContainer(), 'dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
                 let $ = getjQuery();
                 if (!$)
                     return;
@@ -426,11 +426,8 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         }
     }
 
-    protected get_select2Container(): Fluent {
-        let container = this.domNode.previousElementSibling;
-        while (container && !container.classList.contains("select2-container"))
-            container = container.previousElementSibling;
-        return Fluent(container);
+    protected getComboboxContainer(): HTMLElement {
+        return Combobox.getInstance(this.domNode)?.container;
     }
 
     protected get_items() {
@@ -528,10 +525,9 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     }
 
     protected get_text(): string {
-        let $ = getjQuery();
-        if ($?.fn?.select2) {
-            return ($(this.domNode).select2('data') ?? {}).text;
-        }
+        var combobox = Combobox.getInstance(this.domNode);
+        if (combobox)
+            return combobox.getSelectedItems()?.join(", ");
 
         return this.domNode.value;
     }
@@ -846,6 +842,10 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
                 }, null);
             }
         });
+    }
+
+    public openDropdown() {
+        Combobox.getInstance(this.domNode)?.openDropdown();
     }
 
     public openDialogAsPanel: boolean;

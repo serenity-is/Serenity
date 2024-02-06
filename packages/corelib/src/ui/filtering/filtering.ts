@@ -14,6 +14,7 @@ import { ServiceLookupEditor } from "../editors/servicelookupeditor";
 import { StringEditor } from "../editors/stringeditor";
 import { Widget } from "../widgets/widget";
 import { FilterOperator, FilterOperators } from "./filteroperator";
+import { Combobox } from "../editors/combobox";
 
 export interface IFiltering {
     createEditor(): void;
@@ -256,9 +257,9 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         let input = inputs[0];
 
         var value;
-        let $ = getjQuery();
-        if ($ && $(input).data('select2') != null) {
-            value = $(input).select2('val');
+        let combobox = Combobox.getInstance(input);
+        if (combobox) {
+            value = combobox.isMultiple ? combobox.getValues().join(",") : combobox.getValue();
         }
         else {
             value = input.value;
@@ -276,9 +277,9 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             return this.get_container().textContent?.trim();
         }
         var value;
-        let $ = getjQuery();
-        if ($ && $(input).data("select2") != null) {
-            value = ($(input).select2('data') ?? {}).text;
+        let combobox = Combobox.getInstance(input);
+        if (combobox) {        
+            value = combobox.getSelectedItems()?.join(", ");
         }
         else {
             value = input.value;

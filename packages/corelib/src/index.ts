@@ -62,6 +62,7 @@ export * from "./ui/editors/radiobuttoneditor";
 export * from "./ui/editors/combobox"
 export * from "./ui/editors/comboboxeditor";
 export * from "./ui/editors/selecteditor";
+export * from "./ui/editors/select2";
 export * from "./ui/editors/dateyeareditor";
 export * from "./ui/editors/enumeditor";
 export * from "./ui/editors/lookupeditor";

@@ -3,21 +3,21 @@ import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, I
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
+import { Combobox } from "./combobox";
 
 
 export namespace EditorUtils {
 
     export function getDisplayText(editor: Widget<any>): string {
 
-        let $ = getjQuery();
-        var select2 = $ && $(editor.domNode).data('select2');
+        var combobox = Combobox.getInstance(editor.domNode);
 
-        if (select2) {
-            var data = $(editor.domNode).select2('data');
-            if (data == null)
+        if (combobox) {
+            var data = combobox.getSelectedItems();
+            if (!data)
                 return '';
 
-            return data.text ?? '';
+            return data.map(x => x.text).join(", ");
         }
 
         var value = getValue(editor);

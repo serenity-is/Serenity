@@ -1,10 +1,11 @@
-import { Fluent, getjQuery, isArrayLike, isPromiseLike, localText, stringFormat } from "@serenity-is/base";
+import { Fluent, isArrayLike, isPromiseLike } from "@serenity-is/base";
+import { Select2, Select2Options } from "./select2";
 
-export type ComboboxType = "native" | "select2" | "tomselect";
+export type ComboboxType = "select2";
 
 export interface ComboboxItem<TSource = any> {
-    id: string;
-    text: string;
+    id?: string;
+    text?: string;
     source?: TSource;
     disabled?: boolean;
 }
@@ -36,22 +37,10 @@ export interface ComboboxOptions<TSource = any> {
     arbitraryValues?: boolean;
     /** Page size to use while loading or displaying results */
     pageSize?: number;
-    /** True to prefer select2 over tomselect when both are available, default is false */
-    preferSelect2?: boolean;
     /** Callback to get options specific to the combobox provider type */
     providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
     /** Type delay for searching, default is 200 */
     typeDelay?: number;
-}
-
-function getTomSelect(): any {
-    // @ts-ignore
-    return typeof TomSelect !== "undefined" ? TomSelect : null;
-}
-
-function getSelect2() {
-    // @ts-ignore
-    return (typeof Select2 !== "undefined" && getjQuery()?.fn?.select2) ? Select2 : null;
 }
 
 export class Combobox<TItem = any> {
@@ -73,98 +62,12 @@ export class Combobox<TItem = any> {
             return;
 
         opt = Object.assign({}, Combobox.defaults, opt);
-
-        let tomSelect = getTomSelect();
-
-        if (tomSelect && (!opt?.preferSelect2 || !getSelect2())) {
-            this.createTomselect(opt);
-        }
-        else if (getSelect2()) {
-            this.createSelect2(opt);
-        }
-        else {
-        }
-    }
-
-    private createTomselect(opt: ComboboxOptions) {
-        const ts = getTomSelect();
-
-        var settings: any = {
-            create: opt.createSearchChoice ? opt.createSearchChoice : false,
-            persist: false,
-            placeholder: opt.placeholder,
-            maxItems: opt.multiple ? null : 1,
-            valueField: "id",
-            hidePlaceholder: true,            
-            loadThrottle: null,
-            shouldLoad: (query: string) => {
-                if (!query) {
-                    var tomselect = (this.el as any).tomselect;
-                    if (!tomselect.loading && !tomselect.initialemptyload) {
-                        tomselect.initialemptyload = true;
-                        tomselect.load();
-                    }
-
-                }
-                return true;
-            }
-        }
-
-        settings.load = (query: string, callback: (items?: ComboboxItem<TItem>[]) => void) => {
-            var pageSize = opt.pageSize;
-            var searchQuery: ComboboxSearchQuery = {
-                searchTerm: query?.trim() || null,
-                skip: 0,
-                take: Math.min(pageSize, 1000), // tomselect does not support paging by default
-                checkMore: true
-            }
-
-            var tomselect = (this.el as any).tomselect;
-            this.abortPendingQuery();
-
-            //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-
-            (this.el as any).typeTimeout = setTimeout(() => {
-                this.abortPendingQuery();
-                //select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
-                searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
-
-                const cleanup = () => {
-                    //tomselect.clearOptions();
-                    callback();
-                    delete (this.el as any).queryLoading;
-                    //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                }
-
-                try {
-                    const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
-                        delete (this.el as any).queryLoading;
-                        //tomselect.clearOptions();
-                        //select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
-                        callback(result.items);
-                    }
-
-                    var searchResult = opt.search(searchQuery);
-                    if (isPromiseLike(searchResult)) {
-                        searchResult.then(then, cleanup);
-                    }
-                    else {
-                        cleanup();
-                        searchResult && then(searchResult);
-                    }
-                }
-                catch (e) {
-                    cleanup();
-                    throw e;
-                }
-            }, !query ? 0 : opt.typeDelay);
-        }
-
-        new ts(this.el, settings);
+        this.createSelect2(opt);
     }
 
     private createSelect2(opt: ComboboxOptions) {
-        var select2Opt: any = {
+        var select2Opt: Select2Options = {
+            element: this.el,
             multiple: opt.multiple,
             placeholder: opt.placeholder || null,
             allowClear: opt.allowClear,
@@ -182,24 +85,27 @@ export class Combobox<TItem = any> {
 
             this.abortPendingQuery();
 
-            let $ = getjQuery();
-            var select2 = $ && $(this.el).data('select2');
-            select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+            var select2 = Select2.getInstance(this.el);
+
+            function setActive(value: boolean) {
+                select2?.search?.classList.toggle('select2-active', value);
+                select2?.search?.parentElement?.classList.toggle('select2-active', value);
+            }
 
             (this.el as any).typeTimeout = setTimeout(() => {
                 this.abortPendingQuery();
-                select2?.search?.addClass?.('select2-active').parent().addClass('select2-active');
+                setActive(true);
                 searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
 
                 const cleanup = () => {
                     delete (this.el as any).queryLoading;
-                    select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+                    setActive(false);
                 }
 
                 try {
                     const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
                         delete (this.el as any).queryLoading;
-                        select2?.search?.removeClass?.('select2-active').parent().removeClass('select2-active');
+                        setActive(false);
                         query.callback({
                             results: result.items,
                             more: result.more
@@ -285,7 +191,7 @@ export class Combobox<TItem = any> {
         if (opt.providerOptions)
             select2Opt = Object.assign(select2Opt, opt.providerOptions("select2", opt));
 
-        getjQuery()(this.el).select2(select2Opt);        
+        new Select2(select2Opt);        
     }
 
     abortPendingQuery() {
@@ -313,48 +219,69 @@ export class Combobox<TItem = any> {
             return;
         this.abortInitSelection();
         this.abortPendingQuery();
-        let $ = getjQuery();
-        $ && $(this.el)?.data?.('select2') && $(this.el).select2?.('destroy');
-        this.el = null;
+        Select2.getInstance(this.el)?.destroy();
+    }
+
+    get container(): HTMLElement {
+        if (!this.el)
+            return null;
+        return Select2.getInstance(this.el)?.container;
     }
 
     get type(): ComboboxType {
         if (!this.el)
-            return "native";
+            return null;
 
-        if ((this.el as any).tomselect)
-            return "tomselect";
-
-        if (getjQuery()?.(this.el)?.data()?.select2)
+        if (Select2.getInstance(this.el))
             return "select2";
 
-        return "native";
+        return null;
     }
 
     get isMultiple(): boolean {
         if (!this.el)
             return false;
 
-        if ((this.el as any).tomselect)
-            return false;
-
-        var select2 = getjQuery()?.(this.el)?.data()?.select2;
+        var select2 = Select2.getInstance(this.el);
         if (select2)
-            return !!select2.opts?.multiple;
+            return select2.isMultiple;
 
         return this.el.getAttribute('multiple') != null;
+    }
+
+    getSelectedItem(): ComboboxItem {
+        var select2 = Select2.getInstance(this.el);
+        if (select2) {
+            var item = select2.data;
+            if (Array.isArray(item))
+                return item[0];
+            return item;
+        }
+    }
+
+    getSelectedItems(): ComboboxItem[] {
+        var select2 = Select2.getInstance(this.el);
+        if (select2) {
+            var item = select2.data;
+            if (Array.isArray(item))
+                return item;
+
+            if (!item)
+                return [];
+
+            return [item];
+        }
+
+        return [];
     }
 
     getValue(): string {
         if (!this.el)
             return null;
 
-        if ((this.el as any).tomselect)
-            return null;
-
-        let $ = getjQuery();
-        if ($ && $(this.el)?.data()?.select2) {
-            var val = $(this.el).select2('val');
+        var select2 = Select2.getInstance(this.el);
+        if (select2) {
+            var val = select2.val;
             if (Array.isArray(val))
                 return val.join(',');
 
@@ -368,13 +295,10 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return [];
 
-        if ((this.el as any).tomselect)
-            return [];
-
-        let $ = getjQuery();
         let val: any;
-        if ($ && $(this.el)?.data()?.select2)
-            val = $(this.el).select2('val');
+        let select2 = Select2.getInstance(this.el);
+        if (select2)
+            val = select2.val;
         else
             val = this.el.value;
 
@@ -403,12 +327,9 @@ export class Combobox<TItem = any> {
 
         this.el.dataset.comboboxsettingvalue = "true";
         try {
-            if ((this.el as any).tomselect)
-                return;
-
-            let $ = getjQuery();
-            if ($ && $(this.el)?.data()?.select2) {
-                $(this.el).select2('val', val);
+            let select2 = Select2.getInstance(this.el);
+            if (select2) {
+                select2.val = val;
             }
             else {
                 this.el.value = val;
@@ -431,9 +352,18 @@ export class Combobox<TItem = any> {
         this.setValue(value.join(','), triggerChange);
     }
 
+    closeDropdown(): void {
+        Select2.getInstance(this.el)?.close();
+    }
+
+    openDropdown(): void {
+        Select2.getInstance(this.el)?.open();
+    }
+
     static getInstance(el: Element | ArrayLike<Element>): Combobox {
-        if (!el)
+        if (!el || !Select2.getInstance((isArrayLike(el) ? el[0] : el) as HTMLInputElement))
             return null;
+
         return new (Combobox as any)({ element: el }, false);
     }
 }
@@ -441,29 +371,5 @@ export class Combobox<TItem = any> {
 export function stripDiacritics(str: string) {
     if (!str)
         return str;
-    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return Select2.stripDiacritics(str);
 }
-
-export function select2LocaleInitialization() {
-    let $ = getjQuery();
-    if (!$?.fn?.select2)
-        return false;
-
-    const txt = (s: string) => localText("Controls.SelectEditor." + s);
-    const fmt = (s: string, ...prm: any[]) => stringFormat(localText("Controls.SelectEditor." + s), prm);
-
-    $.fn.select2.locales['current'] = {
-        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
-        formatNoMatches: () => txt("NoMatches"),
-        formatAjaxError: () => txt("AjaxError"),
-        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
-        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
-        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
-        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
-        formatSearching: () => txt("Searching")
-    };
-    $.extend(($.fn.select2 as any).defaults, ($.fn.select2 as any).locales['current']);
-    return true;
-}
-
-!select2LocaleInitialization() && Fluent.ready(select2LocaleInitialization);

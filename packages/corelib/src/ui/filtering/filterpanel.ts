@@ -7,6 +7,7 @@ import { FilteringTypeRegistry, IFiltering } from "./filtering";
 import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
 import { FilterWidgetBase } from "./filterwidgetbase";
+import { Combobox } from "../editors/combobox";
 
 export interface FilterFieldSelectOptions {
     fields: PropertyItem[];
@@ -296,8 +297,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (emptyRow != null) {
             emptyRow.querySelector<HTMLInputElement>('input.field-select')?.focus();
             if (popupField) {
-                let $ = getjQuery();
-                $ && $(emptyRow).find('input.field-select').select2('open');
+                Combobox.getInstance(emptyRow?.querySelector("input.field-select"))?.openDropdown();
             }
             return emptyRow;
         }
@@ -351,8 +351,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         row.querySelector<HTMLInputElement>('input.field-select')?.focus();
 
         if (popupField) {
-            let $ = getjQuery();
-            $ && $(row).find('input.field-select').select2('open');
+            Combobox.getInstance(row.querySelector("input.field-select"))?.openDropdown();
         }
 
         return row;
