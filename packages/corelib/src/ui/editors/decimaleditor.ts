@@ -1,8 +1,8 @@
-﻿import { Culture, Fluent, formatNumber, getjQuery, parseDecimal } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Culture, Fluent, formatNumber, parseDecimal } from "@serenity-is/base";
 import { IDoubleValue } from "../../interfaces";
-import { extend } from "../../q";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "../widgets/widget";
+import { AutoNumeric, AutoNumericOptions } from "./autonumeric";
 
 export interface DecimalEditorOptions {
     minValue?: string;
@@ -22,7 +22,20 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
         super(props);
 
         this.domNode.classList.add('decimalQ');
-        var numericOptions = extend(DecimalEditor.defaultAutoNumericOptions(), {
+        this.initAutoNumeric();
+    }
+
+    destroy() {
+        AutoNumeric.destroy(this.domNode);
+        super.destroy();
+    }
+
+    protected initAutoNumeric() {
+        AutoNumeric.init(this.domNode, this.getAutoNumericOptions());
+    }
+
+    protected getAutoNumericOptions() {
+        var numericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
             vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00')),
             vMax: (this.options.maxValue ?? '999999999999.99')
         });
@@ -35,16 +48,13 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             numericOptions.aPad = this.options.padDecimals;
         }
 
-        let $ = getjQuery();
-        if ($?.fn?.autoNumeric)
-            $(this.domNode).autoNumeric(numericOptions);
+        return numericOptions;
     }
 
     get_value(): number {
         var val;
-        let $ = getjQuery();
-        if ($?.fn?.autoNumeric) {
-            val = $(this.domNode).autoNumeric('get');
+        if (AutoNumeric.hasInstance(this.domNode)) {
+            val = AutoNumeric.getValue(this.domNode);
 
             if (!!(val == null || val === ''))
                 return null;
@@ -61,12 +71,11 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
     }
 
     set_value(value: number) {
-        let $ = getjQuery();
         if (value == null || (value as any) === '') {
             this.domNode.value = '';
         }
-        else if ($?.fn?.autoNumeric) {
-            $(this.domNode).autoNumeric('set', value);
+        else if (AutoNumeric.hasInstance(this.domNode)) {
+            AutoNumeric.setValue(this.domNode, value);
         }
         else
             this.domNode.value = formatNumber(value);
@@ -80,7 +89,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
         return !isNaN(this.get_value());
     }
 
-    static defaultAutoNumericOptions(): any {
+    static defaultAutoNumericOptions(): AutoNumericOptions {
         return {
             aDec: Culture.decimalSeparator,
             altDec: ((Culture.decimalSeparator === '.') ? ',' : '.'),

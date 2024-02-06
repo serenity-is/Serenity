@@ -4274,6 +4274,39 @@ declare namespace Serenity {
         protected set_value(value: boolean): void;
     }
 
+    interface AutoNumericOptions {
+        aDec?: string;
+        allowedAutoStrip?: RegExp;
+        allowLeading?: boolean;
+        altDec?: string;
+        aForm?: boolean;
+        aNum?: string;
+        aNeg?: string;
+        aSep?: string;
+        aSign?: string;
+        aNegRegAutoStrip?: string;
+        aPad?: boolean;
+        dGroup?: string;
+        /** internal */
+        holder?: any;
+        lZero?: string;
+        mDec?: number;
+        mInt?: number;
+        mRound?: string;
+        nBracket?: string;
+        numRegAutoStrip?: RegExp;
+        oEvent?: any;
+        pSign?: string;
+        /** internal */
+        runOnce?: boolean;
+        skipFirstAutoStrip?: RegExp;
+        skipLastAutoStrip?: RegExp;
+        tagList?: string[];
+        vMax?: any;
+        vMin?: any;
+        wEmpty?: string;
+    }
+
     interface DecimalEditorOptions {
         minValue?: string;
         maxValue?: string;
@@ -4285,12 +4318,18 @@ declare namespace Serenity {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
+        destroy(): void;
+        protected initAutoNumeric(): void;
+        protected getAutoNumericOptions(): AutoNumericOptions & {
+            vMin: string;
+            vMax: string;
+        };
         get_value(): number;
         get value(): number;
         set_value(value: number): void;
         set value(v: number);
         get_isValid(): boolean;
-        static defaultAutoNumericOptions(): any;
+        static defaultAutoNumericOptions(): AutoNumericOptions;
     }
 
     interface IntegerEditorOptions {
@@ -4302,6 +4341,13 @@ declare namespace Serenity {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
+        destroy(): void;
+        protected initAutoNumeric(): void;
+        protected getAutoNumericOptions(): AutoNumericOptions & {
+            vMin: string;
+            vMax: number;
+            aSep: any;
+        };
         get_value(): number;
         get value(): number;
         set_value(value: number): void;
