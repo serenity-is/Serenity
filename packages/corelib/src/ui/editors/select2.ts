@@ -1116,7 +1116,7 @@ abstract class AbstractSelect2 {
         if (disabled === undefined) disabled = false;
         this.enable(!disabled);
 
-        var readonly = (opts.element as any).readonly;
+        var readonly = (opts.element as any).readOnly;
         if (readonly === undefined) readonly = false;
         this.readonly(readonly);
 
@@ -1404,7 +1404,7 @@ abstract class AbstractSelect2 {
             if (disabled === undefined) disabled = false;
             this.enable(!disabled);
 
-            var readonly = (el as any).readonly;
+            var readonly = (el as any).readOnly;
             if (readonly === undefined) readonly = false;
             this.readonly(readonly);
 
@@ -1495,7 +1495,7 @@ abstract class AbstractSelect2 {
         if (this._readonly === enabled) return;
         this._readonly = enabled;
 
-        (this.opts.element as any).readonly = enabled;
+        (this.opts.element as any).readOnly = enabled;
         this.enableInterface();
     }
 
