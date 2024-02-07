@@ -2961,7 +2961,7 @@ class MultiSelect2 extends AbstractSelect2 {
         Fluent.on(this.selection, "click", ".select2-search-choice:not(.select2-locked)", (e: Event) => {
             //killEvent(e);
             _this.search.focus();
-            _this.selectChoice(e.currentTarget as HTMLElement);
+            _this.selectChoice((e.target as HTMLElement).closest('.select2-search-choice') as HTMLElement);
         });
 
         // rewrite labels from original element to focusser
