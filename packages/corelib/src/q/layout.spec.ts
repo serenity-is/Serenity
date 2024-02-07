@@ -1,5 +1,4 @@
-﻿import { getjQuery } from '@serenity-is/base';
-
+﻿
 beforeEach(() => {
     jest.resetModules();
 });
@@ -28,7 +27,6 @@ describe('initFullHeightGridPage', () => {
     it('works with jQuery and jQuery wrapped element', async () => {
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
         var div = document.createElement('div');
-        const $ = getjQuery();
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
         expect(div.classList.contains('responsive-height')).toBe(true);
@@ -90,4 +88,4 @@ describe('isMobileView', () => {
     });
 });
 
-export {}
+export { };

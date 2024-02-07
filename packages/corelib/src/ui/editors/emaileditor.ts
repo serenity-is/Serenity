@@ -1,8 +1,8 @@
-﻿import { Fluent, getjQuery, tryGetText } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, ValidatableElement, Validator, tryGetText } from "@serenity-is/base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { EditorWidget, EditorProps } from "../widgets/widget";
 import { ValidationHelper } from "../../q";
+import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface EmailEditorOptions {
     domain?: string;
@@ -59,25 +59,24 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     static registerValidationMethods(): void {
-        let $ = getjQuery();
-        if (!$?.validator?.methods || $.validator.methods.emailuser)
-            return;
 
-        $.validator.addMethod('emailuser', function (value: string, element: any) {
+        Validator.addMethod('emailuser', function (value, element) {
 
-            var domain = $(element).nextAll('.emaildomain');
-            if (domain.length > 0 && domain.attr('readonly') == null) {
+            var domain = element.nextElementSibling;
+            while (domain && domain.classList.contains("emaildomain"))
+                domain = domain.nextElementSibling;
+            if (domain && domain.getAttribute('readonly') == null) {
 
-                if (this.optional(element) && this.optional(domain[0])) {
+                if (Validator.optional(element) && Validator.optional(domain as ValidatableElement)) {
                     return true;
                 }
 
-                return $.validator.methods.email.call(this, value + '@' + domain.val(), element);
+                return Validator.methods.email(value + '@' + (domain as any).value, element);
             }
             else {
-                return $.validator.methods.email.call(this, value + '@dummy.com', element);
+                return Validator.methods.email(value + '@dummy.com', element);
             }
-        }, tryGetText("Validation.Email") ?? $.validator.messages.email);
+        }, tryGetText("Validation.Email"));
     }
 
     get_value(): string {

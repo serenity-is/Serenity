@@ -1,5 +1,6 @@
-﻿import { Fluent, PropertyItem, getjQuery, localText, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, localText, tryGetText } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
+import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { WidgetProps, getWidgetFrom } from "../widgets/widget";
@@ -7,7 +8,6 @@ import { FilteringTypeRegistry, IFiltering } from "./filtering";
 import { FilterLine } from "./filterline";
 import { FilterOperator } from "./filteroperator";
 import { FilterWidgetBase } from "./filterwidgetbase";
-import { Combobox } from "../editors/combobox";
 
 export interface FilterFieldSelectOptions {
     fields: PropertyItem[];

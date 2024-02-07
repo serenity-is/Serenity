@@ -1,4 +1,4 @@
-﻿import { Fluent, IconClassName, getjQuery, htmlEncode, iconClassName, isArrayLike } from "@serenity-is/base";
+﻿import { Fluent, IconClassName, getjQuery, iconClassName, isArrayLike } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "./widget";
 

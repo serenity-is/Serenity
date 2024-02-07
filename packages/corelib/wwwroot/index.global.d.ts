@@ -2489,6 +2489,7 @@ declare namespace Serenity {
         delayedHide(delay?: number): void;
         private static existingInstance;
         static getInstance(el: ArrayLike<HTMLElement> | HTMLElement): Tooltip;
+        static get isAvailable(): boolean;
         setTitle(value: string): Tooltip;
         toggle(show: boolean): Tooltip;
         hide(): Tooltip;
@@ -4075,7 +4076,7 @@ declare namespace Serenity {
         destroy(): void;
         protected tabs: Fluent;
         protected toolbar: Toolbar;
-        protected validator: any;
+        protected validator: Validator;
         protected isPanel: boolean;
         protected responsive: boolean;
         arrange(): void;

@@ -1,4 +1,4 @@
-﻿import { Fluent, Validator, getjQuery } from "@serenity-is/base";
+﻿import { Fluent, Validator } from "@serenity-is/base";
 import { validateOptions } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
@@ -26,11 +26,10 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         }
 
         if (this.validator) {
+            this.validator.destroy();
             let form = this.findById('Form');
-            if (form) {
-                getjQuery()?.(form)?.remove();
-                form?.remove();
-            }
+            if (form)
+                Fluent.remove(form);
             this.validator = null;
         }
 
@@ -39,7 +38,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
 
     protected tabs: Fluent;
     protected toolbar: Toolbar;
-    protected validator: any;
+    protected validator: Validator;
     protected isPanel: boolean;
     protected responsive: boolean;
 
@@ -81,7 +80,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
 
     protected resetValidation(): void {
         if (this.validator) {
-            (this.validator as any).resetAll();
+            this.validator.resetAll();
         }
     }
 

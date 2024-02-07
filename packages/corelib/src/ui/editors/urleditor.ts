@@ -1,6 +1,7 @@
-﻿import { Fluent, getjQuery } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, Validator } from "@serenity-is/base";
 import { IStringValue } from "../../interfaces";
+import { ValidationHelper } from "../../q/validation";
+import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
 import { StringEditor } from "./stringeditor";
 
@@ -14,11 +15,7 @@ export class URLEditor<P = {}> extends StringEditor<P> {
         this.domNode.setAttribute("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
         Fluent.on(this.domNode, "blur." + this.uniqueName, e => {
-            let $ = getjQuery();
-            if (!$)
-                return;
-
-            var validator = $(this.domNode).closest("form").data("validator");
+            var validator = ValidationHelper.getValidator(this.domNode);
             if (validator == null)
                 return;
 
@@ -31,7 +28,7 @@ export class URLEditor<P = {}> extends StringEditor<P> {
 
             value = "http://" + value;
 
-            if ($.validator.methods['url'].call(validator, value, this.domNode) == true) {
+            if (Validator.methods.url(value, this.domNode)) {
                 this.domNode.value = value;
                 validator.element(this.domNode);
             }

@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, localText } from "@serenity-is/base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -332,16 +332,13 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
 
         if (this.isMultiple()) {
             Fluent.on(this.getComboboxContainer(), 'dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
-                let $ = getjQuery();
-                if (!$)
-                    return;
-                var q = $(e3.target);
+                var q = Fluent(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
                 }
-                var index = q.index();
+                var index = Array.from(q.parent().getNode()?.children || []).indexOf(q.getNode());
                 var values1 = this.get_values();
-                if (index < 0 || index >= this.get_values().length) {
+                if (index == null || index < 0 || index >= this.get_values().length) {
                     return;
                 }
                 (e3 as any)['editItem'] = values1[index];

@@ -2799,7 +2799,7 @@ declare class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
     destroy(): void;
     protected tabs: Fluent;
     protected toolbar: Toolbar;
-    protected validator: any;
+    protected validator: Validator;
     protected isPanel: boolean;
     protected responsive: boolean;
     arrange(): void;

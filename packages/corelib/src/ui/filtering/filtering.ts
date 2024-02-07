@@ -1,8 +1,9 @@
-﻿import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, getjQuery, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
+﻿import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
+import { Combobox } from "../editors/combobox";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor } from "../editors/datetimeeditor";
 import { DecimalEditor } from "../editors/decimaleditor";
@@ -14,7 +15,6 @@ import { ServiceLookupEditor } from "../editors/servicelookupeditor";
 import { StringEditor } from "../editors/stringeditor";
 import { Widget } from "../widgets/widget";
 import { FilterOperator, FilterOperators } from "./filteroperator";
-import { Combobox } from "../editors/combobox";
 
 export interface IFiltering {
     createEditor(): void;
