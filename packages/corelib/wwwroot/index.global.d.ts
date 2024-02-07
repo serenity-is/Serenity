@@ -2738,7 +2738,7 @@ declare namespace Serenity {
          * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit.
          * The right place to submit a form via Ajax after it is validated.
          */
-        submitHandler?(form: HTMLFormElement, event: Event, validator: Validator): void;
+        submitHandler?(form: HTMLFormElement, event: Event, validator: Validator): void | boolean;
         /**
          * String or Function. If specified, the error label is displayed to show a valid element. If a String is given, it is added as
          * a class to the label. If a Function is given, it is called with the label and the validated input (as a DOM element).

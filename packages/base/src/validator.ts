@@ -190,7 +190,7 @@ export interface ValidatorOptions {
      * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit.
      * The right place to submit a form via Ajax after it is validated.
      */
-    submitHandler?(form: HTMLFormElement, event: Event, validator: Validator): void;
+    submitHandler?(form: HTMLFormElement, event: Event, validator: Validator): void | boolean;
 
     /**
      * String or Function. If specified, the error label is displayed to show a valid element. If a String is given, it is added as
@@ -533,19 +533,23 @@ export class Validator {
 
         if (this.settings.onsubmit) {
 
-            Fluent.on(this.currentForm, "click.validator", "[type=submit]", (event: Event) => {
+            var selector = "[type=submit],button:not([type])";
+            Fluent.on(this.currentForm, "click.validator", selector, (event: Event) => {
+
+                // jquery and dom returns different results for currentTarget
+                var button = ((event.currentTarget as HTMLElement)?.matches?.(selector) ? event.currentTarget : (event.target as HTMLElement).closest?.(selector) ?? event.target) as HTMLButtonElement;;
 
                 // Track the used submit button to properly handle scripted
                 // submits later.
-                this.submitButton = event.currentTarget as HTMLInputElement;
+                this.submitButton = button;
 
                 // Allow suppressing validation by adding a cancel class to the submit button
-                if ((event.target as HTMLElement).classList?.contains("cancel")) {
+                if (button.classList?.contains("cancel")) {
                     this.cancelSubmit = true;
                 }
 
                 // Allow suppressing validation by adding the html5 formnovalidate attribute to the submit button
-                if ((event.target as HTMLElement).getAttribute("formnovalidate") != null) {
+                if (button.getAttribute("formnovalidate") != null) {
                     this.cancelSubmit = true;
                 }
             });
@@ -556,6 +560,12 @@ export class Validator {
 
                     // Prevent form submit to be able to see console output
                     event.preventDefault();
+                }
+
+                const stopSubmit = () => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
                 }
 
                 const handle = () => {
@@ -581,9 +591,11 @@ export class Validator {
                             hidden.remove();
                         }
                         if (result !== undefined) {
+                            if (result === false)
+                                return stopSubmit();
                             return result;
                         }
-                        return false;
+                        return stopSubmit();
                     }
                     return true;
                 }
@@ -596,12 +608,12 @@ export class Validator {
                 if (this.form()) {
                     if (this.pendingRequest) {
                         this.formSubmitted = true;
-                        return false;
+                        return stopSubmit();
                     }
                     return handle();
                 } else {
                     this.focusInvalid();
-                    return false;
+                    return stopSubmit();
                 }
             });
         }
