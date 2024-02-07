@@ -4781,6 +4781,7 @@ declare namespace Serenity {
         dropdownCss?: any;
         dropdownCssClass?: any;
         dropdownAutoWidth?: boolean;
+        dropdownParent?: (input: HTMLElement) => HTMLElement;
         adaptContainerCssClass?: (p1: string) => string;
         adaptDropdownCssClass?: (p1: string) => string;
         escapeMarkup?: (p1: string) => string;

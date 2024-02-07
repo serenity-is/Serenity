@@ -87,6 +87,7 @@ export interface Select2Options {
     dropdownCss?: any;
     dropdownCssClass?: any;
     dropdownAutoWidth?: boolean;
+    dropdownParent?: (input: HTMLElement) => HTMLElement;
     adaptContainerCssClass?: (p1: string) => string;
     adaptDropdownCssClass?: (p1: string) => string;
     escapeMarkup?: (p1: string) => string;
@@ -320,9 +321,9 @@ function debounce(quietMillis: number, fn: any, ctx?: any) {
 }
 
 function installDebouncedScroll(threshold: number, element: Element) {
-    var notify = debounce(threshold, function (e: any) { Fluent.trigger(element, "scroll-debounced", e); });
-    Fluent.on(element, "scroll", function (e: any) {
-        if (e.target === element) notify(e);
+    var notify = debounce(threshold, function (args?: any) { Fluent.trigger(element, "scroll-debounced", args); });
+    Fluent.on(element, "scroll", function (e) {
+        if (e.target === element) notify();
     });
 }
 
@@ -602,6 +603,9 @@ export class Select2 {
         dropdownCss: {},
         containerCssClass: "",
         dropdownCssClass: "",
+        dropdownParent: (element) => {
+            return element?.closest(".modal") ?? document.body;
+        },
         formatAjaxError: () => txt("AjaxError"),
         formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
         formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
@@ -1656,8 +1660,11 @@ abstract class AbstractSelect2 {
 
         this.clearDropdownAlignmentPreference();
 
-        if (this.dropdown !== document.body.lastElementChild) {
-            document.body.appendChild(this.dropdown);
+        var dropdownParent = (typeof this.opts.dropdownParent === "function" ? 
+            this.opts.dropdownParent(this.opts.element) : null) ?? this.dropdown.parentElement ?? document.body;
+
+        if (dropdownParent && this.dropdown !== dropdownParent.lastElementChild) {
+            dropdownParent.appendChild(this.dropdown);
         }
 
         // create the dropdown mask if doesn't already exist
@@ -3154,7 +3161,7 @@ class MultiSelect2 extends AbstractSelect2 {
         var placeholder = this.getPlaceholder(),
             maxWidth = this.getMaxSearchWidth();
 
-        if (placeholder !== undefined && this.getVal().length === 0 && this.search.classList.contains("select2-focused") === false) {
+        if (placeholder !== undefined && this.getVal().length === 0 && !this.search.classList.contains("select2-focused")) {
             this.search.value = placeholder ?? "";
             this.search.classList.add("select2-default");
             // stretch the search box to full width of the container so as much of the placeholder is visible as possible
