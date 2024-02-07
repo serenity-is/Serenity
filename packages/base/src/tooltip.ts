@@ -73,6 +73,11 @@ export class Tooltip {
         return new (Tooltip as any)(el, null, false);
     }
 
+    static get isAvailable(): boolean {
+        return !!((typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) ||
+            getjQuery()?.fn?.tooltip);
+    }
+
     setTitle(value: string): Tooltip {
         if (!this.el)
             return this;

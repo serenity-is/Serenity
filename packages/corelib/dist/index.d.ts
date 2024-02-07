@@ -1185,6 +1185,7 @@ declare class Tooltip {
     delayedHide(delay?: number): void;
     private static existingInstance;
     static getInstance(el: ArrayLike<HTMLElement> | HTMLElement): Tooltip;
+    static get isAvailable(): boolean;
     setTitle(value: string): Tooltip;
     toggle(show: boolean): Tooltip;
     hide(): Tooltip;
