@@ -26,7 +26,7 @@ export class Tooltip {
                 if ($?.fn?.tooltip)
                     $(this.el).tooltip(opt);
                 else if (typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip)
-                    new (bootstrap as any).Tooltip(opt);
+                    new (bootstrap as any).Tooltip(this.el, opt);
                 else if (opt?.title !== void 0)
                     this.el.setAttribute("title", opt.title);
             }
