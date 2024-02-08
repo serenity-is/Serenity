@@ -4006,21 +4006,6 @@ declare namespace Serenity {
         separator?: (false | true | 'left' | 'right' | 'both');
     }
     function ToolbarButton(tb: ToolButtonProps): HTMLElement;
-    interface PopupMenuButtonOptions {
-        menu?: HTMLElement | ArrayLike<HTMLElement>;
-        onPopup?: () => void;
-        positionMy?: string;
-        positionAt?: string;
-    }
-    class PopupMenuButton<P extends PopupMenuButtonOptions = PopupMenuButtonOptions> extends Widget<P> {
-        constructor(props: WidgetProps<P>);
-        destroy(): void;
-    }
-    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
-    }
-    class PopupToolButton<P extends PopupToolButtonOptions = PopupToolButtonOptions> extends PopupMenuButton<P> {
-        constructor(props: WidgetProps<P>);
-    }
     interface ToolbarOptions {
         buttons?: ToolButton[];
         hotkeyContext?: any;
@@ -5149,6 +5134,7 @@ declare namespace Serenity {
         readonly domNode: HTMLInputElement;
         private lastValue;
         private field;
+        private fieldLink;
         private fieldChanged;
         private timer;
         constructor(props: WidgetProps<P>);

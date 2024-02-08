@@ -1,6 +1,5 @@
 ﻿import { Fluent, localText } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
-import { PopupMenuButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
@@ -23,6 +22,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
     private lastValue: string;
     private field: QuickSearchField;
+    private fieldLink: HTMLElement;
     private fieldChanged: boolean;
     private timer: number;
 
@@ -42,16 +42,24 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             .insertBefore(this.domNode);
 
         if (this.options.fields?.length > 0) {
-            var a = Fluent("a").addClass('quick-search-field').attr('title',
-                localText('Controls.QuickSearch.FieldSelection')).insertBefore(this.domNode);
+            var dropdown = Fluent("div")
+                .addClass("dropdown quick-search-field")
+                .insertBefore(this.domNode);
 
-            var menu = Fluent("ul");
-            menu.getNode().style.width = "120px";
+            this.fieldLink = Fluent("a").addClass('.quick-search-field-toggle')
+                .attr('title', localText('Controls.QuickSearch.FieldSelection'))
+                .data("bs-toggle", "dropdown")
+                .appendTo(dropdown)
+                .getNode();
+
+            var menu = Fluent("ul").addClass("dropdown-menu")
+                .appendTo(dropdown);
 
             this.options.fields.forEach(item =>
                 Fluent("li")
                     .appendTo(menu)
                     .append(Fluent("a")
+                        .addClass("dropdown-item")
                         .attr('href', '#')
                         .text(item.title ?? '')
                         .on("click", e => {
@@ -61,13 +69,6 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
                             this.updateInputPlaceHolder();
                             this.checkIfValueChanged();
                         })));
-
-            new PopupMenuButton({
-                positionMy: 'right top',
-                positionAt: 'right bottom',
-                menu: menu,
-                element: a.getNode()
-            });
 
             this.field = this.options.fields[0];
             this.updateInputPlaceHolder();
@@ -123,15 +124,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected updateInputPlaceHolder() {
-        var qsf = Fluent(this.domNode).prevSibling(".quick-search-field").getNode();
-        if (qsf) {
-            if (this.field) {
-                qsf.textContent = this.field.title;
-            }
-            else {
-                qsf.textContent = '';
-            }
-        }
+        this.fieldLink && (this.fieldLink.textContent = this.field?.title ?? "");
     }
 
     public restoreState(value: string, field: QuickSearchField) {
