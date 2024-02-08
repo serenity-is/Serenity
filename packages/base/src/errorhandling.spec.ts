@@ -1,6 +1,6 @@
 import * as dialogs from "./dialogs";
-import * as notify from "./notify";
 import { ErrorHandling } from "./errorhandling";
+import * as notify from "./notify";
 
 function changeJSDOMURL(url: string) {
     (globalThis as any).jsdom.reconfigure({ url: url });

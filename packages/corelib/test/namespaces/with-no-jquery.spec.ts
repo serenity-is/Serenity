@@ -1,4 +1,4 @@
-import { loadNSCorelib } from "../testutil"
+import { loadNSCorelib } from "../testutil";
 
 test('works when jSerenityuery not loaded', function() {
     loadNSCorelib(window);

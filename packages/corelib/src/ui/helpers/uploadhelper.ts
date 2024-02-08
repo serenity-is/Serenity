@@ -1,4 +1,4 @@
-import { Fluent, ServiceResponse, Uploader, alertDialog, blockUI, blockUndo, getjQuery, htmlEncode, iframeDialog, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
+import { Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "@serenity-is/base";
 import { replaceAll } from "../../q";
 
 export namespace UploadHelper {

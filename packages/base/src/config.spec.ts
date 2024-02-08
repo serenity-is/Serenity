@@ -33,4 +33,4 @@
 
 });
 
-export {}
+export { };

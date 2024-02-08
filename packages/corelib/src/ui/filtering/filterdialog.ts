@@ -1,8 +1,8 @@
-﻿import { DialogTexts, cancelDialogButton, localText, notifyError, okDialogButton } from "@serenity-is/base";
+﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "@serenity-is/base";
 import { Decorators } from "../../types/decorators";
 import { TemplatedDialog } from "../dialogs/templateddialog";
-import { FilterPanel } from "./filterpanel";
 import { WidgetProps } from "../widgets/widget";
+import { FilterPanel } from "./filterpanel";
 
 @Decorators.registerClass('Serenity.FilterDialog')
 export class FilterDialog<P = {}> extends TemplatedDialog<P> {

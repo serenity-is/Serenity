@@ -1887,167 +1887,6 @@ declare namespace Serenity {
         function isDevelopmentMode(): boolean;
     }
 
-    interface LookupOptions<TItem> {
-        idField?: string;
-        parentIdField?: string;
-        textField?: string;
-    }
-    interface Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-    }
-    class Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        constructor(options: LookupOptions<TItem>, items?: TItem[]);
-        update?(value: TItem[]): void;
-    }
-
-    enum SummaryType {
-        Disabled = -1,
-        None = 0,
-        Sum = 1,
-        Avg = 2,
-        Min = 3,
-        Max = 4
-    }
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        collapsible?: boolean;
-        collapsed?: boolean;
-        tab?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        allowHide?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        widthSet?: boolean;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        groupOrder?: number;
-        summaryType?: SummaryType;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
-        quickFilterCssClass?: string;
-    }
-    interface PropertyItemsData {
-        items: PropertyItem[];
-        additionalItems: PropertyItem[];
-    }
-
-    /**
-     * Gets the known hash value for a given dynamic script name. They are usually
-     * registered server-side via dynamic script manager and their latest known
-     * hashes are passed to the client-side via a script element named RegisteredScripts.
-     * @param name The dynamic script name
-     * @param reload True to force resetting the script hash client side, e.g. for loading
-     * lookups etc.
-     * @returns The hash or null if no such known registration
-     */
-    function getScriptDataHash(name: string, reload?: boolean): string;
-    /**
-     * Fetches a script data with given name via ~/DynamicData endpoint
-     * @param name Dynamic script name
-     * @returns A promise that will return data if successfull
-     */
-    function fetchScriptData<TData>(name: string): Promise<TData>;
-    /**
-     * Returns the script data from cache if available, or via a fetch
-     * request to ~/DynamicData endpoint
-     * @param name
-     * @param reload Clear cache and force reload
-     * @returns
-     */
-    function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData>;
-    /**
-     * Gets or loads a [ColumnsScript] data
-     * @param key Form key
-     * @returns A property items data object containing items and additionalItems properties
-     */
-    function getColumnsScript(key: string): Promise<PropertyItemsData>;
-    /**
-     * Gets or loads a [FormScript] data
-     * @param key Form key
-     * @returns A property items data object containing items and additionalItems properties
-     */
-    function getFormScript(key: string): Promise<PropertyItemsData>;
-    /**
-     * Gets or loads a Lookup
-     * @param key Lookup key
-     */
-    function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
-    /**
-     * Gets or loads a [RemoteData]
-     * @param key Remote data key
-     */
-    function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
-    /**
-     * Shows a suitable error message for errors occured during loading of
-     * a dynamic script data.
-     * @param name Name of the dynamic script
-     * @param status HTTP status returned if available
-     * @param statusText HTTP status text returned if available
-     */
-    function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow?: boolean): string;
-    function peekScriptData(name: string): any;
-    /**
-     * Forces reload of a lookup from the server. Note that only the
-     * client side cache is cleared. This does not force reloading in the server-side.
-     * @param key Lookup key
-     * @returns Lookup
-     */
-    function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
-    function setRegisteredScripts(scripts: any[]): void;
-    function setScriptData(name: string, value: any): void;
-
     namespace EventHandler {
         function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
         function on(element: EventTarget, type: string, listener: EventListener): void;
@@ -2334,6 +2173,32 @@ declare namespace Serenity {
     function tryGetText(key: string): string;
     function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
 
+    interface LookupOptions<TItem> {
+        idField?: string;
+        parentIdField?: string;
+        textField?: string;
+    }
+    interface Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+    }
+    class Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        constructor(options: LookupOptions<TItem>, items?: TItem[]);
+        update?(value: TItem[]): void;
+    }
+
     type ToastContainerOptions = {
         containerId?: string;
         positionClass?: string;
@@ -2398,6 +2263,141 @@ declare namespace Serenity {
     function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
     function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
     function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
+
+    enum SummaryType {
+        Disabled = -1,
+        None = 0,
+        Sum = 1,
+        Avg = 2,
+        Min = 3,
+        Max = 4
+    }
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        allowHide?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        widthSet?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        groupOrder?: number;
+        summaryType?: SummaryType;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
+    }
+    interface PropertyItemsData {
+        items: PropertyItem[];
+        additionalItems: PropertyItem[];
+    }
+
+    /**
+     * Gets the known hash value for a given dynamic script name. They are usually
+     * registered server-side via dynamic script manager and their latest known
+     * hashes are passed to the client-side via a script element named RegisteredScripts.
+     * @param name The dynamic script name
+     * @param reload True to force resetting the script hash client side, e.g. for loading
+     * lookups etc.
+     * @returns The hash or null if no such known registration
+     */
+    function getScriptDataHash(name: string, reload?: boolean): string;
+    /**
+     * Fetches a script data with given name via ~/DynamicData endpoint
+     * @param name Dynamic script name
+     * @returns A promise that will return data if successfull
+     */
+    function fetchScriptData<TData>(name: string): Promise<TData>;
+    /**
+     * Returns the script data from cache if available, or via a fetch
+     * request to ~/DynamicData endpoint
+     * @param name
+     * @param reload Clear cache and force reload
+     * @returns
+     */
+    function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData>;
+    /**
+     * Gets or loads a [ColumnsScript] data
+     * @param key Form key
+     * @returns A property items data object containing items and additionalItems properties
+     */
+    function getColumnsScript(key: string): Promise<PropertyItemsData>;
+    /**
+     * Gets or loads a [FormScript] data
+     * @param key Form key
+     * @returns A property items data object containing items and additionalItems properties
+     */
+    function getFormScript(key: string): Promise<PropertyItemsData>;
+    /**
+     * Gets or loads a Lookup
+     * @param key Lookup key
+     */
+    function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>;
+    /**
+     * Gets or loads a [RemoteData]
+     * @param key Remote data key
+     */
+    function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
+    /**
+     * Shows a suitable error message for errors occured during loading of
+     * a dynamic script data.
+     * @param name Name of the dynamic script
+     * @param status HTTP status returned if available
+     * @param statusText HTTP status text returned if available
+     */
+    function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow?: boolean): string;
+    function peekScriptData(name: string): any;
+    /**
+     * Forces reload of a lookup from the server. Note that only the
+     * client side cache is cleared. This does not force reloading in the server-side.
+     * @param key Lookup key
+     * @returns Lookup
+     */
+    function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
+    function setRegisteredScripts(scripts: any[]): void;
+    function setScriptData(name: string, value: any): void;
 
     function resolveUrl(url: string): string;
     function resolveServiceUrl(url: string): string;

@@ -2,8 +2,8 @@
 import { getLookup, reloadLookup, ScriptData } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
-import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
+import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 
 export interface LookupEditorOptions extends ComboboxEditorOptions {
     lookupKey?: string;

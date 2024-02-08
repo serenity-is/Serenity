@@ -2,4 +2,4 @@
     export declare let bootstrap: any;
 }
 
-export {}
+export { };

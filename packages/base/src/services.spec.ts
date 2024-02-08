@@ -1,4 +1,4 @@
-import { resolveUrl, resolveServiceUrl } from "./services";
+import { resolveServiceUrl, resolveUrl } from "./services";
 
 jest.mock("./config", () => ({
     __esModule: true,

@@ -1,7 +1,7 @@
 ﻿import { Fluent } from "@serenity-is/base";
 import { IStringValue } from "../../interfaces";
-import { EditorWidget } from "../widgets/widget";
 import { Decorators } from "../../types/decorators";
+import { EditorWidget } from "../widgets/widget";
 
 @Decorators.registerType()
 export class StringEditor<P={}> extends EditorWidget<P> {

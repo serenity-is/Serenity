@@ -1,6 +1,6 @@
 ﻿import { Fluent } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { IBooleanValue } from "../../interfaces";
+import { Decorators } from "../../types/decorators";
 import { EditorWidget } from "../widgets/widget";
 
 @Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])

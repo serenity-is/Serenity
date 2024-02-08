@@ -1,4 +1,4 @@
-import { loadNSCorelib } from "../testutil"
+import { loadNSCorelib } from "../testutil";
 
 test('works when jQuery script loaded', function() {
     loadNSCorelib(window);

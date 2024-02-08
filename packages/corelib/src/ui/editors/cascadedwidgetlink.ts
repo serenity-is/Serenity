@@ -1,6 +1,6 @@
 ﻿import { Fluent, notifyError } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { findElementWithRelativeId } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 

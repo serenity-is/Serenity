@@ -3,11 +3,11 @@ import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
+import { TabsExtensions } from "../helpers/tabsextensions";
 import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { WidgetProps } from "../widgets/widget";
 import { DialogExtensions } from "./dialogextensions";
-import { TabsExtensions } from "../helpers/tabsextensions";
 
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<P> extends TemplatedWidget<P> {

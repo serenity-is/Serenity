@@ -1,9 +1,9 @@
 ﻿import { Fluent, localText, resolveUrl } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
     cols?: number;

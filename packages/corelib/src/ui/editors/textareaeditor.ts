@@ -1,6 +1,6 @@
 ﻿import { Fluent } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { IStringValue } from "../../interfaces";
+import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface TextAreaEditorOptions {

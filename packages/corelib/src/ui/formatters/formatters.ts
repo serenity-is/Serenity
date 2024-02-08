@@ -1,9 +1,9 @@
 ﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { EnumKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { replaceAll } from "../../q";
 import { Formatter } from "../../slick";
+import { EnumKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export interface IInitializeColumn {

@@ -1,7 +1,7 @@
 ﻿import { Fluent, toId } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
 import { addOption } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 import { EditorUtils } from "./editorutils";
 

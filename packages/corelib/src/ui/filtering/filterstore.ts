@@ -1,6 +1,6 @@
 ﻿import { Criteria, Culture, localText, tryGetText, type PropertyItem } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
 import { ArgumentNullException } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { FilterLine } from "./filterline";
 
 @Decorators.registerClass('Serenity.FilterStore')

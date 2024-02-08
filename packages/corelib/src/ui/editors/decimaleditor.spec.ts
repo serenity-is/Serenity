@@ -1,6 +1,6 @@
 import { Culture } from "@serenity-is/base";
-import { type DecimalEditorOptions } from "./decimaleditor";
 import { AutoNumeric } from "./autonumeric";
+import { type DecimalEditorOptions } from "./decimaleditor";
 
 beforeEach(() => {
     jest.clearAllMocks();

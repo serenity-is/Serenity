@@ -1,4 +1,4 @@
-﻿import { addClass, htmlEncode, toggleClass } from "./html";
+﻿import { addClass, htmlEncode } from "./html";
 
 // adapted from https://github.com/JPeer264/toastr2
 export type ToastContainerOptions = {

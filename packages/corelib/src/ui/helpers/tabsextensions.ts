@@ -1,6 +1,6 @@
 ﻿import { Fluent, getjQuery, isArrayLike } from "@serenity-is/base";
 
-export { }
+export { };
 
 export namespace TabsExtensions {
     var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link"

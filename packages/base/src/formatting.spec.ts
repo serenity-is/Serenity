@@ -1016,4 +1016,4 @@ describe("ScriptCulture", () => {
     });    
 });
 
-export {}
+export { };
