@@ -141,9 +141,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         if (value !== this.get_readOnly()) {
             this.domNode.classList.toggle('readonly', !!value);
             value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
-            let trg = this.domNode.nextElementSibling;
-            while (trg && !trg.classList.contains("ui-datepicker-trigger"))
-                trg = trg.nextElementSibling;
+            let trg = Fluent(this.domNode).nextSibling(".ui-datepicker-trigger").getNode();
             trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
         }
     }

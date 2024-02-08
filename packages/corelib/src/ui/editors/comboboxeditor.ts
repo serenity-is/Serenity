@@ -544,9 +544,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     private updateInplaceReadOnly(): void {
         var readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
-        let el = this.domNode.nextElementSibling as HTMLElement;
-        while (el && !el.classList.contains("inplace-create"))
-            el = el.nextElementSibling as HTMLElement;
+        let el = Fluent(this.domNode).nextSibling(".inplace-create").getNode();
         if (el) {
             el.setAttribute('disabled', (readOnly ? 'disabled' : ''));
             el.style.opacity = (readOnly ? '0.1' : '');

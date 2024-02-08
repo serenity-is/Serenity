@@ -32,9 +32,11 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
     one(type: string, listener: EventListener): this;
     one(type: string, selector: string, delegationHandler: Function): this;
+    nextSibling(selector?: string): Fluent<any>;
     parent(): Fluent<HTMLElement>;
     prepend(child: string | Node | Fluent<any>): this;
     prependTo(parent: Element | Fluent<any>): this;
+    prevSibling(selector?: string): Fluent<any>;
     remove(): this;
     removeAttr(name: string): this;
     removeClass(value: string | boolean | (string | boolean)[]): this;
@@ -298,6 +300,13 @@ Fluent.prototype.hide = function (this: FluentThis) {
     return this;
 }
 
+Fluent.prototype.nextSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
+    var sibling = this.el?.nextElementSibling;
+    while (sibling && selector != null && !sibling.matches(selector))
+        sibling = sibling.nextElementSibling;    
+    return new (Fluent as any)(sibling);
+}
+
 Fluent.prototype.parent = function (this: FluentThis): Fluent<HTMLElement> {
     return new (Fluent as any)(this.el?.parentNode);
 }
@@ -305,6 +314,13 @@ Fluent.prototype.parent = function (this: FluentThis): Fluent<HTMLElement> {
 Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fluent<HTMLElement>) {
     this.el && this.el.prepend(extractNode(child));
     return this;
+}
+
+Fluent.prototype.prevSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
+    var sibling = this.el?.previousElementSibling;
+    while (sibling && selector != null && !sibling.matches(selector))
+        sibling = sibling.previousElementSibling;    
+    return new (Fluent as any)(sibling);
 }
 
 function cleanContents(element: Element) {

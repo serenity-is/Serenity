@@ -62,9 +62,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
         Validator.addMethod('emailuser', function (value, element) {
 
-            var domain = element.nextElementSibling;
-            while (domain && domain.classList.contains("emaildomain"))
-                domain = domain.nextElementSibling;
+            var domain = Fluent(element).nextSibling(".emaildomain").getNode();
             if (domain && domain.getAttribute('readonly') == null) {
 
                 if (Validator.optional(element) && Validator.optional(domain as ValidatableElement)) {

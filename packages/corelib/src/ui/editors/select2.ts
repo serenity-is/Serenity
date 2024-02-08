@@ -2986,12 +2986,8 @@ class MultiSelect2 extends AbstractSelect2 {
 
             ++this.keydowns;
             var selected = selection.querySelector<HTMLElement>(".select2-search-choice-focus");
-            var prev = selected?.previousElementSibling as HTMLElement;
-            if (prev && !prev.matches(".select2-search-choice:not(.select2-locked)"))
-                prev = null;
-            var next = selected?.nextElementSibling as HTMLElement;
-            if (next && !next.matches(".select2-search-choice:not(.select2-locked)"))
-                next = null;
+            var prev = Fluent(selected).prevSibling(".select2-search-choice:not(.select2-locked)").getNode();
+            var next = Fluent(selected).nextSibling(".select2-search-choice:not(.select2-locked)").getNode();
             var pos = getCursorInfo(this.search);
 
             if (selected &&

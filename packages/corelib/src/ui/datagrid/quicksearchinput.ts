@@ -123,9 +123,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     }
 
     protected updateInputPlaceHolder() {
-        var qsf = this.domNode.previousElementSibling;
-        while (qsf && !qsf.classList.contains("quick-search-field"))
-            qsf = qsf.previousElementSibling;
+        var qsf = Fluent(this.domNode).prevSibling(".quick-search-field").getNode();
         if (qsf) {
             if (this.field) {
                 qsf.textContent = this.field.title;

@@ -2093,9 +2093,11 @@ declare namespace Serenity {
         one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         one(type: string, listener: EventListener): this;
         one(type: string, selector: string, delegationHandler: Function): this;
+        nextSibling(selector?: string): Fluent<any>;
         parent(): Fluent<HTMLElement>;
         prepend(child: string | Node | Fluent<any>): this;
         prependTo(parent: Element | Fluent<any>): this;
+        prevSibling(selector?: string): Fluent<any>;
         remove(): this;
         removeAttr(name: string): this;
         removeClass(value: string | boolean | (string | boolean)[]): this;

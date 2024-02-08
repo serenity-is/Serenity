@@ -56,7 +56,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
             this.time = Fluent("select").addClass('editor s-DateTimeEditor time').getNode();
             var after = this.domNode.nextElementSibling as HTMLElement;
-            if (after?.classList.contains("ui-datepicker-triggerlength")) {
+            if (after?.classList.contains("ui-datepicker-trigger")) {
                 Fluent(this.time).insertAfter(after);
             }
             else {
@@ -321,15 +321,11 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 this.domNode.classList.toggle('readonly', !!value);
                 value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
                 
-                let trg = this.domNode.nextElementSibling;
-                while (trg && !trg.classList.contains("ui-datepicker-trigger"))
-                    trg = trg.nextElementSibling;
+                let trg = Fluent(this.domNode).nextSibling(".ui-datepicker-trigger").getNode();
                 trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
 
-                trg = this.domNode.nextElementSibling;
-                while (trg && !trg.classList.contains("inplace-now"))
-                    trg = trg.nextElementSibling;
-                    trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
+                let now = Fluent(this.domNode).nextSibling(".inplace-now").getNode();
+                now && ((now as HTMLElement).style.opacity = value ? "0.1" : "1");
             }
 
             this.time && EditorUtils.setReadonly(this.time, value);
