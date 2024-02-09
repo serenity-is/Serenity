@@ -1,3 +1,32 @@
+## 8.3.0 (2024-02-09)
+
+### Features:
+
+- In this version we are removing the jQuery dependency, along with other scripts like `Select2`, `jQuery Validate`, `autoNumeric`. These three plugins are converted to TypeScript w/o jQuery dependency, and are embedded into Serenity Corelib. The jQuery mask input plugin and Colorbox are also removed, but they don't have any alternatives and we are not planning to introduce any. MaskedInput is not used anywhere in our templates / samples and had very limited usage. Colorbox was used for viewing larger images by clicking upload editor thumbnails but they will simply open in a new tab for now.
+- Fluent removes the attribute if the value passed to the Fluent.setAttribute is null
+- Added prevSibling and nextSibling functions to Fluent, which works similar to prevAll and nextAll except single element, and when selector is null acts like .prev/.next
+- **`[Breaking Change]`** jQuery Validator is converted to TypeScript by removing jQuery dependency and is embedded to the Serenity corelib. You should remove the one in appsettings.bundles.json as it will no longer be used.
+- The default date format for upload format date is `yyyyMMddhhmmss` if not specified. (#7067)
+- **`[Breaking Change]`** Select2 is converted to TypeScript by removing jQuery dependency and is embedded to the Serenity corelib. You should remove the one in appsettings.bundles.json as it will no longer be used.
+- **`[Breaking Change]`** The base Select2Editor is renamed to `ComboboxEditor`, and a `Combobox` abstraction class is introduced. This will make it possible to replace Select2 with another library in the future if desired. Several Serenity specific types like Select2SearchQuery etc. are renamed to `ComboboxSearchQuery` and similar. Some methods like getSelect2Options etc are renamed to `getComboboxOptions`. To pass Select2 specific options, you should override that method and provide a `getProviderOptions` callback.
+- Flatpickr will no longer open on click by default, only on button click just like it was the case with UI datepicker. Flatpickr options can be changed for DateEditor/DateTimeEditor by overriding getFlatpickrOptions method.
+- Bootstrap Modal does not allow focusing any element outside the modal so any inputs in flatpickr / ui datepicker / select2 etc. could not be focused while inside a modal. We applied some workarounds / patches to those components and Bootstrap itself.
+- Use Fluent.toggle for hiding grid field in property grid instead of toggling hidden class, so that it can be shown with Fluent.toggle again (https://github.com/serenity-premium/startsharp/issues/892)
+- **`[Breaking Change]`** jquery.autoNumeric is converted to TypeScript by removing jQuery dependency and is embedded to the Serenity corelib (We evaluated the latest version of autoNumeric which does not have jQuery dependency, but it is almost 10 times the size). You should remove the one in appsettings.bundles.json as it will no longer be used.
+- **`[Breaking Change]`** MaskedEditor which depends on a very old jquery.maskedinput plugin is deprecated. You may still use it by including jquery and the plugin but not recommended. The option is to add a validation rule or find another mask input library.
+- **`[Breaking Change]`** Colorbox is removed from StartSharp/Serene as we no longer have jQuery. You may still use it by including together with jQuery but is not recommended. Currently, the images will open in a new tab for upload editor thumbnails.
+- Added Tooltip.isAvailable method to check if bootstrap tooltip is available
+- **`[Breaking Change]`** `@Decorators.option` is deprecated and will be removed completely in a future version as it is not compatible with JSX. Please convert them to regular constructor options / props.
+- Replaced several jQuery plugins used in StartSharp Dashboard with other options like Sortable.
+
+### Bugfixes:
+
+- Fix TextAreaEditor displays undefined on new record mode
+- Bootstrap 5 Tooltip display issue when jQuery is not loaded.
+- The flatpickr trigger button now has type "button" so that it does not cause submit / validation.
+- Space key does not set the date editor to today with flatpickr
+
+
 ## 8.2.2 (2024-01-21)
 
 ### Features:
