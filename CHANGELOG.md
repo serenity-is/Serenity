@@ -1,3 +1,9 @@
+## 8.3.1 (2024-02-09)
+
+### Bugfixes:
+
+- Fix potential stack overflow with Fluent.remove
+
 ## 8.3.0 (2024-02-09)
 
 ### Features:
