@@ -24,7 +24,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         let $ = getjQuery();
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker)) {
-            var options = this.flatPickrOptions(this.domNode);
+            var options = this.getFlatpickrOptions(this.domNode);
             // @ts-ignore
             flatpickr(this.domNode, options);
             this.createFlatPickrTrigger();
@@ -203,8 +203,8 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
     public static useFlatpickr: boolean;
 
-    public flatPickrOptions(input: HTMLElement): any {
-        return {
+    public getFlatpickrOptions(input: HTMLElement): any {
+        var opt: any = {
             clickOpens: false,
             allowInput: true,
             dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y'),
@@ -215,6 +215,22 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
                 () => this.get_readOnly()
             ]
         };
+
+        if (this.domNode.closest(".modal"))
+            opt.appendTo = this.domNode.closest(".modal");
+        else {
+            setTimeout(() => {
+                var modal = this.domNode.closest(".modal");
+                if (modal && !opt.static && !opt.appendTo && this.domNode && 
+                    (this.domNode as any)._flatpickr && 
+                    (this.domNode as any)._flatpickr.calendarContainer && 
+                    (this.domNode as any)._flatpickr.calendarContainer.parentElement !== modal) {
+                    modal.appendChild((this.domNode as any)._flatpickr.calendarContainer);
+                }
+            }, 0);
+        }        
+
+        return opt;
     }
 
     public createFlatPickrTrigger(): HTMLElement {

@@ -143,7 +143,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     }
 
     getFlatpickrOptions(): any {
-        return {
+        var opt: any = {
             clickOpens: false,
             allowInput: true,
             enableTime: true,
@@ -159,6 +159,22 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 () => this.get_readOnly()
             ]
         }
+
+        if (this.domNode.closest(".modal"))
+            opt.appendTo = this.domNode.closest(".modal");
+        else {
+            setTimeout(() => {
+                var modal = this.domNode.closest(".modal");
+                if (modal && !opt.static && !opt.appendTo && this.domNode && 
+                    (this.domNode as any)._flatpickr && 
+                    (this.domNode as any)._flatpickr.calendarContainer && 
+                    (this.domNode as any)._flatpickr.calendarContainer.parentElement !== modal) {
+                    modal.appendChild((this.domNode as any)._flatpickr.calendarContainer);
+                }
+            }, 0);
+        }
+
+        return opt;
     }
 
     public createFlatPickrTrigger(): HTMLElement {

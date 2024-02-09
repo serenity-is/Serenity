@@ -4376,7 +4376,7 @@ declare namespace Serenity {
         static dateInputChange: (e: Event) => void;
         static dateInputKeyup(e: KeyboardEvent): void;
         static useFlatpickr: boolean;
-        flatPickrOptions(input: HTMLElement): any;
+        getFlatpickrOptions(input: HTMLElement): any;
         createFlatPickrTrigger(): HTMLElement;
         static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
     }

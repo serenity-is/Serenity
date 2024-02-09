@@ -388,7 +388,16 @@ export class Dialog {
             Object.assign(modalOpt, opt.providerOptions("bsmodal", opt));
 
         if (bs5 && bootstrap.Modal) {
-            new bootstrap.Modal(modal.getNode(), modalOpt);
+            var modalObj = new bootstrap.Modal(modal.getNode(), modalOpt);
+            if (modalObj && modalObj._focustrap && modalObj._focustrap._handleFocusin) {
+                var org: Function = modalObj._focustrap._handleFocusin;
+                modalObj._focustrap._handleFocusin = function(event: Event) {
+                    if (event.target &&
+                        (event.target as any).closest('.ui-datepicker, .select2-drop, .cke, .cke_dialog, .flatpickr-calendar'))
+                        return;
+                    org.apply(this, arguments);
+                }
+            }
         }
         else {
             getjQuery()?.(modal.getNode())?.modal?.(modalOpt);
