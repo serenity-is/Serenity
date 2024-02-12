@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 
 namespace Serenity.Web;
 
@@ -18,15 +18,16 @@ namespace Serenity.Web;
 /// <param name="requestContext">Request context</param>
 public class TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor? requestContext = null) : IPermissionService, ITransientGrantor
 {
+    private readonly ReaderWriterLockSlim sync = new();
     private readonly IPermissionService permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
-    private readonly IHttpContextItemsAccessor requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
-    private readonly ThreadLocal<Stack<HashSet<string>?>> grantingStack = new();
+    private readonly IHttpContextItemsAccessor? requestContext = requestContext;
+    private readonly AsyncLocal<Stack<HashSet<string>?>> grantingStack = new();
 
     private Stack<HashSet<string>?>? GetGrantingStack(bool createIfNull)
     {
         Stack<HashSet<string>?>? stack;
 
-        var requestItems = requestContext.Items;
+        var requestItems = requestContext?.Items;
 
         if (requestItems != null)
         {
@@ -51,19 +52,27 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
     /// <returns>True if user has the permission</returns>
     public bool HasPermission(string permission)
     {
-        var grantingStack = GetGrantingStack(false);
-
-        if (grantingStack != null && grantingStack.Count > 0)
+        sync.EnterReadLock();
+        try
         {
-            var permissionSet = grantingStack.Peek();
-            if (permissionSet == null)
-                return true;
+            var grantingStack = GetGrantingStack(false);
 
-            return permissionSet.Contains(permission) ||
-                permissionService.HasPermission(permission);
+            if (grantingStack != null && grantingStack.Count > 0)
+            {
+                var permissionSet = grantingStack.Peek();
+                if (permissionSet == null)
+                    return true;
+
+                return permissionSet.Contains(permission) ||
+                    permissionService.HasPermission(permission);
+            }
+
+            return permissionService.HasPermission(permission);
         }
-
-        return permissionService.HasPermission(permission);
+        finally 
+        { 
+            sync.ExitReadLock(); 
+        }
     }
 
     /// <summary>
@@ -72,26 +81,34 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
     /// <param name="permissions">List of permission keys</param>
     public void Grant(params string[] permissions)
     {
-        if (permissions == null || permissions.Length == 0)
-            throw new ArgumentNullException("permissions");
-
-        var grantingStack = GetGrantingStack(true);
-
-        if (grantingStack!.Count > 0)
+        sync.EnterWriteLock();
+        try
         {
-            var oldSet = grantingStack.Peek();
-            if (oldSet == null)
-                grantingStack.Push(null);
+            if (permissions == null || permissions.Length == 0)
+                throw new ArgumentNullException("permissions");
+
+            var grantingStack = GetGrantingStack(true);
+
+            if (grantingStack!.Count > 0)
+            {
+                var oldSet = grantingStack.Peek();
+                if (oldSet == null)
+                    grantingStack.Push(null);
+                else
+                {
+                    var newSet = new HashSet<string>(oldSet);
+                    newSet.AddRange(permissions);
+                    grantingStack.Push(newSet);
+                }
+            }
             else
             {
-                var newSet = new HashSet<string>(oldSet);
-                newSet.AddRange(permissions);
-                grantingStack.Push(newSet);
+                grantingStack.Push(new HashSet<string>(permissions));
             }
         }
-        else
-        {
-            grantingStack.Push(new HashSet<string>(permissions));
+        finally 
+        { 
+            sync.ExitWriteLock(); 
         }
     }
 
@@ -100,8 +117,16 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
     /// </summary>
     public void GrantAll()
     {
-        var grantingStack = GetGrantingStack(true);
-        grantingStack!.Push(null);
+        sync.EnterWriteLock();
+        try
+        {
+            var grantingStack = GetGrantingStack(true);
+            grantingStack!.Push(null);
+        }
+        finally
+        {
+            sync.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -109,10 +134,18 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
     /// </summary>
     public void UndoGrant()
     {
-        var grantingStack = GetGrantingStack(false);
-        if (grantingStack == null || grantingStack.Count == 0)
-            throw new InvalidOperationException("UndoGrant() is called while Granting stack is empty!");
+        sync.EnterWriteLock();
+        try
+        {
+            var grantingStack = GetGrantingStack(false);
+            if (grantingStack == null || grantingStack.Count == 0)
+                throw new InvalidOperationException("UndoGrant() is called while Granting stack is empty!");
 
-        grantingStack.Pop();
+            grantingStack.Pop();
+        }
+        finally
+        {
+            sync.ExitWriteLock();
+        }
     }
 }
