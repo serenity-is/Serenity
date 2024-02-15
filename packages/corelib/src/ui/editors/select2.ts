@@ -998,7 +998,7 @@ abstract class AbstractSelect2 {
             .replace(/([;&,\-\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
         this.container.setAttribute("id", this.containerId);
 
-        this.container.setAttribute("title", opts.element.getAttribute("title"));
+        this.container.setAttribute("title", opts.element.getAttribute("title") ?? "");
 
         syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
 
@@ -1395,6 +1395,10 @@ abstract class AbstractSelect2 {
             if (this.opts.element.dataset.select2ChangeTriggered !== "true") {
                 this.initSelection();
             }
+        }.bind(this));
+
+        Fluent.on(el, "focus.select2", function (this: AbstractSelect2, e: Event) {
+            this.focus();
         }.bind(this));
 
         this._sync = () => {
