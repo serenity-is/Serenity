@@ -2505,10 +2505,7 @@ class SingleSelect2 extends AbstractSelect2 {
             this.selection.focus();
         }));
 
-        ["mousedown", "touchstart"].forEach(ev => Fluent.on(selection, ev, e => {
-            // Prevent IE from generating a click event on the body
-            reinsertElement(selection);
-
+        Fluent.on(selection, "click", e => {
             if (!this.container.classList.contains("select2-container-active")) {
                 Fluent.trigger(this.opts.element, "select2-focus");
             }
@@ -2520,7 +2517,7 @@ class SingleSelect2 extends AbstractSelect2 {
             }
 
             killEvent(e);
-        }));
+        });
 
         ["mousedown", "touchstart"].forEach(ev => Fluent.on(dropdown, ev, () => {
             if (this.opts.shouldFocusInput(this)) {
