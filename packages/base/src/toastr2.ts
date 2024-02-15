@@ -176,7 +176,7 @@ export class Toastr {
         let container = this.getContainer(options);
         if (!container)
             return;
-        if (!container.hasChildNodes() && container.parentNode)
+        if (!container.hasChildNodes?.() && container.parentNode)
             container.parentNode.removeChild(container);
     }
 

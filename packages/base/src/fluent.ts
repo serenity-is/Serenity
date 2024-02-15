@@ -79,7 +79,7 @@ export namespace Fluent {
         if (!el)
             return;
 
-        if (el.hasChildNodes()) {
+        if (typeof el.hasChildNodes === "function" && el.hasChildNodes()) {
             let $ = getjQuery();
             if ($)
                 $(el).empty();
@@ -357,7 +357,7 @@ Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
     if (!this.el)
         return this;
 
-    if (this.el.hasChildNodes()) {
+    if (typeof this.el.hasChildNodes === "function" && this.el.hasChildNodes()) {
         let $ = getjQuery();
         if ($)
             $(this.el).text(value ?? "");
