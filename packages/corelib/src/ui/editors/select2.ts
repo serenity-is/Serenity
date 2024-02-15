@@ -2505,6 +2505,8 @@ class SingleSelect2 extends AbstractSelect2 {
             this.selection.focus();
         }));
 
+        Fluent.on(selection, "dragstart", e => { e.preventDefault(); return false });
+
         Fluent.on(selection, "click", e => {
             if (!this.container.classList.contains("select2-container-active")) {
                 Fluent.trigger(this.opts.element, "select2-focus");
