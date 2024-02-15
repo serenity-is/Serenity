@@ -92,7 +92,7 @@ export class Combobox<TItem = any> {
                 select2?.search?.parentElement?.classList.toggle('select2-active', value);
             }
 
-            (this.el as any).typeTimeout = setTimeout(() => {
+            (this.el as any).typeTimeoutFn = () => {
                 this.abortPendingQuery();
                 setActive(true);
                 searchQuery.signal = ((this.el as any).queryLoading = new AbortController()).signal;
@@ -125,7 +125,9 @@ export class Combobox<TItem = any> {
                     cleanup();
                     throw e;
                 }
-            }, !query.term ? 0 : opt.typeDelay);
+            };
+            
+            (this.el as any).typeTimeout = setTimeout((this.el as any).typeTimeoutFn, !query.term ? 0 : opt.typeDelay);
         }
 
         select2Opt.initSelection = (element: ArrayLike<HTMLElement> | HTMLElement, callback: any) => {
@@ -191,7 +193,16 @@ export class Combobox<TItem = any> {
         if (opt.providerOptions)
             select2Opt = Object.assign(select2Opt, opt.providerOptions("select2", opt));
 
-        new Select2(select2Opt);        
+        new Select2(select2Opt);
+
+        Fluent.on(this.el, "execute-search", () => {
+            if (!this.el || !(this.el as any).typeTimeout || !(this.el as any).typeTimeoutFn) {
+                return;
+            }
+            (this.el as any).typeTimeoutFn();
+            delete (this.el as any).typeTimeout;
+            delete (this.el as any).typeTimeoutFn;
+        });
     }
 
     abortPendingQuery() {
@@ -203,6 +214,7 @@ export class Combobox<TItem = any> {
         if ((this.el as any).typeTimeout) {
             clearTimeout((this.el as any).typeTimeout);
             delete (this.el as any).typeTimeout;
+            delete (this.el as any).typeTimeoutFn;
         }
     }
 
@@ -220,6 +232,7 @@ export class Combobox<TItem = any> {
         this.abortInitSelection();
         this.abortPendingQuery();
         Select2.getInstance(this.el)?.destroy();
+        Fluent.off(this.el, "execute-search");
     }
 
     get container(): HTMLElement {
