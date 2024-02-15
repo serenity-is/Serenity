@@ -212,7 +212,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
                 //this.domNode && Fluent.trigger(this.domNode, 'change');
             },
             disable: [
-                () => this.get_readOnly()
+                (d: Date) => this.get_readOnly() && formatDate(d, "d") != formatDate(this.domNode?.value, "d")
             ]
         };
 
