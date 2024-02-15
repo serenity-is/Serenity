@@ -931,7 +931,7 @@ export function warningDialog(message: string, options?: MessageDialogOptions): 
         message,
         options,
         cssClass: "s-WarningDialog",
-        title: DialogTexts.SuccessTitle,
+        title: DialogTexts.WarningTitle,
         getButtons: () => [okDialogButton({ cssClass: 'btn-warning' })],
         native: (msg) => {
             alert(msg);
