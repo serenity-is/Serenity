@@ -3076,6 +3076,7 @@ declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extend
     static createDefaultElement(): HTMLInputElement;
     readonly domNode: HTMLInputElement;
     constructor(props: EditorProps<P>);
+    destroy(): void;
     get_value(): string;
     get value(): string;
     set_value(value: string): void;
@@ -3111,6 +3112,7 @@ declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpt
     private lastSetValue;
     private lastSetValueGet;
     constructor(props: EditorProps<P>);
+    destroy(): void;
     getFlatpickrOptions(): any;
     createFlatPickrTrigger(): HTMLElement;
     get_value(): string;

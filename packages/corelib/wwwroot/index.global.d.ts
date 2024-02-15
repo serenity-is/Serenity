@@ -4353,6 +4353,7 @@ declare namespace Serenity {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
+        destroy(): void;
         get_value(): string;
         get value(): string;
         set_value(value: string): void;
@@ -4388,6 +4389,7 @@ declare namespace Serenity {
         private lastSetValue;
         private lastSetValueGet;
         constructor(props: EditorProps<P>);
+        destroy(): void;
         getFlatpickrOptions(): any;
         createFlatPickrTrigger(): HTMLElement;
         get_value(): string;

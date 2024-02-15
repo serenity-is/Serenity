@@ -142,6 +142,13 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         }
     }
 
+    destroy() {
+        if (this.domNode && (this.domNode as any)._flatpickr && (this.domNode as any)._flatpickr.destroy) {
+            (this.domNode as any)._flatpickr.destroy();
+        }
+        super.destroy();
+    }
+
     getFlatpickrOptions(): any {
         var opt: any = {
             clickOpens: false,

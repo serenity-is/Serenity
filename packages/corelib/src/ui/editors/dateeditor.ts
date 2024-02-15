@@ -80,6 +80,13 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         this.set_sqlMinMax(true)
     }
 
+    destroy() {
+        if (this.domNode && (this.domNode as any)._flatpickr && (this.domNode as any)._flatpickr.destroy) {
+            (this.domNode as any)._flatpickr.destroy();
+        }
+        super.destroy();
+    }
+
     get_value(): string {
         var value = this.domNode.value?.trim();
         if (!value) {
