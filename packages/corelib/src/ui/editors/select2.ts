@@ -1272,12 +1272,11 @@ abstract class AbstractSelect2 {
                     // bulk append the created nodes
                     container.append(...nodes);
                     var matches = opts.formatMatches(results.length);
+                    Fluent.empty(liveRegion);
                     if (matches instanceof Node) {
-                        Fluent.empty(liveRegion);
                         liveRegion.appendChild(matches);
                     }
                     else {
-                        Fluent.empty(liveRegion);
                         liveRegion.textContent = matches ?? "";
                     }
                 };
@@ -1944,7 +1943,7 @@ abstract class AbstractSelect2 {
                     if (data.more === true) {
                         results.appendChild(more);
                         var loadMore = evaluate(self.opts.formatLoadMore, self.opts.element, page + 1);
-                        Fluent.empty(loadMore);
+                        Fluent.empty(more);
                         if (loadMore instanceof Node)
                             more.appendChild(loadMore);
                         else
