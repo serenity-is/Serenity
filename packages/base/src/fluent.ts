@@ -248,11 +248,13 @@ Fluent.prototype.insertBefore = function (this: FluentThis, referenceNode: HTMLE
 }
 
 Fluent.prototype.prependTo = function (this: FluentThis, parent: HTMLElement | Fluent<HTMLElement>) {
-    parent = extractElement(parent);
-    if (!parent)
-        this.el.remove();
-    else
-        parent.prepend(this.el);
+    if (this.el) {
+        parent = extractElement(parent);
+        if (!parent)
+            this.el.remove();
+        else
+            parent.prepend(this.el);
+    }
     return this;
 }
 
