@@ -5402,6 +5402,7 @@ declare namespace Serenity {
         constructor(props: WidgetProps<P>);
         get_filterPanel(): FilterPanel;
         protected getTemplate(): string;
+        protected getDialogOptions(): DialogOptions;
         protected getDialogButtons(): DialogButton[];
     }
 

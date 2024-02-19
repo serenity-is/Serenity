@@ -4125,6 +4125,7 @@ declare class FilterDialog<P = {}> extends TemplatedDialog<P> {
     constructor(props: WidgetProps<P>);
     get_filterPanel(): FilterPanel;
     protected getTemplate(): string;
+    protected getDialogOptions(): DialogOptions;
     protected getDialogButtons(): DialogButton[];
 }
 

@@ -28,6 +28,12 @@ export class FilterDialog<P = {}> extends TemplatedDialog<P> {
         return '<div id="~_FilterPanel"/>';
     }
 
+    protected getDialogOptions() {
+        var opt = super.getDialogOptions();
+        opt.fullScreen = "lg-down";
+        return opt;
+    }
+
     protected getDialogButtons() {
         return [
             okDialogButton({
