@@ -27,7 +27,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.0" />
     <PackageReference Include="MySqlConnector" Version="2.3.0" />
     <PackageReference Include="Npgsql" Version="7.0.6" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
     <PackageReference Include="Microsoft.Build" Version="17.8.3" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.6.10" />
