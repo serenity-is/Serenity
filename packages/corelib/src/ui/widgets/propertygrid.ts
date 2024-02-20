@@ -171,8 +171,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
             title.on("click", function () {
                 categoryEl.classList.toggle('collapsed');
-                img.classList.toggle(faIcon("plus"));
-                img.classList.toggle(faIcon("minus"));
+                img.classList.toggle('fa-plus');
+                img.classList.toggle('fa-minus');
             });
         }
 
