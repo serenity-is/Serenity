@@ -2,24 +2,35 @@
 
 ### Features:
 
-- Use AsyncLocal instead of ThreadLocal for ImpersonatingUserAccessor and TransientGrantingPermissionService so that background tasks where HttpContext is not available can still work with async code
-- Use click event instead of touchstart/mousedown so that in mobile browsers select2 dropdown does not open while touch scrolling
-- Focus select2 when the hidden input is focused, e.g. by clicking its label.
-- Remove left/top rules from select2-offscreen so that click on a label for the hidden input does not cause it to scroll to top of the page
-- Updated Microsoft.Data.SqlClient to 5.1.5, Dapper to 2.1.28, Nuglify to 1.21.4, System.Text.Json to 8.0.2, Microsoft.Data.Sqlite to 8.0.2, Microsoft.TypeScript.MSBuild to 5.3.3, Markdig to 0.35.0, Bogus to 35.4.0, PuppeteerSharp to 14.1.0, updated Sergen's references Scriban, Microsoft.Data.Sqlite, MySqlConnector, Npgsql, Spectre.Console to latest versions, several packages in test projects including Selenium.WebDriver to 4.17.0, WebDriverManagerto 2.17.2, System.IO.Abstractions.TestingHelpers to 2.0.15
-- FilterDialog has `fullscreen-lg-down` class now
-- Updated OpenIddict to 5.2.0 `(StartSharp)`
-- **`[Breaking Change]`** As external Select2 script is no longer used (since 8.3.0) and it is embedded, Select2.util.stripDiacritics should be replaced with the `stripDiacritics` method from `@serenity-is/corelib`
+- Implemented the use of AsyncLocal instead of ThreadLocal for ImpersonatingUserAccessor and TransientGrantingPermissionService. This change enables background tasks to work with async code even when HttpContext is unavailable.
+- Changed event handling from touchstart/mousedown to click for mobile browsers, preventing the select2 dropdown from opening while touch scrolling.
+- Applied focus to select2 when the hidden input is focused, such as by clicking its label.
+- Removed left/top rules from select2-offscreen to prevent the hidden input from scrolling to the top of the page when its label is clicked.
+- Updated the following packages:
+  - Microsoft.Data.SqlClient to 5.1.5
+  - Dapper to 2.1.28
+  - Nuglify to 1.21.4
+  - System.Text.Json to 8.0.2
+  - Microsoft.Data.Sqlite to 8.0.2
+  - Microsoft.TypeScript.MSBuild to 5.3.3
+  - Markdig to 0.35.0
+  - Bogus to 35.4.0
+  - PuppeteerSharp to 14.1.0
+  - Updated Sergen's references Scriban, Microsoft.Data.Sqlite, MySqlConnector, Npgsql, Spectre.Console to the latest versions.
+  - Several packages in test projects including Selenium.WebDriver to 4.17.0, WebDriverManager to 2.17.2, System.IO.Abstractions.TestingHelpers to 2.0.15.
+- Added `fullscreen-lg-down` class to FilterDialog.
+- Updated OpenIddict to 5.2.0 in StartSharp.
+- **`[Breaking Change]`** Removed external Select2 script usage since 8.3.0 and embedded it. Replaced Select2.util.stripDiacritics with the `stripDiacritics` method from `@serenity-is/corelib`.
 
 ### Bugfixes:
 
-- Destroy flatpickr instance for dateeditor/datetimeeditor
-- Fix Flatpickr clears the input value on focus out of readonly input as disable returns true for current date
-- Some nodes may not have hasChildNodes method (https://github.com/orgs/serenity-is/discussions/7080) and Fluent.empty is called on the wrong element in Select2
-- Comboboxeditor was sometimes returning `more: true` while there are no more pages
-- WarningDialog should show WarningTitle instead of SuccessTitle (#7082)
-- Check for null before Fluent.prependTo
-- Class toggle for category collapse icon in propertygrid.ts (#7084)
+- Ensured destruction of flatpickr instance for dateeditor/datetimeeditor.
+- Fixed Flatpickr clearing the input value on focus out of readonly input as disable returns true for the current date.
+- Addressed an issue where some nodes may not have the hasChildNodes method (https://github.com/orgs/serenity-is/discussions/7080) and Fluent.empty is called on the wrong element in Select2.
+- Resolved a scenario where Comboboxeditor was sometimes returning `more: true` while there are no more pages.
+- Corrected WarningDialog to show WarningTitle instead of SuccessTitle (#7082).
+- Added a check for null before Fluent.prependTo.
+- Applied class toggle for category collapse icon in propertygrid.ts (#7084).
 
 ## 8.3.1 (2024-02-09)
 
