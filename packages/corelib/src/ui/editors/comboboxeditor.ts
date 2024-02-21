@@ -220,7 +220,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
                 }
 
                 return {
-                    items: items.slice(query.skip, query.take ? items.length : query.take),
+                    items: items.slice(query.skip, query.take ? (query.skip + query.take) : items.length),
                     more: query.take && items.length > 0 && items.length > query.skip + query.take
                 };
             };

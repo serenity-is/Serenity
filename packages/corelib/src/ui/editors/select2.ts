@@ -2010,8 +2010,7 @@ abstract class AbstractSelect2 {
             }
         }
 
-        function render(klass: string, html?: Select2FormatResult) {
-            Fluent.empty(results);
+        function createLi(klass: string, html?: Select2FormatResult) {
             if (klass == null && html === undefined)
                 return;
             var li = document.createElement("li");
@@ -2020,7 +2019,15 @@ abstract class AbstractSelect2 {
                 li.appendChild(html);
             else
                 li.innerHTML = html ?? "";
-            results.appendChild(li);
+            return li;
+        }
+
+
+        function render(klass: string, html?: Select2FormatResult) {
+            Fluent.empty(results);
+            var li = createLi(klass, html);
+            if (li != null)
+                results.appendChild(li);
             postRender();
         }
 
@@ -2121,7 +2128,7 @@ abstract class AbstractSelect2 {
                 self.opts.populateResults.call(this, results, data.results, { term: search.value, page: this.resultsPage, context: null });
 
                 if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
-                    render("select2-more-results", evaluate(opts.formatLoadMore, opts.element, this.resultsPage));
+                    results.appendChild(createLi("select2-more-results", evaluate(opts.formatLoadMore, opts.element, this.resultsPage)));
                     window.setTimeout(function () { self.loadMoreIfNeeded(); }, 10);
                 }
 

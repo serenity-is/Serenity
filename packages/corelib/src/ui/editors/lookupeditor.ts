@@ -121,8 +121,8 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         items = ComboboxEditor.filterByText(items, getText.bind(this), query.searchTerm);
 
         return {
-            items: items.slice(query.skip, query.take),
-            more: items.length >= query.take
+            items: items.slice(query.skip, query.take ? (query.skip + query.take) : items.length),
+            more: query.take && items.length > 0 && items.length > query.skip + query.take
         };
     }
 

@@ -172,14 +172,15 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 
         var opt = this.getServiceCallOptions(query);
         var response = await serviceCall(opt);
-        var items = response.Entities || [];
+        var itemsPlus1 = response.Entities || [];
+        var items = itemsPlus1;
 
-        if (items && query.take && query.checkMore && response.Entities.length > items.length)
+        if (query.take && query.checkMore)
             items = items.slice(0, query.take);
 
         return {
-            items: items.slice(0, query.take),
-            more: query.checkMore && query.take && items.length > query.take
+            items: items,
+            more: query.checkMore && query.take && itemsPlus1.length > query.take
         };
     }
 }
