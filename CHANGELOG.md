@@ -1,3 +1,9 @@
+## 8.3.3 (2024-02-21)
+
+### Bugfixes:
+
+- Fix select2/combobox paging more results calculation
+
 ## 8.3.2 (2024-02-20)
 
 ### Features:
