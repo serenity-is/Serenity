@@ -52,7 +52,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.17.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.18.1" />
     <PackageReference Include="WebDriverManager" Version="2.17.2" />
     <Using Include="OpenQA.Selenium" />
   </ItemGroup>
