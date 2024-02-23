@@ -59,7 +59,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected instanceReady(x: any): void {
         this._instanceReady = true;
-        x.editor.container.$?.addClass?.(this.domNode.getAttribute("class"));
+
+        this.domNode.classList.forEach((clss) => { x.editor.container.$?.classList.add(clss); });
         this.domNode.classList.add('select2-offscreen');
         this.domNode.style.display = 'block';
 
@@ -132,6 +133,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             entities_latin: false,
             entities_greek: false,
             autoUpdateElement: true,
+            width: '100%',
             height: (this.options.rows == null || this.options.rows === 0) ? null :
                 ((this.options.rows * 20) + 'px')
         };
