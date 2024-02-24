@@ -1,3 +1,14 @@
+## 8.3.4 (2024-02-24)
+
+### Features:
+- New actions dropdown in grid sample for StartSharp.
+
+### Bugfixes:
+
+- ComboboxEditor.get_text returning `[object Object]` affecting inline editing etc.
+- CKEditor container class assignment
+- Fix Drag Drop in Tree Grid sample which requires jquery and jquery.event.drag scripts.
+
 ## 8.3.3 (2024-02-21)
 
 ### Bugfixes:
