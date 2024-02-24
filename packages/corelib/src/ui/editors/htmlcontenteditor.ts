@@ -59,7 +59,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     protected instanceReady(x: any): void {
         this._instanceReady = true;
-        x.editor.container.$?.addClass?.(this.domNode.getAttribute("class"));
+
+        this.domNode.classList.forEach((clss) => { x.editor.container.$?.classList.add(clss); });
         this.domNode.classList.add('select2-offscreen');
         this.domNode.style.display = 'block';
 
