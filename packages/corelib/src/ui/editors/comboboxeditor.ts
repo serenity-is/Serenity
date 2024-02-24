@@ -524,7 +524,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     protected get_text(): string {
         var combobox = Combobox.getInstance(this.domNode);
         if (combobox)
-            return combobox.getSelectedItems()?.join(", ");
+            return combobox.getSelectedItems()?.map(x => x.text).join(", ");
 
         return this.domNode.value;
     }
