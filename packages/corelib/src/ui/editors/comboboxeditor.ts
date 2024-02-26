@@ -753,10 +753,11 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
 
     protected setEditDialogReadOnly(dialog: any): void {
         // an ugly workaround
-        dialog.element && dialog.element
-            .find('.tool-button.delete-button')
+        dialog.element && 
+            (dialog.element as Fluent).findFirst &&
+            (dialog.element as Fluent).findFirst('.tool-button.delete-button')
             .addClass('disabled')
-            .unbind('click');
+            .off('click', void 0);
     }
 
     protected editDialogDataChange() {
