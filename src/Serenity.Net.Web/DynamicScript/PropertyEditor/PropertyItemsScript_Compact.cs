@@ -15,10 +15,81 @@ public abstract partial class PropertyItemsScript
     private static Func<object, object>[] PropertyGetters = null;
     private static readonly char[] separators = ['.', '/', '_', ':'];
 
+    private static readonly HashSet<string> JsReserved = [
+        "abstract",
+        "arguments",
+        "as",
+        "async",
+        "await",
+        "boolean",
+        "break",
+        "case",
+        "catch",
+        "class",
+        "const",
+        "continue",
+        "debugger",
+        "default",
+        "delete",
+        "do",
+        "double",
+        "else",
+        "enum",
+        "eval",
+        "export",
+        "extends",
+        "false",
+        "final",
+        "finally",
+        "float",
+        "for",
+        "function",
+        "get",
+        "goto",
+        "if",
+        "implements",
+        "import",
+        "in",
+        "instanceof",
+        "int",
+        "interface",
+        "let",
+        "long",
+        "native",
+        "new",
+        "null",
+        "of",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "set",
+        "short",
+        "static",
+        "super",
+        "switch",
+        "synchronized",
+        "this",
+        "throw",
+        "throws",
+        "transient",
+        "true",
+        "try",
+        "typeof",
+        "var",
+        "void",
+        "volatile",
+        "while",
+        "with",
+        "yield"
+    ];
+
     internal static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
     {
         ArgumentNullException.ThrowIfNull(inputs);
         Dictionary<string, string> strMap = [];
+        int strMapCount = 0;
 
         var propertyNames = PropertyNames;
         var propertyGetters = PropertyGetters;
@@ -67,7 +138,13 @@ public abstract partial class PropertyItemsScript
         {
             if (strMap.TryGetValue(s, out string v))
                 return v;
-            return strMap[s] = keyFor(strMap.Count);
+            string key;
+            do
+            {
+                key = keyFor(strMapCount++);
+            }
+            while (JsReserved.Contains(key));
+            return strMap[s] = key;
         }
 
         string mapStrValue(string s)
