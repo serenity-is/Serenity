@@ -1,6 +1,14 @@
+## 8.3.5 (2024-02-28)
+
+## Bugfixes:
+
+- Avoid using js reserved words while generating variable names for compacting property item scripts
+- Fix code for disabling combobox inplace button dialog's delete button via Fluent (https://github.com/serenity-premium/startsharp/issues/915)
+
 ## 8.3.4 (2024-02-24)
 
 ### Features:
+
 - New actions dropdown in grid sample for StartSharp.
 
 ### Bugfixes:
