@@ -113,7 +113,7 @@ export class Widget<P = {}> {
     }
 
     public change(handler: (e: Event) => void) {
-        Fluent.on(this.domNode, 'change', handler);
+        Fluent.on(this.domNode, "change." + this.uniqueName, handler);
     };
 
     public changeSelect2(handler: (e: Event) => void) {
