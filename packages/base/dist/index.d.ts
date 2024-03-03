@@ -648,6 +648,7 @@ declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent
 declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
 declare namespace Fluent {
     var ready: (callback: () => void) => void;
+    var byId: <TElement extends HTMLElement>(id: string) => Fluent<TElement>;
 }
 declare namespace Fluent {
     const off: typeof EventHandler.off;

@@ -1954,6 +1954,7 @@ declare namespace Serenity {
     function Fluent(element: EventTarget): Fluent<HTMLElement>;
     namespace Fluent {
         var ready: (callback: () => void) => void;
+        var byId: <TElement extends HTMLElement>(id: string) => Fluent<TElement>;
     }
     namespace Fluent {
         const off: typeof EventHandler.off;

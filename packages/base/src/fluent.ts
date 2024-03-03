@@ -402,6 +402,10 @@ Fluent.ready = function (callback: () => void) {
     }
 }
 
+Fluent.byId = function<TElement extends HTMLElement>(id: string): Fluent<TElement> {
+    return Fluent<TElement>(document.getElementById(id) as TElement);
+}
+
 export function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]> {
     return new (Fluent as any)(document.createElement(tag));
 }
