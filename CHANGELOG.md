@@ -1,3 +1,13 @@
+## 8.3.6 (2024-03-03)
+
+## Features:
+- Add Fluent.byId which is shortcut for Fluent(document.getElementById)
+- Add Fluent.each and Fluent.style which executes a callback with the node or css style declaration if element is not null
+
+## Bugfixes:
+
+- Column resizing does not work in Firefox without jQuery resizable due to longstanding Firefox issue
+
 ## 8.3.5 (2024-02-28)
 
 ## Bugfixes:
