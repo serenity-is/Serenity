@@ -608,6 +608,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;
+    each(callback: (el: TElement) => void): this;
     getNode(): TElement;
     empty(): this;
     findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
@@ -637,6 +638,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     removeAttr(name: string): this;
     removeClass(value: string | boolean | (string | boolean)[]): this;
     show(): this;
+    style(callback: (css: CSSStyleDeclaration) => void): this;
     text(): string;
     text(value: string): this;
     toggle(flag?: boolean): this;
