@@ -9,6 +9,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
     children(selector?: string): HTMLElement[];
+    className(klass: string): this;
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;
@@ -203,6 +204,11 @@ Fluent.prototype.children = function (this: FluentThis, selector?: string): Elem
     if (selector == null)
         return Array.from(this.el?.children || []);
     return Array.from(this.el?.children || []).filter(x => x.matches(selector));
+}
+
+Fluent.prototype.className = function (this: FluentThis, klass: string): Fluent<HTMLElement> {
+    this.el && (this.el.className = klass);
+    return this;
 }
 
 Fluent.prototype.closest = function (this: FluentThis, selector: string): Fluent<HTMLElement> {
