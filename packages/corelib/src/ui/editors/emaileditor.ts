@@ -24,7 +24,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
         var spanAt = Fluent("span").text('@').className('emailat').insertAfter(this.domNode);
 
-        var domain = Fluent("input").attr("type", "text").addClass('emaildomain').insertAfter(spanAt);
+        var domain = Fluent("input").attr("type", "text").className('emaildomain').insertAfter(spanAt);
         domain.on('blur.' + this.uniqueName, function () {
             ValidationHelper.validateElement(this.domNode);
         });

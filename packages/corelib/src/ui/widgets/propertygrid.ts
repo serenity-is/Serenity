@@ -54,7 +54,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
                 var tabId = this.uniqueName + '_Tab' + tabIndex;
 
-                Fluent("li").className([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
+                Fluent("li").addClass([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
                     .append(Fluent("a")
                         .addClass([!bs3 && "nav-link", !bs3 && tabIndex === 0 && "active"])
                         .attr("role", "tab").data((isBS5Plus() ? "bs-" : "") + "toggle", "tab")
@@ -166,7 +166,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if (collapsed != null) {
             categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
 
-            var img = Fluent("i").appendTo(title).addClass(faIcon(collapsed ? "plus" : "minus")).getNode();
+            var img = Fluent("i").appendTo(title).className(faIcon(collapsed ? "plus" : "minus")).getNode();
             let categoryEl = categoryDiv.getNode();
 
             title.on("click", function () {

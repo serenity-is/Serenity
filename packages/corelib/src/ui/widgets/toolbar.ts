@@ -131,7 +131,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     createButton(container: Fluent, tb: ToolButton) {
 
         if (tb.separator === 'right' || tb.separator === 'both') {
-            container.append(Fluent("div")).addClass("separator");
+            container.append(Fluent("div").className("separator"));
         }
 
         let button = ToolbarButton(tb);
