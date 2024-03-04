@@ -1909,6 +1909,7 @@ declare namespace Serenity {
         attr(name: string): string;
         attr(name: string, value: string | number | boolean | null | undefined): this;
         children(selector?: string): HTMLElement[];
+        className(klass: string): this;
         closest(selector: string): Fluent<HTMLElement>;
         data(name: string): string;
         data(name: string, value: string): this;

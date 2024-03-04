@@ -46,13 +46,13 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
                 .addClass("dropdown quick-search-field")
                 .insertBefore(this.domNode);
 
-            this.fieldLink = Fluent("a").addClass('.quick-search-field-toggle')
+            this.fieldLink = Fluent("a").className('.quick-search-field-toggle')
                 .attr('title', localText('Controls.QuickSearch.FieldSelection'))
                 .data("bs-toggle", "dropdown")
                 .appendTo(dropdown)
                 .getNode();
 
-            var menu = Fluent("ul").addClass("dropdown-menu")
+            var menu = Fluent("ul").className("dropdown-menu")
                 .appendTo(dropdown);
 
             this.options.fields.forEach(item =>

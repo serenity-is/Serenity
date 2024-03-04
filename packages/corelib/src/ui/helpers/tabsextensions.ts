@@ -194,7 +194,7 @@ export namespace TabsExtensions {
                     }
                 }
 
-                let container = Fluent("div").addClass("tab-content").appendTo(tabs);
+                let container = Fluent("div").className("tab-content").appendTo(tabs);
                 tabs.querySelectorAll(":scope>.tab-pane").forEach(pane => {
                     pane.classList.add("pt-3");
                     container.append(pane);

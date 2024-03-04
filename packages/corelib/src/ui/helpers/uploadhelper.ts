@@ -169,7 +169,7 @@ export namespace UploadHelper {
         container.innerHTML = "";
         for (var index = 0; index < items.length; index++) {
             var item = items[index];
-            var li = Fluent("li").addClass('file-item').data('index', index.toString());
+            var li = Fluent("li").className('file-item').data('index', index.toString());
             var isImage = hasImageExtension(item.Filename);
             if (isImage) {
                 li.addClass('file-image');
@@ -177,7 +177,7 @@ export namespace UploadHelper {
             else {
                 li.addClass('file-binary');
             }
-            var thumb = Fluent("a").addClass('thumb').appendTo(li);
+            var thumb = Fluent("a").className('thumb').appendTo(li);
             var originalName = item.OriginalName ?? '';
             var fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
@@ -197,7 +197,7 @@ export namespace UploadHelper {
             }
 
             if (displayOriginalName) {
-                Fluent("div").addClass('filename').text(originalName)
+                Fluent("div").className('filename').text(originalName)
                     .attr('title', originalName).appendTo(li);
             }
 

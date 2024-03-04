@@ -12,7 +12,7 @@ import { DialogExtensions } from "./dialogextensions";
 @Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
 export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
-    static override createDefaultElement() { return Fluent("div").addClass("hidden").appendTo(document.body).getNode(); }
+    static override createDefaultElement() { return Fluent("div").className("hidden").appendTo(document.body).getNode(); }
 
     protected tabs: Fluent<HTMLElement>;
     protected toolbar: Toolbar;

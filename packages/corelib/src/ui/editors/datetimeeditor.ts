@@ -54,7 +54,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 DateEditor.dateInputChange(e as any);
             });
 
-            this.time = Fluent("select").addClass('editor s-DateTimeEditor time').getNode();
+            this.time = Fluent("select").className('editor s-DateTimeEditor time').getNode();
             var after = this.domNode.nextElementSibling as HTMLElement;
             if (after?.classList.contains("ui-datepicker-trigger")) {
                 Fluent(this.time).insertAfter(after);
@@ -128,7 +128,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_sqlMinMax(true);
 
         if (!this.options.inputOnly) {
-            Fluent("i").addClass("inplace-button inplace-now")
+            Fluent("i").className("inplace-button inplace-now")
                 .append(Fluent("b"))
                 .attr('title', this.getInplaceNowText())
                 .insertAfter(this.time).on("click", () => {

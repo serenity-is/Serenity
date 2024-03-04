@@ -28,7 +28,7 @@ export interface ToolButton extends ToolButtonProps {
 export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
     var cssClass = tb.cssClass ?? '';
 
-    let span = Fluent("span").addClass("button-inner");
+    let span = Fluent("span").className("button-inner");
     let btn = Fluent("div")
         .addClass("tool-button")
         .append(span);
@@ -50,7 +50,7 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
 
     if (tb.icon) {
         btn.addClass('icon-tool-button');
-        span.append(Fluent("i").addClass(iconClassName(tb.icon)));
+        span.append(Fluent("i").className(iconClassName(tb.icon)));
         tb.title && span.append(" ").append(tb.title);
     }
     else if (tb.title)
@@ -88,7 +88,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     protected renderContents() {
 
-        let group = Fluent("div").addClass("tool-group");
+        let group = Fluent("div").className("tool-group");
 
         Fluent(this.domNode)
             .addClass("s-Toolbar clearfix")
