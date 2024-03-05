@@ -620,6 +620,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     readonly [n: number]: TElement;
     readonly length: number;
     off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    off(type: string): this;
     off(type: string, listener: EventListener): this;
     off(type: string, selector: string, delegationHandler: Function): this;
     on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
