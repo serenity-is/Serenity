@@ -1,4 +1,4 @@
-﻿import { htmlEncode, toggleClass } from "./html";
+﻿import { htmlEncode, toggleClass, addClass, removeClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -34,6 +34,7 @@ describe("toggleClass", () => {
         expect(el.getAttribute("class")).toBe("test1 test2");
     });
 
+    
     it("can toggle single class", () => {
         var el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
@@ -91,4 +92,68 @@ describe("toggleClass", () => {
         toggleClass(el, "test1      test2", false);
         expect(el.getAttribute("class")).toBe("");
     });       
+});
+
+describe("addClass", () => {
+    it("adds class to the element", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1");
+
+        addClass(el, "test2");
+        expect(el.getAttribute("class")).toBe("test1 test2");
+    });
+
+    it("does nothing if class is null or empty", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1");
+
+        addClass(el, null);
+        expect(el.getAttribute("class")).toBe("test1");
+
+        addClass(el, undefined);
+        expect(el.getAttribute("class")).toBe("test1");
+
+        addClass(el, '');
+        expect(el.getAttribute("class")).toBe("test1");
+    });
+
+    it("does not add duplicate classes", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1");
+
+        addClass(el, "test1");
+        expect(el.getAttribute("class")).toBe("test1");
+    });
+});
+
+describe("removeClass", () => {
+    it("removes class from the element", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1 test2");
+
+        removeClass(el, "test2");
+        expect(el.getAttribute("class")).toBe("test1");
+    });
+
+    it("does nothing if class is null or empty", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1");
+
+        removeClass(el, null);
+        expect(el.getAttribute("class")).toBe("test1");
+
+        removeClass(el, undefined);
+        expect(el.getAttribute("class")).toBe("test1");
+
+        removeClass(el, '');
+        expect(el.getAttribute("class")).toBe("test1");
+    });
+
+    it("does not remove non-existing classes", () => {
+        var el = document.createElement("div");
+        el.setAttribute("class", "test1");
+
+        removeClass(el, "test2");
+        expect(el.getAttribute("class")).toBe("test1");
+    });
 });
