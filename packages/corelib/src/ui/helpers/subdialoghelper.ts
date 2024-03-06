@@ -7,6 +7,10 @@ export namespace SubDialogHelper {
         dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any {
         var uniqueName = (owner as Widget<any>)["uniqueName"];
         Fluent(dialog.domNode).on('ondatachange.' + uniqueName, function (e: DataChangeInfo) {
+            if (typeof e.operationType === "undefined" &&
+                (e as any).originalEvent &&
+                typeof (e as any).originalEvent.operationType !== "undefined")
+                e = (e as any).originalEvent;
             if (useTimeout) {
                 window.setTimeout(function () {
                     dataChange(e);

@@ -782,9 +782,6 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
                 this.updateItems();
                 this.lastCreateTerm = null;
 
-                if (!dci.operationType && (dci as any).originalEvent?.operationType)
-                    dci = (dci as any).originalEvent;
-
                 if ((dci.operationType === 'create' || dci.operationType === 'update') &&
                     dci.entityId != null) {
                     var id = dci.entityId.toString();
