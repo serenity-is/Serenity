@@ -4498,6 +4498,7 @@ declare namespace Serenity {
     }
 
     type ComboboxType = "select2";
+    type ComboboxFormatResult = string | Element | DocumentFragment;
     interface ComboboxItem<TSource = any> {
         id?: string;
         text?: string;
@@ -4518,19 +4519,21 @@ declare namespace Serenity {
         more: boolean;
     }
     interface ComboboxOptions<TSource = any> {
+        allowClear?: boolean;
         createSearchChoice?: (s: string) => ComboboxItem<TSource>;
         element?: HTMLInputElement | HTMLSelectElement | Element[];
-        placeholder?: string;
-        search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
-        minimumResultsForSearch?: number;
-        multiple?: boolean;
-        allowClear?: boolean;
         /** Allow arbitrary values for items */
         arbitraryValues?: boolean;
+        formatSelection?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+        formatResult?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+        minimumResultsForSearch?: number;
+        multiple?: boolean;
         /** Page size to use while loading or displaying results */
         pageSize?: number;
+        placeholder?: string;
         /** Callback to get options specific to the combobox provider type */
         providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
+        search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
         /** Type delay for searching, default is 200 */
         typeDelay?: number;
     }
