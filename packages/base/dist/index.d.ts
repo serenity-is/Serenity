@@ -603,7 +603,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
     children(selector?: string): HTMLElement[];
-    class(klass: string): this;
+    class(value: string | boolean | (string | boolean)[]): this;
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;

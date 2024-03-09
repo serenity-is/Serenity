@@ -340,8 +340,7 @@ export namespace GridUtils {
         toolDiv = isArrayLike(toolDiv) ? toolDiv[0] : toolDiv;
 
         var div = Fluent("div")
-            .addClass('s-ToggleButton')
-            .addClass(cssClass)
+            .class(['s-ToggleButton', cssClass])
             .prependTo(toolDiv)
             .append(Fluent("a")
                 .attr("href", "#")
@@ -440,8 +439,8 @@ export namespace GridUtils {
 
         var input = Fluent("input").attr("type", "text");
         var div = Fluent("div")
+            .class('s-QuickSearchBar')
             .append(input)
-            .addClass('s-QuickSearchBar')
             .prependTo(isArrayLike(container) ? container[0] : container);
 
         if (fields != null && fields.length > 0) {
@@ -685,11 +684,10 @@ export namespace SlickFormatting {
     export function itemLinkText(itemType: string, id: any, text: FormatterResult,
         extraClass: string, encode: boolean): FormatterResult {
         var link = Fluent("a")
-            .attr("href", id != null ? "#" + replaceAll(itemType, '.', '-') +
-                '/' + id : '')
+            .class([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass])
+            .attr("href", id != null ? "#" + replaceAll(itemType, '.', '-') + '/' + id : '')
             .data("item-type", itemType)
-            .data("item-id", "" + id)
-            .addClass([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass]);
+            .data("item-id", "" + id);
 
         if (text instanceof Node) {
             link.append(text);

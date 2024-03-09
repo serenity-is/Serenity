@@ -59,10 +59,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             }
         }
 
-        Fluent("span")
-            .addClass("quick-filter-label")
-            .text(title)
-            .appendTo(quickFilter);
+        Fluent("span").class("quick-filter-label").text(title).appendTo(quickFilter);
 
         var qfElement = quickFilter.getNode() as any;
 

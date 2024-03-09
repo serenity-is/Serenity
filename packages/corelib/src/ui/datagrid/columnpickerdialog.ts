@@ -24,7 +24,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         this.dialogTitle = localText("Controls.ColumnPickerDialog.Title");
 
         var visibles = Fluent("div")
-            .addClass("column-list visible-list bg-success")
+            .class("column-list visible-list bg-success")
             .append(Fluent("h5")
                 .append(Fluent("i").class(faIcon("eye")))
                 .append(" ")
@@ -32,7 +32,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
             .append(this.ulVisible = Fluent("ul"));
 
         var hiddens = Fluent("div")
-            .addClass("column-list hidden-list bg-info")
+            .class("column-list hidden-list bg-info")
             .append(Fluent("h5")
                 .append(Fluent("i").class(faIcon("eye-slash")))
                 .append(" ")
@@ -40,7 +40,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
             .append(this.ulHidden = Fluent("ul"))
 
         return Fluent("div")
-            .addClass("columns-container")
+            .class("columns-container")
             .append(visibles)
             .append(hiddens);
     }
@@ -163,21 +163,17 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
     private createLI(col: Column): HTMLElement {
         var allowHide = this.allowHide(col);
         var li = Fluent("li")
+            .class(!allowHide && "cant-hide")
             .data("key", col.id)
-            .addClass(!allowHide && "cant-hide")
-            .append(Fluent("span")
-                .addClass("drag-handle")
-                .text("☰"))
-            .text(this.getTitle(col));
+            .append(Fluent("span").class("drag-handle").text("☰"))
+            .append(this.getTitle(col));
 
         allowHide && li.append(Fluent("i")
-            .addClass("js-hide")
-            .addClass(faIcon("eye-slash"))
+            .class(["js-hide", faIcon("eye-slash")])
             .attr("title", localText("Controls.ColumnPickerDialog.HideHint")));
 
         li.append(Fluent("i")
-            .addClass("js-show")
-            .addClass(faIcon("eye"))
+            .class(["js-show", faIcon("eye")])
             .attr("title", localText("Controls.ColumnPickerDialog.ShowHint")));
 
         return li.getNode();

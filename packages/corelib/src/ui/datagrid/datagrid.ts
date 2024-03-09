@@ -812,9 +812,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             else {
                 if (!this.titleDiv) {
                     this.titleDiv = Fluent("div")
-                        .addClass("grid-title")
-                        .append(Fluent("div")
-                            .addClass("title-text"))
+                        .class("grid-title")
+                        .append(Fluent("div").class("title-text"))
                         .prependTo(this.domNode);
                 }
                 this.titleDiv.findFirst('.title-text').text(value);

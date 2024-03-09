@@ -37,13 +37,13 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         Fluent.on(this.domNode, "change." + this.uniqueName, this.checkIfValueChanged.bind(this));
 
         Fluent("span")
-            .addClass("quick-search-icon")
+            .class("quick-search-icon")
             .append(Fluent("i"))
             .insertBefore(this.domNode);
 
         if (this.options.fields?.length > 0) {
             var dropdown = Fluent("div")
-                .addClass("dropdown quick-search-field")
+                .class("dropdown quick-search-field")
                 .insertBefore(this.domNode);
 
             this.fieldLink = Fluent("a").class('.quick-search-field-toggle')
@@ -59,8 +59,8 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
                 Fluent("li")
                     .appendTo(menu)
                     .append(Fluent("a")
-                        .addClass("dropdown-item")
-                        .attr('href', '#')
+                        .class("dropdown-item")
+                        .attr("href", "#")
                         .text(item.title ?? '')
                         .on("click", e => {
                             e.preventDefault();

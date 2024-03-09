@@ -27,14 +27,15 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         let el = Fluent(this.domNode).addClass("s-SlickPager slick-pg");
 
         this.currentPage = Fluent("input")
-            .addClass(`${p}current mx-1`).attr("type", "text")
+            .class(`${p}current mx-1`)
+            .attr("type", "text")
             .attr("size", 4).attr("value", 1)
             .on("keydown", e => { if (e.key === "Enter") this._changePage("input"); });
 
         this.totalPages = Fluent("span").class(`${p}total`).text("1");
 
         let control = grp("control").append(Fluent("span")
-            .addClass(`${p}control`)
+            .class(`${p}control`)
             .append(Fluent("span").class(`${p}pagetext`).text(localText("Controls.Pager.Page")))
             .append(this.currentPage)
             .append(Fluent("span").class(`${p}pagesep px-1`).text("/"))
@@ -60,9 +61,9 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         if (this.options.showRowsPerPage) {
 
             this.pageSize = Fluent("select")
-                .appendTo(grp("size").prependTo(inner))
-                .addClass(`${p}size`)
+                .class(`${p}size`)
                 .attr("name", "rp")
+                .appendTo(grp("size").prependTo(inner))
                 .on("change", () => {
                     if (opt.onRowsPerPageChange)
                         opt.onRowsPerPageChange(+this.pageSize.val());

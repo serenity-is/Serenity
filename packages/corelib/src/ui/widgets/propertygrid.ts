@@ -54,16 +54,16 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
                 var tabId = this.uniqueName + '_Tab' + tabIndex;
 
-                Fluent("li").addClass([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
+                Fluent("li").class([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
                     .append(Fluent("a")
-                        .addClass([!bs3 && "nav-link", !bs3 && tabIndex === 0 && "active"])
+                        .class([!bs3 && "nav-link", !bs3 && tabIndex === 0 && "active"])
                         .attr("role", "tab").data((isBS5Plus() ? "bs-" : "") + "toggle", "tab")
                         .attr("href", "#" + tabId)
                         .text(this.determineText(tabName, prefix => prefix + 'Tabs.' + tabName)))
                     .appendTo(tabs);
 
                 var pane = Fluent("div")
-                    .addClass(["tab-pane fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
+                    .class(["tab-pane fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
                     .attr("id", tabId)
                     .attr("role", "tabpanel")
                     .appendTo(panes);
@@ -156,10 +156,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var categoryDiv = Fluent("div").class("category").appendTo(categoriesDiv);
 
         var title = Fluent("div")
-            .addClass("category-title")
+            .class("category-title")
             .appendTo(categoryDiv)
             .append(Fluent("a")
-                .addClass("category-anchor")
+                .class("category-anchor")
                 .attr('name', this.idPrefix + 'Category' + categoryIndexes[category].toString()))
             .text(this.determineText(category, prefix => prefix + 'Categories.' + category));
 
@@ -270,7 +270,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         });
 
         var label = Fluent("label")
-            .addClass('caption')
+            .class('caption')
             .attr('for', editorId)
             .attr('title', hint ?? title ?? "")
             .text(title ?? '')

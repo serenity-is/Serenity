@@ -9,7 +9,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
     children(selector?: string): HTMLElement[];
-    class(klass: string): this;
+    class(value: string | boolean | (string | boolean)[]): this;
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;
@@ -129,12 +129,13 @@ export namespace Fluent {
     }
 
     export function toClassName(value: string | boolean | (string | boolean)[]): string {
+        if (typeof value === "string")
+            return value;
         if (Array.isArray(value))
             return value.map(toClassName).filter(Boolean).join(" ");
-        else if (typeof value !== "boolean" && value != null)
+        if (typeof value !== "boolean" && value != null)
             return "" + value;
-        else
-            return "";
+        return "";
     }
     
     export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
@@ -207,8 +208,8 @@ Fluent.prototype.children = function (this: FluentThis, selector?: string): Elem
     return Array.from(this.el?.children || []).filter(x => x.matches(selector));
 }
 
-Fluent.prototype.class = function (this: FluentThis, klass: string): Fluent<HTMLElement> {
-    this.el && (this.el.className = klass);
+Fluent.prototype.class = function (this: FluentThis, value: string | boolean | (string | boolean)[]): Fluent<HTMLElement> {
+    this.el && (this.el.className = Fluent.toClassName(value));
     return this;
 }
 

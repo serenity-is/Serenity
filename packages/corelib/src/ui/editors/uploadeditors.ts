@@ -37,8 +37,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         });
 
         this.progress = Fluent("div")
+            .class('upload-progress')
             .append(Fluent("div"))
-            .addClass('upload-progress')
             .prependTo(this.toolbar.domNode);
 
         var uio = this.getUploadInputOptions();
@@ -52,8 +52,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             this.domNode.setAttribute('id', this.uniqueName);
 
         this.hiddenInput = Fluent("input")
+            .class("s-offscreen")
             .attr("type", "text")
-            .addClass("s-offscreen")
             .attr("name", this.uniqueName + "_Validator")
             .data("vx-highlight", this.domNode.getAttribute("id"))
             .appendTo(this.domNode);
@@ -299,8 +299,9 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             element: el => this.domNode.append(el)
         });
 
-        this.progress = Fluent("div").append(Fluent("div"))
-            .addClass('upload-progress')
+        this.progress = Fluent("div")
+            .append(Fluent("div"))
+            .class('upload-progress')
             .prependTo(this.toolbar.domNode);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
@@ -310,7 +311,10 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             this.domNode.setAttribute('id', this.uniqueName);
         }
 
-        this.hiddenInput = Fluent("input").attr("type", "text").addClass("s-offscreen").attr("name", this.uniqueName + "_Validator")
+        this.hiddenInput = Fluent("input")
+            .class("s-offscreen")
+            .attr("type", "text")
+            .attr("name", this.uniqueName + "_Validator")
             .data("vx-highlight", this.domNode.getAttribute("id"))
             .attr("multiple", "multiple").appendTo(this.domNode);
 

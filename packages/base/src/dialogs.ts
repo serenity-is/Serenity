@@ -326,21 +326,18 @@ export class Dialog {
     createBSModal(opt: DialogOptions): void {
 
         var modal = Fluent("div")
-            .addClass("modal")
-            .addClass(opt.dialogClass)
-            .addClass(opt.fade && "fade")
+            .class(["modal", opt.dialogClass, opt.fade && "fade"])
             .attr("tabindex", "-1")
             .appendTo(document.body);
 
         let header = Fluent("div")
-            .addClass("modal-header")
-            .append(Fluent("h5")
-                .addClass("modal-title"));
+            .class("modal-header")
+            .append(Fluent("h5").class("modal-title"));
 
         let bs5 = isBS5Plus();
         if (opt.closeButton) {
             let closeButton = Fluent("button")
-                .addClass(bs5 ? "btn-close" : "close")
+                .class(bs5 ? "btn-close" : "close")
                 .attr("type", "button")
                 .data(`${bs5 ? "bs-" : ""}dismiss`, "modal")
                 .attr("aria-label", DialogTexts.CloseButton);
@@ -359,16 +356,17 @@ export class Dialog {
         this.el.classList.add("modal-body");
 
         let footer = Fluent("div")
-            .addClass("modal-footer");
+            .class("modal-footer");
 
         Fluent("div")
-            .addClass("modal-dialog")
-            .addClass(opt.size && "modal-" + opt.size)
-            .addClass(opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""))
-            .addClass(opt.centered && "modal-dialog-centered")
-            .addClass(opt.scrollable && "modal-scrollable")
+            .class([
+                "modal-dialog", 
+                opt.size && "modal-" + opt.size,
+                opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
+                opt.centered && "modal-dialog-centered",
+                opt.scrollable && "modal-scrollable"])
             .append(Fluent("div")
-                .addClass("modal-content")
+                .class("modal-content")
                 .append(header)
                 .append(this.el)
                 .append(footer))
@@ -407,13 +405,12 @@ export class Dialog {
     private createPanel(opt: DialogOptions) {
 
         let titlebar = Fluent("div")
-            .addClass("panel-titlebar")
+            .class("panel-titlebar")
             .append(Fluent("div")
-                .addClass("panel-titlebar-text"));
+                .class("panel-titlebar-text"));
 
         let panel = Fluent("div")
-            .addClass("s-Panel")
-            .addClass(opt.dialogClass)
+            .class(["s-Panel", opt.dialogClass])
             .append(titlebar)
 
         this.el.classList.add("panel-body");
@@ -427,13 +424,13 @@ export class Dialog {
 
         if (opt.closeButton) {
             Fluent("button")
-                .addClass("panel-titlebar-close")
+                .class("panel-titlebar-close")
                 .on("click", this.close.bind(this, null))
                 .appendTo(titlebar);
         }
 
         opt.buttons && this.createBSButtons(Fluent("div")
-            .addClass("panel-footer")
+            .class("panel-footer")
             .appendTo(panel), opt.buttons);
 
     }

@@ -16,7 +16,7 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
         return Fluent("div")
             .append(Fluent("a")
-                .addClass("reset")
+                .class("reset")
                 .attr("title", localText('Controls.FilterPanel.ResetFilterHint'))
                 .on("click", e => {
                     e.preventDefault();
@@ -24,16 +24,16 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
                     this.get_store().raiseChanged();
                 }))
             .append(Fluent("a")
-                .addClass("edit")
+                .class("edit")
                 .text(localText('Controls.FilterPanel.EditFilter'))
                 .on("click", openFilterDialog))
             .append(Fluent("div")
-                .addClass("current")
+                .class("current")
                 .append(Fluent("span")
-                    .addClass("cap")
+                    .class("cap")
                     .text(localText('Controls.FilterPanel.EffectiveFilter')))
                 .append(Fluent("a")
-                    .addClass("txt")
+                    .class("txt")
                     .on("click", openFilterDialog))).getNode();
     }
 

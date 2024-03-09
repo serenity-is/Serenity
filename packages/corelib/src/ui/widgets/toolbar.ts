@@ -30,7 +30,7 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
 
     let span = Fluent("span").class("button-inner");
     let btn = Fluent("div")
-        .addClass("tool-button")
+        .class("tool-button")
         .append(span);
 
     if (tb.action != null)
@@ -100,7 +100,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
             var button = buttons[i];
             if (button.separator && currentCount > 0) {
                 group = Fluent("div")
-                    .addClass("tool-group")
+                    .class("tool-group")
                     .appendTo(group.parent());
                 currentCount = 0;
             }

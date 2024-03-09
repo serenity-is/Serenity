@@ -1274,8 +1274,8 @@ export class Validator {
 
             // Create error element
             var error = Fluent<HTMLElement>(this.settings.errorElement as any)
+                .class(this.settings.errorClass)
                 .attr("id", elementID + "-error")
-                .addClass(this.settings.errorClass)
                 .getNode();
 
             error.textContent = message || "";

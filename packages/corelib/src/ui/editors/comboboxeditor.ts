@@ -299,10 +299,12 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
         editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
-        var inplaceButton = Fluent("a").append(Fluent("b"))
-            .addClass('inplace-button inplace-create')
+        var inplaceButton = Fluent("a")
+            .class('inplace-button inplace-create')
             .attr('title', addTitle)
-            .insertAfter(this.domNode).on("click", function (e) {
+            .append(Fluent("b"))
+            .insertAfter(this.domNode)
+            .on("click", function (e) {
                 self.inplaceCreateClick(e as any);
             });
 
@@ -753,11 +755,11 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
 
     protected setEditDialogReadOnly(dialog: any): void {
         // an ugly workaround
-        dialog.element && 
+        dialog.element &&
             (dialog.element as Fluent).findFirst &&
             (dialog.element as Fluent).findFirst('.tool-button.delete-button')
-            .addClass('disabled')
-            .off('click', void 0);
+                .addClass('disabled')
+                .off('click', void 0);
     }
 
     protected editDialogDataChange() {
