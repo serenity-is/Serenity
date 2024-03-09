@@ -20,8 +20,8 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var v = opt.view; if (!v) throw "SlickPager requires view option to be set!";
 
         let p = "slick-pg-";
-        let grp = (t: string) => Fluent("div").className(`${p}grp ${p}grp-${t}`);
-        let btn = (key: string) => Fluent("div").className(`${p}${key} ${p}btn`).append(Fluent("span").className(`${p}btn-span`));
+        let grp = (t: string) => Fluent("div").class(`${p}grp ${p}grp-${t}`);
+        let btn = (key: string) => Fluent("div").class(`${p}${key} ${p}btn`).append(Fluent("span").class(`${p}btn-span`));
         let nav = (key: string) => btn(key).on("click", () => this._changePage(key));
 
         let el = Fluent(this.domNode).addClass("s-SlickPager slick-pg");
@@ -31,19 +31,19 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             .attr("size", 4).attr("value", 1)
             .on("keydown", e => { if (e.key === "Enter") this._changePage("input"); });
 
-        this.totalPages = Fluent("span").className(`${p}total`).text("1");
+        this.totalPages = Fluent("span").class(`${p}total`).text("1");
 
         let control = grp("control").append(Fluent("span")
             .addClass(`${p}control`)
-            .append(Fluent("span").className(`${p}pagetext`).text(localText("Controls.Pager.Page")))
+            .append(Fluent("span").class(`${p}pagetext`).text(localText("Controls.Pager.Page")))
             .append(this.currentPage)
-            .append(Fluent("span").className(`${p}pagesep px-1`).text("/"))
+            .append(Fluent("span").class(`${p}pagesep px-1`).text("/"))
             .append(this.totalPages)
         );
 
-        this.stat = Fluent("span").className(`${p}stat`);
+        this.stat = Fluent("span").class(`${p}stat`);
 
-        let inner = Fluent("div").className(p + "in").appendTo(el)
+        let inner = Fluent("div").class(p + "in").appendTo(el)
             .append(grp("firstprev")
                 .append(nav("first"))
                 .append(nav("prev")))

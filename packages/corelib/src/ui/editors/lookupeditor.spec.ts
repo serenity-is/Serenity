@@ -107,7 +107,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        const select2Container = Fluent("div").className("select2-container");
+        const select2Container = Fluent("div").class("select2-container");
         document.body.appendChild(select2Container[0]);
 
         const editor = new LookupEditor({

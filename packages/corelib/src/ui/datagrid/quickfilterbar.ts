@@ -47,7 +47,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        var quickFilter = Fluent("div").className("quick-filter-item")
+        var quickFilter = Fluent("div").class("quick-filter-item")
             .appendTo(this.domNode)
             .data('qffield', opt.field)
 
@@ -156,7 +156,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             element: function (el) {
                 end = new DateEditor({ element: el2 => Fluent(el2).insertAfter(el) });
                 Fluent.on(end.domNode, "change", () => el.trigger("change"));
-                Fluent("span").className('range-separator').text('-').insertAfter(el);
+                Fluent("span").class('range-separator').text('-').insertAfter(el);
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
@@ -237,7 +237,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
                 Fluent.on(end.domNode, ".change", () => el.trigger("change"));
-                Fluent("span").className('range-separator').text('-').insertAfter(el);
+                Fluent("span").class('range-separator').text('-').insertAfter(el);
             },
             init: function (w) {
                 Fluent.on(w.domNode.parentElement?.querySelector('.time'), "change", () => Fluent.trigger(w.domNode, "change"));

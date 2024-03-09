@@ -31,13 +31,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             var itemsWithoutTab = items.filter(f => !f.tab);
             if (itemsWithoutTab.length > 0) {
                 this.createItems(this.domNode, itemsWithoutTab);
-                Fluent("div").className("pad").appendTo(this.domNode);
+                Fluent("div").class("pad").appendTo(this.domNode);
             }
 
             var itemsWithTab = items.filter(f => f.tab);
 
-            var tabs = Fluent("ul").className("nav nav-underline property-tabs").attr("role", "tablist").appendTo(this.domNode);
-            var panes = Fluent("div").className("tab-content property-panes").appendTo(this.domNode);
+            var tabs = Fluent("ul").class("nav nav-underline property-tabs").attr("role", "tablist").appendTo(this.domNode);
+            var panes = Fluent("div").class("tab-content property-panes").appendTo(this.domNode);
 
             var tabIndex = 0;
             var i = 0;
@@ -103,7 +103,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var useCategories = this.options.useCategories !== false && items.some(x => !!x.category);
 
         if (useCategories) {
-            var linkContainer = Fluent("div").className("category-links").getNode();
+            var linkContainer = Fluent("div").class("category-links").getNode();
             categoryIndexes = this.createCategoryLinks(linkContainer, items);
             if (Object.keys(categoryIndexes).length > 1) {
                 container.appendChild(linkContainer);
@@ -116,13 +116,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
         }
 
-        categoriesDiv = Fluent("div").className("categories").appendTo(container).getNode();
+        categoriesDiv = Fluent("div").class("categories").appendTo(container).getNode();
         var fieldContainer: HTMLElement;
         if (useCategories) {
             fieldContainer = categoriesDiv;
         }
         else {
-            fieldContainer = Fluent("div").className("category").appendTo(categoriesDiv).getNode();
+            fieldContainer = Fluent("div").class("category").appendTo(categoriesDiv).getNode();
         }
         var priorCategory = null;
         for (var i = 0; i < items.length; i++) {
@@ -153,7 +153,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     private createCategoryDiv(categoriesDiv: HTMLElement, categoryIndexes: { [key: string]: number },
         category: string, collapsed: boolean): HTMLElement {
 
-        var categoryDiv = Fluent("div").className("category").appendTo(categoriesDiv);
+        var categoryDiv = Fluent("div").class("category").appendTo(categoriesDiv);
 
         var title = Fluent("div")
             .addClass("category-title")
@@ -166,7 +166,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if (collapsed != null) {
             categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
 
-            var img = Fluent("i").appendTo(title).className(faIcon(collapsed ? "plus" : "minus")).getNode();
+            var img = Fluent("i").appendTo(title).class(faIcon(collapsed ? "plus" : "minus")).getNode();
             let categoryEl = categoryDiv.getNode();
 
             title.on("click", function () {
@@ -240,7 +240,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             addClass(fieldDiv, item.formCssClass);
             if (item.formCssClass.indexOf('line-break-') >= 0) {
                 var splitted = item.formCssClass.split(String.fromCharCode(32));
-                const addLineBreak = (klass: string) => Fluent("div").className(klass).attr("style", "width: 100%").insertBefore(fieldDiv);
+                const addLineBreak = (klass: string) => Fluent("div").class(klass).attr("style", "width: 100%").insertBefore(fieldDiv);
                 if (splitted.indexOf('line-break-xs') >= 0) {
                     addLineBreak("line-break");
                 }
@@ -342,8 +342,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             ReflectionOptionsSetter.set(editor, item.editorParams);
         }
 
-        Fluent("div").className('vx').appendTo(fieldDiv);
-        Fluent("div").className('clear').appendTo(fieldDiv);
+        Fluent("div").class('vx').appendTo(fieldDiv);
+        Fluent("div").class('clear').appendTo(fieldDiv);
 
         return editor;
     }
@@ -430,9 +430,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 var index = Object.keys(categoryIndexes).length + 1;
                 categoryIndexes[category] = index;
                 if (index > 1) {
-                    Fluent("span").className('separator').text('|').prependTo(container);
+                    Fluent("span").class('separator').text('|').prependTo(container);
                 }
-                Fluent("a").className("category-link")
+                Fluent("a").class("category-link")
                     .text(this.determineText(category, prefix => prefix + 'Categories.' + category))
                     .attr('tabindex', '-1')
                     .attr('href', `#${this.idPrefix}Category${index}`)
@@ -441,7 +441,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
         }
 
-        Fluent("div").className('clear').appendTo(container);
+        Fluent("div").class('clear').appendTo(container);
         return categoryIndexes;
     }
 

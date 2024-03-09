@@ -363,7 +363,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
         this.fileSymbols.children().forEach((e, i) => {
             var x = i;
-            Fluent("a").className("delete").appendTo(Fluent(e).children().find(x => x.matches('.filename')))
+            Fluent("a").class("delete").appendTo(Fluent(e).children().find(x => x.matches('.filename')))
                 .on("click", ev => {
                     ev.preventDefault();
                     this.entities.splice(x, 1);

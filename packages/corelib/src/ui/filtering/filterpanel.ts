@@ -240,7 +240,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         // if an error occurred, display it, otherwise set current filters
         if (errorText != null) {
-            Fluent("span").className('error')
+            Fluent("span").class('error')
                 .attr('title', errorText).appendTo(row.querySelector<HTMLElement>('div.v'));
             row.querySelector<HTMLElement>('div.v input')?.focus();
             return;
@@ -385,7 +385,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (filtering == null)
             return;
 
-        var hidden = Fluent("input").attr("type", 'hidden').className('op-select').appendTo(opDiv);
+        var hidden = Fluent("input").attr("type", 'hidden').class('op-select').appendTo(opDiv);
 
         var operators = filtering.getOperators();
         var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });

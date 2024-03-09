@@ -34,7 +34,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
             addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
         }
 
-        this.minutes = Fluent("select").className('editor s-TimeEditor minute').insertAfter(input);
+        this.minutes = Fluent("select").class('editor s-TimeEditor minute').insertAfter(input);
         this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {

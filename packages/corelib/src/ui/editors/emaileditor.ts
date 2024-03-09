@@ -22,9 +22,9 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
         this.domNode.classList.add('emailuser');
 
-        var spanAt = Fluent("span").text('@').className('emailat').insertAfter(this.domNode);
+        var spanAt = Fluent("span").text('@').class('emailat').insertAfter(this.domNode);
 
-        var domain = Fluent("input").attr("type", "text").className('emaildomain').insertAfter(spanAt);
+        var domain = Fluent("input").attr("type", "text").class('emaildomain').insertAfter(spanAt);
         domain.on('blur.' + this.uniqueName, function () {
             ValidationHelper.validateElement(this.domNode);
         });

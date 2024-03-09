@@ -26,7 +26,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         var visibles = Fluent("div")
             .addClass("column-list visible-list bg-success")
             .append(Fluent("h5")
-                .append(Fluent("i").className(faIcon("eye")))
+                .append(Fluent("i").class(faIcon("eye")))
                 .append(" ")
                 .append(localText(localText("Controls.ColumnPickerDialog.VisibleColumns"))))
             .append(this.ulVisible = Fluent("ul"));
@@ -34,7 +34,7 @@ export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
         var hiddens = Fluent("div")
             .addClass("column-list hidden-list bg-info")
             .append(Fluent("h5")
-                .append(Fluent("i").className(faIcon("eye-slash")))
+                .append(Fluent("i").class(faIcon("eye-slash")))
                 .append(" ")
                 .append(localText(localText("Controls.ColumnPickerDialog.HiddenColumns"))))
             .append(this.ulHidden = Fluent("ul"))

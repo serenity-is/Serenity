@@ -608,9 +608,9 @@ export namespace SlickFormatting {
             var text = formatter(ctx);
             var view = getView();
             var indent = (ctx.item as any)._indent ?? 0;
-            var spacer = Fluent("span").className("s-TreeIndent");
+            var spacer = Fluent("span").class("s-TreeIndent");
             spacer.getNode().style.width = (15 * indent) + 'px';
-            var toggle = Fluent("span").className("s-TreeToggle");
+            var toggle = Fluent("span").class("s-TreeToggle");
             var id = getId(ctx.item);
             var idx = view.getIdxById(id);
             var next = view.getItemByIdx(idx + 1);
