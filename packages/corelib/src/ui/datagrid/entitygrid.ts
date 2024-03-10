@@ -23,7 +23,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
     protected handleRoute(e: HandleRouteEvent): void {
 
-        let route = (!e.route && (e as any).originalEvent?.route) || e.route;
+        let route = Fluent.eventProp(e, "route");
         if (typeof route !== "string")
             return;
 
@@ -51,8 +51,8 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         else
             return;
 
-        let evParts = (!e.parts && (e as any).originalEvent?.parts) || e.parts || parts;
-        let evIndex = (e.index == null && (e as any).originalEvent?.index) || e.index;
+        let evParts: string[] = Fluent.eventProp(e, "parts") ?? parts;
+        let evIndex = Fluent.eventProp(e, "index") ?? e.index;
         
         if (getActiveRequests() > oldRequests && evParts != null && evIndex != null &&
            Fluent.isDefaultPrevented(e) && evIndex >= 0 && evIndex < parts?.length - 1) {

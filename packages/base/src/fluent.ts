@@ -152,6 +152,20 @@ export namespace Fluent {
         return e != null && (!!e.defaultPrevented || 
             (typeof e.isDefaultPrevented === "function" && !!e.isDefaultPrevented()));
     }
+
+    export function eventProp(e: any, prop: string) {
+        if (!e)
+            return void 0;
+
+        if (typeof e[prop] !== "undefined")
+            return e[prop];
+
+        if (typeof e.originalEvent === "object" && typeof e.originalEvent[prop] !== "undefined")
+            return e.originalEvent[prop];
+
+        if (typeof e.detail === "object")
+            return e.detail[prop];
+    }
 }
 
 type FluentThis<TElement extends HTMLElement = HTMLElement> = Fluent<TElement> & {

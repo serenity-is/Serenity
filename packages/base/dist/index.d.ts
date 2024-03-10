@@ -676,6 +676,7 @@ declare namespace Fluent {
         defaultPrevented?: boolean;
         isDefaultPrevented?: () => boolean;
     }): boolean;
+    function eventProp(e: any, prop: string): any;
 }
 declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 

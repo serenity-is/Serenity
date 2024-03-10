@@ -1982,6 +1982,7 @@ declare namespace Serenity {
             defaultPrevented?: boolean;
             isDefaultPrevented?: () => boolean;
         }): boolean;
+        function eventProp(e: any, prop: string): any;
     }
     function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
