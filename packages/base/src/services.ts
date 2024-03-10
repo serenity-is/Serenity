@@ -74,15 +74,25 @@ function serviceOptions<TResponse>(url: string, options: ServiceOptions<TRespons
 let activeRequests: number = 0;
 
 export function requestStarting() {
-    let $ = getjQuery();
-    $ && typeof $.active === "number" && ($.active++ === 0) && $.event?.trigger?.("ajaxStart");
     activeRequests++;
+    let $ = getjQuery();
+    if ($ && typeof $.active === "number") {
+        ($.active++ === 0) && $.event?.trigger?.("ajaxStart");
+    }
+    else if (activeRequests === 1) {
+        typeof document !== "undefined" && document.dispatchEvent(new Event("ajaxStart"));
+    }
 }
 
 export function requestFinished() {
-    let $ = getjQuery();
-    $ && typeof $.active === "number" && !(--$.active) && $.event?.trigger?.("ajaxStop");
     activeRequests--;
+    let $ = getjQuery();
+    if ($ && typeof $.active === "number") {
+         !(--$.active) && $.event?.trigger?.("ajaxStop");
+    }
+    else if (!activeRequests) {
+        typeof document !== "undefined" && document.dispatchEvent(new Event("ajaxStop"));
+    }
 }
 
 export function getActiveRequests() {
