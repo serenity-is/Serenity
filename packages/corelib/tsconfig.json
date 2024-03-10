@@ -5,9 +5,6 @@
     "declarationDir": "./out",
     "rootDir": "./src",
     "paths": {
-      "@serenity-is/squery": [
-        "./src/globals/squery-module"
-      ],
       "@mockdeps": [
         "./src/globals/mockdeps"
       ],
