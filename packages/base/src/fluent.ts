@@ -146,7 +146,12 @@ export namespace Fluent {
     
     export function isInputTag(tag: string) {
         return /^(?:input|select|textarea|button)$/i.test(tag);
-    }    
+    }
+
+    export function isDefaultPrevented(e: { defaultPrevented?: boolean, isDefaultPrevented?: () => boolean }) {
+        return e != null && (!!e.defaultPrevented || 
+            (typeof e.isDefaultPrevented === "function" && !!e.isDefaultPrevented()));
+    }
 }
 
 type FluentThis<TElement extends HTMLElement = HTMLElement> = Fluent<TElement> & {

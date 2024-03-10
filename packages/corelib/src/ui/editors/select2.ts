@@ -1438,7 +1438,7 @@ abstract class AbstractSelect2 {
     protected triggerSelect(data: Select2Item): boolean {
         var evt = { val: this.id(data), object: data, choice: data };
         var event = Fluent.trigger(this.opts.element, "select2-selecting", evt);
-        return !(event.defaultPrevented || event.isDefaultPrevented?.());
+        return !Fluent.isDefaultPrevented(event);
     }
 
     /**
@@ -1619,7 +1619,7 @@ abstract class AbstractSelect2 {
         if (this._enabled === false || this._readonly === true) return false;
 
         var event = Fluent.trigger(this.opts.element, "select2-opening");
-        return !(event.defaultPrevented || event.isDefaultPrevented?.());
+        return !Fluent.isDefaultPrevented(event);
     }
 
     protected clearDropdownAlignmentPreference() {
@@ -2571,7 +2571,7 @@ class SingleSelect2 extends AbstractSelect2 {
         var data = (this.selection as any)?.select2data;
         if (data) { // guard against queued quick consecutive clicks
             var evt = Fluent.trigger(this.opts.element, "select2-clearing");
-            if (evt.defaultPrevented || evt.isDefaultPrevented?.()) {
+            if (Fluent.isDefaultPrevented(evt)) {
                 return;
             }
             var placeholderOption = this.getPlaceholderOption();
@@ -3390,7 +3390,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
         var evt = Fluent.trigger(this.opts.element, "select2-removing", { val: this.id(data), choice: data });
 
-        if (evt.defaultPrevented || evt.isDefaultPrevented?.()) {
+        if (Fluent.isDefaultPrevented(evt)) {
             return false;
         }
 

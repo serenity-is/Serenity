@@ -310,8 +310,8 @@ export class Dialog {
             return;
 
         if (isPromiseLike(value))
-            value.then(value => value !== false && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented) && this.close(btn.result));
-        else if (value !== false && !((e as any)?.isDefaultPrevented?.() || e?.defaultPrevented))
+            value.then(value => value !== false && !Fluent.isDefaultPrevented(e) && this.close(btn.result));
+        else if (value !== false && !Fluent.isDefaultPrevented(e))
             this.close(btn.result);
     }
 
@@ -627,7 +627,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
         return;
 
     let event = Fluent.trigger(panel, "panelbeforeclose", { bubbles: true });
-    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
+    if (Fluent.isDefaultPrevented(event))
         return;
     panel.classList.add("hidden");
 
@@ -657,7 +657,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
     }
 
     let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
-    if (event?.defaultPrevented || event?.isDefaultPrevented?.())
+    if (Fluent.isDefaultPrevented(event))
         return;
 
     panel.dataset.paneluniquename = uniqueName || panel.id || new Date().getTime().toString();

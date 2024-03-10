@@ -672,6 +672,10 @@ declare namespace Fluent {
     function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
     const inputLikeSelector = "input,select,textarea,button";
     function isInputTag(tag: string): boolean;
+    function isDefaultPrevented(e: {
+        defaultPrevented?: boolean;
+        isDefaultPrevented?: () => boolean;
+    }): boolean;
 }
 declare function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 

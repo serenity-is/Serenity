@@ -596,7 +596,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected onClick(e: Event, row: number, cell: number): void {
-        if ((e as any).isDefaultPrevented?.() || e.defaultPrevented) {
+        if (Fluent.isDefaultPrevented(e)) {
             return;
         }
 

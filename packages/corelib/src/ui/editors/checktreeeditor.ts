@@ -167,13 +167,13 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     protected onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
-        if (!(e as any).isDefaultPrevented?.() && !e.defaultPrevented) {
+        if (!Fluent.isDefaultPrevented(e)) {
             SlickTreeHelper.toggleClick(e as any, row, cell, this.view, function (x) {
                 return x.id;
             });
         }
 
-        if ((e as any).isDefaultPrevented?.() || e.defaultPrevented) {
+        if (Fluent.isDefaultPrevented(e)) {
             return;
         }
 

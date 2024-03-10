@@ -51,8 +51,8 @@ export class GridRowSelectionMixin {
             }
         });
 
-        grid.getGrid().onHeaderClick.subscribe((e1, u) => {
-            if ((e1 as any).isDefaultPrevented?.() || e1.defaultPrevented)
+        grid.getGrid().onHeaderClick.subscribe((e1) => {
+            if (Fluent.isDefaultPrevented(e1))
                 return;
             if ((e1.target as HTMLElement).classList.contains('select-all-items')) {
                 e1.preventDefault();

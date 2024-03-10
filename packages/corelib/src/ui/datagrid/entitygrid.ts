@@ -51,11 +51,11 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         else
             return;
 
-        let evParts = (!e.parts && (e as any).oroginalEvent?.parts) || e.parts;
-        let evIndex = (e.index == null && (e as any).oroginalEvent?.index) || e.index;
+        let evParts = (!e.parts && (e as any).originalEvent?.parts) || e.parts || parts;
+        let evIndex = (e.index == null && (e as any).originalEvent?.index) || e.index;
         
-        if (getActiveRequests() > oldRequests && evParts && evIndex &&
-            (e.defaultPrevented || (e as any)?.isDefaultPrevented?.()) && evIndex >= 0 && evIndex < parts?.length - 1) {
+        if (getActiveRequests() > oldRequests && evParts != null && evIndex != null &&
+           Fluent.isDefaultPrevented(e) && evIndex >= 0 && evIndex < parts?.length - 1) {
             Fluent.one(document, "ajaxStop", () => {
                 setTimeout(() => Router.resolve('#' + parts.join('/+/')), 1);
             });
