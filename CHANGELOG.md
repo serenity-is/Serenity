@@ -1,3 +1,15 @@
+## 8.3.7 (2024-03-10)
+
+## Features:
+- Added `Fluent.matches` method which is like $.is but don't support any custom selectors and calls element.matches
+- Added `Fluent.class` method which directly sets the className property. This should be preferred to addClass for element creation
+- Added a `Fluent.isDefaultPrevented` helper to overcome issues when jQuery exists or not so that we don't have to check both e.defaultPrevented and e.isDefaultPrevented?.()
+- Added a `Fluent.eventProp` helper to read a property from event, event.originalEvent or event.detail as jQuery does not pass custom properties like route etc. to the synthetic event.
+- `SubDialogHelper.bindToDataChange` auto extracts the original event if used with jQuery so that data change info can be easily accessed
+- Also trigger ajaxStart/ajaxStop events on document when jquery is not available
+- NProgress works when jQuery is not available (StartSharp)
+- Allow directly passing formatSelection and formatResult from ComboboxOptions to Select2, so that providerOptions don't need to be set explicitly.
+
 ## 8.3.6 (2024-03-03)
 
 ## Features:
