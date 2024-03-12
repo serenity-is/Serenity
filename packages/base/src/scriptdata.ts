@@ -230,7 +230,7 @@ export function setRegisteredScripts(scripts: any[]) {
     if (!scriptDataHash)
         getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
     for (var k in scripts) {
-        scriptDataHash[k], scripts[k] || t;
+        scriptDataHash[k] = scripts[k] || t;
     }
 }
 
