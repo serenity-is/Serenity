@@ -49,7 +49,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// Format string for new Lookup({0}, {1})
     /// </summary>
     public const string NewLookupFormat =
-        "new ((typeof Serenity!=='undefined'&&Serenity.LookupXX)||" +
+        "new ((typeof Serenity!=='undefined'&&Serenity.Lookup)||" +
         "(class Lookup{{" + 
             "constructor(o,a){{" + 
                 "o&&Object.assign(this,o);a&&this.update(a)" + 
