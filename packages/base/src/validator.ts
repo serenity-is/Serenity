@@ -1,4 +1,4 @@
-﻿/*!
+﻿/*
  * Serenity validator implementation inspired from:
  * jQuery Validation Plugin, https://jqueryvalidation.org/) 
  * - and -
@@ -52,7 +52,7 @@ interface ValidationRulesMap {
 type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
 
 function messageKey(method: string) {
-    return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()    
+    return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()
 }
 
 export interface ValidatorOptions {
@@ -1331,7 +1331,7 @@ export class Validator {
                 if (message && element.classList.contains('error'))
                     element.classList.remove('checked');
             }
-        });        
+        });
     }
 
     errorsFor(element: ValidatableElement) {
@@ -1531,7 +1531,7 @@ export class Validator {
 
             if (value == null)
                 continue;
-            
+
             Validator.normalizeAttributeRule(rules, type, method, value);
         }
 
