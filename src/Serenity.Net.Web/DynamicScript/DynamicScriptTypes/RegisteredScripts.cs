@@ -32,8 +32,15 @@ public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptD
     /// <inheritdoc/>
     public override string GetScript()
     {
-        return "Q.ScriptData.setRegisteredScripts(" +
-            ToJsonFast(scriptManager.GetRegisteredScripts()) + ");";
+        return string.Format("((typeof Serenity!=='undefined'&&Serenity.setRegisteredScripts)||" +
+        "(function(v){{" +
+            "var t=''+new Date().getTime();" +
+            "var s=Symbol.for('Serenity.scriptDataHash');" +
+            "var g=globalThis[s];" +
+            "if(!g)g=globalThis[s]={{}};" +
+            "for(var k in v)g[v]=v[k]||t" +
+        "}}))({0});",
+            ToJsonFast(scriptManager.GetRegisteredScripts()));
     }
 
     private static string ToJsonFast(IDictionary<string, string> dictionary)

@@ -70,7 +70,7 @@ public abstract partial class PropertyItemsScript : INamedDynamicScript, IGetScr
     public string GetScript()
     {
         var data = GetScriptData();
-        return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1});",
+        return string.Format(CultureInfo.InvariantCulture, DataScript.SetScriptDataFormat,
             scriptName.ToSingleQuoted(),
             JSON.Stringify(data, writeNulls: false));
     }

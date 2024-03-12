@@ -22,7 +22,7 @@ public class TemplateScript(string key, Func<string> getTemplate) : DynamicScrip
     {
         string templateText = getTemplate();
 
-        return string.Format(CultureInfo.InvariantCulture, "Q.ScriptData.set({0}, {1})", 
+        return string.Format(CultureInfo.InvariantCulture, DataScript.SetScriptDataFormat, 
             ("Template." + key).ToSingleQuoted(),
             templateText.ToSingleQuoted()); 
     }
