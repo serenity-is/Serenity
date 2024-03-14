@@ -64,5 +64,5 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
             "if(!g)g=globalThis[s]={{}};" +
             "g[k]=v" +
         "}})" +
-            ")({0},{1})";
+            ")({0},{1});";
 }
