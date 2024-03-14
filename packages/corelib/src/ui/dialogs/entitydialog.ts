@@ -947,7 +947,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         if (this.useViewMode()) {
             list.push({
                 title: localText('Controls.EntityDialog.EditButton'),
-                action: 'delete',
+                action: 'edit',
                 cssClass: 'edit-button',
                 icon: faIcon("edit"),
                 onClick: () => {
