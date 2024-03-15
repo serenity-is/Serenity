@@ -616,6 +616,9 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     hasClass(klass: string): boolean;
     hide(): this;
+    getWidget<TWidget>(type?: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     [Symbol.iterator]: TElement[];
@@ -647,6 +650,9 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     toggle(flag?: boolean): this;
     toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
     trigger(type: string, args?: any): this;
+    tryGetWidget<TWidget>(type?: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
     val(value: string): this;
     val(): string;
 }
@@ -1294,12 +1300,6 @@ declare class Uploader {
     static errorHandler: (data: UploaderErrorData) => void;
 }
 
-/*!
- * Serenity validator implementation inspired from:
- * jQuery Validation Plugin, https://jqueryvalidation.org/)
- * - and -
- * https://raw.githubusercontent.com/haacked/aspnet-client-validation
- */
 /**
  * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or [contenteditable).
  */
@@ -1915,16 +1915,6 @@ declare function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement>
 declare function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: {
     new (...args: any[]): TWidget;
 }): TWidget;
-declare module "@serenity-is/base" {
-    interface Fluent<TElement extends HTMLElement> {
-        getWidget<TWidget>(type?: {
-            new (...args: any[]): TWidget;
-        }): TWidget;
-        tryGetWidget<TWidget>(type?: {
-            new (...args: any[]): TWidget;
-        }): TWidget;
-    }
-}
 type IdPrefixType = {
     [key: string]: string;
     Form: string;

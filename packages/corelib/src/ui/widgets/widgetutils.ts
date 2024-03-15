@@ -97,13 +97,6 @@ export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element
     return widget as TWidget;
 }
 
-declare module "@serenity-is/base" {
-    interface Fluent<TElement extends HTMLElement> {
-        getWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
-        tryGetWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
-    }
-}
-
 Fluent.prototype.getWidget = function<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget {
     return getWidgetFrom(this.element, type);
 }

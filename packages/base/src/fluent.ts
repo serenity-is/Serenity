@@ -20,6 +20,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     hasClass(klass: string): boolean;
     hide(): this;
+    getWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     [Symbol.iterator]: TElement[];
@@ -51,6 +52,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     toggle(flag?: boolean): this;
     toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
     trigger(type: string, args?: any): this;
+    tryGetWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
     val(value: string): this;
     val(): string;
 }
