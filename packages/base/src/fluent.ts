@@ -208,8 +208,6 @@ Fluent.prototype.attr = function (this: FluentThis<any>, name: string, value?: s
         return this.el?.getAttribute(name);
 
     if (this.el) {
-        if (name === "class")
-            name = "className";
         if (value == null)
             this.el.removeAttribute(name);
         else if (typeof value === "string")
@@ -340,7 +338,7 @@ Fluent.prototype.hide = function (this: FluentThis) {
 }
 
 Fluent.prototype.matches = function (this: FluentThis, selector?: string): boolean {
-    return !!this.el && this.el.matches(selector);
+    return !!this.el && typeof this.el.matches === "function" && this.el.matches(selector);
 }
 
 Fluent.prototype.nextSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
