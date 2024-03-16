@@ -6,11 +6,11 @@ import { Widget } from "./widget";
 export class TemplatedWidget<P> extends Widget<P> {
 
     protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement> {
-        return Fluent<TElement>(this.domNode.querySelector('#' + this.idPrefix + id));
+        return Fluent(this.domNode).findFirst<TElement>('#' + this.idPrefix + id);
     }
 
     protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {
-        return this.domNode.querySelector<TElement>('#' + this.idPrefix + id);
+        return this.domNode?.querySelector<TElement>('#' + this.idPrefix + id);
     }
 
     protected getTemplate(): string {
