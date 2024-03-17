@@ -329,7 +329,9 @@ Fluent.prototype.findFirst = function (this: FluentThis, selector: string): Flue
 }
 
 Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLElement[] {
-    return Array.from(this.el?.querySelectorAll<HTMLElement>(selector));
+    if (!this.el)
+        return [];
+    return Array.from(this.el.querySelectorAll<HTMLElement>(selector));
 }
 
 Fluent.prototype.hide = function (this: FluentThis) {
