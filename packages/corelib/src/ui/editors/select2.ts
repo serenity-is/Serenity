@@ -555,8 +555,8 @@ export class Select2 {
         return this.instance?.opened();
     }
 
-    open(): void {
-        this.instance?.open();
+    open(): boolean {
+        return this.instance?.open();
     }
 
     positionDropdown() {
