@@ -664,7 +664,7 @@ declare namespace Fluent {
 declare namespace Fluent {
     const off: typeof EventHandler.off;
     const on: typeof EventHandler.on;
-    const one: typeof EventHandler.on;
+    const one: typeof EventHandler.one;
     const trigger: typeof EventHandler.trigger;
     function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
     function empty(el: Element): void;

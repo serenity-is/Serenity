@@ -2599,6 +2599,8 @@ class SingleSelect2 extends AbstractSelect2 {
         } else {
             var self = this;
             this.opts.initSelection.call(null, this.opts.element, function (selected: Select2Item) {
+                if (!self.container)
+                    return;
                 if (selected !== undefined && selected !== null) {
                     self.updateSelection(selected);
                     self.close();
@@ -2750,6 +2752,8 @@ class SingleSelect2 extends AbstractSelect2 {
 
     protected updateSelection(data: Select2Item) {
 
+        if (!this.selection)
+            return;
         var container = this.selection.querySelector<HTMLElement>(".select2-chosen"), formatted, cssClass;
 
         (this.selection as any).select2data = data;
@@ -3152,6 +3156,8 @@ class MultiSelect2 extends AbstractSelect2 {
         if (this.select || this.opts.element.value !== "") {
             var self = this;
             this.opts.initSelection.call(null, this.opts.element, function (data: Select2Item[]) {
+                if (!this.container)
+                    return;
                 if (data !== undefined && data !== null) {
                     self.updateSelection(data);
                     self.close();

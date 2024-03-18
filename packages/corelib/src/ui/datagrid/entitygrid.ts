@@ -21,6 +21,11 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         Fluent.on(this.domNode, "handleroute." + this.uniqueName, this.handleRoute.bind(this));
     }
 
+    destroy() {
+        Fluent.off(document, "." + this.uniqueName + "_routerfix");
+        super.destroy();
+    }
+
     protected handleRoute(e: HandleRouteEvent): void {
 
         let route = Fluent.eventProp(e, "route");
@@ -36,28 +41,32 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         var oldRequests = getActiveRequests();
 
         var parts = route.split('/');
-        if (!!(parts.length === 2 && parts[0] === 'edit')) {
+        if (parts.length === 2 && parts[0] === 'edit') {
             e.preventDefault();
             this.editItem(decodeURIComponent(parts[1]));
         }
-        else if (!!(parts.length === 2 && parts[1] === 'new')) {
+        else if (parts.length === 2 && parts[1] === 'new') {
             e.preventDefault();
             this.editItemOfType(parts[0], null);
         }
-        else if (!!(parts.length === 3 && parts[1] === 'edit')) {
+        else if (parts.length === 3 && parts[1] === 'edit') {
             e.preventDefault();
             this.editItemOfType(parts[0], decodeURIComponent(parts[2]));
         }
         else
             return;
 
-        let evParts: string[] = Fluent.eventProp(e, "parts") ?? parts;
-        let evIndex = Fluent.eventProp(e, "index") ?? e.index;
+        Fluent.off(document, "." + this.uniqueName + "_routerfix");
+
+        let evParts: string[] = Fluent.eventProp(e, "parts");
+        let evIndex = Fluent.eventProp(e, "index");
         
-        if (getActiveRequests() > oldRequests && evParts != null && evIndex != null &&
-           Fluent.isDefaultPrevented(e) && evIndex >= 0 && evIndex < parts?.length - 1) {
-            Fluent.one(document, "ajaxStop", () => {
-                setTimeout(() => Router.resolve('#' + parts.join('/+/')), 1);
+        if (getActiveRequests() > oldRequests && 
+            evParts != null && evIndex != null && evIndex >= 0 && evIndex < evParts.length - 1 &&
+            !evParts[evIndex + 1].startsWith("!") &&
+            Fluent.isDefaultPrevented(e)) {
+            Fluent.one(document, "ajaxStop." + this.uniqueName + "_routerfix", () => {
+                setTimeout(() => Router.resolve('#' + evParts.join('/+/')), 1);
             });
         }
     }
@@ -267,7 +276,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             if (itemType !== this.getItemType())
                 hash = itemType + '/';
 
-            if (!!(dialog != null && (dialog as any).entityId != null))
+            if (dialog != null && (dialog as any).entityId != null)
                 hash += 'edit/' + (dialog as any).entityId.toString();
             else
                 hash += 'new';

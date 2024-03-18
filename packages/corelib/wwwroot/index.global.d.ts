@@ -1961,7 +1961,7 @@ declare namespace Serenity {
     namespace Fluent {
         const off: typeof EventHandler.off;
         const on: typeof EventHandler.on;
-        const one: typeof EventHandler.on;
+        const one: typeof EventHandler.one;
         const trigger: typeof EventHandler.trigger;
         function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
         function empty(el: Element): void;
@@ -4803,7 +4803,7 @@ declare namespace Serenity {
         get isFocused(): boolean;
         get isMultiple(): boolean;
         get opened(): boolean;
-        open(): void;
+        open(): boolean;
         positionDropdown(): void;
         readonly(value?: boolean): void;
         get search(): HTMLInputElement;
@@ -5974,6 +5974,7 @@ declare namespace Serenity {
 
     class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         constructor(props: WidgetProps<P>);
+        destroy(): void;
         protected handleRoute(e: HandleRouteEvent): void;
         protected usePager(): boolean;
         protected createToolbarExtensions(): void;

@@ -666,7 +666,7 @@ declare namespace Fluent {
 declare namespace Fluent {
     const off: typeof EventHandler.off;
     const on: typeof EventHandler.on;
-    const one: typeof EventHandler.on;
+    const one: typeof EventHandler.one;
     const trigger: typeof EventHandler.trigger;
     function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
     function empty(el: Element): void;
@@ -3526,7 +3526,7 @@ declare class Select2 {
     get isFocused(): boolean;
     get isMultiple(): boolean;
     get opened(): boolean;
-    open(): void;
+    open(): boolean;
     positionDropdown(): void;
     readonly(value?: boolean): void;
     get search(): HTMLInputElement;
@@ -4697,6 +4697,7 @@ declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exte
 
 declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props: WidgetProps<P>);
+    destroy(): void;
     protected handleRoute(e: HandleRouteEvent): void;
     protected usePager(): boolean;
     protected createToolbarExtensions(): void;

@@ -75,7 +75,7 @@ export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | 
 export namespace Fluent {
     export const off = EventHandler.off;
     export const on = EventHandler.on;
-    export const one = EventHandler.on;
+    export const one = EventHandler.one;
     export const trigger = EventHandler.trigger;
 
     export function addClass(el: Element, value: string | boolean | (string | boolean)[]) {
