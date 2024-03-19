@@ -325,7 +325,7 @@ declare class Dialog {
     getContentNode(): HTMLElement;
     /** Gets the dialog element of the dialog */
     getDialogNode(): HTMLElement;
-    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .s-Panel */
+    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .panel-body */
     getEventsNode(): HTMLElement;
     /** Gets the footer element of the dialog */
     getFooterNode(): HTMLElement;
@@ -2053,11 +2053,11 @@ interface HandleRouteEvent extends Event {
 }
 declare namespace Router {
     let enabled: boolean;
-    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
-    function replace(hash: string, tryBack?: boolean): void;
-    function replaceLast(hash: string, tryBack?: boolean): void;
-    function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string): void;
-    function resolve(hash?: string): void;
+    function navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+    function replace(newHash: string, tryBack?: boolean): void;
+    function replaceLast(newHash: string, tryBack?: boolean): void;
+    function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+    function resolve(newHash?: string): void;
 }
 
 declare namespace ScriptData {

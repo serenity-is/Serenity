@@ -66,7 +66,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             !evParts[evIndex + 1].startsWith("!") &&
             Fluent.isDefaultPrevented(e)) {
             Fluent.one(document, "ajaxStop." + this.uniqueName + "_routerfix", () => {
-                setTimeout(() => Router.resolve('#' + evParts.join('/+/')), 1);
+                window.location.hash = '#' + evParts.join('/+/');
             });
         }
     }

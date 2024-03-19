@@ -33,7 +33,6 @@ export namespace Router {
                 if (silent)
                     ignoreChange();
 
-                var prior = window.location.href;
                 oldURL = null;
                 window.history.back();
                 return;
