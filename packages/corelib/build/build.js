@@ -24,5 +24,6 @@ await esbuild.build({
     ],
     outbase: 'src',
     external: ['@serenity-is/sleekgrid'],
-    minify: true
+    minify: false,
+    sourcemap: false
 });

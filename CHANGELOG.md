@@ -1,3 +1,12 @@
+## 8.3.8 (2024-03-19)
+
+## Features:
+
+- Improve generated dynamic script code behavior when Serenity is not pre-loaded
+- Make getWidget and tryGetWidget available on Fluent. It was normally available but declaration merging did not properly change "@serenity-is/base" to "@serenity-is/corelib" although base was bundled into corelib
+- Improve router resolve handling when pending requests are in progress
+- **`[Breaking change]`** Panel events will fire at the .panel-body instead of .s-Panel. This will make it compatible with ui dialog behavior and will allow attaching panelopen events before the panel body is wrapped with a s-Panel. We also now fire new modalbeforeopen modalopen etc. events at .modal-body for Bootstrap modal to make behavior consistent between all dialog types. This is required as it is possible for our dialogs to be opened later as a panel, ui-dialog or modal, but this information is not available on Dialog class creation and the body element is not yet wrapped with any of dialog types yet.
+
 ## 8.3.7 (2024-03-10)
 
 ## Features:
