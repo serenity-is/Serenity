@@ -3345,6 +3345,7 @@ declare namespace Serenity {
         route: string;
         parts: string[];
         index: number;
+        isInitial: boolean;
     }
     namespace Router {
         let enabled: boolean;

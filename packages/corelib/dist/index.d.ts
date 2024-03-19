@@ -2050,6 +2050,7 @@ interface HandleRouteEvent extends Event {
     route: string;
     parts: string[];
     index: number;
+    isInitial: boolean;
 }
 declare namespace Router {
     let enabled: boolean;

@@ -3,7 +3,8 @@
 export interface HandleRouteEvent extends Event {
     route: string,
     parts: string[],
-    index: number
+    index: number,
+    isInitial: boolean
 }
 
 export namespace Router {
@@ -157,8 +158,11 @@ export namespace Router {
     }
 
     let resolvingPreRoute: string;
+    let resolveIndex = 0;
 
     export function resolve(newHash?: string) {
+        resolveIndex++;
+
         if (!enabled)
             return;
 
@@ -223,7 +227,8 @@ export namespace Router {
                     Fluent.trigger(handler, "handleroute", <HandleRouteEvent>{
                         route: route,
                         parts: newParts,
-                        index: i
+                        index: i,
+                        isInitial: resolveIndex == 1
                     });
                 }
                 finally {

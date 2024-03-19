@@ -56,6 +56,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         else
             return;
 
+        if (!Fluent.eventProp(e, "isInitial"))
+            return;
+        
         Fluent.off(document, "." + this.uniqueName + "_routerfix");
 
         let evParts: string[] = Fluent.eventProp(e, "parts");
