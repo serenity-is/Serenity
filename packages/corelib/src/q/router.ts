@@ -228,7 +228,7 @@ export namespace Router {
                         route: route,
                         parts: newParts,
                         index: i,
-                        isInitial: resolveIndex == 1
+                        isInitial: resolveIndex <= 3
                     });
                 }
                 finally {
