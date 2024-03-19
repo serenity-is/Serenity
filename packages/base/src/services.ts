@@ -88,7 +88,7 @@ export function requestFinished() {
     activeRequests--;
     let $ = getjQuery();
     if ($ && typeof $.active === "number") {
-         !(--$.active) && $.event?.trigger?.("ajaxStop");
+        !(--$.active) && $.event?.trigger?.("ajaxStop");
     }
     else if (!activeRequests) {
         typeof document !== "undefined" && document.dispatchEvent(new Event("ajaxStop"));
@@ -101,13 +101,13 @@ export function getActiveRequests() {
 
 function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): Promise<TResponse> {
 
-    if (typeof fetch === "undefined")
-        return Promise.reject("The fetch method is not available!");
+    if (typeof fetch !== "function")
+        return Promise.reject(reason("fetch-missing", "The fetch method is not available!"));
 
     return (async function () {
 
-        let uri = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-        options = serviceOptions(uri, options);
+        let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+        options = serviceOptions(url, options);
 
         requestStarting();
         try {
@@ -129,20 +129,21 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
                 fetchInit.body = JSON.stringify(options.request);
 
-                var fetchResponse = await fetch(uri, fetchInit);
+                var fetchResponse = await fetch(url, fetchInit);
 
                 if (!fetchResponse.ok) {
                     await handleFetchError(fetchResponse, options);
-                    return Promise.reject({ description: `HTTP ${fetchResponse.status}: ${fetchResponse.statusText}!`, fetchResponse });
+                    return Promise.reject(reason("http-error", `Service fetch to '${url}' resulted in HTTP ${fetchResponse.status} error: ${fetchResponse.statusText}!`, { fetchResponse, url }));
                 }
 
                 let response = await fetchResponse.json() as TResponse;
                 if (!response)
-                    return Promise.reject({ description: `Empty response received!`, fetchResponse });
+                    return Promise.reject(reason("empty-response", `Received empty response from service fetch to '${url}'!`, { fetchResponse, url }));
 
                 if (response.Error) {
                     handleError(response ?? {}, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
-                    return Promise.reject({ description: response?.Error.Message ?? response.Error.Code, response, fetchResponse });
+                    return Promise.reject(reason("service-error", `Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`, 
+                        { response, fetchResponse, url }));
                 }
 
                 options.onSuccess?.(response);
@@ -159,18 +160,39 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
     })();
 }
 
+function reason(message: string, kind: string, extra?: any) {
+    var error: Error;
+    if (extra?.cause != null) {
+        error = (Error as any)(message, { cause: extra.cause });
+    }
+    else {
+        error = Error(message);
+    }
+    if (kind != null) {
+        (error as any).kind = kind;
+    }
+    if (extra != null) {
+        if ((error as any).cause)
+            delete extra.cause;
+        Object.assign(error, extra);
+    }
+
+    return error;
+}
+
 export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse> {
 
     if (options?.async ?? true)
         return serviceFetch(options);
 
+    let url: string;
     return new Promise((resolve, reject) => {
         try {
-            let uri = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-            options = serviceOptions(uri, options);
+            url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+            options = serviceOptions(url, options);
 
             var xhr = new XMLHttpRequest();
-            xhr.open(options.method, uri, false);
+            xhr.open(options.method, url, false);
 
             if (options.cache == "no-store")
                 options.headers["Cache-Control"] ??= "no-cache, no-store, max-age=0";
@@ -193,16 +215,19 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
                 try {
                     if (xhr.status !== 200) {
                         handleXHRError(xhr, options);
-                        return reject({ xhr, description: `HTTP ${xhr.status}: ${xhr.statusText}!` });
+                        return reject(reason(`HTTP ${xhr.status} error on service call to '${url}': ${xhr.statusText}!`,
+                            "http-error", { status: xhr.status, statusText: xhr.statusText, url }));
                     }
 
                     let response = JSON.parse(xhr.responseText) as TResponse;
                     if (!response)
-                        return reject({ xhr, description: `Empty response received!` });
+                        return reject(reason(`Empty response received on service call to '${url}'!`,
+                            "empty-response", { url }));
 
                     if (response.Error) {
                         handleError(response, { status: xhr.status, statusText: xhr.statusText }, options);
-                        return reject({ xhr, description: response.Error.Message ?? response.Error.Code, response });
+                        return reject(reason(`Service call to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`,
+                            "service-error", { response, url }));
                     }
 
                     options.onSuccess?.(response);
@@ -218,7 +243,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
             }
         }
         catch (exception) {
-            reject({ description: exception?.toString(), exception });
+            reject(reason(`Service call to '${url}' thrown exception: ${exception.toString()}`, "exception", { cause: exception, url }));
         }
     });
 }
