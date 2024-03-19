@@ -102,7 +102,7 @@ export function getActiveRequests() {
 function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): Promise<TResponse> {
 
     if (typeof fetch !== "function")
-        return Promise.reject(reason("fetch-missing", "The fetch method is not available!"));
+        return Promise.reject(reason("The fetch method is not available!", "fetch-missing"));
 
     return (async function () {
 
@@ -133,17 +133,19 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
                 if (!fetchResponse.ok) {
                     await handleFetchError(fetchResponse, options);
-                    return Promise.reject(reason("http-error", `Service fetch to '${url}' resulted in HTTP ${fetchResponse.status} error: ${fetchResponse.statusText}!`, { fetchResponse, url }));
+                    return Promise.reject(reason(`Service fetch to '${url}' resulted in HTTP ${fetchResponse.status} error: ${fetchResponse.statusText}!`,
+                        "http-error", { fetchResponse, url }));
                 }
 
                 let response = await fetchResponse.json() as TResponse;
                 if (!response)
-                    return Promise.reject(reason("empty-response", `Received empty response from service fetch to '${url}'!`, { fetchResponse, url }));
+                    return Promise.reject(reason(`Received empty response from service fetch to '${url}'!`,
+                        "empty-response", { fetchResponse, url }));
 
                 if (response.Error) {
                     handleError(response ?? {}, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
-                    return Promise.reject(reason("service-error", `Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`, 
-                        { response, fetchResponse, url }));
+                    return Promise.reject(reason(`Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`,
+                        "service-error", { response, fetchResponse, url }));
                 }
 
                 options.onSuccess?.(response);
@@ -243,7 +245,8 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
             }
         }
         catch (exception) {
-            reject(reason(`Service call to '${url}' thrown exception: ${exception.toString()}`, "exception", { cause: exception, url }));
+            reject(reason(`Service call to '${url}' thrown exception: ${exception.toString()}`, 
+                "exception", { cause: exception, url }));
         }
     });
 }
