@@ -258,6 +258,9 @@ describe("Bootstrap noConflict", function () {
             return {
                 html: function (): any {
                     return null;
+                },
+                on: function(): any {
+                    return this;
                 }
             }
         },

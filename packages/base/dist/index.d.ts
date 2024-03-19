@@ -323,7 +323,7 @@ declare class Dialog {
     getContentNode(): HTMLElement;
     /** Gets the dialog element of the dialog */
     getDialogNode(): HTMLElement;
-    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .s-Panel */
+    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .panel-body */
     getEventsNode(): HTMLElement;
     /** Gets the footer element of the dialog */
     getFooterNode(): HTMLElement;

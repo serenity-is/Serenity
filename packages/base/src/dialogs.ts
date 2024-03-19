@@ -182,7 +182,7 @@ export class Dialog {
         if (!target)
             return;
 
-        if (target.classList.contains("s-Panel"))
+        if (target.classList.contains("panel-body"))
             closePanel(this.el);
         else if (target.classList.contains("ui-dialog-content"))
             getjQuery()?.(this.el).dialog?.("close");
@@ -203,7 +203,7 @@ export class Dialog {
         var target = getDialogEventsNode(this.el);
         if (!target)
             return;
-        if (target.classList.contains("s-Panel"))
+        if (target.classList.contains("panel-body"))
             Fluent.on(target, before ? "panelbeforeclose" : "panelclose", e => handler(this.result, e));
         else if (target.classList.contains("ui-dialog-content"))
             Fluent.on(target, before ? "dialogbeforeclose" : "dialogclose", e => handler(this.result, e));
@@ -215,7 +215,7 @@ export class Dialog {
         var target = getDialogEventsNode(this.el);
         if (!target)
             return;
-        if (target.classList.contains("s-Panel"))
+        if (target.classList.contains("panel-body"))
             Fluent.on(target, before ? "panelbeforeopen" : "panelopen", handler);
         else if (target.classList.contains("ui-dialog-content"))
             Fluent.on(target, before ? "dialogbeforeopen" : "dialogopen", handler);
@@ -229,7 +229,7 @@ export class Dialog {
         var target = getDialogEventsNode(this.el);
         if (!target)
             return;
-        if (target.classList.contains("s-Panel"))
+        if (target.classList.contains("panel-body"))
             openPanel(this.el);
         else if (target.classList.contains("ui-dialog-content"))
             getjQuery()?.(target).dialog("open");
@@ -282,7 +282,7 @@ export class Dialog {
         return getDialogNode(this.el);
     }
 
-    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .s-Panel */
+    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .panel-body */
     getEventsNode(): HTMLElement {
         return getDialogEventsNode(this.el);
     }
@@ -626,7 +626,9 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
     if (!panel || panel.classList.contains("hidden"))
         return;
 
-    let event = Fluent.trigger(panel, "panelbeforeclose", { bubbles: true });
+    var eventsNode = getDialogEventsNode(el) ?? panel;
+
+    let event = Fluent.trigger(eventsNode, "panelbeforeclose");
     if (Fluent.isDefaultPrevented(event))
         return;
     panel.classList.add("hidden");
@@ -640,7 +642,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
     Fluent.trigger(window, "resize");
     document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => Fluent.isVisibleLike(rl) && Fluent.trigger(rl, "layout"));
-    Fluent.trigger(panel, "panelclose", { bubbles: true });
+    Fluent.trigger(eventsNode, "panelclose");
 }
 
 function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: string) {
@@ -656,7 +658,9 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
         container.appendChild(panel);
     }
 
-    let event = Fluent.trigger(panel, "panelbeforeopen", { bubbles: true });
+    let eventNode = getDialogEventsNode(element) ?? panel;
+
+    let event = Fluent.trigger(eventNode, "panelbeforeopen");
     if (Fluent.isDefaultPrevented(event))
         return;
 
@@ -685,9 +689,8 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
 
     panel.classList.remove("hidden");
     delete panel.dataset.hiddenby;
-    panel.classList.add("s-Panel");
 
-    Fluent.trigger(panel, "panelopen", { bubbles: true });
+    Fluent.trigger(eventNode, "panelopen");
 }
 
 /** Returns .s-Panel, .modal, .ui-dialog */
@@ -700,17 +703,17 @@ function getDialogNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLEleme
 
 }
 
-/** Returns .s-Panel, .modal, .ui-dialog-content */
+/** Returns .panel-body, .modal, .ui-dialog-content */
 function getDialogEventsNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
     if (isArrayLike(element))
         element = element[0];
     if (!element)
         return null;
-    return element.closest(".modal, .s-Panel, .ui-dialog-content") as HTMLElement ??
-        element.closest(".ui-dialog")?.querySelector(":scope > .ui-dialog-content");
+    return element.closest(".modal, .panel-body, .ui-dialog-content") as HTMLElement ??
+        getDialogNode(element)?.querySelector(".panel-body, .ui-dialog-content");
 }
 
-/** Returns .s-Panel, .modal, .ui-dialog-content */
+/** Returns .panel-body, .modal, .ui-dialog-content */
 function getDialogContentNode(element: HTMLElement | ArrayLike<HTMLElement>): HTMLElement {
     if (isArrayLike(element))
         element = element[0];
@@ -987,6 +990,40 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
                     height: '400'
                 }
             }
+        }
+    });
+}
+
+if (typeof document !== "undefined") {
+    Fluent.on(document, "show.bs.modal", e => {
+        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+        if (body) {
+            var evt = Fluent.trigger(body, "modalbeforeopen");
+            if (Fluent.isDefaultPrevented(evt))
+                e.preventDefault();
+        }
+    });
+
+    Fluent.on(document, "shown.bs.modal", e => {
+        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+        if (body) {
+            Fluent.trigger(body, "modalopen");
+        }
+    });
+
+    Fluent.on(document, "hide.bs.modal", e => {
+        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+        if (body) {
+            var evt = Fluent.trigger(body, "modalbeforeclose");
+            if (Fluent.isDefaultPrevented(evt))
+                e.preventDefault();
+        }
+    });
+
+    Fluent.on(document, "hidden.bs.modal", e => {
+        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+        if (body) {
+            Fluent.trigger(body, "modalclose");
         }
     });
 }

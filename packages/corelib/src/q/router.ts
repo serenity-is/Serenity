@@ -19,15 +19,15 @@ export namespace Router {
         return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
     }
 
-    export function navigate(hash: string, tryBack?: boolean, silent?: boolean) {
+    export function navigate(newHash: string, tryBack?: boolean, silent?: boolean) {
         if (!enabled || resolving > 0)
             return;
 
-        hash = hash || '';
-        hash = hash.replace(/^#/, '');
-        hash = (!hash ? "" : '#' + hash);
+        newHash = newHash || '';
+        newHash = newHash.replace(/^#/, '');
+        newHash = (!newHash ? "" : '#' + newHash);
         var newURL = window.location.href.replace(/#$/, '')
-            .replace(/#.*$/, '') + hash;
+            .replace(/#.*$/, '') + newHash;
         if (newURL != window.location.href) {
             if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
                 if (silent)
@@ -43,15 +43,15 @@ export namespace Router {
                 ignoreChange();
 
             oldURL = window.location.href;
-            window.location.hash = hash;
+            window.location.hash = newHash;
         }
     }
 
-    export function replace(hash: string, tryBack?: boolean) {
-        navigate(hash, tryBack, true);
+    export function replace(newHash: string, tryBack?: boolean) {
+        navigate(newHash, tryBack, true);
     }
 
-    export function replaceLast(hash: string, tryBack?: boolean) {
+    export function replaceLast(newHash: string, tryBack?: boolean) {
         if (!enabled)
             return;
 
@@ -62,16 +62,16 @@ export namespace Router {
         var parts = current.split('/+/');
 
         if (parts.length > 1) {
-            if (hash && hash.length) {
-                parts[parts.length - 1] = hash;
-                hash = parts.join("/+/");
+            if (newHash && newHash.length) {
+                parts[parts.length - 1] = newHash;
+                newHash = parts.join("/+/");
             }
             else {
                 parts.splice(parts.length - 1, 1);
-                hash = parts.join("/+/");
+                newHash = parts.join("/+/");
             }
         }
-        replace(hash, tryBack);
+        replace(newHash, tryBack);
     }
 
     function isVisibleOrHiddenBy(el: HTMLElement): boolean {
@@ -80,7 +80,7 @@ export namespace Router {
     }
 
     function getVisibleOrHiddenByDialogs(): HTMLElement[] {
-        var visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .s-Panel, .ui-dialog-content"))
+        var visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .panel-body, .ui-dialog-content"))
             .filter(isVisibleOrHiddenBy);
         visibleDialogs.sort((a: any, b: any) => {
             return parseInt(a.dataset.qrouterorder || "0", 10) - parseInt(b.dataset.qrouterorder || "0", 10);
@@ -93,13 +93,13 @@ export namespace Router {
     let pendingDialogOwner: HTMLElement;
     let pendingDialogPreHash: string;
 
-    function onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
+    function onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
         var route = [];
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
             pendingDialogElement && 
             (element === pendingDialogElement) || (element.contains(pendingDialogElement))) {
-            hash = pendingDialogHash ?? hash;
+            dialogHash = pendingDialogHash ?? dialogHash;
             ownerEl = pendingDialogOwner;
         }
 
@@ -111,7 +111,7 @@ export namespace Router {
         ownerEl = isArrayLike(ownerEl) ? ownerEl[0] : ownerEl;
         var ownerIsDialog = ownerEl?.matches(".ui-dialog-content, .panel-body, .modal-content");
         var ownerDlgInst = Dialog.getInstance(ownerEl);
-        var value = hash();
+        var value = dialogHash();
 
         var idPrefix: string;
         if (ownerDlgInst) {
@@ -146,31 +146,31 @@ export namespace Router {
         replace(route.join("/+/"));
     }
 
-    export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, hash: () => string) {
+    export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
         if (!enabled)
             return;
 
         var el = isArrayLike(element) ? element[0] : element;
         pendingDialogElement = el;
-        pendingDialogHash = hash;
+        pendingDialogHash = dialogHash;
         pendingDialogOwner = isArrayLike(owner) ? owner[0] : owner;
         pendingDialogPreHash = resolvingPreRoute;
     }
 
     let resolvingPreRoute: string;
 
-    export function resolve(hash?: string) {
+    export function resolve(newHash?: string) {
         if (!enabled)
             return;
 
         resolving++;
         try {
-            hash = hash ?? window.location.hash ?? '';
-            if (hash.charAt(0) == '#')
-                hash = hash.substring(1);
+            newHash = newHash ?? window.location.hash ?? '';
+            if (newHash.charAt(0) == '#')
+                newHash = newHash.substring(1);
 
             var dialogs = getVisibleOrHiddenByDialogs();
-            var newParts = hash.split("/+/");
+            var newParts = newHash.split("/+/");
             var oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
             var same = 0;
@@ -282,7 +282,7 @@ export namespace Router {
 
         Fluent.on(document, "dialogopen", ".ui-dialog-content", onDocumentDialogOpen);
         Fluent.on(document, "shown.bs.modal", ".modal", onDocumentDialogOpen);
-        Fluent.on(document, "panelopen", ".s-Panel", onDocumentDialogOpen);
+        Fluent.on(document, "panelopen", ".panel-body", onDocumentDialogOpen);
 
         function shouldTryBack(e: Event) {
             if ((e.target as HTMLElement)?.closest?.(".s-MessageDialog, .s-MessageModal") ||
@@ -319,6 +319,4 @@ export namespace Router {
         Fluent.on(document, "hidden.bs.modal", closeHandler);
         Fluent.on(document, "panelclose.qrouter", closeHandler);
     }
-
-    
 }
