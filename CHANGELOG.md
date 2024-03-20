@@ -1,6 +1,13 @@
+## 8.3.9 (2024-03-20)
+
+### Bugfixes
+
+- Fluent.getWidget and Fluent.tryGetWidget uses wrong target and fails
+- Order for reason / message in service call / fetch Promise reject reason
+
 ## 8.3.8 (2024-03-19)
 
-## Features:
+### Features:
 
 - Improve generated dynamic script code behavior when Serenity is not pre-loaded
 - Make getWidget and tryGetWidget available on Fluent. It was normally available but declaration merging did not properly change "@serenity-is/base" to "@serenity-is/corelib" although base was bundled into corelib
@@ -9,7 +16,7 @@
 
 ## 8.3.7 (2024-03-10)
 
-## Features:
+### Features:
 - Added `Fluent.matches` method which is like $.is but don't support any custom selectors and calls element.matches
 - Added `Fluent.class` method which directly sets the className property. This should be preferred to addClass for element creation
 - Added a `Fluent.isDefaultPrevented` helper to overcome issues when jQuery exists or not so that we don't have to check both e.defaultPrevented and e.isDefaultPrevented?.()
@@ -21,17 +28,17 @@
 
 ## 8.3.6 (2024-03-03)
 
-## Features:
+### Features:
 - Add Fluent.byId which is shortcut for Fluent(document.getElementById)
 - Add Fluent.each and Fluent.style which executes a callback with the node or css style declaration if element is not null
 
-## Bugfixes:
+### Bugfixes:
 
 - Column resizing does not work in Firefox without jQuery resizable due to longstanding Firefox issue
 
 ## 8.3.5 (2024-02-28)
 
-## Bugfixes:
+### Bugfixes:
 
 - Avoid using js reserved words while generating variable names for compacting property item scripts
 - Fix code for disabling combobox inplace button dialog's delete button via Fluent (https://github.com/serenity-premium/startsharp/issues/915)
