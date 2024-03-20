@@ -262,14 +262,12 @@ public partial class FileUploadBehaviorTests
         };
 
         Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
-            x1 => Assert.Equal("new.jpg", x1));
+        Assert.Equal("new.jpg", Assert.Single(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName)));
 
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
-            x1 => Assert.Equal("new.jpg", x1));
+        Assert.Equal("new.jpg", Assert.Single(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName)));
     }
 
     [Fact]
@@ -305,8 +303,7 @@ public partial class FileUploadBehaviorTests
         };
 
         Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
-            x1 => Assert.Equal("old.jpg", x1));
+        Assert.Equal("old.jpg", Assert.Single(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName)));
 
         sut.OnBeforeSave(requestHandler);
         uow.Commit();

@@ -1,4 +1,4 @@
-﻿using static Serenity.Tests.CustomerEntityInputs;
+using static Serenity.Tests.CustomerEntityInputs;
 using Serenity.CodeGenerator;
 using Serenity.Data.Schema;
 
@@ -112,13 +112,13 @@ public class CustomerDataSchema : IEntityDataSchema
 
     public IEnumerable<string> GetIdentityFields(string schema, string table)
     {
-        return OnGetIdentityFields?.Invoke(schema, table) ?? Array.Empty<string>();
+        return OnGetIdentityFields?.Invoke(schema, table) ?? [];
     }
 
     public Func<string, string, IEnumerable<string>> OnGetPrimaryKeyFields;
 
     public IEnumerable<string> GetPrimaryKeyFields(string schema, string table)
     {
-        return OnGetPrimaryKeyFields?.Invoke(schema, table) ?? Array.Empty<string>();
+        return OnGetPrimaryKeyFields?.Invoke(schema, table) ?? [];
     }
 }

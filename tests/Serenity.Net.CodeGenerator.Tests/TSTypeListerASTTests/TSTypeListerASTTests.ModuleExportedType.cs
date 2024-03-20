@@ -67,25 +67,16 @@ export class PasswordEditor extends StringEditor {
         var types = tl.ExtractTypes();
 
         var stringEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib:StringEditor");
-        Assert.Collection(stringEditor.Attributes,
-            attr =>
-            {
-                Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
-                Assert.Collection(attr.Arguments, arg1 =>
-                {
-                    Assert.Equal("Serenity.StringEditor", arg1.Value);
-                }, arg2 => { });
-            });
+        var attr = Assert.Single(stringEditor.Attributes);
+        Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
+        Assert.Collection(attr.Arguments, arg1 =>
+        {
+            Assert.Equal("Serenity.StringEditor", arg1.Value);
+        }, arg2 => { });
 
         var passwordEditor = Assert.Single(types, x => x.FullName == "@serenity-is/corelib:PasswordEditor");
-        Assert.Collection(passwordEditor.Attributes,
-            attr =>
-            {
-                Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
-                Assert.Collection(attr.Arguments, arg1 =>
-                {
-                    Assert.Equal("Serenity.PasswordEditor", arg1.Value);
-                });
-            });
+        attr = Assert.Single(passwordEditor.Attributes);
+        Assert.Equal("@serenity-is/corelib:Decorators.registerEditor", attr.Type);
+        Assert.Equal("Serenity.PasswordEditor", Assert.Single(attr.Arguments).Value);
     }
 }

@@ -13,9 +13,7 @@ public class Parser
     private NodeFlags sourceFlags;
     private string sourceText;
     private ScriptTarget languageVersion;
-    private ScriptKind scriptKind;
     private LanguageVariant languageVariant;
-    //private List<Diagnostic> jsDocDiagnostics;
     public List<Diagnostic> parseDiagnostics;
     private ISyntaxCursor syntaxCursor;
 
@@ -119,9 +117,9 @@ public class Parser
         Action<SourceFile> setExternalModuleIndicatorOverride = null,
         JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseNone)
     {
-        this.scriptKind = EnsureScriptKind(fileName, scriptKind);
+        scriptKind = EnsureScriptKind(fileName, scriptKind);
 
-        if (this.scriptKind == ScriptKind.JSON)
+        if (scriptKind == ScriptKind.JSON)
             throw new ArgumentOutOfRangeException(nameof(scriptKind));
 
         InitializeState(fileName, sourceText, languageVersion, syntaxCursor, scriptKind, jsDocParsingMode);
@@ -141,7 +139,6 @@ public class Parser
         this.sourceText = sourceText;
         this.languageVersion = languageVersion;
         this.syntaxCursor = syntaxCursor;
-        this.scriptKind = scriptKind;
         languageVariant = GetLanguageVariant(scriptKind);
 
         parseDiagnostics = [];
@@ -182,7 +179,6 @@ public class Parser
         sourceText = null;
         languageVersion = ScriptTarget.Latest;
         syntaxCursor = null;
-        scriptKind = ScriptKind.Unknown!;
         languageVariant = LanguageVariant.Standard;
         sourceFlags = 0;
         parseDiagnostics = null;

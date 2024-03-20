@@ -704,21 +704,19 @@ public class StringHelperTests
     [Fact]
     public void JoinNonEmpty_Enumerable_NullValues_ReturnsEmptyString()
     {
-        Assert.Equal(string.Empty, StringHelper.JoinNonEmpty("-", (IEnumerable<string>)new string[] { null, null }));
+        Assert.Equal(string.Empty, StringHelper.JoinNonEmpty("-", (IEnumerable<string>)[null, null]));
     }
 
     [Fact]
     public void JoinNonEmpty_Enumerable_EmptyValues_ReturnsEmptyString()
     {
-        Assert.Equal(string.Empty, StringHelper.JoinNonEmpty("-", (IEnumerable<string>)new string[] { string.Empty, string.Empty }));
+        Assert.Equal(string.Empty, StringHelper.JoinNonEmpty("-", (IEnumerable<string>)[string.Empty, string.Empty]));
     }
 
     [Fact]
     public void JoinNonEmpty_Enumerable_NonEmptyValues_ReturnsJoinedString()
     {
-#pragma warning disable CA1861 // Avoid constant arrays as arguments
-        Assert.Equal("hello-world", StringHelper.JoinNonEmpty("-", (IEnumerable<string>)new string[] { "hello", "world" }));
-#pragma warning restore CA1861 // Avoid constant arrays as arguments
+        Assert.Equal("hello-world", StringHelper.JoinNonEmpty("-", (IEnumerable<string>)["hello", "world"]));
     }
 
 

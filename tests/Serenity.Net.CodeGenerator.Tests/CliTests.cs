@@ -72,8 +72,7 @@ public partial class CliTests
         var exitCode = RunCli(arguments);
         Assert.Equal(ExitCodes.Help, exitCode);
         Assert.Empty(runCalls);
-        Assert.Collection(console.WriteCalls,
-            x => Assert.Equal(CallType.Help, x.type));
+        Assert.Equal(CallType.Help, Assert.Single(console.WriteCalls).type);
     }
 
     [InlineData()]
@@ -86,8 +85,7 @@ public partial class CliTests
         var exitCode = RunCli(arguments);
         Assert.Equal(ExitCodes.NoCommand, exitCode);
         Assert.Empty(runCalls);
-        Assert.Collection(console.WriteCalls,
-            x => Assert.Equal(CallType.Help, x.type));
+        Assert.Equal(CallType.Help, Assert.Single(console.WriteCalls).type);
     }
 
     [ForAllCommands]
@@ -98,12 +96,9 @@ public partial class CliTests
         var exitCode = RunCli([command]);
         Assert.Equal(ExitCodes.NoProjectFiles, exitCode);
         Assert.Empty(runCalls);
-        Assert.Collection(console.WriteCalls,
-            x =>
-            {
-                Assert.Equal(CallType.Error, x.type);
-                Assert.Equal(Texts.NoProjectFiles, x.message);
-            });
+        var (type, message, _) = Assert.Single(console.WriteCalls);
+        Assert.Equal(CallType.Error, type);
+        Assert.Equal(Texts.NoProjectFiles, message);
     }
 
     [ForAllCommands]
@@ -114,11 +109,8 @@ public partial class CliTests
         var exitCode = RunCli([command]);
         Assert.Equal(ExitCodes.MultipleProjectFiles, exitCode);
         Assert.Empty(runCalls);
-        Assert.Collection(console.WriteCalls,
-            x =>
-            {
-                Assert.Equal(CallType.Error, x.type);
-                Assert.Equal(Texts.MultipleProjectFiles, x.message);
-            });
+        var (type, message, _) = Assert.Single(console.WriteCalls);
+        Assert.Equal(CallType.Error, type);
+        Assert.Equal(Texts.MultipleProjectFiles, message);
     }
 }

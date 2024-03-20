@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Tests;
 
@@ -14,7 +14,7 @@ public class MockImageProcessor : IImageProcessor
         formatInfo = new ImageFormatInfo
         {
             MimeType = "image/jpeg",
-            FileExtensions = new[] { ".jpg", ".jpeg" }
+            FileExtensions = [".jpg", ".jpeg"]
         };
         return new MockImage();
     }
