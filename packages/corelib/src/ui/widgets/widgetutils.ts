@@ -97,12 +97,12 @@ export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element
     return widget as TWidget;
 }
 
-Fluent.prototype.getWidget = function<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget {
-    return getWidgetFrom(this.element, type);
+Fluent.prototype.getWidget = function<TWidget>(this: Fluent, type?: { new (...args: any[]): TWidget }): TWidget {
+    return getWidgetFrom(this, type);
 }
 
-Fluent.prototype.tryGetWidget = function<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget {
-    return tryGetWidget(this.element, type);
+Fluent.prototype.tryGetWidget = function<TWidget>(this: Fluent, type?: { new (...args: any[]): TWidget }): TWidget {
+    return tryGetWidget(this, type);
 }
 
 export type IdPrefixType = { [key: string]: string, Form: string, Tabs: string, Toolbar: string, PropertyGrid: string };
