@@ -18,7 +18,7 @@ public class EnumJsonConverter : JsonConverterFactory
     /// <inheritdoc/>
     public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options) =>
         (JsonConverter)Activator.CreateInstance(
-            typeof(EnumValueConverter<>).MakeGenericType(new Type[] { type }),
+            typeof(EnumValueConverter<>).MakeGenericType([type]),
             BindingFlags.Instance | BindingFlags.Public, binder: null, args: [], culture: null);
 
     class EnumValueConverter<T> : JsonConverter<T> where T : struct

@@ -30,7 +30,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             ])
             .Select(x => FileSystem.Combine(rootDir, PathHelper.ToPath(x)));
 
-        IEnumerable<string> files = new List<string>();
+        IEnumerable<string> files = [];
         foreach (var path in searchViewPaths)
         {
             if (FileSystem.DirectoryExists(path))

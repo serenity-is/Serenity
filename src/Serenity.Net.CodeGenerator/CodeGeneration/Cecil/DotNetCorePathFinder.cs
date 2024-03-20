@@ -195,8 +195,8 @@ public class DotNetCorePathFinder
             var type = library.First()["type"].ToString();
             var path = library.First()["path"]?.ToString();
             var rti = runtimeInfos.FirstOrDefault(r => r.Name == library.Name)?.First();
-            var runtimeInfo = (rti?["runtime"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? Array.Empty<string>())
-                .Concat(rti?["compile"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? Array.Empty<string>())
+            var runtimeInfo = (rti?["runtime"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? [])
+                .Concat(rti?["compile"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? [])
                 .ToArray();
 
             yield return new DotNetCorePackageInfo(library.Name, type, path, runtimeInfo);

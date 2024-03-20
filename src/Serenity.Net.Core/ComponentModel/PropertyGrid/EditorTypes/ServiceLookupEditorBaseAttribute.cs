@@ -1,19 +1,15 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Base class for service lookup based editor types
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
-public abstract class ServiceLookupEditorBaseAttribute : CustomEditorAttribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="ServiceLookupEditorBaseAttribute"/> class.
+/// </remarks>
+/// <param name="editorType">Type of the editor.</param>
+public abstract class ServiceLookupEditorBaseAttribute(string editorType) : CustomEditorAttribute(editorType)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ServiceLookupEditorBaseAttribute"/> class.
-    /// </summary>
-    /// <param name="editorType">Type of the editor.</param>
-    protected ServiceLookupEditorBaseAttribute(string editorType)
-        : base(editorType)
-    {
-    }
 
     /// <summary>
     /// List service url, e.g. Northwind/Customer/List.

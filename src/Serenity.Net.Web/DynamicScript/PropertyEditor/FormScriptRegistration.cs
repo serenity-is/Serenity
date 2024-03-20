@@ -32,10 +32,10 @@ public class FormScriptRegistration
             scripts.Add(script);
         }
 
-        scriptManager.Register("FormBundle", new ConcatenatedScript(new Func<string>[]
-        {
+        scriptManager.Register("FormBundle", new ConcatenatedScript(
+        [
             () => PropertyItemsScript.Compact(scripts.Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-        }));
+        ]));
 
         return scripts;
     }

@@ -19,7 +19,7 @@ public class NullAsDefaultJsonConverter : JsonConverterFactory
     public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options) =>
         (JsonConverter)Activator.CreateInstance(
             typeof(MyConverter<>).MakeGenericType(
-                new Type[] { type }),
+                [type]),
             BindingFlags.Instance | BindingFlags.Public,
             binder: null,
             args: [],

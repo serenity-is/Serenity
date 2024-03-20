@@ -32,10 +32,10 @@ public class ColumnsScriptRegistration
             scripts.Add(script);
         }
 
-        scriptManager.Register("ColumnsBundle", new ConcatenatedScript(new Func<string>[]
-        {
+        scriptManager.Register("ColumnsBundle", new ConcatenatedScript(
+        [
             () => PropertyItemsScript.Compact(scripts.Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-        }));
+        ]));
 
         return scripts;
     }

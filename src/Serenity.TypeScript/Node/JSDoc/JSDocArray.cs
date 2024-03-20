@@ -7,7 +7,7 @@ public class JSDocArray : List<JSDoc>
     }
 
     public JSDocArray(JSDoc[] elements)
-        : base(elements.ToList())
+        : base([.. elements])
     {
     }
 

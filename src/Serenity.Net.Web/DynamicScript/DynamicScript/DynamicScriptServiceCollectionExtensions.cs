@@ -191,11 +191,10 @@ public static class DynamicScriptServiceCollectionExtensions
             typeSource, propertyProvider, serviceProvider);
 
         scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
-            new Func<string>[]
-            {
+            [
                 () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
                     .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-            }));
+            ]));
 
         return serviceProvider;
     }

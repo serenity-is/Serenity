@@ -312,7 +312,7 @@ public partial class TSModuleResolver
         if (allDependencies is not null)
             return allDependencies;
 
-        PackageJson packageJson = null;
+        PackageJson packageJson;
         var path = tsBasePath;
         do
         {

@@ -2,13 +2,13 @@ namespace Serenity.TypeScript;
 
 partial class Scanner
 {
-    private static bool IsIdentifierStart(int ch, ScriptTarget _languageVersion)
+    private static bool IsIdentifierStart(int ch, ScriptTarget _)
     {
         return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '$' || ch == '_' ||
             (ch > CharacterCodes.MaxAsciiCharacter && IsUnicodeIdentifierStart(ch));
     }
 
-    private static bool IsIdentifierPart(int ch, ScriptTarget _languageVersion, LanguageVariant identifierVariant = LanguageVariant.Standard)
+    private static bool IsIdentifierPart(int ch, ScriptTarget _, LanguageVariant identifierVariant = LanguageVariant.Standard)
     {
         return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ||
             (ch >= '0' && ch <= '9') || ch == '$' || ch == '_' ||
@@ -38,7 +38,7 @@ partial class Scanner
 
         for (var i = CharSize(ch); i < name.Length; i += CharSize(ch))
         {
-            if (!IsIdentifierPart((int)name[i], languageVersion, identifierVariant))
+            if (!IsIdentifierPart(name[i], languageVersion, identifierVariant))
             {
                 return false;
             }

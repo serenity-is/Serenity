@@ -19,7 +19,6 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     public string ProjectFile => projectFile;
 
     private static readonly char[] complexValueChars = [';', '$', '@'];
-    private static readonly char[] propertySeps = [',', ';'];
 
     /// <summary>
     /// Callback for tests to validate MSBuild execution arguments

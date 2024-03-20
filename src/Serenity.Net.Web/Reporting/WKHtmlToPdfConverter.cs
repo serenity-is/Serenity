@@ -44,16 +44,16 @@ public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
                 ["wkhtmltopdf.exe", "wkhtmltopdf.cmd", "wkhtmltopdf.bat"] :
                 ["wkhtmltopdf", "wkhtmltopdf.sh"];
 
-        IEnumerable<string> paths = new[] { assemblyPath };
+        IEnumerable<string> paths = [assemblyPath];
         string contentRootPath = webHostEnvironment?.ContentRootPath;
         if (!string.IsNullOrEmpty(contentRootPath))
-            paths = paths.Concat(new[]
-            {
+            paths = paths.Concat(
+            [
                 fileSystem.Combine(contentRootPath),
                 fileSystem.Combine(contentRootPath, "App_Data", "Reporting"),
                 fileSystem.Combine(contentRootPath, "App_Data", "reporting"),
                 fileSystem.Combine(contentRootPath, "bin")
-            });
+            ]);
 
         paths = paths.Concat((Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'));
 

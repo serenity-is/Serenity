@@ -2,7 +2,7 @@ namespace Serenity.TypeScript;
 
 partial class Scanner
 {
-    private static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default)
+    internal static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default)
     {
         int pendingPos = 0;
         int pendingEnd = 0;

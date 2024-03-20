@@ -1,20 +1,15 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Base class for lookup based editor types
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
-public abstract class LookupEditorBaseAttribute : CustomEditorAttribute
+/// <remarks>
+/// Initializes a new instance of the <see cref="LookupEditorBaseAttribute"/> class.
+/// </remarks>
+/// <param name="editorType">Type of the editor.</param>
+public abstract class LookupEditorBaseAttribute(string editorType) : CustomEditorAttribute(editorType)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LookupEditorBaseAttribute"/> class.
-    /// </summary>
-    /// <param name="editorType">Type of the editor.</param>
-    protected LookupEditorBaseAttribute(string editorType)
-        : base(editorType)
-    {
-    }
-
     /// <summary>
     /// Lookup key, e.g. Northwind.CustomerCity
     /// </summary>

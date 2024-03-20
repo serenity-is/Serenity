@@ -80,7 +80,7 @@ public class OracleSchemaProvider : ISchemaProvider
     /// <returns></returns>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
-        return new List<string>();
+        return [];
     }
 
     /// <summary>

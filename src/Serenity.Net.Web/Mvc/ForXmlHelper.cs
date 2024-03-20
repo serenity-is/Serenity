@@ -21,7 +21,7 @@ public static class ForXmlHelper
     {
         forXml = forXml.TrimToNull();
         if (forXml == null)
-            return new List<XElement>();
+            return [];
 
         var node = XElement.Parse("<root>" + forXml + "</root>");
         return node.Descendants("row");

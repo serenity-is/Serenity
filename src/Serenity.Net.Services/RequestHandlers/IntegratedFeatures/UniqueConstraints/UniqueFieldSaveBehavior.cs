@@ -40,7 +40,7 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
             Target.IsNull(handler.Row))
             return;
 
-        ValidateUniqueConstraint(handler, new Field[] { Target }, localizer,
+        ValidateUniqueConstraint(handler, [Target], localizer,
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
     }

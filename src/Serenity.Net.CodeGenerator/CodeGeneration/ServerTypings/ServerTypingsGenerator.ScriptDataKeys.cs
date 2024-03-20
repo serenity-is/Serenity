@@ -68,7 +68,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             .Where(x => x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
                 .ToList();
 
-        if (!list.Any())
+        if (list.Count == 0)
             return;
 
         list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));

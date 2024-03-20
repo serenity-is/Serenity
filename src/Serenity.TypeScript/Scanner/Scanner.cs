@@ -30,7 +30,7 @@ public partial class Scanner
 
     private ScriptTarget languageVersion = ScriptTarget.Latest;
     private LanguageVariant languageVariant;
-    private bool skipTrivia;
+    private readonly bool skipTrivia;
 
     private ErrorCallback onError;
 
@@ -2116,32 +2116,6 @@ public partial class Scanner
             tokenValue = saveTokenValue;
             tokenFlags = saveTokenFlags;
         }
-        return result;
-    }
-
-    T ScanRange<T>(int start, int length, Func<T> callback)
-    {
-        var saveEnd = end;
-        var savePos = pos;
-        var saveStartPos = fullStartPos;
-        var saveTokenPos = tokenStart;
-        var saveToken = token;
-        var saveTokenValue = tokenValue;
-        var saveTokenFlags = tokenFlags;
-        var saveErrorExpectations = commentDirectives;
-
-        SetText(text, start, length);
-        var result = callback();
-
-        end = saveEnd;
-        pos = savePos;
-        fullStartPos = saveStartPos;
-        tokenStart = saveTokenPos;
-        token = saveToken;
-        tokenValue = saveTokenValue;
-        tokenFlags = saveTokenFlags;
-        commentDirectives = saveErrorExpectations;
-
         return result;
     }
 

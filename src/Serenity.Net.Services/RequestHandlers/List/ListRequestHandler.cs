@@ -256,7 +256,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             {
                 var nameField = Row.NameField;
                 if (nameField is not null)
-                    return new Field[] { nameField };
+                    return [nameField];
             }
 
             return fields;
@@ -270,7 +270,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             throw new ArgumentOutOfRangeException("containsField");
         }
 
-        return new Field[] { field };
+        return [field];
     }
 
     /// <summary>
@@ -721,7 +721,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
             // if any of fields are invalid, return an empty array to avoid errors
             if (result.Any(x => x is null))
-                return new Field[0];
+                return [];
 
             return result;
         }

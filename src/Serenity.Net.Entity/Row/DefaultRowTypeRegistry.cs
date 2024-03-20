@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Default row type registry
@@ -31,7 +31,7 @@ public class DefaultRowTypeRegistry(ITypeSource typeSource) : IRowTypeRegistry
     public IEnumerable<Type> ByConnectionKey(string connectionKey)
     {
         if (string.IsNullOrEmpty(connectionKey))
-            return Array.Empty<Type>();
+            return [];
 
         return AllRowTypes.Where(x => x.GetCustomAttribute<ConnectionKeyAttribute>()?.Value == connectionKey);
     }

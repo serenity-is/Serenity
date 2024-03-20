@@ -96,10 +96,10 @@ public class SqliteSchemaProvider : ISchemaProvider
         if (fields.Count() == 1 &&
             fields.First().type == "INTEGER")
         {
-            return new List<string> { fields.First().name };
+            return [fields.First().name];
         };
 
-        return new List<string> { "ROWID" };
+        return ["ROWID"];
     }
 
     private class PrimaryKeySource

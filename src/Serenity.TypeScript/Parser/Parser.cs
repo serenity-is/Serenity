@@ -119,9 +119,9 @@ public class Parser
         Action<SourceFile> setExternalModuleIndicatorOverride = null,
         JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseNone)
     {
-        scriptKind = EnsureScriptKind(fileName, scriptKind);
+        this.scriptKind = EnsureScriptKind(fileName, scriptKind);
 
-        if (scriptKind == ScriptKind.JSON)
+        if (this.scriptKind == ScriptKind.JSON)
             throw new ArgumentOutOfRangeException(nameof(scriptKind));
 
         InitializeState(fileName, sourceText, languageVersion, syntaxCursor, scriptKind, jsDocParsingMode);
@@ -526,11 +526,6 @@ public class Parser
         return currentToken = scanner.ScanJsDocToken();
     }
 
-    SyntaxKind NextJSDocCommentTextToken(bool inBackticks)
-    {
-        return currentToken = scanner.ScanJSDocCommentTextToken(inBackticks);
-    }
-
     SyntaxKind ReScanGreaterToken()
     {
         return currentToken = scanner.ReScanGreaterToken();
@@ -549,11 +544,6 @@ public class Parser
     SyntaxKind ReScanLessThanToken()
     {
         return currentToken = scanner.ReScanLessThanToken();
-    }
-
-    SyntaxKind ReScanHashToken()
-    {
-        return currentToken = scanner.ReScanHashToken();
     }
 
     SyntaxKind ScanJsxIdentifier()
@@ -686,9 +676,6 @@ public class Parser
         return false;
     }
 
-    static readonly string[] viableKeywordSuggestions = textToKeyword.Keys.Where(keyword => keyword.Length > 2).ToArray();
-
-
     // Provides a better error message than the generic "';' expected" if possible for
     // known common variants of a missing semicolon, such as from a misspelled names.
     // 
@@ -780,22 +767,6 @@ public class Parser
         }
     }
 
-    static string GetSpaceSuggestion(string expressionText)
-    {
-        if (string.IsNullOrEmpty(expressionText))
-            return null;
-
-        foreach (var keyword in viableKeywordSuggestions)
-        {
-            if (expressionText.Length > keyword.Length + 2 && expressionText.StartsWith(keyword, StringComparison.Ordinal))
-            {
-                return $"{keyword} ${expressionText[(keyword.Length)..]}";
-            }
-        }
-
-        return null;
-    }
-
     void ParseSemicolonAfterPropertyName(IPropertyName name, ITypeNode type, IExpression initializer)
     {
         if (Token() == SyntaxKind.AtToken && !scanner.HasPrecedingLineBreak())
@@ -838,18 +809,6 @@ public class Parser
         ParseErrorForMissingSemicolonAfter(name);
     }
 
-    bool ParseExpectedJSDoc(SyntaxKind kind)
-    {
-        if (Token() == kind)
-        {
-            NextTokenJSDoc();
-            return true;
-        }
-        Debug.Assert(IsKeywordOrPunctuation(kind));
-        ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(kind));
-        return false;
-    }
-
     void ParseExpectedMatchingBrackets(SyntaxKind _1, SyntaxKind closeKind, bool openParsed, int _2)
     {
         if (Token() == closeKind)
@@ -883,28 +842,10 @@ public class Parser
         return null;
     }
 
-    T ParseOptionalTokenJSDoc<T>(SyntaxKind t) where T : class, INode, new()
-    {
-        if (Token() == t)
-        {
-            return ParseTokenNodeJSDoc<T>();
-        }
-        return null;
-    }
-
     T ParseExpectedToken<T>(SyntaxKind t, DiagnosticMessage diagnosticMessage = null, string arg0 = null) where T : class, INode, new()
     {
         return ParseOptionalToken<T>(t) ??
             CreateMissingNode<T>(t, reportAtCurrentPosition: false, diagnosticMessage ?? Diagnostics._0_expected, arg0 ?? TokenToString(t));
-    }
-
-    T ParseExpectedTokenJSDoc<T>(SyntaxKind t) where T : class, INode, new()
-    {
-        var optional = ParseOptionalTokenJSDoc<T>(t);
-        if (optional != null)
-            return optional;
-        Debug.Assert(IsKeywordOrPunctuation(t));
-        return CreateMissingNode<T>(t, reportAtCurrentPosition: false, Diagnostics._0_expected, TokenToString(t));
     }
 
     T ParseTokenNode<T>() where T : INode, new()
@@ -912,14 +853,6 @@ public class Parser
         var pos = GetNodePos();
         var kind = Token();
         NextToken();
-        return FinishNode(new T() { Kind = kind }, pos);
-    }
-
-    T ParseTokenNodeJSDoc<T>() where T : INode, new()
-    {
-        var pos = GetNodePos();
-        var kind = Token();
-        NextTokenJSDoc();
         return FinishNode(new T() { Kind = kind }, pos);
     }
 

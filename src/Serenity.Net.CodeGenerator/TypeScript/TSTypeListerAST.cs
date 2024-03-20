@@ -1038,7 +1038,7 @@ public class TSTypeListerAST
                 catch
                 {
                     // if parser fails it is better to return an empty source file, log to console for sergen
-                    Console.Error.WriteLine("Error parsing file: ", fileFullPath);
+                    Console.Error.WriteLine("Error parsing file: {0}", fileFullPath);
                     return new SourceFile();
                 }
             }

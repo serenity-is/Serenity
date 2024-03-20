@@ -346,7 +346,7 @@ public partial class CssBundleManager : ICssBundleManager
             if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
                 return includes;
 
-            return Array.Empty<string>();
+            return [];
         }
     }
 

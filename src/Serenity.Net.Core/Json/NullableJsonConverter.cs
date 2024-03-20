@@ -19,7 +19,7 @@ public class NullableJsonConverter : JsonConverterFactory
     public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options) =>
         (JsonConverter)Activator.CreateInstance(
             typeof(NullableValueConverter<>).MakeGenericType(
-                new Type[] { Nullable.GetUnderlyingType(type) }),
+                [Nullable.GetUnderlyingType(type)]),
             BindingFlags.Instance | BindingFlags.Public,
             binder: null,
             args: [],
