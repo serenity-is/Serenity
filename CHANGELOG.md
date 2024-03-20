@@ -1,3 +1,9 @@
+## 8.4.0 (2024-03-20)
+
+### Bugfixes
+
+- Panel root element is not removed on destroy
+
 ## 8.3.9 (2024-03-20)
 
 ### Bugfixes

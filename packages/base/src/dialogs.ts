@@ -486,11 +486,13 @@ export class Dialog {
                     }
                     this.el?.classList.remove("modal-body");
                 }
-                else
+                else {
                     this.el?.classList.remove("panel-body");
+                    target = target.closest(".s-Panel") ?? target;
+                }
             }
             finally {
-                Fluent(target).remove();
+                Fluent.remove(target);
             }
         }
         finally {
