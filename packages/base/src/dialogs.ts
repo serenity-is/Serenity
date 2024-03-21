@@ -425,6 +425,7 @@ export class Dialog {
         if (opt.closeButton) {
             Fluent("button")
                 .class("panel-titlebar-close")
+                .attr("type", "button")
                 .on("click", this.close.bind(this, null))
                 .appendTo(titlebar);
         }
@@ -524,6 +525,7 @@ function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     if (iconClass)
         html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
     let button = document.createElement("button");
+    button.type = "button";
     button.classList.add("btn");
     Fluent.addClass(button, x.cssClass ?? "btn-secondary");
     if (x.hint)
