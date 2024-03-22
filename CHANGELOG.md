@@ -1,3 +1,10 @@
+## 8.4.1 (2024-03-22)
+
+## Features:
+
+- The url method in jquery validate port made functional again.
+- JsonField.ValueFromJson is now be able to read from non string fields just like Newtonsoft version did before the System.Text.Json switch
+
 ## 8.4.0 (2024-03-20)
 
 ### Bugfixes
