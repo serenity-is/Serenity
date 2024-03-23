@@ -3156,7 +3156,7 @@ class MultiSelect2 extends AbstractSelect2 {
         if (this.select || this.opts.element.value !== "") {
             var self = this;
             this.opts.initSelection.call(null, this.opts.element, function (data: Select2Item[]) {
-                if (!this.container)
+                if (!self.container)
                     return;
                 if (data !== undefined && data !== null) {
                     self.updateSelection(data);
