@@ -439,11 +439,14 @@ Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { re
 Fluent.ready = function (callback: () => void) {
     if (!callback)
         return;
+    
     let $ = getjQuery();
     if ($) {
         $(callback);
+        return;
     }
-    else if (typeof document !== "undefined" && document.readyState === 'loading') {
+    
+    if (typeof document !== "undefined" && document.readyState === 'loading') {
         const loaded = () => {
             document.removeEventListener('DOMContentLoaded', loaded);
             callback();
@@ -451,9 +454,8 @@ Fluent.ready = function (callback: () => void) {
         document.addEventListener('DOMContentLoaded', loaded);
         return;
     }
-    else {
-        setTimeout(callback, 0);
-    }
+        
+    setTimeout(callback, 0);
 }
 
 Fluent.byId = function <TElement extends HTMLElement>(id: string): Fluent<TElement> {

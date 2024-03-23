@@ -1635,6 +1635,7 @@ declare namespace Serenity {
     }
     function hasBSModal(): boolean;
     function hasUIDialog(): boolean;
+    function uiAndBSButtonNoConflict(): void;
     function okDialogButton(opt?: DialogButton): DialogButton;
     function yesDialogButton(opt?: DialogButton): DialogButton;
     function noDialogButton(opt?: DialogButton): DialogButton;
