@@ -2591,7 +2591,6 @@ class SingleSelect2 extends AbstractSelect2 {
      * Sets selection based on source element's value
      */
     protected initSelection() {
-        var selected;
         if (this.isPlaceholderOptionSelected()) {
             this.updateSelection(null);
             this.close();
