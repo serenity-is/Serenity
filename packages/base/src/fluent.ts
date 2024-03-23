@@ -20,7 +20,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     hasClass(klass: string): boolean;
     hide(): this;
-    getWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
+    getWidget<TWidget>(type?: { new(...args: any[]): TWidget }): TWidget;
     insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
     [Symbol.iterator]: TElement[];
@@ -52,7 +52,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     toggle(flag?: boolean): this;
     toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
     trigger(type: string, args?: any): this;
-    tryGetWidget<TWidget>(type?: { new (...args: any[]): TWidget }): TWidget;
+    tryGetWidget<TWidget>(type?: { new(...args: any[]): TWidget }): TWidget;
     val(value: string): this;
     val(): string;
 }
@@ -139,19 +139,19 @@ export namespace Fluent {
             return "" + value;
         return "";
     }
-    
+
     export function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
         return isInputTag(node?.nodeName);
     }
-    
+
     export const inputLikeSelector = "input,select,textarea,button";
-    
+
     export function isInputTag(tag: string) {
         return /^(?:input|select|textarea|button)$/i.test(tag);
     }
 
     export function isDefaultPrevented(e: { defaultPrevented?: boolean, isDefaultPrevented?: () => boolean }) {
-        return e != null && (!!e.defaultPrevented || 
+        return e != null && (!!e.defaultPrevented ||
             (typeof e.isDefaultPrevented === "function" && !!e.isDefaultPrevented()));
     }
 
@@ -346,7 +346,7 @@ Fluent.prototype.matches = function (this: FluentThis, selector?: string): boole
 Fluent.prototype.nextSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
     var sibling = this.el?.nextElementSibling;
     while (sibling && selector != null && !sibling.matches(selector))
-        sibling = sibling.nextElementSibling;    
+        sibling = sibling.nextElementSibling;
     return new (Fluent as any)(sibling);
 }
 
@@ -362,7 +362,7 @@ Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fl
 Fluent.prototype.prevSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
     var sibling = this.el?.previousElementSibling;
     while (sibling && selector != null && !sibling.matches(selector))
-        sibling = sibling.previousElementSibling;    
+        sibling = sibling.previousElementSibling;
     return new (Fluent as any)(sibling);
 }
 
@@ -437,19 +437,26 @@ Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { re
 
 
 Fluent.ready = function (callback: () => void) {
+    if (!callback)
+        return;
     let $ = getjQuery();
     if ($) {
         $(callback);
     }
-    else if (typeof document !== "undefined") {
-        if (document.readyState === 'loading')
-            document.addEventListener('DOMContentLoaded', callback);
-        else
-            setTimeout(callback, 0);
+    else if (typeof document !== "undefined" && document.readyState === 'loading') {
+        const loaded = () => {
+            document.removeEventListener('DOMContentLoaded', loaded);
+            callback();
+        }
+        document.addEventListener('DOMContentLoaded', loaded);
+        return;
+    }
+    else {
+        setTimeout(callback, 0);
     }
 }
 
-Fluent.byId = function<TElement extends HTMLElement>(id: string): Fluent<TElement> {
+Fluent.byId = function <TElement extends HTMLElement>(id: string): Fluent<TElement> {
     return Fluent<TElement>(document.getElementById(id) as TElement);
 }
 

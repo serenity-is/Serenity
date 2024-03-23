@@ -1,13 +1,13 @@
 import { Dialog, alertDialog, confirmDialog, iframeDialog, informationDialog, successDialog, uiAndBSButtonNoConflict, warningDialog, type MessageDialogOptions } from "./dialogs";
 import { Fluent } from "./fluent";
 
-function cleanup() {
+afterEach(function cleanup() {
     document.body.innerHTML = "";
     delete (window as any)["$"]
     delete (window as any)["jQuery"]
     delete (window as any)["bootstrap"]
     jest.restoreAllMocks();
-}
+});
 
 function mockUndefinedJQuery() {
     delete (window as any)["jQuery"]
@@ -180,8 +180,6 @@ function mockJQueryWithUIDialog(): any {
 
 describe("Bootstrap version detection", () => {
 
-    afterEach(cleanup);
-
     it('detects BS3 when modal version starts with 3', async function () {
         let jQuery = mockJQueryWithBootstrapModal();
         jQuery.fn.modal.Constructor.VERSION = "3.3.1";
@@ -248,7 +246,6 @@ describe("Bootstrap version detection", () => {
 });
 
 describe("Bootstrap noConflict", function () {
-    afterEach(cleanup);
 
     function setupDummyJQuery() {
         return (window as any)["jQuery"] = Object.assign(function () {
@@ -356,8 +353,6 @@ describe("Bootstrap noConflict", function () {
 
 
 describe("alertDialog", () => {
-    afterEach(cleanup);
-
     it('alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
         let alertSpy = jest.spyOn(window, "alert");
         try {
@@ -474,7 +469,6 @@ describe("alertDialog", () => {
 });
 
 describe("informationDialog", () => {
-    afterEach(cleanup);
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
@@ -531,8 +525,6 @@ describe("informationDialog", () => {
 
 describe("warningDialog", () => {
 
-    afterEach(cleanup);
-
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
@@ -549,7 +541,6 @@ describe("warningDialog", () => {
 });
 
 describe("confirmDialog", () => {
-    afterEach(cleanup);
 
     it('uses window.confirm when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
@@ -672,7 +663,6 @@ describe("confirmDialog", () => {
 });
 
 describe("successDialog", () => {
-    afterEach(cleanup);
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
@@ -731,7 +721,6 @@ describe("successDialog", () => {
 });
 
 describe("iframeDialog", () => {
-    afterEach(cleanup);
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
@@ -816,7 +805,6 @@ describe("iframeDialog", () => {
 });
 
 describe("dialog button icon handling", () => {
-    afterEach(cleanup);
 
     it("auto prefixes icons with 'fa-' prefix with 'fa' with BS5+ and no JQuery", async function () {
         mockBS5PlusWithUndefinedJQuery();
@@ -840,7 +828,6 @@ describe("dialog button icon handling", () => {
 });
 
 //describe("dialogButtonToBS", () => {
-//    afterEach(cleanup);
 //    it("converts dialog button to BS5+ button", async function () {
 //        mockBS5PlusWithUndefinedJQuery();
 //        const dialogs = await import("./dialogs");
@@ -912,7 +899,6 @@ describe("dialog button icon handling", () => {
 //});
 //
 //describe("dialogButtonToUI", () => {
-//    afterEach(cleanup);
 //    it("html encodes by default", async function () {
 //        const dialogs = (await import("./dialogs"));
 //        let button = dialogs.dialogButtonToUI({ text: "<div>x</div>" });
@@ -939,7 +925,6 @@ describe("dialog button icon handling", () => {
 //});
 
 describe("Dialog.close", () => {
-    afterEach(cleanup);
 
     it("ignores when element is null or undefined", async function () {
         new Dialog(null).close();
@@ -1161,7 +1146,6 @@ describe("Dialog.close", () => {
 });
 
 describe("Dialog panels", () => {
-    afterEach(cleanup);
 
     it("can open panel via jQuery", async function () {
         let jQuery = mockJQuery({});
@@ -1261,8 +1245,6 @@ describe("Dialog panels", () => {
 });
 
 describe("modal event propagation to modal-body", () => {
-
-    afterEach(cleanup);
 
     it("installs an event propagation handler for show.bs.modal to modal body as modalbeforeopen event", () => {
         const spy = jest.fn();
