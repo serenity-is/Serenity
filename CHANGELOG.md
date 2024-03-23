@@ -1,3 +1,9 @@
+## 8.4.2 (2024-03-24)
+
+### Bugfixes:
+
+- Fix select2 null ref error in some cases
+
 ## 8.4.1 (2024-03-22)
 
 ## Features:
