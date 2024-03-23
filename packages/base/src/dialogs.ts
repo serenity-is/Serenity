@@ -295,7 +295,7 @@ export class Dialog {
     /** Gets the header element of the dialog */
     getHeaderNode(): HTMLElement {
         return this.getDialogNode()?.querySelector(".modal-header, .panel-titlebar, .ui-dialog-titlebar");
-    }  
+    }
 
     private onButtonClick(e: MouseEvent, btn: DialogButton) {
         e ??= new Event("click") as MouseEvent;
@@ -360,7 +360,7 @@ export class Dialog {
 
         Fluent("div")
             .class([
-                "modal-dialog", 
+                "modal-dialog",
                 opt.size && "modal-" + opt.size,
                 opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
                 opt.centered && "modal-dialog-centered",
@@ -389,7 +389,7 @@ export class Dialog {
             var modalObj = new bootstrap.Modal(modal.getNode(), modalOpt);
             if (modalObj && modalObj._focustrap && modalObj._focustrap._handleFocusin) {
                 var org: Function = modalObj._focustrap._handleFocusin;
-                modalObj._focustrap._handleFocusin = function(event: Event) {
+                modalObj._focustrap._handleFocusin = function (event: Event) {
                     if (event.target &&
                         (event.target as any).closest('.ui-datepicker, .select2-drop, .cke, .cke_dialog, .flatpickr-calendar'))
                         return;
@@ -415,7 +415,7 @@ export class Dialog {
 
         this.el.classList.add("panel-body");
 
-        if (this.el.parentElement && 
+        if (this.el.parentElement &&
             this.el.parentElement !== document.body) {
             this.el.parentElement.insertBefore(panel.getNode(), this.el);
         }
@@ -510,14 +510,16 @@ export function hasUIDialog() {
     return !!(getjQuery()?.ui?.dialog);
 }
 
-(function () {
+export function uiAndBSButtonNoConflict() {
     const $ = getjQuery();
 
     // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
     if ($ && $.fn?.button?.noConflict && $.ui?.button) {
         $.fn.btn = $.fn.button.noConflict();
     }
-})();
+}
+
+uiAndBSButtonNoConflict();
 
 function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     let html = htmlEncode(x.text);
@@ -655,7 +657,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
     if (!panel)
         return;
 
-    let container = panel.parentElement && panel.parentElement !== document.body ? panel.parentElement : 
+    let container = panel.parentElement && panel.parentElement !== document.body ? panel.parentElement :
         (document.querySelector('.panels-container') ?? document.querySelector('section.content') as HTMLElement ?? panel.parentElement ?? document.body);
 
     if (panel.parentElement !== container) {
@@ -736,15 +738,6 @@ export interface MessageDialogOptions extends DialogOptions {
     /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
 }
-
-(function () {
-    const $ = getjQuery();
-
-    // if both jQuery UI and bootstrap button exists, prefer jQuery UI button as UI dialog needs them
-    if ($ && $.fn?.button?.noConflict && $.ui?.button) {
-        $.fn.btn = $.fn.button.noConflict();
-    }
-})();
 
 function getMessageBodyHtml(message: string, options?: MessageDialogOptions): string {
     let encode = options == null || options.htmlEncode == null || options.htmlEncode;
@@ -998,36 +991,55 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
     });
 }
 
-if (typeof document !== "undefined") {
-    Fluent.on(document, "show.bs.modal", e => {
-        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
-        if (body) {
-            var evt = Fluent.trigger(body, "modalbeforeopen");
-            if (Fluent.isDefaultPrevented(evt))
-                e.preventDefault();
-        }
-    });
-
-    Fluent.on(document, "shown.bs.modal", e => {
-        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
-        if (body) {
-            Fluent.trigger(body, "modalopen");
-        }
-    });
-
-    Fluent.on(document, "hide.bs.modal", e => {
-        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
-        if (body) {
-            var evt = Fluent.trigger(body, "modalbeforeclose");
-            if (Fluent.isDefaultPrevented(evt))
-                e.preventDefault();
-        }
-    });
-
-    Fluent.on(document, "hidden.bs.modal", e => {
-        var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
-        if (body) {
-            Fluent.trigger(body, "modalclose");
-        }
-    });
+const modalShow = (e: Event) => {
+    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    if (body) {
+        var evt = Fluent.trigger(body, "modalbeforeopen");
+        if (Fluent.isDefaultPrevented(evt))
+            e.preventDefault();
+    }
 }
+
+const modalShown = (e: Event) => {
+    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    if (body) {
+        Fluent.trigger(body, "modalopen");
+    }
+}
+
+const modalHide = (e: Event) => {
+    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    if (body) {
+        var evt = Fluent.trigger(body, "modalbeforeclose");
+        if (Fluent.isDefaultPrevented(evt))
+            e.preventDefault();
+    }
+}
+
+const modalHidden = (e: Event) => {
+    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    if (body) {
+        Fluent.trigger(body, "modalclose");
+    }
+}
+
+function installBsModalEventPropagation() {
+    uninstallBsModalEventPropagation();
+    if (typeof document === "undefined" || typeof document.addEventListener !== "function")
+        return;
+    document.addEventListener("show.bs.modal", modalShow);
+    document.addEventListener("shown.bs.modal", modalShown);
+    document.addEventListener("hide.bs.modal", modalHide);
+    document.addEventListener("hidden.bs.modal", modalHidden);
+}
+
+function uninstallBsModalEventPropagation() {
+    if (typeof document === "undefined" || typeof document.removeEventListener !== "function")
+        return;
+    document.removeEventListener("show.bs.modal", modalShow);
+    document.removeEventListener("shown.bs.modal", modalShown);
+    document.removeEventListener("hide.bs.modal", modalHide);
+    document.removeEventListener("hidden.bs.modal", modalHidden);
+}
+
+installBsModalEventPropagation();

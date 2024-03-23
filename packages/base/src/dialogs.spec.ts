@@ -1,21 +1,17 @@
-import { Dialog, type MessageDialogOptions } from "./dialogs";
+import { Dialog, alertDialog, confirmDialog, iframeDialog, informationDialog, successDialog, uiAndBSButtonNoConflict, warningDialog, type MessageDialogOptions } from "./dialogs";
 import { Fluent } from "./fluent";
 
-jest.mock("./localtext", () => ({
-    ...jest.requireActual("./localtext"),
-    localText: (key: string, def: string) => def ?? ("Local" + key)
-}));
-
-beforeEach(() => {
+function cleanup() {
     document.body.innerHTML = "";
+    delete (window as any)["$"]
     delete (window as any)["jQuery"]
     delete (window as any)["bootstrap"]
-    jest.resetModules();
     jest.restoreAllMocks();
-})
+}
 
 function mockUndefinedJQuery() {
     delete (window as any)["jQuery"]
+    delete (window as any)["$"]
 }
 
 function mockUndefinedBS5Plus() {
@@ -104,7 +100,7 @@ function mockJQuery(fn: any) {
             triggerHandler: function (ev: any) {
                 this._selector?.dispatchEvent?.(typeof ev === "string" ? new Event(ev) : ev);
                 return this;
-            },            
+            },
             hasClass: function (cls: string) {
                 return !!this._selector?.classList?.contains(cls);
             },
@@ -184,11 +180,12 @@ function mockJQueryWithUIDialog(): any {
 
 describe("Bootstrap version detection", () => {
 
+    afterEach(cleanup);
+
     it('detects BS3 when modal version starts with 3', async function () {
         let jQuery = mockJQueryWithBootstrapModal();
         jQuery.fn.modal.Constructor.VERSION = "3.3.1";
-        let dialogs = await import("./dialogs");
-        dialogs.alertDialog("hello");
+        alertDialog("hello");
         expect(jQuery.fn.modal).toHaveBeenCalledTimes(2);
         expect(jQuery.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false, keyboard: true });
         expect(jQuery.fn.modal).toHaveBeenNthCalledWith(2, 'show');
@@ -204,15 +201,14 @@ describe("Bootstrap version detection", () => {
     it('detects BS4 when modal version does not exist', async function () {
         let $ = mockJQueryWithBootstrapModal();
         delete $.fn.modal.Constructor;
-        let dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
-        dialogs.alertDialog("hello", opt);
+        alertDialog("hello", opt);
         expect($.fn.modal).toHaveBeenCalledTimes(2);
         expect($.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false, keyboard: true });
-        expect($.fn.modal).toHaveBeenNthCalledWith(2, 'show');        
+        expect($.fn.modal).toHaveBeenNthCalledWith(2, 'show');
         let instance = $.fn.modal.mock?.contexts[0];
         let div = instance._selector;
         expect(div).toBeDefined();
@@ -237,8 +233,7 @@ describe("Bootstrap version detection", () => {
 
         let $ = mockJQueryWithBootstrapModal();
         $.fn.modal.Constructor.VERSION = '4.1.0';
-        let dialogs = await import("./dialogs");
-        dialogs.alertDialog("hello");
+        alertDialog("hello");
         expect($.fn.modal).toHaveBeenCalledTimes(2);
         expect($.fn.modal).toHaveBeenNthCalledWith(1, { backdrop: false, keyboard: true });
         expect($.fn.modal).toHaveBeenNthCalledWith(2, 'show');
@@ -253,13 +248,15 @@ describe("Bootstrap version detection", () => {
 });
 
 describe("Bootstrap noConflict", function () {
+    afterEach(cleanup);
+
     function setupDummyJQuery() {
         return (window as any)["jQuery"] = Object.assign(function () {
             return {
                 html: function (): any {
                     return null;
                 },
-                on: function(): any {
+                on: function (): any {
                     return this;
                 }
             }
@@ -284,7 +281,7 @@ describe("Bootstrap noConflict", function () {
                 noConflictCalled = true;
             }
         }
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(false);
     });
 
@@ -296,7 +293,7 @@ describe("Bootstrap noConflict", function () {
         };
         $.fn.button = {
         }
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
     });
 
     it('noConflict called if jQuery ui button widget exists and $.fn.button has noConflict method', async function () {
@@ -312,7 +309,7 @@ describe("Bootstrap noConflict", function () {
         $.ui = {
             button: uiButton
         };
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(true);
         expect(($.fn as any).button).toBe(uiButton);
         expect(($.fn as any).btn).toBe(bsButton);
@@ -325,7 +322,7 @@ describe("Bootstrap noConflict", function () {
         $.ui = {
             button: uiButton
         };
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(false);
     });
 
@@ -333,7 +330,7 @@ describe("Bootstrap noConflict", function () {
         let $ = setupDummyJQuery();
         let noConflictCalled = false;
         delete $.ui;
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(false);
     });
 
@@ -341,7 +338,7 @@ describe("Bootstrap noConflict", function () {
         let $ = setupDummyJQuery();
         let noConflictCalled = false;
         $.ui = {};
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(false);
     });
 
@@ -352,20 +349,21 @@ describe("Bootstrap noConflict", function () {
         $.ui = {
             button: uiButton
         };
-        await import("./dialogs");
+        uiAndBSButtonNoConflict();
         expect(noConflictCalled).toBe(false);
     });
 });
 
 
 describe("alertDialog", () => {
+    afterEach(cleanup);
+
     it('alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
         let alertSpy = jest.spyOn(window, "alert");
         try {
             mockEnvironmentWithBrowserDialogsOnly();
             alertSpy.mockImplementation(() => { });
-            const dialogs = (await import("./dialogs"));
-            dialogs.alertDialog('test message');
+            alertDialog('test message');
             expect(alertSpy).toHaveBeenCalledTimes(1);
             expect(alertSpy).toHaveBeenCalledWith("test message");
         }
@@ -376,12 +374,11 @@ describe("alertDialog", () => {
 
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
-        var dialog = dialogs.alertDialog("hello", opt);
+        var dialog = alertDialog("hello", opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -409,12 +406,11 @@ describe("alertDialog", () => {
 
     it('returns expected bootstrap.Modal markup', async function () {
         let bootstrap = mockBS5PlusWithUndefinedJQuery();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
-        var dialog = dialogs.alertDialog("hello", opt);
+        var dialog = alertDialog("hello", opt);
         let modal = document.querySelector<HTMLElement>(".modal");
         try {
             expect(modal).not.toBeNull();
@@ -464,33 +460,28 @@ describe("alertDialog", () => {
 
     it('calls localText for title', async function () {
         let $ = mockJQueryWithUIDialog();
-        try {
-            const dialogs = await import("./dialogs");
-            let opt = {
-                onOpen: jest.fn(),
-                onClose: jest.fn()
-            };
-            dialogs.alertDialog("hello", opt);
-            expect($.fn.dialog).toHaveBeenCalledTimes(2);
-            expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
-            let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
-            expect(x).toBeDefined();
-            expect(x.title).toBe("Alert");
-        }
-        finally {
-            jest.resetModules();
-        }
+        let opt = {
+            onOpen: jest.fn(),
+            onClose: jest.fn()
+        };
+        alertDialog("hello", opt);
+        expect($.fn.dialog).toHaveBeenCalledTimes(2);
+        expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
+        let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
+        expect(x).toBeDefined();
+        expect(x.title).toBe("Alert");
     });
 });
 
 describe("informationDialog", () => {
+    afterEach(cleanup);
+
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
-            const dialogs = (await import("./dialogs"));
-            dialogs.informationDialog('test message', () => { });
+            informationDialog('test message', () => { });
             expect(alertSpy).toHaveBeenCalledTimes(1);
             expect(alertSpy).toHaveBeenCalledWith("test message");
         }
@@ -501,14 +492,13 @@ describe("informationDialog", () => {
 
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
         let onOK = jest.fn(function () {
         });
-        var dialog = dialogs.informationDialog("hello", onOK, opt);
+        var dialog = informationDialog("hello", onOK, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -536,18 +526,19 @@ describe("informationDialog", () => {
         expect(onOK).toHaveBeenCalledTimes(1);
         expect(dialog.type).toBe("uidialog");
         expect(dialog.result).toBe("ok");
-    });    
+    });
 });
 
 describe("warningDialog", () => {
+
+    afterEach(cleanup);
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
-            const dialogs = (await import("./dialogs"));
-            dialogs.warningDialog('test message');
+            warningDialog('test message');
             expect(alertSpy).toHaveBeenCalledTimes(1);
             expect(alertSpy).toHaveBeenCalledWith("test message");
         }
@@ -558,14 +549,15 @@ describe("warningDialog", () => {
 });
 
 describe("confirmDialog", () => {
+    afterEach(cleanup);
+
     it('uses window.confirm when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         let confirmSpy = jest.spyOn(window, "confirm");
         try {
             confirmSpy.mockImplementation(() => true);
             let onYesCalled;
-            const dialogs = (await import("./dialogs"));
-            dialogs.confirmDialog('test message', function () {
+            confirmDialog('test message', function () {
                 onYesCalled = true;
             });
             expect(confirmSpy).toHaveBeenCalledTimes(1);
@@ -579,14 +571,13 @@ describe("confirmDialog", () => {
 
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
         let onYes = jest.fn(function () {
         });
-        dialogs.confirmDialog("hello", onYes, opt);
+        confirmDialog("hello", onYes, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -619,7 +610,6 @@ describe("confirmDialog", () => {
 
     it('returns expected bootstrap.Modal markup with BS5+ and no JQuery', async function () {
         let bootstrap = mockBS5PlusWithUndefinedJQuery();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn(),
@@ -627,7 +617,7 @@ describe("confirmDialog", () => {
         };
         let onYes = jest.fn(function () {
         });
-        dialogs.confirmDialog("hello", onYes, opt);
+        confirmDialog("hello", onYes, opt);
         let modal = document.querySelector<HTMLElement>(".modal");
         try {
             expect(modal).not.toBeNull();
@@ -682,14 +672,15 @@ describe("confirmDialog", () => {
 });
 
 describe("successDialog", () => {
+    afterEach(cleanup);
+
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             let onOKCalled;
-            const dialogs = (await import("./dialogs"));
-            dialogs.successDialog('test message', () => {
+            successDialog('test message', () => {
                 onOKCalled = true;
             });
             expect(alertSpy).toHaveBeenCalledTimes(1);
@@ -703,14 +694,13 @@ describe("successDialog", () => {
 
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
-        const dialogs = await import("./dialogs");
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
         };
         let onOK = jest.fn(function () {
         });
-        dialogs.successDialog("hello", onOK, opt);
+        successDialog("hello", onOK, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -741,13 +731,14 @@ describe("successDialog", () => {
 });
 
 describe("iframeDialog", () => {
+    afterEach(cleanup);
+
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
         mockEnvironmentWithBrowserDialogsOnly();
         var alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             var testHtml = '<html><body>test message<body></html>';
-            const iframeDialog = (await import("./dialogs")).iframeDialog;
             iframeDialog({
                 html: testHtml
             });
@@ -768,7 +759,7 @@ describe("iframeDialog", () => {
         dialogs.iframeDialog(opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
-        
+
         var x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Alert");
@@ -825,10 +816,11 @@ describe("iframeDialog", () => {
 });
 
 describe("dialog button icon handling", () => {
+    afterEach(cleanup);
+
     it("auto prefixes icons with 'fa-' prefix with 'fa' with BS5+ and no JQuery", async function () {
         mockBS5PlusWithUndefinedJQuery();
-        const dialogs = await import("./dialogs");
-        dialogs.alertDialog("test", {
+        alertDialog("test", {
             buttons: [{
                 result: "ok",
                 text: "ok",
@@ -848,6 +840,7 @@ describe("dialog button icon handling", () => {
 });
 
 //describe("dialogButtonToBS", () => {
+//    afterEach(cleanup);
 //    it("converts dialog button to BS5+ button", async function () {
 //        mockBS5PlusWithUndefinedJQuery();
 //        const dialogs = await import("./dialogs");
@@ -919,6 +912,7 @@ describe("dialog button icon handling", () => {
 //});
 //
 //describe("dialogButtonToUI", () => {
+//    afterEach(cleanup);
 //    it("html encodes by default", async function () {
 //        const dialogs = (await import("./dialogs"));
 //        let button = dialogs.dialogButtonToUI({ text: "<div>x</div>" });
@@ -945,19 +939,19 @@ describe("dialog button icon handling", () => {
 //});
 
 describe("Dialog.close", () => {
+    afterEach(cleanup);
+
     it("ignores when element is null or undefined", async function () {
-        let dialogs = (await import("./dialogs"));
-        new dialogs.Dialog(null).close();
+        new Dialog(null).close();
         expect(true).toBe(true);
-        new dialogs.Dialog(undefined).close();
+        new Dialog(undefined).close();
         expect(true).toBe(true);
     });
 
     it("ignores when element does not have s-Panel class", async function () {
         let div = document.createElement("div");
         div.className = "test";
-        let dialogs = (await import("./dialogs"));
-        dialogs.Dialog.getInstance(div)?.close();
+        Dialog.getInstance(div)?.close();
         expect(div.classList.contains("test")).toBe(true);
         expect(div.classList.contains("hidden")).toBe(false);
     });
@@ -965,8 +959,7 @@ describe("Dialog.close", () => {
     it("ignores when element already has hidden class", async function () {
         let div = document.createElement("div");
         div.className = "s-Panel hidden test";
-        let dialogs = (await import("./dialogs"));
-        dialogs.Dialog.getInstance(div)?.close();
+        Dialog.getInstance(div)?.close();
         expect(div.classList.contains("test")).toBe(true);
         expect(div.classList.contains("hidden")).toBe(true);
     });
@@ -1055,7 +1048,7 @@ describe("Dialog.close", () => {
     //        div.remove();
     //    }
     //});
-//
+    //
     //it("removes [data-hiddenby] from other panels that were hidden by this one with jQuery", async function () {
     //    let jQuery = mockJQuery({});
     //    document.body.classList.add(".panels-container");
@@ -1087,22 +1080,22 @@ describe("Dialog.close", () => {
     //    }
     //
     //});
-//
+    //
     //it("removes [data-hiddenby] from other panels that were hidden by this one with undefined jQuery", async function () {
     //    mockUndefinedJQuery();
     //    document.body.classList.add(".panels-container");
     //    let div1 = document.body.appendChild(document.createElement("div"));
     //    div1.classList.add("s-Panel");
     //    div1.setAttribute("data-hiddenby", "test");
-//
+    //
     //    let div2 = document.body.appendChild(document.createElement("div"));
     //    div2.classList.add("s-Panel");
     //    div2.setAttribute("data-hiddenby", "test2");
-//
+    //
     //    let div3 = document.body.appendChild(document.createElement("div"));
     //    div3.classList.add("s-Panel");
     //    div3.setAttribute("data-paneluniquename", "test");
-//
+    //
     //    try {
     //        let dialogs = (await import("./dialogs"));
     //        dialogs.Dialog.getInstance(div3).close();
@@ -1118,7 +1111,7 @@ describe("Dialog.close", () => {
     //        document.body.classList.remove("panels-container");
     //    }
     //});
-//
+    //
     //it("triggers layout event for elements with .require-layout class where offsetWidth > 0 without jQuery", async function () {
     //    mockUndefinedJQuery();
     //    document.body.classList.add(".panels-container");
@@ -1127,11 +1120,11 @@ describe("Dialog.close", () => {
     //    div.classList.add("require-layout");
     //    let layoutCalls = 0;
     //    div.addEventListener("layout", e => layoutCalls++);
-//
+    //
     //    let div2 = document.body.appendChild(document.createElement("div"));
     //    div2.classList.add("s-Panel");
     //    div2.setAttribute("data-paneluniquename", "test");
-//
+    //
     //    try {
     //        let dialogs = (await import("./dialogs"));
     //        dialogs.Dialog.getInstance(div2).close();
@@ -1150,11 +1143,11 @@ describe("Dialog.close", () => {
     //    div.classList.add("require-layout");
     //    let layoutCalls = 0;
     //    div.addEventListener("layout", e => layoutCalls++);
-//
+    //
     //    let div2 = document.body.appendChild(document.createElement("div"));
     //    div2.classList.add("s-Panel");
     //    div2.setAttribute("data-paneluniquename", "test");
-//
+    //
     //    try {
     //        let dialogs = (await import("./dialogs"));
     //        dialogs.Dialog.getInstance(div2).close();
@@ -1167,84 +1160,144 @@ describe("Dialog.close", () => {
 
 });
 
-describe("openPanel", () => {
-    //it("ignores when element is null or undefined", async function () {
-    //    let dialogs = (await import("./dialogs"));
-    //    expect(dialogs.Dialog.getInstance(null) == null).toBe(true);
-    //    expect(dialogs.Dialog.getInstance(undefined) == null).toBe(true);
-    //    expect(true).toBe(true);
-    //});
+describe("Dialog panels", () => {
+    afterEach(cleanup);
 
-    //it("can open panel via jQuery", async function () {
-    //    let jQuery = mockJQuery({});
-    //
-    //    document.body.classList.add("panels-container");
-    //    let div1El = document.body.appendChild(document.createElement("div"));
-    //    div1El.classList.add("s-Panel");
-    //    let div1 = jQuery(div1El);
-    //    let div2El = document.createElement("div");
-    //    div2El.classList.add("s-Panel");
-    //    let div2 = jQuery(div2El);
-    //    let openingPanel, openedPanel;
-    //    const panelBeforeOpen = function(e: any) {
-    //        openingPanel = e?.target;
-    //    }
-    //    const panelOpen = function(e: any) {
-    //        openedPanel = e?.target;
-    //    }
-    //    jQuery(window).on('panelbeforeopen', panelBeforeOpen);
-    //    jQuery(window).on('panelopen', panelOpen);
-    //
-    //    try {
-    //        let dialogs = (await import("./dialogs"));
-    //        dialogs.Dialog.getInstance(div2).open();
-    //        expect(openingPanel).toBe(div2El);
-    //        expect(openedPanel).toBe(div2El);
-    //        expect(div1.attr("data-hiddenby")).toBeTruthy();
-    //        expect(div2.attr("data-paneluniquename")).toBe(div1.attr('data-hiddenby'));
-    //        expect(div2.hasClass("hidden")).toBe(false);
-    //        expect(div2.attr("data-hiddenby")).toBeFalsy();
-    //    }
-    //    finally {
-    //        jQuery(window).off('panelbeforeopen', panelBeforeOpen);
-    //        jQuery(window).off('panelopen', panelOpen);
-    //        div1.remove();
-    //        div2.remove();
-    //    }
-    //});
+    it("can open panel via jQuery", async function () {
+        let jQuery = mockJQuery({});
 
-    // it("can open panel without jQuery", async function () {
-    //     mockUndefinedJQuery();
-    //     document.body.classList.add("panels-container");
-    //     let div1 = document.body.appendChild(document.createElement('div'));
-    //     let div2 = document.createElement('div');
-    //     let openingPanel, openedPanel;
-    //     const panelOpening = function(e: any) {
-    //         openingPanel = e?.target;
-    //     }
-    //     const panelOpened = function(e: any) {
-    //         openedPanel = e?.target;
-    //     }
-    //     window.addEventListener('panelbeforeopen', panelOpening);
-    //     window.addEventListener('panelopen', panelOpened);
-// 
-    //     try {
-    //         let dialogs = (await import("./dialogs"));
-    //         new dialogs.Dialog({ element: div2 }).open();
-    //         expect(openingPanel).toBe(div2);
-    //         expect(openedPanel).toBe(div2);
-    //         expect(div1.dataset.hiddenby).toBeTruthy();
-    //         expect(div2.getAttribute("data-paneluniquename")).toBe(div1.dataset.hiddenby);
-    //         expect(div2.classList.contains("hidden")).toBe(false);
-    //         expect(div2.dataset.hiddenby).toBeFalsy();
-    //     }
-    //     finally {
-    //         window.removeEventListener('panelbeforeopen', panelOpening);
-    //         window.removeEventListener('panelopen', panelOpened);
-    //         div1.remove();
-    //         div2.remove();
-    //     }
-    // });
+        document.body.classList.add("panels-container");
+        var body1 = Fluent("div").addClass("panel-body 1");
+        var panel1 = Fluent("div").class("s-Panel").appendTo(document.body).append(body1);
+        var body2 = Fluent("div").addClass("panel-body 2");
+        var panel2 = Fluent("div").class("s-Panel").appendTo(document.body).append(body2);
+
+        let openingPanel, openedPanel;
+        const panelBeforeOpen = function (e: any) {
+            openingPanel = e?.target;
+        }
+        const panelOpen = function (e: any) {
+            openedPanel = e?.target;
+        }
+        jQuery(window).on('panelbeforeopen', panelBeforeOpen);
+        jQuery(window).on('panelopen', panelOpen);
+
+        try {
+            Dialog.getInstance(panel2).open();
+            expect(openingPanel).toBe(body2.getNode());
+            expect(openedPanel).toStrictEqual(body2.getNode());
+            expect(panel1.attr("data-hiddenby")).toBeTruthy();
+            expect(panel2.attr("data-paneluniquename")).toBe(panel1.attr('data-hiddenby'));
+            expect(panel2.hasClass("hidden")).toBe(false);
+            expect(panel2.attr("data-hiddenby")).toBeFalsy();
+        }
+        finally {
+            jQuery(window).off('panelbeforeopen', panelBeforeOpen);
+            jQuery(window).off('panelopen', panelOpen);
+            panel1.remove();
+            panel2.remove();
+        }
+    });
+
+    it("can open panel without jQuery", async function () {
+        mockUndefinedJQuery();
+        document.body.classList.add("panels-container");
+        var body1 = Fluent("div").addClass("panel-body 1");
+        var panel1 = Fluent("div").class("s-Panel").appendTo(document.body).append(body1);
+        var body2 = Fluent("div").addClass("panel-body 2");
+        var panel2 = Fluent("div").class("s-Panel").appendTo(document.body).append(body2);
+
+        let openingPanel, openedPanel;
+        const panelOpening = function (e: any) {
+            openingPanel = e?.target;
+        }
+        const panelOpened = function (e: any) {
+            openedPanel = e?.target;
+        }
+        window.addEventListener('panelbeforeopen', panelOpening);
+        window.addEventListener('panelopen', panelOpened);
+        try {
+            Dialog.getInstance(panel2).open();
+            expect(openingPanel).toBe(body2.getNode());
+            expect(openedPanel).toBe(body2.getNode());
+            expect(panel1.data("hiddenby")).toBeTruthy();
+            expect(panel2.attr("data-paneluniquename")).toBe(panel1.data("hiddenby"));
+            expect(panel2.getNode().classList.contains("hidden")).toBe(false);
+            expect(panel2.data("hiddenby")).toBeFalsy();
+        }
+        finally {
+            window.removeEventListener('panelbeforeopen', panelOpening);
+            window.removeEventListener('panelopen', panelOpened);
+            panel1.remove();
+            panel2.remove();
+        }
+    });
+
+    it("creates panels when preferPane is true even if jquery ui and bootstrap are both available", () => {
+        mockBS5Plus();
+        mockJQueryWithUIDialog();
+        var dlg = new Dialog({ preferPanel: true });
+        dlg.open();
+        expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
+        expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
+    });
+
+    it("creates panels when preferPane is true even if jquery ui is available", () => {
+        mockJQueryWithUIDialog();
+        var dlg = new Dialog({ preferPanel: true });
+        dlg.open();
+        expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
+        expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
+    });
+
+    
+    it("creates panels when preferPane is true even if bootstrap is available", () => {
+        mockBS5Plus();
+        var dlg = new Dialog({ preferPanel: true });
+        dlg.open();
+        expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
+        expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
+    });
+});
+
+describe("modal event propagation to modal-body", () => {
+
+    afterEach(cleanup);
+
+    it("installs an event propagation handler for show.bs.modal to modal body as modalbeforeopen event", () => {
+        const spy = jest.fn();
+        Fluent("div")
+            .addClass("modal")
+            .append(Fluent("div").addClass("modal-body").on("modalbeforeopen", spy))
+            .appendTo(document.body)
+            .trigger("show.bs.modal");
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it("can prevent modal to be shown by calling original event's preventDefault if preventDefault is called on modalbeforeopen ", () => {
+        const spy = jest.fn().mockImplementation(e => {
+            e.preventDefault();
+        });
+
+        var modal = Fluent("div")
+            .addClass("modal")
+            .append(Fluent("div").addClass("modal-body").on("modalbeforeopen", spy))
+            .appendTo(document.body);
+
+        var e = Fluent.trigger(modal.getNode(), "show.bs.modal");
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(e.defaultPrevented).toBeTruthy();
+    });
+
+    it("installs an event propagation handler for shown.bs.modal to modal body as modalopen event", () => {
+        const spy = jest.fn();
+        Fluent("div")
+            .addClass("modal")
+            .append(Fluent("div").addClass("modal-body").on("modalopen", spy))
+            .appendTo(document.body)
+            .trigger("shown.bs.modal");
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 
 });
 
