@@ -1234,7 +1234,7 @@ describe("Dialog panels", () => {
         expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
     });
 
-    
+
     it("creates panels when preferPane is true even if bootstrap is available", () => {
         mockBS5Plus();
         var dlg = new Dialog({ preferPanel: true });
@@ -1283,5 +1283,62 @@ describe("modal event propagation to modal-body", () => {
 
 });
 
-export { };
 
+describe("Dialog.dispose", () => {
+    let bodyEl: HTMLElement;
+
+    beforeEach(() => {
+        bodyEl = document.createElement("div");
+    });
+
+    afterEach(() => {
+        bodyEl = null;
+    });
+
+    it("should do nothing if target is not found", () => {
+        const dlg = new Dialog();
+        (dlg as any).el = null;
+        dlg.dispose();
+    });
+
+    it("should remove panel-body element if s-Panel element is not found", () => {
+        const dlg = new Dialog();
+        (dlg as any).el = bodyEl;;
+        bodyEl.classList.add('panel-body');
+        document.body.appendChild(bodyEl);
+        dlg.dispose();
+        expect(bodyEl.parentNode).toBe(null);
+        expect(bodyEl.classList.contains('panel-body')).toBe(false);
+        expect((dlg as any).el).toBe(null);
+    });
+
+    it("should destroy jQuery UI dialog if target has 'ui-dialog-content' class", () => {
+        const dlg = new Dialog();
+        (dlg as any).el = bodyEl;
+        bodyEl.classList.add("ui-dialog-content");
+        document.body.appendChild(bodyEl);
+        const destroyMock = jest.fn();
+        const dialogMock = jest.fn((method) => {
+            if (method == 'destroy')
+                destroyMock();
+            return this;
+        });
+        const removeMock = jest.fn();
+        const jQueryMock = (window as any).jQuery = jest.fn(() => ({
+            dialog: dialogMock,
+            remove: removeMock
+        }));
+        try {
+            dlg.dispose();
+            expect(jQueryMock).toHaveBeenCalled();
+            expect(dialogMock).toHaveBeenCalled();
+            expect(destroyMock).toHaveBeenCalled();
+            expect(removeMock).toHaveBeenCalled();
+            expect(bodyEl.classList.contains('ui-dialog-content')).toBe(false);
+        }
+        finally {
+            delete (window as any).jQuery;
+        }
+    });
+    
+});

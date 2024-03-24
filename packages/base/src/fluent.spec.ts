@@ -244,6 +244,86 @@ describe('Fluent instance methods', () => {
         });
     });
 
+    describe('style', () => {
+        it('should apply styles to the element', () => {
+            const callback = (css: CSSStyleDeclaration) => {
+                css.setProperty('color', 'red');
+                css.setProperty('font-size', '16px');
+            };
+
+            fluent.style(callback);
+
+            expect(element.style.color).toBe('red');
+            expect(element.style.fontSize).toBe('16px');
+        });
+
+        it('should override existing styles', () => {
+            element.style.color = 'blue';
+            element.style.fontSize = '14px';
+
+            const callback = (css: CSSStyleDeclaration) => {
+                css.setProperty('color', 'red');
+                css.setProperty('font-size', '16px');
+            };
+
+            fluent.style(callback);
+
+            expect(element.style.color).toBe('red');
+            expect(element.style.fontSize).toBe('16px');
+        });
+
+        it('should keep styles when callback is empty', () => {
+            element.style.color = 'blue';
+            element.style.fontSize = '14px';
+
+            fluent.style(() => {});
+
+            expect(element.style.color).toBe('blue');
+            expect(element.style.fontSize).toBe('14px');
+        });
+
+        it('should ignore when element is null', () => {
+            fluent = Fluent(null);
+            const callback = jest.fn();
+            fluent.style(callback);
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('text', () => {
+
+        it('should set the text content of the element', () => {
+            fluent.text('Hello, world!');
+
+            expect(element.textContent).toBe('Hello, world!');
+        });
+
+        it('should return the text content of the element', () => {
+            element.textContent = 'Hello, world!';
+
+            const result = fluent.text();
+
+            expect(result).toBe('Hello, world!');
+        });
+
+        it('should return undefined for null element', () => {
+            fluent = Fluent(null);
+
+            const result = fluent.text();
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should return fluent instance for null element', () => {
+            fluent = Fluent(null);
+
+            const result = fluent.text("test");
+
+            expect(result).toBe(fluent);
+        });
+
+    });
+
 
     describe('toggle', () => {
 
@@ -363,6 +443,36 @@ describe('Fluent instance methods', () => {
 
             expect(element.classList.contains('test-class')).toBe(false);
             expect(element.classList.contains('another-class')).toBe(true);
+        });
+    });
+
+    describe('val', () => {
+        let element: HTMLInputElement;
+        let fluent: Fluent<HTMLInputElement>;
+
+        beforeEach(() => {
+            element = document.createElement('input');
+            fluent = Fluent(element);
+        });
+
+        it('should return the current value of the input element', () => {
+            element.value = 'Hello World';
+
+            const result = fluent.val();
+
+            expect(result).toBe('Hello World');
+        });
+
+        it('should set the value of the input element', () => {
+            fluent.val('New Value');
+
+            expect(element.value).toBe('New Value');
+        });
+
+        it('should chain the fluent object', () => {
+            const result = fluent.val('New Value');
+
+            expect(result).toBe(fluent);
         });
     });
 

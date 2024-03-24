@@ -467,7 +467,7 @@ export class Dialog {
 
     dispose(): void {
         try {
-            let target = getDialogEventsNode(this.el);
+            let target = getDialogEventsNode(this.el) ?? this.el;
             if (!target)
                 return;
 
@@ -475,7 +475,7 @@ export class Dialog {
                 if (target.classList.contains("ui-dialog-content")) {
                     getjQuery?.()(target)?.dialog?.('destroy');
                     target.classList.remove("ui-dialog-content");
-                    target = target.closest(".ui-dialog");
+                    target = target.closest(".ui-dialog") ?? target;
                 }
                 else if (target.classList.contains("modal")) {
                     if (!getjQuery() && isBS5Plus()) {
