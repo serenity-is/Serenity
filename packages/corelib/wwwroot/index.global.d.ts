@@ -5769,6 +5769,7 @@ declare namespace Serenity {
         protected getPropertyItemsData(): PropertyItemsData;
         protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getColumns(): Slick.Column<TItem>[];
+        protected wrapFormatterWithEditLink(column: Slick.Column, item: PropertyItem): void;
         protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Slick.Column[];
         protected getSlickOptions(): Slick.GridOptions;
         protected populateLock(): void;

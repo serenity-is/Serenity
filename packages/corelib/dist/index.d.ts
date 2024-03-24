@@ -4492,6 +4492,7 @@ declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IR
     protected getPropertyItemsData(): PropertyItemsData;
     protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
     protected getColumns(): Column<TItem>[];
+    protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[];
     protected getSlickOptions(): GridOptions;
     protected populateLock(): void;

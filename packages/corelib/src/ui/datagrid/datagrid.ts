@@ -882,31 +882,27 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.propertyItemsToSlickColumns(this.getPropertyItems());
     }
 
+    protected wrapFormatterWithEditLink(column: Column, item: PropertyItem) {
+        const orgFormat = column.format;
+        const itemType = item.editLinkItemType || null;
+        const idField = item.editLinkIdField || null;
+        const linkClass = item.editLinkCssClass || null;
+        column.format = this.itemLink(itemType, idField,
+            ctx => orgFormat != null ? orgFormat(ctx) : htmlEncode(ctx.value),
+            () => linkClass || null, false);
+
+        if (item.editLinkIdField) {
+            column.referencedFields = column.referencedFields || [];
+            column.referencedFields.push(item.editLinkIdField);
+        }
+    }
+
     protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
         var columns = PropertyItemSlickConverter.toSlickColumns(propertyItems);
         for (var i = 0; i < propertyItems.length; i++) {
             var item = propertyItems[i];
-            var column = columns[i];
-            if (item.editLink === true) {
-                var oldFormat = column.format;
-                var css = item.editLinkCssClass != null ? item.editLinkCssClass : null;
-                column.format = this.itemLink(
-                    item.editLinkItemType != null ? item.editLinkItemType : null,
-                    item.editLinkIdField != null ? item.editLinkIdField : null,
-                    function (ctx: FormatterContext) {
-                        if (oldFormat != null) {
-                            return oldFormat(ctx);
-                        }
-                        return htmlEncode(ctx.value);
-                    },
-                    function (ctx1: FormatterContext) {
-                        return css;
-                    }, false);
-
-                if (item.editLinkIdField) {
-                    column.referencedFields = column.referencedFields || [];
-                    column.referencedFields.push(item.editLinkIdField);
-                }
+            if (item.editLink) {
+                this.wrapFormatterWithEditLink(columns[i], item);
             }
         }
         return columns;
