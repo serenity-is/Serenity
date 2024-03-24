@@ -1,3 +1,9 @@
+## 8.4.3 (2024-03-25)
+
+### Bugfixes:
+
+- Fix possible closure variable issue with edit link formatting
+
 ## 8.4.2 (2024-03-24)
 
 ### Bugfixes:
