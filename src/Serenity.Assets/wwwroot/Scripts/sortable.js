@@ -767,6 +767,8 @@
 				oldIndex = startIndex;
 				oldDraggableIndex = startDraggableIndex;
 
+				Sortable.dragged = dragEl;
+
 				tapEvt = {
 					target: dragEl,
 					clientX: (touch || evt).clientX,
@@ -1584,7 +1586,8 @@
 
 			putSortable =
 			activeGroup =
-			Sortable.active = null;
+			Sortable.active =
+			Sortable.dragged = null;
 
 			savedInputChecked.forEach(function (el) {
 				el.checked = true;
