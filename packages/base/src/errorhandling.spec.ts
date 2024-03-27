@@ -2,42 +2,37 @@ import * as dialogs from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
 import * as notify from "./notify";
 
-function changeJSDOMURL(url: string) {
-    (globalThis as any).jsdom.reconfigure({ url: url });
-}
-
 beforeEach(() => {
     jest.restoreAllMocks();
 });
 
 describe("showServiceError", function () {
     it("shows ??ERROR?? if error is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError(null);
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows ??ERROR?? if error message and code is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({});
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
     });
 
     it("shows error code if message is undefined", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({ Code: 'Test' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("Test");
     });
 
     it("shows message if both message and code is not null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();;
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({ Code: 'TestCode', Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");
-
     });
 
     it("shows message if code is undefined", () => {
@@ -45,6 +40,34 @@ describe("showServiceError", function () {
         ErrorHandling.showServiceError({ Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");
+    });
+
+    it("shows iframe dialog if errorInfo has responseText", () => {
+        var iframeDialogSpy = jest.spyOn(dialogs, "iframeDialog").mockImplementation();
+        ErrorHandling.showServiceError(null, { responseText: "<html>Some error message</html>" });
+        expect(iframeDialogSpy).toHaveBeenCalledTimes(1);
+        expect(iframeDialogSpy).toHaveBeenCalledWith({ html: "<html>Some error message</html>" });
+    });
+
+    it("shows alert dialog for unknown AJAX connection error", () => {
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        ErrorHandling.showServiceError(null, { statusText: "something" });
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("An unknown AJAX connection error occurred! Check browser console for details.");
+    });
+
+    it("shows alert dialog for HTTP 500 error", () => {
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        ErrorHandling.showServiceError(null, { status: 500 });
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("HTTP 500: Connection refused! Check browser console for details.");
+    });
+
+    it("shows alert dialog for other HTTP errors", () => {
+        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        ErrorHandling.showServiceError(null, { status: 404 });
+        expect(alertSpy).toHaveBeenCalledTimes(1);
+        expect(alertSpy).toHaveBeenCalledWith("HTTP 404 error! Check browser console for details.");
     });
 
 });
@@ -162,3 +185,8 @@ describe("runtimeErrorHandler", function () {
     });
 
 });
+
+
+function changeJSDOMURL(url: string) {
+    (globalThis as any).jsdom.reconfigure({ url: url });
+}
