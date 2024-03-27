@@ -142,9 +142,6 @@ export class Widget<P = {}> {
 
     protected internalInit() {
         getInstanceType(this).deferRenderContents && this.internalRenderContents();
-
-        if (typeof (this.options as any)?.ref === "function")
-            (this.options as any)?.ref(this);
     }
 
     public init(): this {
