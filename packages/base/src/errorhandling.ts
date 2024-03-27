@@ -81,4 +81,30 @@ export namespace ErrorHandling {
             hostname.endsWith(".local") ||
             hostname.endsWith(".localhost"));
     }
+
+    /**
+     * Unhandled promise rejection error handler. It's purpose is to
+     * ignore logging serviceCall / serviceFetch errors as they have built-in
+     * error handling but browser logs it in the console, while Node crashes.
+     * Include below code in script-init/errorhandling.ts to enable:
+     * window.addEventListener("unhandledrejection", ErrorHandling.unhandledRejectionHandler);
+     */
+    export function unhandledRejectionHandler(err: PromiseRejectionEvent) {
+        try {
+            if (!err || !err.reason)
+                return;
+
+            const reason = err.reason;
+            if (reason.origin == "serviceCall") {
+                err.preventDefault();
+
+                if ((reason.ignore ?? false) &&
+                    (reason.kind ?? "exception") === "exception") {
+                    console.error(err);
+                }
+            }
+        }
+        catch {
+        }
+    }
 }

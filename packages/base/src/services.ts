@@ -173,6 +173,7 @@ function reason(message: string, kind: string, extra?: any) {
     if (kind != null) {
         (error as any).kind = kind;
     }
+    (error as any).origin = "serviceCall";
     if (extra != null) {
         if ((error as any).cause)
             delete extra.cause;
