@@ -186,6 +186,82 @@ describe("runtimeErrorHandler", function () {
 
 });
 
+describe("unhandledRejectionHandler", function () {
+    let preventDefault: jest.Mock;
+    beforeEach(() => {
+         preventDefault = jest.fn(); 
+    });
+
+    it("ignores if err or err.reason is null", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler(null);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).not.toHaveBeenCalled();
+
+        ErrorHandling.unhandledRejectionHandler({ reason: null } as any);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).not.toHaveBeenCalled();
+    });
+
+    it("ignores if reason.origin is not 'serviceCall'", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "other" } } as any);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).not.toHaveBeenCalled();
+    });
+
+    it("does not log if reason.silent is true and kind is exception", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: true, kind: "exception" } } as any);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).toHaveBeenCalled();
+    });
+
+    it("does not log if reason.silent is true and kind is not exception", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: true, kind: "other" } } as any);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).toHaveBeenCalled();
+    });
+
+
+    it("does not log if reason.silent is null and kind is not exception", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: null, kind: "other" } } as any);
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(preventDefault).toHaveBeenCalled();
+    });    
+
+    it("logs error if reason.silent is false and kind is 'exception'", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: false, kind: "exception" } } as any);
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        expect(preventDefault).toHaveBeenCalled();
+    });
+
+    it("logs error if reason.silent is undefined and kind is 'exception'", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", kind: "exception" } } as any);
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        expect(preventDefault).toHaveBeenCalled();
+    });    
+
+    it("logs error if reason.silent is undefined and kind is undefined", function () {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+        ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall" } } as any);
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        expect(preventDefault).toHaveBeenCalled();
+    });   
+});
+
 
 function changeJSDOMURL(url: string) {
     (globalThis as any).jsdom.reconfigure({ url: url });

@@ -98,7 +98,7 @@ export namespace ErrorHandling {
             if (reason.origin == "serviceCall") {
                 err.preventDefault();
 
-                if ((reason.ignore ?? false) &&
+                if (!reason.silent &&
                     (reason.kind ?? "exception") === "exception") {
                     console.error(err);
                 }
