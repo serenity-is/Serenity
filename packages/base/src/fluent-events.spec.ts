@@ -1,4 +1,4 @@
-import { EventHandler, triggerRemoveAndClearAll } from "./eventhandler";
+import { addListener as addListener, triggerRemoveAndClearAll } from "./fluent-events";
 
 beforeEach(() => {
     jest.restoreAllMocks();
@@ -25,7 +25,7 @@ describe("triggerRemoveAndClearAll", () => {
 
     it("clears any events other than remove", () => {
         const test = jest.fn();
-        EventHandler.on(element, "test", test); 
+        addListener(element, "test", test); 
         triggerRemoveAndClearAll(element);
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
@@ -44,8 +44,8 @@ describe("triggerRemoveAndClearAll", () => {
     it("calls remove handlers", () => {
         const remove1 = jest.fn();
         const remove2 = jest.fn();
-        EventHandler.on(element, "remove", remove1); 
-        EventHandler.on(element, "remove", remove2); 
+        addListener(element, "remove", remove1); 
+        addListener(element, "remove", remove2); 
         triggerRemoveAndClearAll(element);
         expect(remove1).toHaveBeenCalled();
         expect(remove2).toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe("triggerRemoveAndClearAll", () => {
     it("does not trigger externally attached remove event", () => {
         const remove1 = jest.fn();
         const remove2 = jest.fn();
-        EventHandler.on(element, "remove", remove1); 
+        addListener(element, "remove", remove1); 
         element.addEventListener("remove", remove2); 
         triggerRemoveAndClearAll(element);
         expect(remove1).toHaveBeenCalled();

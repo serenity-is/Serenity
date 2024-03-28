@@ -1,5 +1,5 @@
 ﻿import { getjQuery } from "./environment";
-import { EventHandler, triggerRemoveAndClearAll } from "./eventhandler";
+import { removeListener, addListener, triggerEvent, triggerRemoveAndClearAll } from "./fluent-events";
 import { toggleClass as toggleCls } from "./html";
 
 export interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
@@ -73,10 +73,30 @@ export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | 
 }
 
 export namespace Fluent {
-    export const off = EventHandler.off;
-    export const on = EventHandler.on;
-    export const one = EventHandler.one;
-    export const trigger = EventHandler.trigger;
+    export function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    export function on(element: EventTarget, type: string, listener: EventListener): void;
+    export function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    export function on(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
+        addListener(element, type, handler, delegationHandler, /*oneOff*/ false);
+    }
+
+    export function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    export function one(element: EventTarget, type: string, listener: EventListener): void;
+    export function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    export function one(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
+        addListener(element, type, handler, delegationHandler, true);
+    }
+
+    export function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    export function off(element: EventTarget, type: string, listener?: EventListener): void;
+    export function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    export function off(element: EventTarget, originalTypeEvent: string, handler?: any, delegationHandler?: Function): void {
+        return removeListener(element, originalTypeEvent, handler, delegationHandler);
+    }
+
+    export function trigger(element: EventTarget, type: string, args?: any): Event & { isDefaultPrevented?(): boolean } {    
+        return triggerEvent(element, type, args);
+    }
 
     export function addClass(el: Element, value: string | boolean | (string | boolean)[]) {
         toggleCls(el, toClassName(value), true);
@@ -305,17 +325,17 @@ Fluent.prototype.data = function (this: FluentThis, name: string, value?: string
 }
 
 Fluent.prototype.off = function (this: FluentThis<any>, type: string, handler: any, delegationHandler?: Function) {
-    this.el && EventHandler.off(this.el, type, handler, delegationHandler);
+    this.el && removeListener(this.el, type, handler, delegationHandler);
     return this;
 }
 
 Fluent.prototype.on = function (this: FluentThis<any>, type: string, handler: any, delegationHandler?: Function) {
-    this.el && EventHandler.on(this.el, type, handler, delegationHandler);
+    this.el && addListener(this.el, type, handler, delegationHandler, false);
     return this;
 }
 
 Fluent.prototype.one = function (this: FluentThis<any>, type: string, handler: any, delegationHandler?: Function) {
-    this.el && EventHandler.one(this.el, type, handler, delegationHandler);
+    this.el && addListener(this.el, type, handler, delegationHandler, true);
     return this;
 }
 
@@ -387,7 +407,7 @@ Fluent.prototype.style = function (this: FluentThis, callback: (css: CSSStyleDec
 }
 
 Fluent.prototype.trigger = function (this: FluentThis, type: string, args?: any) {
-    this.el && EventHandler.trigger(this.el, type, args);
+    this.el && triggerEvent(this.el, type, args);
     return this;
 }
 

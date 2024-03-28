@@ -590,21 +590,6 @@ declare namespace ErrorHandling {
     function unhandledRejectionHandler(err: PromiseRejectionEvent): void;
 }
 
-declare namespace EventHandler {
-    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function on(element: EventTarget, type: string, listener: EventListener): void;
-    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function one(element: EventTarget, type: string, listener: EventListener): void;
-    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
-    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
-    function off(element: EventTarget, type: string, listener?: EventListener): void;
-    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
-    function trigger(element: EventTarget, type: string, args?: any): Event & {
-        isDefaultPrevented?(): boolean;
-    };
-}
-
 interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
     addClass(value: string | boolean | (string | boolean)[]): this;
     append(child: string | Node | Fluent<any>): this;
@@ -671,10 +656,18 @@ declare namespace Fluent {
     var byId: <TElement extends HTMLElement>(id: string) => Fluent<TElement>;
 }
 declare namespace Fluent {
-    const off: typeof EventHandler.off;
-    const on: typeof EventHandler.on;
-    const one: typeof EventHandler.one;
-    const trigger: typeof EventHandler.trigger;
+    function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function on(element: EventTarget, type: string, listener: EventListener): void;
+    function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function one(element: EventTarget, type: string, listener: EventListener): void;
+    function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    function off(element: EventTarget, type: string, listener?: EventListener): void;
+    function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    function trigger(element: EventTarget, type: string, args?: any): Event & {
+        isDefaultPrevented?(): boolean;
+    };
     function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
     function empty(el: Element): void;
     /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
