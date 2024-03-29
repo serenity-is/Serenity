@@ -219,7 +219,7 @@ Fluent.prototype.after = function (this: FluentThis, content: string | HTMLEleme
         else if (node instanceof DocumentFragment) {
             Fluent(node).insertAfter(this.el);
         }
-        else if (node != null && (node as any) !== false) {
+        else if (node != null) {
             this.el.insertAdjacentText("afterend", "" + node);
         }
     }
@@ -268,7 +268,7 @@ Fluent.prototype.before = function (this: FluentThis, content: string | HTMLElem
         else if (node instanceof DocumentFragment) {
             Fluent(node).insertBefore(this.el);
         }
-        else if (node != null && (node as any) !== false) {
+        else if (node != null) {
             this.el.insertAdjacentText("beforebegin", "" + node);
         }
     }

@@ -40,6 +40,59 @@ describe('Fluent instance methods', () => {
         });
     });
 
+    describe('after', () => {
+        let parent: HTMLElement;
+
+        beforeEach(() => {
+            parent = document.createElement('div');
+            fluent.appendTo(parent);
+        });
+
+        it('should ignore null', () => {
+            fluent.after(null);
+            expect(element.previousSibling).toBe(null);
+            expect(element.nextSibling).toBe(null);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(1);
+        });
+
+        it('should ignore empty Fluent', () => {
+            fluent.before(Fluent(null));
+            expect(element.previousSibling).toBe(null);
+            expect(element.nextSibling).toBe(null);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(1);
+        });
+
+        it('should insert the content node after itself', () => {
+            const after = document.createElement('span');
+            fluent.after(after);
+            expect(element.nextSibling).toBe(after);
+            expect(after.parentElement).toBe(parent);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(2);
+        });
+
+        it('should insert the text after itself', () => {
+            fluent.after("test");
+            expect(element.nextSibling instanceof Text).toBe(true);
+            expect(element.nextSibling.textContent).toBe("test");
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(2);
+        });
+
+        it('can insert fragment contents', () => {
+            const fragment = new DocumentFragment();
+            const span = fragment.appendChild(document.createElement("span"));
+            const input = fragment.appendChild(document.createElement("input"));
+            fluent.after(fragment);
+            expect(element.nextSibling).toBe(span);
+            expect(element.nextSibling.nextSibling).toBe(input);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(3);
+        });
+    });
+
     describe('append', () => {
         it('should append child to the element', () => {
             const child = document.createElement('span');
@@ -137,6 +190,59 @@ describe('Fluent instance methods', () => {
             fluent.attr('data-test', 123);
 
             expect(element.getAttribute('data-test')).toBe('123');
+        });
+    });
+
+    describe('before', () => {
+        let parent: HTMLElement;
+
+        beforeEach(() => {
+            parent = document.createElement('div');
+            fluent.appendTo(parent);
+        });
+
+        it('should ignore null', () => {
+            fluent.before(null);
+            expect(element.previousSibling).toBe(null);
+            expect(element.nextSibling).toBe(null);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(1);
+        });
+
+        it('should ignore empty Fluent', () => {
+            fluent.before(Fluent(null));
+            expect(element.previousSibling).toBe(null);
+            expect(element.nextSibling).toBe(null);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(1);
+        });
+
+        it('should insert the content node before itself', () => {
+            const before = document.createElement('span');
+            fluent.before(before);
+            expect(element.previousSibling).toBe(before);
+            expect(before.parentElement).toBe(parent);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(2);
+        });
+
+        it('should insert the text before itself', () => {
+            fluent.before("test");
+            expect(element.previousSibling instanceof Text).toBe(true);
+            expect(element.previousSibling.textContent).toBe("test");
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(2);
+        });
+
+        it('can insert fragment contents', () => {
+            const fragment = new DocumentFragment();
+            const span = fragment.appendChild(document.createElement("span"));
+            const input = fragment.appendChild(document.createElement("input"));
+            fluent.before(fragment);
+            expect(element.previousSibling).toBe(input);
+            expect(element.previousSibling.previousSibling).toBe(span);
+            expect(element.parentElement).toBe(parent);
+            expect(element.parentElement.childNodes.length).toBe(3);
         });
     });
 
