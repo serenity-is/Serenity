@@ -383,7 +383,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     protected updateInterface(): void {
         var addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
-        this.fileSymbols.findAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
+        this.fileSymbols.findEach('a.delete', x => x.toggle(!this.get_readOnly()));
     }
 
     get_readOnly(): boolean {

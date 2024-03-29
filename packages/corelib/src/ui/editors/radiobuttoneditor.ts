@@ -63,7 +63,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     get_value(): string {
-        return (Fluent(this.domNode).findAll('input').filter(x => (x as HTMLInputElement).checked)[0] as HTMLInputElement)?.value
+        return this.element.findFirst('input:checked').val();
     }
 
     get value(): string {
@@ -72,8 +72,8 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
 
     set_value(value: string): void {
         if (value !== this.get_value()) {
-            var inputs = Fluent(this.domNode).findAll('input');
-            var checks = inputs.filter(x => (x as HTMLInputElement).checked);
+            var inputs = Fluent(this.domNode).findAll<HTMLInputElement>('input');
+            var checks = inputs.filter(x => x.checked);
             if (checks.length > 0) {
                 (checks[0] as HTMLInputElement).checked = false;
             }
