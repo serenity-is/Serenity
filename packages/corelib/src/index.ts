@@ -32,7 +32,6 @@ export * from "./ui/helpers/lazyloadhelper";
 export * from "./ui/widgets/prefixedcontext";
 export * from "./ui/widgets/widgetutils";
 export * from "./ui/widgets/widget";
-export * from "./globals/jquery-globals";
 export * from "./ui/widgets/toolbar";
 export * from "./ui/widgets/templatedwidget";
 export * from "./ui/dialogs/templateddialog";
