@@ -1,4 +1,4 @@
-﻿import { htmlEncode, toggleClass, addClass, removeClass } from "./html";
+﻿import { addClass, htmlEncode, removeClass, toggleClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {

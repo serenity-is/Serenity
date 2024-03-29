@@ -1,4 +1,4 @@
-import { bgColor, textColor, faIcon, fabIcon, iconClassName, KnownIconClass, AnyIconClass, IconClassName } from './icons';
+import { AnyIconClass, IconClassName, KnownIconClass, bgColor, faIcon, fabIcon, iconClassName, textColor } from './icons';
 
 describe('bgColor', () => {
     it('should return the correct background color class', () => {

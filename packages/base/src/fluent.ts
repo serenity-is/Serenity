@@ -1,5 +1,5 @@
 ﻿import { getjQuery } from "./environment";
-import { removeListener, addListener, triggerEvent, triggerRemoveAndClearAll } from "./fluent-events";
+import { addListener, removeListener, triggerEvent, triggerRemoveAndClearAll } from "./fluent-events";
 import { toggleClass as toggleCls } from "./html";
 
 export interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {

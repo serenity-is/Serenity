@@ -1,4 +1,4 @@
-import { addListener as addListener, triggerRemoveAndClearAll } from "./fluent-events";
+import { addListener, triggerRemoveAndClearAll } from "./fluent-events";
 
 beforeEach(() => {
     jest.restoreAllMocks();
