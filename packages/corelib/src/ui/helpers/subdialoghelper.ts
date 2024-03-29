@@ -6,7 +6,7 @@ export namespace SubDialogHelper {
     export function bindToDataChange(dialog: any, owner: Widget<any>,
         dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any {
         var uniqueName = (owner as Widget<any>)["uniqueName"];
-        Fluent(dialog.domNode).on('ondatachange.' + uniqueName, function (e: DataChangeInfo) {
+        dialog.element.on('ondatachange.' + uniqueName, function (e: DataChangeInfo) {
             if (typeof e.operationType === "undefined" &&
                 (e as any).originalEvent &&
                 typeof (e as any).originalEvent.operationType !== "undefined")

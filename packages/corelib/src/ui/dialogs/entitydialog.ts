@@ -643,7 +643,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         this.localizationGrid.enumerateItems((item, widget) => {
             if (item.name.indexOf('$') < 0 && Fluent.isInputLike(widget.domNode)) {
             valueByName[item.name] = this.byId(item.name).val();
-                Fluent(widget.domNode).val(valueByName[item.name]);
+                widget.element.val(valueByName[item.name]);
             }
         });
 
@@ -652,7 +652,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
             if (idx >= 0 && Fluent.isInputLike(widget1.domNode)) {
                 var hint = valueByName[item1.name.substr(idx + 1)];
                 if (hint != null && hint.length > 0) {
-                    Fluent(widget1.domNode).attr('title', hint).attr('placeholder', hint);
+                    widget1.element.attr('title', hint).attr('placeholder', hint);
                 }
             }
         });

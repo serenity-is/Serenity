@@ -928,7 +928,7 @@ function cleanupJQueryElements() {
     var self = this;
 
     Array.from(arguments).forEach(function (element) {
-        Fluent(self[element]).remove();
+        Fluent.remove(self[element]);
         self[element] = null;
     });
 }
