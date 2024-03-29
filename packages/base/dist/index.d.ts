@@ -593,9 +593,11 @@ declare namespace ErrorHandling {
 interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
     addClass(value: string | boolean | (string | boolean)[]): this;
     append(child: string | Node | Fluent<any>): this;
+    after(content: string | Node | Fluent<any>): this;
     appendTo(parent: Element | Fluent<any>): this;
     attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
+    before(content: string | Node | Fluent<any>): this;
     children(selector?: string): HTMLElement[];
     class(value: string | boolean | (string | boolean)[]): this;
     closest(selector: string): Fluent<HTMLElement>;

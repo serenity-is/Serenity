@@ -500,7 +500,8 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         var localGridDiv = Fluent("div")
             .attr('id', this.idPrefix + 'LocalizationGrid')
-            .hide().insertAfter(pgDiv);
+            .hide()
+            .insertAfter(pgDiv);
 
         pgOptions.idPrefix = this.idPrefix + 'Localization_';
 

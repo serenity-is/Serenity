@@ -156,7 +156,7 @@ export class Widget<P = {}> {
      * As widgets may get their elements from props unlike regular JSX widgets, 
      * this method should not be overridden. Override renderContents() instead.
      */
-    public render(): HTMLElement | DocumentFragment {
+    public render(): any {
         let el = this.init().domNode;
         let parent = el?.parentNode;
         if (parent instanceof DocumentFragment &&

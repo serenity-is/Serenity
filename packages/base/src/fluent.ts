@@ -5,9 +5,11 @@ import { toggleClass as toggleCls } from "./html";
 export interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
     addClass(value: string | boolean | (string | boolean)[]): this;
     append(child: string | Node | Fluent<any>): this;
+    after(content: string | Node | Fluent<any>): this;
     appendTo(parent: Element | Fluent<any>): this;
     attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
+    before(content: string | Node | Fluent<any>): this;
     children(selector?: string): HTMLElement[];
     class(value: string | boolean | (string | boolean)[]): this;
     closest(selector: string): Fluent<HTMLElement>;
@@ -208,6 +210,22 @@ Fluent.prototype.addClass = function (this: FluentThis, value: string | boolean 
     return this;
 }
 
+
+Fluent.prototype.after = function (this: FluentThis, content: string | HTMLElement | Fluent<any>) {
+    if (this.el) {
+        const node = extractNode(content);
+        if (node instanceof Element)
+            this.el.insertAdjacentElement("afterend", node);
+        else if (node instanceof DocumentFragment) {
+            Fluent(node).insertAfter(this.el);
+        }
+        else if (node != null && (node as any) !== false) {
+            this.el.insertAdjacentText("afterend", "" + node);
+        }
+    }
+    return this;
+}
+
 Fluent.prototype.append = function (this: FluentThis, child: string | Node | Fluent<HTMLElement>) {
     this.el && this.el.append(extractNode(child));
     return this;
@@ -239,6 +257,21 @@ Fluent.prototype.attr = function (this: FluentThis<any>, name: string, value?: s
             this.el.setAttribute(name, "true");
     }
 
+    return this;
+}
+
+Fluent.prototype.before = function (this: FluentThis, content: string | HTMLElement | Fluent<any>) {
+    if (this.el) {
+        const node = extractNode(content);
+        if (node instanceof Element)
+            this.el.insertAdjacentElement("beforebegin", node);
+        else if (node instanceof DocumentFragment) {
+            Fluent(node).insertBefore(this.el);
+        }
+        else if (node != null && (node as any) !== false) {
+            this.el.insertAdjacentText("beforebegin", "" + node);
+        }
+    }
     return this;
 }
 
