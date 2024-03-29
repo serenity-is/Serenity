@@ -1,9 +1,9 @@
 ﻿import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
-import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { IEditDialog } from "../../interfaces";
 import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../q";
 import { RemoteViewOptions } from "../../slick";
+import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";

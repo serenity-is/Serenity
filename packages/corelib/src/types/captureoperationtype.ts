@@ -1,6 +1,6 @@
 ﻿import { registerEnum } from "@serenity-is/base";
 
-export {}
+export { };
 
 export enum CaptureOperationType {
     Before = 0,
