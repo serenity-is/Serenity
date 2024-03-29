@@ -1950,8 +1950,7 @@ declare class Widget<P = {}> {
     destroy(): void;
     static createDefaultElement(): HTMLElement;
     /**
-     * @deprecated
-     * Prefer domNode as this one returns a Fluent object emulating jQuery
+     * Returns a Fluent(this.domNode) object
      */
     get element(): Fluent;
     protected addCssClass(): void;

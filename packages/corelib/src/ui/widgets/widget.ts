@@ -62,8 +62,7 @@ export class Widget<P = {}> {
     }
 
     /**
-     * @deprecated
-     * Prefer domNode as this one returns a Fluent object emulating jQuery
+     * Returns a Fluent(this.domNode) object
      */
     public get element(): Fluent {
         return Fluent(this.domNode);
