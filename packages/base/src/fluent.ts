@@ -16,8 +16,9 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     each(callback: (el: TElement) => void): this;
     getNode(): TElement;
     empty(): this;
-    findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
+    findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
+    findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
     hasClass(klass: string): boolean;
     hide(): this;
     getWidget<TWidget>(type?: { new(...args: any[]): TWidget }): TWidget;
@@ -352,6 +353,16 @@ Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLEl
     if (!this.el)
         return [];
     return Array.from(this.el.querySelectorAll<HTMLElement>(selector));
+}
+
+Fluent.prototype.findEach = function (this: FluentThis, selector: string, callback: (el: Fluent) => void): Fluent<HTMLElement> {
+    if (!this.el || !callback)
+        return this;
+    var result = this.el.querySelectorAll<HTMLElement>(selector);
+    for (var i = 0; i < result.length; i++) {
+        callback(Fluent(result[i]));
+    }
+    return this;
 }
 
 Fluent.prototype.hide = function (this: FluentThis) {

@@ -1901,8 +1901,9 @@ declare namespace Serenity {
         each(callback: (el: TElement) => void): this;
         getNode(): TElement;
         empty(): this;
-        findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
         findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
+        findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
+        findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
         hasClass(klass: string): boolean;
         hide(): this;
         getWidget<TWidget>(type?: {
