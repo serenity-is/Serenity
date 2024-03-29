@@ -6164,16 +6164,7 @@ declare namespace Serenity {
 
     type Constructor<T> = new (...args: any[]) => T;
 }
-interface JQuery {
-    getWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    tryGetWidget<TWidget>(widgetType?: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    validate(...args: any[]): any;
-    valid(): boolean;
-}
+
 
 import Q = Serenity;
 
