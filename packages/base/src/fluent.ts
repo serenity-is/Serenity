@@ -358,10 +358,7 @@ Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLEl
 Fluent.prototype.findEach = function (this: FluentThis, selector: string, callback: (el: Fluent) => void): Fluent<HTMLElement> {
     if (!this.el || !callback)
         return this;
-    var result = this.el.querySelectorAll<HTMLElement>(selector);
-    for (var i = 0; i < result.length; i++) {
-        callback(Fluent(result[i]));
-    }
+    this.el.querySelectorAll<HTMLElement>(selector).forEach(x => callback(Fluent(x)));
     return this;
 }
 
