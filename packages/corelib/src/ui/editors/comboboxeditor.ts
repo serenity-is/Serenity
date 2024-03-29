@@ -311,12 +311,12 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         this.getComboboxContainer()?.classList.add("has-inplace-button");
         this.domNode.classList.add("has-inplace-button");
 
-        Fluent(this.domNode).on("change", () => {
+        this.element.on("change", () => {
             var isNew = this.isMultiple() || !this.get_value();
             inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
         });
 
-        Fluent(this.domNode).on("change", (e: any) => {
+        this.element.on("change", (e: any) => {
             if ((e.target.dataset.comboboxsettingvalue))
                 return;
             if (this.isMultiple()) {
@@ -546,7 +546,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     private updateInplaceReadOnly(): void {
         var readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
-        let el = Fluent(this.domNode).nextSibling(".inplace-create").getNode();
+        let el = this.element.nextSibling(".inplace-create").getNode();
         if (el) {
             el.setAttribute('disabled', (readOnly ? 'disabled' : ''));
             el.style.opacity = (readOnly ? '0.1' : '');

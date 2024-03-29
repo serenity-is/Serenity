@@ -42,12 +42,12 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
         var displayText = this.get_store().get_displayText()?.trim() || null;
 
-        Fluent(this.domNode).findFirst('.current').toggle(displayText != null);
-        Fluent(this.domNode).findFirst('.reset').toggle(displayText != null);
+        this.element.findFirst('.current').toggle(displayText != null);
+        this.element.findFirst('.reset').toggle(displayText != null);
 
         if (displayText == null)
             displayText = localText('Controls.FilterPanel.EffectiveEmpty');
 
-        Fluent(this.domNode).findFirst('.txt').text('[' + displayText + ']');
+        this.element.findFirst('.txt').text('[' + displayText + ']');
     }
 }

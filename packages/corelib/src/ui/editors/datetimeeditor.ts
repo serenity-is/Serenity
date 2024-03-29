@@ -344,10 +344,10 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 this.domNode.classList.toggle('readonly', !!value);
                 value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
                 
-                let trg = Fluent(this.domNode).nextSibling(".ui-datepicker-trigger").getNode();
+                let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
                 trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
 
-                let now = Fluent(this.domNode).nextSibling(".inplace-now").getNode();
+                let now = this.element.nextSibling(".inplace-now").getNode();
                 now && ((now as HTMLElement).style.opacity = value ? "0.1" : "1");
             }
 

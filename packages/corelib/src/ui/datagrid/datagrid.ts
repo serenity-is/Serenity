@@ -1,10 +1,10 @@
-import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData, getjQuery } from "@serenity-is/base";
+import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, getjQuery, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
+import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor } from "../editors/selecteditor";
@@ -97,7 +97,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 LayoutTimer.store(this._layoutTimer);
         }.bind(this);
 
-        Fluent(this.domNode).addClass('require-layout').on('layout.' + this.uniqueName, layout);
+        this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
 
         if (this.useLayoutTimer())
             this._layoutTimer = LayoutTimer.onSizeChange(() => this.domNode && this.domNode, debounce(layout, 50));

@@ -38,7 +38,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             domain.attr('readonly', 'readonly').addClass('disabled').attr('tabindex', '-1');
         }
 
-        Fluent(this.domNode).on('keypress.' + this.uniqueName, (e: KeyboardEvent) => {
+        this.element.on('keypress.' + this.uniqueName, (e: KeyboardEvent) => {
             if (e.key === "@") {
                 e.preventDefault();
                 if (!this.options.readOnlyDomain) {

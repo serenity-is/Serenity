@@ -6,7 +6,7 @@ import { Widget } from "./widget";
 export class TemplatedWidget<P> extends Widget<P> {
 
     protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement> {
-        return Fluent(this.domNode).findFirst<TElement>('#' + this.idPrefix + id);
+        return this.element.findFirst<TElement>('#' + this.idPrefix + id);
     }
 
     protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {

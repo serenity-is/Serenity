@@ -1,6 +1,6 @@
-﻿import { Fluent, htmlEncode, localText } from "@serenity-is/base";
-import { Decorators } from "../../types/decorators";
+﻿import { Fluent, localText } from "@serenity-is/base";
 import { PagerOptions } from "../../slick";
+import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 @Decorators.registerClass("Serenity.SlickPager")
@@ -24,7 +24,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         let btn = (key: string) => Fluent("div").class(`${p}${key} ${p}btn`).append(Fluent("span").class(`${p}btn-span`));
         let nav = (key: string) => btn(key).on("click", () => this._changePage(key));
 
-        let el = Fluent(this.domNode).addClass("s-SlickPager slick-pg");
+        let el = this.element.addClass("s-SlickPager slick-pg");
 
         this.currentPage = Fluent("input")
             .class(`${p}current mx-1`)

@@ -23,7 +23,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
         
-        let input = Fluent(this.domNode);
+        let input = this.element;
         input.addClass('editor s-TimeEditor hour');
 
         if (!this.options.noEmptyOption) {
@@ -84,10 +84,10 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
 
         if (value !== this.get_readOnly()) {
             if (value) {
-                Fluent(this.domNode).addClass('readonly').attr('readonly', 'readonly');
+                this.element.addClass('readonly').attr('readonly', 'readonly');
             }
             else {
-                Fluent(this.domNode).removeClass('readonly').removeAttr('readonly');
+                this.element.removeClass('readonly').removeAttr('readonly');
             }
             EditorUtils.setReadonly(this.minutes, value);
         }

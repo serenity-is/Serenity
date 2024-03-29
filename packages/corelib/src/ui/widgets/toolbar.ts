@@ -90,7 +90,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
         let group = Fluent("div").class("tool-group");
 
-        Fluent(this.domNode)
+        this.element
             .addClass("s-Toolbar clearfix")
             .append(group);
 

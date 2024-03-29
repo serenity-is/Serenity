@@ -1,5 +1,4 @@
-﻿import { Fluent } from "@serenity-is/base";
-import { IStringValue } from "../../interfaces";
+﻿import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";
 
@@ -15,7 +14,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
 
     constructor(props: EditorProps<P>) {
         super(props);
-        let input = Fluent(this.domNode);
+        let input = this.element;
         if (this.options.cols !== 0) {
             input.attr('cols', this.options.cols ?? 80);
         }
@@ -25,7 +24,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public get value(): string {
-        return Fluent(this.domNode).val() as string;
+        return this.element.val() as string;
     }
 
     protected get_value(): string {
@@ -33,7 +32,7 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
     }
 
     public set value(value: string) {
-        Fluent(this.domNode).val(value ?? "");
+        this.element.val(value ?? "");
     }
 
     protected set_value(value: string): void {

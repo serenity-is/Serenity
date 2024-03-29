@@ -43,7 +43,7 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
     protected responsive: boolean;
 
     public arrange(): void {
-        Fluent(this.domNode).findAll('.require-layout').forEach(el => {
+        this.element.findAll('.require-layout').forEach(el => {
             Fluent.isVisibleLike(el) && Fluent.trigger(el, "layout");
         });
     }

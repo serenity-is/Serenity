@@ -172,7 +172,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
             let domNode = this.domNode
             this.destroy();
             if (domNode) {
-                Fluent(this.domNode).remove();
+                this.element.remove();
             }
             positionToastContainer(defaultNotifyOptions, false);
         }, 0);
