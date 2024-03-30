@@ -1,4 +1,4 @@
-﻿import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "@serenity-is/base";
 import { Column, FormatterContext, FormatterResult, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";
@@ -309,12 +309,11 @@ export namespace GridSelectAllButtonHelper {
             title: text,
             action: "select-all",
             cssClass: 'select-all-button',
-            onClick: function () {
+            onClick: function (e: Event) {
                 var grid = getGrid();
                 var view = grid.getView();
-                var btn = (grid as any).element.children('.s-Toolbar')
-                    .getWidget(Toolbar).findButton('select-all-button');
-                var makeSelected = !btn.hasClass('checked');
+                var btn = (e.target as HTMLElement).closest('.select-all-button');
+                var makeSelected = !btn?.classList.contains('checked');
                 view.beginUpdate();
                 try {
                     for (var item of view.getItems()) {
@@ -327,7 +326,7 @@ export namespace GridSelectAllButtonHelper {
                     view.endUpdate();
                 }
 
-                btn.toggleClass('checked', makeSelected);
+                btn?.classList.toggle('checked', makeSelected);
             }
         };
     }
