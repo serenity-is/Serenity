@@ -15,7 +15,7 @@ export default {
         },
         keepClassNames: true,
         experimental: {
-          plugins: [["jest_workaround", {}]]
+          plugins: [["swc_mut_cjs_exports", {}]]
         },
       },
       module: {
