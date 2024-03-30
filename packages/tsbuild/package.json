@@ -5,8 +5,8 @@
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity ESBuild functions",
   "dependencies": {
-    "esbuild": "0.19.9",
-    "glob": "10.3.10"
+    "esbuild": "0.20.2",
+    "glob": "10.3.12"
   },
   "exports": {
     ".": {
