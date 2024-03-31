@@ -3139,7 +3139,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected override enableInterface() {
         var result = super.enableInterface();
-        if (super.enableInterface()) {
+        if (result) {
             this.search.disabled = !this.isInterfaceEnabled();
         }
         return result;
