@@ -1,4 +1,4 @@
-﻿import { Dialog, Fluent, isArrayLike } from "@serenity-is/base";
+import { Dialog, Fluent, isArrayLike } from "@serenity-is/base";
 
 export interface HandleRouteEvent extends Event {
     route: string,
@@ -74,6 +74,12 @@ export namespace Router {
         replace(newHash, tryBack);
     }
 
+    const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .route-ignore';
+
+    function isIgnoredDialog(el: HTMLElement) {
+        return !!(el?.closest(ignoredSelector) || Dialog.getInstance(el)?.getContentNode()?.closest(ignoredSelector));
+    }
+
     function isVisibleOrHiddenBy(el: HTMLElement): boolean {
         return (el.offsetWidth > 0 && el.offsetHeight > 0) ||  // if visible
             !!(!el.closest(".hidden") && el.closest("[data-hiddenby]")) // or temporarily hidden by another panel
@@ -81,7 +87,8 @@ export namespace Router {
 
     function getVisibleOrHiddenByDialogs(): HTMLElement[] {
         var visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .panel-body, .ui-dialog-content"))
-            .filter(isVisibleOrHiddenBy);
+            .filter(isVisibleOrHiddenBy)
+            .filter(x => !isIgnoredDialog(x));
         visibleDialogs.sort((a: any, b: any) => {
             return parseInt(a.dataset.qrouterorder || "0", 10) - parseInt(b.dataset.qrouterorder || "0", 10);
         });
@@ -183,9 +190,24 @@ export namespace Router {
                 same++;
             }
 
+            let closedMessages = false;
+            function closeMessages() {
+                if (closedMessages) {
+                    return;
+                }
+                closedMessages = true;
+                // user pressed back possibly? close any visible confirm dialogs etc.
+                Array.from(document.querySelectorAll<HTMLElement>(".s-MessageDialog")).reverse().forEach(x => {
+                    if (Fluent.isVisibleLike(x)) {
+                        Dialog.getInstance(x)?.close();
+                    }
+                });
+            }
+
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
                 Dialog.getInstance(d)?.close("router");
+                closeMessages();
             }
 
             for (var i = same; i < Math.min(newParts.length, 5); i++) {
@@ -224,6 +246,7 @@ export namespace Router {
 
                 resolvingPreRoute = newParts.slice(0, i).join("/+/");
                 try {
+                    closeMessages();
                     Fluent.trigger(handler, "handleroute", <HandleRouteEvent>{
                         route: route,
                         parts: newParts,
@@ -269,6 +292,9 @@ export namespace Router {
                 return;
 
             var dlg = event.target as HTMLElement;
+            if (!dlg || isIgnoredDialog(dlg))
+                return;
+
             dlg.dataset.qrouterorder = (routerOrder++).toString();
 
             if (dlg.dataset.qroute)
@@ -289,6 +315,9 @@ export namespace Router {
         Fluent.on(document, "panelopen", ".panel-body", onDocumentDialogOpen);
 
         function shouldTryBack(e: Event) {
+            if (isIgnoredDialog(e.target as HTMLElement))
+                return false;
+
             if ((e.target as HTMLElement)?.closest?.(".s-MessageDialog, .s-MessageModal") ||
                 (e as any).key === "Escape")
                 return true;
@@ -306,7 +335,7 @@ export namespace Router {
 
         function closeHandler(e: any) {
             var dlg = e.target as HTMLElement;
-            if (!dlg)
+            if (!dlg || isIgnoredDialog(e.target))
                 return;
             delete dlg.dataset.qroute;
             var prhash = dlg.dataset.qprhash;
