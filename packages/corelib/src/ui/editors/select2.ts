@@ -950,7 +950,6 @@ abstract class AbstractSelect2 {
     protected elementTabIndex: string;
     protected enabledInterface: boolean;
     protected id: (item: any) => string;
-    protected liveRegion: HTMLElement;
     protected nextSearchTerm: string;
     protected opts: Select2Options;
     protected propertyObserver: MutationObserver;
@@ -985,12 +984,6 @@ abstract class AbstractSelect2 {
         }
 
         this.container = this.createContainer();
-
-        this.liveRegion = document.createElement("span");
-        this.liveRegion.role = "status";
-        this.liveRegion.ariaLive = "polite";
-        this.liveRegion.classList.add("select2-hidden-accessible");
-        document.body.appendChild(this.liveRegion);
 
         this.containerId = "s2id_" + (opts.element.getAttribute("id") || "autogen" + nextUid());
         this.containerEventName = this.containerId
@@ -1146,7 +1139,6 @@ abstract class AbstractSelect2 {
 
         if (select2 !== undefined) {
             select2.container?.remove();
-            select2.liveRegion?.remove();
             select2.dropdown?.remove();
             if (element) {
                 element.classList.remove("select2-offscreen");
@@ -1164,7 +1156,6 @@ abstract class AbstractSelect2 {
 
         cleanupJQueryElements.call(this,
             "container",
-            "liveRegion",
             "dropdown",
             "results",
             "search"
@@ -1213,7 +1204,7 @@ abstract class AbstractSelect2 {
 
         opts = Object.assign({}, <Select2Options>{
             populateResults: function(this: AbstractSelect2, container, results, query) {
-                var id = this.opts.id, liveRegion = this.liveRegion;
+                var id = this.opts.id;
 
                 let populate = function (results: Select2Item[], container: HTMLElement, depth: number) {
 
@@ -1271,14 +1262,6 @@ abstract class AbstractSelect2 {
 
                     // bulk append the created nodes
                     container.append(...nodes);
-                    var matches = opts.formatMatches(results.length);
-                    Fluent.empty(liveRegion);
-                    if (matches instanceof Node) {
-                        liveRegion.appendChild(matches);
-                    }
-                    else {
-                        liveRegion.textContent = matches ?? "";
-                    }
                 };
 
                 populate(results, container, 0);
@@ -1876,8 +1859,6 @@ abstract class AbstractSelect2 {
 
         this.ensureHighlightVisible();
 
-        this.liveRegion.innerText = choice?.textContent ?? "";
-
         data = (choice as any)?.select2data;
         if (data) {
             Fluent.trigger(this.opts.element, "select2-highlight", { val: this.id(data), choice: data });
@@ -1997,17 +1978,6 @@ abstract class AbstractSelect2 {
             search.classList.remove("select2-active");
             search.parentElement?.classList.remove("select2-active");
             self.positionDropdown();
-            Fluent.empty(self.liveRegion);
-            if (results.querySelector('.select2-no-results,.select2-selection-limit,.select2-searching')) {
-                self.liveRegion.textContent = results.textContent;
-            }
-            else {
-                var matches = self.opts.formatMatches(results.querySelectorAll('.select2-result-selectable').length)
-                if (matches instanceof Node)
-                    self.liveRegion.appendChild(matches);
-                else
-                    self.liveRegion.textContent = matches ?? "";
-            }
         }
 
         function createLi(klass: string, html?: Select2FormatResult) {
