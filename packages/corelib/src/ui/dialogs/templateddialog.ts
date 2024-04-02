@@ -119,7 +119,7 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
 
     protected onDialogOpen(): void {
         if (!isMobileView())
-            (this.domNode.querySelector('input:not([type=hidden]), textarea, select') as HTMLElement)?.focus();
+            this.element.findFirst('input:not([type=hidden]), textarea, select').focus();
         this.arrange();
         TabsExtensions.selectTab(this.tabs, 0);
     }
