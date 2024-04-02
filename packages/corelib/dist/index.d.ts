@@ -602,6 +602,8 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     before(content: string | Node | Fluent<any>): this;
     children(selector?: string): HTMLElement[];
     class(value: string | boolean | (string | boolean)[]): this;
+    click(): this;
+    click(listener: (e: MouseEvent) => void): this;
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;
@@ -611,6 +613,7 @@ interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<T
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
     findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
+    focus(): this;
     hasClass(klass: string): boolean;
     hide(): this;
     getWidget<TWidget>(type?: {

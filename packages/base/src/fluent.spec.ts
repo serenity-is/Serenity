@@ -268,6 +268,40 @@ describe('Fluent instance methods', () => {
         });
     });
 
+    describe("click", () => {
+        it('should ignore null element', () => {
+            Fluent(null).click();
+        });
+
+        it('should trigger click event with no arguments', () => {
+            const onClickSpy = jest.fn();
+            fluent.getNode().addEventListener("click", onClickSpy);
+            fluent.click();
+            expect(onClickSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should call elements click method with no arguments", () => {
+            const clickSpy = jest.spyOn(fluent.getNode(), "click");
+            fluent.click();
+            expect(clickSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should ignore if element has no click method", () => {
+            const onClickSpy = jest.fn();
+            fluent.getNode().addEventListener("click", onClickSpy);
+            fluent.getNode().click = null;
+            fluent.click();
+            expect(onClickSpy).not.toHaveBeenCalled();
+        });
+
+        it('should add click event handler', () => {
+            const clickSpy = jest.fn();
+            fluent.click(clickSpy);
+            fluent.getNode().click();
+            expect(clickSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe('empty', () => {
         it('ignores if el is null', () => {
             const f = Fluent(null);
@@ -305,6 +339,23 @@ describe('Fluent instance methods', () => {
             finally {
                 delete (window as any).jQuery;
             }
+        });
+    });
+
+    describe("focus", () => {
+        it('should ignore null element', () => {
+            Fluent(null).focus();
+        });
+
+        it("should call elements focus method", () => {
+            const focusSpy = jest.spyOn(fluent.getNode(), "focus");
+            fluent.focus();
+            expect(focusSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should ignore if element has no focus method", () => {
+            fluent.getNode().focus = null;
+            fluent.focus();
         });
     });
 

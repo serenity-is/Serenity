@@ -12,6 +12,8 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     before(content: string | Node | Fluent<any>): this;
     children(selector?: string): HTMLElement[];
     class(value: string | boolean | (string | boolean)[]): this;
+    click(): this;
+    click(listener: (e: MouseEvent) => void): this;
     closest(selector: string): Fluent<HTMLElement>;
     data(name: string): string;
     data(name: string, value: string): this;
@@ -21,6 +23,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
     findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
     findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
+    focus(): this;
     hasClass(klass: string): boolean;
     hide(): this;
     getWidget<TWidget>(type?: { new(...args: any[]): TWidget }): TWidget;
@@ -210,7 +213,6 @@ Fluent.prototype.addClass = function (this: FluentThis, value: string | boolean 
     return this;
 }
 
-
 Fluent.prototype.after = function (this: FluentThis, content: string | HTMLElement | Fluent<any>) {
     if (this.el) {
         const node = extractNode(content);
@@ -286,6 +288,16 @@ Fluent.prototype.class = function (this: FluentThis, value: string | boolean | (
     return this;
 }
 
+Fluent.prototype.click = function (this: FluentThis, listener?: (e: MouseEvent) => void) {
+    if (listener === void 0 && !arguments.length) {
+        this.el && typeof this.el.click === "function" && this.el.click();
+        return this;
+    }
+    else {
+        return this.on("click", listener);
+    }
+}
+
 Fluent.prototype.closest = function (this: FluentThis, selector: string): Fluent<HTMLElement> {
     return new (Fluent as any)(this.el?.closest<HTMLElement>(selector));
 }
@@ -297,6 +309,11 @@ Fluent.prototype.each = function (this: FluentThis, callback: (el: HTMLElement) 
 
 Fluent.prototype.empty = function (this: FluentThis<any>) {
     Fluent.empty(this.el);
+    return this;
+}
+
+Fluent.prototype.focus = function (this: FluentThis) {
+    this.el && typeof this.el.focus === "function" && this.el.focus();
     return this;
 }
 
