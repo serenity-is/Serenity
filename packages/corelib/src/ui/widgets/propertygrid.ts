@@ -281,7 +281,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 label.getNode().style.display = "none";
             }
             else {
-                label.getNode().style.width = item.labelWidth + "px";
+                label.getNode().style.width = item.labelWidth;
             }
         }
 
