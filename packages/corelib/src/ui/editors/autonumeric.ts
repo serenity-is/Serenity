@@ -588,16 +588,22 @@ class AutoNumericHolder {
             new_value = parts.join(''),
             position = parts[0].length;
         this.dirty = true;
-        if (autoCheck(new_value, settingsClone)) {
-            new_value = truncateDecimal(new_value, settingsClone.aDec, settingsClone.mDec);
-            if (position > new_value.length) {
-                position = new_value.length;
-            }
-            this.value = new_value;
-            this.setPosition(position, false);
-            return true;
+        if (new_value.trim() === '') {
+            new_value = '';
         }
-        return false;
+        else if (autoCheck(new_value, settingsClone)) {
+            new_value = truncateDecimal(new_value, settingsClone.aDec, settingsClone.mDec);
+        }
+        else {
+            return false;
+        }
+
+        if (position > new_value.length) {
+            position = new_value.length;
+        }
+        this.value = new_value;
+        this.setPosition(position, false);
+        return true;
     }
 
     /**
