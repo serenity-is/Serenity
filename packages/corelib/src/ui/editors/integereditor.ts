@@ -36,8 +36,8 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
 
     protected getAutoNumericOptions(): any {
         var numericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
-            vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0')),
-            vMax: (this.options.maxValue ?? 2147483647),
+            vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
+            vMax: this.options.maxValue ?? 2147483647,
             aSep: null
         });
 
