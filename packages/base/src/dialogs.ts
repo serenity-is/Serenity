@@ -581,7 +581,7 @@ export function cancelDialogButton(opt?: DialogButton): DialogButton {
     return {
         text: opt?.text != void 0 ? opt.text : DialogTexts.CancelButton,
         cssClass: opt?.cssClass != void 0 ? opt.cssClass : isBS5Plus() ? 'btn-secondary' : 'btn-default',
-        result: 'cancel',
+        result: opt?.result != void 0 ? opt.result : 'cancel',
         click: opt?.click
     }
 }

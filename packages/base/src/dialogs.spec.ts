@@ -1,4 +1,4 @@
-import { Dialog, alertDialog, confirmDialog, iframeDialog, informationDialog, successDialog, uiAndBSButtonNoConflict, warningDialog, type MessageDialogOptions } from "./dialogs";
+import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
 import { Fluent } from "./fluent";
 
 afterEach(function cleanup() {
@@ -1341,4 +1341,76 @@ describe("Dialog.dispose", () => {
         }
     });
     
+});
+
+describe("okDialogButton", () => {
+    it("should return a dialog button with 'OK' text", () => {
+        const button = okDialogButton();
+        expect(button.result).toBe("ok");
+        expect(button.text).toBe("OK");
+        expect(button.cssClass).toBe("btn-info");
+    });
+
+    it("should return a dialog button with the specified options", () => {
+        const click = jest.fn();
+        const button = okDialogButton({ text: "Confirm", cssClass: "btn-primary", result: "test", click });
+        expect(button.text).toBe("Confirm");
+        expect(button.cssClass).toBe("btn-primary");
+        expect(button.result).toBe("test");
+        expect(button.click).toBe(click);
+    });
+});
+
+describe("yesDialogButton", () => {
+    it("should return a dialog button with 'Yes' text", () => {
+        const button = yesDialogButton();
+        expect(button.result).toBe("yes");
+        expect(button.text).toBe("Yes");
+        expect(button.cssClass).toBe("btn-primary");
+    });
+
+    it("should return a dialog button with the specified options", () => {
+        const click = jest.fn();
+        const button = yesDialogButton({ text: "Agree", cssClass: "btn-success", result: "test", click });
+        expect(button.text).toBe("Agree");
+        expect(button.cssClass).toBe("btn-success");
+        expect(button.result).toBe("test");
+        expect(button.click).toBe(click);
+    });
+});
+
+describe("noDialogButton", () => {
+    it("should return a dialog button with 'No' text", () => {
+        const button = noDialogButton();
+        expect(button.result).toBe("no");
+        expect(button.text).toBe("No");
+        expect(button.cssClass).toBe("btn-default");
+    });
+
+    it("should return a dialog button with the specified options", () => {
+        const click = jest.fn();
+        const button = noDialogButton({ text: "Disagree", cssClass: "btn-danger", result: "test", click });
+        expect(button.text).toBe("Disagree");
+        expect(button.cssClass).toBe("btn-danger");
+        expect(button.result).toBe("test");
+        expect(button.click).toBe(click);        
+    });
+});
+
+describe("cancelDialogButton", () => {
+    it("should return a dialog button with 'Cancel' text", () => {
+        const button = cancelDialogButton();
+        expect(button.result).toBe("cancel");
+        expect(button.text).toBe("Cancel");
+        expect(button.cssClass).toBe("btn-default");
+    });
+
+    it("should return a dialog button with the specified options", () => {
+        const click = jest.fn();
+        const button = cancelDialogButton({ text: "Abort", cssClass: "btn-secondary", result: "test", click });
+        expect(button.text).toBe("Abort");
+        expect(button.cssClass).toBe("btn-secondary");
+        expect(button.result).toBe("test");
+        expect(button.click).toBe(click);
+    });
 });
