@@ -4317,10 +4317,7 @@ declare namespace Serenity {
         constructor(props: EditorProps<P>);
         destroy(): void;
         protected initAutoNumeric(): void;
-        protected getAutoNumericOptions(): AutoNumericOptions & {
-            vMin: string;
-            vMax: string;
-        };
+        protected getAutoNumericOptions(): any;
         get_value(): number;
         get value(): number;
         set_value(value: number): void;
@@ -4340,11 +4337,7 @@ declare namespace Serenity {
         constructor(props: EditorProps<P>);
         destroy(): void;
         protected initAutoNumeric(): void;
-        protected getAutoNumericOptions(): AutoNumericOptions & {
-            vMin: string;
-            vMax: number;
-            aSep: any;
-        };
+        protected getAutoNumericOptions(): any;
         get_value(): number;
         get value(): number;
         set_value(value: number): void;

@@ -1,4 +1,4 @@
-﻿import { Fluent, formatNumber, parseInteger } from "@serenity-is/base";
+import { Fluent, formatNumber, parseInteger } from "@serenity-is/base";
 import { IDoubleValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -34,9 +34,9 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
         AutoNumeric.init(this.domNode, this.getAutoNumericOptions());
     }
 
-    protected getAutoNumericOptions() {
+    protected getAutoNumericOptions(): any {
         var numericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
-            vMin: (this.options.minValue ?? this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
+            vMin: (this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0')),
             vMax: (this.options.maxValue ?? 2147483647),
             aSep: null
         });
