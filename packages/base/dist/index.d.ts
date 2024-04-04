@@ -660,6 +660,9 @@ declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
 declare namespace Fluent {
     var ready: (callback: () => void) => void;
     var byId: <TElement extends HTMLElement>(id: string) => Fluent<TElement>;
+    var findAll: <TElement extends HTMLElement>(selector: string) => TElement[];
+    var findEach: <TElement extends HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void) => void;
+    var findFirst: <TElement extends HTMLElement>(selector: string) => Fluent<TElement>;
 }
 declare namespace Fluent {
     function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;

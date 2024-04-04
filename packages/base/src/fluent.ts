@@ -249,13 +249,13 @@ Fluent.prototype.attr = function (this: FluentThis<any>, name: string, value?: s
         return this.el?.getAttribute(name);
 
     if (this.el) {
-        if (value == null)
+        if (value == null || value === false)
             this.el.removeAttribute(name);
         else if (typeof value === "string")
             this.el.setAttribute(name, value);
         else if (typeof value === "number")
             this.el.setAttribute(name, "" + value);
-        else if (value != null && value !== false)
+        else
             this.el.setAttribute(name, "true");
     }
 
@@ -538,6 +538,20 @@ Fluent.ready = function (callback: () => void) {
 
 Fluent.byId = function <TElement extends HTMLElement>(id: string): Fluent<TElement> {
     return Fluent<TElement>(document.getElementById(id) as TElement);
+}
+
+Fluent.findAll = function <TElement extends HTMLElement>(selector: string): TElement[] {
+    return Array.from(document.querySelectorAll<TElement>(selector));
+}
+
+Fluent.findEach = function<TElement extends HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): void {
+    if (!callback)
+        return;
+    document.querySelectorAll<TElement>(selector).forEach(x => callback(Fluent(x)));
+}
+
+Fluent.findFirst = function <TElement extends HTMLElement>(selector: string): Fluent<TElement> {
+    return Fluent<TElement>(document.querySelector<TElement>(selector));
 }
 
 export function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]> {
