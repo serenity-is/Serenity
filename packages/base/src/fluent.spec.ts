@@ -342,6 +342,92 @@ describe('Fluent instance methods', () => {
         });
     });
 
+    describe('findAll', () => {
+        it('should find all elements that match the specified selector within the element', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = fluent.findAll('.item');
+
+            expect(result.length).toBe(3);
+            expect(result[0].textContent).toBe('Item 1');
+            expect(result[1].textContent).toBe('Item 2');
+            expect(result[2].textContent).toBe('Item 3');
+        });
+
+        it('should return an empty array if no elements match the specified selector', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = fluent.findAll('.non-existent');
+
+            expect(result.length).toBe(0);
+        });
+    });
+
+    describe('findEach', () => {
+        it('should find each element that matches the specified selector within the element and execute a callback function for each found element', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const callback = jest.fn();
+            fluent.findEach('.item', callback);
+
+            expect(callback).toHaveBeenCalledTimes(3);
+            expect(callback.mock.calls[0][0].getNode().textContent).toBe('Item 1');
+            expect(callback.mock.calls[1][0].getNode().textContent).toBe('Item 2');
+            expect(callback.mock.calls[2][0].getNode().textContent).toBe('Item 3');
+        });
+
+        it('should not execute the callback function if no elements match the specified selector', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const callback = jest.fn();
+            fluent.findEach('.non-existent', callback);
+
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('findFirst', () => {
+        it('should find the first element that matches the specified selector within the element', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = fluent.findFirst('.item');
+
+            expect(result.getNode().textContent).toBe('Item 1');
+        });
+
+        it('should return null if no elements match the specified selector', () => {
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = fluent.findFirst('.non-existent');
+
+            expect(result.getNode()).toBeNull();
+        });
+    });
+
     describe("focus", () => {
         it('should ignore null element', () => {
             Fluent(null).focus();
@@ -356,6 +442,88 @@ describe('Fluent instance methods', () => {
         it("should ignore if element has no focus method", () => {
             fluent.getNode().focus = null;
             fluent.focus();
+        });
+    });
+
+    describe('nextSibling', () => {
+
+        it('should return the next sibling of the element', () => {
+            document.createElement("div").appendChild(element);
+            const nextElement = document.createElement('span');
+            element.parentNode.insertBefore(nextElement, element.nextSibling);
+
+            expect(fluent.nextSibling().getNode()).toBe(nextElement);
+        });
+
+        it('should not return the prev sibling of the element', () => {
+            document.createElement("div").appendChild(element);
+            const nextElement = document.createElement('span');
+            element.parentNode.prepend(document.createElement("span"));
+            element.parentNode.append(nextElement, element.nextSibling);
+            expect(fluent.nextSibling().getNode()).toBe(nextElement);
+        });
+
+        it('should return the next sibling matching the selector', () => {
+            document.createElement("div").appendChild(element);
+            const nextElement = document.createElement('span');
+            nextElement.classList.add("test");
+            element.parentNode.append(document.createElement("span"));
+            element.parentNode.append(nextElement);
+            expect(fluent.nextSibling(".test").getNode()).toBe(nextElement);
+        });
+
+        it('should return null if no next element', () => {
+            document.createElement("div").appendChild(element);
+            element.parentNode.prepend(document.createElement("span"));
+            expect(fluent.nextSibling().getNode()).toBe(null);
+        });
+
+        it('should return null if no next matching element', () => {
+            document.createElement("div").appendChild(element);
+            element.parentNode.append(document.createElement("span"));
+            expect(fluent.nextSibling(".test").getNode()).toBe(null);
+        });
+
+    });
+
+    describe('prevSibling', () => {
+
+        it('should return the previous sibling of the element', () => {
+            document.createElement("div").appendChild(element);
+            const prevElement = document.createElement('span');
+            element.parentNode?.insertBefore(prevElement, element);
+
+            expect(fluent.prevSibling().getNode()).toBe(prevElement);
+        });
+
+
+        it('should not return the next sibling of the element', () => {
+            document.createElement("div").appendChild(element);
+            const prevElement = document.createElement('span');
+            element.parentNode.append(document.createElement("span"));
+            element.parentNode.prepend(prevElement);
+            expect(fluent.prevSibling().getNode()).toBe(prevElement);
+        });
+
+        it('should return the prev sibling matching the selector', () => {
+            document.createElement("div").appendChild(element);
+            const prevElement = document.createElement('span');
+            prevElement.classList.add("test");
+            element.parentNode.prepend(document.createElement("span"));
+            element.parentNode.prepend(prevElement);
+            expect(fluent.prevSibling(".test").getNode()).toBe(prevElement);
+        });
+
+        it('should return null if no prev element', () => {
+            document.createElement("div").appendChild(element);
+            element.parentNode.prepend(document.createElement("span"));
+            expect(fluent.nextSibling().getNode()).toBe(null);
+        });
+
+        it('should return null if no prev matching element', () => {
+            document.createElement("div").appendChild(element);
+            element.parentNode.prepend(document.createElement("span"));
+            expect(fluent.prevSibling(".test").getNode()).toBe(null);
         });
     });
 
@@ -433,7 +601,7 @@ describe('Fluent instance methods', () => {
             element.style.color = 'blue';
             element.style.fontSize = '14px';
 
-            fluent.style(() => {});
+            fluent.style(() => { });
 
             expect(element.style.color).toBe('blue');
             expect(element.style.fontSize).toBe('14px');
@@ -644,6 +812,32 @@ describe('Fluent static methods', () => {
         element = document.createElement('div');
     });
 
+    afterEach(() => {
+        element.remove();
+    });
+
+    describe('byId', () => {
+        it('should return a Fluent object with the specified element', () => {
+            const elementId = 'myElementId';
+            const element = document.createElement('div');
+            element.id = elementId;
+            document.body.appendChild(element);
+
+            const fluent = Fluent.byId(elementId);
+
+            expect(fluent.length).toBe(1);
+            expect(fluent.getNode()).toBe(element);
+        });
+
+        it('should return an empty Fluent object if the element does not exist', () => {
+            const elementId = 'nonExistentElementId';
+
+            const fluent = Fluent.byId(elementId);
+
+            expect(fluent.length).toBe(0);
+        });
+    });
+
     describe('empty', () => {
         it('ignores if el is null', () => {
             Fluent.empty(null);
@@ -712,6 +906,98 @@ describe('Fluent static methods', () => {
             const event = { detail: { value: 5 } }
             const result = Fluent.eventProp(event, 'value');
             expect(result).toBe(5);
+        });
+    });
+
+    describe('findAll', () => {
+        it('should find all elements that match the specified selector within the element', () => {
+            document.body.append(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = Fluent.findAll('.item');
+
+            expect(result.length).toBe(3);
+            expect(result[0].textContent).toBe('Item 1');
+            expect(result[1].textContent).toBe('Item 2');
+            expect(result[2].textContent).toBe('Item 3');
+        });
+
+        it('should return an empty array if no elements match the specified selector', () => {
+            document.body.append(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = Fluent.findAll('.non-existent');
+
+            expect(result.length).toBe(0);
+        });
+    });
+
+    describe('findEach', () => {
+        it('should find each element that matches the specified selector within the element and execute a callback function for each found element', () => {
+            document.body.append(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const callback = jest.fn();
+            Fluent.findEach('.item', callback);
+
+            expect(callback).toHaveBeenCalledTimes(3);
+            expect(callback.mock.calls[0][0].getNode().textContent).toBe('Item 1');
+            expect(callback.mock.calls[1][0].getNode().textContent).toBe('Item 2');
+            expect(callback.mock.calls[2][0].getNode().textContent).toBe('Item 3');
+        });
+
+        it('should not execute the callback function if no elements match the specified selector', () => {
+            document.body.append(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const callback = jest.fn();
+            Fluent.findEach('.non-existent', callback);
+
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('findFirst', () => {
+        it('should find the first element that matches the specified selector within the element', () => {
+            document.body.appendChild(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = Fluent.findFirst('.item');
+
+            expect(result.getNode().textContent).toBe('Item 1');
+        });
+
+        it('should return null if no elements match the specified selector', () => {
+            document.body.appendChild(element);
+            element.innerHTML = `
+                    <span class="item">Item 1</span>
+                    <span class="item">Item 2</span>
+                    <span class="item">Item 3</span>
+                `;
+
+            const result = Fluent.findFirst('.non-existent');
+
+            expect(result.getNode()).toBeNull();
         });
     });
 
