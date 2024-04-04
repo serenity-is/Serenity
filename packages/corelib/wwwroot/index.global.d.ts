@@ -1887,67 +1887,351 @@ declare namespace Serenity {
         function unhandledRejectionHandler(err: PromiseRejectionEvent): void;
     }
 
+    /**
+     * Represents a Fluent object, which is similar to jQuery but works for only one element.
+     * It implements the `ArrayLike` interface and can have 0 (null) or 1 element.
+     *
+     * @typeparam TElement The type of the underlying HTML element.
+     */
     interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
+        /**
+         * Adds one or more classes to the element. Any falsy value is ignored.
+         *
+         * @param value The class or classes to add. It can be a string, boolean, or an array of strings or booleans.
+         * @returns The Fluent object itself.
+         */
         addClass(value: string | boolean | (string | boolean)[]): this;
+        /**
+         * Appends content to the element.
+         *
+         * @param child The content to append. It can be a string, a Node object, or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         append(child: string | Node | Fluent<any>): this;
+        /**
+         * Inserts content after the element.
+         *
+         * @param content The content to insert. It can be a string, a Node object, or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         after(content: string | Node | Fluent<any>): this;
+        /**
+         * Appends the element to the specified parent element.
+         *
+         * @param parent The parent element to append to. It can be an Element object or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         appendTo(parent: Element | Fluent<any>): this;
+        /**
+         * Gets or sets the value of the specified attribute.
+         *
+         * @param name The name of the attribute.
+         * @param value The value of the attribute. If the value is falsy the attribute is removed.
+         * @returns The value of the attribute if no value is provided, or the Fluent object itself if a value is provided.
+         */
         attr(name: string): string;
         attr(name: string, value: string | number | boolean | null | undefined): this;
+        /**
+         * Inserts content before the element.
+         *
+         * @param content The content to insert. It can be a string, a Node object, or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         before(content: string | Node | Fluent<any>): this;
+        /**
+         * Gets the children of the element as an array (not Fluent)
+         *
+         * @param selector Optional. A CSS selector to filter the children.
+         * @returns An array of HTMLElement objects representing the children.
+         */
         children(selector?: string): HTMLElement[];
+        /**
+         * Sets (overrides) the class attribute of the element. Any falsy value is ignored.
+         *
+         * @param value The class or classes to add. It can be a string, boolean, or an array of strings or booleans.
+         * @returns The Fluent object itself.
+         */
         class(value: string | boolean | (string | boolean)[]): this;
+        /**
+         * Triggers a click event on the element.
+         *
+         * @param listener Optional. A callback function to execute when the click event is triggered.
+         * @returns The Fluent object itself.
+         */
         click(): this;
         click(listener: (e: MouseEvent) => void): this;
+        /**
+         * Gets the closest ancestor of the element that matches the specified selector.
+         *
+         * @param selector A CSS selector to match against.
+         * @returns A Fluent object representing the closest ancestor element.
+         */
         closest(selector: string): Fluent<HTMLElement>;
+        /**
+         * Gets or sets the value of the specified data attribute.
+         *
+         * @param name The name of the data attribute.
+         * @returns The value of the data attribute if no value is provided, or the Fluent object itself if a value is provided.
+         */
         data(name: string): string;
         data(name: string, value: string): this;
+        /**
+         * Executes a callback function for the element in the Fluent object if it is not null.
+         *
+         * @param callback The callback function to execute for each element.
+         * @returns The Fluent object itself.
+         */
         each(callback: (el: TElement) => void): this;
+        /**
+         * Gets the underlying HTML element.
+         *
+         * @returns The underlying HTML element.
+         */
         getNode(): TElement;
+        /**
+         * Removes all child nodes from the element. It also clears event handlers attached via Fluent, and disposes any attached widgets.
+         *
+         * @returns The Fluent object itself.
+         */
         empty(): this;
+        /**
+         * Finds all elements that match the specified selector within the element.
+         *
+         * @typeparam TElement The type of the found elements.
+         * @param selector A CSS selector to match against.
+         * @returns An array of elements that match the selector.
+         */
         findAll<TElement extends HTMLElement = HTMLElement>(selector: string): TElement[];
+        /**
+         * Finds each element that matches the specified selector within the element and executes a callback function for each found element as a Fluent object.
+         *
+         * @typeparam TElement The type of the found elements.
+         * @param selector A CSS selector to match against.
+         * @param callback The callback function to execute for each found element. It receives a Fluent object for each element.
+         * @returns The Fluent object itself.
+         */
         findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
+        /**
+         * Finds the first element that matches the specified selector within the element.
+         *
+         * @typeparam TElement The type of the found element.
+         * @param selector A CSS selector to match against.
+         * @returns A Fluent object representing the first element that matches the selector.
+         */
         findFirst<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
+        /**
+         * Sets focus on the element.
+         *
+         * @returns The Fluent object itself.
+         */
         focus(): this;
+        /**
+         * Checks if the element has the specified class.
+         *
+         * @param klass The class to check for.
+         * @returns `true` if the element has the class, `false` otherwise.
+         */
         hasClass(klass: string): boolean;
+        /**
+         * Hides the element by setting its display property to "none".
+         *
+         * @returns The Fluent object itself.
+         */
         hide(): this;
+        /**
+         * Gets the widget associated with the element.
+         *
+         * @typeparam TWidget The type of the widget.
+         * @param type Optional. The constructor function of the widget.
+         * @returns The widget associated with the element.
+         */
         getWidget<TWidget>(type?: {
             new (...args: any[]): TWidget;
         }): TWidget;
+        /**
+         * Inserts the element after the specified reference element.
+         *
+         * @param referenceNode The reference element to insert after. It can be an HTMLElement object or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         insertAfter(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+        /**
+         * Inserts the element before the specified reference element.
+         *
+         * @param referenceNode The reference element to insert before. It can be an HTMLElement object or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         insertBefore(referenceNode: HTMLElement | Fluent<HTMLElement>): this;
+        /**
+         * Gets an iterator for the elements in the Fluent object.
+         *
+         * @returns An iterator for the elements in the Fluent object.
+         */
         [Symbol.iterator]: TElement[];
+        /**
+         * Gets the element at the specified index.
+         *
+         * @param n The index of the element.
+         * @returns The element at the specified index.
+         */
         readonly [n: number]: TElement;
+        /**
+         * Gets the number of elements in the Fluent object. Can only be 1 or 0.
+         */
         readonly length: number;
+        /**
+         * Removes an event listener from the element.
+         *
+         * @typeparam K The type of the event.
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to remove.
+         * @returns The Fluent object itself.
+         */
         off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         off(type: string): this;
         off(type: string, listener: EventListener): this;
         off(type: string, selector: string, delegationHandler: Function): this;
+        /**
+         * Adds an event listener to the element. It is possible to use delegated events like jQuery.
+         *
+         * @typeparam K The type of the event.
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to add.
+         * @returns The Fluent object itself.
+         */
         on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         on(type: string, listener: EventListener): this;
         on(type: string, selector: string, delegationHandler: Function): this;
+        /**
+         * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
+         *
+         * @typeparam K The type of the event.
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to add.
+         * @returns The Fluent object itself.
+         */
         one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
         one(type: string, listener: EventListener): this;
         one(type: string, selector: string, delegationHandler: Function): this;
-        matches(selector?: string): boolean;
+        /**
+         * Checks if the element matches the specified selector.
+         *
+         * @param selector A CSS selector to match against.
+         * @returns `true` if the element matches the selector, `false` otherwise.
+         */
+        matches(selector: string): boolean;
+        /**
+         * Gets the next sibling element that matches the specified selector, or the first sibling if no selector is provided..
+         *
+         * @param selector Optional. A CSS selector to filter the next sibling.
+         * @returns A Fluent object representing the next sibling element.
+         */
         nextSibling(selector?: string): Fluent<any>;
+        /**
+         * Gets the parent element of the element.
+         *
+         * @returns A Fluent object representing the parent element.
+         */
         parent(): Fluent<HTMLElement>;
+        /**
+         * Prepends content to the element.
+         *
+         * @param child The content to prepend. It can be a string, a Node object, or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         prepend(child: string | Node | Fluent<any>): this;
+        /**
+         * Prepends the element to the specified parent element.
+         *
+         * @param parent The parent element to prepend to. It can be an Element object or another Fluent object.
+         * @returns The Fluent object itself.
+         */
         prependTo(parent: Element | Fluent<any>): this;
+        /**
+         * Gets the previous sibling element that matches the specified selector, or the first sibling if no selector is provided.
+         *
+         * @param selector Optional. A CSS selector to filter the previous sibling.
+         * @returns A Fluent object representing the previous sibling element.
+         */
         prevSibling(selector?: string): Fluent<any>;
+        /**
+         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+         *
+         * @returns The Fluent object itself.
+         */
         remove(): this;
+        /**
+         * Removes the specified attribute from the element.
+         *
+         * @param name The name of the attribute to remove.
+         * @returns The Fluent object itself.
+         */
         removeAttr(name: string): this;
+        /**
+         * Removes one or more classes from the element. Any falsy value is ignored.
+         *
+         * @param value The class or classes to remove. It can be a string, boolean, or an array of strings or booleans.
+         * @returns The Fluent object itself.
+         */
         removeClass(value: string | boolean | (string | boolean)[]): this;
+        /**
+         * Shows the element by setting its display property to empty string.
+         *
+         * @returns The Fluent object itself.
+         */
         show(): this;
+        /**
+         * Executes a callback function to modify the inline style of the element.
+         *
+         * @param callback The callback function to modify the inline style.
+         * @returns The Fluent object itself.
+         */
         style(callback: (css: CSSStyleDeclaration) => void): this;
+        /**
+         * Gets or sets the text content of the element.
+         *
+         * @returns The text content of the element if no value is provided, or the Fluent object itself if a value is provided.
+         */
         text(): string;
         text(value: string): this;
+        /**
+         * Toggles the visibility of the element.
+         *
+         * @param flag Optional. A flag indicating whether to show or hide the element. If not provided, the visibility will be toggled.
+         * @returns The Fluent object itself.
+         */
         toggle(flag?: boolean): this;
+        /**
+         * Toggles one or more classes on the element. If the class exists, it is removed; otherwise, it is added.
+         *
+         * @param value The class or classes to toggle. It can be a string, boolean, or an array of strings or booleans.
+         * @returns The Fluent object itself.
+         */
         toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
+        /**
+         * Triggers a specified event on the element.
+         *
+         * @param type The type of the event to trigger.
+         * @param args Optional. An object that specifies event-specific initialization properties.
+         * @returns The Fluent object itself.
+         */
         trigger(type: string, args?: any): this;
+        /**
+         * Tries to get the widget associated with the element.
+         *
+         * @typeparam TWidget The type of the widget.
+         * @param type Optional. The constructor function of the widget.
+         * @returns The widget associated with the element, or `null` if no widget is found.
+         */
         tryGetWidget<TWidget>(type?: {
             new (...args: any[]): TWidget;
         }): TWidget;
+        /**
+         * Gets or sets the value of the element.
+         *
+         * @param value The value to set. If no value is provided, returns the current value of the element.
+         * @returns The value of the element if no value is provided, or the Fluent object itself if a value is provided.
+         */
         val(value: string): this;
         val(): string;
     }
@@ -1962,37 +2246,133 @@ declare namespace Serenity {
         var findFirst: <TElement extends HTMLElement>(selector: string) => Fluent<TElement>;
     }
     namespace Fluent {
+        /**
+         * Adds an event listener to the element. It is possible to use delegated events like jQuery.
+         *
+         * @typeparam K The type of the event.
+         * @param element The target element
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to add.
+         */
         function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
         function on(element: EventTarget, type: string, listener: EventListener): void;
         function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+        /**
+         * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
+         *
+         * @typeparam K The type of the event.
+         * @param element The target element
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to add.
+         */
         function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
         function one(element: EventTarget, type: string, listener: EventListener): void;
         function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+        /**
+         * Removes an event listener from the element.
+         *
+         * @param element The target element
+         * @typeparam K The type of the event.
+         * @param type The type of the event. It can include a ".namespace" similar to jQuery.
+         * @param listener The event listener to remove.
+         */
         function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
         function off(element: EventTarget, type: string, listener?: EventListener): void;
         function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+        /**
+         * Triggers a specified event on the element.
+         *
+         * @param element The target element
+         * @param type The type of the event to trigger.
+         * @param args Optional. An object that specifies event-specific initialization properties.
+         * @returns The event object. Use Fluent.isDefaultPrevented the check if preventDefault is called.
+         */
         function trigger(element: EventTarget, type: string, args?: any): Event & {
             isDefaultPrevented?(): boolean;
         };
-        function addClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-        function empty(el: Element): void;
-        /** For compatibility with jQuery's :visible selector, e.g. has offsetWidth or offsetHeight or any client rect */
-        function isVisibleLike(el: Element): boolean;
-        function remove(el: Element): any;
-        function removeClass(el: Element, value: string | boolean | (string | boolean)[]): void;
-        function toggle(el: Element, flag?: boolean): void;
-        function toggleClass(el: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
+        /**
+         * Adds one or more classes to the element. Any falsy value is ignored.
+         *
+         * @param element The target element
+         * @param value The class or classes to add. It can be a string, boolean, or an array of strings or booleans.
+         */
+        function addClass(element: Element, value: string | boolean | (string | boolean)[]): void;
+        function empty(element: Element): void;
+        /**
+         * Returns true if the element is visible like. This is for compatibility with jQuery's :visible selector.
+         * @param element The target element
+         * @returns true if the element has offsetWidth or offsetHeight or any getClientRects().length > 0
+         */
+        function isVisibleLike(element: Element): boolean;
+        /**
+         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+         *
+         * @param element The element to remove
+         */
+        function remove(element: Element): void;
+        /**
+         * Removes one or more classes from the element. Any falsy value is ignored.
+         *
+         * @param element The target element
+         * @param value The class or classes to remove. It can be a string, boolean, or an array of strings or booleans.
+         */
+        function removeClass(element: Element, value: string | boolean | (string | boolean)[]): void;
+        /**
+         * Toggles the visibility of the element.
+         *
+         * @param element The target element
+         * @param flag Optional. A flag indicating whether to show or hide the element. If not provided, the visibility will be toggled.
+         * @returns The Fluent object itself.
+         */
+        function toggle(element: Element, flag?: boolean): void;
+        /**
+         * Toggles one or more classes on the element. If the class exists, it is removed; otherwise, it is added. Falsy values are ignored.
+         *
+         * @param element The target element
+         * @param value The class or classes to toggle. It can be a string, boolean, or an array of strings or booleans.
+         */
+        function toggleClass(element: Element, value: string | boolean | (string | boolean)[], add?: boolean): void;
+        /**
+         * Converts the given class value or an array of class values to a CSS class name. Any falsy value is ignored.
+         * @param value The class or classes. It can be a string, boolean, or an array of strings or booleans.
+         * @returns Class name string
+         */
         function toClassName(value: string | boolean | (string | boolean)[]): string;
-        function isInputLike(node: Element): node is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+        /**
+         * Returns true if the element is input like. E.g. one of input, textarea, select, button. This is for compatibility with jQuery's :input selector.
+         * @param element The target element
+         * @returns true if element is an input like node
+         */
+        function isInputLike(element: Element): element is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement);
+        /** A CSS selector for input like tags */
         const inputLikeSelector = "input,select,textarea,button";
+        /**
+         * Returns true if the tag is one of input, textarea, select, button.
+         * @param tag The tag
+         * @returns true if the element has offsetWidth or offsetHeight or any getClientRects().length > 0
+         */
         function isInputTag(tag: string): boolean;
-        function isDefaultPrevented(e: {
+        /**
+         * Checks if the event's preventDefault method is called. This is for compatibility with jQuery which
+         * has a non-standard isDefaultPrevented method.
+         * @param event The event object
+         * @returns True if preventDefault is called.
+         */
+        function isDefaultPrevented(event: {
             defaultPrevented?: boolean;
             isDefaultPrevented?: () => boolean;
         }): boolean;
-        function eventProp(e: any, prop: string): any;
+        /**
+         * Tries to read a property from the event, or event.originalEvent, or event.detail. It is designed
+         * for compatibility with the way jQuery wraps original event under originalEvent property, that
+         * causes custom properties to be not available in the event object.
+         *
+         * @param event The event object
+         * @param prop The property name
+         * @returns The property value
+         */
+        function eventProp(event: any, prop: string): any;
     }
-    function H<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 
     /**
      * Interface for number formatting, similar to .NET's NumberFormatInfo
