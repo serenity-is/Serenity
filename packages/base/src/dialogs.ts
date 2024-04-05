@@ -410,7 +410,7 @@ export class Dialog {
                 .class("panel-titlebar-text"));
 
         let panel = Fluent("div")
-            .class(["s-Panel", opt.dialogClass])
+            .class(["s-Panel", "hidden", opt.dialogClass])
             .append(titlebar)
 
         this.el.classList.add("panel-body");

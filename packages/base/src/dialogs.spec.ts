@@ -9,24 +9,11 @@ afterEach(function cleanup() {
     jest.restoreAllMocks();
 });
 
-function mockUndefinedJQuery() {
-    delete (window as any)["jQuery"]
-    delete (window as any)["$"]
-}
-
-function mockUndefinedBS5Plus() {
-    delete (window as any)["bootstrap"]
-}
-
-function mockEnvironmentWithBrowserDialogsOnly() {
-    mockUndefinedBS5Plus();
-    mockUndefinedJQuery();
-}
-
 function mockBS5Plus() {
     let modal = jest.fn(function (div: HTMLElement, opt: any) {
         return (div as any).modalInstance = {
             opt: opt,
+            dispose: jest.fn(),
             show: jest.fn(function () {
                 div.dataset.showCalls = (parseInt(div.dataset.showCalls ?? "0", 10) + 1).toString();
             }),
@@ -44,11 +31,6 @@ function mockBS5Plus() {
     return ((window as any)["bootstrap"] = {
         Modal: modal
     });
-}
-
-function mockBS5PlusWithUndefinedJQuery() {
-    mockUndefinedJQuery();
-    return mockBS5Plus();
 }
 
 function mockJQuery(fn: any) {
@@ -351,12 +333,45 @@ describe("Bootstrap noConflict", function () {
     });
 });
 
+describe("Dialog constructor", () => {
+    it("accepts ArrayLike element", () => {
+        const body = document.createElement("div");
+
+        const dlg = new Dialog({
+            element: [body]
+        })
+        expect(dlg.getContentNode()).toBe(body);
+        dlg.dispose();
+    });
+
+    it("removes hidden class from the element", () => {
+        const body = document.createElement("div");
+        body.classList.add("hidden");
+
+        const dlg = new Dialog({
+            element: [body]
+        })
+        expect(dlg.getContentNode()).toBe(body);
+        expect(body.classList.contains("hidden")).toBe(false);
+        dlg.dispose();
+    });
+
+    it("creates UI dialog if both jQuery UI and Bootstrap are available and preferBSModal is false", () => {
+        mockJQueryWithUIDialog();
+        mockBS5Plus();
+        const dlg = new Dialog({
+            preferBSModal: false,
+            preferPanel: false
+        });
+        expect(dlg.getDialogNode().classList.contains("ui-dialog")).toBe(true);
+    });
+});
+
 
 describe("alertDialog", () => {
     it('alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
         let alertSpy = jest.spyOn(window, "alert");
         try {
-            mockEnvironmentWithBrowserDialogsOnly();
             alertSpy.mockImplementation(() => { });
             alertDialog('test message');
             expect(alertSpy).toHaveBeenCalledTimes(1);
@@ -400,7 +415,7 @@ describe("alertDialog", () => {
     });
 
     it('returns expected bootstrap.Modal markup', async function () {
-        let bootstrap = mockBS5PlusWithUndefinedJQuery();
+        let bootstrap = mockBS5Plus();
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn()
@@ -471,7 +486,6 @@ describe("alertDialog", () => {
 describe("informationDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
@@ -526,7 +540,6 @@ describe("informationDialog", () => {
 describe("warningDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
@@ -543,7 +556,6 @@ describe("warningDialog", () => {
 describe("confirmDialog", () => {
 
     it('uses window.confirm when no BS/jQuery UI loaded', async function () {
-        mockEnvironmentWithBrowserDialogsOnly();
         let confirmSpy = jest.spyOn(window, "confirm");
         try {
             confirmSpy.mockImplementation(() => true);
@@ -600,7 +612,7 @@ describe("confirmDialog", () => {
     });
 
     it('returns expected bootstrap.Modal markup with BS5+ and no JQuery', async function () {
-        let bootstrap = mockBS5PlusWithUndefinedJQuery();
+        let bootstrap = mockBS5Plus();
         let opt = {
             onOpen: jest.fn(),
             onClose: jest.fn(),
@@ -665,7 +677,6 @@ describe("confirmDialog", () => {
 describe("successDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        mockEnvironmentWithBrowserDialogsOnly();
         let alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
@@ -723,7 +734,6 @@ describe("successDialog", () => {
 describe("iframeDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        mockEnvironmentWithBrowserDialogsOnly();
         var alertSpy = jest.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
@@ -764,7 +774,7 @@ describe("iframeDialog", () => {
     });
 
     it('returns expected bootstrap.Modal markup', async function () {
-        let bootstrap = mockBS5PlusWithUndefinedJQuery();
+        let bootstrap = mockBS5Plus();
         const dialogs = await import("./dialogs");
         var opt = {
             html: "<span>test</span>",
@@ -807,7 +817,7 @@ describe("iframeDialog", () => {
 describe("dialog button icon handling", () => {
 
     it("auto prefixes icons with 'fa-' prefix with 'fa' with BS5+ and no JQuery", async function () {
-        mockBS5PlusWithUndefinedJQuery();
+        mockBS5Plus();
         alertDialog("test", {
             buttons: [{
                 result: "ok",
@@ -949,72 +959,72 @@ describe("Dialog.close", () => {
         expect(div.classList.contains("hidden")).toBe(true);
     });
 
-    //it("can close panel via jQuery", async function () {
-    //    let jQuery = mockJQuery({});
-    //    var divEl = document.body.appendChild(document.createElement('div'));
-    //    divEl.classList.add("s-Panel");
-    //    let div = jQuery(divEl);
-    //    let closingPanel: any;
-    //    let closedPanel: any;
-    //    let panelBeforeClose = (e: any) => closingPanel = e.target;
-    //    let panelClose = (e: any) => closedPanel = e.target;
-    //    Fluent.on(window, 'panelbeforeclose', panelBeforeClose);
-    //    Fluent.on(window, 'panelclose', panelClose);
-    //    try {
-    //        let dialogs = (await import("./dialogs"));
-    //        dialogs.Dialog.getInstance(div).close();
-    //        expect(div.hasClass("hidden")).toBe(true);
-    //        expect(closingPanel).toBe(divEl);
-    //        expect(closedPanel).toBe(divEl);
-    //    }
-    //    finally {
-    //        Fluent.off(window, 'panelbeforeclose', panelBeforeClose);
-    //        Fluent.off(window, 'panelclose', panelClose);
-    //        div.remove();
-    //    }
-    //});
+    it("can close panel via jQuery", async function () {
+        const jQuery = mockJQuery({});
+        const panel = document.body.appendChild(document.createElement('div'));
+        panel.classList.add("s-Panel");
+        const body = panel.appendChild(document.createElement("div"));
+        body.classList.add("panel-body");
+        let closingPanel: any;
+        let closedPanel: any;
+        const panelBeforeClose = (e: any) => closingPanel = e.target;
+        const panelClose = (e: any) => closedPanel = e.target;
+        Fluent.on(window, 'panelbeforeclose', panelBeforeClose);
+        Fluent.on(window, 'panelclose', panelClose);
+        try {
+            Dialog.getInstance(jQuery(body)).close();
+            expect(panel.classList.contains("hidden")).toBe(true);
+            expect(closingPanel).toBe(body);
+            expect(closedPanel).toBe(body);
+        }
+        finally {
+            Fluent.off(window, 'panelbeforeclose', panelBeforeClose);
+            Fluent.off(window, 'panelclose', panelClose);
+            panel.remove();
+        }
+    });
 
-    // it("can close panel with Undefined jQuery", async function () {
-    //     mockUndefinedJQuery();
-    //     let div = document.body.appendChild(document.createElement("div"));
-    //     let closingPanel: any;
-    //     let closedPanel: any;
-    //     let panelClosing = (e: any) => closingPanel = e.target;
-    //     let panelClose = (e: any) => closedPanel = e.target;
-    //     Fluent.on(window, 'panelbeforeclose', panelClosing);
-    //     Fluent.on(window, 'panelclose', panelClose);
-    //     try {
-    //         div.classList.add("s-Panel");
-    //         let dialogs = (await import("./dialogs"));
-    //         dialogs.Dialog.getInstance(div).close();
-    //         expect(div.classList.contains("hidden")).toBe(true);
-    //         expect(closingPanel).toBe(div);
-    //         expect(closedPanel).toBe(div);
-    //     }
-    //     finally {
-    //         Fluent.off(window, 'panelbeforeclose', panelClosing);
-    //         Fluent.off(window, 'panelclose', panelClose);
-    //         div.remove();
-    //     }
-    // });
+    it("can close panel with Undefined jQuery", async function () {
+        const panel = document.body.appendChild(document.createElement('div'));
+        panel.classList.add("s-Panel");
+        const body = panel.appendChild(document.createElement("div"));
+        body.classList.add("panel-body");
+        let closingPanel: any;
+        let closedPanel: any;
+        const panelBeforeClose = (e: any) => closingPanel = e.target;
+        const panelClose = (e: any) => closedPanel = e.target;
+        Fluent.on(window, 'panelbeforeclose', panelBeforeClose);
+        Fluent.on(window, 'panelclose', panelClose);
+        try {
+            Dialog.getInstance(body).close();
+            expect(panel.classList.contains("hidden")).toBe(true);
+            expect(closingPanel).toBe(body);
+            expect(closedPanel).toBe(body);
+        }
+        finally {
+            Fluent.off(window, 'panelbeforeclose', panelBeforeClose);
+            Fluent.off(window, 'panelclose', panelClose);
+            panel.remove();
+        }
+    });
 
-    // it("can be cancelled with preventDefault with Undefined jQuery", async function () {
-    //     mockUndefinedJQuery();
-    //     let div = document.body.appendChild(document.createElement("div"));
-    //     try {
-    //         div.classList.add("s-Panel");
-    //         div.addEventListener("panelbeforeclose", e => {
-    //             e.preventDefault();
-    //         });
-    //         let dialogs = (await import("./dialogs"));
-    //         dialogs.Dialog.getInstance(div).close();
-    //         expect(div.dataset.hiddenby).toBeFalsy();
-    //         expect(div.classList.contains("hidden")).toBe(false);
-    //     }
-    //     finally {
-    //         div.remove();
-    //     }
-    // });
+    it("can be cancelled with preventDefault with Undefined jQuery", async function () {
+        const panel = document.body.appendChild(document.createElement('div'));
+        panel.classList.add("s-Panel");
+        const body = panel.appendChild(document.createElement("div"));
+        body.classList.add("panel-body");
+        try {
+            body.addEventListener("panelbeforeclose", e => {
+                e.preventDefault();
+            });
+            Dialog.getInstance(body).close();
+            expect(panel.dataset.hiddenby).toBeFalsy();
+            expect(panel.classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            panel.remove();
+        }
+    });
 
     //it("can be cancelled with preventDefault with jQuery", async function () {
     //    let jQuery = mockJQuery({});
@@ -1184,7 +1194,6 @@ describe("Dialog panels", () => {
     });
 
     it("can open panel without jQuery", async function () {
-        mockUndefinedJQuery();
         document.body.classList.add("panels-container");
         var body1 = Fluent("div").addClass("panel-body 1");
         var panel1 = Fluent("div").class("s-Panel").appendTo(document.body).append(body1);
@@ -1301,6 +1310,28 @@ describe("Dialog.dispose", () => {
         dlg.dispose();
     });
 
+    it("should set private property el to null", () => {
+        const dlg = new Dialog();
+        dlg.dispose();
+        expect(dlg.getDialogNode()).toBe(null);
+        expect(dlg.getContentNode()).toBe(null);
+        expect(dlg.getEventsNode()).toBe(null);
+    });
+
+    it("should use modal instance dispose method if Bootstrap 5+", () => {
+        const bootstrap = mockBS5Plus();
+        const dlg = new Dialog({ preferBSModal: true, preferPanel: false });
+        const modal = bootstrap.Modal.getInstance(dlg.getEventsNode());
+        expect(modal).toBeTruthy();
+        expect(modal.dispose).not.toHaveBeenCalled();
+        dlg.dispose();
+        expect(modal.dispose).toHaveBeenCalledTimes(1);
+        expect(dlg.getDialogNode()).toBe(null);
+        expect(dlg.getContentNode()).toBe(null);
+        expect(dlg.getEventsNode()).toBe(null);
+    });
+
+
     it("should remove panel-body element if s-Panel element is not found", () => {
         const dlg = new Dialog();
         (dlg as any).el = bodyEl;;
@@ -1340,7 +1371,71 @@ describe("Dialog.dispose", () => {
             delete (window as any).jQuery;
         }
     });
-    
+
+});
+
+describe("Dialog.onOpen", () => {
+    it("ignores if panel is disposed", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        dlg.dispose();
+        const onOpen = jest.fn();
+        dlg.onOpen(onOpen);
+        expect(onOpen).not.toHaveBeenCalled();
+    });
+
+    it("attaches an event handler for panelopen event", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        try {
+            const onOpen1 = jest.fn();
+            const onOpen2 = jest.fn();
+            dlg.onOpen(onOpen1);
+            dlg.onOpen(onOpen2);
+            expect(onOpen1).not.toHaveBeenCalled();
+            expect(onOpen2).not.toHaveBeenCalled();
+            dlg.open();
+            expect(onOpen1).toHaveBeenCalledTimes(1);
+            expect(onOpen2).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("attaches an event handler for panelbeforeopen event if second argument is true", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        try {
+            const beforeOpen1 = jest.fn();
+            const beforeOpen2 = jest.fn();
+            dlg.onOpen(beforeOpen1, true);
+            dlg.onOpen(beforeOpen2, true);
+            expect(beforeOpen1).not.toHaveBeenCalled();
+            expect(beforeOpen2).not.toHaveBeenCalled();
+            dlg.open();
+            expect(beforeOpen1).toHaveBeenCalledTimes(1);
+            expect(beforeOpen2).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("can abort openining preventDefault is called in panelbeforeopen", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
+        try {
+            const beforeOpen = jest.fn().mockImplementation((e) => e.preventDefault());
+            const afterOpen = jest.fn();
+            dlg.onOpen(beforeOpen, true);
+            dlg.open();
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            expect(afterOpen).not.toHaveBeenCalled();
+            console.log(dlg.getDialogNode().outerHTML);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
 });
 
 describe("okDialogButton", () => {
@@ -1393,7 +1488,7 @@ describe("noDialogButton", () => {
         expect(button.text).toBe("Disagree");
         expect(button.cssClass).toBe("btn-danger");
         expect(button.result).toBe("test");
-        expect(button.click).toBe(click);        
+        expect(button.click).toBe(click);
     });
 });
 
