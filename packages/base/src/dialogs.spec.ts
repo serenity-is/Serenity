@@ -1428,7 +1428,6 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             expect(afterOpen).not.toHaveBeenCalled();
-            console.log(dlg.getDialogNode().outerHTML);
             expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
         }
         finally {
