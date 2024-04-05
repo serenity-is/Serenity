@@ -1,5 +1,5 @@
 ﻿import { formatNumber, htmlEncode, tryGetText } from "@serenity-is/base";
-import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escape } from "@serenity-is/sleekgrid";
+import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
 
 export { };
 
@@ -163,7 +163,7 @@ export namespace AggregateFormatting {
             var item = new NonDataRow();
             (item as any)[column.field] = value;
             try {
-                var result = formatter({ column, escape, item, value });
+                var result = formatter({ column, escape: escapeHtml, item, value });
                 if (result instanceof Element)
                     return result.outerHTML;
                 else if (result instanceof DocumentFragment)

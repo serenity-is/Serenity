@@ -8,154 +8,6 @@ declare namespace Slick {
     	__nonDataRow: boolean;
     }
     const preClickClassName = "slick-edit-preclick";
-    interface FormatterContext<TItem = any> {
-    	addAttrs?: {
-    		[key: string]: string;
-    	};
-    	addClass?: string;
-    	cell?: number;
-    	column?: Column<TItem>;
-    	/** returns html escaped ctx.value if called without arguments. prefer this over ctx.value to avoid html injection attacks! */
-    	readonly escape: ((value?: any) => string);
-    	grid?: any;
-    	item?: TItem;
-    	row?: number;
-    	tooltip?: string;
-    	/** when returning a formatter result, prefer ctx.escape() to avoid script injection attacks! */
-    	value?: any;
-    }
-    export type FormatterResult = (string | Element | DocumentFragment);
-    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
-    interface CompatFormatterResult {
-    	addClasses?: string;
-    	text?: FormatterResult;
-    	toolTip?: string;
-    }
-    export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
-    interface FormatterFactory<TItem = any> {
-    	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
-    	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
-    }
-    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    export type CellStylesHash = {
-    	[row: number]: {
-    		[columnId: string]: string;
-    	};
-    };
-    function defaultColumnFormat(ctx: FormatterContext): any;
-    function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
-    function applyFormatterResultToCellNode(ctx: FormatterContext, html: FormatterResult, node: HTMLElement): void;
-    /***
-     * Information about a group of rows.
-     */
-    class Group<TEntity = any> extends NonDataRow {
-    	readonly __group = true;
-    	/**
-    	 * Grouping level, starting with 0.
-    	 * @property level
-    	 * @type {Number}
-    	 */
-    	level: number;
-    	/***
-    	 * Number of rows in the group.
-    	 * @property count
-    	 * @type {Number}
-    	 */
-    	count: number;
-    	/***
-    	 * Grouping value.
-    	 * @property value
-    	 * @type {Object}
-    	 */
-    	value: any;
-    	/***
-    	 * Formatted display value of the group.
-    	 * @property title
-    	 * @type {String}
-    	 */
-    	title: string;
-    	/***
-    	 * Whether a group is collapsed.
-    	 * @property collapsed
-    	 * @type {Boolean}
-    	 */
-    	collapsed: boolean;
-    	/***
-    	 * GroupTotals, if any.
-    	 * @property totals
-    	 * @type {GroupTotals}
-    	 */
-    	totals: GroupTotals<TEntity>;
-    	/**
-    	 * Rows that are part of the group.
-    	 * @property rows
-    	 * @type {Array}
-    	 */
-    	rows: TEntity[];
-    	/**
-    	 * Sub-groups that are part of the group.
-    	 * @property groups
-    	 * @type {Array}
-    	 */
-    	groups: Group<TEntity>[];
-    	/**
-    	 * A unique key used to identify the group.  This key can be used in calls to DataView
-    	 * collapseGroup() or expandGroup().
-    	 * @property groupingKey
-    	 * @type {Object}
-    	 */
-    	groupingKey: string;
-    	/***
-    	 * Compares two Group instances.
-    	 * @method equals
-    	 * @return {Boolean}
-    	 * @param group {Group} Group instance to compare to.
-    	 */
-    	equals(group: Group): boolean;
-    }
-    /***
-     * Information about group totals.
-     * An instance of GroupTotals will be created for each totals row and passed to the aggregators
-     * so that they can store arbitrary data in it.  That data can later be accessed by group totals
-     * formatters during the display.
-     * @class GroupTotals
-     * @extends NonDataRow
-     * @constructor
-     */
-    class GroupTotals<TEntity = any> extends NonDataRow {
-    	readonly __groupTotals = true;
-    	/***
-    	 * Parent Group.
-    	 * @param group
-    	 * @type {Group}
-    	 */
-    	group: Group<TEntity>;
-    	/***
-    	 * Whether the totals have been fully initialized / calculated.
-    	 * Will be set to false for lazy-calculated group totals.
-    	 * @param initialized
-    	 * @type {Boolean}
-    	 */
-    	initialized: boolean;
-    	/**
-    	 * Contains sum
-    	 */
-    	sum?: number;
-    	/**
-    	 * Contains avg
-    	 */
-    	avg?: number;
-    	/**
-    	 * Contains min
-    	 */
-    	min?: any;
-    	/**
-    	 * Contains max
-    	 */
-    	max?: any;
-    }
-    export type EventListener<TArgs, TEventData extends IEventData = IEventData> = (e: TEventData, args: TArgs) => void;
     interface IEventData {
     	readonly type?: string;
     	currentTarget?: EventTarget | null;
@@ -206,13 +58,13 @@ declare namespace Slick {
     	 * @method subscribe
     	 * @param fn {Function} Event handler.
     	 */
-    	subscribe(fn: EventListener<TArgs, TEventData>): void;
+    	subscribe(fn: ((e: TEventData, args: TArgs) => void)): void;
     	/***
     	 * Removes an event handler added with <code>subscribe(fn)</code>.
     	 * @method unsubscribe
     	 * @param fn {Function} Event handler to be removed.
     	 */
-    	unsubscribe(fn: EventListener<TArgs, TEventData>): void;
+    	unsubscribe(fn: ((e: TEventData, args: TArgs) => void)): void;
     	/***
     	 * Fires an event notifying all subscribers.
     	 * @param args {Object} Additional data object to be passed to all handlers.
@@ -230,8 +82,8 @@ declare namespace Slick {
     }
     class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
     	private _handlers;
-    	subscribe(event: EventEmitter<TArgs, TEventData>, handler: EventListener<TArgs, TEventData>): this;
-    	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: EventListener<TArgs, TEventData>): this;
+    	subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this;
+    	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this;
     	unsubscribeAll(): EventSubscriber<TArgs, TEventData>;
     }
     /** @deprecated */
@@ -383,6 +235,153 @@ declare namespace Slick {
      * @constructor
      */
     const GlobalEditorLock: EditorLock;
+    interface FormatterContext<TItem = any> {
+    	addAttrs?: {
+    		[key: string]: string;
+    	};
+    	addClass?: string;
+    	cell?: number;
+    	column?: Column<TItem>;
+    	/** returns html escaped ctx.value if called without arguments. prefer this over ctx.value to avoid html injection attacks! */
+    	readonly escape: ((value?: any) => string);
+    	grid?: any;
+    	item?: TItem;
+    	row?: number;
+    	tooltip?: string;
+    	/** when returning a formatter result, prefer ctx.escape() to avoid script injection attacks! */
+    	value?: any;
+    }
+    export type FormatterResult = (string | Element | DocumentFragment);
+    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
+    interface CompatFormatterResult {
+    	addClasses?: string;
+    	text?: FormatterResult;
+    	toolTip?: string;
+    }
+    export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    interface FormatterFactory<TItem = any> {
+    	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
+    	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
+    }
+    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    export type CellStylesHash = {
+    	[row: number]: {
+    		[columnId: string]: string;
+    	};
+    };
+    function defaultColumnFormat(ctx: FormatterContext): any;
+    function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
+    function applyFormatterResultToCellNode(ctx: FormatterContext, html: FormatterResult, node: HTMLElement): void;
+    /***
+     * Information about a group of rows.
+     */
+    class Group<TEntity = any> extends NonDataRow {
+    	readonly __group = true;
+    	/**
+    	 * Grouping level, starting with 0.
+    	 * @property level
+    	 * @type {Number}
+    	 */
+    	level: number;
+    	/***
+    	 * Number of rows in the group.
+    	 * @property count
+    	 * @type {Number}
+    	 */
+    	count: number;
+    	/***
+    	 * Grouping value.
+    	 * @property value
+    	 * @type {Object}
+    	 */
+    	value: any;
+    	/***
+    	 * Formatted display value of the group.
+    	 * @property title
+    	 * @type {String}
+    	 */
+    	title: string;
+    	/***
+    	 * Whether a group is collapsed.
+    	 * @property collapsed
+    	 * @type {Boolean}
+    	 */
+    	collapsed: boolean;
+    	/***
+    	 * GroupTotals, if any.
+    	 * @property totals
+    	 * @type {GroupTotals}
+    	 */
+    	totals: GroupTotals<TEntity>;
+    	/**
+    	 * Rows that are part of the group.
+    	 * @property rows
+    	 * @type {Array}
+    	 */
+    	rows: TEntity[];
+    	/**
+    	 * Sub-groups that are part of the group.
+    	 * @property groups
+    	 * @type {Array}
+    	 */
+    	groups: Group<TEntity>[];
+    	/**
+    	 * A unique key used to identify the group.  This key can be used in calls to DataView
+    	 * collapseGroup() or expandGroup().
+    	 * @property groupingKey
+    	 * @type {Object}
+    	 */
+    	groupingKey: string;
+    	/***
+    	 * Compares two Group instances.
+    	 * @method equals
+    	 * @return {Boolean}
+    	 * @param group {Group} Group instance to compare to.
+    	 */
+    	equals(group: Group): boolean;
+    }
+    /***
+     * Information about group totals.
+     * An instance of GroupTotals will be created for each totals row and passed to the aggregators
+     * so that they can store arbitrary data in it.  That data can later be accessed by group totals
+     * formatters during the display.
+     * @class GroupTotals
+     * @extends NonDataRow
+     * @constructor
+     */
+    class GroupTotals<TEntity = any> extends NonDataRow {
+    	readonly __groupTotals = true;
+    	/***
+    	 * Parent Group.
+    	 * @param group
+    	 * @type {Group}
+    	 */
+    	group: Group<TEntity>;
+    	/***
+    	 * Whether the totals have been fully initialized / calculated.
+    	 * Will be set to false for lazy-calculated group totals.
+    	 * @param initialized
+    	 * @type {Boolean}
+    	 */
+    	initialized: boolean;
+    	/**
+    	 * Contains sum
+    	 */
+    	sum?: number;
+    	/**
+    	 * Contains avg
+    	 */
+    	avg?: number;
+    	/**
+    	 * Contains min
+    	 */
+    	min?: any;
+    	/**
+    	 * Contains max
+    	 */
+    	max?: any;
+    }
     interface Column<TItem = any> {
     	asyncPostRender?: AsyncPostRender<TItem>;
     	asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
@@ -444,7 +443,7 @@ declare namespace Slick {
     }
     function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
     function titleize(str: string): string;
-    class Range {
+    class CellRange {
     	fromRow: number;
     	fromCell: number;
     	toRow: number;
@@ -468,7 +467,7 @@ declare namespace Slick {
     	toString(): string;
     }
     function addClass(el: Element, cls: string): void;
-    function escape(s: any): any;
+    function escapeHtml(s: any): any;
     function disableSelection(target: HTMLElement): void;
     function removeClass(el: Element, cls: string): void;
     function H<K extends keyof HTMLElementTagNameMap>(tag: K, attr?: {
@@ -497,8 +496,8 @@ declare namespace Slick {
     	numVisibleRows: number;
     }
     interface SelectionModel extends IPlugin {
-    	setSelectedRanges(ranges: Range[]): void;
-    	onSelectedRangesChanged: EventEmitter<Range[]>;
+    	setSelectedRanges(ranges: CellRange[]): void;
+    	onSelectedRangesChanged: EventEmitter<CellRange[]>;
     	refreshSelections?(): void;
     }
     interface ViewRange {
@@ -1200,13 +1199,13 @@ declare namespace Slick {
     	totalsFormatter?: CompatFormatter<GroupTotals>;
     }
     class GroupItemMetadataProvider {
-    	protected grid: Pick<Grid, "getActiveCell" | "getColumns" | "getData" | "getDataItem" | "getRenderedRange" | "onClick" | "onKeyDown" | "groupTotalsFormatter">;
+    	protected grid: Grid;
     	private options;
     	constructor(opt?: GroupItemMetadataProviderOptions);
     	static readonly defaults: GroupItemMetadataProviderOptions;
     	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string;
-    	static defaultTotalsFormat(ctx: FormatterContext, grid?: typeof this.prototype["grid"]): string;
-    	init(grid: typeof this.grid): void;
+    	static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): string;
+    	init(grid: Grid): void;
     	readonly pluginName = "GroupItemMetadataProvider";
     	destroy(): void;
     	getOptions(): GroupItemMetadataProviderOptions;
@@ -1269,7 +1268,7 @@ declare namespace Slick {
     	private inHandler;
     	private options;
     	private ranges;
-    	onSelectedRangesChanged: EventEmitter<Range[], IEventData>;
+    	onSelectedRangesChanged: EventEmitter<CellRange[], IEventData>;
     	constructor(options?: RowSelectionModelOptions);
     	static readonly defaults: RowSelectionModelOptions;
     	init(grid: Grid): void;
@@ -1278,8 +1277,8 @@ declare namespace Slick {
     	private rowsToRanges;
     	getSelectedRows(): number[];
     	setSelectedRows(rows: number[]): void;
-    	setSelectedRanges(ranges: Range[]): void;
-    	getSelectedRanges(): Range[];
+    	setSelectedRanges(ranges: CellRange[]): void;
+    	getSelectedRanges(): CellRange[];
     	private handleActiveCellChange;
     	private handleKeyDown;
     	private handleClick;
