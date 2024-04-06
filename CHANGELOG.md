@@ -1,3 +1,28 @@
+## 8.4.4 (2024-04-06)
+
+### Features:
+
+- Improve drag drop group by handling StartSharp
+- Added an unhandledRejectionHandler which should be installed via ScriptInit.ts or errorhandling-init.ts file via `window.addEventListener("unhandledrejection", ErrorHandling.unhandledRejectionHandler);` so that it does not result in unhandled promise errors for serviceCall/serviceFetch methods.
+- **`[Breaking Change]`** As jsx-dom has recently fixed an issue (before version 8.1.4) where ref callbacks were not executed for React style class components like Serenity Widgets, we will no longer call the ref callback from the Widget itself to avoid double execution. This might cause problems when an older version of jsx-dom is used. So, after updating to Serenity 8.4.4+, please update jsx-dom in your package.json to 8.1.4+ and run npm install.
+- Widget.element is no longer deprecated, it just returns a Fluent object wrapping this.domNode
+- Added a Fluent.findEach function that executes a callback for each element found with a Fluent object
+- Added Fluent.after and Fluent.before methods similar to jQuery ones.
+- Added frequently used click/focus methods to Fluent to make it easier to port from jQuery
+- Add static versions of Fluent.findAll, Fluent.findEach, Fluent.findFirst that works with the document
+- Removing typings for jQuery extensions getWidget and tryGetWidget as they are causing a global jQuery object to be available in TypeScript context even if it doesn't. The methods are still there. If you still use them cast jQuery object to any or add a global.d.ts with contents of old jquery-globals.d.ts that is removed in the commit.
+- Message dialog types are now ignored for routing, e.g. they don't modify the URL hash when opening/closing
+- Updated System.Text.Json to 8.0.3, Dapper to 2.1.35, Microsoft.Data.SqlClient to 5.2.0, System.IO.Abstractions.TestingHelpers, coverlet.collector, Selenium.WebDriver and db connectors in sergen
+- Updated SleekGrid to 1.8.0
+
+### Bugfixes:
+
+- Select2 input was not readonly for multi select even if the select itself is readonly
+- Fix select all button function in CheckLookupEditor
+- Label style width was set to XYZpxpx instead of XYZpx breaking form label widths
+- Missing parens in coalesce for vMin calculation in IntegerEditor
+- Allow clearing by backspace in autonumeric based editors when minValue > 0
+
 ## 8.4.3 (2024-03-25)
 
 ### Bugfixes:
@@ -12,7 +37,7 @@
 
 ## 8.4.1 (2024-03-22)
 
-## Features:
+### Features:
 
 - The url method in jquery validate port made functional again.
 - JsonField.ValueFromJson is now be able to read from non string fields just like Newtonsoft version did before the System.Text.Json switch
