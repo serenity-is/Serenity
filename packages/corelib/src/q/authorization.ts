@@ -1,4 +1,4 @@
-﻿import { getRemoteDataAsync, localText, notifyError } from "@serenity-is/base";
+﻿import { getRemoteDataAsync, localText, notifyError } from "../base";
 import { getRemoteData } from "./scriptdata-compat";
 import { UserDefinition } from "./userdefinition";
 

@@ -1,4 +1,4 @@
-import { Dialog, DialogButton, DialogOptions, Fluent, Validator, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "@serenity-is/base";
+import { Dialog, DialogButton, DialogOptions, Fluent, Validator, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "../../base";
 import { IDialog } from "../../interfaces";
 import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";

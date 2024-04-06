@@ -1,4 +1,4 @@
-﻿import { formatNumber, htmlEncode, tryGetText } from "@serenity-is/base";
+﻿import { formatNumber, htmlEncode, tryGetText } from "../base";
 import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
 
 export { };

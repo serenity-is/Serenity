@@ -1922,13 +1922,19 @@ declare namespace Serenity {
          */
         appendTo(parent: Element | Fluent<any>): this;
         /**
-         * Gets or sets the value of the specified attribute.
+         * Gets the value of the specified attribute.
+         *
+         * @param name The name of the attribute.
+         * @returns The value of the attribute.
+         */
+        attr(name: string): string;
+        /**
+         * Sets the value of the specified attribute.
          *
          * @param name The name of the attribute.
          * @param value The value of the attribute. If the value is falsy the attribute is removed.
-         * @returns The value of the attribute if no value is provided, or the Fluent object itself if a value is provided.
+         * @returns The Fluent object itself if a value is provided.
          */
-        attr(name: string): string;
         attr(name: string, value: string | number | boolean | null | undefined): this;
         /**
          * Inserts content before the element.
@@ -1954,10 +1960,15 @@ declare namespace Serenity {
         /**
          * Triggers a click event on the element.
          *
-         * @param listener Optional. A callback function to execute when the click event is triggered.
          * @returns The Fluent object itself.
          */
         click(): this;
+        /**
+         * Adds a click event listener on the element.
+         *
+         * @param listener A callback function to execute when the click event is triggered.
+         * @returns The Fluent object itself.
+         */
         click(listener: (e: MouseEvent) => void): this;
         /**
          * Gets the closest ancestor of the element that matches the specified selector.
@@ -2529,7 +2540,7 @@ declare namespace Serenity {
     function formatDate(d: Date | string, format?: string, locale?: Locale): string;
     /**
      * Formats a date as the ISO 8601 UTC date/time format.
-     * @param n The number of minutes.
+     * @param d The date.
      */
     function formatISODateTimeUTC(d: Date): string;
     /**
@@ -2863,6 +2874,7 @@ declare namespace Serenity {
     function getCustomAttributes<TAttr>(type: any, attrType: {
         new (...args: any[]): TAttr;
     }, inherit?: boolean): TAttr[];
+
     type ClassTypeInfo<T> = TypeInfo<T>;
     type EditorTypeInfo<T> = TypeInfo<T>;
     type FormatterTypeInfo<T> = TypeInfo<T>;
@@ -3538,7 +3550,7 @@ declare namespace Serenity {
     /**
      * Parses a time string in the format "hh:mm" into a number containing number of minutes.
      * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
-     * @param s The string to parse.
+     * @param value The string to parse.
      */
     function parseHourAndMin(value: string): number;
     /**
@@ -3863,7 +3875,7 @@ declare namespace Serenity {
     function replaceAll(str: string, find: string, replace: string): string;
     /**
      * Pads the start of string to make it the specified length.
-     * @param s String to pad.
+     * @param n The number to pad.
      * @param len Target length of the string.
      */
     function zeroPad(n: number, len: number): string;
@@ -4684,6 +4696,20 @@ declare namespace Serenity {
         vMax?: any;
         vMin?: any;
         wEmpty?: string;
+    }
+    class AutoNumeric {
+        static init(input: HTMLInputElement, options: AutoNumericOptions): void;
+        /** method to remove settings and stop autoNumeric() */
+        static destroy(input: HTMLInputElement): void;
+        /** method to update settings - can call as many times */
+        static updateOptions(input: HTMLInputElement, options: AutoNumericOptions): void;
+        /** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
+        static setValue(input: HTMLInputElement, valueIn: number | string): string;
+        /** method to get the unformatted value from a specific input field, returns a numeric value */
+        static getValue(input: HTMLInputElement): string;
+        /** returns the settings object for those who need to look under the hood */
+        static getSettings(input: HTMLInputElement): AutoNumericOptions;
+        static hasInstance(input: HTMLInputElement): boolean;
     }
 
     interface DecimalEditorOptions {

@@ -1,4 +1,4 @@
-﻿import { alertDialog, confirmDialog, informationDialog, successDialog, warningDialog } from "@serenity-is/base";
+﻿import { alertDialog, confirmDialog, informationDialog, successDialog, warningDialog } from "../base";
 
 /** @deprecated use alertDialog */
 export const alert = alertDialog;

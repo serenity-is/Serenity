@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery, isArrayLike } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, isArrayLike } from "../../base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";
 

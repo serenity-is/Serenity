@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, localText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, localText } from "../../base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";

@@ -1,4 +1,4 @@
-﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "@serenity-is/base";
+﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "../../base";
 import { ArgumentNullException } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { DateEditor } from "../editors/dateeditor";

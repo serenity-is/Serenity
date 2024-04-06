@@ -1,4 +1,4 @@
-﻿import { addClass, getCustomAttribute, getTypeFullName, isArrayLike } from "@serenity-is/base";
+﻿import { addClass, getCustomAttribute, getTypeFullName, isArrayLike } from "../../base";
 import { ElementAttribute } from "../../types/attributes";
 import { EditorUtils } from "../editors/editorutils";
 import { EditorProps, WidgetProps } from "./widgetutils";

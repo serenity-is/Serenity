@@ -1,4 +1,4 @@
-﻿import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "@serenity-is/base";
+﻿import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { deepClone, extend } from "../q";
 import { AggregateFormatting } from "./aggregators";

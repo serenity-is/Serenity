@@ -1,4 +1,4 @@
-﻿import { Fluent } from "@serenity-is/base";
+﻿import { Fluent } from "../../base";
 import { IBooleanValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorWidget } from "../widgets/widget";

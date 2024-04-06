@@ -1,4 +1,4 @@
-﻿import { PropertyItem } from "@serenity-is/base";
+﻿import { PropertyItem } from "../base";
 import { FormatterContext, FormatterResult, Group } from "@serenity-is/sleekgrid";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;

@@ -1,4 +1,4 @@
-﻿import { Fluent, addValidationRule, localText } from "@serenity-is/base";
+﻿import { Fluent, addValidationRule, localText } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";

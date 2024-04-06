@@ -1,4 +1,4 @@
-﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "@serenity-is/base";
+﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";

@@ -1,4 +1,4 @@
-﻿import { htmlEncode, isArrayLike, isPromiseLike, localText } from "@serenity-is/base";
+﻿import { htmlEncode, isArrayLike, isPromiseLike, localText } from "../base";
 
 /**
  * Adds an empty option to the select.

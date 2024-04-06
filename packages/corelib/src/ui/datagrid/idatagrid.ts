@@ -1,7 +1,7 @@
 ﻿import { Grid } from "@serenity-is/sleekgrid"
 import { RemoteView } from "../../slick";
 import { FilterStore } from "../filtering/filterstore";
-import { Fluent } from "@serenity-is/base";
+import { Fluent } from "../../base";
 
 export interface IDataGrid {
     getElement(): HTMLElement;

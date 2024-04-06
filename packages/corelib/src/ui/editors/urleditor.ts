@@ -1,6 +1,6 @@
-﻿import { Fluent, Validator } from "@serenity-is/base";
+﻿import { Fluent, Validator } from "../../base";
 import { IStringValue } from "../../interfaces";
-import { ValidationHelper } from "../../q/validation";
+import { ValidationHelper } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";
 import { StringEditor } from "./stringeditor";

@@ -4,8 +4,6 @@ export default {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     "^@mockdeps": '<rootDir>/src/globals/mockdeps',
-    '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base/src/index.ts',
-    '^@serenity-is/base-ui$': '<rootDir>/node_modules/@serenity-is/base-ui/src/index.ts',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts'
   },
   "coveragePathIgnorePatterns": [

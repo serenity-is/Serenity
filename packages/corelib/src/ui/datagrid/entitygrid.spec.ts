@@ -1,4 +1,4 @@
-import { addCustomAttribute, classTypeInfo } from "@serenity-is/base";
+import { addCustomAttribute, classTypeInfo } from "../../base";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";

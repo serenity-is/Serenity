@@ -1,4 +1,4 @@
-﻿import { Fluent } from "@serenity-is/base";
+﻿import { Fluent } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { StringEditor } from "./stringeditor";
 

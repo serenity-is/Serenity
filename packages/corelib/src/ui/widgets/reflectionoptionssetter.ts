@@ -1,4 +1,4 @@
-﻿import { getInstanceType, isInstanceOfType } from "@serenity-is/base";
+﻿import { getInstanceType, isInstanceOfType } from "../../base";
 import { MemberType, TypeMember, getMembers } from "../../q";
 import { DisplayNameAttribute } from "../../types/attributes";
 import { OptionAttribute } from "../../types/decorators";

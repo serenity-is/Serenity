@@ -1,4 +1,4 @@
-﻿import { DialogTexts, Fluent, faIcon, getjQuery } from "@serenity-is/base";
+﻿import { DialogTexts, Fluent, faIcon, getjQuery } from "../../base";
 
 export namespace DialogExtensions {
 

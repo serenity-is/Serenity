@@ -1,4 +1,4 @@
-import { addLocalText } from "@serenity-is/base";
+import { addLocalText } from "../../base";
 import { PropertyItemSlickConverter } from "./slickhelpers";
 
 describe('SlickHelpers.toSlickColumn', () => {

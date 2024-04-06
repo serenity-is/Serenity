@@ -1,4 +1,4 @@
-import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "@serenity-is/base";
+import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { today } from "../../q";
 import { Decorators } from "../../types/decorators";

@@ -1,4 +1,4 @@
-import { Config, classTypeInfo } from "@serenity-is/base";
+import { Config, classTypeInfo } from "../../base";
 import { Widget, useIdPrefix } from "./widget";
 
 test('Serenity Widget must return class name without root namespace', function() {

@@ -1,4 +1,4 @@
-import { Fluent, isArrayLike, isPromiseLike } from "@serenity-is/base";
+import { Fluent, isArrayLike, isPromiseLike } from "../../base";
 import { Select2, Select2Options } from "./select2";
 
 export type ComboboxType = "select2";

@@ -1,4 +1,4 @@
-﻿import { Fluent, ListRequest, getCookie, isSameOrigin, resolveServiceUrl, resolveUrl } from "@serenity-is/base";
+﻿import { Fluent, ListRequest, getCookie, isSameOrigin, resolveServiceUrl, resolveUrl } from "../base";
 
 export function setEquality(request: ListRequest, field: string, value: any) {
     if (request.EqualityFilter == null) {

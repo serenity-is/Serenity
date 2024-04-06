@@ -1,4 +1,4 @@
-﻿import { Fluent, ListRequest } from "@serenity-is/base";
+﻿import { Fluent, ListRequest } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickFilterArgs<TWidget> {

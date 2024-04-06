@@ -1,4 +1,4 @@
-import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "@serenity-is/base";
+import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "../base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 

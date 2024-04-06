@@ -1,4 +1,4 @@
-import { Enum, getCustomAttribute, tryGetText } from "@serenity-is/base";
+import { Enum, getCustomAttribute, tryGetText } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";

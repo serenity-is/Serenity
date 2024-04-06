@@ -1,4 +1,4 @@
-﻿import { Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "@serenity-is/base";
+﻿import { Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "../../base";
 import { Column } from "@serenity-is/sleekgrid";
 import { Authorization, Router } from "../../q";
 import { Decorators } from "../../types/decorators";

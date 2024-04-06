@@ -31,25 +31,25 @@ export type ValidationValue = string | string[] | number | boolean;
  */
 export type ValidationProvider = (value: ValidationValue, element: ValidatableElement, params?: any) => boolean | string | Promise<boolean | string>;
 
-interface ValidationErrorMap {
+export interface ValidationErrorMap {
     [name: string]: (string | boolean);
 }
 
-interface ValidationErrorItem {
+export interface ValidationErrorItem {
     message: string;
     element: ValidatableElement;
     method?: string;
 }
 
-type ValidationErrorList = ValidationErrorItem[];
+export type ValidationErrorList = ValidationErrorItem[];
 
-type ValidationRules = Record<string, any>;
+export type ValidationRules = Record<string, any>;
 
-interface ValidationRulesMap {
+export interface ValidationRulesMap {
     [name: string]: ValidationRules;
 }
 
-type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
+export type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
 
 function messageKey(method: string) {
     return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()

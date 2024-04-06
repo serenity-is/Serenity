@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, resolveUrl } from "@serenity-is/base";
+﻿import { Fluent, localText, resolveUrl } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";

@@ -1,4 +1,4 @@
-﻿import { faIcon, getTypeFullName, getjQuery } from "@serenity-is/base";
+﻿import { faIcon, getTypeFullName, getjQuery } from "../base";
 import { isMobileView } from "../q";
 import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 

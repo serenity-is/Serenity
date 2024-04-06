@@ -1,4 +1,4 @@
-﻿import { Fluent, IconClassName, iconClassName } from "@serenity-is/base";
+﻿import { Fluent, IconClassName, iconClassName } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { Widget } from "./widget";
 

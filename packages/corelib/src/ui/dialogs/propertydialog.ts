@@ -1,4 +1,4 @@
-﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "@serenity-is/base";
+﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../q";
 import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";

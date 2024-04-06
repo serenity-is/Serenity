@@ -1,4 +1,4 @@
-﻿import { Culture, parseInteger, stringFormat, stringFormatLocale } from "@serenity-is/base";
+﻿import { Culture, parseInteger, stringFormat, stringFormatLocale } from "../base";
 /**
  * A string to lowercase function that handles special Turkish
  * characters like 'ı'. Left in for compatibility reasons.
@@ -56,7 +56,7 @@ export function formatDayHourAndMin(n: number): string {
 /**
  * Parses a time string in the format "hh:mm" into a number containing number of minutes.
  * Returns NaN if the hours not in range 0-23 or minutes not in range 0-59.
- * @param s The string to parse.
+ * @param value The string to parse.
  */
 export function parseHourAndMin(value: string): number {
     let v = value?.trim() ?? '';

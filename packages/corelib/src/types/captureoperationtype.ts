@@ -1,4 +1,4 @@
-﻿import { registerEnum } from "@serenity-is/base";
+﻿import { registerEnum } from "../base";
 
 export { };
 

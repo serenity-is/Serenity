@@ -275,6 +275,7 @@ export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: a
     return result;
 };
 
+export type { TypeInfo } from "./system-internal";
 export type ClassTypeInfo<T> = TypeInfo<T>;
 export type EditorTypeInfo<T> = TypeInfo<T>;
 export type FormatterTypeInfo<T> = TypeInfo<T>;

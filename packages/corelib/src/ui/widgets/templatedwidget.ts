@@ -1,4 +1,4 @@
-import { Fluent, getjQuery } from "@serenity-is/base";
+import { Fluent, getjQuery } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { Widget } from "./widget";
 

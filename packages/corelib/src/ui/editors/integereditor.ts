@@ -1,4 +1,4 @@
-import { Fluent, formatNumber, parseInteger } from "@serenity-is/base";
+import { Fluent, formatNumber, parseInteger } from "../../base";
 import { IDoubleValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";

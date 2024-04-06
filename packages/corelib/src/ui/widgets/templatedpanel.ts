@@ -1,4 +1,4 @@
-﻿import { Fluent, Validator } from "@serenity-is/base";
+﻿import { Fluent, Validator } from "../../base";
 import { validateOptions } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";

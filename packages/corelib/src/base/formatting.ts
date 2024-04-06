@@ -813,7 +813,7 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
 
 /**
  * Formats a date as the ISO 8601 UTC date/time format.
- * @param n The number of minutes.
+ * @param d The date.
  */
 export function formatISODateTimeUTC(d: Date): string {
     if (d == null)

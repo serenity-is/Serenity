@@ -1,4 +1,4 @@
-﻿import { getGlobalObject } from "@serenity-is/base";
+﻿import { getGlobalObject } from "../base";
 
 export function reactPatch() {
     let global = getGlobalObject();

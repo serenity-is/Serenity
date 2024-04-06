@@ -1,4 +1,4 @@
-import { Fluent } from "@serenity-is/base";
+import { Fluent } from "../../base";
 
 /**
 * Adapted from autoNumeric.js 1.9.22 by Bob Knothe / Sokolov Yura, https://github.com/BobKnothe/autoNumeric, removing jQuery dependency

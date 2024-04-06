@@ -1,4 +1,4 @@
-﻿import { Fluent, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "@serenity-is/base";
+﻿import { Fluent, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "../base";
 import { extend } from "./system-compat";
 
 export function validatorAbortHandler(validator: Validator) {

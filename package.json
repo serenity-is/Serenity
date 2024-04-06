@@ -17,7 +17,7 @@
     "swc_mut_cjs_exports": "0.90.24",
     "terser": "5.30.0",
     "tslib": "2.6.2",
-    "typescript": "5.4.3"
+    "typescript": "5.4.4"
   },
   "optionalDependencies": {
     "fsevents": "2.3.3"

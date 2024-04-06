@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, getjQuery, localText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, getjQuery, localText } from "../../base";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";

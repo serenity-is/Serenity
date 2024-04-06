@@ -1,4 +1,4 @@
-﻿import { addCustomAttribute } from "@serenity-is/base";
+﻿import { addCustomAttribute } from "../../base";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { DataGrid } from "./datagrid";
 

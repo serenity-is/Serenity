@@ -1,4 +1,4 @@
-﻿import { Culture, Fluent, formatNumber, parseDecimal } from "@serenity-is/base";
+﻿import { Culture, Fluent, formatNumber, parseDecimal } from "../../base";
 import { IDoubleValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";

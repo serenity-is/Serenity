@@ -2,7 +2,7 @@
     Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, reloadLookupAsync,
     requestFinished, requestStarting,
     resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
-} from "@serenity-is/base";
+} from "../base";
 
 export namespace ScriptData {
 

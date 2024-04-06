@@ -1,4 +1,4 @@
-﻿import { Fluent, ValidatableElement, Validator, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, ValidatableElement, Validator, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { ValidationHelper } from "../../q";
 import { Decorators } from "../../types/decorators";

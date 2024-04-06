@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, localText, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, PropertyItem, localText, tryGetText } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";

@@ -1,4 +1,4 @@
-import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, getjQuery, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "@serenity-is/base";
+import { Criteria, Fluent, ListResponse, debounce, getInstanceType, getTypeFullName, getjQuery, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { IReadOnly } from "../../interfaces";
 import { Authorization, LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../q";

@@ -20,7 +20,7 @@ importers:
         version: 15.2.3(rollup@4.13.2)
       '@rollup/plugin-typescript':
         specifier: 11.1.6
-        version: 11.1.6(rollup@4.13.2)(tslib@2.6.2)(typescript@5.4.3)
+        version: 11.1.6(rollup@4.13.2)(tslib@2.6.2)(typescript@5.4.4)
       '@rollup/pluginutils':
         specifier: 5.1.0
         version: 5.1.0(rollup@4.13.2)
@@ -53,7 +53,7 @@ importers:
         version: 4.13.2
       rollup-plugin-dts:
         specifier: 6.1.0
-        version: 6.1.0(rollup@4.13.2)(typescript@5.4.3)
+        version: 6.1.0(rollup@4.13.2)(typescript@5.4.4)
       swc_mut_cjs_exports:
         specifier: 0.90.24
         version: 0.90.24(@swc/core@1.4.11)(@swc/jest@0.2.36)
@@ -64,10 +64,8 @@ importers:
         specifier: 2.6.2
         version: 2.6.2
       typescript:
-        specifier: 5.4.3
-        version: 5.4.3
-
-  packages/base: {}
+        specifier: 5.4.4
+        version: 5.4.4
 
   packages/corelib:
     dependencies:
@@ -75,9 +73,6 @@ importers:
         specifier: workspace:*
         version: link:../sleekgrid
     devDependencies:
-      '@serenity-is/base':
-        specifier: workspace:*
-        version: link:../base
       tslib:
         specifier: 2.6.2
         version: 2.6.2
@@ -929,7 +924,7 @@ packages:
       rollup: 4.13.2
     dev: true
 
-  /@rollup/plugin-typescript@11.1.6(rollup@4.13.2)(tslib@2.6.2)(typescript@5.4.3):
+  /@rollup/plugin-typescript@11.1.6(rollup@4.13.2)(tslib@2.6.2)(typescript@5.4.4):
     resolution: {integrity: sha512-R92yOmIACgYdJ7dJ97p4K69I8gg6IEHt8M7dUBxN3W6nrO8uUxX5ixl0yU/N3aZTi8WhPuICvOHXQvF6FaykAA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -946,7 +941,7 @@ packages:
       resolve: 1.22.8
       rollup: 4.13.2
       tslib: 2.6.2
-      typescript: 5.4.3
+      typescript: 5.4.4
     dev: true
 
   /@rollup/pluginutils@5.1.0(rollup@4.13.2):
@@ -2982,7 +2977,7 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
-  /rollup-plugin-dts@6.1.0(rollup@4.13.2)(typescript@5.4.3):
+  /rollup-plugin-dts@6.1.0(rollup@4.13.2)(typescript@5.4.4):
     resolution: {integrity: sha512-ijSCPICkRMDKDLBK9torss07+8dl9UpY9z1N/zTeA1cIqdzMlpkV3MOOC7zukyvQfDyxa1s3Dl2+DeiP/G6DOw==}
     engines: {node: '>=16'}
     peerDependencies:
@@ -2991,7 +2986,7 @@ packages:
     dependencies:
       magic-string: 0.30.8
       rollup: 4.13.2
-      typescript: 5.4.3
+      typescript: 5.4.4
     optionalDependencies:
       '@babel/code-frame': 7.24.2
     dev: true
@@ -3268,8 +3263,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /typescript@5.4.3:
-    resolution: {integrity: sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==}
+  /typescript@5.4.4:
+    resolution: {integrity: sha512-dGE2Vv8cpVvw28v8HCPqyb08EzbBURxDpuhJvTrusShUfGnhHBafDsLdS1EhhxyL6BJQE+2cT3dDPAv+MQ6oLw==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

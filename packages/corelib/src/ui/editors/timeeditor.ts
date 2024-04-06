@@ -1,4 +1,4 @@
-﻿import { Fluent, toId } from "@serenity-is/base";
+﻿import { Fluent, toId } from "../../base";
 import { IDoubleValue, IReadOnly } from "../../interfaces";
 import { addOption } from "../../q";
 import { Decorators } from "../../types/decorators";

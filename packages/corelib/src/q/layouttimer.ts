@@ -1,4 +1,4 @@
-﻿import { isArrayLike } from "@serenity-is/base";
+﻿import { isArrayLike } from "../base";
 
 export { };
 

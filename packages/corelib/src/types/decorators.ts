@@ -1,4 +1,4 @@
-import { EditorAttribute, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, formatterTypeInfo, interfaceTypeInfo, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "@serenity-is/base";
+import { EditorAttribute, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, formatterTypeInfo, interfaceTypeInfo, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "../base";
 import { MemberType, addTypeMember } from "../q";
 import { CloseButtonAttribute, DialogTypeAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute, StaticPanelAttribute } from "./attributes";
 

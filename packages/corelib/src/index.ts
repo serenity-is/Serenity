@@ -21,7 +21,7 @@
  * @packageDocumentation
  */
 
-export * from "@serenity-is/base";
+export * from "./base";
 export * from "./q";
 export * from "./slick";
 export * from "./interfaces";
@@ -49,6 +49,7 @@ export * from "./ui/editors/stringeditor";
 export * from "./ui/editors/passwordeditor";
 export * from "./ui/editors/textareaeditor";
 export * from "./ui/editors/booleaneditor";
+export * from "./ui/editors/autonumeric";
 export * from "./ui/editors/decimaleditor";
 export * from "./ui/editors/integereditor";
 export * from "./ui/editors/dateeditor";

@@ -43,13 +43,20 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     appendTo(parent: Element | Fluent<any>): this;
 
     /**
-     * Gets or sets the value of the specified attribute. 
+     * Gets the value of the specified attribute. 
+     *
+     * @param name The name of the attribute.
+     * @returns The value of the attribute.
+     */
+    attr(name: string): string;
+    
+    /**
+     * Sets the value of the specified attribute. 
      *
      * @param name The name of the attribute.
      * @param value The value of the attribute. If the value is falsy the attribute is removed.
-     * @returns The value of the attribute if no value is provided, or the Fluent object itself if a value is provided.
+     * @returns The Fluent object itself if a value is provided.
      */
-    attr(name: string): string;
     attr(name: string, value: string | number | boolean | null | undefined): this;
 
     /**
@@ -79,10 +86,15 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Triggers a click event on the element.
      *
-     * @param listener Optional. A callback function to execute when the click event is triggered.
      * @returns The Fluent object itself.
      */
     click(): this;
+    /**
+     * Adds a click event listener on the element.
+     *
+     * @param listener A callback function to execute when the click event is triggered.
+     * @returns The Fluent object itself.
+     */
     click(listener: (e: MouseEvent) => void): this;
 
     /**

@@ -1,4 +1,4 @@
-import type { Criteria } from "@serenity-is/base";
+import type { Criteria } from "../../src/base";
 import { loadNSCorelib } from "../testutil";
 
 beforeEach(() => {

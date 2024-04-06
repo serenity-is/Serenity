@@ -1,4 +1,4 @@
-﻿import { Fluent, ListResponse, htmlEncode } from "@serenity-is/base";
+﻿import { Fluent, ListResponse, htmlEncode } from "../../base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { toGrouping } from "../../q";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";

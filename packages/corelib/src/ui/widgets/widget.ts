@@ -1,4 +1,4 @@
-﻿import { Config, Fluent, addClass, addValidationRule, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "@serenity-is/base";
+﻿import { Config, Fluent, addClass, addValidationRule, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
 import { jQueryPatch } from "../../patch/jquerypatch";
 import { reactPatch } from "../../patch/reactpatch";
 import { appendChild, replaceAll } from "../../q";

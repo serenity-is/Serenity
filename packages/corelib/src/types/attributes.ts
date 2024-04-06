@@ -1,4 +1,4 @@
-import { registerClass } from "@serenity-is/base";
+import { registerClass } from "../base";
 
 function attr(name: string) {
     return function (target: Function) {

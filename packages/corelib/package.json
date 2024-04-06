@@ -8,7 +8,6 @@
     "@serenity-is/sleekgrid": "workspace:*"
   },
   "devDependencies": {
-    "@serenity-is/base": "workspace:*",
     "tslib": "2.6.2"
   },
   "exports": {
@@ -45,7 +44,7 @@
     "test": "pnpm build && jest --coverage",
     "jest": "jest",
     "tsc": "tsc",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src"
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src"
   },
   "type": "module"
 }

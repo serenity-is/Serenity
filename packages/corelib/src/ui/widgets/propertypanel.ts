@@ -1,4 +1,4 @@
-﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
+﻿import { PropertyItem, getInstanceType, getTypeFullName } from "../../base";
 import { getForm } from "../../q";
 import { FormKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";

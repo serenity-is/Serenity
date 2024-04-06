@@ -1,4 +1,4 @@
-﻿import { Fluent } from "@serenity-is/base";
+﻿import { Fluent } from "../../base";
 import { getWidgetFrom } from "./widgetutils";
 
 export class PrefixedContext {

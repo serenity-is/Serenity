@@ -1,10 +1,10 @@
 
-jest.mock("@serenity-is/base", () => ({
-    ...jest.requireActual("@serenity-is/base"),
+jest.mock("../../base", () => ({
+    ...jest.requireActual("../../base"),
     tryGetText: jest.fn().mockImplementation((key: string) => key)
 }));
 
-import { addCustomAttribute, registerEnum } from "@serenity-is/base";
+import { addCustomAttribute, registerEnum } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";

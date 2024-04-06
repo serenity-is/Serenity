@@ -1,4 +1,4 @@
-﻿import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
+﻿import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "../../base";
 import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";

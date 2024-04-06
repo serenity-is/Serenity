@@ -1,4 +1,4 @@
-﻿import { Enum, Fluent, getCustomAttribute, tryGetText } from "@serenity-is/base";
+﻿import { Enum, Fluent, getCustomAttribute, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getLookup } from "../../q";
 import { EnumKeyAttribute } from "../../types/attributes";

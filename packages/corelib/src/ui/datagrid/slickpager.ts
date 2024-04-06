@@ -1,4 +1,4 @@
-﻿import { Fluent, localText } from "@serenity-is/base";
+﻿import { Fluent, localText } from "../../base";
 import { PagerOptions } from "../../slick";
 import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "../widgets/widget";

@@ -1,5 +1,5 @@
-import { Fluent, Lookup } from "@serenity-is/base";
-import { ScriptData } from "../../q/scriptdata-compat";
+import { Fluent, Lookup } from "../../base";
+import { ScriptData } from "../../q";
 import { LookupEditor } from "./lookupeditor";
 
 let oldWindowAlert: any;

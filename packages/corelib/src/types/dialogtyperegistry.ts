@@ -1,4 +1,4 @@
-﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
+﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { IDialog } from "../interfaces";
 import { ArgumentNullException, Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";

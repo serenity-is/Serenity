@@ -1,4 +1,4 @@
-import { Culture } from "@serenity-is/base";
+import { Culture } from "../../base";
 import { AutoNumeric } from "./autonumeric";
 import { type DecimalEditorOptions } from "./decimaleditor";
 

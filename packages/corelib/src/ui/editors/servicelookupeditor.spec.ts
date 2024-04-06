@@ -5,7 +5,7 @@ describe("servicelookupeditor", () => {
 });
 
 /*
-import { ListResponse, ServiceResponse } from "@serenity-is/base";
+import { ListResponse, ServiceResponse } from "../../base";
 import { ServiceLookupEditor } from "./servicelookupeditor";
 
 let oldWindowAlert: any;

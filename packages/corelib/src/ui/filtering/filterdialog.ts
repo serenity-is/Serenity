@@ -1,4 +1,4 @@
-﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "@serenity-is/base";
+﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { TemplatedDialog } from "../dialogs/templateddialog";
 import { WidgetProps } from "../widgets/widget";

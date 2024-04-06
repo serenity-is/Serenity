@@ -1,4 +1,4 @@
-import { confirmDialog, informationDialog, successDialog, warningDialog } from "@serenity-is/base";
+import { confirmDialog, informationDialog, successDialog, warningDialog } from "../base";
 
 describe("informationDialog", () => {
     it('is aliased by obsolete inform', async function () {

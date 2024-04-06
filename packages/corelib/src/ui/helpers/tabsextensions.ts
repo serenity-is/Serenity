@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery, isArrayLike } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, isArrayLike } from "../../base";
 
 export { };
 

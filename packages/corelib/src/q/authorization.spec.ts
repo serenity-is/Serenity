@@ -16,8 +16,8 @@ function mockUserDefinition(async = false) {
     }
 
     jest.resetModules();
-    jest.mock("@serenity-is/base", () => ({
-        ...jest.requireActual("@serenity-is/base"),
+    jest.mock("../base", () => ({
+        ...jest.requireActual("../base"),
         getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
             if (!async)
                 throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
@@ -427,7 +427,7 @@ describe('Authorization.validatePermissionAsync', () => {
     })
 
     it('throws if no permission', async function () {
-        const base = await import("@serenity-is/base");
+        const base = await import("../base");
         const localText = base.localText as any;
         const notifyError = base.notifyError as any;
     let authorization = (await import("./authorization")).Authorization;

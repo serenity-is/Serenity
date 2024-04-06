@@ -1,4 +1,4 @@
-import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "@serenity-is/base";
+import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "../../base";
 import { Column, FormatterContext, FormatterResult, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, Formatter, RemoteView } from "../../slick";

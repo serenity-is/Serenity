@@ -1,4 +1,4 @@
-﻿import { Fluent, NoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "@serenity-is/base";
+﻿import { Fluent, NoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "../../base";
 
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 

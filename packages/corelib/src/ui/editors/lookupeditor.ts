@@ -1,4 +1,4 @@
-﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "@serenity-is/base";
+﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "../../base";
 import { getLookup, reloadLookup, ScriptData } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "../widgets/widget";

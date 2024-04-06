@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery, notifyError } from "@serenity-is/base";
+﻿import { Fluent, getjQuery, notifyError } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "../widgets/widget";

@@ -1,4 +1,4 @@
-import { Dialog, Fluent, isArrayLike } from "@serenity-is/base";
+import { Dialog, Fluent, isArrayLike } from "../base";
 
 export interface HandleRouteEvent extends Event {
     route: string,

@@ -2,12 +2,12 @@
  * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
  */
 
-import { Fluent, localText, serviceCall, stringFormat } from "@serenity-is/base";
+import { Fluent, localText, serviceCall, stringFormat } from "../../base";
 
-type Select2Element = HTMLInputElement | HTMLSelectElement;
-type Select2FormatResult = string | Element | DocumentFragment;
+export type Select2Element = HTMLInputElement | HTMLSelectElement;
+export type Select2FormatResult = string | Element | DocumentFragment;
 
-interface Select2QueryOptions {
+export interface Select2QueryOptions {
     element?: Select2Element;
     term?: string;
     page?: number;
@@ -16,7 +16,7 @@ interface Select2QueryOptions {
     matcher?: (p1: any, p2: any, p3?: any) => boolean;
 }
 
-interface Select2Item {
+export interface Select2Item {
     id?: string;
     text?: string;
     source?: any;
@@ -25,7 +25,7 @@ interface Select2Item {
     locked?: boolean;
 }
 
-interface Select2Result {
+export interface Select2Result {
     hasError?: boolean;
     errorInfo?: any;
     results: Select2Item[];
@@ -33,7 +33,7 @@ interface Select2Result {
     context?: any;
 }
 
-interface Select2AjaxOptions extends RequestInit {
+export interface Select2AjaxOptions extends RequestInit {
     headers?: Record<string, string>;
     url?: string | ((term: string, page: number, context: any) => string);
     quietMillis?: number;

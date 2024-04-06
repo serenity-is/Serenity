@@ -1,4 +1,4 @@
-﻿import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "@serenity-is/base";
+﻿import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { IEditDialog } from "../../interfaces";
 import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../q";
 import { RemoteViewOptions } from "../../slick";

@@ -1,4 +1,4 @@
-﻿import { Config, Fluent, getGlobalObject, getNested, getjQuery, isArrayLike } from "@serenity-is/base";
+﻿import { Config, Fluent, getGlobalObject, getNested, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";

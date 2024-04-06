@@ -1,4 +1,4 @@
-import { Culture, formatDate, getjQuery, parseDate } from "@serenity-is/base";
+import { Culture, formatDate, getjQuery, parseDate } from "../../base";
 
 export function dateInputChangeHandler(e: Event) {
     if (Culture.dateOrder !== 'dmy')
