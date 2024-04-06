@@ -5,9 +5,6 @@
     "declarationDir": "./out",
     "rootDir": "./src",
     "paths": {
-      "@mockdeps": [
-        "./src/globals/mockdeps"
-      ],
     },
     "outDir": "./out",
     "target": "ES2017"

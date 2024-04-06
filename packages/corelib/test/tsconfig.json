@@ -16,7 +16,7 @@
     "noImplicitAny": false
   },
   "include": [
-    "./testutil/*.ts",
+    "../src/base/globals.d.ts",
     "./**/*.spec.ts",
     "./**/*.spec.tsx"
   ],

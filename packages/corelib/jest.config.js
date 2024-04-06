@@ -3,7 +3,6 @@ export default {
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    "^@mockdeps": '<rootDir>/src/globals/mockdeps',
     '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts'
   },
   "coveragePathIgnorePatterns": [

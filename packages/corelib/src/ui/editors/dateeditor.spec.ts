@@ -1,10 +1,13 @@
-import * as mockdeps from "@mockdeps";
 import { type DateEditorOptions } from "./dateeditor";
+import { mockJQuery } from "../../mocks";
 
 beforeEach(() => {
     jest.useRealTimers();
     document.body.innerHTML = "";
-    mockdeps.clearMockGlobals();
+    delete (window as any)["$"]
+    delete (window as any)["jQuery"];
+    delete (window as any)["flatpickr"];
+    delete (window as any)["bootstrap"];
 });
 
 const newEditor = async (opt: DateEditorOptions) => new (await import("./dateeditor")).DateEditor(opt);
@@ -82,7 +85,7 @@ describe("DateEditor_WithFlatPicker", () => {
 describe("DateEditor_WithJQueryDatePicker", () => {
 
     it("uses jquery date if it is found", async () => {
-        let $ = mockdeps.mockJQuery({
+        let $ = mockJQuery({
             datepicker: jest.fn().mockImplementation(function() { return this })
         });
         var editor = await newEditor({});

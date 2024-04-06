@@ -1,9 +1,25 @@
-﻿export function clearMockGlobals() {
-    delete (window as any)["$"]
-    delete (window as any)["jQuery"];
-    delete (window as any)["flatpickr"];
-    delete (window as any)["bootstrap"];
-    delete (window as any)["Select2"];
+// @ts-ignore
+import { readFileSync } from "fs";
+// @ts-ignore
+import { join, resolve } from "path";
+
+const root = resolve('./');
+
+const nscorelibPath = "~/out/index.global.js";
+
+export function loadNSCorelib() {
+    loadExternalScripts(nscorelibPath);
+}
+
+export function loadExternalScripts(...scripts: string[]) {
+    scripts.forEach(path => {
+        if (path.startsWith('~/'))
+            path = join(root, path.substring(2));
+        const src = readFileSync(path, 'utf8');
+        const scriptEl = window.document.createElement("script");
+        scriptEl.textContent = src;
+        window.document.body.appendChild(scriptEl);
+    });
 }
 
 export function mockJQuery(fn: any = {}) {
@@ -41,13 +57,11 @@ export function mockJQuery(fn: any = {}) {
                 return this;
             },
             off: function (ev: string, handler: () => void) {
-                if (typeof handler === "function")
-                    this._selector?.removeEventListener?.(ev, handler);
+                this._selector?.removeEventListener?.(ev, handler);
                 return this;
             },
             on: function (ev: string, handler: () => void) {
-                if (typeof handler === "function")
-                    this._selector?.addEventListener?.(ev, handler);
+                this._selector?.addEventListener?.(ev, handler);
                 return this;
             },
             trigger: function (ev: Event) {
@@ -57,7 +71,7 @@ export function mockJQuery(fn: any = {}) {
             triggerHandler: function (ev: any) {
                 this._selector?.dispatchEvent?.(typeof ev === "string" ? new Event(ev) : ev);
                 return this;
-            },            
+            },
             hasClass: function (cls: string) {
                 return !!this._selector?.classList?.contains(cls);
             },
@@ -97,85 +111,4 @@ export function mockJQuery(fn: any = {}) {
     }
     (window as any)["jQuery"] = jQuery;
     return jQuery;
-}
-
-export function mockJQueryWithBootstrapModal(): any {
-    let modal = jest.fn(function () {
-        return this;
-    }) as any;
-
-    modal.Constructor = {
-        VERSION: null
-    };
-
-    return mockJQuery({
-        modal
-    });
-}
-
-export function mockJQueryWithUIDialog(): any {
-    let dialog = jest.fn(function () {
-        return this;
-    }) as any;
-
-    let jQuery = mockJQuery({
-        dialog
-    });
-
-    jQuery.ui = {
-        dialog: dialog
-    }
-
-    return jQuery;
-}
-
-
-export function mockUndefinedJQuery() {
-    delete (window as any)["jQuery"]
-}
-
-export function mockUndefinedBS5Plus() {
-    delete (window as any)["bootstrap"]
-}
-
-export function mockEnvironmentWithBrowserDialogsOnly() {
-    mockUndefinedBS5Plus();
-    mockUndefinedJQuery();
-}
-
-export function mockBS5Plus() {
-    let modal = jest.fn(function (div: HTMLElement) {
-        return {
-            show: jest.fn(function () {
-                div.dataset.showCalls = (parseInt(div.dataset.showCalls ?? "0", 10) + 1).toString();
-            }),
-            hide: jest.fn(function () {
-                div.dataset.hideCalls = (parseInt(div.dataset.hideClass ?? "0", 10) + 1).toString();
-            })
-        }
-    }) as any;
-
-    modal.VERSION = "5.3.2";
-    modal.getInstance = function (el: HTMLElement) {
-        if (el && el.dataset.options) {
-            return {
-                opt: JSON.parse(el.dataset.options),
-                show: function () {
-                    el.dataset.shown = (parseInt(el.dataset.shown ?? "0", 10) + 1).toString();
-                },
-                hide: function () {
-                    el.dataset.hidden = (parseInt(el.dataset.hidden ?? "0", 10) + 1).toString();
-                }
-            }
-        }
-    };
-
-    return ((window as any)["bootstrap"] = {
-        Modal: modal
-    });
-}
-
-function mockBS5PlusWithUndefinedJQuery() {
-    mockUndefinedJQuery();
-    return mockBS5Plus();
 }

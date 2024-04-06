@@ -1,11 +1,11 @@
-import { loadNSCorelib } from "../testutil";
+import { loadNSCorelib } from "@/mocks";
 
 beforeEach(() => {
     jest.resetModules();
 });
 
 test('summary type enum is registered', function () {
-    loadNSCorelib(window);
+    loadNSCorelib();
     const Q = (window as any)?.Q;
     expect(Q).toBeDefined();
     const QSummaryType = Q.SummaryType;
