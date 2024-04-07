@@ -1,4 +1,5 @@
 import { resolveServiceUrl, resolveUrl } from "./services";
+import { getCookie } from "./services";
 
 jest.mock("./config", () => ({
     __esModule: true,
@@ -70,3 +71,37 @@ describe("resolveServiceUrl", () => {
         expect(resolvedUrl).toBe("/app/Services/test");
     });
 });
+
+describe("getCookie", () => {
+    it("should return the value of the specified cookie", () => {
+        document.cookie = "cookie1=value1";
+        document.cookie = "cookie2=value2";
+
+        const cookieValue = getCookie("cookie2");
+
+        expect(cookieValue).toBe("value2");
+    });
+
+    it("should return an empty string if the specified cookie does not exist", () => {
+        const cookieValue = getCookie("nonexistentCookie");
+
+        expect(cookieValue).toBeUndefined();
+    });
+
+    it("should use jQuery.cookie plugin if available", () => {
+        const jQuery = (window as any).jQuery = jest.fn();
+        try {
+            const cookieSpy = (jQuery as any).cookie = jest.fn().mockReturnValue("value");
+
+            const cookieValue = getCookie("cookie");
+
+            expect(cookieValue).toBe("value");
+            expect(cookieSpy).toHaveBeenCalledWith("cookie");
+        }
+        finally {
+            delete (jQuery as any).cookie;
+        }
+    });
+});
+
+

@@ -17,19 +17,6 @@ export function resolveServiceUrl(url: string) {
     return resolveUrl(url);
 }
 
-(function () {
-    let $ = getjQuery();
-    $?.ajaxSetup?.({
-        beforeSend: function (xhr: XMLHttpRequest, opt: any) {
-            if (!opt || !opt.crossDomain) {
-                var token = getCookie('CSRF-TOKEN');
-                if (token)
-                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
-            }
-        }
-    });
-});
-
 export function getCookie(name: string) {
     let $ = getjQuery();
     if (typeof $?.cookie === "function")

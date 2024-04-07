@@ -1,4 +1,4 @@
-﻿import { faIcon, getTypeFullName, getjQuery } from "../base";
+﻿import { faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
 import { isMobileView } from "../q";
 import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
@@ -84,6 +84,18 @@ function applyCleanDataPatch($: any) {
     })(($ as any).cleanData);
 }
 
+function applyAjaxCSRFToken($: any) {
+    $?.ajaxSetup?.({
+        beforeSend: function (xhr: XMLHttpRequest, opt: any) {
+            if (!opt || !opt.crossDomain) {
+                var token = getCookie('CSRF-TOKEN');
+                if (token)
+                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
+            }
+        }
+    });
+}
+
 export function jQueryPatch(): boolean {
     let $ = getjQuery();
     if (!$)
@@ -91,5 +103,6 @@ export function jQueryPatch(): boolean {
     applyJQueryUIFixes($);
     applyCleanDataPatch($);
     applyGetWidgetExtensions($);
+    applyAjaxCSRFToken($);
     return true;
 }
