@@ -112,3 +112,9 @@ export function mockJQuery(fn: any = {}) {
     (window as any)["jQuery"] = jQuery;
     return jQuery;
 }
+
+export function unmockBSAndJQuery() {
+    delete (window as any).$;
+    delete (window as any).jQuery;
+    delete (window as any).bootstrap;
+}
