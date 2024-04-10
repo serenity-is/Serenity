@@ -569,6 +569,28 @@ describe('Fluent instance methods', () => {
         });
     });
 
+    describe('show', () => {
+
+        beforeEach(() => {
+            fluent = Fluent(element);
+        });
+
+        it('should ignore null element', () => {
+            fluent = Fluent(null);
+            const result = fluent.show();
+            expect(result).toBe(fluent);
+        });
+
+        it('should set the display property to the default value', () => {
+            element.style.display = 'none';
+
+            const result = fluent.show();
+
+            expect(element.style.display).toBe('');
+            expect(result).toBe(fluent);
+        });
+    });
+
     describe('style', () => {
         it('should apply styles to the element', () => {
             const callback = (css: CSSStyleDeclaration) => {
@@ -1106,6 +1128,55 @@ describe('Fluent static methods', () => {
             });
             expect(Fluent.isVisibleLike(element)).toBe(true);
         });
+    });
+
+    describe("remove", () => {
+        it("should ignore null and undefined", () => {
+            Fluent.remove(null);
+            Fluent.remove(undefined);
+        });
+
+        it("should remove the element from the DOM", () => {
+            document.body.appendChild(element);
+            expect(document.body.contains(element)).toBe(true);
+            Fluent.remove(element);
+            expect(document.body.contains(element)).toBe(false);
+        });
+
+        it("should remove event listeners", () => {
+            document.body.appendChild(element);
+
+            const listener = jest.fn();
+            Fluent.on(element, "click", listener);
+            
+            Fluent.remove(element);
+
+            element.click();
+            expect(listener).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("toClassName", () => {
+        it("should convert a string to a valid CSS class name", () => {
+            const className = Fluent.toClassName("my-class");
+            expect(className).toBe("my-class");
+        });
+
+        it("should leave a string with spaces as is", () => {
+            const className = Fluent.toClassName("my class");
+            expect(className).toBe("my class");
+        });
+
+        it("should convert an empty string to an empty CSS class name", () => {
+            const className = Fluent.toClassName("");
+            expect(className).toBe("");
+        });
+
+        it("should convert numbers to string", () => {
+            const className = Fluent.toClassName(1 as any);
+            expect(className).toBe("1");
+        });
+
     });
 });
 
