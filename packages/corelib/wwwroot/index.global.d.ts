@@ -1593,12 +1593,27 @@ declare namespace Serenity {
         /** Only used for jQuery UI dialogs for backwards compatibility */
         width?: number;
     }
+    /**
+     * Wrapper for different types of dialogs, including jQuery UI, Bootstrap modals, and Panels.
+     */
     class Dialog {
         private el;
         private dialogResult;
+        /**
+         * Creates a new dialog. The type of the dialog will be determined based on
+         * the availability of jQuery UI, Bootstrap, and the options provided.
+         * @param opt Optional configuration for the dialog
+         */
         constructor(opt?: DialogOptions);
+        /** Default set of dialog options */
         static defaults: DialogOptions;
+        /** Default set of message dialog options */
         static messageDefaults: MessageDialogOptions;
+        /**
+         * Gets the dialog instance for the specified element.
+         * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body) or the root element (.modal, .ui-dialog, .s-Panel)
+         * @returns The dialog instance, or null if the element is not a dialog.
+         */
         static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog;
         /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
         get result(): string;
@@ -1606,14 +1621,29 @@ declare namespace Serenity {
         close(): this;
         /** Closes dialog with the result set to value */
         close(result: string): this;
+        /**
+         * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+         * the closing can be cancelled by calling preventDefault on the event object.
+         * @param handler The event handler function
+         * @param before Indicates whether the handler should be called before the dialog is closed
+         * @returns The dialog instance
+         */
         onClose(handler: (result?: string, e?: Event) => void, before?: boolean): void;
+        /**
+         * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+         * the opening can be cancelled by calling preventDefault on the event object.
+         * @param handler The event handler function
+         * @param before Indicates whether the handler should be called before the dialog is opened
+         * @returns The dialog instance
+         */
         onOpen(handler: (e?: Event) => void, before?: boolean): this;
-        /** Closes dialog */
+        /** Opens the dialog */
         open(): this;
         /** Gets the title text of the dialog */
         title(): string;
         /** Sets the title text of the dialog. */
         title(value: string): this;
+        /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
         get type(): DialogType;
         /** Gets the body/content element of the dialog */
         getContentNode(): HTMLElement;
@@ -1627,30 +1657,95 @@ declare namespace Serenity {
         getHeaderNode(): HTMLElement;
         private onButtonClick;
         private createBSButtons;
-        createBSModal(opt: DialogOptions): void;
+        private createBSModal;
         private createPanel;
-        createUIDialog(opt: DialogOptions): void;
+        private createUIDialog;
+        /**
+         * Disposes the dialog, removing it from the DOM and unbinding all event handlers.
+         */
         dispose(): void;
     }
+    /** Returns true if Bootstrap modal is available */
     function hasBSModal(): boolean;
+    /** Returns true if jQuery UI dialog is available */
     function hasUIDialog(): boolean;
+    /** Calls Bootstrap button.noConflict method if both jQuery UI and Bootstrap buttons are available in the page */
     function uiAndBSButtonNoConflict(): void;
+    /**
+     * Creates a dialog button which, by default, has "Yes" as caption (localized) and "ok" as the result.
+     * @param opt - Optional configuration for the dialog button.
+     * @returns The dialog button with the specified configuration.
+     */
     function okDialogButton(opt?: DialogButton): DialogButton;
+    /**
+     * Creates a dialog button which, by default, has "Yes" as the caption (localized) and "yes" as the result.
+     * @param opt - Optional configuration for the dialog button.
+     * @returns The dialog button with the specified configuration.
+     */
     function yesDialogButton(opt?: DialogButton): DialogButton;
+    /**
+     * Creates a dialog button which, by default, has "No" as the caption (localized) and "no" as the result.
+     * @param opt - Optional configuration for the dialog button.
+     * @returns The dialog button with the specified configuration.
+     */
     function noDialogButton(opt?: DialogButton): DialogButton;
+    /**
+     * Creates a dialog button which, by default, has "Cancel" as the caption (localized) and "cancel" as the result.
+     * @param opt - Optional configuration for the dialog button.
+     * @returns The dialog button with the specified configuration.
+     */
     function cancelDialogButton(opt?: DialogButton): DialogButton;
+    /**
+     * Namespace containing localizable text constants for dialogs.
+     */
     namespace DialogTexts {
+        /**
+         * Title for alert dialogs.
+         */
         const AlertTitle: string;
+        /**
+         * Text for the cancel button in dialogs.
+         */
         const CancelButton: string;
+        /**
+         * Text for the close button in dialogs.
+         */
         const CloseButton: string;
+        /**
+         * Title for confirmation dialogs.
+         */
         const ConfirmationTitle: string;
+        /**
+         * Title for information dialogs.
+         */
         const InformationTitle: string;
+        /**
+         * Hint for maximizing dialogs.
+         */
         const MaximizeHint: string;
+        /**
+         * Text for the "No" button in dialogs.
+         */
         const NoButton: string;
+        /**
+         * Text for the "OK" button in dialogs.
+         */
         const OkButton: string;
+        /**
+         * Hint for restoring dialogs.
+         */
         const RestoreHint: string;
+        /**
+         * Title for success dialogs.
+         */
         const SuccessTitle: string;
+        /**
+         * Title for warning dialogs.
+         */
         const WarningTitle: string;
+        /**
+         * Text for the "Yes" button in dialogs.
+         */
         const YesButton: string;
     }
     /**
