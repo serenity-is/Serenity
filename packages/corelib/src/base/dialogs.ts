@@ -75,11 +75,19 @@ export interface DialogOptions {
     width?: number;
 }
 
+/**
+ * Wrapper for different types of dialogs, including jQuery UI, Bootstrap modals, and Panels.
+ */
 export class Dialog {
 
     private el: HTMLElement;
     private dialogResult: string;
 
+    /**
+     * Creates a new dialog. The type of the dialog will be determined based on 
+     * the availability of jQuery UI, Bootstrap, and the options provided.
+     * @param opt Optional configuration for the dialog
+     */
     constructor(opt?: DialogOptions);
     constructor(opt?: DialogOptions, create = true) {
 
@@ -129,6 +137,7 @@ export class Dialog {
             this.open();
     }
 
+    /** Default set of dialog options */
     static defaults: DialogOptions = {
         autoDispose: true,
         autoOpen: true,
@@ -142,6 +151,7 @@ export class Dialog {
         size: "lg"
     }
 
+    /** Default set of message dialog options */
     static messageDefaults: MessageDialogOptions = {
         autoDispose: true,
         autoOpen: true,
@@ -158,6 +168,11 @@ export class Dialog {
         size: "md"
     }
 
+    /**
+     * Gets the dialog instance for the specified element.
+     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body) or the root element (.modal, .ui-dialog, .s-Panel)
+     * @returns The dialog instance, or null if the element is not a dialog.
+     */
     static getInstance(el: HTMLElement | ArrayLike<HTMLElement>): Dialog {
         el = getDialogContentNode(el);
         if (!el)
@@ -199,6 +214,13 @@ export class Dialog {
         return this;
     }
 
+    /**
+     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+     * the closing can be cancelled by calling preventDefault on the event object.
+     * @param handler The event handler function
+     * @param before Indicates whether the handler should be called before the dialog is closed
+     * @returns The dialog instance
+     */
     onClose(handler: (result?: string, e?: Event) => void, before = false) {
         var target = getDialogEventsNode(this.el);
         if (!target)
@@ -211,6 +233,13 @@ export class Dialog {
             Fluent.on(target, before ? "hide.bs.modal" : "hidden.bs.modal", e => handler(this.result, e));
     }
 
+    /**
+     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+     * the opening can be cancelled by calling preventDefault on the event object.
+     * @param handler The event handler function
+     * @param before Indicates whether the handler should be called before the dialog is opened
+     * @returns The dialog instance
+     */    
     onOpen(handler: (e?: Event) => void, before = false): this {
         var target = getDialogEventsNode(this.el);
         if (!target)
@@ -224,7 +253,7 @@ export class Dialog {
         return this;
     }
 
-    /** Closes dialog */
+    /** Opens the dialog */
     open() {
         var target = getDialogEventsNode(this.el);
         if (!target)
@@ -259,6 +288,7 @@ export class Dialog {
         return this;
     }
 
+    /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
     get type(): DialogType {
         var root = getDialogNode(this.el);
         if (!root)
@@ -323,7 +353,7 @@ export class Dialog {
         }
     }
 
-    createBSModal(opt: DialogOptions): void {
+    private createBSModal(opt: DialogOptions): void {
 
         var modal = Fluent("div")
             .class(["modal", opt.dialogClass, opt.fade && "fade"])
@@ -436,7 +466,7 @@ export class Dialog {
 
     }
 
-    createUIDialog(opt: DialogOptions): void {
+    private createUIDialog(opt: DialogOptions): void {
 
         let uiOpt: any = {
             autoOpen: opt.autoOpen,
@@ -465,6 +495,9 @@ export class Dialog {
     }
 
 
+    /**
+     * Disposes the dialog, removing it from the DOM and unbinding all event handlers.
+     */
     dispose(): void {
         try {
             let target = getDialogEventsNode(this.el) ?? this.el;
@@ -502,14 +535,17 @@ export class Dialog {
     }
 }
 
+/** Returns true if Bootstrap modal is available */
 export function hasBSModal() {
     return isBS5Plus() || !!(getjQuery()?.fn?.modal);
 }
 
+/** Returns true if jQuery UI dialog is available */
 export function hasUIDialog() {
     return !!(getjQuery()?.ui?.dialog);
 }
 
+/** Calls Bootstrap button.noConflict method if both jQuery UI and Bootstrap buttons are available in the page */
 export function uiAndBSButtonNoConflict() {
     const $ = getjQuery();
 
@@ -550,6 +586,12 @@ function dialogButtonToUI(x: DialogButton): any {
     return button;
 }
 
+
+/**
+ * Creates a dialog button which, by default, has "Yes" as caption (localized) and "ok" as the result.
+ * @param opt - Optional configuration for the dialog button.
+ * @returns The dialog button with the specified configuration.
+ */
 export function okDialogButton(opt?: DialogButton): DialogButton {
     return {
         text: opt?.text != void 0 ? opt.text : DialogTexts.OkButton,
@@ -559,6 +601,11 @@ export function okDialogButton(opt?: DialogButton): DialogButton {
     }
 }
 
+/**
+ * Creates a dialog button which, by default, has "Yes" as the caption (localized) and "yes" as the result.
+ * @param opt - Optional configuration for the dialog button.
+ * @returns The dialog button with the specified configuration.
+ */
 export function yesDialogButton(opt?: DialogButton): DialogButton {
     return {
         text: opt?.text != void 0 ? opt.text : DialogTexts.YesButton,
@@ -568,6 +615,11 @@ export function yesDialogButton(opt?: DialogButton): DialogButton {
     }
 }
 
+/**
+ * Creates a dialog button which, by default, has "No" as the caption (localized) and "no" as the result.
+ * @param opt - Optional configuration for the dialog button.
+ * @returns The dialog button with the specified configuration.
+ */
 export function noDialogButton(opt?: DialogButton): DialogButton {
     return {
         text: opt?.text != void 0 ? opt.text : DialogTexts.NoButton,
@@ -577,6 +629,11 @@ export function noDialogButton(opt?: DialogButton): DialogButton {
     }
 }
 
+/**
+ * Creates a dialog button which, by default, has "Cancel" as the caption (localized) and "cancel" as the result.
+ * @param opt - Optional configuration for the dialog button.
+ * @returns The dialog button with the specified configuration.
+ */
 export function cancelDialogButton(opt?: DialogButton): DialogButton {
     return {
         text: opt?.text != void 0 ? opt.text : DialogTexts.CancelButton,
@@ -586,18 +643,69 @@ export function cancelDialogButton(opt?: DialogButton): DialogButton {
     }
 }
 
+
+/**
+ * Namespace containing localizable text constants for dialogs.
+ */
 export namespace DialogTexts {
+    /**
+     * Title for alert dialogs.
+     */
     export declare const AlertTitle: string;
+    
+    /**
+     * Text for the cancel button in dialogs.
+     */
     export declare const CancelButton: string;
+    
+    /**
+     * Text for the close button in dialogs.
+     */
     export declare const CloseButton: string;
+    
+    /**
+     * Title for confirmation dialogs.
+     */
     export declare const ConfirmationTitle: string;
+    
+    /**
+     * Title for information dialogs.
+     */
     export declare const InformationTitle: string;
+    
+    /**
+     * Hint for maximizing dialogs.
+     */
     export declare const MaximizeHint: string;
+    
+    /**
+     * Text for the "No" button in dialogs.
+     */
     export declare const NoButton: string;
+    
+    /**
+     * Text for the "OK" button in dialogs.
+     */
     export declare const OkButton: string;
+    
+    /**
+     * Hint for restoring dialogs.
+     */
     export declare const RestoreHint: string;
+    
+    /**
+     * Title for success dialogs.
+     */
     export declare const SuccessTitle: string;
+    
+    /**
+     * Title for warning dialogs.
+     */
     export declare const WarningTitle: string;
+    
+    /**
+     * Text for the "Yes" button in dialogs.
+     */
     export declare const YesButton: string;
 
     const defaultTxt: Record<string, string> = {
