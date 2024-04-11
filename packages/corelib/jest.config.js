@@ -35,5 +35,8 @@ export default {
         type: "commonjs"
       }
     }]
-  }
+  },
+  setupFiles: [
+    '<rootDir>/jest.setup.js'
+  ]  
 };

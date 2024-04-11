@@ -744,6 +744,101 @@ describe("dialog button icon handling", () => {
     });
 });
 
+describe("dialog button result handling", () => {
+
+    let dlg: Dialog;
+    let okButton: HTMLButtonElement;
+    let okClickSpy: jest.Mock;
+    let closeSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+        okClickSpy = jest.fn();
+        dlg = new Dialog({
+            buttons: [
+                okDialogButton({
+                    cssClass: 'ok-button',
+                    click: okClickSpy,
+                    result: 'ok'
+                }),
+                cancelDialogButton()
+            ]
+        });
+        okButton = dlg.getFooterNode().querySelector<HTMLButtonElement>(".ok-button");
+        closeSpy = jest.spyOn(Dialog.prototype, "close");
+    });
+
+    it("closes the dialog after calling the click handler returns void", async function () {
+        okButton.click();
+        
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).toHaveBeenCalledTimes(1);
+        const okOrder = okClickSpy.mock.invocationCallOrder[0];
+        const closeOrder = closeSpy.mock.invocationCallOrder[0];
+        expect(okOrder).toBeLessThan(closeOrder);
+    });
+
+    it("closes the dialog after calling the click handler returns true", async function () {
+        okClickSpy.mockImplementation(() => true);
+
+        okButton.click();
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).toHaveBeenCalledTimes(1);
+        const okOrder = okClickSpy.mock.invocationCallOrder[0];
+        const closeOrder = closeSpy.mock.invocationCallOrder[0];
+        expect(okOrder).toBeLessThan(closeOrder);
+    });
+
+    it("does not close the dialog if the click handler returns false", async function () {
+        okClickSpy.mockImplementation(() => false);
+
+        okButton.click();
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).not.toHaveBeenCalled();
+    });
+
+    it("closes the dialog when the promise is resolved if the click handler returns a promise", async function () {
+        okClickSpy.mockImplementation(() => Promise.resolve());
+
+        okButton.click();
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).not.toHaveBeenCalled();
+
+        await Promise.resolve();
+
+        expect(closeSpy).toHaveBeenCalledTimes(1);
+        const okOrder = okClickSpy.mock.invocationCallOrder[0];
+        const closeOrder = closeSpy.mock.invocationCallOrder[0];
+        expect(okOrder).toBeLessThan(closeOrder);
+    });
+
+    it("does not close the dialog when the promise is rejected if the click handler returns a promise", async function () {
+        okClickSpy.mockImplementation(() => Promise.reject("test"));
+
+        okButton.click();
+
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).not.toHaveBeenCalled();
+
+        await Promise.resolve();
+
+        expect(closeSpy).not.toHaveBeenCalled();
+    });
+
+    it("does not close the dialog when the promise returns false if the click handler returns a promise", async function () {
+        okClickSpy.mockImplementation(() => Promise.resolve(false));
+
+        okButton.click();
+
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).not.toHaveBeenCalled();
+
+        await Promise.resolve();
+        
+        expect(closeSpy).not.toHaveBeenCalled();
+    });
+});
+
+
 //describe("dialogButtonToBS", () => {
 //    it("converts dialog button to BS5+ button", async function () {
 //        mockBS5PlusWithUndefinedJQuery();
@@ -915,7 +1010,7 @@ describe("Dialog.close", () => {
         }
     });
 
-    it("can be cancelled with preventDefault with Undefined jQuery", async function () {
+    it("can be cancelled with preventDefault", async function () {
         const panel = document.body.appendChild(document.createElement('div'));
         panel.classList.add("s-Panel");
         const body = panel.appendChild(document.createElement("div"));
