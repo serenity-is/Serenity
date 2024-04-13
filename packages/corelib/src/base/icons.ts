@@ -1,26 +1,78 @@
-﻿export type UtilityColor = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "muted" | "white";
+﻿/**
+ * Represents the utility color options for icons corresponding to Bootstrap contextual colors like primary, secondary, success etc.
+ */
+export type UtilityColor = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "muted" | "white";
+
+
+/**
+ * Represents the type of text color.
+ * It can be one of the predefined UtilityColor values or one of the following CSS color names:
+ * "aqua", "blue", "fuschia", "gray", "green", "light-blue", "lime", "maroon", "navy", "olive", "orange", "purple", "red", "teal", "yellow".
+ */
 export type TextColor = UtilityColor | "aqua" | "blue" | "fuschia" | "gray" | "green" | "light-blue" | "lime" | "maroon" | "navy" | "olive" | "orange" | "purple" | "red" | "teal" | "yellow";
 
+
+/**
+ * Returns the CSS class name for the background color based on the provided UtilityColor.
+ * @param color - The UtilityColor to generate the CSS class name for.
+ * @returns The CSS class name for the background color.
+ */
 export function bgColor(color: UtilityColor) {
     return "bg-" + color;
 }
 
+/**
+ * Returns the CSS class for the specified text color.
+ * @param color - The text color.
+ * @returns The CSS class for the specified text color.
+ */
 export function textColor(color: TextColor): string {
     return "text-" + color;
 }
 
+/**
+ * Returns the CSS class for a Font Awesome icon.
+ * @param key - The key of the Font Awesome icon.
+ * @param color - The optional color of the icon.
+ * @returns The CSS class for the icon.
+ */
 export function faIcon(key: faIconKey, color?: TextColor): string {
     return "fa fa-" + key + (color ? " " + textColor(color) : "");
 }
 
+/**
+ * Generates a fully qualified class name for a Font Awesome brand icon.
+ * @param key - The key of the Font Awesome brand icon.
+ * @param color - The optional color of the icon.
+ * @returns The fully qualified class name for the icon.
+ */
 export function fabIcon(key: fabIconKey, color?: TextColor): string {
     return "fab fa-" + key + (color ? " " + textColor(color) : "");
 }
 
+/**
+ * Represents a known icon class.
+ * The icon class can be either a Font Awesome icon (`fa fa-${faIconKey}`)
+ * or a Font Awesome Brands icon (`fab fa-${fabIconKey}`).
+ */
 export type KnownIconClass = `fa fa-${faIconKey}` | `fab fa-${fabIconKey}`;
+
+/**
+ * Represents a type that can be either a known icon class or a string.
+ */
 export type AnyIconClass = KnownIconClass | (string & {});
+
+/**
+ * Represents the type for an icon class name.
+ * It can be either a single icon class or an array of icon classes.
+ */
 export type IconClassName = AnyIconClass | (AnyIconClass[]);
 
+/**
+ * Returns the CSS class name for the given icon.
+ * @param icon The icon class name or an array of class names.
+ * @returns The CSS class name for the icon.
+ */
 export function iconClassName(icon: IconClassName): string {
     let klass = Array.isArray(icon) ? icon.join(" ") : icon;
     if (!klass)
@@ -37,7 +89,6 @@ var c = Array.from(document.querySelectorAll('.icons__item')).map(x => x.querySe
     .map((x)=>{if (l + x.length > 120) { l = 0; x = x + '\n' } l += x.length; return x}); 
      var t = (b && "fab") || "fa"; return `export type ${t}Icon =\n${a.join('|')};` }).join('\n\n');
 */
-
 export type faIconKey =
     "ad" | "address-book" | "address-card" | "adjust" | "air-freshener" | "align-center" | "align-justify" | "align-left" | "align-right" | "allergies" | "ambulance"
     | "american-sign-language-interpreting" | "anchor" | "angle-double-down" | "angle-double-left" | "angle-double-right" | "angle-double-up"

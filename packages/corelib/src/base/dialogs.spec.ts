@@ -777,6 +777,15 @@ describe("dialog button result handling", () => {
         expect(okOrder).toBeLessThan(closeOrder);
     });
 
+    it("stores the result after disposing the dialog", async function () {
+        expect(dlg.result).toBeUndefined();
+        okButton.click();
+        expect(dlg.result).toBe("ok");
+        dlg.dispose();
+        expect(dlg.getEventsNode()).toBeNull();
+        expect(dlg.result).toBe("ok");
+    });
+
     it("closes the dialog after calling the click handler returns true", async function () {
         okClickSpy.mockImplementation(() => true);
 
@@ -943,6 +952,24 @@ describe("Dialog.close", () => {
         expect(true).toBe(true);
         new Dialog(undefined).close();
         expect(true).toBe(true);
+    });
+
+    it("ignores when dialog element not found", async function () {
+        const modal = document.createElement("div");
+        modal.classList.add("modal");
+        const body = document.createElement("div");
+        body.classList.add("modal-body");
+        modal.appendChild(body);
+        const dlg = Dialog.getInstance(body);
+        expect(dlg).toBeTruthy();
+        try {
+            document.body.appendChild(body);
+            dlg.close();
+            expect(body.parentElement).toBe(document.body);
+        }
+        finally {
+            body.remove();
+        }
     });
 
     it("ignores when element does not have s-Panel class", async function () {
@@ -1282,6 +1309,21 @@ describe("modal event propagation to modal-body", () => {
         expect(e.defaultPrevented).toBeTruthy();
     });
 
+    it("can prevent modal from closing by calling original event's preventDefault if preventDefault is called on modalbeforeclose ", () => {
+        const spy = jest.fn().mockImplementation(e => {
+            e.preventDefault();
+        });
+
+        var modal = Fluent("div")
+            .addClass("modal")
+            .append(Fluent("div").addClass("modal-body").on("modalbeforeclose", spy))
+            .appendTo(document.body);
+
+        var e = Fluent.trigger(modal.getNode(), "hide.bs.modal");
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(e.defaultPrevented).toBeTruthy();
+    });
+
     it("installs an event propagation handler for shown.bs.modal to modal body as modalopen event", () => {
         const spy = jest.fn();
         Fluent("div")
@@ -1376,6 +1418,15 @@ describe("Dialog.dispose", () => {
 
 });
 
+describe("Dialog.open", () => {
+    it("ignores if panel is disposed", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
+        dlg.dispose();
+        dlg.open();
+    });
+
+});
+
 describe("Dialog.onOpen", () => {
     it("ignores if panel is disposed", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
@@ -1437,6 +1488,14 @@ describe("Dialog.onOpen", () => {
         }
     });
 
+});
+
+describe("Dialog.title", () => {
+    it("sets the title of the dialog", () => {
+        const dlg = new Dialog({ preferPanel: true });
+        dlg.title("test");
+        expect(dlg.getHeaderNode().querySelector(".panel-titlebar-text")?.textContent).toBe("test");
+    });
 });
 
 describe("okDialogButton", () => {

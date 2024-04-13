@@ -45,10 +45,24 @@ export function toggleClass(el: Element, cls: string, add?: boolean) {
         el.classList.toggle(a, add);
 }
 
+/**
+ * Adds a CSS class to the specified element.
+ * 
+ * @param el - The element to add the class to.
+ * @param cls - The CSS class to add.
+ * @returns A boolean value indicating whether the class was successfully added.
+ */
 export function addClass(el: Element, cls: string) {
     return toggleClass(el, cls, true);
 }
 
+/**
+ * Removes a CSS class from an element.
+ * 
+ * @param el - The element from which to remove the class.
+ * @param cls - The CSS class to remove.
+ * @returns A boolean indicating whether the class was successfully removed.
+ */
 export function removeClass(el: Element, cls: string) {
     return toggleClass(el, cls, false);
 }
