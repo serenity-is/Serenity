@@ -2961,7 +2961,7 @@ declare namespace Serenity {
      * @returns Lookup
      */
     function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
-    function setRegisteredScripts(scripts: any[]): void;
+    function setRegisteredScripts(scripts: Record<string, string>): void;
     function setScriptData(name: string, value: any): void;
 
     function resolveUrl(url: string): string;

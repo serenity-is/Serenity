@@ -1667,7 +1667,7 @@ declare function peekScriptData(name: string): any;
  * @returns Lookup
  */
 declare function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>>;
-declare function setRegisteredScripts(scripts: any[]): void;
+declare function setRegisteredScripts(scripts: Record<string, string>): void;
 declare function setScriptData(name: string, value: any): void;
 
 declare function resolveUrl(url: string): string;

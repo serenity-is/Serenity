@@ -224,7 +224,7 @@ export async function reloadLookupAsync<TItem = any>(key: string): Promise<Looku
     return await getScriptData('Lookup.' + key, true);
 }
 
-export function setRegisteredScripts(scripts: any[]) {
+export function setRegisteredScripts(scripts: Record<string, string>) {
     var t = new Date().getTime().toString();
     var scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
     if (!scriptDataHash)
