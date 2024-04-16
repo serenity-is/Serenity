@@ -603,9 +603,6 @@ export class Select2 {
         dropdownCss: {},
         containerCssClass: "",
         dropdownCssClass: "",
-        dropdownParent: (element) => {
-            return element?.closest(".modal") ?? document.body;
-        },
         formatAjaxError: () => txt("AjaxError"),
         formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
         formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
@@ -1647,7 +1644,7 @@ abstract class AbstractSelect2 {
         this.clearDropdownAlignmentPreference();
 
         var dropdownParent = (typeof this.opts.dropdownParent === "function" ? 
-            this.opts.dropdownParent(this.opts.element) : null) ?? this.dropdown.parentElement ?? document.body;
+            this.opts.dropdownParent(this.opts.element) : null) ?? document?.body;
 
         if (dropdownParent && this.dropdown !== dropdownParent.lastElementChild) {
             dropdownParent.appendChild(this.dropdown);
