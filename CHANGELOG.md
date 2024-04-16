@@ -1,3 +1,14 @@
+## 8.4.5 (2024-04-16)
+
+## Features:
+
+- Update SixLabors.ImageSharp to 2.1.8 (2.1.7 seems to have a vulnerability)
+
+### Bugfixes:
+
+- Contains operator not working properly in filter dialog
+- Select2 positioning does not work inside a modal when page is scrolled down
+
 ## 8.4.4 (2024-04-06)
 
 ### Features:

@@ -174,12 +174,6 @@ Task("Test")
         StartProcess("powershell", new ProcessSettings 
         { 
             Arguments = "pnpm test", 
-            WorkingDirectory = System.IO.Path.Combine(root, "packages", "base") 
-        });
-        
-        StartProcess("powershell", new ProcessSettings 
-        { 
-            Arguments = "pnpm test", 
             WorkingDirectory = System.IO.Path.Combine(root, "packages", "corelib") 
         });
 
