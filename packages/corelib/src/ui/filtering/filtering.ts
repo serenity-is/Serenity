@@ -272,7 +272,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
     getEditorText(): string {
 
-        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not('.select2-input')");
+        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not(.select2-input)");
         if (!input) {
             return this.get_container().textContent?.trim();
         }
