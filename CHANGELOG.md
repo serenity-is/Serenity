@@ -1,3 +1,12 @@
+## 8.4.6 (2024-04-16)
+
+### Bugfixes:
+
+- Fix sortablejs removing draggable attribute from .slick-resizable-handle after columns change, stopping column resizing
+- DataExplorer might fail on Postgres as migrator create ID field with quotes
+- Fix sorting issue when data explorer grid is sorted manually by ID, and clear sort columns when changing table
+- Missing brackets in DisplayName expression for EmailQueueRow causing issue in Postgres due to the way FluentMigrator quotes field names by default
+
 ## 8.4.5 (2024-04-16)
 
 ## Features:
