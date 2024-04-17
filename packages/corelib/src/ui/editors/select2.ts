@@ -575,7 +575,7 @@ export class Select2 {
         return this.instance?.val();
     }
 
-    set val(value: string[]) {
+    set val(value: string | string[]) {
         this.instance?.val(value);
     }
 
