@@ -3794,7 +3794,7 @@ declare namespace Serenity {
         static typeInfo: ClassTypeInfo<"Serenity.Widget">;
         private static nextWidgetNumber;
         protected readonly options: WidgetProps<P>;
-        protected readonly uniqueName: string;
+        readonly uniqueName: string;
         readonly idPrefix: string;
         readonly domNode: HTMLElement;
         constructor(props: WidgetProps<P>);
@@ -3809,6 +3809,8 @@ declare namespace Serenity {
         static getWidgetName(type: Function): string;
         addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
         addValidationRule(uniqueName: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
+        protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement>;
+        protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement;
         getFieldElement(): HTMLElement;
         getGridField(): Fluent;
         change(handler: (e: Event) => void): void;
@@ -3826,7 +3828,7 @@ declare namespace Serenity {
          */
         render(): any;
         protected internalRenderContents(): void;
-        protected renderContents(): any | void;
+        protected renderContents(): any;
         get props(): WidgetProps<P>;
         protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
         protected useIdPrefix(): IdPrefixType;
@@ -3939,7 +3941,6 @@ declare namespace Serenity {
     function getFormAsync(key: string): Promise<PropertyItem[]>;
     function getFormData(key: string): PropertyItemsData;
     const getFormDataAsync: typeof getFormScript;
-    function getTemplate(key: string): string;
 
     function setEquality(request: ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
@@ -4579,10 +4580,9 @@ declare namespace Serenity {
     }
 
     class TemplatedWidget<P> extends Widget<P> {
-        protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement>;
-        protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement;
+        /** @deprecated Please use renderContents() and .tsx (jsx-dom) to return HTML markup */
         protected getTemplate(): string;
-        protected renderContents(): void;
+        protected renderContents(): any;
     }
 
     class TemplatedDialog<P> extends TemplatedWidget<P> {
