@@ -158,7 +158,6 @@ public static class DynamicScriptServiceCollectionExtensions
         UseDynamicScriptTypes(builder.ApplicationServices);
         UseCssWatching(builder.ApplicationServices);
         UseScriptWatching(builder.ApplicationServices);
-        UseTemplateScripts(builder.ApplicationServices);
 
         return UseDynamicScriptMiddleware(builder);
     }
@@ -303,48 +302,6 @@ public static class DynamicScriptServiceCollectionExtensions
 
             fileWatcherFactory.KeepAlive(scriptWatcher);
         }
-
-        return serviceProvider;
-    }
-
-    /// <summary>
-    /// Registers template scripts
-    /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider)
-    {
-        var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
-        var templateRoots = new[]
-        {
-            System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views", "Templates"),
-            System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
-        };
-        UseTemplateScripts(serviceProvider, templateRoots);
-        return serviceProvider;
-    }
-
-    /// <summary>
-    /// Registers template scripts
-    /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="templateRoots">Root paths for templates</param>
-    /// <exception cref="ArgumentNullException">Service provider or template roots is null</exception>
-    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider,
-        params string[] templateRoots)
-    {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        if (templateRoots == null || templateRoots.Length == 0)
-            throw new ArgumentNullException(nameof(templateRoots));
-
-        var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
-
-        var templateWatchers = new TemplateScriptRegistrar()
-            .Initialize(scriptManager, templateRoots, watchForChanges: true);
-
-        foreach (var templateWatcher in templateWatchers)
-            serviceProvider.GetRequiredService<IFileWatcherFactory>()
-                .KeepAlive(templateWatcher);
 
         return serviceProvider;
     }
