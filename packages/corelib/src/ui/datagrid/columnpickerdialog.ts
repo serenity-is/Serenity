@@ -1,15 +1,15 @@
-﻿import { Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "../../base";
-import { Column } from "@serenity-is/sleekgrid";
+﻿import { Column } from "@serenity-is/sleekgrid";
+import { Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "../../base";
 import { Authorization, Router } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { TemplatedDialog } from "../dialogs/templateddialog";
+import { BaseDialog } from "../dialogs/basedialog";
 import { ToolButton } from "../widgets/toolbar";
 import { IDataGrid } from "./idatagrid";
 
 @Decorators.registerClass('Serenity.ColumnPickerDialog')
 @Decorators.resizable()
 @Decorators.responsive()
-export class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
+export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 
     private ulVisible: Fluent;
     private ulHidden: Fluent;

@@ -37,6 +37,8 @@ export function triggerRemoveAndClearAll(element: EventTarget): void {
     if (!events)
         return;
 
+    eventRegistry.delete(element);
+
     var removeHandlers = events["remove"];
     if (removeHandlers) {
         for (const [_, handler] of Object.entries(removeHandlers)) {
@@ -56,7 +58,6 @@ export function triggerRemoveAndClearAll(element: EventTarget): void {
         }
     }
 
-    eventRegistry.delete(element);
 }
 
 function getElementEvents(element: EventTarget): ElementEvents {

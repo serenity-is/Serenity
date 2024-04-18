@@ -30,12 +30,11 @@ export class Widget<P = {}> {
         delete this.options.element;
         setElementProps(this, this.props as any);
 
-        let widgetName = getWidgetName(getInstanceType(this));
-        this.uniqueName = widgetName + (Widget.nextWidgetNumber++).toString();
+        this.uniqueName = getWidgetName(getInstanceType(this)) + (Widget.nextWidgetNumber++).toString();
 
         associateWidget(this);
 
-        Fluent.one(this.domNode, 'remove.' + widgetName, e => {
+        Fluent.one(this.domNode, 'remove.' + this.uniqueName, e => {
             if (e.bubbles || e.cancelable)
                 return;
             this.destroy();
@@ -50,8 +49,6 @@ export class Widget<P = {}> {
         if (this.domNode) {
             deassociateWidget(this);
             toggleClass(this.domNode, this.getCssClass(), false);
-            let widgetName = getWidgetName(getInstanceType(this));
-            Fluent.off(this.domNode, '.' + widgetName);
             Fluent.off(this.domNode, '.' + this.uniqueName);
             delete (this as any).domNode;
         }
@@ -184,7 +181,22 @@ export class Widget<P = {}> {
     }
 
     protected renderContents(): any {
+        if (this.legacyTemplateRender())
+            return void 0;
         return (this.options as any).children;
+    }
+
+    protected legacyTemplateRender(): boolean {
+        if (typeof (this as any).getTemplate !== "function")
+            return;
+
+        var template = (this as any).getTemplate();
+        if (typeof template !== "string")
+            return;
+
+        template = template.replace(new RegExp('~_', 'g'), this.idPrefix);
+        this.domNode.innerHTML = template;
+        return true;
     }
 
     public get props(): WidgetProps<P> {
@@ -202,6 +214,9 @@ export class Widget<P = {}> {
         return useIdPrefix(this.idPrefix);
     }
 }
+
+/** @deprecated Use Widget */
+export const TemplatedWidget = Widget;
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 

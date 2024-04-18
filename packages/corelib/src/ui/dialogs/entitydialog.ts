@@ -11,11 +11,11 @@ import { TabsExtensions } from "../helpers/tabsextensions";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
-import { TemplatedDialog } from "./templateddialog";
+import { BaseDialog } from "./basedialog";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 @Decorators.panel(true)
-export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
+export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
     protected entity: TItem;
     protected entityId: any;
@@ -643,7 +643,7 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
 
         this.localizationGrid.enumerateItems((item, widget) => {
             if (item.name.indexOf('$') < 0 && Fluent.isInputLike(widget.domNode)) {
-            valueByName[item.name] = this.byId(item.name).val();
+                valueByName[item.name] = this.byId(item.name).val();
                 widget.element.val(valueByName[item.name]);
             }
         });
@@ -1155,7 +1155,16 @@ export class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements I
         return false;
     }
 
-    protected getTemplate() {
-        return `<div id="~_Toolbar" class="s-DialogToolbar"></div><div class="s-Form"><form id="~_Form" action=""><div id="~_PropertyGrid"></div></form></div>`;
+    protected renderContents(): any {
+        if (this.legacyTemplateRender())
+            return void 0;
+
+        const id = this.useIdPrefix();
+        return Fluent(document.createDocumentFragment())
+            .append(Fluent("div").attr("id", id.Toolbar))
+            .append(Fluent("div").class("s-Form")
+                .append(Fluent("form").attr("id", id.Form).attr("action", "")
+                    .append(Fluent("div").attr("id", id.PropertyGrid))))
+            .getNode();
     }
 }

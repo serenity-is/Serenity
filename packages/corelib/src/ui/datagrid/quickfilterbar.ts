@@ -360,10 +360,13 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public find<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        return getWidgetFrom('#' + this.options.idPrefix + field, type);
+        const selector = '#' + this.options.idPrefix + field;
+
+        return getWidgetFrom(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
     public tryFind<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
-        return tryGetWidget('#' + this.options.idPrefix + field, type);
+        const selector = '#' + this.options.idPrefix + field;
+        return tryGetWidget(this.domNode?.querySelector(selector) ?? selector, type);
     }
 }

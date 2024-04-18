@@ -3829,10 +3829,13 @@ declare namespace Serenity {
         render(): any;
         protected internalRenderContents(): void;
         protected renderContents(): any;
+        protected legacyTemplateRender(): boolean;
         get props(): WidgetProps<P>;
         protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
         protected useIdPrefix(): IdPrefixType;
     }
+    /** @deprecated Use Widget */
+    const TemplatedWidget: typeof Widget;
     class EditorWidget<P> extends Widget<EditorProps<P>> {
         static typeInfo: ClassTypeInfo<"Serenity.EditorWidget">;
         constructor(props: EditorProps<P>);
@@ -4579,13 +4582,7 @@ declare namespace Serenity {
         updateInterface(): void;
     }
 
-    class TemplatedWidget<P> extends Widget<P> {
-        /** @deprecated Please use renderContents() and .tsx (jsx-dom) to return HTML markup */
-        protected getTemplate(): string;
-        protected renderContents(): any;
-    }
-
-    class TemplatedDialog<P> extends TemplatedWidget<P> {
+    class BaseDialog<P> extends Widget<P> {
         static createDefaultElement(): HTMLDivElement;
         protected tabs: Fluent<HTMLElement>;
         protected toolbar: Toolbar;
@@ -4616,8 +4613,10 @@ declare namespace Serenity {
         protected initTabs(): void;
         protected handleResponsive(): void;
     }
+    /** @deprecated use BaseDialog */
+    const TemplatedDialog: typeof BaseDialog;
 
-    class TemplatedPanel<P = {}> extends TemplatedWidget<P> {
+    class BasePanel<P = {}> extends Widget<P> {
         constructor(props: WidgetProps<P>);
         destroy(): void;
         protected tabs: Fluent;
@@ -4634,6 +4633,8 @@ declare namespace Serenity {
         protected resetValidation(): void;
         protected validateForm(): boolean;
     }
+    /** @deprecated use BasePanel */
+    const TemplatedPanel: typeof BasePanel;
 
     class CascadedWidgetLink<TParent extends Widget<any>> {
         private parentType;
@@ -4703,7 +4704,7 @@ declare namespace Serenity {
         mode?: PropertyGridMode;
     }
 
-    class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
+    class PropertyPanel<TItem, P> extends BasePanel<P> {
         private _entity;
         private _entityId;
         constructor(props: WidgetProps<P>);
@@ -4738,7 +4739,7 @@ declare namespace Serenity {
         function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void;
     }
 
-    class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
+    class PropertyDialog<TItem, P> extends BaseDialog<P> {
         protected entity: TItem;
         protected entityId: any;
         protected propertyItemsData: PropertyItemsData;
@@ -4769,7 +4770,7 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
         protected updateTitle(): void;
         protected propertyGrid: PropertyGrid;
-        protected getTemplate(): string;
+        protected renderContents(): HTMLDivElement;
     }
 
     namespace EditorUtils {
@@ -5915,7 +5916,7 @@ declare namespace Serenity {
         function get(key: string): Function;
     }
 
-    class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
+    class FilterWidgetBase<P = {}> extends Widget<P> {
         private store;
         private onFilterStoreChanged;
         constructor(props: WidgetProps<P>);
@@ -5942,7 +5943,7 @@ declare namespace Serenity {
         private updateStoreOnReset;
         get_updateStoreOnReset(): boolean;
         set_updateStoreOnReset(value: boolean): void;
-        protected getTemplate(): string;
+        protected renderContents(): any;
         protected initButtons(): void;
         protected searchButtonClick(e: Event): void;
         get_hasErrors(): boolean;
@@ -5966,11 +5967,11 @@ declare namespace Serenity {
         protected updateParens(): void;
     }
 
-    class FilterDialog<P = {}> extends TemplatedDialog<P> {
+    class FilterDialog<P = {}> extends BaseDialog<P> {
         private filterPanel;
         constructor(props: WidgetProps<P>);
         get_filterPanel(): FilterPanel;
-        protected getTemplate(): string;
+        protected renderContents(): any;
         protected getDialogOptions(): DialogOptions;
         protected getDialogButtons(): DialogButton[];
     }
@@ -6386,7 +6387,7 @@ declare namespace Serenity {
         getFilterStore(): FilterStore;
     }
 
-    class ColumnPickerDialog<P = {}> extends TemplatedDialog<P> {
+    class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
         private ulVisible;
         private ulHidden;
         private colById;
@@ -6580,7 +6581,7 @@ declare namespace Serenity {
         };
     }
 
-    class EntityDialog<TItem, P = {}> extends TemplatedDialog<P> implements IEditDialog, IReadOnly {
+    class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
         protected entity: TItem;
         protected entityId: any;
         protected propertyItemsData: PropertyItemsData;
@@ -6698,7 +6699,7 @@ declare namespace Serenity {
         protected editClicked: boolean;
         protected isViewMode(): boolean;
         protected useViewMode(): boolean;
-        protected getTemplate(): string;
+        protected renderContents(): any;
     }
 
     /**

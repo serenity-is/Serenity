@@ -1,11 +1,11 @@
-﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
+﻿import { Fluent, cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
 import { Decorators } from "../../types/decorators";
-import { TemplatedDialog } from "../dialogs/templateddialog";
+import { BaseDialog } from "../dialogs/basedialog";
 import { WidgetProps } from "../widgets/widget";
 import { FilterPanel } from "./filterpanel";
 
 @Decorators.registerClass('Serenity.FilterDialog')
-export class FilterDialog<P = {}> extends TemplatedDialog<P> {
+export class FilterDialog<P = {}> extends BaseDialog<P> {
 
     private filterPanel: FilterPanel;
 
@@ -24,8 +24,8 @@ export class FilterDialog<P = {}> extends TemplatedDialog<P> {
         return this.filterPanel;
     }
 
-    protected getTemplate(): string {
-        return '<div id="~_FilterPanel"/>';
+    protected renderContents(): any {
+        return Fluent("div").attr("id", this.useIdPrefix().FilterPanel).getNode();
     }
 
     protected getDialogOptions() {

@@ -3,11 +3,11 @@ import { getForm } from "../../q";
 import { FormKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
-import { TemplatedPanel } from "./templatedpanel";
+import { BasePanel } from "./basepanel";
 import { WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')
-export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
+export class PropertyPanel<TItem, P> extends BasePanel<P> {
 
     private _entity: TItem;
     private _entityId: any;

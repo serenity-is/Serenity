@@ -164,16 +164,16 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
-    protected getTemplate(): string {
-        return "<div id='~_Rows' class='filter-lines'>" +
-            "</div>" +
-            "<div id='~_Buttons' class='buttons'>" +
-            "<button id='~_AddButton' class='btn btn-primary add'></button>" +
-            "<button id='~_SearchButton' class='btn btn-success search'></button>" +
-            "<button id='~_ResetButton' class='btn btn-danger reset'></button>" +
-            "</div>" +
-            "<div style='clear: both'>" +
-            "</div>"
+    protected renderContents(): any {
+        const id = this.useIdPrefix();
+        return Fluent(document.createDocumentFragment())
+            .append(Fluent("div").attr("id", id.Rows).class("filter-lines"))
+            .append(Fluent("div").attr("id", id.Buttons).class("buttons")
+                .append(Fluent("button").attr("id", id.AddButton).attr("type", "button").class("btn btn-primary add"))
+                .append(Fluent("button").attr("id", id.SearchButton).attr("type", "button").class("btn btn-success search"))
+                .append(Fluent("button").attr("id", id.ResetButton).attr("type", "button").class("btn btn-danger reset")))
+            .append(Fluent("div").attr("style", "clear: both"))
+            .getNode();
     }
 
     protected initButtons(): void {

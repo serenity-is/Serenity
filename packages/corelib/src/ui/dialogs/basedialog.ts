@@ -4,13 +4,12 @@ import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
-import { TemplatedWidget } from "../widgets/templatedwidget";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { WidgetProps } from "../widgets/widget";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { DialogExtensions } from "./dialogextensions";
 
-@Decorators.registerClass('Serenity.TemplatedDialog', [IDialog])
-export class TemplatedDialog<P> extends TemplatedWidget<P> {
+@Decorators.registerClass('Serenity.BaseDialog', [IDialog])
+export class BaseDialog<P> extends Widget<P> {
 
     static override createDefaultElement() { return Fluent("div").class("hidden").appendTo(document.body).getNode(); }
 
@@ -35,9 +34,11 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         this.toolbar = null;
         this.validator && this.byId('Form').remove();
         this.validator = null;
-        if (this.dialog) {
-            this.dialog.dispose();
+        const dialog = this.dialog;
+        if (dialog) {
+            Fluent.off(this.domNode, "." + this.uniqueName);
             this.dialog = null;
+            dialog.dispose();
         }
         Fluent.off(window, '.' + this.uniqueName);
         super.destroy();
@@ -169,10 +170,10 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         document.dispatchEvent(new Event('click'));
 
         window.setTimeout(() => {
-            let domNode = this.domNode
+            let domNode = this.domNode;
             this.destroy();
             if (domNode) {
-                this.element.remove();
+                Fluent.remove(domNode);
             }
             positionToastContainer(defaultNotifyOptions, false);
         }, 0);
@@ -206,6 +207,9 @@ export class TemplatedDialog<P> extends TemplatedWidget<P> {
         handleUIDialogResponsive(this.domNode);
     }
 }
+
+/** @deprecated use BaseDialog */
+export const TemplatedDialog = BaseDialog;
 
 function getCssSize(element: HTMLElement, name: string): number {
     var cssSize = getComputedStyle(element).getPropertyValue(name);

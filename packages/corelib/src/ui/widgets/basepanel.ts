@@ -2,12 +2,11 @@
 import { validateOptions } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
-import { TemplatedWidget } from "./templatedwidget";
 import { ToolButton, Toolbar } from "./toolbar";
-import { WidgetProps } from "./widget";
+import { Widget, WidgetProps } from "./widget";
 
-@Decorators.registerClass("Serenity.TemplatedPanel")
-export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
+@Decorators.registerClass("Serenity.BasePanel")
+export class BasePanel<P={}> extends Widget<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
         
@@ -88,3 +87,6 @@ export class TemplatedPanel<P={}> extends TemplatedWidget<P> {
         return this.validator == null || !!this.validator.form();
     }
 }
+
+/** @deprecated use BasePanel */
+export const TemplatedPanel = BasePanel;

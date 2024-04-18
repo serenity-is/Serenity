@@ -1,14 +1,14 @@
-﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
+﻿import { Fluent, PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../q";
 import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
-import { TemplatedDialog } from "./templateddialog";
+import { BaseDialog } from "./basedialog";
 
 @Decorators.registerClass('Serenity.PropertyDialog')
 @Decorators.panel(false)
-export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
+export class PropertyDialog<TItem, P> extends BaseDialog<P> {
     protected entity: TItem;
     protected entityId: any;
     protected propertyItemsData: PropertyItemsData;
@@ -197,7 +197,14 @@ export class PropertyDialog<TItem, P> extends TemplatedDialog<P> {
 
     protected propertyGrid: PropertyGrid;
 
-    protected getTemplate() {
-        return `<div class="s-Form"><form id="~_Form" action=""><div id="~_PropertyGrid"></div></form></div>`;
+    protected renderContents() {
+        if (this.legacyTemplateRender())
+            return void 0;
+
+        const id = this.useIdPrefix();
+        return Fluent("div").class("s-Form")
+            .append(Fluent("form").attr("id", id.Form).attr("action", "")
+                .append(Fluent("div").attr("id", id.PropertyGrid)))
+            .getNode();
     }
 }

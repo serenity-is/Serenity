@@ -290,14 +290,16 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.find(type, field);
 
-        return getWidgetFrom('#' + this.uniqueName + '_QuickFilter_' + field, type);
+        const selector = '#' + this.uniqueName + '_QuickFilter_' + field;
+        return getWidgetFrom(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
     protected tryFindQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.tryFind(type, field);
 
-        return tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, type);
+        const selector = '#' + this.uniqueName + '_QuickFilter_' + field;
+        return tryGetWidget(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
     protected createIncludeDeletedButton(): void {
