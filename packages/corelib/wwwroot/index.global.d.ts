@@ -6447,7 +6447,7 @@ declare namespace Serenity {
     }
     class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
         static createDefaultElement(): HTMLDivElement;
-        private byId;
+        private itemById;
         constructor(props: EditorProps<P>);
         protected getIdProperty(): string;
         protected getTreeItems(): TItem[];

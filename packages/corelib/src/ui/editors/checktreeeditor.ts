@@ -29,7 +29,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     static override createDefaultElement() { return document.createElement("div"); }
 
-    private byId: { [key: string]: TItem };
+    private itemById: { [key: string]: TItem };
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -135,17 +135,17 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 return null;
             }
 
-            if (self.byId == null) {
-                self.byId = {};
+            if (self.itemById == null) {
+                self.itemById = {};
                 for (var i = 0; i < items.length; i++) {
                     var o = items[i];
                     if (o.id != null) {
-                        self.byId[o.id] = o;
+                        self.itemById[o.id] = o;
                     }
                 }
             }
 
-            return self.byId[x.parentId];
+            return self.itemById[x.parentId];
         });
     }
 
@@ -155,7 +155,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         response = super.onViewProcessData(response);
-        this.byId = null;
+        this.itemById = null;
         SlickTreeHelper.setIndents(response.Entities, function (x) {
             return x.id;
         }, function (x1) {
