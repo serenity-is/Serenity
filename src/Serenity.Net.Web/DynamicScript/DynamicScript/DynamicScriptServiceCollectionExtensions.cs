@@ -125,7 +125,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     /// <param name="setupAction">Action to edit options</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddScriptBundling(this IServiceCollection collection, 
+    public static void AddScriptBundling(this IServiceCollection collection,
         Action<ScriptBundlingOptions> setupAction)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -329,7 +329,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <param name="serviceProvider">Service provider</param>
     /// <param name="templateRoots">Root paths for templates</param>
     /// <exception cref="ArgumentNullException">Service provider or template roots is null</exception>
-    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider, 
+    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider,
         params string[] templateRoots)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
@@ -347,5 +347,27 @@ public static class DynamicScriptServiceCollectionExtensions
                 .KeepAlive(templateWatcher);
 
         return serviceProvider;
+    }
+
+    /// <summary>
+    /// Registers the default local text initializer
+    /// </summary>
+    /// <param name="collection">Service collection</param>
+    public static void AddLocalTextInitializer(this IServiceCollection collection)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+        collection.TryAddSingleton<ILocalTextInitializer, DefaultLocalTextInitializer>();
+    }
+
+
+    /// <summary>
+    /// Initializes local texts by calling <see cref="ILocalTextInitializer.Initialize"/>
+    /// </summary>
+    public static void InitializeLocalTexts(this IApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+        var registry = app.ApplicationServices.GetRequiredService<ILocalTextRegistry>();
+        var initializer = app.ApplicationServices.GetRequiredService<ILocalTextInitializer>();
+        initializer.Initialize(registry);
     }
 }
