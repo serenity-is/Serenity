@@ -183,7 +183,7 @@ export class Widget<P = {}> {
             appendChild(contents, this.domNode);
     }
 
-    protected renderContents(): any | void {
+    protected renderContents(): any {
         return (this.options as any).children;
     }
 

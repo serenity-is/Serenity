@@ -119,10 +119,6 @@ export function getFormData(key: string): PropertyItemsData {
 
 export const getFormDataAsync = getFormScript;
 
-export function getTemplate(key: string): string {
-    return ScriptData.ensure('Template.' + key, true);
-}
-
 var compatExports = {
     canLoadScriptData,
     getColumns,
@@ -133,7 +129,6 @@ var compatExports = {
     getLookupAsync,
     getRemoteData,
     getRemoteDataAsync,
-    getTemplate,
     reloadLookup,
     reloadLookupAsync,
     ScriptData
