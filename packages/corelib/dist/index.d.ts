@@ -4084,7 +4084,7 @@ declare class Select2 {
     readonly(value?: boolean): void;
     get search(): HTMLInputElement;
     get val(): (string | string[]);
-    set val(value: string[]);
+    set val(value: string | string[]);
     static getInstance(el: Select2Element): Select2;
     static readonly ajaxDefaults: Select2AjaxOptions;
     static readonly defaults: Select2Options;
