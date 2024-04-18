@@ -13,7 +13,7 @@ export class Widget<P = {}> {
 
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
-    declare protected readonly uniqueName: string;
+    declare public readonly uniqueName: string;
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
 
@@ -101,6 +101,14 @@ export class Widget<P = {}> {
     public addValidationRule(rule: any, uniqueName: any): void {
         addValidationRule(this.domNode, typeof rule === "function" ? rule : uniqueName,
             typeof rule === "function" ? uniqueName ?? this.uniqueName : rule);
+    }
+
+    protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement> {
+        return this.element.findFirst<TElement>('#' + this.idPrefix + id);
+    }
+
+    protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {
+        return this.domNode?.querySelector<TElement>('#' + this.idPrefix + id);
     }
 
     public getFieldElement(): HTMLElement {
