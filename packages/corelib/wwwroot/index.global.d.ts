@@ -3781,14 +3781,6 @@ declare namespace Serenity {
         class?: string;
         element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
     } & NoInfer<P>;
-    type EditorProps<T> = WidgetProps<T> & {
-        initialValue?: any;
-        maxLength?: number;
-        name?: string;
-        placeholder?: string;
-        required?: boolean;
-        readOnly?: boolean;
-    };
 
     class Widget<P = {}> {
         static typeInfo: ClassTypeInfo<"Serenity.Widget">;
@@ -3835,10 +3827,6 @@ declare namespace Serenity {
     }
     /** @deprecated Use Widget */
     const TemplatedWidget: typeof Widget;
-    class EditorWidget<P> extends Widget<EditorProps<P>> {
-        static typeInfo: ClassTypeInfo<"Serenity.EditorWidget">;
-        constructor(props: EditorProps<P>);
-    }
     interface CreateWidgetParams<TWidget extends Widget<P>, P> {
         type?: {
             new (options?: P): TWidget;
@@ -4521,6 +4509,10 @@ declare namespace Serenity {
         function makeCamelCase(s: string): string;
     }
 
+    function jQueryPatch(): boolean;
+
+    function reactPatch(): void;
+
     interface IRowDefinition {
         readonly deletePermission?: string;
         readonly idProperty?: string;
@@ -4634,6 +4626,19 @@ declare namespace Serenity {
     }
     /** @deprecated use BasePanel */
     const TemplatedPanel: typeof BasePanel;
+
+    type EditorProps<T> = WidgetProps<T> & {
+        initialValue?: any;
+        maxLength?: number;
+        name?: string;
+        placeholder?: string;
+        required?: boolean;
+        readOnly?: boolean;
+    };
+    class EditorWidget<P> extends Widget<EditorProps<P>> {
+        static typeInfo: ClassTypeInfo<"Serenity.EditorWidget">;
+        constructor(props: EditorProps<P>);
+    }
 
     class CascadedWidgetLink<TParent extends Widget<any>> {
         private parentType;
@@ -6604,6 +6609,8 @@ declare namespace Serenity {
         destroy(): void;
         get entity(): TItem;
         protected set entity(value: TItem);
+        /** @deprecated use entityId */
+        protected get_entityId(): any;
         get entityId(): any;
         protected set entityId(value: any);
         protected getEntityNameFieldValue(): any;

@@ -2,8 +2,8 @@ import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODat
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, today } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { flatPickrTrigger } from "../helpers/dateediting";
-import { EditorProps, EditorWidget } from "../widgets/widget";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
 
@@ -172,9 +172,9 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         else {
             setTimeout(() => {
                 var modal = this.domNode.closest(".modal");
-                if (modal && !opt.static && !opt.appendTo && this.domNode && 
-                    (this.domNode as any)._flatpickr && 
-                    (this.domNode as any)._flatpickr.calendarContainer && 
+                if (modal && !opt.static && !opt.appendTo && this.domNode &&
+                    (this.domNode as any)._flatpickr &&
+                    (this.domNode as any)._flatpickr.calendarContainer &&
                     (this.domNode as any)._flatpickr.calendarContainer.parentElement !== modal) {
                     modal.appendChild((this.domNode as any)._flatpickr.calendarContainer);
                 }
@@ -343,7 +343,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             if (value) {
                 this.domNode.classList.toggle('readonly', !!value);
                 value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
-                
+
                 let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
                 trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
 

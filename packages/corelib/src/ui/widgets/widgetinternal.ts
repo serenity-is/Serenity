@@ -1,7 +1,8 @@
 ﻿import { addClass, getCustomAttribute, getTypeFullName, isArrayLike } from "../../base";
 import { ElementAttribute } from "../../types/attributes";
 import { EditorUtils } from "../editors/editorutils";
-import { EditorProps, WidgetProps } from "./widgetutils";
+import { type EditorProps } from "../editors/editorwidget";
+import { WidgetProps } from "./widgetutils";
 
 export let isFragmentWorkaround = Symbol();
 

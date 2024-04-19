@@ -2,8 +2,8 @@
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface HtmlContentEditorOptions {
     cols?: number;

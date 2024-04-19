@@ -1,6 +1,6 @@
 ﻿import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface TextAreaEditorOptions {
     cols?: number;

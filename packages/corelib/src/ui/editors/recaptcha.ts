@@ -1,7 +1,7 @@
 ﻿import { Fluent, addValidationRule, localText } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface RecaptchaOptions {
     siteKey?: string;

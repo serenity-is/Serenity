@@ -1,7 +1,7 @@
 ﻿import { Fluent, getjQuery, notifyError } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
 @Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])

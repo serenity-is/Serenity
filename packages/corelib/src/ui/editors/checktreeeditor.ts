@@ -1,5 +1,5 @@
-﻿import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "../../base";
-import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
+﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
+import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "../../base";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -7,10 +7,11 @@ import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
-import { EditorProps, Widget } from "../widgets/widget";
+import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
+import { EditorProps } from "./editorwidget";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;

@@ -1,9 +1,9 @@
 ﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "../../base";
-import { getLookup, reloadLookup, ScriptData } from "../../q";
+import { ScriptData, getLookup, reloadLookup } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps } from "../widgets/widget";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
+import { EditorProps } from "./editorwidget";
 
 export interface LookupEditorOptions extends ComboboxEditorOptions {
     lookupKey?: string;
@@ -13,7 +13,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 @Decorators.registerEditor("Serenity.LookupEditorBase")
 export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
-    private lookupChangeUnbind: any; 
+    private lookupChangeUnbind: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -145,7 +145,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
 @Decorators.registerEditor("Serenity.LookupEditor")
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
-    
+
     constructor(props: EditorProps<P>) {
         super(props);
     }

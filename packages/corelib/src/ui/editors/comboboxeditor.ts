@@ -5,10 +5,11 @@ import { Decorators } from "../../types/decorators";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
-import { EditorProps, Widget } from "../widgets/widget";
+import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { Combobox, ComboboxItem, ComboboxOptions, ComboboxSearchQuery, ComboboxSearchResult, stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
+import { EditorProps } from "./editorwidget";
 
 export interface ComboboxCommonOptions {
     allowClear?: boolean;

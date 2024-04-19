@@ -1,7 +1,7 @@
 ﻿import { Fluent } from "../../base";
 import { IBooleanValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
-import { EditorWidget } from "../widgets/widget";
+import { EditorWidget } from "./editorwidget";
 
 @Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
 export class BooleanEditor<P = {}> extends EditorWidget<P> {

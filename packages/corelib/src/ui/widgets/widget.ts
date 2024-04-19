@@ -1,11 +1,9 @@
 ﻿import { Config, Fluent, addClass, addValidationRule, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
-import { jQueryPatch } from "../../patch/jquerypatch";
-import { reactPatch } from "../../patch/reactpatch";
 import { appendChild, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
-import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type EditorProps, type WidgetProps } from "./widgetutils";
-export { getWidgetFrom, tryGetWidget, useIdPrefix, type EditorProps, type IdPrefixType, type WidgetProps } from "./widgetutils";
+import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
+export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
 @Decorators.registerType()
 export class Widget<P = {}> {
@@ -212,15 +210,6 @@ export const TemplatedWidget = Widget;
 
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
-@Decorators.registerType()
-export class EditorWidget<P> extends Widget<EditorProps<P>> {
-    static override typeInfo = Decorators.classType("Serenity.EditorWidget");
-
-    constructor(props: EditorProps<P>) {
-        super(props);
-    }
-}
-
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     type?: { new(options?: P): TWidget, prototype: TWidget };
     options?: P & WidgetProps<{}>;
@@ -231,6 +220,3 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
 
 const initialized = Symbol();
 const renderContentsCalled = Symbol();
-
-!jQueryPatch() && Fluent.ready(jQueryPatch);
-reactPatch();

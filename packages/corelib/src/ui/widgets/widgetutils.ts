@@ -125,13 +125,3 @@ export type WidgetProps<P> = {
     class?: string;
     element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
 } & NoInfer<P>
-
-export type EditorProps<T> = WidgetProps<T> & {
-    initialValue?: any;
-    maxLength?: number;
-    name?: string;
-    placeholder?: string;
-    required?: boolean;
-    readOnly?: boolean;
-}
-

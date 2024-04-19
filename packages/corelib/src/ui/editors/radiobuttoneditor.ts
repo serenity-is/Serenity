@@ -4,7 +4,7 @@ import { getLookup } from "../../q";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface RadioButtonEditorOptions {
     enumKey?: string;

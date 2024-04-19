@@ -3,7 +3,7 @@ import { IReadOnly, IStringValue } from "../../interfaces";
 import { today } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface DateEditorOptions {
     yearRange?: string;
@@ -228,14 +228,14 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         else {
             setTimeout(() => {
                 var modal = this.domNode.closest(".modal");
-                if (modal && !opt.static && !opt.appendTo && this.domNode && 
-                    (this.domNode as any)._flatpickr && 
-                    (this.domNode as any)._flatpickr.calendarContainer && 
+                if (modal && !opt.static && !opt.appendTo && this.domNode &&
+                    (this.domNode as any)._flatpickr &&
+                    (this.domNode as any)._flatpickr.calendarContainer &&
                     (this.domNode as any)._flatpickr.calendarContainer.parentElement !== modal) {
                     modal.appendChild((this.domNode as any)._flatpickr.calendarContainer);
                 }
             }, 0);
-        }        
+        }
 
         return opt;
     }

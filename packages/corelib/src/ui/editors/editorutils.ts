@@ -5,7 +5,6 @@ import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 import { Combobox } from "./combobox";
 
-
 export namespace EditorUtils {
 
     export function getDisplayText(editor: Widget<any>): string {

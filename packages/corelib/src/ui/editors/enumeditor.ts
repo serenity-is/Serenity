@@ -2,9 +2,9 @@ import { Enum, getCustomAttribute, tryGetText } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
-import { EditorProps } from "../widgets/widget";
 import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
+import { EditorProps } from "./editorwidget";
 
 export interface EnumEditorOptions extends ComboboxCommonOptions {
     enumKey?: string;

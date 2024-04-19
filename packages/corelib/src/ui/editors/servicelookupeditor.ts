@@ -1,8 +1,8 @@
 ﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "../../base";
 import { Decorators } from "../../types/decorators";
-import { EditorProps } from "../widgets/widget";
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
+import { EditorProps } from "./editorwidget";
 
 export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
     service?: string;

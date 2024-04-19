@@ -2,7 +2,7 @@
 import { IStringValue } from "../../interfaces";
 import { ValidationHelper } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps } from "../widgets/widget";
+import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";
 
 @Decorators.registerEditor('Serenity.URLEditor', [IStringValue])

@@ -2,7 +2,7 @@
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { ValidationHelper } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface EmailEditorOptions {
     domain?: string;

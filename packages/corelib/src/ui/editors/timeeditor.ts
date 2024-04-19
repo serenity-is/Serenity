@@ -2,7 +2,7 @@
 import { IDoubleValue, IReadOnly } from "../../interfaces";
 import { addOption } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { EditorUtils } from "./editorutils";
 
 export interface TimeEditorOptions {
@@ -22,7 +22,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
 
     constructor(props: EditorProps<P>) {
         super(props);
-        
+
         let input = this.element;
         input.addClass('editor s-TimeEditor hour');
 

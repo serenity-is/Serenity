@@ -2,9 +2,9 @@
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
-import { EditorProps, EditorWidget } from "../widgets/widget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;

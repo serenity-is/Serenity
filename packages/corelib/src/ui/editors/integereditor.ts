@@ -2,7 +2,7 @@ import { Fluent, formatNumber, parseInteger } from "../../base";
 import { IDoubleValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "../widgets/widget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { AutoNumeric } from "./autonumeric";
 import { DecimalEditor } from "./decimaleditor";
 
