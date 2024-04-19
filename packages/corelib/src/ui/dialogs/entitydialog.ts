@@ -91,6 +91,11 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this._entity = value || new Object() as any;
     }
 
+    /** @deprecated use entityId */
+    protected get_entityId(): any {
+        return this.entityId;
+    }
+
     get entityId(): any {
         return this._entityId;
     }

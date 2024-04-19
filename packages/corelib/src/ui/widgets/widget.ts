@@ -34,11 +34,7 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        Fluent.one(this.domNode, 'remove.' + this.uniqueName, e => {
-            if (e.bubbles || e.cancelable)
-                return;
-            this.destroy();
-        });
+        Fluent.one(this.domNode, 'remove.' + this.uniqueName, () => this.destroy());
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
         this.addCssClass();
@@ -106,10 +102,6 @@ export class Widget<P = {}> {
 
     protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {
         return this.domNode?.querySelector<TElement>('#' + this.idPrefix + id);
-    }
-
-    public getFieldElement(): HTMLElement {
-        return this.domNode.closest('.field');
     }
 
     public getGridField(): Fluent {

@@ -3811,7 +3811,6 @@ declare namespace Serenity {
         addValidationRule(uniqueName: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
         protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement>;
         protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement;
-        getFieldElement(): HTMLElement;
         getGridField(): Fluent;
         change(handler: (e: Event) => void): void;
         changeSelect2(handler: (e: Event) => void): void;
