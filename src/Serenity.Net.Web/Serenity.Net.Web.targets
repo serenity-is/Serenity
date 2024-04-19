@@ -124,7 +124,7 @@ catch (Exception ex)
       <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct())" />
     </ItemGroup>
     <Delete Files="@(_NodeTypeDeleteFiles)" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
     <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
   </Target>
   <Target Name="RestoreTypings"
