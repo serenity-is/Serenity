@@ -1,11 +1,12 @@
-import { Dialog, DialogButton, DialogOptions, Fluent, Validator, addClass, defaultNotifyOptions, getjQuery, positionToastContainer } from "../../base";
+import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, positionToastContainer } from "../../base";
 import { IDialog } from "../../interfaces";
-import { isMobileView, layoutFillHeight, validateOptions } from "../../q";
+import { isMobileView, validateOptions } from "../../q";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
+import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 import { DialogExtensions } from "./dialogextensions";
 
 @Decorators.registerClass('Serenity.BaseDialog', [IDialog])
@@ -30,17 +31,26 @@ export class BaseDialog<P> extends Widget<P> {
     public destroy(): void {
         TabsExtensions.destroy(this.tabs);
         this.tabs = null;
-        (this.toolbar as any)?.toolbar?.destroy?.();
-        this.toolbar = null;
-        this.validator && this.byId('Form').remove();
-        this.validator = null;
+
+        if (this.toolbar) {
+            this.toolbar.destroy();
+            this.toolbar = null;
+        }
+
+        if (this.validator) {
+            this.byId('Form').remove();
+            this.validator = null;
+        }
+
         const dialog = this.dialog;
         if (dialog) {
             Fluent.off(this.domNode, "." + this.uniqueName);
             this.dialog = null;
             dialog.dispose();
         }
+
         Fluent.off(window, '.' + this.uniqueName);
+
         super.destroy();
     }
 
@@ -51,7 +61,7 @@ export class BaseDialog<P> extends Widget<P> {
     protected getInitialDialogTitle() {
         return "";
     }
-    
+
     protected isStaticPanel() {
         return this.getCustomAttribute(StaticPanelAttribute)?.value === true;
     }
@@ -72,7 +82,7 @@ export class BaseDialog<P> extends Widget<P> {
                 this.onDialogOpen()
             },
             width: Math.min(window.innerWidth, 920),
-            providerOptions: (type, options) => {
+            providerOptions: (type) => {
                 if (type === "uidialog") {
                     var opt: any = {};
                     applyCssSizes(opt, this.getCssClass());
@@ -210,93 +220,3 @@ export class BaseDialog<P> extends Widget<P> {
 
 /** @deprecated use BaseDialog */
 export const TemplatedDialog = BaseDialog;
-
-function getCssSize(element: HTMLElement, name: string): number {
-    var cssSize = getComputedStyle(element).getPropertyValue(name);
-    if (cssSize == null || !cssSize.endsWith('px'))
-        return null;
-
-    cssSize = cssSize.substring(0, cssSize.length - 2);
-    let i = parseInt(cssSize, 10);
-    if (i == null || isNaN(i) || i == 0)
-        return null;
-
-    return i;
-}
-
-function applyCssSizes(opt: any, dialogClass: string) {
-    let size: number;
-    let dialog = document.createElement("div");
-    try {
-        dialog.style.display = "none";
-        addClass(dialog, dialogClass);
-        document.body.append(dialog);
-
-        var sizeHelper = document.createElement("div");
-        sizeHelper.classList.add("size");
-        dialog.append(sizeHelper);
-        size = getCssSize(sizeHelper, 'minWidth');
-        if (size != null)
-            opt.minWidth = size;
-
-        size = getCssSize(sizeHelper, 'width');
-        if (size != null)
-            opt.width = size;
-
-        size = getCssSize(sizeHelper, 'height');
-        if (size != null)
-            opt.height = size;
-
-        size = getCssSize(sizeHelper, 'minHeight');
-        if (size != null)
-            opt.minHeight = size;
-    }
-    finally {
-        dialog.remove();
-    }
-};
-
-function handleUIDialogResponsive(domNode: HTMLElement) {
-    let $ = getjQuery();
-    if (!$)
-        return;
-
-    var dlg = ($(domNode) as any)?.dialog();
-    var uiDialog = $(domNode).closest('.ui-dialog');
-    if (!uiDialog.length)
-        return;
-
-    if (isMobileView()) {
-        var data = $(domNode).data('responsiveData');
-        if (!data) {
-            data = {};
-            data.draggable = dlg.dialog('option', 'draggable');
-            data.resizable = dlg.dialog('option', 'resizable');
-            data.position = dlg.css('position');
-            var pos = uiDialog.position();
-            data.left = pos.left;
-            data.top = pos.top;
-            data.width = uiDialog.width();
-            data.height = uiDialog.height();
-            data.contentHeight = $(domNode).height();
-            $(domNode).data('responsiveData', data);
-            dlg.dialog('option', 'draggable', false);
-            dlg.dialog('option', 'resizable', false);
-        }
-        uiDialog.addClass('mobile-layout');
-        uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
-        $(document.body).scrollTop(0);
-        layoutFillHeight(domNode);
-    }
-    else {
-        var d = $(domNode).data('responsiveData');
-        if (d) {
-            dlg.dialog('option', 'draggable', d.draggable);
-            dlg.dialog('option', 'resizable', d.resizable);
-            $(domNode).closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
-            $(domNode).height(d.contentHeight);
-            uiDialog.removeClass('mobile-layout');
-            $(domNode).removeData('responsiveData');
-        }
-    }
-}

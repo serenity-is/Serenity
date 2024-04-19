@@ -42,11 +42,6 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
             this.propertyGrid = null;
         }
 
-        if (this.validator) {
-            this.byId('Form').remove();
-            this.validator = null;
-        }
-
         super.destroy();
     }
 

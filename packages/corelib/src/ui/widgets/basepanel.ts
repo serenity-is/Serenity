@@ -26,9 +26,7 @@ export class BasePanel<P={}> extends Widget<P> {
 
         if (this.validator) {
             this.validator.destroy();
-            let form = this.findById('Form');
-            if (form)
-                Fluent.remove(form);
+            this.byId('Form').remove();
             this.validator = null;
         }
 
