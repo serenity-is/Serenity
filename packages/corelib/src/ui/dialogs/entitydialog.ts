@@ -17,8 +17,9 @@ import { BaseDialog } from "./basedialog";
 @Decorators.panel(true)
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    protected entity: TItem;
-    protected entityId: any;
+    private _entity: TItem;
+    private _entityId: any;
+
     protected propertyItemsData: PropertyItemsData;
     protected propertyGrid: PropertyGrid;
 
@@ -82,24 +83,24 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         super.destroy();
     }
 
-    protected get_entity(): TItem {
-        return this.entity;
+    get entity(): TItem {
+        return this._entity;
     }
 
-    protected set_entity(entity: any): void {
-        this.entity = entity || new Object();
+    protected set entity(value: TItem) {
+        this._entity = value || new Object() as any;
     }
 
-    protected get_entityId(): any {
-        return this.entityId;
+    get entityId(): any {
+        return this._entityId;
     }
 
-    protected set_entityId(value: any) {
-        this.entityId = value;
+    protected set entityId(value: any) {
+        this._entityId = value;
     }
 
     protected getEntityNameFieldValue(): any {
-        return ((this.get_entity() as any)[this.getNameProperty()] ?? '').toString();
+        return ((this.entity as any)[this.getNameProperty()] ?? '').toString();
     }
 
     protected getEntityTitle(): string {
@@ -124,20 +125,20 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected isEditMode(): boolean {
-        return this.get_entityId() != null && !this.isCloneMode();
+        return this.entityId != null && !this.isCloneMode();
     }
 
     protected isDeleted(): boolean {
-        if (this.get_entityId() == null) {
+        if (this.entityId == null) {
             return false;
         }
 
         var isDeletedProperty = this.getIsDeletedProperty();
         if (isDeletedProperty) {
-            return !!(this.get_entity() as any)[isDeletedProperty];
+            return !!(this.entity as any)[isDeletedProperty];
         }
 
-        var value = (this.get_entity() as any)[this.getIsActiveProperty()];
+        var value = (this.entity as any)[this.getIsActiveProperty()];
         if (value == null) {
             return false;
         }
@@ -146,7 +147,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected isNew(): boolean {
-        return this.get_entityId() == null;
+        return this.entityId == null;
     }
 
     protected isNewOrDeleted(): boolean {
@@ -165,7 +166,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         var self = this;
 
         var request: DeleteRequest = {
-            EntityId: this.get_entityId()
+            EntityId: this.entityId
         };
 
         var baseOptions: ServiceOptions<DeleteResponse> = {
@@ -401,7 +402,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         var entity = data.Entity || new Object();
         this.beforeLoadEntity(entity);
         this.loadEntity(entity);
-        this.set_entity(entity);
+        this.entity = entity;
         this.afterLoadEntity();
     }
 
@@ -409,9 +410,9 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         var idField = this.getIdProperty();
 
         if (idField != null)
-            this.set_entityId((entity as any)[idField]);
+            this.entityId = ((entity as any)[idField]);
 
-        this.set_entity(entity);
+        this.entity = entity;
 
         if (this.propertyGrid != null) {
             this.propertyGrid.set_mode((this.isEditMode() ?
@@ -454,7 +455,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected reloadById(): void {
-        this.loadById(this.get_entityId());
+        this.loadById(this.entityId);
     }
 
     loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
@@ -613,12 +614,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             service: this.getService() + '/Retrieve',
             blockUI: true,
             request: {
-                EntityId: this.get_entityId(),
+                EntityId: this.entityId,
                 ColumnSelection: 'keyOnly',
                 IncludeColumns: ['Localizations']
             },
             onSuccess: response => {
-                var copy = extend(new Object(), this.get_entity());
+                var copy = extend(new Object(), this.entity);
                 if (response.Localizations) {
                     for (var language of Object.keys(response.Localizations)) {
                         var entity = response.Localizations[language];
@@ -686,7 +687,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             var entity: any = {};
 
             if (idField != null) {
-                entity[idField] = this.get_entityId();
+                entity[idField] = this.entityId;
             }
 
             var prefix = language + '$';
@@ -771,7 +772,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 var typ = (this.isEditMode() ? 'update' : 'create');
 
                 var ent = opt.request == null ? null : opt.request.Entity;
-                var eid: any = this.isEditMode() ? this.get_entityId() :
+                var eid: any = this.isEditMode() ? this.entityId :
                     (response == null ? null : response.EntityId);
 
                 var dci = {
@@ -803,7 +804,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this.isEditMode()) {
             var idField = this.getIdProperty();
             if (idField != null && (entity as any)[idField] == null) {
-                (entity as any)[idField] = this.get_entityId();
+                (entity as any)[idField] = this.entityId;
             }
         }
 
@@ -819,7 +820,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this.isEditMode()) {
             var idField = this.getIdProperty();
             if (idField != null) {
-                req.EntityId = this.get_entityId();
+                req.EntityId = this.entityId;
             }
         }
 
@@ -900,7 +901,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     if (this.isEditMode()) {
                         var id1 = response1.EntityId;
                         if (id1 == null) {
-                            id1 = this.get_entityId();
+                            id1 = this.entityId;
                         }
                         this.loadById(id1);
                     }
@@ -937,7 +938,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             onClick: () => {
                 if (this.isDeleted()) {
                     confirmDialog(localText('Controls.EntityDialog.UndeleteConfirmation'), () => {
-                        this.undelete(() => this.loadById(this.get_entityId()));
+                        this.undelete(() => this.loadById(this.entityId));
                     });
                 }
             },
@@ -995,7 +996,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     protected getCloningEntity(): TItem {
 
         var clone: any = new Object();
-        clone = extend(clone, this.get_entity());
+        clone = extend(clone, this.entity);
 
         var idField = this.getIdProperty();
         if (idField) {
@@ -1075,13 +1076,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         baseOptions.service = this.getService() + '/Undelete';
 
         var request: UndeleteRequest = {};
-        request.EntityId = this.get_entityId();
+        request.EntityId = this.entityId;
 
         baseOptions.request = request;
         baseOptions.onSuccess = response => {
             callback && callback(response);
             Fluent.trigger(this.domNode, "ondatachange", {
-                entityId: this.get_entityId(),
+                entityId: this.entityId,
                 entity: this.entity,
                 operationType: 'undelete'
             });

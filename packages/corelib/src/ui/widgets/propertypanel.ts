@@ -84,19 +84,19 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
         return entity as TItem;
     }
 
-    protected get_entity(): TItem {
+    public get entity(): TItem {
         return this._entity;
     }
 
-    protected get_entityId(): any {
+    public get entityId(): any {
         return this._entityId;
     }
-    
-    protected set_entity(value: TItem): void {
+
+    protected set entity(value: TItem) {
         this._entity = value ?? new Object() as any;
     }
 
-    protected set_entityId(value: any): void {
+    protected set entityId(value: any) {
         this._entityId = value;
     }
 

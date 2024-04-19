@@ -4715,10 +4715,10 @@ declare namespace Serenity {
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyItems(): PropertyItem[];
         protected getSaveEntity(): TItem;
-        protected get_entity(): TItem;
-        protected get_entityId(): any;
-        protected set_entity(value: TItem): void;
-        protected set_entityId(value: any): void;
+        get entity(): TItem;
+        get entityId(): any;
+        protected set entity(value: TItem);
+        protected set entityId(value: any);
         protected validateBeforeSave(): boolean;
         protected propertyGrid: PropertyGrid;
     }
@@ -4740,8 +4740,8 @@ declare namespace Serenity {
     }
 
     class PropertyDialog<TItem, P> extends BaseDialog<P> {
-        protected entity: TItem;
-        protected entityId: any;
+        private _entity;
+        private _entityId;
         protected propertyItemsData: PropertyItemsData;
         protected isClosable(): boolean;
         protected isStatic(): boolean;
@@ -4763,10 +4763,10 @@ declare namespace Serenity {
         protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
         protected getSaveEntity(): TItem;
         protected loadInitialEntity(): void;
-        protected get_entity(): TItem;
-        protected set_entity(value: TItem): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
+        get entity(): TItem;
+        protected set entity(value: TItem);
+        get entityId(): any;
+        protected set entityId(value: any);
         protected validateBeforeSave(): boolean;
         protected updateTitle(): void;
         protected propertyGrid: PropertyGrid;
@@ -6582,8 +6582,8 @@ declare namespace Serenity {
     }
 
     class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
-        protected entity: TItem;
-        protected entityId: any;
+        private _entity;
+        private _entityId;
         protected propertyItemsData: PropertyItemsData;
         protected propertyGrid: PropertyGrid;
         protected toolbar: Toolbar;
@@ -6603,10 +6603,10 @@ declare namespace Serenity {
         protected afterInit(): void;
         protected useAsync(): boolean;
         destroy(): void;
-        protected get_entity(): TItem;
-        protected set_entity(entity: any): void;
-        protected get_entityId(): any;
-        protected set_entityId(value: any): void;
+        get entity(): TItem;
+        protected set entity(value: TItem);
+        get entityId(): any;
+        protected set entityId(value: any);
         protected getEntityNameFieldValue(): any;
         protected getEntityTitle(): string;
         protected updateTitle(): void;
