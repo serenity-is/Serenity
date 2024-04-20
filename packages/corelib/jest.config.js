@@ -37,6 +37,6 @@ export default {
     }]
   },
   setupFiles: [
-    '<rootDir>/jest.setup.js'
+    '<rootDir>/build/jest.setup.js'
   ]  
 };
