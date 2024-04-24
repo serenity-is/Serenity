@@ -120,6 +120,7 @@ export interface ServiceOptions<TResponse extends ServiceResponse> extends Reque
     request?: any;
     service?: string;
     url?: string;
+    errorMode?: 'alert' | 'notification' | 'none';
     onCleanup?(): void;
     /** Should return true if the error is handled (e.g. notification shown). Otherwise the error may be shown twice. */
     onError?(response: TResponse, info?: RequestErrorInfo): void | boolean;

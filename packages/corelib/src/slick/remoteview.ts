@@ -1392,12 +1392,9 @@ export class RemoteView<TEntity> {
                 request,
                 url: intf.url,
                 signal: controller.signal,
+                errorMode: 'notification',
                 onSuccess: function (response: ServiceResponse) {
                     addData(response);
-                },
-                onError: function(response: ListResponse<TEntity>, errorInfo) {
-                    ErrorHandling.showServiceError(response?.Error, errorInfo, true);
-                    return true;
                 },
                 onCleanup: function() {
                     loading = false;
