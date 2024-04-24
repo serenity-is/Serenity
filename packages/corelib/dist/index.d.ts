@@ -706,7 +706,7 @@ declare namespace ErrorHandling {
      * Shows a service error as an alert dialog. If the error
      * is null, has no message or code, it shows "??ERROR??".
      */
-    function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo): void;
+    function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo, useNotification?: boolean): void;
     /**
      * Runtime error handler that shows a runtime error as a notification
      * by default only in development mode (@see isDevelopmentMode)

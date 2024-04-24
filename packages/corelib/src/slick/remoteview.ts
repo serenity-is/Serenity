@@ -1,4 +1,4 @@
-﻿import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
+﻿import { ErrorHandling, ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { deepClone, extend } from "../q";
 import { AggregateFormatting } from "./aggregators";
@@ -1395,10 +1395,9 @@ export class RemoteView<TEntity> {
                 onSuccess: function (response: ServiceResponse) {
                     addData(response);
                 },
-                onError: function(response: ListResponse<TEntity>, { status, statusText }) {
-                    errorMessage = response?.Error?.Message ?? response?.Error?.Code ??
-                        statusText == "abort" ? null : `HTTP ${status} ${statusText}!`;
-                    errorMessage && notifyError(errorMessage);
+                onError: function(response: ListResponse<TEntity>, errorInfo) {
+                    ErrorHandling.showServiceError(response?.Error, errorInfo, true);
+                    return true;
                 },
                 onCleanup: function() {
                     loading = false;
