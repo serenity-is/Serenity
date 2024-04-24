@@ -7,18 +7,18 @@ beforeEach(() => {
 });
 
 describe("showServiceError", function () {
-    it("shows ??ERROR?? if error is null", () => {
+    it("shows generic message if error is null", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError(null);
         expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
+        expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
-    it("shows ??ERROR?? if error message and code is null", () => {
+    it("shows generic message if error message and code is null", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError({});
         expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("??ERROR??");
+        expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
     it("shows error code if message is undefined", () => {
@@ -53,21 +53,21 @@ describe("showServiceError", function () {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError(null, { statusText: "something" });
         expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("An unknown AJAX connection error occurred! Check browser console for details.");
+        expect(alertSpy).toHaveBeenCalledWith("An error occured while connecting to the server.");
     });
 
     it("shows alert dialog for HTTP 500 error", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError(null, { status: 500 });
         expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("HTTP 500: Connection refused! Check browser console for details.");
+        expect(alertSpy).toHaveBeenCalledWith("Internal Server Error (500).");
     });
 
     it("shows alert dialog for other HTTP errors", () => {
         var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
         ErrorHandling.showServiceError(null, { status: 404 });
         expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("HTTP 404 error! Check browser console for details.");
+        expect(alertSpy).toHaveBeenCalledWith("HTTP Error 404.");
     });
 
 });

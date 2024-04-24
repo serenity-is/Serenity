@@ -1998,8 +1998,8 @@ declare namespace Serenity {
 
     namespace ErrorHandling {
         /**
-         * Shows a service error as an alert dialog. If the error
-         * is null, has no message or code, it shows "??ERROR??".
+         * Shows a service error as an alert dialog / notification. If the error
+         * is null, has no message or code, it shows a generic error message.
          */
         function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo, errorMode?: 'alert' | 'notification'): void;
         /**

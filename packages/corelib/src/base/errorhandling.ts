@@ -1,32 +1,36 @@
 ﻿import { alertDialog, iframeDialog } from "./dialogs";
+import { stringFormat } from "./formatting";
 import { htmlEncode } from "./html";
+import { localText } from "./localtext";
 import { notifyError } from "./notify";
 import { RequestErrorInfo, ServiceError } from "./servicetypes";
 
 export namespace ErrorHandling {
 
     /**
-     * Shows a service error as an alert dialog. If the error
-     * is null, has no message or code, it shows "??ERROR??".
+     * Shows a service error as an alert dialog / notification. If the error
+     * is null, has no message or code, it shows a generic error message.
      */
     export function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo, errorMode?: 'alert' | 'notification') {
         
         const showMessage = errorMode == 'notification' ? notifyError : alertDialog;
 
         if (error || !errorInfo) {
-            showMessage(error?.Message ?? error?.Code ?? "??ERROR??");
+            showMessage(error?.Message ?? error?.Code ?? localText("Services.GenericErrorMessage", "An error occurred while processing your request."));
             return;
         }
+
+        const seeBrowserConsole = !ErrorHandling.isDevelopmentMode() ? (" " + localText("Services.SeeBrowserConsole", "See browser console (F12) for more information.")) : "";
 
         if (!errorInfo.responseText) {
             if (!errorInfo.status) {
                 if (errorInfo.statusText != "abort")
-                    showMessage("An unknown AJAX connection error occurred! Check browser console for details.");
+                    showMessage(localText("Services.UnknownConnectionEror", "An error occured while connecting to the server.") + seeBrowserConsole);
             }
             else if (errorInfo.status == 500)
-                showMessage("HTTP 500: Connection refused! Check browser console for details.");
+                showMessage(localText("Services.InternalServerError", "Internal Server Error (500).") + seeBrowserConsole);
             else
-            showMessage("HTTP " + errorInfo?.status + ' error! Check browser console for details.');
+                showMessage(stringFormat(localText("Services.HttpError", "HTTP Error {0}."), errorInfo.status) + seeBrowserConsole);
         }
         else if (errorMode == 'notification')
             notifyError(errorInfo.responseText);
