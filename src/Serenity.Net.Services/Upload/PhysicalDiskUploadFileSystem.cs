@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 
 namespace Serenity.Web;
 
@@ -10,13 +10,13 @@ public class PhysicalDiskUploadFileSystem : PhysicalFileSystem, IDiskUploadFileS
     /// <inheritdoc/>
     public void TryDeleteMarkedFiles(string path)
     {
-        TemporaryFileHelper.TryDeleteMarkedFiles(path);
+        TemporaryFileHelper.TryDeleteMarkedFiles(path, fileSystem: null);
     }
 
     /// <inheritdoc/>
     public void Delete(string path, DeleteType deleteType)
     {
-        TemporaryFileHelper.Delete(path, deleteType);
+        TemporaryFileHelper.Delete(path, deleteType, fileSystem: null);
     }
 
     /// <inheritdoc/>
@@ -25,12 +25,13 @@ public class PhysicalDiskUploadFileSystem : PhysicalFileSystem, IDiskUploadFileS
         TemporaryFileHelper.PurgeDirectory(directoryToClean, 
             autoExpireTime ?? TemporaryFileHelper.DefaultAutoExpireTime, 
             maxFilesInDirectory ?? TemporaryFileHelper.DefaultMaxFilesInDirectory, 
-            checkFileName ?? TemporaryFileHelper.DefaultTemporaryCheckFile);
+            checkFileName ?? TemporaryFileHelper.DefaultTemporaryCheckFile,
+            fileSystem: null);
     }
 
     /// <inheritdoc/>
     public void TryDeleteOrMark(string path)
     {
-        TemporaryFileHelper.TryDeleteOrMark(path);
+        TemporaryFileHelper.TryDeleteOrMark(path, fileSystem: null);
     }
 }

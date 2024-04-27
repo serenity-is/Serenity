@@ -197,7 +197,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
         }
         finally
         {
-            TemporaryFileHelper.TryDelete(tempFile);
+            TemporaryFileHelper.TryDelete(tempFile, fileSystem: null);
         }
     }
 

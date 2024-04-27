@@ -136,7 +136,7 @@ public class TemporaryFileHelper
         if (fileSystem.FileExists(filePath))
             try
             {
-                Delete(filePath);
+                Delete(filePath, fileSystem);
             }
             catch
             {
@@ -230,12 +230,12 @@ public class TemporaryFileHelper
                     if (long.TryParse(readLine, out long fileTime))
                     {
                         if (fileTime == fileSystem.GetLastWriteTimeUtc(actualFile).ToFileTimeUtc())
-                            TryDelete(actualFile);
+                            TryDelete(actualFile, fileSystem);
                     }
-                    TryDelete(name);
+                    TryDelete(name, fileSystem);
                 }
                 else
-                    TryDelete(name);
+                    TryDelete(name, fileSystem);
             }
             catch
             {
