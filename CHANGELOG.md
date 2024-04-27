@@ -1,3 +1,28 @@
+## 8.4.7 (2024-04-27)
+
+
+### Features:
+
+- Introduced a new IInitializeLocalTexts abstraction, which should be used in Startup.cs instead of an InitializeLocalTexts method by calling services.AddLocalTextInitializer() in ConfigureServices, and calling app.InitializeLocalTexts in Configure method.
+- Add option to show service errors as notification by passing third arg as true. Show errors in slick remote view as notification instead of alert dialog like it was before. 
+- Made messages shown in showServiceError function localizable
+- Set UseHardlinksIfPossible to true for copying files under node_modules/.dotnet
+- Removing get_entity/set_entity/get_entityId/set_entityId methods in entity/property dialogs, which were remaining from Saltaralle times and using properties instead
+- Moved byId and findById methods up to Widget class as preparation for obsoleting/removing TemplatedWidget
+- Removing TemplateScript type and registration. .Template.html and ts.html files were already deprecated before along with getTemplate which will be removed soon.
+- TemplatedWidget is deprecated, use Widget instead. TemplatedPanel is deprecated, use BasePanel. TemplatedDialog is deprecated, use BaseDialog. These changes reflect deprecating legacy template mechanism in 8.2.0. Use renderContents method to return markup via tsx/jsx-dom, or Fluent(...).getNode(). Even though legacy getTemplate() will be supported internally, it is not recommended.
+- Allow passing editorType as type in addition to string for PromptDialog
+- Pad column names with spaces to avoid unique column errors while exporting to Excel (if multiple columns has the same display name), and also add _numbers to table names
+- Set IgnoreHTTPSErrors to true for PuppeteerHtmlToPdf to overcome development certificate issues
+
+### Bugfixes:
+
+- Fix TemporaryFileHelper.TryDeleteOrMark not working properly with virtual file systems
+- Fix prompt dialog validateValue callback
+- Fix SqlFileSystem null reference exception during GetFiles
+- Fix impersonation links sometimes failing due to base64 / url encoding and caching issues
+- Add missing top/left to select2-offscreen which was in the original css. This was causing unnecessary scroll bars.
+
 ## 8.4.6 (2024-04-16)
 
 ### Bugfixes:
