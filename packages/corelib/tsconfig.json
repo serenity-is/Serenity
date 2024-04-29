@@ -1,7 +1,6 @@
 ﻿{
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
     "experimentalDecorators": true,
     "declarationDir": "./out",
     "rootDir": "./src",
