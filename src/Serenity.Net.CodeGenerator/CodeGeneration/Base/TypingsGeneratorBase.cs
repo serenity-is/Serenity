@@ -1,6 +1,8 @@
 #if ISSOURCEGENERATOR
 using Microsoft.CodeAnalysis;
+using Serenity.CodeGenerator;
 using System.Collections.Immutable;
+using System.IO;
 using System.Threading;
 using INamedTypeSymbol = Microsoft.CodeAnalysis.INamedTypeSymbol;
 #endif
@@ -1061,10 +1063,13 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         .Select(z =>
                     {
                         var from = z.Key.From;
-                        if (!z.Key.External)
+                        if (!z.Key.External && !from.StartsWith("."))
                         {
-                            if (!from.StartsWith('/') &&
-                                !from.StartsWith('.'))
+                            if (from.StartsWith("@/") &&
+                                !string.IsNullOrEmpty(ModulesPathFolder))
+                                from = "/" + ModulesPathFolder + "/" + from;
+
+                            if (!from.StartsWith("/"))
                             {
                                 if (System.IO.Path.GetDirectoryName(filename) ==
                                     System.IO.Path.GetDirectoryName(from))
@@ -1072,16 +1077,27 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                                 else
                                     from = "../" + from;
                             }
-                            else if (!string.IsNullOrEmpty(ModulesPathFolder) && 
-                                ModulesPathAlias != null &&
+                            else if (!string.IsNullOrEmpty(ModulesPathFolder) &&
+                                !string.IsNullOrEmpty(ModulesPathAlias) &&
                                 from.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
                             {
                                 from = ModulesPathAlias + from[(ModulesPathFolder.Length + 2)..];
                             }
-                            else if (!string.IsNullOrEmpty(RootPathAlias) &&
-                                from.StartsWith('/'))
+                            else if (!string.IsNullOrEmpty(RootPathAlias))
                             {
                                 from = RootPathAlias + from[1..];
+                            }
+                            else
+                            {
+                                var relativeTo = PathHelper.ToPath("/Modules/ServerTypes/") + 
+                                    PathHelper.ToPath(System.IO.Path.GetDirectoryName(filename));
+
+#if ISSOURCEGENERATOR
+                                from = PathHelper.GetRelativePath(relativeTo, from);
+#else
+                                from = System.IO.Path.GetRelativePath(relativeTo, from);
+#endif
+                                from = PathHelper.ToUrl(from);
                             }
                         }
 

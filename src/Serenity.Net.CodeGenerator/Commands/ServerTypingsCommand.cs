@@ -38,6 +38,11 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         };
         generator.ModuleReExports = generator.ModuleTypings && config?.ServerTypings?.ModuleReExports != false;
         generator.NamespaceTypings = !Modules && config?.ServerTypings?.NamespaceTypings != false;
+        if (config?.ServerTypings?.PreferRelativePaths == true)
+        {
+            generator.ModulesPathAlias = null;
+            generator.RootPathAlias = null;
+        }
 
         string outDir = Modules ? FileSystem.Combine(generator.DetermineModulesRoot(
             FileSystem, ProjectFile, config.RootNamespace), "ServerTypes") :

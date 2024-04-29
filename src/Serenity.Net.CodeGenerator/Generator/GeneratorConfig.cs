@@ -436,6 +436,13 @@ public class GeneratorConfig
         public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
 
         /// <summary>
+        /// Prefer using relative paths like "../ServerTypes/" instead of "@/ServerTypes/"
+        /// </summary>
+        public bool? PreferRelativePaths { get; set; }
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializePreferRelativePaths() => PreferRelativePaths != null;
+
+        /// <summary>
         /// Set false to disable the server typings source generator in Serenity.Pro.Coder
         /// </summary>
         public bool? SourceGenerator { get; set; }
