@@ -80,7 +80,7 @@ public class EntityCodeGenerator
         if (config.GenerateService)
         {
             var handlerPrefix = fileSystem.Combine(fileSystem.GetDirectoryName(mainPrefix),
-                fileSystem.Combine(model.ClassName, "RequestHandlers", model.ClassName));
+                "RequestHandlers", model.ClassName);
             Add(handlerPrefix + "DeleteHandler.cs", "DeleteHandler");
             Add(handlerPrefix + "ListHandler.cs", "ListHandler");
             Add(handlerPrefix + "RetrieveHandler.cs", "RetrieveHandler");
