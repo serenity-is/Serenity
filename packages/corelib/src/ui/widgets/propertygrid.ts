@@ -89,7 +89,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
 
         this.domNode.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
-            Fluent.off(el, 'click', this.categoryLinkClick);
+            Fluent.off(el, 'click.' + this.uniqueName);
             el.remove();
         });
 
@@ -110,7 +110,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
             else {
                 linkContainer.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
-                    Fluent.off(el, "click", this.categoryLinkClick);
+                    Fluent.off(el, "click." + this.uniqueName);
                     el.remove();
                 });
             }
@@ -179,7 +179,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return categoryDiv.getNode();
     }
 
-    private categoryLinkClick = (e: Event) => {
+    private categoryLinkClick(e: Event) {
         e.preventDefault();
 
         var title = document.querySelector('a[name=' + (e.target as HTMLElement).getAttribute('href')
@@ -436,7 +436,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                     .text(this.determineText(category, prefix => prefix + 'Categories.' + category))
                     .attr('tabindex', '-1')
                     .attr('href', `#${this.idPrefix}Category${index}`)
-                    .on("click", this.categoryLinkClick)
+                    .on("click." + this.uniqueName, this.categoryLinkClick.bind(this))
                     .prependTo(container);
             }
         }
