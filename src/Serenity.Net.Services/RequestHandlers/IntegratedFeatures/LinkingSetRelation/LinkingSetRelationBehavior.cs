@@ -364,7 +364,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     /// <inheritdoc/>
     public override void OnAfterSave(ISaveRequestHandler handler)
     {
-        if (Target.AsObject(handler.Row) is not IList newList)
+        if (!handler.Row.IsAssigned(Target) || Target.AsObject(handler.Row) is not IList newList)
             return;
 
         var idField = handler.Row.IdField;
