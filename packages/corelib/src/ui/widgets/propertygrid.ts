@@ -161,7 +161,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             .append(Fluent("a")
                 .class("category-anchor")
                 .attr('name', this.idPrefix + 'Category' + categoryIndexes[category].toString()))
-            .text(this.determineText(category, prefix => prefix + 'Categories.' + category));
+            .append(this.determineText(category, prefix => prefix + 'Categories.' + category));
 
         if (collapsed != null) {
             categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
@@ -185,7 +185,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var title = document.querySelector('a[name=' + (e.target as HTMLElement).getAttribute('href')
             .toString().substring(1) + ']');
 
-        if (title.closest('.category')?.classList.contains('collapsed'))
+        if (title?.closest('.category')?.classList.contains('collapsed'))
             title.closest('.category').querySelector<HTMLElement>(':scope > .category-title')?.click();
 
         var animate = function () {
@@ -196,7 +196,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             }
         };
 
-        let intoView = title.closest('.category');
+        let intoView = title?.closest('.category');
         if (intoView?.scrollIntoView) {
             intoView.scrollIntoView();
             animate();
