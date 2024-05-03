@@ -14,12 +14,28 @@ namespace Serenity.Web;
 /// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
 /// </remarks>
 /// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
-public class LogicOperatorPermissionService(IPermissionService permissionService) : IPermissionService
+public class LogicOperatorPermissionService(IPermissionService permissionService) : IPermissionService, ITransientGrantor
 {
     private static readonly char[] chars = ['|', '&', '!', '(', ')'];
     private readonly IPermissionService permissionService = permissionService ??
             throw new ArgumentNullException(nameof(permissionService));
     private readonly ConcurrentDictionary<string, string[]> cache = new();
+
+    /// <inheritdoc/>
+    public void Grant(params string[] permissions)
+    {
+        if (permissionService is not ITransientGrantor transientGrantor)
+            throw new NotImplementedException();
+        transientGrantor.Grant(permissions);
+    }
+
+    /// <inheritdoc/>
+    public void GrantAll()
+    {
+        if (permissionService is not ITransientGrantor transientGrantor)
+            throw new NotImplementedException();
+        transientGrantor.GrantAll();
+    }
 
     /// <summary>
     /// Returns true if user has specified permission
@@ -39,5 +55,13 @@ public class LogicOperatorPermissionService(IPermissionService permissionService
         }
 
         return PermissionExpressionParser.Evaluate(rpnTokens, permissionService.HasPermission);
+    }
+
+    /// <inheritdoc/>
+    public void UndoGrant()
+    {
+        if (permissionService is not ITransientGrantor transientGrantor)
+            throw new NotImplementedException();
+        transientGrantor.UndoGrant();
     }
 }
