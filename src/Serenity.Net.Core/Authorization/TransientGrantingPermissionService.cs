@@ -16,10 +16,9 @@ namespace Serenity.Web;
 /// </remarks>
 /// <param name="permissionService">Permission service to wrap with transient granting ability</param>
 /// <param name="requestContext">Request context</param>
-public class TransientGrantingPermissionService(IPermissionService permissionService, IHttpContextItemsAccessor? requestContext = null) : IPermissionService, ITransientGrantor
+public class TransientGrantingPermissionService(IPermissionService? permissionService = null, IHttpContextItemsAccessor? requestContext = null) : IPermissionService, ITransientGrantor
 {
     private readonly ReaderWriterLockSlim sync = new();
-    private readonly IPermissionService permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
     private readonly IHttpContextItemsAccessor? requestContext = requestContext;
     private readonly AsyncLocal<Stack<HashSet<string>?>> grantingStack = new();
 
@@ -52,6 +51,9 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
     /// <returns>True if user has the permission</returns>
     public bool HasPermission(string permission)
     {
+        if (string.IsNullOrEmpty(permission))
+            return false;
+
         sync.EnterReadLock();
         try
         {
@@ -64,12 +66,12 @@ public class TransientGrantingPermissionService(IPermissionService permissionSer
                     return true;
 
                 return permissionSet.Contains(permission) ||
-                    permissionService.HasPermission(permission);
+                    (permissionService != null && permissionService.HasPermission(permission));
             }
 
-            return permissionService.HasPermission(permission);
+            return permissionService != null && permissionService.HasPermission(permission);
         }
-        finally 
+        finally
         { 
             sync.ExitReadLock(); 
         }
