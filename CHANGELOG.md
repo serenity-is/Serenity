@@ -1,5 +1,17 @@
-## 8.4.7 (2024-04-27)
+## 8.4.8 (2024-05-03)
 
+### Features:
+
+- New AuditedAttribute which when placed on a row property like Audited(false), can skip auditing for that particular field
+- Add option to prefer relative paths in sergen.json ("../ServerTypes/" instead of "@/ServerTypes/") which is better when directly referencing TypeScript source code in feature projects from Jest tests etc.
+- Hide category links in Serene just like in StartSharp. Category links are deprecated and will be eventually removed.
+
+### Bugfixes:
+- Remove extra folder for RequestHandlers while generating code with sergen
+- Fix clicking on category link click closing dialog, due to renderContents called before derived initializers (e.g. arrow functions) run, causing this.categoryLinkClick to be undefined.
+- Fix upload issue in Serene due to HandleUploadRequest in FilePage returning ServiceResponse type instead of UploadResponse, resulting in missing value in JSON serialization.
+
+## 8.4.7 (2024-04-27)
 
 ### Features:
 

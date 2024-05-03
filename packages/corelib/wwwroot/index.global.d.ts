@@ -251,21 +251,21 @@ declare namespace Slick {
     	/** when returning a formatter result, prefer ctx.escape() to avoid script injection attacks! */
     	value?: any;
     }
-    export type FormatterResult = (string | Element | DocumentFragment);
-    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
+    type FormatterResult = (string | Element | DocumentFragment);
+    type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
     interface CompatFormatterResult {
     	addClasses?: string;
     	text?: FormatterResult;
     	toolTip?: string;
     }
-    export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
     interface FormatterFactory<TItem = any> {
     	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
     	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
     }
-    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    export type CellStylesHash = {
+    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    type CellStylesHash = {
     	[row: number]: {
     		[columnId: string]: string;
     	};
@@ -1021,7 +1021,7 @@ declare namespace Slick {
     interface ArgsColumnNode extends ArgsColumn {
     	node: HTMLElement;
     }
-    export type ArgsSortCol = {
+    type ArgsSortCol = {
     	sortCol: Column;
     	sortAsc: boolean;
     };
