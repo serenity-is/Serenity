@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Localization;
 using Serenity.Reflection;
@@ -75,4 +75,57 @@ public static class CoreServiceCollectionExtensions
 
         services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
     }
+
+    /// <summary>
+    /// Adds a singleton service of the type specified in <typeparamref name="TService"/> with a
+    /// wrapper specified in <typeparamref name="TWrapper"/> to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <typeparam name="TService">The type of the service to add.</typeparam>
+    /// <typeparam name="TWrapper">The type of the wrapper to use.</typeparam>
+    /// <typeparam name="TImplementation">The type of the implementation to use.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the service to.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <seealso cref="ServiceLifetime.Singleton"/>
+    public static IServiceCollection AddSingletonWrapped<TService, TWrapper, TImplementation>(
+        this IServiceCollection services)
+        where TService : class
+        where TWrapper : TService
+        where TImplementation: TService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        return services.AddSingleton<TService>(services =>
+            ActivatorUtilities.CreateInstance<TWrapper>(services,
+                ActivatorUtilities.CreateInstance<TImplementation>(services)));
+    }
+
+    /// <summary>
+    /// Adds a singleton service of the type specified in <typeparamref name="TService"/> with a
+    /// wrapper specified in <typeparamref name="TWrapper1"/> and <typeparamref name="TWrapper2"/>
+    /// to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <typeparam name="TService">The type of the service to add.</typeparam>
+    /// <typeparam name="TWrapper1">The type of the wrapper 1 to use.</typeparam>
+    /// <typeparam name="TWrapper2">The type of the wrapper 2 to use.</typeparam>
+    /// <typeparam name="TImplementation">The type of the implementation to use.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the service to.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <seealso cref="ServiceLifetime.Singleton"/>
+    public static IServiceCollection AddSingletonWrapped<TService, TWrapper1, TWrapper2, TImplementation>(
+        this IServiceCollection services)
+        where TService : class
+        where TWrapper1 : TService
+        where TWrapper2 : TService
+        where TImplementation : TService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        return services.AddSingleton<TService>(services =>
+            ActivatorUtilities.CreateInstance<TWrapper1>(services,
+                ActivatorUtilities.CreateInstance<TWrapper2>(services,
+                    ActivatorUtilities.CreateInstance<TImplementation>(services))));
+    }
+
 }
