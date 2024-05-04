@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Serenity.Web;
 
 namespace Serenity.Reporting;
@@ -49,6 +49,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         return new ReportRenderResult
         {
             ContentBytes = excelRenderer.Render(report),
+            FileName = GetFileNameFor(report),
             FileExtension = ".xlsx",
             MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         };
@@ -82,6 +83,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     {
         var result = new ReportRenderResult()
         {
+            FileName = GetFileNameFor(report),
             FileExtension = ".html",
             MimeType = "text/html"
         };
@@ -157,8 +159,9 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         return new ReportRenderResult 
         {
             ContentBytes = htmlReportPdfRenderer.Render(report, renderOptions),
-            MimeType = "application/pdf",
             FileExtension = ".pdf",
+            FileName = GetFileNameFor(report),
+            MimeType = "application/pdf",
         };
     }
 
@@ -188,4 +191,18 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
 
         return RenderHtmlReport(report, options);
     }
+    
+    private static string GetFileNameFor(IReport report)
+    {
+        if (report is ICustomFileName customFileName)
+            return customFileName.GetFileName();
+
+        var filePrefix = report.GetType().GetAttribute<DisplayNameAttribute>()?.DisplayName ??
+            report.GetType().GetAttribute<ReportAttribute>()?.ReportKey ??
+            report.GetType().Name;
+
+        return filePrefix + "_" +
+            DateTime.Now.ToString("yyyyMMdd_HHss", CultureInfo.InvariantCulture);
+    }
+
 }
