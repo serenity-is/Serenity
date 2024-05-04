@@ -93,11 +93,8 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
         }
     }
 
-    /// <summary>
-    /// Gets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    public override object AsObject(IRow row)
+    /// <inheritdoc/>
+    public override object AsObjectNoCheck(IRow row)
     {
         return _getValue(row);
     }

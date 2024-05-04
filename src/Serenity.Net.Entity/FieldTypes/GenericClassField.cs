@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Base class for fields with reference type values
@@ -76,13 +76,9 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
         }
     }
 
-    /// <summary>
-    /// Gets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    public override object AsObject(IRow row)
+    /// <inheritdoc />
+    public override object AsObjectNoCheck(IRow row)
     {
-        CheckUnassignedRead(row);
         return _getValue(row);
     }
 

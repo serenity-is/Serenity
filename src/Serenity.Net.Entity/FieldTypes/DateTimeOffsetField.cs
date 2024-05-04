@@ -93,32 +93,6 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     }
 
     /// <summary>
-    /// Gets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <returns></returns>
-    public override object AsObject(IRow row)
-    {
-        CheckUnassignedRead(row);
-        return _getValue(row);
-    }
-
-    /// <summary>
-    /// Sets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <param name="value">The value.</param>
-    public override void AsObject(IRow row, object value)
-    {
-        if (value == null)
-            _setValue(row, null);
-        else
-            _setValue(row, (DateTimeOffset)value);
-
-        row.FieldAssignedValue(this);
-    }
-
-    /// <summary>
     /// Serializes this fields value to JSON
     /// </summary>
     /// <param name="writer">The writer.</param>
