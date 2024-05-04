@@ -77,8 +77,9 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds a singleton service of the type specified in <typeparamref name="TService"/> with a
-    /// wrapper specified in <typeparamref name="TWrapper"/> to the specified <see cref="IServiceCollection"/>.
+    /// Adds a singleton service of the type <typeparamref name="TService"/> with the
+    /// implementation type <typeparamref name="TWrapper"/> that wraps the <typeparamref name="TImplementation"/>
+    /// to the <see cref="IServiceCollection"/>.
     /// </summary>
     /// <typeparam name="TService">The type of the service to add.</typeparam>
     /// <typeparam name="TWrapper">The type of the wrapper to use.</typeparam>
@@ -101,9 +102,9 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds a singleton service of the type specified in <typeparamref name="TService"/> with a
-    /// wrapper specified in <typeparamref name="TWrapper1"/> and <typeparamref name="TWrapper2"/>
-    /// to the specified <see cref="IServiceCollection"/>.
+    /// Adds a singleton service of the type <typeparamref name="TService"/> with the
+    /// implementation type <typeparamref name="TWrapper1"/> that wraps the <typeparamref name="TWrapper2"/>
+    /// which itself wraps the <typeparamref name="TImplementation"/> to the <see cref="IServiceCollection"/>.
     /// </summary>
     /// <typeparam name="TService">The type of the service to add.</typeparam>
     /// <typeparam name="TWrapper1">The type of the wrapper 1 to use.</typeparam>
