@@ -173,6 +173,7 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     /// <inheritdoc/>
     public IEnumerable<string> GetGranted()
     {
+        sync.EnterReadLock();
         try
         {
             var grantingStack = GetGrantingStack(false);
