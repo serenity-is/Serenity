@@ -1,3 +1,4 @@
+
 namespace Serenity.Web;
 
 /// <summary>
@@ -64,4 +65,10 @@ public class LogicOperatorPermissionService(IPermissionService permissionService
             throw new NotImplementedException();
         transientGrantor.UndoGrant();
     }
+
+    /// <inheritdoc/>
+    public bool IsAllGranted() => permissionService is ITransientGrantor transientGrantor && transientGrantor.IsAllGranted();
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetGranted() => (permissionService as ITransientGrantor)?.GetGranted() ?? [];
 }

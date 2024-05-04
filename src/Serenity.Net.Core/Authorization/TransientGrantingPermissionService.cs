@@ -21,7 +21,7 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     private readonly ReaderWriterLockSlim sync = new();
     private readonly IHttpContextItemsAccessor? requestContext = requestContext;
     private readonly AsyncLocal<Stack<HashSet<string>?>> grantingStack = new();
-
+    
     private Stack<HashSet<string>?>? GetGrantingStack(bool createIfNull)
     {
         Stack<HashSet<string>?>? stack;
@@ -72,8 +72,8 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
             return permissionService != null && permissionService.HasPermission(permission);
         }
         finally
-        { 
-            sync.ExitReadLock(); 
+        {
+            sync.ExitReadLock();
         }
     }
 
@@ -108,9 +108,9 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
                 grantingStack.Push(new HashSet<string>(permissions));
             }
         }
-        finally 
-        { 
-            sync.ExitWriteLock(); 
+        finally
+        {
+            sync.ExitWriteLock();
         }
     }
 
@@ -150,4 +150,46 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
             sync.ExitWriteLock();
         }
     }
+
+    /// <inheritdoc/>
+    public bool IsAllGranted()
+    {
+        sync.EnterReadLock();
+        try
+        {
+            var grantingStack = GetGrantingStack(false);
+
+            if (grantingStack != null && grantingStack.Count > 0)
+                return grantingStack.Peek() == null;
+        }
+        finally
+        {
+            sync.ExitReadLock();
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetGranted()
+    {
+        try
+        {
+            var grantingStack = GetGrantingStack(false);
+
+            if (grantingStack != null && grantingStack.Count > 0)
+            {
+                var permissionSet = grantingStack.Peek();
+                if (permissionSet != null)
+                    return permissionSet;
+            }
+        }
+        finally
+        {
+            sync.ExitReadLock();
+        }
+
+        return [];
+    }
+
 }

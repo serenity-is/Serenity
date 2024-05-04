@@ -21,4 +21,14 @@ public interface ITransientGrantor
     /// Undoes last grant or grant all operation
     /// </summary>
     void UndoGrant();
+
+    /// <summary>
+    /// Returns true if currently all permissions are granted via GrantAll.
+    /// </summary>
+    bool IsAllGranted();
+
+    /// <summary>
+    /// Returns a list of permissions granted via Grant.
+    /// </summary>
+    IEnumerable<string> GetGranted();
 }
