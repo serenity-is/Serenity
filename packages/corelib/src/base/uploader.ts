@@ -114,7 +114,7 @@ export class Uploader {
     private async addToBatch(file: File, filePath: string): Promise<void> {
         this.batch.filePaths.push(filePath);
         this.batch.formData.set(this.opt.name, file, filePath);
-        if (!this.isMultiple() ||
+        if (!this.isMultiple() &&
             (this.opt.batchSize && this.batch.filePaths.length > this.opt.batchSize)) {
             await this.endBatch();
         }
