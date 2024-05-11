@@ -1193,7 +1193,7 @@ abstract class AbstractSelect2 {
         if (select) {
             // these options are not allowed when attached to a select because they are picked up off the element itself
             ["id", "multiple", "ajax", "query", "createSearchChoice", "initSelection", "data", "tags"].forEach(function (opt) {
-                if (opt in opts) {
+                if (opt in opts && ((opts as any)[opt] != null)) {
                     throw new Error("Option '" + this + "' is not allowed for Select2 when attached to a <select> element.");
                 }
             });
