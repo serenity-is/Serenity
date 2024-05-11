@@ -193,7 +193,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
 
     protected propertyGrid: PropertyGrid;
 
-    protected renderContents() {
+    protected renderContents(): any {
         if (this.legacyTemplateRender())
             return void 0;
 

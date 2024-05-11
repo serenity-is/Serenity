@@ -6,7 +6,7 @@ import { FilterWidgetBase } from "./filterwidgetbase";
 @Decorators.registerClass('Serenity.FilterDisplayBar')
 export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
-    protected renderContents() {
+    protected renderContents(): any {
         var openFilterDialog = (e: Event) => {
             e.preventDefault();
             var dialog = new FilterDialog({});

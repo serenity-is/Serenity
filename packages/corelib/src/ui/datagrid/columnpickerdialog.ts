@@ -20,7 +20,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     public defaultColumns: string[];
     public done: () => void;
 
-    protected renderContents() {
+    protected renderContents(): any {
         this.dialogTitle = localText("Controls.ColumnPickerDialog.Title");
 
         var visibles = Fluent("div")

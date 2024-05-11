@@ -3277,7 +3277,7 @@ interface ToolbarOptions {
     hotkeyContext?: any;
 }
 declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    protected renderContents(): HTMLDivElement;
+    protected renderContents(): any;
     destroy(): void;
     protected mouseTrap: any;
     createButton(container: Fluent, tb: ToolButton): void;
@@ -3383,7 +3383,7 @@ declare namespace ReflectionOptionsSetter {
 declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
     private editors;
     private items;
-    protected renderContents(): void;
+    protected renderContents(): any;
     destroy(): void;
     private createItems;
     private createCategoryDiv;
@@ -3486,7 +3486,7 @@ declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
     protected validateBeforeSave(): boolean;
     protected updateTitle(): void;
     protected propertyGrid: PropertyGrid;
-    protected renderContents(): HTMLDivElement;
+    protected renderContents(): any;
 }
 
 declare namespace EditorUtils {
@@ -4693,7 +4693,7 @@ declare class FilterDialog<P = {}> extends BaseDialog<P> {
 }
 
 declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-    protected renderContents(): HTMLDivElement;
+    protected renderContents(): any;
     protected filterStoreChanged(): void;
 }
 
@@ -5111,7 +5111,7 @@ declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     visibleColumns: string[];
     defaultColumns: string[];
     done: () => void;
-    protected renderContents(): Fluent<HTMLDivElement>;
+    protected renderContents(): any;
     static createToolButton(grid: IDataGrid): ToolButton;
     protected getDialogButtons(): DialogButton[];
     protected getDialogOptions(): DialogOptions;

@@ -13,7 +13,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     private editors: Widget<any>[];
     private items: PropertyItem[];
 
-    protected renderContents() {
+    protected renderContents(): any {
 
         this.domNode.classList.add('s-PropertyGrid');
 

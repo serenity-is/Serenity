@@ -4566,7 +4566,7 @@ declare namespace Serenity {
         hotkeyContext?: any;
     }
     class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-        protected renderContents(): HTMLDivElement;
+        protected renderContents(): any;
         destroy(): void;
         protected mouseTrap: any;
         createButton(container: Fluent, tb: ToolButton): void;
@@ -4672,7 +4672,7 @@ declare namespace Serenity {
     class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
         private editors;
         private items;
-        protected renderContents(): void;
+        protected renderContents(): any;
         destroy(): void;
         private createItems;
         private createCategoryDiv;
@@ -4775,7 +4775,7 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
         protected updateTitle(): void;
         protected propertyGrid: PropertyGrid;
-        protected renderContents(): HTMLDivElement;
+        protected renderContents(): any;
     }
 
     namespace EditorUtils {
@@ -5982,7 +5982,7 @@ declare namespace Serenity {
     }
 
     class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-        protected renderContents(): HTMLDivElement;
+        protected renderContents(): any;
         protected filterStoreChanged(): void;
     }
 
@@ -6400,7 +6400,7 @@ declare namespace Serenity {
         visibleColumns: string[];
         defaultColumns: string[];
         done: () => void;
-        protected renderContents(): Fluent<HTMLDivElement>;
+        protected renderContents(): any;
         static createToolButton(grid: IDataGrid): ToolButton;
         protected getDialogButtons(): DialogButton[];
         protected getDialogOptions(): DialogOptions;

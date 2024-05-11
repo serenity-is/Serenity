@@ -86,7 +86,7 @@ export interface ToolbarOptions {
 @Decorators.registerClass('Serenity.Toolbar')
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
 
-    protected renderContents() {
+    protected renderContents(): any {
 
         let group = Fluent("div").class("tool-group");
 
