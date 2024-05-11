@@ -67,10 +67,14 @@ function getElementEvents(element: EventTarget): ElementEvents {
     return events;
 }
 
-function hydrateObj(obj: any, meta = {}) {
+function hydrateEvent(obj: Event, meta = {}) {
     for (const [key, value] of Object.entries(meta)) {
+        if (key === 'bubbles' || key === 'cancelable') {
+            // these should be set when the event is constructed
+            continue;
+        }
         try {
-            obj[key] = value
+            (obj as any)[key] = value
         } catch {
             Object.defineProperty(obj, key, {
                 configurable: true,
@@ -86,7 +90,7 @@ function hydrateObj(obj: any, meta = {}) {
 
 function baseHandler(element: EventTarget, fn: any) {
     return function handler(event: Event) {
-        hydrateObj(event, { delegateTarget: element })
+        hydrateEvent(event, { delegateTarget: element })
 
         if ((handler as any).oneOff) {
             removeListener(element, event.type, fn)
@@ -106,7 +110,7 @@ function delegationHandler(element: EventTarget, selector: string, fn: Function)
                     continue
                 }
 
-                hydrateObj(event, { delegateTarget: target })
+                hydrateEvent(event, { delegateTarget: target })
 
                 if ((handler as any).oneOff) {
                     removeListener(element, event.type, selector, fn)
@@ -264,19 +268,19 @@ export function triggerEvent(element: EventTarget, type: string, args?: any): Ev
     const inNamespace = type !== typeEvent;
 
     let jQueryEvent = null;
-    let bubbles = true;
+    let bubbles = args?.bubbles ?? true;
     let nativeDispatch = true;
     let defaultPrevented = false;
 
     if (inNamespace && $) {
         jQueryEvent = $.Event(type, args);
         $(element).trigger(jQueryEvent);
-        bubbles = !jQueryEvent.isPropagationStopped();
+        bubbles = bubbles && !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
     }
 
-    const evt = hydrateObj(new Event(type, { bubbles, cancelable: true }), args);
+    const evt = hydrateEvent(new Event(type, { bubbles, cancelable: args?.cancelable ?? true }), args);
 
     if (defaultPrevented) {
         evt.preventDefault();
