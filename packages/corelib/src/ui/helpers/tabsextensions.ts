@@ -3,8 +3,8 @@
 export { };
 
 export namespace TabsExtensions {
-    var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link"
-    var navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active"
+    var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link, :scope > ul > li > a.ui-tabs-anchor, :scope > li > a.ui-tabs-anchor";
+    var navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active, :scope > ul > li.ui-tabs-active > a, :scope > li.ui-tabs-active > a";
 
     export function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
