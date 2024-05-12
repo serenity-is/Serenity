@@ -139,6 +139,8 @@ export namespace LayoutTimer {
 
 export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void {
     el = isArrayLike(el) ? el[0] : el;
+    if (!el)
+        return;
     if (el.offsetWidth > 0 && el.offsetHeight > 0) {
         callback();
         return;
