@@ -145,7 +145,7 @@ export namespace UploadHelper {
         return resolveUrl('~/upload/') + filename;
     }
 
-    export function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options: any): void {
+    export function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options?: any): void {
         link = isArrayLike(link) ? link[0] : link;
         if (!link)
             return;
