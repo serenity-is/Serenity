@@ -165,8 +165,8 @@ export namespace TabsExtensions {
         }
         else {
             // emulate UI tabs with bootstrap
-            let ul = tabs.querySelector(":scope > ul");
-            if (!ul.classList.contains("nav-tabs") && !ul.classList.contains("nav-underline")) {
+            let ul = tabs.matches("ul") ? tabs : tabs.querySelector(":scope > ul");
+            if (ul && !ul.classList.contains("nav-tabs") && !ul.classList.contains("nav-underline")) {
                 ul.classList.add("nav", "nav-tabs");
 
                 let activeLink: HTMLLinkElement;
