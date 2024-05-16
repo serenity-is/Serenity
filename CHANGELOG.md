@@ -1,3 +1,26 @@
+## 8.5.0 (2024-05-16)
+
+### Features
+
+- Allow `permissionService` to be passed as `null` to the `TransientGrantingPermissionService`. This enables wrapping within another permission service. If `permissionService` is `null` and no transient permissions are granted, it returns `false`.
+- Add `ITransientGrantor` interface to `LogicOperatorPermissionService` to ensure the wrapped permission service retains transient granting support.
+- Add `ITransientGrantor` interface to `OpenIdScopePermissionWrapper` to preserve the `ITransientGrantor` interface if the wrapped permission service implements it (StartSharp).
+- Add `ITransientGrantor` support to the default `IPermissionService` implementation (`PermissionService`), eliminating the need for separate configuration in `Startup.cs`.
+- **`[Breaking Change]`** Added `IsAllGranted` and `GetGranted` methods to the `ITransientGrantor` interface. Custom implementations not using `TransientGrantingPermissionService` should be updated to include these methods.
+- Add impersonation/transient grant support during report callback execution based on current user/transient granting status. This is useful for background task report generation.
+- Introduce `AddSingletonWrapped` extension to simplify wrapping services like `IPermissionService`.
+- Added `AsObjectNoCheck` function to skip `TrackWithChecks` errors for behaviors, etc. Use with caution.
+- Add `FileName` property to `ReportRenderResult` to determine the download name from the result without accessing the rendered report.
+- Introduce `IReportCallbackInterceptor` interface.
+- Allow passing `bubbles`/`cancelable` via event args through `Fluent.trigger`.
+- **`[Breaking Change]`** Rename previously exported `SleekGrid` compat editor types, such as changing `IntegerEditor` to `IntegerCellEdit`, to avoid clashes with corelib editor types. These legacy editor types are rarely used in Serenity apps, so this change should not cause issues.
+
+### Bug Fixes
+
+- Fixed batch ending condition in the `Uploader` class affecting multiple uploads (#7139).
+- Added support for jQuery UI tabs active/link selectors in `TabExtensions` methods.
+- Restored color application to category titles as previously implemented.
+
 ## 8.4.8 (2024-05-03)
 
 ### Features:

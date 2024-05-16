@@ -251,21 +251,21 @@ declare namespace Slick {
     	/** when returning a formatter result, prefer ctx.escape() to avoid script injection attacks! */
     	value?: any;
     }
-    type FormatterResult = (string | Element | DocumentFragment);
-    type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
+    export type FormatterResult = (string | Element | DocumentFragment);
+    export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
     interface CompatFormatterResult {
     	addClasses?: string;
     	text?: FormatterResult;
     	toolTip?: string;
     }
-    type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+    export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
     interface FormatterFactory<TItem = any> {
     	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
     	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
     }
-    type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-    type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-    type CellStylesHash = {
+    export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+    export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+    export type CellStylesHash = {
     	[row: number]: {
     		[columnId: string]: string;
     	};
@@ -1021,7 +1021,7 @@ declare namespace Slick {
     interface ArgsColumnNode extends ArgsColumn {
     	node: HTMLElement;
     }
-    type ArgsSortCol = {
+    export type ArgsSortCol = {
     	sortCol: Column;
     	sortAsc: boolean;
     };
@@ -1086,7 +1086,7 @@ declare namespace Slick {
     	function Checkbox(_row: number, _cell: number, value: any): string;
     	function Checkmark(_row: number, _cell: number, value: any): "" | "<i class=\"slick-checkmark\"></i>";
     }
-    abstract class BaseEditor {
+    abstract class BaseCellEdit {
     	protected _input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     	protected _defaultValue: any;
     	protected _args: EditorOptions;
@@ -1102,15 +1102,15 @@ declare namespace Slick {
     	isValueChanged(): boolean;
     	validate(): ValidationResult;
     }
-    class TextEditor extends BaseEditor {
+    class TextCellEdit extends BaseCellEdit {
     	_input: HTMLInputElement;
     	init(): void;
     }
-    class IntegerEditor extends TextEditor {
+    class IntegerCellEdit extends TextCellEdit {
     	serializeValue(): number;
     	validate(): ValidationResult;
     }
-    class FloatEditor extends TextEditor {
+    class FloatCellEdit extends TextCellEdit {
     	static AllowEmptyValue: boolean;
     	static DefaultDecimalPlaces: number;
     	getDecimalPlaces(): number;
@@ -1118,7 +1118,7 @@ declare namespace Slick {
     	serializeValue(): any;
     	validate(): ValidationResult;
     }
-    class DateEditor extends TextEditor {
+    class DateCellEdit extends TextCellEdit {
     	private _calendarOpen;
     	init(): void;
     	destroy(): void;
@@ -1126,7 +1126,7 @@ declare namespace Slick {
     	hide(): void;
     	position(position: Position): void;
     }
-    class YesNoSelectEditor extends BaseEditor {
+    class YesNoSelectCellEdit extends BaseCellEdit {
     	_input: HTMLSelectElement;
     	init(): void;
     	loadValue(item: any): void;
@@ -1137,7 +1137,7 @@ declare namespace Slick {
     		msg: string;
     	};
     }
-    class CheckboxEditor extends BaseEditor {
+    class CheckboxCellEdit extends BaseCellEdit {
     	_input: HTMLInputElement;
     	init(): void;
     	loadValue(item: any): void;
@@ -1150,12 +1150,12 @@ declare namespace Slick {
     		msg: string;
     	};
     }
-    class PercentCompleteEditor extends IntegerEditor {
+    class PercentCompleteCellEdit extends IntegerCellEdit {
     	protected _picker: HTMLDivElement;
     	init(): void;
     	destroy(): void;
     }
-    class LongTextEditor extends BaseEditor {
+    class LongTextCellEdit extends BaseCellEdit {
     	_input: HTMLTextAreaElement;
     	protected _container: HTMLElement;
     	protected _wrapper: HTMLDivElement;
@@ -1169,14 +1169,14 @@ declare namespace Slick {
     	destroy(): void;
     }
     namespace Editors {
-    	const Text: typeof TextEditor;
-    	const Integer: typeof IntegerEditor;
-    	const Float: typeof FloatEditor;
-    	const Date: typeof DateEditor;
-    	const YesNoSelect: typeof YesNoSelectEditor;
-    	const Checkbox: typeof CheckboxEditor;
-    	const PercentComplete: typeof PercentCompleteEditor;
-    	const LongText: typeof LongTextEditor;
+    	const Text: typeof TextCellEdit;
+    	const Integer: typeof IntegerCellEdit;
+    	const Float: typeof FloatCellEdit;
+    	const Date: typeof DateCellEdit;
+    	const YesNoSelect: typeof YesNoSelectCellEdit;
+    	const Checkbox: typeof CheckboxCellEdit;
+    	const PercentComplete: typeof PercentCompleteCellEdit;
+    	const LongText: typeof LongTextCellEdit;
     }
     interface GroupItemMetadataProviderOptions {
     	enableExpandCollapse?: boolean;
@@ -5535,7 +5535,7 @@ declare namespace Serenity {
         function hasImageExtension(filename: string): boolean;
         function thumbFileName(filename: string): string;
         function dbFileUrl(filename: string): string;
-        function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options: any): void;
+        function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options?: any): void;
         function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
     }
     interface UploadedFile {

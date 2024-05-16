@@ -4246,7 +4246,7 @@ declare namespace UploadHelper {
     function hasImageExtension(filename: string): boolean;
     function thumbFileName(filename: string): string;
     function dbFileUrl(filename: string): string;
-    function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options: any): void;
+    function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options?: any): void;
     function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
 }
 interface UploadedFile {
