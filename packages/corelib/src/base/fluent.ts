@@ -73,7 +73,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
      * @param selector Optional. A CSS selector to filter the children.
      * @returns An array of HTMLElement objects representing the children.
      */
-    children(selector?: string): HTMLElement[];
+    children<TElement extends HTMLElement = HTMLElement>(selector?: string): TElement[];
 
     /**
      * Sets (overrides) the class attribute of the element. Any falsy value is ignored.
@@ -153,7 +153,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
      * @param callback The callback function to execute for each found element. It receives a Fluent object for each element.
      * @returns The Fluent object itself.
      */
-    findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
+    findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>, index: number) => void): this;
 
     /**
      * Finds the first element that matches the specified selector within the element.
@@ -289,7 +289,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
      *
      * @returns A Fluent object representing the parent element.
      */
-    parent(): Fluent<HTMLElement>;
+    parent<TElement extends HTMLElement = HTMLElement>(): Fluent<TElement>;
 
     /**
      * Prepends content to the element.
@@ -843,10 +843,10 @@ Fluent.prototype.findAll = function (this: FluentThis, selector: string): HTMLEl
     return Array.from(this.el.querySelectorAll<HTMLElement>(selector));
 }
 
-Fluent.prototype.findEach = function (this: FluentThis, selector: string, callback: (el: Fluent) => void): Fluent<HTMLElement> {
+Fluent.prototype.findEach = function (this: FluentThis, selector: string, callback: (el: Fluent, idx: number) => void): Fluent<HTMLElement> {
     if (!this.el || !callback)
         return this;
-    this.el.querySelectorAll<HTMLElement>(selector).forEach(x => callback(Fluent(x)));
+    this.el.querySelectorAll<HTMLElement>(selector).forEach((x, i) => callback(Fluent(x), i));
     return this;
 }
 

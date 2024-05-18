@@ -2092,7 +2092,7 @@ declare namespace Serenity {
          * @param selector Optional. A CSS selector to filter the children.
          * @returns An array of HTMLElement objects representing the children.
          */
-        children(selector?: string): HTMLElement[];
+        children<TElement extends HTMLElement = HTMLElement>(selector?: string): TElement[];
         /**
          * Sets (overrides) the class attribute of the element. Any falsy value is ignored.
          *
@@ -2119,7 +2119,7 @@ declare namespace Serenity {
          * @param selector A CSS selector to match against.
          * @returns A Fluent object representing the closest ancestor element.
          */
-        closest(selector: string): Fluent<HTMLElement>;
+        closest<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
         /**
          * Gets or sets the value of the specified data attribute.
          *
@@ -2163,7 +2163,7 @@ declare namespace Serenity {
          * @param callback The callback function to execute for each found element. It receives a Fluent object for each element.
          * @returns The Fluent object itself.
          */
-        findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): Fluent;
+        findEach<TElement extends HTMLElement = HTMLElement>(selector: string, callback: (el: Fluent<TElement>, index: number) => void): this;
         /**
          * Finds the first element that matches the specified selector within the element.
          *
@@ -2285,7 +2285,7 @@ declare namespace Serenity {
          *
          * @returns A Fluent object representing the parent element.
          */
-        parent(): Fluent<HTMLElement>;
+        parent<TElement extends HTMLElement = HTMLElement>(): Fluent<TElement>;
         /**
          * Prepends content to the element.
          *
