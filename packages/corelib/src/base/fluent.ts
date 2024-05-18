@@ -103,7 +103,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
      * @param selector A CSS selector to match against.
      * @returns A Fluent object representing the closest ancestor element.
      */
-    closest(selector: string): Fluent<HTMLElement>;
+    closest<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
 
     /**
      * Gets or sets the value of the specified data attribute.
