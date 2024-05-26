@@ -375,39 +375,57 @@ declare class Dialog {
     /** Closes dialog with the result set to value */
     close(result: string): this;
     /**
-     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
      * the closing can be cancelled by calling preventDefault on the event object.
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is closed
+     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once.
+     * The default for oneOff is true unless opt.before is true.
      * @returns The dialog instance
      */
-    onClose(handler: (result?: string, e?: Event) => void, before?: boolean): this;
+    onClose(handler: (result?: string, e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): this;
     /**
-     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
-     * the closing can be cancelled by calling preventDefault on the event object.
-     * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
+     * the closing can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
+     * the body element of the dialog.
+     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is closed
-     * @returns The dialog instance
+     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once.
+     * The default for oneOff is true unless opt.before is true.
      */
-    static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, before?: boolean): void;
+    static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): void;
     /**
      * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
      * the opening can be cancelled by calling preventDefault on the event object.
-     * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is opened
-     * @returns The dialog instance
-     */
-    onOpen(handler: (e?: Event) => void, before?: boolean): this;
-    /**
-     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
-     * the opening can be cancelled by calling preventDefault on the event object.
      * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is opened
+     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once.
+     * The default for oneOff is true unless opt.before is true.
      * @returns The dialog instance
      */
-    static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, before?: boolean): void;
+    onOpen(handler: (e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): this;
+    /**
+     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+     * the opening can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
+     * the body element of the dialog.
+     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
+     * @param handler The event handler function
+     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once.
+     * The default for oneOff is true unless opt.before is true.
+     * @returns The dialog instance
+     */
+    static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): void;
     /** Opens the dialog */
     open(): this;
     /** Gets the title text of the dialog */
@@ -3319,6 +3337,16 @@ declare class BaseDialog<P> extends Widget<P> {
     protected initUIDialog(): void;
     dialogOpen(asPanel?: boolean): void;
     protected onDialogOpen(): void;
+    /** Attaches a dialog/modal/panel close event handler. See Dialog.close for more info. */
+    onClose(handler: (result?: string, e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): void;
+    /** Attaches a dialog/modal/panel open event handler. See Dialog.open for more info. */
+    onOpen(handler: (e?: Event) => void, opt?: {
+        before?: boolean;
+        oneOff?: boolean;
+    }): void;
     protected getToolbarButtons(): ToolButton[];
     protected initToolbar(): void;
     protected getValidatorOptions(): any;

@@ -1459,8 +1459,8 @@ describe("Dialog.onOpen", () => {
         try {
             const beforeOpen1 = jest.fn();
             const beforeOpen2 = jest.fn();
-            dlg.onOpen(beforeOpen1, true);
-            dlg.onOpen(beforeOpen2, true);
+            dlg.onOpen(beforeOpen1, { before: true });
+            dlg.onOpen(beforeOpen2, { before: true });
             expect(beforeOpen1).not.toHaveBeenCalled();
             expect(beforeOpen2).not.toHaveBeenCalled();
             dlg.open();
@@ -1472,12 +1472,12 @@ describe("Dialog.onOpen", () => {
         }
     });
 
-    it("can abort openining preventDefault is called in panelbeforeopen", () => {
+    it("can abort opening preventDefault is called in panelbeforeopen", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
         try {
             const beforeOpen = jest.fn().mockImplementation((e) => e.preventDefault());
             const afterOpen = jest.fn();
-            dlg.onOpen(beforeOpen, true);
+            dlg.onOpen(beforeOpen, { before: true });
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             expect(afterOpen).not.toHaveBeenCalled();
@@ -1488,6 +1488,223 @@ describe("Dialog.onOpen", () => {
         }
     });
 
+    it("has oneOff true by default", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const afterOpen = jest.fn();
+            dlg.onOpen(afterOpen);
+            dlg.open();
+            expect(afterOpen).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(afterOpen).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(afterOpen).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("is possible to set oneOff to false for after open", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const afterOpen = jest.fn();
+            dlg.onOpen(afterOpen, { oneOff: false });
+            dlg.open();
+            expect(afterOpen).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(afterOpen).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(afterOpen).toHaveBeenCalledTimes(2);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("has oneOff false by default for beforeOpen", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const beforeOpen = jest.fn();
+            dlg.onOpen(beforeOpen, { before: true });
+            dlg.open();
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(beforeOpen).toHaveBeenCalledTimes(2);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("is possible to set oneOff to true for beforeOpen", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const beforeOpen = jest.fn();
+            dlg.onOpen(beforeOpen, { before: true, oneOff: true });
+            dlg.open();
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(beforeOpen).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+});
+
+describe("Dialog.onClose", () => {
+    it("ignores if panel is disposed", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        dlg.dispose();
+        const onClose = jest.fn();
+        dlg.onClose(onClose);
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("attaches an event handler for panelclose event", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        try {
+            const onClose1 = jest.fn();
+            const onClose2 = jest.fn();
+            dlg.onClose(onClose1);
+            dlg.onClose(onClose2);
+            dlg.open();
+            expect(onClose1).not.toHaveBeenCalled();
+            expect(onClose2).not.toHaveBeenCalled();
+            dlg.close();
+            expect(onClose1).toHaveBeenCalledTimes(1);
+            expect(onClose2).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("attaches an event handler for panelbeforeclose event if second argument.before is true", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
+        try {
+            const beforeClose1 = jest.fn();
+            const beforeClose2 = jest.fn();
+            dlg.onClose(beforeClose1, { before: true });
+            dlg.onClose(beforeClose2, { before: true });
+            dlg.open();
+            expect(beforeClose1).not.toHaveBeenCalled();
+            expect(beforeClose2).not.toHaveBeenCalled();
+            dlg.close();
+            expect(beforeClose1).toHaveBeenCalledTimes(1);
+            expect(beforeClose2).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("can abort closing preventDefault is called in panelbeforeclose", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
+        try {
+            const beforeClose = jest.fn().mockImplementation((_, e) => e.preventDefault());
+            const afterClose = jest.fn();
+            dlg.open();
+            dlg.onClose(beforeClose, { before: true });
+            dlg.close();
+            expect(beforeClose).toHaveBeenCalledTimes(1);
+            expect(afterClose).not.toHaveBeenCalled();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("has oneOff true by default", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const afterClose = jest.fn();
+            dlg.onClose(afterClose);
+            dlg.open();
+            dlg.close();
+            expect(afterClose).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(afterClose).toHaveBeenCalledTimes(1);
+            dlg.open();
+            dlg.close();
+            expect(afterClose).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("is possible to set oneOff to false for after open", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const afterClose = jest.fn();
+            dlg.onOpen(afterClose, { oneOff: false });
+            dlg.open();
+            expect(afterClose).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(afterClose).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(afterClose).toHaveBeenCalledTimes(2);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("has oneOff false by default for beforeClose", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const beforeClose = jest.fn();
+            dlg.onOpen(beforeClose, { before: true });
+            dlg.open();
+            expect(beforeClose).toHaveBeenCalledTimes(1);
+            dlg.close();
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(beforeClose).toHaveBeenCalledTimes(1);
+            dlg.open();
+            expect(beforeClose).toHaveBeenCalledTimes(2);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
+
+    it("is possible to set oneOff to true for beforeClose", () => {
+        const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
+        try {
+            const beforeClose = jest.fn();
+            dlg.onOpen(beforeClose, { before: true, oneOff: true });
+            dlg.open();
+            dlg.close();
+            expect(beforeClose).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            dlg.open();
+            dlg.close();
+            expect(beforeClose).toHaveBeenCalledTimes(1);
+            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+        }
+        finally {
+            dlg.dispose();
+        }
+    });
 });
 
 describe("Dialog.title", () => {

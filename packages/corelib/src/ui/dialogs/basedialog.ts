@@ -135,6 +135,16 @@ export class BaseDialog<P> extends Widget<P> {
         TabsExtensions.selectTab(this.tabs, 0);
     }
 
+    /** Attaches a dialog/modal/panel close event handler. See Dialog.close for more info. */
+    onClose(handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
+        Dialog.onClose(this.element, handler, opt);
+    }
+
+    /** Attaches a dialog/modal/panel open event handler. See Dialog.open for more info. */
+    onOpen(handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
+        Dialog.onOpen(this.element, handler, opt);
+    }
+
     protected getToolbarButtons(): ToolButton[] {
         return [];
     }

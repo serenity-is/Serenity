@@ -215,67 +215,59 @@ export class Dialog {
     }
 
     /**
-     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
      * the closing can be cancelled by calling preventDefault on the event object.
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is closed
+     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once. 
+     * The default for oneOff is true unless opt.before is true.
      * @returns The dialog instance
      */
-    onClose(handler: (result?: string, e?: Event) => void, before = false): this {
+
+    onClose(handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
         var target = getDialogEventsNode(this.el);
         if (!target)
             return;
+        const before = opt?.before ?? false;
+        const onOrOne = (opt?.oneOff ?? !opt?.before) ? Fluent.one : Fluent.on;
         if (target.classList.contains("panel-body"))
-            Fluent.on(target, before ? "panelbeforeclose" : "panelclose", e => handler(this.result, e));
+            onOrOne(target, before ? "panelbeforeclose" : "panelclose", e => handler(this.result, e));
         else if (target.classList.contains("ui-dialog-content"))
-            Fluent.on(target, before ? "dialogbeforeclose" : "dialogclose", e => handler(this.result, e));
+            onOrOne(target, before ? "dialogbeforeclose" : "dialogclose", e => handler(this.result, e));
         else if (target.classList.contains("modal"))
-            Fluent.on(target, before ? "hide.bs.modal" : "hidden.bs.modal", e => handler(this.result, e));
+            onOrOne(target, before ? "hide.bs.modal" : "hidden.bs.modal", e => handler(this.result, e));
 
         return this;
     }
 
     /**
-     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
-     * the closing can be cancelled by calling preventDefault on the event object.
-     * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
+     * the closing can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
+     * the body element of the dialog.
+     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is closed
-     * @returns The dialog instance
+     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once. 
+     * The default for oneOff is true unless opt.before is true.
      */
-    static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, before = false) {
+    static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
         var instance = Dialog.getInstance(el);
         if (instance) {
-            instance.onClose(handler, before);
+            instance.onClose(handler, opt);
             return;
         }
 
         const target = isArrayLike(el) ? el[0] : el;
         if (target) {
+            const before = opt?.before ?? false;
+            const events = [before ? "panelbeforeclose" : "panelclose", before ? "dialogbeforeclose" : "dialogclose", before ? "hide.bs.modal" : "hidden.bs.modal"];
+            const wrapper = (e: Event) => {
+                handler(Dialog.getInstance(el)?.result, e);
+                if (opt?.oneOff ?? !before) {
+                    events.forEach(type => Fluent.off(target, type, wrapper));
+                }
+            }
             // don't know which mode the dialog will be opened, so we need to listen to all events
-            [before ? "panelbeforeclose" : "panelclose", before ? "dialogbeforeclose" : "dialogclose", before ? "hide.bs.modal" : "hidden.bs.modal"]
-                .forEach(event => Fluent.on(target, event, e => handler(Dialog.getInstance(target)?.result, e)));
+            events.forEach(type => Fluent.on(target, type, wrapper));
         }
-    }
-
-    /**
-     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
-     * the opening can be cancelled by calling preventDefault on the event object.
-     * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is opened
-     * @returns The dialog instance
-     */
-    onOpen(handler: (e?: Event) => void, before = false): this {
-        var target = getDialogEventsNode(this.el);
-        if (!target)
-            return;
-        if (target.classList.contains("panel-body"))
-            Fluent.on(target, before ? "panelbeforeopen" : "panelopen", handler);
-        else if (target.classList.contains("ui-dialog-content"))
-            Fluent.on(target, before ? "dialogbeforeopen" : "dialogopen", handler);
-        else if (target.classList.contains("modal"))
-            Fluent.on(target, before ? "show.bs.modal" : "shown.bs.modal", handler);
-        return this;
     }
 
     /**
@@ -283,21 +275,54 @@ export class Dialog {
      * the opening can be cancelled by calling preventDefault on the event object.
      * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
      * @param handler The event handler function
-     * @param before Indicates whether the handler should be called before the dialog is opened
+     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once. 
+     * The default for oneOff is true unless opt.before is true.
      * @returns The dialog instance
      */
-    static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, before = false) {
+    onOpen(handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
+        var target = getDialogEventsNode(this.el);
+        if (!target)
+            return;
+        const before = opt?.before ?? false;
+        const onOrOne = (opt?.oneOff ?? !opt?.before) ? Fluent.one : Fluent.on;
+        if (target.classList.contains("panel-body"))
+            onOrOne(target, before ? "panelbeforeopen" : "panelopen", handler);
+        else if (target.classList.contains("ui-dialog-content"))
+            onOrOne(target, before ? "dialogbeforeopen" : "dialogopen", handler);
+        else if (target.classList.contains("modal"))
+            onOrOne(target, before ? "show.bs.modal" : "shown.bs.modal", handler);
+        return this;
+    }
+
+    /**
+     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+     * the opening can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
+     * the body element of the dialog.
+     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
+     * @param handler The event handler function
+     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once. 
+     * The default for oneOff is true unless opt.before is true.
+     * @returns The dialog instance
+     */
+    static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
         var instance = Dialog.getInstance(el);
         if (instance) {
-            instance.onOpen(handler, before);
+            instance.onOpen(handler, opt);
             return;
         }
 
         const target = isArrayLike(el) ? el[0] : el;
         if (target) {
+            const before = opt?.before ?? false;
+            const events = [before ? "panelbeforeopen" : "panelopen", before ? "dialogbeforeopen" : "dialogopen", before ? "show.bs.modal" : "shown.bs.modal"];
+            const wrapper = (e: Event) => {
+                handler(e);
+                if (opt?.oneOff ?? !before) {
+                    events.forEach(type => Fluent.off(target, type, wrapper));
+                }
+            }
             // don't know which mode the dialog will be opened, so we need to listen to all events
-            [before ? "panelbeforeopen" : "panelopen", before ? "dialogbeforeopen" : "dialogopen", before ? "show.bs.modal" : "shown.bs.modal"]
-                .forEach(event => Fluent.on(target, event, handler));
+            events.forEach(type => Fluent.on(target, type, wrapper));
         }
     }
 
