@@ -221,7 +221,7 @@ export class Dialog {
      * @param before Indicates whether the handler should be called before the dialog is closed
      * @returns The dialog instance
      */
-    onClose(handler: (result?: string, e?: Event) => void, before = false) {
+    onClose(handler: (result?: string, e?: Event) => void, before = false): this {
         var target = getDialogEventsNode(this.el);
         if (!target)
             return;
@@ -231,6 +231,31 @@ export class Dialog {
             Fluent.on(target, before ? "dialogbeforeclose" : "dialogclose", e => handler(this.result, e));
         else if (target.classList.contains("modal"))
             Fluent.on(target, before ? "hide.bs.modal" : "hidden.bs.modal", e => handler(this.result, e));
+
+        return this;
+    }
+
+    /**
+     * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+     * the closing can be cancelled by calling preventDefault on the event object.
+     * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+     * @param handler The event handler function
+     * @param before Indicates whether the handler should be called before the dialog is closed
+     * @returns The dialog instance
+     */
+    static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, before = false) {
+        var instance = Dialog.getInstance(el);
+        if (instance) {
+            instance.onClose(handler, before);
+            return;
+        }
+
+        const target = isArrayLike(el) ? el[0] : el;
+        if (target) {
+            // don't know which mode the dialog will be opened, so we need to listen to all events
+            [before ? "panelbeforeclose" : "panelclose", before ? "dialogbeforeclose" : "dialogclose", before ? "hide.bs.modal" : "hidden.bs.modal"]
+                .forEach(event => Fluent.on(target, event, e => handler(Dialog.getInstance(target)?.result, e)));
+        }
     }
 
     /**
@@ -239,7 +264,7 @@ export class Dialog {
      * @param handler The event handler function
      * @param before Indicates whether the handler should be called before the dialog is opened
      * @returns The dialog instance
-     */    
+     */
     onOpen(handler: (e?: Event) => void, before = false): this {
         var target = getDialogEventsNode(this.el);
         if (!target)
@@ -251,6 +276,29 @@ export class Dialog {
         else if (target.classList.contains("modal"))
             Fluent.on(target, before ? "show.bs.modal" : "shown.bs.modal", handler);
         return this;
+    }
+
+    /**
+     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+     * the opening can be cancelled by calling preventDefault on the event object.
+     * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+     * @param handler The event handler function
+     * @param before Indicates whether the handler should be called before the dialog is opened
+     * @returns The dialog instance
+     */
+    static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, before = false) {
+        var instance = Dialog.getInstance(el);
+        if (instance) {
+            instance.onOpen(handler, before);
+            return;
+        }
+
+        const target = isArrayLike(el) ? el[0] : el;
+        if (target) {
+            // don't know which mode the dialog will be opened, so we need to listen to all events
+            [before ? "panelbeforeopen" : "panelopen", before ? "dialogbeforeopen" : "dialogopen", before ? "show.bs.modal" : "shown.bs.modal"]
+                .forEach(event => Fluent.on(target, event, handler));
+        }
     }
 
     /** Opens the dialog */
@@ -652,57 +700,57 @@ export namespace DialogTexts {
      * Title for alert dialogs.
      */
     export declare const AlertTitle: string;
-    
+
     /**
      * Text for the cancel button in dialogs.
      */
     export declare const CancelButton: string;
-    
+
     /**
      * Text for the close button in dialogs.
      */
     export declare const CloseButton: string;
-    
+
     /**
      * Title for confirmation dialogs.
      */
     export declare const ConfirmationTitle: string;
-    
+
     /**
      * Title for information dialogs.
      */
     export declare const InformationTitle: string;
-    
+
     /**
      * Hint for maximizing dialogs.
      */
     export declare const MaximizeHint: string;
-    
+
     /**
      * Text for the "No" button in dialogs.
      */
     export declare const NoButton: string;
-    
+
     /**
      * Text for the "OK" button in dialogs.
      */
     export declare const OkButton: string;
-    
+
     /**
      * Hint for restoring dialogs.
      */
     export declare const RestoreHint: string;
-    
+
     /**
      * Title for success dialogs.
      */
     export declare const SuccessTitle: string;
-    
+
     /**
      * Title for warning dialogs.
      */
     export declare const WarningTitle: string;
-    
+
     /**
      * Text for the "Yes" button in dialogs.
      */

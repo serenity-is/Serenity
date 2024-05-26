@@ -1675,7 +1675,16 @@ declare namespace Serenity {
          * @param before Indicates whether the handler should be called before the dialog is closed
          * @returns The dialog instance
          */
-        onClose(handler: (result?: string, e?: Event) => void, before?: boolean): void;
+        onClose(handler: (result?: string, e?: Event) => void, before?: boolean): this;
+        /**
+         * Adds an event handler that is called when the dialog is closed. If the second parameter is true, the handler is called before the dialog is closed and
+         * the closing can be cancelled by calling preventDefault on the event object.
+         * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+         * @param handler The event handler function
+         * @param before Indicates whether the handler should be called before the dialog is closed
+         * @returns The dialog instance
+         */
+        static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, before?: boolean): void;
         /**
          * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
          * the opening can be cancelled by calling preventDefault on the event object.
@@ -1684,6 +1693,15 @@ declare namespace Serenity {
          * @returns The dialog instance
          */
         onOpen(handler: (e?: Event) => void, before?: boolean): this;
+        /**
+         * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
+         * the opening can be cancelled by calling preventDefault on the event object.
+         * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
+         * @param handler The event handler function
+         * @param before Indicates whether the handler should be called before the dialog is opened
+         * @returns The dialog instance
+         */
+        static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, before?: boolean): void;
         /** Opens the dialog */
         open(): this;
         /** Gets the title text of the dialog */
