@@ -19,7 +19,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// The fields
     /// </summary>
     protected readonly TFields fields;
-    internal bool[] assignedFields;
+    internal long assignedFieldsMask;
+    internal int[] assignedFieldsArray;
     internal Hashtable dictionaryData;
     internal object[] indexedData;
     internal bool tracking;
@@ -84,13 +85,20 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
             field.Copy(this, clone);
 
         clone.tracking = tracking;
-        if (tracking && assignedFields != null)
+        if (tracking)
         {
-            clone.assignedFields = new bool[assignedFields.Length];
-            Array.Copy(assignedFields, clone.assignedFields, assignedFields.Length);
+            clone.assignedFieldsMask = assignedFieldsMask;
+            if (assignedFieldsArray != null)
+            {
+                clone.assignedFieldsArray = new int[assignedFieldsArray.Length];
+                Array.Copy(assignedFieldsArray, clone.assignedFieldsArray, assignedFieldsArray.Length);
+            }
         }
         else
-            clone.assignedFields = null;
+        {
+            clone.assignedFieldsArray = null;
+            clone.assignedFieldsMask = 0L;
+        }
 
         clone.trackWithChecks = trackWithChecks;
 
@@ -176,9 +184,15 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         if (!tracking)
             return;
 
-        assignedFields ??= new bool[fields.Count];
-
-        assignedFields[field.index] = true;
+        var index = field.index;
+        if (index < 64)
+            assignedFieldsMask |= 1L << index;
+        else
+        {
+            assignedFieldsArray ??= new int[((fields.Count - 64) / 32) + 1];
+            index -= 64;
+            assignedFieldsArray[index / 32] |= 1 << (index % 32);
+        }
 
         if (validationErrors != null)
             ((IEditableRow)this).RemoveValidationError(field.PropertyName ?? field.Name);
@@ -212,12 +226,12 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     }
 
     /// <summary>
-    /// Gets a value indicating whether this instance is any field assigned.
+    /// Gets a value indicating whether this instance has any field assigned.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if this instance is any field assigned; otherwise, <c>false</c>.
+    ///   <c>true</c> if this instance has any field assigned; otherwise, <c>false</c>.
     /// </value>
-    bool IRow.IsAnyFieldAssigned => tracking && assignedFields != null;
+    bool IRow.IsAnyFieldAssigned => tracking && (assignedFieldsMask != 0 || assignedFieldsArray != null);
 
     bool IRow.IgnoreConstraints { get; set; }
 
@@ -253,7 +267,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
                 {
                     tracking = false;
                     trackWithChecks = false;
-                    assignedFields = null;
+                    assignedFieldsMask = 0;
+                    assignedFieldsArray = null;
                 }
             }
         }
@@ -403,10 +418,18 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </returns>
     public bool IsAssigned(Field field)
     {
-        if (assignedFields == null)
+        if (assignedFieldsMask == 0 && assignedFieldsArray == null)
             return false;
 
-        return assignedFields[field.index];
+        var index = field.index;
+        if (index < 64)
+            return (assignedFieldsMask & (1L << index)) != 0;
+
+        if (assignedFieldsArray == null)
+            return false;
+
+        index -= 64;
+        return (assignedFieldsArray[index / 32] & (1 << (index % 32))) != 0;
     }
 
     /// <summary>
@@ -415,16 +438,21 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <param name="field">The field.</param>
     public void ClearAssignment(Field field)
     {
-        if (assignedFields == null)
+        if (assignedFieldsArray == null && assignedFieldsMask == 0)
             return;
 
-        assignedFields[field.index] = false;
-
-        for (var i = 0; i < assignedFields.Length; i++)
-            if (assignedFields[i])
-                return;
-
-        assignedFields = null;
+        var index = field.index;
+        if (index < 64)
+            assignedFieldsMask &= ~(1L << index);
+        else if (assignedFieldsArray != null)
+        {
+            index -= 64;
+            assignedFieldsArray[index / 32] &= ~(1 << (index % 32));
+            for (var i = 0; i < assignedFieldsArray.Length; i++)
+                if (assignedFieldsArray[i] != 0)
+                    return;
+            assignedFieldsArray = null;
+        }
     }
 
     IDictionary<string, Join> IHaveJoins.Joins => fields.Joins;
