@@ -1,7 +1,7 @@
 import { registerClass } from "../base";
 
 function attr(name: string) {
-    return function (target: Function) {
+    return function (target: Function, _context?: any) {
         return registerClass(target, 'Serenity.' + name + 'Attribute');
     }
 }

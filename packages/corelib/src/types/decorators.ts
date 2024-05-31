@@ -10,7 +10,11 @@ export namespace Decorators {
 
     export function registerType() {
         return function(target: Function & { [typeInfoProperty]: any }, _context?: any): void {
-            return regType(target);
+            if (_context && typeof _context.addInitializer === "function") {
+                _context.addInitializer(() => { regType(target); });
+            }
+            else
+                regType(target);
         }
     }
 
