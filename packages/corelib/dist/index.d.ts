@@ -3209,28 +3209,28 @@ declare namespace Decorators {
     const formatterType: typeof formatterTypeInfo;
     function registerType(): (target: Function & {
         [typeInfoProperty]: any;
-    }) => void;
-    function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-    function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-    function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
+    }, _context?: any) => void;
+    function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+    function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+    function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
     function registerEnum(target: any, enumKey?: string, name?: string): void;
     function registerEnumType(target: any, name?: string, enumKey?: string): void;
-    function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
-    function enumKey(value: string): (target: Function) => void;
+    function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+    function enumKey(value: string): (target: Function, _context?: any) => void;
     function option(): (target: Object, propertyKey: string) => void;
-    function closeButton(value?: boolean): (target: Function) => void;
-    function dialogType(value: any): (target: Function) => void;
-    function editor(): (target: Function) => void;
-    function element(value: string): (target: Function) => void;
-    function filterable(value?: boolean): (target: Function) => void;
-    function itemName(value: string): (target: Function) => void;
-    function maximizable(value?: boolean): (target: Function) => void;
-    function optionsType(value: Function): (target: Function) => void;
-    function panel(value?: boolean): (target: Function) => void;
-    function resizable(value?: boolean): (target: Function) => void;
-    function responsive(value?: boolean): (target: Function) => void;
-    function service(value: string): (target: Function) => void;
-    function staticPanel(value?: boolean): (target: Function) => void;
+    function closeButton(value?: boolean): (target: Function, _context?: any) => void;
+    function dialogType(value: any): (target: Function, _context?: any) => void;
+    function editor(): (target: Function, _context?: any) => void;
+    function element(value: string): (target: Function, _context?: any) => void;
+    function filterable(value?: boolean): (target: Function, _context?: any) => void;
+    function itemName(value: string): (target: Function, _context?: any) => void;
+    function maximizable(value?: boolean): (target: Function, _context?: any) => void;
+    function optionsType(value: Function, _context?: any): (target: Function, _context?: any) => void;
+    function panel(value?: boolean): (target: Function, _context?: any) => void;
+    function resizable(value?: boolean): (target: Function, _context?: any) => void;
+    function responsive(value?: boolean): (target: Function, _context?: any) => void;
+    function service(value: string): (target: Function, _context?: any) => void;
+    function staticPanel(value?: boolean): (target: Function, _context?: any) => void;
 }
 
 declare namespace DialogTypeRegistry {

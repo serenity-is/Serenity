@@ -9,13 +9,13 @@ export namespace Decorators {
     export const formatterType = formatterTypeInfo;
 
     export function registerType() {
-        return function(target: Function & { [typeInfoProperty]: any }): void {
+        return function(target: Function & { [typeInfoProperty]: any }, _context?: any): void {
             return regType(target);
         }
     }
 
     export function registerClass(nameOrIntf?: string | any[], intf2?: any[]) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regClass(target, nameOrIntf, intf2);
             else
@@ -24,7 +24,7 @@ export namespace Decorators {
     }
 
     export function registerInterface(nameOrIntf?: string | any[], intf2?: any[]) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
 
             if (typeof nameOrIntf == "string")
                 regIntf(target, nameOrIntf, intf2);
@@ -34,7 +34,7 @@ export namespace Decorators {
     }
 
     export function registerEditor(nameOrIntf?: string | any[], intf2?: any[]) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regEditor(target, nameOrIntf, intf2);
             else
@@ -53,7 +53,7 @@ export namespace Decorators {
     }
 
     export function registerFormatter(nameOrIntf: string | any[] = [ISlickFormatter], intf2: any[] = [ISlickFormatter]) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regFormatter(target, nameOrIntf, intf2);
             else
@@ -62,7 +62,7 @@ export namespace Decorators {
     }
 
     export function enumKey(value: string) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new EnumKeyAttribute(value));
         }
     }
@@ -84,80 +84,80 @@ export namespace Decorators {
     }
 
     export function closeButton(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new CloseButtonAttribute(value));
         }
     }
 
     export function dialogType(value: any) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new DialogTypeAttribute(value));
         }
     }
 
     export function editor() {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             var attr = new EditorAttribute();
             addCustomAttribute(target, attr);
         }
     }
 
     export function element(value: string) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ElementAttribute(value));
         }
     }
 
     export function filterable(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new FilterableAttribute(value));
         }
     }
 
     export function itemName(value: string) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ItemNameAttribute(value));
         }
     }
 
     export function maximizable(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new MaximizableAttribute(value));
         }
     }
 
-    export function optionsType(value: Function) {
-        return function (target: Function) {
+    export function optionsType(value: Function, _context?: any) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new OptionsTypeAttribute(value));
         }
     }
 
     export function panel(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new PanelAttribute(value));
         }
     }
 
     export function resizable(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ResizableAttribute(value));
         }
     }
 
     export function responsive(value = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ResponsiveAttribute(value));
         }
     }
 
     export function service(value: string) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ServiceAttribute(value));
         }
     }
 
     export function staticPanel(value: boolean = true) {
-        return function (target: Function) {
+        return function (target: Function, _context?: any) {
             addCustomAttribute(target, new StaticPanelAttribute(value));
         }
     }
