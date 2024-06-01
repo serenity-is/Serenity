@@ -290,7 +290,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.find(type, field);
 
-        const selector = '#' + this.uniqueName + '_QuickFilter_' + field;
+        const selector = '#' + CSS.escape(this.uniqueName + '_QuickFilter_' + field);
         return getWidgetFrom(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
@@ -298,7 +298,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.tryFind(type, field);
 
-        const selector = '#' + this.uniqueName + '_QuickFilter_' + field;
+        const selector = '#' + CSS.escape(this.uniqueName + '_QuickFilter_' + field);
         return tryGetWidget(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
@@ -1322,7 +1322,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                         return;
                     }
 
-                    var widget = tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, Widget);
+                    var widget = tryGetWidget('#' + CSS.escape(this.uniqueName + '_QuickFilter_' + field), Widget);
                     if (widget == null) {
                         return;
                     }
