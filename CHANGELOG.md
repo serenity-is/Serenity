@@ -1,3 +1,23 @@
+## 8.5.1 (2024-06-04)
+
+### Features
+
+- Added optional generic type arguments to several Fluent functions, such as `closest`.
+- `Fluent.findEach` now passes the index as the second argument to the callback.
+- Introduced static versions of `Dialog.onOpen` and `Dialog.onClose` that function even when the dialog is not yet initialized, as the mode (modal, panel, UI) is unknown at that time.
+- Added `onOpen` and `onClose` methods to `BaseDialog` to attach event handlers for dialogs, which operate even before the dialog is initialized.
+- Changed the second argument (previously `before`) to an options object for `Dialog.onOpen` and `Dialog.onClose` to allow the `oneOff` option. This change may be breaking if the second argument, such as `before`, was used.
+- Switched to using a bitmask instead of a boolean array for assigned field tracking. If the number of fields is less than 64, this reduces the amount of allocations.
+- Released `tsbuild` 8.5.0, which updates esbuild to 0.21.4. After updating `tsbuild`, the `experimentalDecorators` option in `tsconfig.json` is no longer needed when using TypeScript 5.0+.
+- Added a context argument to the `Serenity` decorator function to support JavaScript decorators in addition to TypeScript experimental decorators.
+- Utilized `CSS.escape` to prevent issues when a field name contains special characters while searching for quick filters.
+- Enabled pending changes confirmation to work even when the dialog is not yet initialized. Normally, `DialogUtils.pendingChangesConfirmation` should be called from the `initDialog` method, but some instances call it from the constructor where the dialog is not yet created.
+- Increased the size of the `TableName`, `RecordId`, and `FieldName` columns to 200 in the `DataAuditLog` table (StartSharp).
+
+### Bugfixes
+
+- Fixed: Replaced `select *` with `select datname` in PostgreSQL database queries for data migrations.
+
 ## 8.5.0 (2024-05-16)
 
 ### Features
@@ -15,7 +35,7 @@
 - Allow passing `bubbles`/`cancelable` via event args through `Fluent.trigger`.
 - **`[Breaking Change]`** Rename previously exported `SleekGrid` compat editor types, such as changing `IntegerEditor` to `IntegerCellEdit`, to avoid clashes with corelib editor types. These legacy editor types are rarely used in Serenity apps, so this change should not cause issues.
 
-### Bug Fixes
+### Bugfixes
 
 - Fixed batch ending condition in the `Uploader` class affecting multiple uploads (#7139).
 - Added support for jQuery UI tabs active/link selectors in `TabExtensions` methods.
