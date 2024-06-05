@@ -4005,7 +4005,7 @@ declare class ComboboxEditor<P, TItem> extends Widget<P> implements ISetEditValu
     protected initNewEntity(entity: TItem): void;
     protected setEditDialogReadOnly(dialog: any): void;
     protected editDialogDataChange(): void;
-    protected setTermOnNewEntity(entity: TItem, term: string): void;
+    protected setTermOnNewEntity(entity: TItem, term: string, dialog: any): void;
     protected inplaceCreateClick(e: Event): void;
     openDropdown(): void;
     openDialogAsPanel: boolean;

@@ -766,7 +766,13 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     protected editDialogDataChange() {
     }
 
-    protected setTermOnNewEntity(entity: TItem, term: string) {
+    protected setTermOnNewEntity(entity: TItem, term: string, dialog: any) {
+        if (term && typeof dialog?.getNameProperty === "function") {
+            const nameProperty = dialog.getNameProperty() as string;
+            if (nameProperty) {
+                (entity as any)[nameProperty] = term;
+            }
+        }
     }
 
     protected inplaceCreateClick(e: Event) {
@@ -826,7 +832,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
             }
             else if (this.isMultiple() || !this.get_value()) {
                 var entity: TItem = {} as any;
-                this.setTermOnNewEntity(entity, this.lastCreateTerm?.trim() ?? '');
+                this.setTermOnNewEntity(entity, this.lastCreateTerm?.trim() ?? '', dialog);
                 this.initNewEntity(entity);
                 dialog.load(entity, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);

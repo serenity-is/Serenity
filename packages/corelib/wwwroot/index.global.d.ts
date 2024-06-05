@@ -5294,7 +5294,7 @@ declare namespace Serenity {
         protected initNewEntity(entity: TItem): void;
         protected setEditDialogReadOnly(dialog: any): void;
         protected editDialogDataChange(): void;
-        protected setTermOnNewEntity(entity: TItem, term: string): void;
+        protected setTermOnNewEntity(entity: TItem, term: string, dialog: any): void;
         protected inplaceCreateClick(e: Event): void;
         openDropdown(): void;
         openDialogAsPanel: boolean;
