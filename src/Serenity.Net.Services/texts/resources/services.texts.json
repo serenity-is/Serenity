@@ -2,7 +2,7 @@
   "__comment__": "Auto generated template, don't modify!",
   "Controls.ImageUpload.ExtensionBlacklisted": "Uploaded file extension '{0}' is not allowed!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Uploaded file extension '{0}' is not in the list of allowed extensions: '{1}'!",
-  "Controls.ImageUpload.FailedScan": "An error occured while scanning the uploaded file for viruses!",
+  "Controls.ImageUpload.FailedScan": "An error occurred while scanning the uploaded file for viruses! For more information, visit https://serenity.is/docs/av",
   "Controls.ImageUpload.ImageExtensionMismatch": "Uploaded image extension ({0}) does not match its format ({1})!",
   "Controls.ImageUpload.InfectedFile": "Uploaded file may contain a virus!",
   "Controls.ImageUpload.InfectedFileOrError": "Uploaded file may contain a virus or an error occured during the AV scan!",

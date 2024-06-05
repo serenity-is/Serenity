@@ -10,7 +10,7 @@ public static partial class UploadTexts
         {
             public static readonly LocalText InfectedFile = "Uploaded file may contain a virus!";
             public static readonly LocalText InfectedFileOrError = "Uploaded file may contain a virus or an error occurred during the AV scan!";
-            public static readonly LocalText FailedScan = "An error occurred while scanning the uploaded file for viruses!";
+            public static readonly LocalText FailedScan = "An error occurred while scanning the uploaded file for viruses! For more information, visit https://serenity.is/docs/av";
             public static readonly LocalText NotAnImageFile = "Uploaded file is not an image!";
             public static readonly LocalText NotAnImageWithExtensions = "Uploaded file extension is not in the list of allowed image extensions: '{1}'!";
             public static readonly LocalText ImageExtensionMismatch = "Uploaded image extension ({0}) does not match its format ({1})!";
