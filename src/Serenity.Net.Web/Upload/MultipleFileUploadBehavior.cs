@@ -9,13 +9,11 @@ namespace Serenity.Services;
 /// <remarks>
 /// Creates a new instance of the class
 /// </remarks>
-/// <param name="uploadValidator">Upload validator</param>
-/// <param name="imageProcessor">Image processor</param>
 /// <param name="storage">Upload storage</param>
+/// <param name="uploadProcessor">Upload processor</param>
 /// <param name="formatSanitizer">Filename format sanitizer</param>
 /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
-public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-    IUploadStorage storage,
+public class MultipleFileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadProcessor,
     IFilenameFormatSanitizer formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
@@ -26,9 +24,10 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
     private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
     private Dictionary<string, Field> replaceFields;
     private readonly IFilenameFormatSanitizer formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
-    private readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
+    private readonly IUploadProcessor uploadProcessor = uploadProcessor ?? throw new ArgumentNullException(nameof(uploadProcessor));
+    private string entityType;
+    private string propertyName;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -40,15 +39,18 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
         if (editorAttr is null || editorAttr.DisableDefaultBehavior || !editorAttr.IsMultiple)
             return false;
 
+        propertyName = Target.PropertyName ?? Target.Name;
+        entityType = row.GetType().FullName;
+
         if (Target is not StringField)
             throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but it is not a String field!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    propertyName, row.GetType().FullName));
 
         if (row is not IIdRow)
             throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    propertyName, row.GetType().FullName));
 
         var format = (editorAttr as IUploadFileOptions)?.FilenameFormat;
 
@@ -88,9 +90,9 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
     {
         base.OnPrepareQuery(handler, query);
 
-        if (replaceFields == null) 
+        if (replaceFields == null)
             return;
-        
+
         foreach (var field in replaceFields.Values)
         {
             if (!field.IsTableField() &&
@@ -130,7 +132,7 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
             if (newFileList.Any(x => string.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                 continue;
 
-            FileUploadBehavior.DeleteOldFile(storage, filesToDelete, filename, 
+            FileUploadBehavior.DeleteOldFile(storage, filesToDelete, filename,
                 copyToHistory: editorAttr is IUploadFileOptions { CopyToHistory: true });
         }
 
@@ -158,7 +160,7 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
         handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
         foreach (var file in oldFileList)
-            FileUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename, 
+            FileUploadBehavior.DeleteOldFile(storage, filesToDelete, file.Filename,
                 editorAttr is IUploadFileOptions { CopyToHistory: true });
     }
 
@@ -174,8 +176,10 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
             if (!filename.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-            FileUploadBehavior.CheckUploadedImageAndCreateThumbs(editorAttr as IUploadOptions, uploadValidator, imageProcessor,
-                storage, ref filename);
+            UploadPathHelper.CheckFileNameSecurity(filename);
+            using var fs = storage.OpenFile(filename);
+            var uploadInfo = uploadProcessor.Process(fs, filename, editorAttr as IUploadOptions);
+            filename = uploadInfo.TemporaryFile;
 
             var idField = ((IIdRow)handler.Row).IdField;
 
@@ -183,16 +187,25 @@ public class MultipleFileUploadBehavior(IUploadValidator uploadValidator, IImage
             if (string.IsNullOrEmpty(originalName))
                 originalName = System.IO.Path.GetFileName(filename);
 
+            var entityId = idField.AsObject(handler.Row);
+
             var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
             {
                 Format = fileNameFormat,
                 PostFormat = s => FileUploadBehavior.ProcessReplaceFields(s, replaceFields, handler,
                     editorAttr as IFilenameFormatSanitizer ?? formatSanitizer),
                 TemporaryFile = filename,
-                EntityId = idField.AsObject(handler.Row),
+                EntityId = entityId,
                 FilesToDelete = filesToDelete,
                 OriginalName = originalName
             });
+
+            storage.SetFileMetadata(copyResult.Path, new Dictionary<string, string>
+            {
+                { FileMetadataKeys.EntityType, entityType },
+                { FileMetadataKeys.EntityProperty, propertyName },
+                { FileMetadataKeys.EntityId, Convert.ToString(entityId, CultureInfo.InvariantCulture) }
+            }, overwriteAll: false);
 
             file.Filename = copyResult.Path;
         }

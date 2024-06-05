@@ -72,13 +72,11 @@ public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) 
             storage, new DefaultUploadValidator(imageProcessor, localizer));
 
         var result = uploadProcessor.Process(fileContent, "___tempfile__" + extension, options);
-        ErrorMessage = result.ErrorMessage;
         FileSize = result.FileSize;
         ImageHeight = result.ImageWidth;
         ImageHeight = result.ImageHeight;
         IsImage = result.IsImage;
-        Success = result.Success;
         TemporaryFile = result.TemporaryFile;
-        return result.Success;
+        return true;
     }
 }

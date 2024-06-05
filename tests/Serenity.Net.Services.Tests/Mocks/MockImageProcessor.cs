@@ -2,35 +2,21 @@ using System.IO;
 
 namespace Serenity.Tests;
 
-public class MockImageProcessor : IImageProcessor
+public class MockUploadProcessor : IUploadProcessor
 {
-    public (int width, int height) GetImageSize(object image)
+    private readonly IUploadStorage uploadStorage;
+
+    public MockUploadProcessor(IUploadStorage uploadStorage = null)
     {
-        return (1000, 1000);
+        this.uploadStorage = uploadStorage;
     }
 
-    public object Load(Stream source, out ImageFormatInfo formatInfo)
+    public ProcessedUploadInfo Process(Stream fileContent, string filename, IUploadOptions options)
     {
-        formatInfo = new ImageFormatInfo
-        {
-            MimeType = "image/jpeg",
-            FileExtensions = [".jpg", ".jpeg"]
-        };
-        return new MockImage();
-    }
+        if (filename?.StartsWith("temporary/") == true)
+            return new ProcessedUploadInfo() { TemporaryFile = filename, IsImage = false };
 
-    public void Save(object image, Stream target, string mimeType, ImageEncoderParams encoderParams)
-    {
-    }
-
-    public object Scale(object image, int width, int height, ImageScaleMode mode, string backgroundColor, bool inplace)
-    {
-        return new MockImage();
-    }
-
-    private class MockImage
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        return new ProcessedUploadInfo() { TemporaryFile = "temporary/" +
+            Guid.NewGuid().ToString("N") + Path.GetExtension(filename), IsImage = false };
     }
 }

@@ -1,27 +1,51 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
+using System.IO;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
 namespace Serenity.Tests.Web;
 
-public partial class FileUploadBehaviorTests
+public partial class DefaultUploadProcessorTests
 {
-    [Fact]
-    public void Throws_WhenStorageIsNull()
+    private static byte[] CreateImage(int width, int height, 
+        IImageFormat format = null, Configuration configuration = null, Rgba32? color = null)
     {
-        var attr = new ImageUploadEditorAttribute();
-        var temporaryFile = "temporary/test.jpg";
+        using var image = new Image<Rgba32>(configuration ?? Configuration.Default, width, height, color ?? new Rgba32(255, 255, 255));
+        using var stream = new System.IO.MemoryStream();
 
-        Assert.Throws<ArgumentNullException>("storage", () => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: null,
-            temporaryFile: ref temporaryFile,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        image.Save(stream, format ?? PngFormat.Instance);
+
+        return stream.ToArray();
+    }
+
+    private IUploadStorage storage;
+    private MockFileSystem mockFileSystem;
+
+    private DefaultUploadProcessor CreateUploadProcessor(IImageProcessor imageProcessor = null, 
+        IUploadStorage uploadStorage = null, 
+        IUploadValidator uploadValidator = null,
+        ILogger<DefaultUploadProcessor> logger = null,
+        IUploadAVScanner avScanner = null)
+    {
+        storage = uploadStorage ??= MockUploadStorage.Create();
+        mockFileSystem = (uploadStorage as MockUploadStorage)?.MockFileSystem;
+        imageProcessor ??= new DefaultImageProcessor();
+        logger ??= new NullLogger<DefaultUploadProcessor>();
+        uploadValidator ??= new DefaultUploadValidator(imageProcessor, NullTextLocalizer.Instance);
+
+        return new DefaultUploadProcessor(imageProcessor,
+            storage,
+            uploadValidator,
+            logger,
+            avScanner);
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData(" ")]
     [InlineData(".")]
     [InlineData(" . ")]
@@ -51,16 +75,12 @@ public partial class FileUploadBehaviorTests
     [InlineData("\\a.jpg")]
     [InlineData(" \\a.jpg")]
     [InlineData(" \\a.jpg ")]
-    public void Throws_WhenFileNameIsNotSecure(string fileName)
+    public void Throws_WhenFileNameIsNotSecure(string filename)
     {
         var attr = new ImageUploadEditorAttribute();
-        var mockStorage = MockUploadStorage.Create();
+        var uploadProcessor = CreateUploadProcessor();
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uploadProcessor.Process(new MemoryStream(), filename, attr));
     }
 
     [Fact]
@@ -70,9 +90,7 @@ public partial class FileUploadBehaviorTests
             .Where(x => x != '/' && x != '\\').ToArray();
 
         var attr = new ImageUploadEditorAttribute();
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-
+        var uploadProcessor = CreateUploadProcessor();
 
         foreach (var invalidChar in invalidChars)
         {
@@ -88,13 +106,8 @@ public partial class FileUploadBehaviorTests
 
             foreach (var testFileName in testFileNames)
             {
-                var fileName = testFileName;
-
-                Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-                    imageProcessor: new DefaultImageProcessor(),
-                    storage: mockStorage,
-                    temporaryFile: ref fileName,
-                    validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+                Assert.Throws<ArgumentOutOfRangeException>(() => 
+                    uploadProcessor.Process(new MemoryStream(), testFileName, options: attr));
             }
         }
     }
@@ -102,8 +115,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void Throws_WhenFileMinSizeIsSmaller_ThanTheAttribute()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
@@ -112,20 +124,15 @@ public partial class FileUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, string.Empty);
 
-        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        var ex = Assert.Throws<ValidationError>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
 
         Assert.Equal("Uploaded file must be at least 0.01 KB!", ex.Message);
     }
 
     [Fact]
-    public void DoesntThrows_WhenFileMinSizeIsBigger_ThanTheAttribute()
+    public void DoesntThrow_WhenFileMinSizeIsBigger_ThanTheAttribute()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
@@ -134,37 +141,27 @@ public partial class FileUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1)));
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
     }
 
     [Fact]
     public void Throws_WhenFileIsNotValidImage()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.png";
 
         var attr = new ImageUploadEditorAttribute();
         mockFileSystem.AddFile(fileName, "\0");
 
-        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        var ex = Assert.Throws<ValidationError>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
 
         Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(typeof(ImageCheckResult), ImageCheckResult.InvalidImage)}", ex.Message);
     }
 
     [Fact]
-    public void DoesntThrows_WhenFileIsNotValidImage_AndAllowNonImageIsTrue()
+    public void DoesntThrow_WhenFileIsNotValidImage_AndAllowNonImageIsTrue()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.txt";
 
         var attr = new ImageUploadEditorAttribute
@@ -173,18 +170,13 @@ public partial class FileUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, "\0");
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
     }
 
     [Fact]
-    public void DoesntThrows_WhenFileMinSizeIsZero_OnTheAttribute()
+    public void DoesntThrow_WhenFileMinSizeIsZero_OnTheAttribute()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.txt";
 
         var attr = new ImageUploadEditorAttribute
@@ -194,11 +186,7 @@ public partial class FileUploadBehaviorTests
         };
         mockFileSystem.AddFile(fileName, "\0");
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
     }
 
     [Theory]
@@ -208,8 +196,7 @@ public partial class FileUploadBehaviorTests
     [InlineData(10, 100, 10, 100, 15, 150, ImageCheckResult.HeightTooHigh)]
     public void Throws_WhenFileDoesntFit_DimensionConstraints(int minWidth, int maxWeight, int minHeight, int maxHeight, int width, int height, ImageCheckResult result)
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
+        var uploadProcessor = CreateUploadProcessor();
         var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
@@ -222,11 +209,7 @@ public partial class FileUploadBehaviorTests
 
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(width, height)));
 
-        var ex = Assert.Throws<ValidationError>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        var ex = Assert.Throws<ValidationError>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
 
         Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(typeof(ImageCheckResult), result)}", ex.Message);
     }
@@ -234,9 +217,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ScalesImage_WhenAttributeScaleWidthAndScaleHeight_IsBiggerThanZero()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -247,13 +229,9 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
-        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
+        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Single()).Contents);
 
         Assert.Equal(1, scaledImage.Width);
         Assert.Equal(1, scaledImage.Height);
@@ -263,11 +241,10 @@ public partial class FileUploadBehaviorTests
     }
 
     [Fact]
-    public void DoesntScalesImage_WhenAttributeScaleWidthAndScaleHeight_IsBiggerThanImageSize_AndScaleSmallerIsFalse()
+    public void DoesntScaleImage_WhenAttributeScaleWidthAndScaleHeight_IsBiggerThanImageSize_AndScaleSmallerIsFalse()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -279,13 +256,9 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
-        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
+        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Single()).Contents);
 
         Assert.Equal(2, scaledImage.Width);
         Assert.Equal(2, scaledImage.Height);
@@ -297,9 +270,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ScalesImage_WhenAttributeScaleWidthAndScaleHeight_IsBiggerThanImageSize_AndScaleSmallerIsTrue()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -311,13 +283,9 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(2, 2)));
         using var originalImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
 
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
-        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
+        using var scaledImage = Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Single()).Contents);
 
         Assert.Equal(10, scaledImage.Width);
         Assert.Equal(10, scaledImage.Height);
@@ -329,9 +297,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ScalesImage_WithSpecifiedBackgroundColor_WhenItsNotNull()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -346,13 +313,9 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1, format: JpegFormat.Instance, color: Rgba32.ParseHex("#000000"))));
         using var originalImage = Image.Load<Rgb24>(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
     
-        using var scaledImage = Image.Load<Rgb24>(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
+        using var scaledImage = Image.Load<Rgb24>(mockFileSystem.GetFile(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Single()).Contents);
 
         var white = new Rgb24(255, 255, 255);
         var black = new Rgb24(0, 0, 0);
@@ -374,9 +337,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ScalesImage_WithBackgroundColor_BlackIfNotSpecified()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -390,13 +352,9 @@ public partial class FileUploadBehaviorTests
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1, format: JpegFormat.Instance, color: Rgba32.ParseHex("#FFFFFF"))));
         using var originalImage = (Image<Rgb24>)Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
     
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
     
-        using var scaledImage = (Image<Rgb24>)Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Single()).Contents);
+        using var scaledImage = (Image<Rgb24>)Image.Load(mockFileSystem.GetFile(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Single()).Contents);
 
         var black = new Rgb24(0, 0, 0);
         var white = new Rgb24(255, 255, 255);
@@ -427,9 +385,8 @@ public partial class FileUploadBehaviorTests
     [InlineData("100x100;-96x-96")]
     public void Throws_When_WhenThumbSizesOnAttr_IsNegative(string thumbSizes)
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -445,19 +402,14 @@ public partial class FileUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        Assert.Throws<ArgumentOutOfRangeException>(() => FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
     }
 
     [Fact]
     public void CreatesThumbnails_WhenThumbSizesOnAttr_IsNotNull()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -473,21 +425,16 @@ public partial class FileUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
-        Assert.Single(mockFileSystem.AllFiles.Except([originalFile]));
+        Assert.Single(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Except([originalFile]));
     }
     
     [Fact]
     public void SetsThumbnailNames_ToTheirRespectiveWidthAndHeight()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -498,17 +445,12 @@ public partial class FileUploadBehaviorTests
 
         mockFileSystem.AddFile(fileName, new MockFileData(CreateImage(1, 1)));
         var originalFile = mockFileSystem.AllFiles.Single();
-        
-    
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
         var originalFileNameWithoutExt = mockFileSystem.GetFileNameWithoutExtension(originalFile);
 
-        Assert.Collection(mockFileSystem.AllFiles.Except([originalFile]).Select(mockFileSystem.GetFileName).OrderBy(fn => fn),
+        Assert.Collection(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Except([originalFile]).Select(mockFileSystem.GetFileName).OrderBy(fn => fn),
             x => Assert.Equal($"{originalFileNameWithoutExt}_t100x100.jpg", x),
             x => Assert.Equal($"{originalFileNameWithoutExt}_t200x200.jpg", x));
     }
@@ -516,9 +458,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void CreatesThumbnails_WithThumbSizesOnAttr()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -531,14 +472,10 @@ public partial class FileUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
 
-        Assert.Collection(mockFileSystem.AllFiles.Except([originalFile]).OrderBy(fn => fn),
+        Assert.Collection(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Except([originalFile]).OrderBy(fn => fn),
             file100 =>
             {
                 var image = Image.Load(mockFileSystem.GetFile(file100).Contents);
@@ -562,9 +499,8 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void CreatesThumbnails_WithThumbBackColor()
     {
-        var mockStorage = (MockUploadStorage)MockUploadStorage.Create();
-        var mockFileSystem = (MockFileSystem)mockStorage.MockFileSystem;
-        var fileName = "upload/test.jpg";
+        var uploadProcessor = CreateUploadProcessor();
+        var fileName = "temporary/test.jpg";
 
         var attr = new ImageUploadEditorAttribute
         {
@@ -578,16 +514,12 @@ public partial class FileUploadBehaviorTests
         var originalFile = mockFileSystem.AllFiles.Single();
         using var originalImage = Image.Load(mockFileSystem.GetFile(originalFile).Contents);
     
-        FileUploadBehavior.CheckUploadedImageAndCreateThumbs(uploadOptions: attr,
-            imageProcessor: new DefaultImageProcessor(),
-            storage: mockStorage,
-            temporaryFile: ref fileName,
-            validator: new DefaultUploadValidator(new DefaultImageProcessor(), NullTextLocalizer.Instance));
+        uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr);
 
         var white = new Rgb24(255, 255, 255);
         var black = new Rgb24(0, 0, 0);
         
-        Assert.Collection(mockFileSystem.AllFiles.Except([originalFile]).OrderBy(fn => fn),
+        Assert.Collection(mockFileSystem.AllFiles.Where(x => !x.EndsWith(".meta")).Except([originalFile]).OrderBy(fn => fn),
             file100 =>
             {
                 var image = Image.Load<Rgb24>(mockFileSystem.GetFile(file100).Contents);

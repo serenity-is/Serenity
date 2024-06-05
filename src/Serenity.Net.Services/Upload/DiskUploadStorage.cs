@@ -167,10 +167,18 @@ public class DiskUploadStorage : IUploadStorage
             foreach (var f in store.GetFiles(sourceDir,
                  sourceBaseName + "_t*.jpg"))
             {
-                string thumbSuffix = fileSystem.GetFileName(f)[sourceBaseName.Length..];
+                if (!UploadPathHelper.TryParseThumbSuffix(fileSystem.GetFileName(f), 
+                    out var baseName, out var suffix, out _, out _) ||
+                    !string.Equals(sourceBaseName, baseName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 using var src = store.OpenFile(f);
-                newFiles.Add(WriteFile(targetBasePath + thumbSuffix, src, OverwriteOption.Overwrite));
+                newFiles.Add(WriteFile(targetBasePath + suffix, src, OverwriteOption.Overwrite));
             }
+
+            var metadata = store.GetFileMetadata(sourcePath);
+            if (metadata.Count > 0)
+                SetFileMetadata(targetPath, metadata, true);
 
             return targetPath;
         }
@@ -217,8 +225,13 @@ public class DiskUploadStorage : IUploadStorage
         string sourceBase = fileSystem.GetFileNameWithoutExtension(fileName);
 
         foreach (var f in fileSystem.GetFiles(sourcePath,
-            sourceBase + "_t*.jpg", recursive: true))
+            sourceBase + "_t*.jpg", recursive: false))
         {
+            if (!UploadPathHelper.TryParseThumbSuffix(fileSystem.GetFileName(f),
+                out var baseName, out _, out _, out _) ||
+                !string.Equals(sourceBase, baseName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             fileSystem.Delete(f, DeleteType.TryDeleteOrMark);
         }
 
