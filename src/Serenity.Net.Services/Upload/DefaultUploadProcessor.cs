@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace Serenity.Web;
 
@@ -45,7 +44,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     protected readonly IUploadAVScanner avScanner = avScanner;
 
     /// <inheritdoc/>
-    public virtual ProcessedUploadInfo Process(Stream stream, string filename, IUploadOptions options)
+    public virtual ProcessedUploadInfo Process(System.IO.Stream stream, string filename, IUploadOptions options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
@@ -88,9 +87,10 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
                     if (!isExistingTemporary)
                     {
                         var basePath = "temporary/" + Guid.NewGuid().ToString("N");
-                        stream.Seek(0, SeekOrigin.Begin);
-                        result.TemporaryFile = uploadStorage.WriteFile(basePath + Path.GetExtension(filename),
+                        stream.Seek(0, System.IO.SeekOrigin.Begin);
+                        result.TemporaryFile = uploadStorage.WriteFile(basePath + System.IO.Path.GetExtension(filename),
                             stream, OverwriteOption.Disallowed);
+                        uploadStorage.SetOriginalName(result.TemporaryFile, System.IO.Path.GetFileName(filename));
                     }
                     else
                     {
@@ -173,7 +173,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
             ((options.ScaleWidth > 0 && (scaleSmaller || options.ScaleWidth < imageWidth)) ||
              (options.ScaleHeight > 0 && (scaleSmaller || options.ScaleHeight < imageHeight))))
         {
-            var baseFile = Path.ChangeExtension(imageFile, null);
+            var baseFile = System.IO.Path.ChangeExtension(imageFile, null);
             var originalName = uploadStorage.GetOriginalName(imageFile);
             result = ScaleImageAs(image, options.ScaleWidth, options.ScaleHeight, options.ScaleMode, 
                 options.ScaleBackColor, new ImageEncoderParams { Quality = options.ScaleQuality },
@@ -183,7 +183,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
             imageHeight = result.Height;
 
             if (!string.IsNullOrEmpty(originalName))
-                uploadStorage.SetOriginalName(result.Filename, Path.ChangeExtension(originalName, ".jpg"));
+                uploadStorage.SetOriginalName(result.Filename, System.IO.Path.ChangeExtension(originalName, ".jpg"));
         }
 
         uploadStorage.SetFileMetadata(result?.Filename ?? imageFile, new Dictionary<string, string>()
@@ -216,7 +216,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
             var result = ScaleImageAs(image, options.ThumbWidth, options.ThumbHeight, 
                 options.ThumbMode, options.ThumbBackColor, 
                 new ImageEncoderParams { Quality = options.ThumbQuality },
-                Path.ChangeExtension(imageFile, null) + "_t.jpg");
+                System.IO.Path.ChangeExtension(imageFile, null) + "_t.jpg");
 
             uploadStorage.SetFileMetadata(imageFile, new Dictionary<string, string>()
             {
@@ -255,7 +255,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         if (thumbSizes is null)
             return result;
 
-        var baseFile = Path.ChangeExtension(imageFile, null);
+        var baseFile = System.IO.Path.ChangeExtension(imageFile, null);
 
         foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split([',']))
         {
@@ -297,9 +297,9 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         {
             var size = imageProcessor.GetImageSize(scaledImage);
 
-            using var ms = new MemoryStream();
+            using var ms = new System.IO.MemoryStream();
             imageProcessor.Save(scaledImage, ms, "image/jpeg", encoderParams);
-            ms.Seek(0, SeekOrigin.Begin);
+            ms.Seek(0, System.IO.SeekOrigin.Begin);
             return new ScaleImageAsResult
             {
                 Filename = uploadStorage.WriteFile(targetFile, ms, OverwriteOption.Overwrite),
