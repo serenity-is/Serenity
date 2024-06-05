@@ -36,7 +36,14 @@ export namespace UploadHelper {
 
         new Uploader({
             batchSize: 1,
-            batchSuccess: data => options.fileDone?.(data.response ?? {}, data.batch?.filePaths?.[0], data),
+            batchSuccess: data => {
+                const response: UploadResponse = data.response ?? {};
+                if (response?.Error) {
+                    notifyError(response.Error.Message);
+                    return;
+                } 
+                options.fileDone?.(response, data.batch?.filePaths?.[0], data);
+            },
             input: uploadInput.getNode() as HTMLInputElement,
             dropZone: options.zone,
             batchStart: () => {
