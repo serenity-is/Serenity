@@ -1,3 +1,15 @@
+## 8.5.2 (2024-06-05)
+
+### Features
+
+- Added a "More Information" link (https://serenity.is/docs/av) for the failed AV scan message.
+- Improved the combobox editor by attempting to transfer the text typed into the inplace-add dialog, if the dialog provides a name property via its getNameProperty function.
+
+### Bugfixes
+
+- Fixed an issue where upload editors did not display errors returned from TemporaryUpload and incorrectly assumed the upload was successful, even in cases of blacklist or other validation errors.
+- Resolved a problem where the data audit log migration added in version 8.5.1 failed in SQLite (e.g., tests/Linux) due to SQLite's lack of support for altering columns.
+
 ## 8.5.1 (2024-06-04)
 
 ### Features
