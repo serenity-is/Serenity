@@ -16,9 +16,19 @@ public static class FileMetadataKeys
     public const string EntityId = "EntityId";
 
     /// <summary>
+    /// Fieldname of the associated entity
+    /// </summary>
+    public const string EntityField = "EntityField";
+
+    /// <summary>
     /// The property name of the associated entity
     /// </summary>
     public const string EntityProperty = "EntityProperty";
+
+    /// <summary>
+    /// Tablename of the associated entity
+    /// </summary>
+    public const string EntityTable = "EntityTable";
 
     /// <summary>
     /// Type of the associated entity

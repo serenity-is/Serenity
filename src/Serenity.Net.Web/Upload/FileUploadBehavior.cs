@@ -28,8 +28,10 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     private readonly IFilenameFormatSanitizer formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
     private StringField originalNameField;
     private Dictionary<string, Field> replaceFields;
+    private string entityTable;
     private string entityType;
-    private string propertyName;
+    private string entityProperty;
+    private string entityField;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -41,19 +43,21 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (editorAttr is null || editorAttr.DisableDefaultBehavior || editorAttr.IsMultiple)
             return false;
 
-        propertyName = Target.PropertyName ?? Target.Name;
+        entityField = Target.Name;
+        entityProperty = Target.PropertyName ?? entityField;
 
         if (Target is not StringField)
             throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but it is not a String field!",
-                    propertyName, row.GetType().FullName));
+                    entityProperty, row.GetType().FullName));
 
         if (row is not IIdRow)
             throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
-                    propertyName, row.GetType().FullName));
+                    entityProperty, row.GetType().FullName));
 
         entityType = row.GetType().FullName;
+        entityTable = row.Table;
 
         var originalNameProperty = (editorAttr as IUploadFileOptions)?.OriginalNameProperty;
         if (!string.IsNullOrEmpty(originalNameProperty))
@@ -316,8 +320,10 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
 
         storage.SetFileMetadata(copyResult.Path, new Dictionary<string, string>
         {
+            { FileMetadataKeys.EntityTable, entityTable },
             { FileMetadataKeys.EntityType, entityType },
-            { FileMetadataKeys.EntityProperty, propertyName },
+            { FileMetadataKeys.EntityField, entityField },
+            { FileMetadataKeys.EntityProperty, entityProperty },
             { FileMetadataKeys.EntityId, Convert.ToString(entityId, CultureInfo.InvariantCulture) }
         }, overwriteAll: false);
 
