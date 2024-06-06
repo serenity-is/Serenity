@@ -548,7 +548,7 @@ public partial class MultipleFileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.AllFiles.Select(mockFileSystem.Path.GetFileName).ToList();
+        var newFile = mockFileSystem.AllFiles.Where(NotMeta).Select(mockFileSystem.Path.GetFileName).ToList();
         var rowFileName = JSON.Parse<UploadedFile[]>(row.StringFieldImageUploadEditor)
             .Select(x => mockFileSystem.Path.GetFileName(x.Filename));
 
@@ -715,5 +715,10 @@ public partial class MultipleFileUploadBehaviorTests
     private static string Normalize(string str)
     {
         return str.ToLowerInvariant().ReplaceLineEndings().Replace(Environment.NewLine, string.Empty);
+    }
+
+    private bool NotMeta(string str)
+    {
+        return !str.EndsWith(".meta", StringComparison.OrdinalIgnoreCase);
     }
 }

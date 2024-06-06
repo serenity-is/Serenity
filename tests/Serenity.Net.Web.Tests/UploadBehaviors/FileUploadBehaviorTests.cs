@@ -218,15 +218,17 @@ public partial class FileUploadBehaviorTests
             UnitOfWork = uow
         };
 
-        Assert.NotEmpty(mockFileSystem.AllFiles);
-        Assert.Collection(mockFileSystem.AllFiles.Select(mockFileSystem.GetFileName),
+        var files = mockFileSystem.AllFiles.Where(NotMeta);
+
+        Assert.NotEmpty(files);
+        Assert.Collection(files.Select(mockFileSystem.GetFileName),
             x1 => Assert.Equal("old.jpg", x1),
             x2 => Assert.Equal("new.jpg", x2));
 
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        Assert.Single(mockFileSystem.AllFiles); // should be a random file name
+        Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)); // should be a random file name
     }
 
     [Fact]
@@ -582,7 +584,9 @@ public partial class FileUploadBehaviorTests
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+
+        var files = mockFileSystem.AllFiles.Where(NotMeta);
+        var newFile = mockFileSystem.GetFileName(Assert.Single(files));
         var rowFileName = mockFileSystem.GetFileName(row.StringFieldImageUploadEditor);
 
         if (!isUpdate)
@@ -773,7 +777,7 @@ public partial class FileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)));
         var rowFileName = mockFileSystem.GetFileName(row.StringFieldImageUploadEditor);
 
         if (!isUpdate)
@@ -829,7 +833,7 @@ public partial class FileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles));
+        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)));
         
         Assert.NotNull(dbCommand);
         var updateStatement = (TSQL.Statements.TSQLUpdateStatement)Assert.Single(TSQL.TSQLStatementReader.ParseStatements(dbCommand.CommandText));
@@ -1191,7 +1195,8 @@ public partial class FileUploadBehaviorTests
             sut.OnAfterSave(requestHandler);
             uow.Commit();
 
-            var file = Assert.Single(mockFileSystem.AllFiles);
+            var files = mockFileSystem.AllFiles.Where(NotMeta);
+            var file = Assert.Single(files);
             return file[mockFileSystem.Path.GetPathRoot(file).Length..].Replace('\\', '/'); // remove drive letter
         }
         finally
@@ -1213,5 +1218,10 @@ public partial class FileUploadBehaviorTests
     private static string Normalize(string str)
     {
         return str.ToLowerInvariant().ReplaceLineEndings().Replace(Environment.NewLine, string.Empty);
+    }
+
+    private static bool NotMeta(string str)
+    {
+        return !str.EndsWith(".meta", StringComparison.Ordinal);
     }
 }
