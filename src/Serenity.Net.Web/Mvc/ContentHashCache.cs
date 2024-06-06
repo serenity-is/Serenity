@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Serenity.IO;
 using System.Security.Cryptography;
 
 namespace Serenity.Web;
@@ -86,17 +87,38 @@ public class ContentHashCache : IContentHashCache
     {
         byte[] hash;
         var md5 = MD5.Create();
-        var physicalPath = file.PhysicalPath;
-        if (physicalPath != null)
+        try
         {
-            using System.IO.FileStream fs = new(physicalPath,
-                System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read, 120000);
-            hash = md5.ComputeHash(fs);
+            var physicalPath = file.PhysicalPath;
+            if (physicalPath != null)
+            {
+                try
+                {
+                    using System.IO.FileStream fs = new(physicalPath,
+                        System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite, 120000);
+                    hash = md5.ComputeHash(fs);
+                }
+                catch
+                {
+                    hash = md5.ComputeHash(Encoding.UTF8.GetBytes(System.IO.File.GetLastWriteTime(physicalPath).ToString("s")));
+                }
+            }
+            else
+            {
+                try
+                {
+                    using var stream = file.CreateReadStream();
+                    hash = md5.ComputeHash(stream);
+                }
+                catch
+                {
+                    hash = md5.ComputeHash(Encoding.UTF8.GetBytes(file.LastModified.ToString("s")));
+                }
+            }
         }
-        else
+        catch
         {
-            using var stream = file.CreateReadStream();
-            hash = md5.ComputeHash(stream);
+            hash = md5.ComputeHash(Encoding.UTF8.GetBytes(TemporaryFileHelper.RandomFileCode()));
         }
         return WebEncoders.Base64UrlEncode(hash);
     }
