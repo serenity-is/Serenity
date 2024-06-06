@@ -80,7 +80,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
-        collection.TryAddSingleton<ICssMinifier, NuglifyMinifier>();
+        collection.AddEsBuildCssMinifier();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
     }
 
@@ -114,7 +114,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
-        collection.TryAddSingleton<IScriptMinifier, NuglifyMinifier>();
+        collection.AddEsBuildScriptMinifier();
         collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
     }
 
