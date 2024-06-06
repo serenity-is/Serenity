@@ -16,6 +16,7 @@ public class CssBundleWatchTests
         container.AddCssBundling(options =>
         {
             options.Enabled = true;
+            options.Minimize = false;
             options.Bundles["Test"] = [ "~/" + env.Path.GetFileName(testFile) ];
         });
         var services = container.BuildServiceProvider();
