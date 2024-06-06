@@ -54,6 +54,20 @@ internal class EsBuildDownloader(IEsBuildPlatformInfo platformInfo = null, HttpC
                 using (var fs = File.Create(targetPath))
                     TarFileReader.CopyEntryTo(ms, entry, fs);
 
+                if (!OperatingSystem.IsWindows())
+                {
+                    try
+                    {
+                        File.SetUnixFileMode(targetPath,
+                            UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                            UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute |
+                            UnixFileMode.OtherRead);
+                    }
+                    catch
+                    {
+                    }
+                }
+
                 return targetPath;
             }
         }
