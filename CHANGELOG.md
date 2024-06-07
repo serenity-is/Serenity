@@ -1,3 +1,20 @@
+## 8.5.3 (2024-06-07)
+
+### Features:
+
+- **`[Breaking Change]`** Moved image processing methods like `ScaleImage` from `UploadStorageExtensions` to `DefaultUploadProcessor` as virtual methods. Removed `FileUploadBehavior.CheckUploadedImageAndCreateThumbs` and used the existing `IUploadProcessor` interface instead.
+- Added additional metadata such as `EntityType` (row full name), `EntityTable` (table name), `EntityId` (ID property value), `EntityField`/`EntityProperty` (field/property where the upload editor is placed) to enable tracing files back to their original entities. Also set generated `ImageSize` and `ThumbSize` as metadata to avoid loading image files to get actual sizes when required. This prepares for adding custom metadata like tags, descriptions, etc., to files if desired.
+- `IUploadProcessor` no longer returns a `Success` flag and raises an exception instead. The check for `.Success` should be removed from `FilePage` after updating to Serenity 8.5.3+. The property still exists but is obsolete and will always return true, so this is not a breaking change.
+- There is no need to set the original name in `FilePage` as the upload processor handles it now.
+- Improved handling of situations where a script or CSS file is locked by a process when trying to get the content hash.
+- Made EsBuild the default script/CSS minifier, as Nuglify has issues with some script syntax.
+- Added `allStart` / `allStop` events to the uploader and triggered `allStart`, `allStop`, `batchStart`, `batchStop` events on upload input if available.
+- Updated Google Maps editor sample for the latest API changes.
+
+### Bugfixes:
+
+- Fixed an issue where the widget constructor would fail when an empty array is passed as an element.
+
 ## 8.5.2 (2024-06-05)
 
 ### Features
