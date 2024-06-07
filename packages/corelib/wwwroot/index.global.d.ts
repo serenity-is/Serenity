@@ -3111,6 +3111,10 @@ declare namespace Serenity {
         batchSize?: number;
         /** An optional list of dropzones. */
         dropZone?: HTMLElement | ArrayLike<HTMLElement>;
+        /** Progress event that is called before first batch start is about to be uploaded */
+        allStart?: () => void;
+        /** Progress event that is called after last batch is ended uploading or failed */
+        allStop?: () => void;
         /** Progress event that is called when a batch is about to be uploaded */
         batchStart?: (data: {
             batch: UploaderBatch;
@@ -3154,6 +3158,7 @@ declare namespace Serenity {
         event?: Event;
         filePaths?: string[];
         formData: FormData;
+        isFirst?: boolean;
     }
     interface UploaderSuccessData {
         batch: UploaderBatch;

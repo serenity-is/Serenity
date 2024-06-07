@@ -1,6 +1,7 @@
 /** Inspired from https://github.com/silverwind/uppie and https://github.com/GoogleChromeLabs/file-drop/blob/master/lib/filedrop.ts */
 
 import { iframeDialog } from "./dialogs";
+import { Fluent } from "./fluent";
 import { notifyError } from "./notify";
 import { getCookie, isSameOrigin, resolveUrl } from "./services";
 import { isArrayLike } from "./system";
@@ -14,6 +15,10 @@ export interface UploaderOptions {
     batchSize?: number;
     /** An optional list of dropzones. */
     dropZone?: HTMLElement | ArrayLike<HTMLElement>;
+    /** Progress event that is called before first batch start is about to be uploaded */
+    allStart?: () => void;
+    /** Progress event that is called after last batch is ended uploading or failed */
+    allStop?: () => void;      
     /** Progress event that is called when a batch is about to be uploaded */
     batchStart?: (data: { batch: UploaderBatch }) => void;
     /** Progress event that is called when a batch is ended uploading or failed */
@@ -51,6 +56,7 @@ export interface UploaderBatch {
     event?: Event;
     filePaths?: string[];
     formData: FormData;
+    isFirst?: boolean;
 }
 
 export interface UploaderSuccessData {
@@ -103,11 +109,12 @@ export class Uploader {
         }
     }
 
-    private newBatch(event: Event) {
+    private newBatch(event: Event, isFirst: boolean) {
         this.batch = {
             event,
             filePaths: [],
-            formData: new FormData()
+            formData: new FormData(),
+            isFirst
         }
     }
 
@@ -116,15 +123,19 @@ export class Uploader {
         this.batch.formData.set(this.opt.name, file, filePath);
         if (!this.isMultiple() ||
             (this.opt.batchSize && this.batch.filePaths.length >= this.opt.batchSize)) {
-            await this.endBatch();
+            await this.endBatch(false);
         }
     }
 
-    private async endBatch() {
+    private async endBatch(final: boolean) {
         if (this.batch?.filePaths?.length) {
             const batch = this.batch;
             await this.opt.batchHandler?.(batch, this);
-            this.newBatch(batch.event);
+            this.newBatch(batch.event, false);
+        }
+        if (final) {
+            this.opt.allStop?.();
+            Fluent.trigger(this.opt.input, "allStop");
         }
     }
 
@@ -183,7 +194,7 @@ export class Uploader {
                         (e.target as HTMLInputElement).value = null;
                 }
             } else {
-                this.opt.changeCallback(e);
+                this.opt.changeCallback?.(e);
             }
         });
     }
@@ -230,7 +241,7 @@ export class Uploader {
             } else if (e.dataTransfer.files) {
                 this.arrayApi(e, e.dataTransfer.files);
             } else {
-                this.opt.changeCallback(e);
+                this.opt.changeCallback?.(e);
             }
         });
 
@@ -240,13 +251,13 @@ export class Uploader {
             } else if (e.clipboardData.files) {
                 this.arrayApi(e, e.clipboardData.files);
             } else {
-                this.opt.changeCallback(e);
+                this.opt.changeCallback?.(e);
             }
         });
     }
 
     private async arrayApi(e: Event, fileList: FileList): Promise<void> {
-        this.newBatch(e);
+        this.newBatch(e, true);
         let predicate = this.getTypePredicate();
         let filteredFiles = Array.from(fileList).filter(x => predicate(x.type));
         if (!this.isMultiple() && filteredFiles.length > 0)
@@ -254,11 +265,11 @@ export class Uploader {
         for (var file of filteredFiles) {
             await this.addToBatch(file, file.webkitRelativePath || file.name);
         }
-        await this.endBatch();
+        await this.endBatch(true);
     }
 
     private async entriesApi(e: Event, items: DataTransferItemList): Promise<void> {
-        this.newBatch(e);
+        this.newBatch(e, true);
         let predicate = this.getTypePredicate();
         let multiple = this.isMultiple();
         const skipRest = () => !multiple && this.batch?.filePaths?.length > 0;
@@ -326,7 +337,7 @@ export class Uploader {
             }
         }
 
-        this.endBatch();
+        this.endBatch(true);
     }
 
     async uploadBatch(batch: UploaderBatch, request?: UploaderRequest): Promise<void> {
@@ -337,7 +348,12 @@ export class Uploader {
         if (request.url === void 0)
             request.url = resolveUrl("~/File/TemporaryUpload");
 
+        if (batch.isFirst) {
+            this.opt.allStart?.();
+            Fluent.trigger(this.opt.input, "allStart");
+        }
         this.opt.batchStart?.({ batch });
+        Fluent.trigger(this.opt.input, "batchStart", { detail: batch });
         try {
             await new Promise((resolve, reject) => {
                 try {
@@ -388,6 +404,7 @@ export class Uploader {
                                     xhr
                                 }
                                 this.opt.batchSuccess?.(data);
+                                Fluent.trigger(this.opt.input, "batchSuccess", { detail: data });
                                 resolve(data);
                             }
                             else {
@@ -404,11 +421,13 @@ export class Uploader {
                     xhr.onprogress = (event) => {
                         try {
                             if (event.lengthComputable) {
-                                this.opt.batchProgress?.({
+                                const data = {
                                     batch,
                                     loaded: event.loaded,
                                     total: event.total
-                                });
+                                }
+                                this.opt.batchProgress?.(data);
+                                Fluent.trigger(this.opt.input, "batchProgress", { detail: data });
                             }
                         }
                         catch {
@@ -434,6 +453,7 @@ export class Uploader {
         }
         finally {
             this.opt.batchStop?.({ batch });
+            Fluent.trigger(this.opt.input, "batchStop", { detail: batch });
         }
     }
 
