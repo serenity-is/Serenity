@@ -27,7 +27,7 @@ export function handleElementProp(type: { createDefaultElement(): HTMLElement },
         if (isArrayLike(elementProp)) {
             elementProp = elementProp[0];
         }
-         if (elementProp instanceof HTMLElement) {
+        if (elementProp instanceof HTMLElement) {
             domNode = elementProp;
         }
         else {
@@ -88,8 +88,7 @@ export function setElementProps(widget: { domNode: HTMLElement }, props: EditorP
     // using try catch here as some editors might not be able
     // to set them in the constructor if forwarding these
     // properties to any elements created in the constructor
-    if (props.required != null)
-    {
+    if (props.required != null) {
         try {
             EditorUtils.setRequired(widget as any, props.required);
         }
@@ -107,7 +106,7 @@ export function setElementProps(widget: { domNode: HTMLElement }, props: EditorP
 
     if (props.initialValue != null) {
         try {
-            EditorUtils.setValue(this, props.initialValue);            
+            EditorUtils.setValue(this, props.initialValue);
         }
         catch {
         }
