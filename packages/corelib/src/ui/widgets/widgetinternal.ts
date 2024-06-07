@@ -23,16 +23,18 @@ export function handleElementProp(type: { createDefaultElement(): HTMLElement },
         if (domNode == null)
             throw `The element ${elementProp} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
     }
-    else if (isArrayLike(elementProp)) {
-        domNode = elementProp[0];
-    }
-    else if (elementProp instanceof HTMLElement) {
-        domNode = elementProp;
-    }
     else {
-        domNode = createElementFor(type);
-        if (typeof elementProp === "function")
-            elementProp(domNode);
+        if (isArrayLike(elementProp)) {
+            elementProp = elementProp[0];
+        }
+         if (elementProp instanceof HTMLElement) {
+            domNode = elementProp;
+        }
+        else {
+            domNode = createElementFor(type);
+            if (typeof elementProp === "function")
+                elementProp(domNode);
+        }
     }
 
     return ensureParentOrFragment(domNode);
