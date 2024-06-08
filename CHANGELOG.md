@@ -1,3 +1,9 @@
+## 8.5.4 (2024-06-08)
+
+### Bugfixes:
+
+- Fix assigned fields array for more than 64 fields is not cleared during clone if only one of the first 64 fields were assigned before cloning
+
 ## 8.5.3 (2024-06-07)
 
 ### Features:
