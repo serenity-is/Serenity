@@ -1,3 +1,9 @@
+## 8.5.5 (2024-06-08)
+
+### Bugfixes:
+
+- Fix static Dialog.onClose for modals when the modal is not initialized as the event triggered on body is not regular bs modal events
+
 ## 8.5.4 (2024-06-08)
 
 ### Bugfixes:
