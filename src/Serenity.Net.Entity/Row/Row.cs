@@ -80,6 +80,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         bool cloneHandlers)
     {
         ((IRow)clone).IgnoreConstraints = ((IRow)this).IgnoreConstraints;
+        ((IRow)clone).TrackAssignments = false;
 
         foreach (var field in fields)
             field.Copy(this, clone);
@@ -93,6 +94,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
                 clone.assignedFieldsArray = new int[assignedFieldsArray.Length];
                 Array.Copy(assignedFieldsArray, clone.assignedFieldsArray, assignedFieldsArray.Length);
             }
+            else
+                clone.assignedFieldsArray = null;
         }
         else
         {
@@ -102,7 +105,10 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
 
         clone.trackWithChecks = trackWithChecks;
 
-        clone.originalValues = originalValues;
+        if (originalValues != null)
+            clone.originalValues = originalValues.CloneRow();
+        else
+            clone.originalValues = null;
 
         if (dictionaryData != null)
             clone.dictionaryData = (Hashtable)dictionaryData.Clone();

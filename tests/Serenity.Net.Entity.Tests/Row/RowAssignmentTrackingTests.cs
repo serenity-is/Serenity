@@ -202,4 +202,57 @@ public class RowAssignmentTrackingTests
         foreach (var field in fields)
             Assert.False(row.IsAssigned(field));
     }
+
+    [Fact]
+    public void Clone_Preserves_Assignments_199FieldsRow_Case1()
+    {
+        var source = new _199FieldsRow();
+        var fields = source.GetFields();
+        source.Name = "Test";
+        Assert.Equal(197, fields.Others.Length);
+        for (var i = 0; i < fields.Others.Length; i++)
+            if (i % 5 == 0)
+                fields.Others[i][source] = "Test";
+
+        var copy = source.Clone();
+        Assert.False(copy.IsAssigned(fields.Id));
+        Assert.True(copy.IsAssigned(fields.Name));
+
+        for (var i = 0; i < fields.Others.Length; i++)
+        {
+            if (i % 5 == 0)
+            {
+                Assert.True(copy.IsAssigned(fields.Others[i]));
+            }
+            else
+            {
+                Assert.False(copy.IsAssigned(fields.Others[i]));
+            }
+        }
+    }
+
+    [Fact]
+    public void Clone_Preserves_Assignments_199FieldsRow_Case2()
+    {
+        var source = new _199FieldsRow();
+        var fields = source.GetFields();
+        source.Name = "Test";
+
+        Assert.False(source.IsAssigned(fields.Id));
+        Assert.True(source.IsAssigned(fields.Name));
+
+        for (var i = 0; i < fields.Others.Length; i++)
+        {
+            Assert.False(source.IsAssigned(fields.Others[i]));
+        }
+
+        var copy = source.Clone();
+        Assert.False(copy.IsAssigned(fields.Id));
+        Assert.True(copy.IsAssigned(fields.Name));
+
+        for (var i = 0; i < fields.Others.Length; i++)
+        {
+            Assert.False(copy.IsAssigned(fields.Others[i]));
+        }
+    }
 }
