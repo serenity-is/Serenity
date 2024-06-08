@@ -6,7 +6,7 @@ internal class EsBuildCLI(string path = null)
 {
     private readonly string path = path ?? new EsBuildDownloader().Download();
 
-    private string Run(string arguments = null, string stdin = null)
+    private string Run(string arguments, string stdin)
     {
         var process = new Process
         {
@@ -27,44 +27,35 @@ internal class EsBuildCLI(string path = null)
 
         process.Start();
 
-        if (!string.IsNullOrEmpty(stdin))
-        {
-            var input = process.StandardInput;
-            input.Write(stdin);
-            input.Flush();
-            input.Close();
-        }
+        var input = process.StandardInput;
+        input.Write(stdin ?? "");
+        input.WriteLine();
+        input.Flush();
+        input.Close();
 
         var output = process.StandardOutput.ReadToEnd();
         var error = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+        if (!process.WaitForExit(5000))
+            throw new OperationCanceledException("ESBuild CLI did not exit in 5 seconds");
 
         if (process.ExitCode != 0)
-            throw new Exception(error);
+            throw new Exception($"Error {process.ExitCode}: {error}!");
 
         return output;
     }
 
-    public string MinifyCssFile(string path, int lineLimit = 1000)
-    {
-        var arguments = $"--minify --loader=css {path} --line-limit={lineLimit}";
-        return Run(arguments);
-    }
-
-    public string MinifyScriptFile(string path, int lineLimit = 1000)
-    {
-        var arguments = $"--minify --keep-names {path} --line-limit={lineLimit}";
-        return Run(arguments);
-    }
-
     public string MinifyCss(string code, int lineLimit = 1000)
     {
+        if (string.IsNullOrEmpty(code))
+            return "";
         var arguments = $"--minify --loader=css --line-limit={lineLimit}";
         return Run(arguments, code);
     }
 
     public string MinifyScript(string code, int lineLimit = 1000)
     {
+        if (string.IsNullOrEmpty(code))
+            return "";
         var arguments = $"--minify --keep-names --line-limit={lineLimit}";
         return Run(arguments, code);
     }
