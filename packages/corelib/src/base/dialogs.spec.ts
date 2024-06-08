@@ -1707,6 +1707,66 @@ describe("Dialog.onClose", () => {
     });
 });
 
+
+describe("Static Dialog.onClose", () => {
+    let el: HTMLElement;
+
+    beforeEach(() => {
+        el = document.createElement("div");
+        document.body.append(el);
+    });
+
+    afterEach(() => {
+        el.remove();
+    });
+
+    it("attaches an event handler for panelclose event", () => {
+        const onClose1 = jest.fn();
+        const onClose2 = jest.fn();
+        Dialog.onClose(el, onClose1);
+        Dialog.onClose(el, onClose2);
+        expect(onClose1).not.toHaveBeenCalled();
+        expect(onClose2).not.toHaveBeenCalled();
+        Fluent.trigger(el, "panelclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+        Fluent.trigger(el, "panelclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+    });
+
+    it("attaches an event handler for dialogclose event", () => {
+        const onClose1 = jest.fn();
+        const onClose2 = jest.fn();
+        Dialog.onClose(el, onClose1);
+        Dialog.onClose(el, onClose2);
+        expect(onClose1).not.toHaveBeenCalled();
+        expect(onClose2).not.toHaveBeenCalled();
+        Fluent.trigger(el, "dialogclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+        Fluent.trigger(el, "dialogclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+    });
+
+    it("attaches an event handler for modalclose event", () => {
+        const onClose1 = jest.fn();
+        const onClose2 = jest.fn();
+        Dialog.onClose(el, onClose1);
+        Dialog.onClose(el, onClose2);
+        expect(onClose1).not.toHaveBeenCalled();
+        expect(onClose2).not.toHaveBeenCalled();
+        // there is no modalclose event in bootstrap, we simulate it on modal body
+        Fluent.trigger(el, "modalclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+        Fluent.trigger(el, "modalclose");
+        expect(onClose1).toHaveBeenCalledTimes(1);
+        expect(onClose2).toHaveBeenCalledTimes(1);            
+    });
+});
+
 describe("Dialog.title", () => {
     it("sets the title of the dialog", () => {
         const dlg = new Dialog({ preferPanel: true });

@@ -258,7 +258,7 @@ export class Dialog {
         const target = isArrayLike(el) ? el[0] : el;
         if (target) {
             const before = opt?.before ?? false;
-            const events = [before ? "panelbeforeclose" : "panelclose", before ? "dialogbeforeclose" : "dialogclose", before ? "hide.bs.modal" : "hidden.bs.modal"];
+            const events = [before ? "panelbeforeclose" : "panelclose", before ? "dialogbeforeclose" : "dialogclose", before ? "modalbeforeclose" : "modalclose"];
             const wrapper = (e: Event) => {
                 handler(Dialog.getInstance(el)?.result, e);
                 if (opt?.oneOff ?? !before) {
@@ -314,7 +314,7 @@ export class Dialog {
         const target = isArrayLike(el) ? el[0] : el;
         if (target) {
             const before = opt?.before ?? false;
-            const events = [before ? "panelbeforeopen" : "panelopen", before ? "dialogbeforeopen" : "dialogopen", before ? "show.bs.modal" : "shown.bs.modal"];
+            const events = [before ? "panelbeforeopen" : "panelopen", before ? "dialogbeforeopen" : "dialogopen", before ? "modalbeforeopen" : "modalopen"];
             const wrapper = (e: Event) => {
                 handler(e);
                 if (opt?.oneOff ?? !before) {
