@@ -4976,6 +4976,7 @@ declare namespace Serenity {
         static createDefaultElement(): HTMLInputElement;
         readonly domNode: HTMLInputElement;
         constructor(props: EditorProps<P>);
+        setToToday(triggerChange?: boolean): void;
         destroy(): void;
         get_value(): string;
         get value(): string;

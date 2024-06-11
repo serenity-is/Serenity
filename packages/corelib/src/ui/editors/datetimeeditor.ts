@@ -105,20 +105,21 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             this.domNode.classList.add('dateTimeQ');
         }
 
+        Fluent.on(this.domNode, 'keydown.' + this.uniqueName, (e: KeyboardEvent) => {
+            if (this.get_readOnly() || e.key !== " ")
+                return;
+
+            var input = this.domNode as HTMLInputElement;
+            if (input && !(input.value?.trim()?.length) ||
+                input.selectionStart === 0 && input.selectionEnd === input.value?.length) {
+                e.preventDefault();
+                this.setToNow(true);
+            }
+        });
+
         Fluent.on(this.domNode, 'keyup.' + this.uniqueName, (e: KeyboardEvent) => {
             if (this.get_readOnly())
                 return;
-
-            if (e.key == " ") {
-                e.preventDefault();
-                var input = this.domNode as HTMLInputElement;
-                if (input && !(input.value?.trim()?.length) ||
-                    input.selectionStart === 0 && input.selectionEnd === input.value?.length) {
-                    this.setToNow(true);
-                    return;
-                }
-                return;
-            }
 
             var before = this.domNode.value;
             DateEditor.dateInputKeyup(e as any);

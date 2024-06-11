@@ -46,16 +46,22 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             this.domNode.setAttribute('type', 'date');
         }
 
+        Fluent.on(this.domNode, 'keydown.' + this.uniqueName, (e: KeyboardEvent) => {
+            if (this.get_readOnly() || e.key !== " ") {
+                return;
+            }
+            
+            e.preventDefault();
+            if (this.get_valueAsDate() != today()) {
+                this.setToToday(true);
+            }
+        });
+
         Fluent.on(this.domNode, "keyup." + this.uniqueName, (e: KeyboardEvent) => {
-            if (e.key === " " && !this.get_readOnly()) {
-                if (this.get_valueAsDate() != today()) {
-                    this.set_valueAsDate(today());
-                    Fluent.trigger(this.domNode, 'change');
-                }
+            if (this.get_readOnly()) {
+                return;
             }
-            else {
-                DateEditor.dateInputKeyup(e as any);
-            }
+            DateEditor.dateInputKeyup(e as any);
         });
 
         Fluent.on(this.domNode, 'change.' + this.uniqueName, DateEditor.dateInputChange);
@@ -79,6 +85,11 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
         this.set_sqlMinMax(true)
     }
+
+    setToToday(triggerChange?: boolean) {
+        this.set_valueAsDate(today());
+        triggerChange && Fluent.trigger(this.domNode, 'change');
+    }    
 
     destroy() {
         if (this.domNode && (this.domNode as any)._flatpickr && (this.domNode as any)._flatpickr.destroy) {
