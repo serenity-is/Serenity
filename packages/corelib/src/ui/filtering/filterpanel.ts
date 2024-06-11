@@ -493,7 +493,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         var andor = e.target as HTMLElement;
         andor.classList.toggle('or');
         andor.textContent = localText('Controls.FilterPanel.' +
-            andor.classList.contains('or') ? 'Or' : 'And');
+            (andor.classList.contains('or') ? 'Or' : 'And'));
     }
 
     protected leftRightParenClick(e: Event): void {
