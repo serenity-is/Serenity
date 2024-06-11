@@ -3723,6 +3723,7 @@ declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpt
     private lastSetValue;
     private lastSetValueGet;
     constructor(props: EditorProps<P>);
+    setToNow(triggerChange?: boolean): void;
     destroy(): void;
     getFlatpickrOptions(): any;
     createFlatPickrTrigger(): HTMLElement;

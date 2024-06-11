@@ -109,20 +109,21 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             if (this.get_readOnly())
                 return;
 
-            if (this.time) {
-                if (e.key === " ") {
-                    if (this.get_valueAsDate() !== new Date()) {
-                        this.set_valueAsDate(new Date());
-                        Fluent.trigger(this.domNode, 'change');
-                    }
+            if (e.key == " ") {
+                e.preventDefault();
+                var input = this.domNode as HTMLInputElement;
+                if (input && !(input.value?.trim()?.length) ||
+                    input.selectionStart === 0 && input.selectionEnd === input.value?.length) {
+                    this.setToNow(true);
+                    return;
                 }
-                else {
-                    var before = this.domNode.value;
-                    DateEditor.dateInputKeyup(e as any);
-                    if (before != this.domNode.value)
-                        this.lastSetValue = null;
-                }
+                return;
             }
+
+            var before = this.domNode.value;
+            DateEditor.dateInputKeyup(e as any);
+            if (before != this.domNode.value)
+                this.lastSetValue = null;
         });
 
         this.set_sqlMinMax(true);
@@ -132,14 +133,17 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 .append(Fluent("b"))
                 .attr('title', this.getInplaceNowText())
                 .insertAfter(this.time).on("click", () => {
-                    if (this.domNode.classList.contains('readonly')) {
+                    if (this.get_readOnly())
                         return;
-                    }
-                    this.lastSetValue = null;
-                    this.set_valueAsDate(new Date());
-                    Fluent.trigger(this.domNode, 'change');
+                    this.setToNow(true);
                 });
         }
+    }
+
+    setToNow(triggerChange?: boolean) {
+        this.lastSetValue = null;
+        this.set_valueAsDate(new Date());
+        triggerChange && Fluent.trigger(this.domNode, 'change');
     }
 
     destroy() {
