@@ -32,16 +32,20 @@ type ElementEvents = Record<string, EventHandlers>;
 
 const eventRegistry: WeakMap<EventTarget, ElementEvents> = new WeakMap();
 
-export function triggerRemoveAndClearAll(element: EventTarget): void {
+export function disposeDescendants(element: Element) {
+    element.querySelectorAll("*").forEach(node => disposeElement(node));
+}
+
+export function disposeElement(element: EventTarget): void {
     let events = eventRegistry.get(element);
     if (!events)
         return;
 
     eventRegistry.delete(element);
 
-    var removeHandlers = events["remove"];
-    if (removeHandlers) {
-        for (const [_, handler] of Object.entries(removeHandlers)) {
+    var disposeHandlers = events["disposing"];
+    if (disposeHandlers) {
+        for (const [_, handler] of Object.entries(disposeHandlers)) {
             if (typeof handler.callable === "function") {
                 try {
                     handler.callable.call(element, { target: element });

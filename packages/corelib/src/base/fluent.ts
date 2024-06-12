@@ -1,5 +1,5 @@
 ﻿import { getjQuery } from "./environment";
-import { addListener, removeListener, triggerEvent, triggerRemoveAndClearAll } from "./fluent-events";
+import { addListener, disposeDescendants, disposeElement, removeListener, triggerEvent } from "./fluent-events";
 import { toggleClass as toggleCls } from "./html";
 
 /**
@@ -316,7 +316,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     prevSibling(selector?: string): Fluent<any>;
 
     /**
-     * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+     * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "disposing" event handlers.
      *
      * @returns The Fluent object itself.
      */
@@ -497,7 +497,7 @@ export namespace Fluent {
             if ($)
                 $(element).empty();
             else {
-                cleanContents(element);
+                disposeDescendants(element);
                 element.innerHTML = "";
             }
         }
@@ -515,7 +515,7 @@ export namespace Fluent {
     }
 
     /**
-     * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+     * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "disposing" event handlers.
      *
      * @param element The element to remove
      */
@@ -523,11 +523,12 @@ export namespace Fluent {
         if (!element)
             return;
         let $ = getjQuery();
-        if ($)
+        if ($) {
             $(element).remove();
+        }
         else {
-            cleanContents(element);
-            triggerRemoveAndClearAll(element);
+            disposeDescendants(element);
+            disposeElement(element);
             element.remove();
         }
     }
@@ -882,10 +883,6 @@ Fluent.prototype.prevSibling = function (this: FluentThis, selector?: string): F
     return new (Fluent as any)(sibling);
 }
 
-function cleanContents(element: Element) {
-    element.querySelectorAll("*").forEach(node => triggerRemoveAndClearAll(node));
-}
-
 Fluent.prototype.remove = function (this: FluentThis<any>) {
     Fluent.remove(this.el);
     return this;
@@ -927,7 +924,7 @@ Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
         if ($)
             $(this.el).text(value ?? "");
         else {
-            cleanContents(this.el);
+            disposeDescendants(this.el);
             this.el.textContent = value ?? "";
         }
     }

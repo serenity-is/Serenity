@@ -11,7 +11,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         private widget: Widget<any>,
         private parentChange: (p1: TParent) => void) {
         this.bind();
-        Fluent.on(this.widget.domNode, 'remove.' + (widget as any).uniqueName + 'cwh', () => {
+        Fluent.one(this.widget.domNode, 'disposing.' + (widget as any).uniqueName + 'cwh', () => {
             this.unbind();
             this.widget = null;
             this.parentChange = null;

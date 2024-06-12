@@ -133,9 +133,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         });
 
         this.add_submitHandlers(submitHandler);
-        Fluent.on(widget.domNode, 'remove.' + this.uniqueName, x => {
+        Fluent.on(widget.domNode, 'cleanup.' + this.uniqueName, x => {
             this.remove_submitHandlers(submitHandler);
-        });
+    });
 
         return widget;
     }

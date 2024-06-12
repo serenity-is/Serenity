@@ -80,7 +80,7 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
     layout();
 
-    Fluent.one(el, 'remove', () => {
+    Fluent.one(el, 'disposing', () => {
         Fluent.off(window, 'resize', layout);
         Fluent.off(document.body, 'layout', layout);
     });

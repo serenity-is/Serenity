@@ -1,10 +1,10 @@
-import { addListener, triggerRemoveAndClearAll } from "./fluent-events";
+import { addListener, disposeElement } from "./fluent-events";
 
 beforeEach(() => {
     jest.restoreAllMocks();
 });
 
-describe("triggerRemoveAndClearAll", () => {
+describe("disposeElement", () => {
     let element: HTMLElement;
     beforeEach(() => {
         element = document.createElement("div");
@@ -16,17 +16,17 @@ describe("triggerRemoveAndClearAll", () => {
     });
 
     it("ignores if element is null", () => {
-        triggerRemoveAndClearAll(null);
+        disposeElement(null);
     });
 
     it("ignores if element has no attached handlers", () => {
-        triggerRemoveAndClearAll(element);
+        disposeElement(element);
     });
 
-    it("clears any events other than remove", () => {
+    it("clears any events other than disposing", () => {
         const test = jest.fn();
         addListener(element, "test", test); 
-        triggerRemoveAndClearAll(element);
+        disposeElement(element);
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
         expect(test).not.toHaveBeenCalled();
@@ -35,30 +35,30 @@ describe("triggerRemoveAndClearAll", () => {
     it("can't clear externally attached events", () => {
         const test = jest.fn();
         element.addEventListener("test", test); 
-        triggerRemoveAndClearAll(element);
+        disposeElement(element);
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
         expect(test).toHaveBeenCalled();
     });
 
-    it("calls remove handlers", () => {
-        const remove1 = jest.fn();
-        const remove2 = jest.fn();
-        addListener(element, "remove", remove1); 
-        addListener(element, "remove", remove2); 
-        triggerRemoveAndClearAll(element);
-        expect(remove1).toHaveBeenCalled();
-        expect(remove2).toHaveBeenCalled();
+    it("calls disposing handlers", () => {
+        const disposing1 = jest.fn();
+        const disposing2 = jest.fn();
+        addListener(element, "disposing", disposing1); 
+        addListener(element, "disposing", disposing2); 
+        disposeElement(element);
+        expect(disposing1).toHaveBeenCalled();
+        expect(disposing2).toHaveBeenCalled();
     });
 
-    it("does not trigger externally attached remove event", () => {
-        const remove1 = jest.fn();
-        const remove2 = jest.fn();
-        addListener(element, "remove", remove1); 
-        element.addEventListener("remove", remove2); 
-        triggerRemoveAndClearAll(element);
-        expect(remove1).toHaveBeenCalled();
-        expect(remove2).not.toHaveBeenCalled();
+    it("does not trigger externally attached disposing event", () => {
+        const disposing1 = jest.fn();
+        const disposing2 = jest.fn();
+        addListener(element, "disposing", disposing1); 
+        element.addEventListener("disposing", disposing2); 
+        disposeElement(element);
+        expect(disposing1).toHaveBeenCalled();
+        expect(disposing2).not.toHaveBeenCalled();
     });
 
 });

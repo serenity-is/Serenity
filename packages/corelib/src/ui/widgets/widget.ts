@@ -32,11 +32,8 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        Fluent.one(this.domNode, 'remove.' + this.uniqueName, (e) => {
-            if (e.bubbles || e.cancelable)
-                return
-
-            this.destroy()
+        Fluent.one(this.domNode, 'disposing.' + this.uniqueName, (e) => {
+            this.destroy();
         });
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');

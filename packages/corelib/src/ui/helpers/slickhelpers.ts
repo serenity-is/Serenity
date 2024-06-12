@@ -379,7 +379,7 @@ export namespace GridUtils {
                 view.populate();
             }, hint, initial);
 
-        Fluent.on(isArrayLike(toolDiv) ? toolDiv[0] : toolDiv, "remove", function () {
+        Fluent.one(isArrayLike(toolDiv) ? toolDiv[0] : toolDiv, "disposing", function () {
             view.onSubmit = null;
             oldSubmit = null;
         });

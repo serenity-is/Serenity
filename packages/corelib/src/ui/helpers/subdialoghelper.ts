@@ -19,7 +19,7 @@ export namespace SubDialogHelper {
             else {
                 dataChange(e);
             }
-        }).one('remove.' + uniqueName, function () {
+        }).one('disposing.' + uniqueName, function () {
             Fluent.off(dialog.domNode, 'ondatachange.' + uniqueName);
         });
         return dialog;

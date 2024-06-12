@@ -58,19 +58,19 @@ function applyCleanDataPatch($: any) {
         $.parseJSON = JSON.parse;
 
     $.cleanData = (function (orig) {
-        return function (elems: any[]) {
-            var events, elem, i, e;
-            var cloned = elems;
-            for (i = 0; (elem = cloned[i]) != null; i++) {
+        return function (elements: any[]) {
+            var events, element, i;
+            var cloned = elements;
+            for (i = 0; (element = cloned[i]) != null; i++) {
                 try {
-                    events = ($ as any)._data(elem, "events");
-                    if (events && events.remove) {
-                        let remove = events.remove;
-                        delete events.remove;
-                        for (var x of remove) {
-                            if (typeof x?.handler === "function") {
+                    events = ($ as any)._data(element, "events");
+                    if (events && events.disposing) {
+                        let handlers = events.disposing;
+                        delete events.disposing;
+                        for (var x of handlers) {
+                            if (x && typeof x.handler === "function") {
                                 try {
-                                    x.handler.call(elem, ({ target: elem }));
+                                    x.handler.call(element, ({ target: element }));
                                 }
                                 catch {
                                 }
@@ -79,7 +79,7 @@ function applyCleanDataPatch($: any) {
                     }
                 } catch (e) { }
             }
-            orig(elems);
+            orig(elements);
         };
     })(($ as any).cleanData);
 }

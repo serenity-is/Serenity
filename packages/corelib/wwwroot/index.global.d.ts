@@ -2344,7 +2344,7 @@ declare namespace Serenity {
          */
         prevSibling(selector?: string): Fluent<any>;
         /**
-         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "disposing" event handlers.
          *
          * @returns The Fluent object itself.
          */
@@ -2494,7 +2494,7 @@ declare namespace Serenity {
          */
         function isVisibleLike(element: Element): boolean;
         /**
-         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "remove" event handlers.
+         * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "disposing" event handlers.
          *
          * @param element The element to remove
          */
