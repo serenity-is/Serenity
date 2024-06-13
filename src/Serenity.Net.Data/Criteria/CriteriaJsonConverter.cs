@@ -134,7 +134,14 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                         throw new ArgumentNullException("item");
 
                     if (item.ValueKind == JsonValueKind.String)
-                        list.Add(item.GetString());
+                    {
+                        if (item.TryGetDateTimeOffset(out var dto))
+                            list.Add(dto);
+                        else if (item.TryGetDateTime(out var dt))
+                            list.Add(dt);
+                        else
+                            list.Add(item.GetString());
+                    }
                     else if (item.ValueKind == JsonValueKind.Number)
                         list.Add(item.GetDouble());
                     else if (item.ValueKind == JsonValueKind.True)
