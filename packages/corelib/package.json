@@ -8,7 +8,7 @@
     "@serenity-is/sleekgrid": "workspace:*"
   },
   "devDependencies": {
-    "tslib": "2.6.2"
+    "tslib": "2.6.3"
   },
   "exports": {
     ".": {
