@@ -1,3 +1,14 @@
+## 8.5.6 (2024-06-13)
+
+### Features:
+- Replace the internal "remove" event, triggered by Fluent when an element is cleaned up (e.g., by calling `remove()` on itself or `empty()` on its parent), with a new "disposing" event. Note: This may be a breaking change if you were using this undocumented event.
+- Enable the space key in the date-time editor to set the current date and time again (only when the field is empty or all text is selected).
+- Added support for `ByteArrayField` and `RowField` in the `GenerateRowFields` attribute.
+
+### Bugfixes:
+- Fix the esbuild minifier locks for empty code blocks.
+- Resolve the issue where the column picker dialog closes when dragging and dropping.
+
 ## 8.5.5 (2024-06-08)
 
 ### Bugfixes:
