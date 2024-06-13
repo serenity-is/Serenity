@@ -93,7 +93,15 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     private BaseCriteria ParseValue(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.String)
+        {
+            if (value.TryGetDateTimeOffset(out var dto))
+                return new ValueCriteria(dto);
+
+            if (value.TryGetDateTime(out var dt))
+                return new ValueCriteria(dt);
+
             return new ValueCriteria(value.GetString());
+        }
         else if (value.ValueKind == JsonValueKind.Number)
             return new ValueCriteria(value.GetDouble());
         else if (value.ValueKind == JsonValueKind.True)
