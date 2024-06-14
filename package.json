@@ -24,8 +24,7 @@
   },
   "pnpm": {
     "overrides": {
-      "jsdom": "24.1.0",
-      "glob": "10.4.1"
+      "jsdom": "24.1.0"
     }
   },
   "scripts": {
