@@ -93,15 +93,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     private BaseCriteria ParseValue(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.String)
-        {
-            if (value.TryGetDateTimeOffset(out var dto))
-                return new ValueCriteria(dto);
-
-            if (value.TryGetDateTime(out var dt))
-                return new ValueCriteria(dt);
-
             return new ValueCriteria(value.GetString());
-        }
         else if (value.ValueKind == JsonValueKind.Number)
             return new ValueCriteria(value.GetDouble());
         else if (value.ValueKind == JsonValueKind.True)
@@ -134,14 +126,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                         throw new ArgumentNullException("item");
 
                     if (item.ValueKind == JsonValueKind.String)
-                    {
-                        if (item.TryGetDateTimeOffset(out var dto))
-                            list.Add(dto);
-                        else if (item.TryGetDateTime(out var dt))
-                            list.Add(dt);
-                        else
                             list.Add(item.GetString());
-                    }
                     else if (item.ValueKind == JsonValueKind.Number)
                         list.Add(item.GetDouble());
                     else if (item.ValueKind == JsonValueKind.True)

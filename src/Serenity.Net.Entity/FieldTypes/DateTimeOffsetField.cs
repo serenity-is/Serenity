@@ -37,6 +37,41 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     }
 
     /// <summary>
+    /// Converts the value.
+    /// </summary>
+    /// <param name="source">The source.</param>
+    /// <param name="provider">The provider.</param>
+    /// <returns></returns>
+    public override object ConvertValue(object source, IFormatProvider provider)
+    {
+        if (source is Newtonsoft.Json.Linq.JValue jValue)
+            source = jValue.Value;
+
+        if (source == null)
+            return null;
+
+        if (source is DateTime dt)
+            return dt;
+
+        if (source is DateTimeOffset dto)
+            return dto.DateTime;
+
+        if (source is string s)
+        {
+            if (DateTimeOffset.TryParse(s, provider, DateTimeStyles.None, out var dtOffset))
+                return dtOffset;
+
+            if (s.TryParseISO8601DateTime(out var dateTime))
+                return dateTime;
+
+            if (DateTime.TryParse(s, provider, DateTimeStyles.None, out dateTime))
+                return dateTime;
+        }
+
+        return Convert.ChangeType(source, typeof(DateTime), provider);
+    }
+
+    /// <summary>
     /// Gets field value from a data reader.
     /// </summary>
     /// <param name="reader">The reader.</param>
