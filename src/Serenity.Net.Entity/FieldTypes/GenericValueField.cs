@@ -42,13 +42,11 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
 
         if (source == null)
             return null;
-        else
-        {
-            if (source is TValue val)
-                return val;
 
-            return Convert.ChangeType(source, typeof(TValue), provider);
-        }
+        if (source is TValue val)
+            return val;
+
+        return Convert.ChangeType(source, typeof(TValue), provider);
     }
 
     /// <summary>
