@@ -4886,7 +4886,9 @@ declare class DateFormatter implements Formatter {
     format(ctx: FormatterContext): string;
 }
 declare class DateTimeFormatter extends DateFormatter {
-    constructor();
+    constructor(props?: {
+        displayFormat?: string;
+    });
 }
 declare class EnumFormatter implements Formatter {
     readonly props: {
