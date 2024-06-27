@@ -89,8 +89,7 @@ export class DateFormatter implements Formatter {
 @Decorators.registerFormatter('Serenity.DateTimeFormatter')
 export class DateTimeFormatter extends DateFormatter {
     constructor(props: { displayFormat?: string } = {}) {
-        props.displayFormat ??= Culture.dateTimeFormat;
-        super(props)
+        super({ displayFormat: Culture.dateTimeFormat, ...props });
     }
 }
 
