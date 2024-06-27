@@ -6175,7 +6175,9 @@ declare namespace Serenity {
         format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
-        constructor();
+        constructor(props?: {
+            displayFormat?: string;
+        });
     }
     class EnumFormatter implements Formatter {
         readonly props: {
