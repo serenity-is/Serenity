@@ -5971,6 +5971,7 @@ declare namespace Serenity {
         validateEditorValue(value: string): string;
     }
     namespace FilteringTypeRegistry {
+        function reset(): void;
         function get(key: string): Function;
     }
 

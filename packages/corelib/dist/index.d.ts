@@ -4682,6 +4682,7 @@ declare class StringFiltering extends BaseFiltering {
     validateEditorValue(value: string): string;
 }
 declare namespace FilteringTypeRegistry {
+    function reset(): void;
     function get(key: string): Function;
 }
 

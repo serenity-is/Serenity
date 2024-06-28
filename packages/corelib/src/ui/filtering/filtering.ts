@@ -739,7 +739,7 @@ export namespace FilteringTypeRegistry {
         }
     }
 
-    function reset(): void {
+    export function reset(): void {
         knownTypes = null;
     }
 
