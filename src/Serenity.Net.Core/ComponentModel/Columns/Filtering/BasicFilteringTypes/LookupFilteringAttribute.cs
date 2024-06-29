@@ -18,6 +18,8 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     public LookupFilteringAttribute(string lookupKey)
         : base(Key)
     {
+        if (lookupKey is null)
+            throw new ArgumentNullException(nameof(lookupKey));
         SetOption("lookupKey", lookupKey);
     }
 
@@ -30,7 +32,7 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     public LookupFilteringAttribute(Type lookupType)
         : base(Key)
     {
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentOutOfRangeException("lookupType");
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentOutOfRangeException("lookupType");// Burada lookupType tipinin LookupScript adlı özel bir attribute içerip içermediğini kontrol ediyoruz (false parametresi bu özelliğin kalıtım yoluyla aranmayacağını sadece LookUpscrptAttirbute de olması gerektğni söyler) ?? bu ifade sol tarafındaki ifadenin null olup olmadığını kontrol eder, Eğer sol taraf null ise sağ taraftaki kodu döndürür.lookupType tipi üzerinde LookupScriptAttribute bulunamazsa veya null dönerse, ArgumentOutOfRangeException istisnası fırlatılır. Bu istisna, genellikle bir parametrenin geçersiz bir değere sahip olduğunu veya beklenen bir özelliği karşılamadığını belirtir.
         SetOption("lookupKey", attr.Key ??
             LookupScriptAttribute.AutoLookupKeyFor(lookupType));
     }
@@ -45,5 +47,13 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     {
         get { return GetOption<string>("idField"); }
         set { SetOption("idField", value); }
+    }
+
+    /// <summary>
+    /// Gets the lookup key
+    /// </summary>
+    public string? LookupKey
+    {
+        get { return GetOption<string>("lookupKey"); }
     }
 }
