@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that property should a custom editor for filtering,
@@ -61,7 +61,7 @@ public class EditorFilteringAttribute : CustomFilteringAttribute
     public bool UseRelative
     {
         get { return GetOption<bool>("useRelative"); }
-        set { SetOption("useSearch", value); }
+        set { SetOption("useRelative", value); }
     }
 
     /// <summary>

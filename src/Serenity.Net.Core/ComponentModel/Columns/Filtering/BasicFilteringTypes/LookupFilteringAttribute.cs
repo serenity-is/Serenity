@@ -18,6 +18,8 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     public LookupFilteringAttribute(string lookupKey)
         : base(Key)
     {
+        if (lookupKey is null)
+            throw new ArgumentNullException(nameof(lookupKey));
         SetOption("lookupKey", lookupKey);
     }
 
@@ -45,5 +47,13 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     {
         get { return GetOption<string>("idField"); }
         set { SetOption("idField", value); }
+    }
+
+    /// <summary>
+    /// Gets the lookup key
+    /// </summary>
+    public string? LookupKey
+    {
+        get { return GetOption<string>("lookupKey"); }
     }
 }
