@@ -10,7 +10,7 @@ public class NumberFormatterAttributeTests
     }
 
     [Fact]
-    public void DısplayFormat_CanBeSet_ToNull()
+    public void DisplayFormat_CanBeSet_ToNull()
     {
         var attribute = new NumberFormatterAttribute()
         {

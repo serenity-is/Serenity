@@ -58,7 +58,7 @@ public class LookupFilteringAttributeTests
     }
 
     [Fact]
-    public void IdFıeld_CanBeSet_ToNull()
+    public void IdField_CanBeSet_ToNull()
     {
 
         var attribute = new LookupFilteringAttribute("id")

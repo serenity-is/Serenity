@@ -20,7 +20,7 @@ public class MinuteFormatterAttributeTests
     }
 
     [Fact]
-    public void DısplayFormat_CanBeSet_ToNull()
+    public void DisplayFormat_CanBeSet_ToNull()
     {
         var attribute = new MinuteFormatterAttribute()
         {
@@ -30,7 +30,7 @@ public class MinuteFormatterAttributeTests
     }
 
     [Fact]
-    public void DısplayFormat_IsNull_ByDefault()
+    public void DisplayFormat_IsNull_ByDefault()
     {
         var attribute = new MinuteFormatterAttribute();
         Assert.Null(attribute.DisplayFormat);

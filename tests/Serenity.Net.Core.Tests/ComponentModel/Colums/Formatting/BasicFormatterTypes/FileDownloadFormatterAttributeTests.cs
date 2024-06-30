@@ -20,7 +20,7 @@ public class FileDownloadFormatterAttributeTests
     }
 
     [Fact]
-    public void DısplayFormat_CanBeSet_ToNull()
+    public void DisplayFormat_CanBeSet_ToNull()
     {
         var attribute = new FileDownloadFormatterAttribute()
         {
@@ -31,7 +31,7 @@ public class FileDownloadFormatterAttributeTests
     }
 
     [Fact]
-    public void DısplayFormat_IsNull_ByDefault()
+    public void DisplayFormat_IsNull_ByDefault()
     {
         var attribute = new FileDownloadFormatterAttribute();
         Assert.Null(attribute.DisplayFormat);
