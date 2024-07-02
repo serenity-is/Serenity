@@ -1,4 +1,4 @@
-﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getTypeShortName, getjQuery, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getjQuery, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -323,16 +323,6 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 fieldDiv.append(el);
             }
         }).init();
-
-        if (getTypeShortName(editor) == "BooleanEditor" &&
-            (item.editorParams == null || !!!item.editorParams['labelFor'])) {
-            label.removeAttr('for');
-        }
-
-        if (getTypeShortName(editor) == "RadioButtonEditor" &&
-            (item.editorParams == null || !!!item.editorParams['labelFor'])) {
-            label.removeAttr('for');
-        }
 
         if (item.maxLength != null) {
             PropertyGrid.setMaxLength(editor, item.maxLength);
