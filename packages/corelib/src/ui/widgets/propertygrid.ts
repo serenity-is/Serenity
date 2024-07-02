@@ -135,9 +135,6 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                     ((item.collapsible !== true) ? null :
                         item.collapsed ?? false));
 
-                if (priorCategory == null) {
-                    categoryDiv.classList.add("first-category");
-                }
                 priorCategory = category;
                 fieldContainer = categoryDiv;
             }
