@@ -78,7 +78,6 @@ public static partial class WebTexts
 
         public static class PropertyGrid
         {
-            public static readonly LocalText DefaultCategory = "Properties";
             public static readonly LocalText RequiredHint = "this field is required";
         }
 

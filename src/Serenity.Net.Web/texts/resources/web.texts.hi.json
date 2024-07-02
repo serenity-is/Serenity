@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "कोई रिकॉर्ड नहीं",
   "Controls.Pager.Page": "पृष्ठ",
   "Controls.Pager.PageStatus": "कुल {total} रिकॉर्ड में से {from} से {to} तक दिखाई दे रहा है",
-  "Controls.PropertyGrid.DefaultCategory": "गुण",
   "Controls.PropertyGrid.RequiredHint": "यह फ़ील्ड आवश्यक है",
   "Controls.QuickSearch.FieldSelection": "खोज के लिए फील्ड का चयन करें",
   "Controls.QuickSearch.Hint": "खोजने के लिए पाठ दर्ज करें",

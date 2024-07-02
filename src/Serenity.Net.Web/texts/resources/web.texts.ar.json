@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "لا سجلات",
   "Controls.Pager.Page": "صفحة",
   "Controls.Pager.PageStatus": "عرض {from} إلى {to} من {total} سجلات كلياً",
-  "Controls.PropertyGrid.DefaultCategory": "الخصائص",
   "Controls.PropertyGrid.RequiredHint": "هذا الحقل مطلوب",
   "Controls.QuickSearch.FieldSelection": "اختر الحقل للبحث عنه",
   "Controls.QuickSearch.Hint": "أدخل النص للبحث عنه",

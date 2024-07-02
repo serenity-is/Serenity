@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Нет записей",
   "Controls.Pager.Page": "Страница",
   "Controls.Pager.PageStatus": "Показывается от {from} до {to} из общего количества {total} записей",
-  "Controls.PropertyGrid.DefaultCategory": "Свойства",
   "Controls.PropertyGrid.RequiredHint": "Это поле обязательно",
   "Controls.QuickSearch.FieldSelection": "Выберите поле для поиска",
   "Controls.QuickSearch.Hint": "Введите текст для поиска",

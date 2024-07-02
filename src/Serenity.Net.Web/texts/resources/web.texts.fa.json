@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "هیچ رکوردی وجود ندارد",
   "Controls.Pager.Page": "صفحه",
   "Controls.Pager.PageStatus": "نمایش از {from} تا {to} از {total} رکوردهای کلی",
-  "Controls.PropertyGrid.DefaultCategory": "ویژگی‌ها",
   "Controls.PropertyGrid.RequiredHint": "این فیلد الزامی است",
   "Controls.QuickSearch.FieldSelection": "فیلد را برای جستجو انتخاب کنید",
   "Controls.QuickSearch.Hint": "برای جستجو متن را وارد کنید",

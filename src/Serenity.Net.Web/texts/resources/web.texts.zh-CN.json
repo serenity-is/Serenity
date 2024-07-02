@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "无记录",
   "Controls.Pager.Page": "页",
   "Controls.Pager.PageStatus": "显示 {from} 到 {to}，共 {total} 条记录",
-  "Controls.PropertyGrid.DefaultCategory": "属性",
   "Controls.PropertyGrid.RequiredHint": "此字段为必填",
   "Controls.QuickSearch.FieldSelection": "选择要搜索的字段",
   "Controls.QuickSearch.Hint": "输入要搜索的文本",

@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "기록 없음",
   "Controls.Pager.Page": "페이지",
   "Controls.Pager.PageStatus": "전체 {total} 개의 레코드 중 {from} 부터 {to} 까지 보여주고 있습니다",
-  "Controls.PropertyGrid.DefaultCategory": "속성",
   "Controls.PropertyGrid.RequiredHint": "이 필드는 필수입니다",
   "Controls.QuickSearch.FieldSelection": "검색할 필드를 선택하십시오",
   "Controls.QuickSearch.Hint": "검색할 텍스트를 입력하십시오",

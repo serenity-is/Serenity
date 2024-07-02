@@ -3466,7 +3466,6 @@ interface PropertyGridOptions {
     items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
-    defaultCategory?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }

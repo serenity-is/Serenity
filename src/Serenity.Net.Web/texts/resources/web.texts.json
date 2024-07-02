@@ -93,7 +93,6 @@
   "Controls.Pager.NoRowStatus": "No records",
   "Controls.Pager.Page": "Page",
   "Controls.Pager.PageStatus": "Showing {from} to {to} of {total} total records",
-  "Controls.PropertyGrid.DefaultCategory": "Properties",
   "Controls.PropertyGrid.RequiredHint": "this field is required",
   "Controls.QuickSearch.FieldSelection": "select the field to search on",
   "Controls.QuickSearch.Hint": "enter the text to search for...",

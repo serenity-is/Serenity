@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "レコードがありません",
   "Controls.Pager.Page": "ページ",
   "Controls.Pager.PageStatus": "全{total}レコードのうち{from}から{to}までを表示",
-  "Controls.PropertyGrid.DefaultCategory": "プロパティ",
   "Controls.PropertyGrid.RequiredHint": "このフィールドは必須です",
   "Controls.QuickSearch.FieldSelection": "検索するフィールドを選択してください",
   "Controls.QuickSearch.Hint": "検索するテキストを入力してください",

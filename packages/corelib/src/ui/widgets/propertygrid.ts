@@ -127,10 +127,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var priorCategory = null;
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var category = item.category;
-            if (category == null) {
-                category = this.options.defaultCategory ?? '';
-            }
+            var category = item.category ?? '';
 
             if (useCategories && priorCategory !== category) {
                 var categoryDiv = this.createCategoryDiv(categoriesDiv,
@@ -338,7 +335,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return editor;
     }
 
-    private getCategoryOrder(items: PropertyItem[]) {
+    private getCategoryOrder(items: PropertyItem[]): any {
         var order = 0;
         var result = {} as any;
         var categoryOrder = this.options.categoryOrder?.trim() || null;
@@ -357,10 +354,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
 
         for (var x1 of items) {
-            var category = x1.category;
-            if (category == null) {
-                category = this.options.defaultCategory ?? '';
-            }
+            var category = x1.category ?? '';
             if (result[category] == null) {
                 result[category] = order++;
             }
@@ -374,16 +368,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         var itemIndex: Record<string, number> = {};
         var itemCategory: Record<string, string> = {};
         for (var x of items) {
-            var name1 = x.name;
-            var cat1 = x.category;
-            if (cat1 == null) {
-                cat1 = this.options.defaultCategory ?? '';
-            }
-            itemCategory[name1] = cat1;
+            itemCategory[x.name] = x.category ?? '';
             itemIndex[x.name] = idx++;
         }
 
-        var self = this;
         var categoryOrder = this.getCategoryOrder(items);
 
         items.sort(function (x1, y) {
@@ -572,7 +560,6 @@ export interface PropertyGridOptions {
     items: PropertyItem[];
     useCategories?: boolean;
     categoryOrder?: string;
-    defaultCategory?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }
