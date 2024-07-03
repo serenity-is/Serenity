@@ -3,9 +3,11 @@ import { IDialog } from "../interfaces";
 import { Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
 
+export type DialogType = ({ new(props?: any): IDialog & { init?: () => void } });
+
 export namespace DialogTypeRegistry {
 
-    const registry = commonTypeRegistry({
+    const registry = commonTypeRegistry<DialogType>({
         attrKey: null,
         isMatch: type => isAssignableFrom(IDialog, type),
         kind: "dialog",

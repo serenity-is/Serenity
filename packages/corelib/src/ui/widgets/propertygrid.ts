@@ -286,7 +286,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 .prependTo(label);
         }
 
-        var editorType = EditorTypeRegistry.get(item.editorType ?? 'String') as typeof Widget<WidgetProps<P>>;
+        var editorType = EditorTypeRegistry.get(item.editorType ?? 'String');
 
         var editorParams = item.editorParams;
         var optionsType = null;
@@ -305,7 +305,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         let editor = new editorType({
             ...editorParams,
             id: editorId,
-            element: el => {
+            element: (el: HTMLElement) => {
                 Fluent(el).addClass("editor");
 
                 if (Fluent.isInputLike(el))

@@ -43,7 +43,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         }
 
         if (isPromiseLike(enumType))
-            return enumType.then(() => then(enumType));
+            return enumType.then(then);
         else
             then(enumType);
     }

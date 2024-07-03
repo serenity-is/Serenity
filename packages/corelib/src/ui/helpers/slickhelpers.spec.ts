@@ -51,7 +51,6 @@ describe('SlickHelpers.toSlickColumn', () => {
 
         expect(converted.format).toBeDefined();
         var formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
-        console.log(formattedDate)
         expect(formattedDate).toBe('01/01/2021 00:00');
     });
 });

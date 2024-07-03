@@ -1,8 +1,8 @@
-﻿import { Fluent, PropertyItem, localText } from "../../base";
+﻿import { Fluent, PropertyItem, isPromiseLike, localText } from "../../base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
+import { DialogTypeRegistry, DialogType } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
@@ -731,11 +731,14 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return null;
     }
 
-    protected createEditDialog(callback: (dlg: IEditDialog) => void) {
+    protected createEditDialog(callback: (dlg: IEditDialog) => void): void {
         var dialogTypeKey = this.getDialogTypeKey();
-        var dialogType = DialogTypeRegistry.get(dialogTypeKey) as typeof Widget<{}>;
-        var dialog = new dialogType({}).init();
-        callback?.(dialog as unknown as IEditDialog);
+        var dialogType = DialogTypeRegistry.getOrLoad(dialogTypeKey);
+        const then = (dialogType: DialogType) => {
+            var dialog = new dialogType({}).init?.();
+            callback?.(dialog as unknown as IEditDialog);
+        }
+        isPromiseLike(dialogType) ? dialogType.then(then) : then(dialogType);
     }
 
     public onInitNewEntity: (entity: TItem) => void;

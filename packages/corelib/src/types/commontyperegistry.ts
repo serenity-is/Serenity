@@ -3,9 +3,9 @@ import { getTypes } from "../q";
 
 export function commonTypeRegistry<TType = any>(props: {
     kind: string,
-    attrKey: (type: any) => string, 
-    isMatch: (type: any) => boolean, 
-    suffix: string, 
+    attrKey: (type: any) => string,
+    isMatch: (type: any) => boolean,
+    suffix: string,
     loadError: (key: string) => void
 }) {
 
@@ -16,7 +16,7 @@ export function commonTypeRegistry<TType = any>(props: {
     function reset() {
         knownTypes = null;
     }
-    
+
     function searchSystemTypes(key: string, load?: boolean) {
         var type = getType(key);
         if (type != null && isMatch(type))
@@ -33,7 +33,7 @@ export function commonTypeRegistry<TType = any>(props: {
                 return type;
         }
     }
-    
+
     function init() {
         knownTypes = {};
         for (var type of getTypes()) {
@@ -97,7 +97,10 @@ export function commonTypeRegistry<TType = any>(props: {
 
     function tryGetOrLoad(key: string): TType | PromiseLike<TType> {
         let type = tryGet(key);
-        if (!type && key && Config.lazyTypeLoader) {
+        if (type)
+            return type;
+
+        if (key && Config.lazyTypeLoader) {
             let promise = Config.lazyTypeLoader(key, kind as any);
             if (isPromiseLike(promise)) {
                 return promise.then(t => {
@@ -108,7 +111,7 @@ export function commonTypeRegistry<TType = any>(props: {
                     return null;
                 });
             }
-            
+
             if (promise && isMatch(promise)) {
                 knownTypes[key] = promise;
                 return promise;
@@ -116,6 +119,8 @@ export function commonTypeRegistry<TType = any>(props: {
 
             return null;
         }
+
+        return type;
     }
 
     function get(key: string): TType {
@@ -124,21 +129,20 @@ export function commonTypeRegistry<TType = any>(props: {
             return type;
 
         loadError(key);
-    }    
+    }
 
     function getOrLoad(key: string): TType | PromiseLike<TType> {
-        var type = tryGet(key);
+        var type = tryGetOrLoad(key);
         if (type) {
             if (isPromiseLike(type)) {
                 return type.then(t => {
-                    if (!t || !isMatch(t))
+                    if (!t)
                         loadError(key);
                     return t;
                 });
             }
-            
-            if (isMatch(type))
-                return type;
+
+            return type;
         }
 
         loadError(key);

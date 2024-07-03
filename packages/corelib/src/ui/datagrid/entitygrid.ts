@@ -1,10 +1,11 @@
-﻿import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, localText, resolveUrl, stringFormat, tryGetText } from "../../base";
+﻿
+import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { IEditDialog } from "../../interfaces";
 import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../q";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
+import { DialogType, DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";
@@ -58,13 +59,13 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
         if (!Fluent.eventProp(e, "isInitial"))
             return;
-        
+
         Fluent.off(document, "." + this.uniqueName + "_routerfix");
 
         let evParts: string[] = Fluent.eventProp(e, "parts");
         let evIndex = Fluent.eventProp(e, "index");
-        
-        if (getActiveRequests() > oldRequests && 
+
+        if (getActiveRequests() > oldRequests &&
             evParts != null && evIndex != null && evIndex >= 0 && evIndex < evParts.length - 1 &&
             !evParts[evIndex + 1].startsWith("!") &&
             Fluent.isDefaultPrevented(e)) {
@@ -236,8 +237,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         this.createEntityDialog(itemType, dlg => {
             var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
-                dialog.load(entityOrId, () =>
-                    dialog.dialogOpen(this.openDialogsAsPanel));
+                dialog.load(entityOrId, () => {
+                    dialog.dialogOpen(this.openDialogsAsPanel)
+                });
                 return;
             }
 
@@ -325,14 +327,25 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         this.routeDialog(itemType, dialog);
     }
 
-    protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any> {
-        var dialog = Widget.create({
-            type: this.getDialogTypeFor(itemType),
-            options: this.getDialogOptionsFor(itemType)
-        });
-        this.initEntityDialog(itemType, dialog);
-        callback?.(dialog);
-        return dialog;
+    protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): (Widget<any> | PromiseLike<Widget<any>>) {
+        const dialogType = this.getDialogTypeFor(itemType);
+
+        const then = (dialogType: any) => {
+            var dialog = Widget.create({
+                type: dialogType,
+                options: this.getDialogOptionsFor(itemType)
+            });
+            this.initEntityDialog(itemType, dialog);
+            callback?.(dialog);
+            return dialog;
+        }
+
+        if (isPromiseLike(dialogType)) {
+            return dialogType.then(then);
+        }
+        else {
+            return then(dialogType);
+        }
     }
 
     protected getDialogOptions(): any {
@@ -346,18 +359,18 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return {};
     }
 
-    protected getDialogTypeFor(itemType: string): { new(...args: any[]): Widget<any> } {
+    protected getDialogTypeFor(itemType: string): DialogType | PromiseLike<DialogType> {
 
         if (itemType === this.getItemType()) {
             return this.getDialogType();
         }
 
-        return DialogTypeRegistry.get(itemType) as any;
+        return DialogTypeRegistry.getOrLoad(itemType);
     }
 
     private _dialogType: any;
 
-    protected getDialogType(): { new(...args: any[]): Widget<any> } {
+    protected getDialogType(): DialogType | PromiseLike<DialogType> {
 
         if (this._dialogType != null)
             return this._dialogType;
@@ -365,8 +378,17 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         var attr = this.getCustomAttribute(DialogTypeAttribute);
         if (attr)
             this._dialogType = attr.value;
-        else
-            this._dialogType = DialogTypeRegistry.get(this.getEntityType());
+        else {
+            const promise = DialogTypeRegistry.getOrLoad(this.getEntityType());
+            if (isPromiseLike(promise)) {
+                return promise.then(t => {
+                    this._dialogType = t;
+                    return t;
+                });
+            }
+
+            this._dialogType = promise;
+        }
 
         return this._dialogType;
     }

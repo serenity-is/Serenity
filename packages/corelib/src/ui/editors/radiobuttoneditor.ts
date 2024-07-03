@@ -54,7 +54,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
                 }
             }
             if (isPromiseLike(enumType))
-                enumType.then(() => then(enumType));
+                enumType.then(then);
             else
                 then(enumType);
         }

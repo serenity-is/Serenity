@@ -1,11 +1,13 @@
 ﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { Exception } from "../q";
-import { Widget } from "../ui/widgets/widget";
+import { Widget, WidgetProps } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
+
+export type EditorType = { new(props?: WidgetProps<any>): Widget<any> }
 
 export namespace EditorTypeRegistry {
 
-    const registry = commonTypeRegistry({
+    const registry = commonTypeRegistry<EditorType>({
         attrKey: null,
         isMatch: type => hasCustomAttribute(type, EditorAttribute, false) || isAssignableFrom(Widget, type),
         kind: "editor",

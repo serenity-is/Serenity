@@ -1318,7 +1318,7 @@ declare namespace Serenity {
          */
         emailAllowOnlyAscii: boolean;
         /**
-         * This is an optional callback that is used to load types dynamically when they are not found in the
+         * This is an optional callback that is used to load types lazily when they are not found in the
          * type registry. This is useful when a type is not available in currently loaded scripts
          * (e.g. chunks / entry modules) but is available via some other means (e.g. a separate script file).
          * The method may return a type or a promise that resolves to a type. If either returns null,
@@ -1602,7 +1602,7 @@ declare namespace Serenity {
          */
         result?: string;
     }
-    type DialogType = "bsmodal" | "uidialog" | "panel";
+    type DialogProviderType = "bsmodal" | "uidialog" | "panel";
     /**
      * Options that apply to all dialog types
      */
@@ -1640,7 +1640,7 @@ declare namespace Serenity {
         /** Prefer Panel even when Modal / jQuery UI is available */
         preferPanel?: boolean;
         /** Callback to get options specific to the dialog provider type */
-        providerOptions?: (type: DialogType, opt: DialogOptions) => any;
+        providerOptions?: (type: DialogProviderType, opt: DialogOptions) => any;
         /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
         scrollable?: boolean;
         /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
@@ -1737,7 +1737,7 @@ declare namespace Serenity {
         /** Sets the title text of the dialog. */
         title(value: string): this;
         /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
-        get type(): DialogType;
+        get type(): DialogProviderType;
         /** Gets the body/content element of the dialog */
         getContentNode(): HTMLElement;
         /** Gets the dialog element of the dialog */
@@ -4537,28 +4537,36 @@ declare namespace Serenity {
         function staticPanel(value?: boolean): (target: Function, _context?: any) => void;
     }
 
+    type DialogType = ({
+        new (props?: any): IDialog & {
+            init?: () => void;
+        };
+    });
     namespace DialogTypeRegistry {
-        let get: (key: string) => any;
-        let getOrLoad: (key: string) => any;
+        let get: (key: string) => DialogType;
+        let getOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
         let reset: () => void;
-        let tryGet: (key: string) => any;
-        let tryGetOrLoad: (key: string) => any;
+        let tryGet: (key: string) => DialogType;
+        let tryGetOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
     }
 
+    type EditorType = {
+        new (props?: WidgetProps<any>): Widget<any>;
+    };
     namespace EditorTypeRegistry {
-        let get: (key: string) => any;
-        let getOrLoad: (key: string) => any;
+        let get: (key: string) => EditorType;
+        let getOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
         let reset: () => void;
-        let tryGet: (key: string) => any;
-        let tryGetOrLoad: (key: string) => any;
+        let tryGet: (key: string) => EditorType;
+        let tryGetOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
     }
 
     namespace EnumTypeRegistry {
-        let get: (key: string) => any;
-        let getOrLoad: (key: string) => any;
+        let get: (key: string) => object;
+        let getOrLoad: (key: string) => object | PromiseLike<object>;
         let reset: () => void;
-        let tryGet: (key: string) => any;
-        let tryGetOrLoad: (key: string) => any;
+        let tryGet: (key: string) => object;
+        let tryGetOrLoad: (key: string) => object | PromiseLike<object>;
     }
 
     namespace ReflectionUtils {
@@ -6275,12 +6283,15 @@ declare namespace Serenity {
         set target(value: string);
     }
 
+    type FormatterType = ({
+        new (props?: any): Formatter;
+    });
     namespace FormatterTypeRegistry {
-        let get: (key: string) => any;
-        let getOrLoad: (key: string) => any;
+        let get: (key: string) => FormatterType;
+        let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
         let reset: () => void;
-        let tryGet: (key: string) => any;
-        let tryGetOrLoad: (key: string) => any;
+        let tryGet: (key: string) => FormatterType;
+        let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
     }
 
     interface SettingStorage {
@@ -6647,16 +6658,12 @@ declare namespace Serenity {
         protected transferDialogReadOnly(dialog: Widget<any>): void;
         protected initDialog(dialog: Widget<any>): void;
         protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
-        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
+        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): (Widget<any> | PromiseLike<Widget<any>>);
         protected getDialogOptions(): any;
         protected getDialogOptionsFor(itemType: string): any;
-        protected getDialogTypeFor(itemType: string): {
-            new (...args: any[]): Widget<any>;
-        };
+        protected getDialogTypeFor(itemType: string): DialogType | PromiseLike<DialogType>;
         private _dialogType;
-        protected getDialogType(): {
-            new (...args: any[]): Widget<any>;
-        };
+        protected getDialogType(): DialogType | PromiseLike<DialogType>;
     }
 
     class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {

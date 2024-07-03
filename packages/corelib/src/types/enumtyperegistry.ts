@@ -5,7 +5,7 @@ import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace EnumTypeRegistry {
 
-    let registry = commonTypeRegistry({
+    let registry = commonTypeRegistry<object>({
         attrKey: type => getCustomAttribute(type, EnumKeyAttribute, false)?.value,
         isMatch: isEnum,
         kind: "enum",

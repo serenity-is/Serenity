@@ -1,9 +1,9 @@
-import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, localText, serviceRequest, tryGetText, type PropertyItem } from "../../base";
 import { Column, FormatterContext, FormatterResult, Grid, RowMoveManager } from "@serenity-is/sleekgrid";
+import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, isPromiseLike, localText, serviceRequest, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
-import { Format, Formatter, RemoteView } from "../../slick";
+import { Format, RemoteView } from "../../slick";
 import { Decorators } from "../../types/decorators";
-import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
+import { FormatterType, FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
@@ -574,10 +574,12 @@ export namespace PropertyItemSlickConverter {
             }
         }
 
-        if (item.formatterType != null && item.formatterType.length > 0) {
+        if (!item.formatterType)
+            return result;
 
-            var formatterType = FormatterTypeRegistry.get(item.formatterType) as any;
-            var formatter = new formatterType(item.formatterParams ?? {}) as Formatter;
+        const formatterType = FormatterTypeRegistry.getOrLoad(item.formatterType);
+        const then = (formatterType: FormatterType) => {
+            var formatter = new formatterType(item.formatterParams ?? {});
 
             if (item.formatterParams != null) {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);
@@ -589,6 +591,23 @@ export namespace PropertyItemSlickConverter {
             }
 
             result.format = (ctx) => formatter.format(ctx);
+        }
+        if (isPromiseLike(formatterType)) {
+            result.format = (ctx) => {
+                if (ctx.row != null && ctx.cell != null && ctx.grid instanceof Grid) {
+                    const grid = ctx.grid;
+                    const row = ctx.row;
+                    const cell = ctx.cell;
+                    formatterType.then(() => {
+                        grid.updateCell?.(row, cell);
+                    });
+                }
+                return "";
+            }
+            formatterType.then(then);
+        }
+        else {
+            then(formatterType);
         }
 
         return result;

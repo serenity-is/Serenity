@@ -25,7 +25,7 @@ export interface DialogButton {
     result?: string;
 }
 
-export type DialogType = "bsmodal" | "uidialog" | "panel";
+export type DialogProviderType = "bsmodal" | "uidialog" | "panel";
 
 /**
  * Options that apply to all dialog types
@@ -64,7 +64,7 @@ export interface DialogOptions {
     /** Prefer Panel even when Modal / jQuery UI is available */
     preferPanel?: boolean;
     /** Callback to get options specific to the dialog provider type */
-    providerOptions?: (type: DialogType, opt: DialogOptions) => any;
+    providerOptions?: (type: DialogProviderType, opt: DialogOptions) => any;
     /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
     scrollable?: boolean;
     /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
@@ -362,7 +362,7 @@ export class Dialog {
     }
 
     /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
-    get type(): DialogType {
+    get type(): DialogProviderType {
         var root = getDialogNode(this.el);
         if (!root)
             return null;

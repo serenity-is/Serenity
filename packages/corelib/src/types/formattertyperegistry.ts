@@ -1,10 +1,13 @@
 ﻿import { ISlickFormatter, htmlEncode, isAssignableFrom, notifyError } from "../base";
-import { ArgumentNullException, Exception } from "../q";
+import { Exception } from "../q";
+import { Formatter } from "../slick/slicktypes";
 import { commonTypeRegistry } from "./commontyperegistry";
+
+export type FormatterType = ({ new(props?: any): Formatter });
 
 export namespace FormatterTypeRegistry {
 
-    const registry = commonTypeRegistry({
+    const registry = commonTypeRegistry<FormatterType>({
         attrKey: null,
         isMatch: type => isAssignableFrom(ISlickFormatter, type),
         kind: "formatter",
