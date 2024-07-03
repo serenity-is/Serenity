@@ -4745,6 +4745,7 @@ declare namespace Serenity {
     }
 
     class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
+        private editorPromises;
         private editors;
         private items;
         protected renderContents(): any;

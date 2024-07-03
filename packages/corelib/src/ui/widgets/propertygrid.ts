@@ -1,15 +1,16 @@
-﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getjQuery, isBS3, isBS5Plus, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getjQuery, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { EditorTypeRegistry } from "../../types/editortyperegistry";
+import { EditorType, EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
-import { Widget, WidgetProps } from "./widget";
+import { Widget } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
+    private editorPromises: PromiseLike<void>[];
     private editors: Widget<any>[];
     private items: PropertyItem[];
 
@@ -21,6 +22,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             this.options.mode = 1;
 
         this.editors = [];
+        this.editorPromises = [];
         this.items = [];
 
         const items = this.options.items || [];
@@ -86,6 +88,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 this.editors[i]?.destroy?.();
             }
             this.editors = null;
+            this.editorPromises = null;
         }
 
         this.domNode.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
@@ -138,9 +141,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 priorCategory = category;
                 fieldContainer = categoryDiv;
             }
-            var editor = this.createField(fieldContainer, item);
-            this.items.push(item);
-            this.editors.push(editor);
+            this.createField(fieldContainer, item);
         }
     }
 
@@ -219,7 +220,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return text;
     }
 
-    private createField(container: HTMLElement, item: PropertyItem) {
+    private createField(container: HTMLElement, item: PropertyItem): void {
 
         var fieldDiv = container.appendChild(document.createElement("div"));
         fieldDiv.classList.add("field");
@@ -286,50 +287,80 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
                 .prependTo(label);
         }
 
-        var editorType = EditorTypeRegistry.get(item.editorType ?? 'String');
-
         var editorParams = item.editorParams;
-        var optionsType = null;
-        var optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
 
-        if (optionsAttr) {
-            optionsType = optionsAttr.value as any;
-        }
-        if (optionsType != null) {
-            editorParams = extend(new optionsType(), item.editorParams);
+        var editorType = EditorTypeRegistry.getOrLoad(item.editorType ?? 'String');
+        let editorSpan: HTMLSpanElement;
+        const index = this.editors.length;
+
+        const then = (editorType: EditorType) => {
+            if (!this.editors) {
+                // destroyed?
+                return;
+            }
+
+            var optionsType = null;
+            var optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
+            if (optionsAttr) {
+                optionsType = optionsAttr.value as any;
+            }
+            if (optionsType != null) {
+                editorParams = extend(new optionsType(), item.editorParams);
+            }
+            else {
+                editorParams = extend(new Object(), item.editorParams);
+            }
+
+            let editor = new editorType({
+                ...editorParams,
+                id: editorId,
+                element: (el: HTMLElement) => {
+                    Fluent(el).addClass("editor");
+
+                    if (Fluent.isInputLike(el))
+                        el.setAttribute("name", item.name ?? "");
+
+                    if (placeHolder)
+                        el.setAttribute("placeholder", placeHolder);
+
+                    if (editorSpan) {
+                        editorSpan.replaceWith(el);
+                        editorSpan = null;
+                        this.editorPromises[index] = null;
+                    }
+                    else {
+                        fieldDiv.append(el);
+                    }
+                }
+            }).init();
+
+            if (item.maxLength != null) {
+                PropertyGrid.setMaxLength(editor, item.maxLength);
+            }
+
+            if (item.editorParams != null) {
+                ReflectionOptionsSetter.set(editor, item.editorParams);
+            }
+
+            this.editors[index] = editor;
+        };
+
+        this.editors.push(null);
+        this.items.push(item);
+        this.editorPromises.push(null);
+
+        if (isPromiseLike(editorType)) {
+            editorSpan = document.createElement("span");
+            editorSpan.className = "editor-loading-placeholder";
+            fieldDiv.append(editorSpan);
+            this.editorPromises.push(editorType.then(then));
         }
         else {
-            editorParams = extend(new Object(), item.editorParams);
-        }
-
-        let editor = new editorType({
-            ...editorParams,
-            id: editorId,
-            element: (el: HTMLElement) => {
-                Fluent(el).addClass("editor");
-
-                if (Fluent.isInputLike(el))
-                    el.setAttribute("name", item.name ?? "");
-
-                if (placeHolder)
-                    el.setAttribute("placeholder", placeHolder);
-
-                fieldDiv.append(el);
-            }
-        }).init();
-
-        if (item.maxLength != null) {
-            PropertyGrid.setMaxLength(editor, item.maxLength);
-        }
-
-        if (item.editorParams != null) {
-            ReflectionOptionsSetter.set(editor, item.editorParams);
+            then(editorType);
         }
 
         Fluent("div").class('vx').appendTo(fieldDiv);
         Fluent("div").class('clear').appendTo(fieldDiv);
-
-        return editor;
     }
 
     private getCategoryOrder(items: PropertyItem[]): any {
@@ -457,13 +488,20 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     load(source: any): void {
         for (var i = 0; i < this.editors.length; i++) {
             var item = this.items[i];
-            var editor = this.editors[i];
             if (!!(this.get_mode() === 1 && item.defaultValue != null) &&
                 typeof (source[item.name]) === 'undefined') {
                 source[item.name] = item.defaultValue;
             }
 
-            EditorUtils.loadValue(editor, item, source);
+            var editor = this.editors[i];
+            if (!editor && this.editorPromises[i]) {
+                this.editorPromises[i].then(() => {
+                    this.editors && EditorUtils.loadValue(this.editors[i], item, source);
+                });
+            }
+            else {
+                EditorUtils.loadValue(editor, item, source);
+            }
         }
     }
 
@@ -474,6 +512,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             var item = this.items[i];
             if (item.oneWay !== true && this.canModifyItem(item)) {
                 var editor = this.editors[i];
+                if (!editor && this.editorPromises)
+                    throw `Editor for "${this.items[i]?.name}" at index ${i} is not loaded yet.`;
+
                 EditorUtils.saveValue(editor, item, target);
             }
         }
@@ -519,21 +560,35 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     updateInterface() {
         for (var i = 0; i < this.editors.length; i++) {
             var item = this.items[i];
-            var editor = this.editors[i];
             var readOnly = item.readOnly === true || !this.canModifyItem(item);
-            EditorUtils.setReadOnly(editor, readOnly);
-            EditorUtils.setRequired(editor, !readOnly &&
-                !!item.required && item.editorType !== 'Boolean');
-            if (item.visible === false || item.readPermission != null ||
-                item.insertPermission != null || item.updatePermission != null ||
-                item.hideOnInsert === true || item.hideOnUpdate === true) {
-                var hidden = (item.readPermission != null &&
-                    !Authorization.hasPermission(item.readPermission)) ||
-                    item.visible === false ||
-                    (this.get_mode() === PropertyGridMode.insert && item.hideOnInsert === true) ||
-                    (this.get_mode() === 2 && item.hideOnUpdate === true);
+            var editor = this.editors[i];
+            const then = (editor: Widget<any>) => {
+                if (!editor)
+                    return;
+                EditorUtils.setReadOnly(editor, readOnly);
+                EditorUtils.setRequired(editor, !readOnly &&
+                    !!item.required && item.editorType !== 'Boolean');
+                if (item.visible === false || item.readPermission != null ||
+                    item.insertPermission != null || item.updatePermission != null ||
+                    item.hideOnInsert === true || item.hideOnUpdate === true) {
+                    var hidden = (item.readPermission != null &&
+                        !Authorization.hasPermission(item.readPermission)) ||
+                        item.visible === false ||
+                        (this.get_mode() === PropertyGridMode.insert && item.hideOnInsert === true) ||
+                        (this.get_mode() === 2 && item.hideOnUpdate === true);
 
-                editor.getGridField().toggle(!hidden);
+                    editor.getGridField().toggle(!hidden);
+                }
+            }
+            if (!editor && this.editorPromises[i]) {
+                this.editorPromises[i].then(() => {
+                    if (!this.editors)
+                        return;
+                    then(this.editors[i]);
+                });
+            }
+            else {
+                then(editor);
             }
         }
     }
@@ -542,6 +597,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         for (var i = 0; i < this.editors.length; i++) {
             var item = this.items[i];
             var editor = this.editors[i];
+            if (!editor && this.editorPromises[i])
+                throw `Editor for "${this.items[i]?.name}" at index ${i} is not loaded yet.`;
             callback(item, editor);
         }
     }
