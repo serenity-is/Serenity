@@ -1,7 +1,15 @@
-﻿import { Config, getType, getTypeNameProp } from "../base";
+﻿import { Config, getType, getTypeNameProp, isPromiseLike } from "../base";
 import { getTypes } from "../q";
 
-export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (type: any) => string, suffix: string) {
+export function commonTypeRegistry<TType = any>(props: {
+    kind: string,
+    attrKey: (type: any) => string, 
+    isMatch: (type: any) => boolean, 
+    suffix: string, 
+    loadError: (key: string) => void
+}) {
+
+    const { kind, attrKey, isMatch, suffix, loadError } = props;
 
     let knownTypes: { [key: string]: any };
 
@@ -9,7 +17,7 @@ export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (ty
         knownTypes = null;
     }
     
-    function search(key: string) {
+    function searchSystemTypes(key: string, load?: boolean) {
         var type = getType(key);
         if (type != null && isMatch(type))
             return type;
@@ -25,7 +33,7 @@ export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (ty
                 return type;
         }
     }
-
+    
     function init() {
         knownTypes = {};
         for (var type of getTypes()) {
@@ -50,8 +58,8 @@ export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (ty
             }
         }
     }
-    
-    function tryGet(key: string): any {
+
+    function tryGet(key: string): TType {
         if (!key)
             return null;
 
@@ -63,10 +71,10 @@ export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (ty
         if (type)
             return type;
 
-        type = search(key);
+        type = searchSystemTypes(key);
 
         if (type == null && suffix && !key.endsWith(suffix))
-            type = knownTypes[key + suffix] ?? search(key + suffix);
+            type = knownTypes[key + suffix] ?? searchSystemTypes(key + suffix);
 
         if (type) {
             knownTypes[key] = type;
@@ -87,8 +95,60 @@ export function commonTypeRegistry(isMatch: (type: any) => boolean, attrKey: (ty
         return type;
     }
 
+    function tryGetOrLoad(key: string): TType | PromiseLike<TType> {
+        let type = tryGet(key);
+        if (!type && key && Config.lazyTypeLoader) {
+            let promise = Config.lazyTypeLoader(key, kind as any);
+            if (isPromiseLike(promise)) {
+                return promise.then(t => {
+                    if (t && isMatch(t)) {
+                        knownTypes[key] = t;
+                        return t;
+                    }
+                    return null;
+                });
+            }
+            
+            if (promise && isMatch(promise)) {
+                knownTypes[key] = promise;
+                return promise;
+            }
+
+            return null;
+        }
+    }
+
+    function get(key: string): TType {
+        var type = tryGet(key);
+        if (type)
+            return type;
+
+        loadError(key);
+    }    
+
+    function getOrLoad(key: string): TType | PromiseLike<TType> {
+        var type = tryGet(key);
+        if (type) {
+            if (isPromiseLike(type)) {
+                return type.then(t => {
+                    if (!t || !isMatch(t))
+                        loadError(key);
+                    return t;
+                });
+            }
+            
+            if (isMatch(type))
+                return type;
+        }
+
+        loadError(key);
+    }
+
     return {
+        get,
+        getOrLoad,
         reset,
-        tryGet
+        tryGet,
+        tryGetOrLoad
     }
 }

@@ -1318,6 +1318,16 @@ declare namespace Serenity {
          */
         emailAllowOnlyAscii: boolean;
         /**
+         * This is an optional callback that is used to load types dynamically when they are not found in the
+         * type registry. This is useful when a type is not available in currently loaded scripts
+         * (e.g. chunks / entry modules) but is available via some other means (e.g. a separate script file).
+         * The method may return a type or a promise that resolves to a type. If either returns null,
+         * the type is considered to be not found.
+         * The method is called with the type key and an optional kind parameter, which is used to distinguish
+         * between different kinds of types (e.g. "editor" or "dialog" or "enum").
+         */
+        lazyTypeLoader: (typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | string) => any | Promise<any>;
+        /**
          * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
          * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
          * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
@@ -4528,21 +4538,27 @@ declare namespace Serenity {
     }
 
     namespace DialogTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-        function tryGet(key: string): any;
+        let get: (key: string) => any;
+        let getOrLoad: (key: string) => any;
+        let reset: () => void;
+        let tryGet: (key: string) => any;
+        let tryGetOrLoad: (key: string) => any;
     }
 
     namespace EditorTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-        function tryGet(key: string): any;
+        let get: (key: string) => any;
+        let getOrLoad: (key: string) => any;
+        let reset: () => void;
+        let tryGet: (key: string) => any;
+        let tryGetOrLoad: (key: string) => any;
     }
 
     namespace EnumTypeRegistry {
-        function get(key: string): Function;
-        function reset(): void;
-        function tryGet(key: string): any;
+        let get: (key: string) => any;
+        let getOrLoad: (key: string) => any;
+        let reset: () => void;
+        let tryGet: (key: string) => any;
+        let tryGetOrLoad: (key: string) => any;
     }
 
     namespace ReflectionUtils {
@@ -5454,7 +5470,7 @@ declare namespace Serenity {
     }
     class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
         constructor(props: EditorProps<P>);
-        protected updateItems(): void;
+        protected updateItems(): void | PromiseLike<void>;
         protected allowClear(): boolean;
     }
 
@@ -6186,7 +6202,7 @@ declare namespace Serenity {
         constructor(props?: {
             enumKey?: string;
         });
-        format(ctx: Slick.FormatterContext): string;
+        format(ctx: Slick.FormatterContext): string | Element;
         get enumKey(): string;
         set enumKey(value: string);
         static format(enumType: any, value: any): string;
@@ -6260,9 +6276,11 @@ declare namespace Serenity {
     }
 
     namespace FormatterTypeRegistry {
-        function get(key: string): any;
-        function reset(): void;
-        function tryGet(key: string): any;
+        let get: (key: string) => any;
+        let getOrLoad: (key: string) => any;
+        let reset: () => void;
+        let tryGet: (key: string) => any;
+        let tryGetOrLoad: (key: string) => any;
     }
 
     interface SettingStorage {

@@ -1,23 +1,17 @@
 ﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "../base";
-import { ArgumentNullException, Exception } from "../q";
+import { Exception } from "../q";
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 
 export namespace EditorTypeRegistry {
-    
-    let registry = commonTypeRegistry(
-        type => hasCustomAttribute(type, EditorAttribute, false) || isAssignableFrom(Widget, type), 
-        null, "Editor");
 
-    export function get(key: string): any {
-        if (!key) 
-            throw new ArgumentNullException('key');
-        
-        var type = registry.tryGet(key);
-        if (type)
-            return type;
-
-        var message = `"${htmlEncode(key)}" editor class not found! 
+    const registry = commonTypeRegistry({
+        attrKey: null,
+        isMatch: type => hasCustomAttribute(type, EditorAttribute, false) || isAssignableFrom(Widget, type),
+        kind: "editor",
+        suffix: "Editor",
+        loadError: function (key: string) {
+            var message = `"${htmlEncode(key)}" editor class not found! 
 Make sure there is such a editor type under the project root namespace,
 and its namespace parts start with capital letters like MyProject.MyModule.MyEditor.
 
@@ -29,15 +23,14 @@ and "side-effect-import" this editor class from the current
 After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
 from the project folder.`;
 
-        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
-        throw new Exception(message);
-    }
+            notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+            throw new Exception(message);
+        }
+    });
 
-    export function reset() {
-        registry.reset();
-    }
-
-    export function tryGet(key: string) {
-        return registry.tryGet(key);
-    }
+    export let get = registry.get;
+    export let getOrLoad = registry.getOrLoad;
+    export let reset = registry.reset;
+    export let tryGet = registry.tryGet;
+    export let tryGetOrLoad = registry.tryGetOrLoad;
 }

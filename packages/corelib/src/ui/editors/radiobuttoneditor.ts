@@ -1,4 +1,4 @@
-﻿import { Enum, Fluent, getCustomAttribute, tryGetText } from "../../base";
+﻿import { Enum, Fluent, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getLookup } from "../../q";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -36,21 +36,27 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
             }
         }
         else {
-            var enumType = this.options.enumType || EnumTypeRegistry.get(this.options.enumKey);
-            var enumKey = this.options.enumKey;
-            if (enumKey == null && enumType != null) {
-                var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
-                if (enumKeyAttr) {
-                    enumKey = enumKeyAttr.value;
+            var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
+            const then = (enumType: any) => {
+                var enumKey = this.options.enumKey;
+                if (enumKey == null && enumType != null) {
+                    var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
+                    if (enumKeyAttr) {
+                        enumKey = enumKeyAttr.value;
+                    }
+                }
+
+                var values = Enum.getValues(enumType);
+                for (var x of values) {
+                    var name = Enum.toString(enumType, x);
+                    this.addRadio(x.toString(), tryGetText(
+                        'Enums.' + enumKey + '.' + name) ?? name);
                 }
             }
-
-            var values = Enum.getValues(enumType);
-            for (var x of values) {
-                var name = Enum.toString(enumType, x);
-                this.addRadio(x.toString(), tryGetText(
-                    'Enums.' + enumKey + '.' + name) ?? name);
-            }
+            if (isPromiseLike(enumType))
+                enumType.then(() => then(enumType));
+            else
+                then(enumType);
         }
     }
 

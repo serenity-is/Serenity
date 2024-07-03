@@ -1,4 +1,4 @@
-import { Enum, getCustomAttribute, tryGetText } from "../../base";
+import { Enum, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
@@ -19,25 +19,33 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         this.updateItems();
     }
 
-    protected updateItems(): void {
+    protected updateItems(): void | PromiseLike<void> {
         this.clearItems();
 
-        var enumType = this.options.enumType || EnumTypeRegistry.get(this.options.enumKey);
-        var enumKey = this.options.enumKey;
+        var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
 
-        if (enumKey == null && enumType != null) {
-            var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
-            if (enumKeyAttr) {
-                enumKey = enumKeyAttr.value;
+        const then = (enumType: any) => {
+            var enumKey = this.options.enumKey;
+
+            if (enumKey == null && enumType != null) {
+                var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
+                if (enumKeyAttr) {
+                    enumKey = enumKeyAttr.value;
+                }
+            }
+
+            var values = Enum.getValues(enumType);
+            for (var x of values) {
+                var name = Enum.toString(enumType, x);
+                this.addOption(parseInt(x, 10).toString(),
+                    (tryGetText('Enums.' + enumKey + '.' + name) ?? name), null, false);
             }
         }
 
-        var values = Enum.getValues(enumType);
-        for (var x of values) {
-            var name = Enum.toString(enumType, x);
-            this.addOption(parseInt(x, 10).toString(),
-                (tryGetText('Enums.' + enumKey + '.' + name) ?? name), null, false);
-        }
+        if (isPromiseLike(enumType))
+            return enumType.then(() => then(enumType));
+        else
+            then(enumType);
     }
 
     protected allowClear() {
