@@ -1596,6 +1596,7 @@ interface PropertyItem {
     hint?: string;
     placeholder?: string;
     editorType?: string;
+    editorTypeRef?: any;
     editorParams?: any;
     category?: string;
     collapsible?: boolean;
