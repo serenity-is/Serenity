@@ -290,7 +290,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
         var editorParams = item.editorParams;
 
-        var editorType = item.editorTypeRef ?? EditorTypeRegistry.getOrLoad(item.editorType ?? 'String');
+        const editorType = (isPromiseLike(item.editorType) || typeof item.editorType === "function")
+            ? item.editorType : (EditorTypeRegistry.getOrLoad(item.editorType ?? 'String'));
         let editorSpan: HTMLSpanElement;
         const index = this.editors.length;
 

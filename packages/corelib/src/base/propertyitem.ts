@@ -16,8 +16,7 @@ export interface PropertyItem {
     title?: string;
     hint?: string;
     placeholder?: string;
-    editorType?: string;
-    editorTypeRef?: any;
+    editorType?: string | { new(props?: any): any } | PromiseLike<{ new(props?: any): any }>;
     editorParams?: any;
     category?: string;
     collapsible?: boolean;
