@@ -27,7 +27,6 @@ public class FileDownloadFormatterAttributeTests
             DisplayFormat = null
         };
         Assert.Null(attribute.DisplayFormat);
-
     }
 
     [Fact]

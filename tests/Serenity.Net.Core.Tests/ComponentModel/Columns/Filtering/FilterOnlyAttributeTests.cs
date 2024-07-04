@@ -10,7 +10,7 @@ public class FilterOnlyAttributeTests
     }
 
     [Fact]
-    public void Value_CanBe_SetTo_False()
+    public void Value_CanBe_Set_ToFalse()
     {
         var attribute = new FilterOnlyAttribute(false);
         Assert.False(attribute.Value);
