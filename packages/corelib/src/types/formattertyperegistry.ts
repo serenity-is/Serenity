@@ -1,9 +1,7 @@
 ﻿import { ISlickFormatter, htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { Exception } from "../q";
-import { Formatter } from "../slick/slicktypes";
 import { commonTypeRegistry } from "./commontyperegistry";
-
-export type FormatterType = ({ new(props?: any): Formatter });
+import { FormatterType } from "./formattertype";
 
 export namespace FormatterTypeRegistry {
 

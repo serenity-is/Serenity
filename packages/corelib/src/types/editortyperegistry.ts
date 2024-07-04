@@ -1,9 +1,8 @@
 ﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { Exception } from "../q";
-import { Widget, WidgetProps } from "../ui/widgets/widget";
+import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
-
-export type EditorType = { new(props?: WidgetProps<any>): Widget<any> }
+import { EditorType } from "./editortype";
 
 export namespace EditorTypeRegistry {
 

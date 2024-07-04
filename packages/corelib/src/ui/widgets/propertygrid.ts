@@ -2,7 +2,8 @@
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { EditorType, EditorTypeRegistry } from "../../types/editortyperegistry";
+import { EditorType } from "../../types/editortype";
+import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget } from "./widget";

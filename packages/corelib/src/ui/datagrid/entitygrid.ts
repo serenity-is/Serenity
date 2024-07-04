@@ -5,7 +5,8 @@ import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from ".
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { DialogType, DialogTypeRegistry } from "../../types/dialogtyperegistry";
+import { DialogType } from "../../types/dialogtype";
+import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";

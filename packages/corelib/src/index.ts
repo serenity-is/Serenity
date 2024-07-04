@@ -88,7 +88,6 @@ export * from "./ui/datagrid/slickpager";
 export * from "./ui/datagrid/idatagrid";
 export * from "./ui/helpers/slickhelpers";
 export * from "./ui/formatters/formatters";
-export * from "./types/formattertyperegistry";
 export * from "./ui/datagrid/datagrid";
 export * from "./ui/datagrid/columnpickerdialog";
 export * from "./ui/datagrid/treegridmixin";

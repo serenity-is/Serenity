@@ -2,8 +2,7 @@
 import { IDialog } from "../interfaces";
 import { Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
-
-export type DialogType = ({ new(props?: any): IDialog & { init?: () => void } });
+import { DialogType } from "./dialogtype";
 
 export namespace DialogTypeRegistry {
 

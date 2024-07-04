@@ -4542,6 +4542,7 @@ declare namespace Serenity {
             init?: () => void;
         };
     });
+
     namespace DialogTypeRegistry {
         let get: (key: string) => DialogType;
         let getOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
@@ -4553,12 +4554,25 @@ declare namespace Serenity {
     type EditorType = {
         new (props?: WidgetProps<any>): Widget<any>;
     };
+
     namespace EditorTypeRegistry {
         let get: (key: string) => EditorType;
         let getOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
         let reset: () => void;
         let tryGet: (key: string) => EditorType;
         let tryGetOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
+    }
+
+    type FormatterType = ({
+        new (props?: any): Formatter;
+    });
+
+    namespace FormatterTypeRegistry {
+        let get: (key: string) => FormatterType;
+        let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
+        let reset: () => void;
+        let tryGet: (key: string) => FormatterType;
+        let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
     }
 
     namespace EnumTypeRegistry {
@@ -6282,17 +6296,6 @@ declare namespace Serenity {
         set urlFormat(value: string);
         get target(): string;
         set target(value: string);
-    }
-
-    type FormatterType = ({
-        new (props?: any): Formatter;
-    });
-    namespace FormatterTypeRegistry {
-        let get: (key: string) => FormatterType;
-        let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
-        let reset: () => void;
-        let tryGet: (key: string) => FormatterType;
-        let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
     }
 
     interface SettingStorage {

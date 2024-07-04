@@ -3253,6 +3253,7 @@ type DialogType = ({
         init?: () => void;
     };
 });
+
 declare namespace DialogTypeRegistry {
     let get: (key: string) => DialogType;
     let getOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
@@ -3264,12 +3265,25 @@ declare namespace DialogTypeRegistry {
 type EditorType = {
     new (props?: WidgetProps<any>): Widget<any>;
 };
+
 declare namespace EditorTypeRegistry {
     let get: (key: string) => EditorType;
     let getOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
     let reset: () => void;
     let tryGet: (key: string) => EditorType;
     let tryGetOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
+}
+
+type FormatterType = ({
+    new (props?: any): Formatter;
+});
+
+declare namespace FormatterTypeRegistry {
+    let get: (key: string) => FormatterType;
+    let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
+    let reset: () => void;
+    let tryGet: (key: string) => FormatterType;
+    let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
 }
 
 declare namespace EnumTypeRegistry {
@@ -4993,17 +5007,6 @@ declare class UrlFormatter implements Formatter, IInitializeColumn {
     set urlFormat(value: string);
     get target(): string;
     set target(value: string);
-}
-
-type FormatterType = ({
-    new (props?: any): Formatter;
-});
-declare namespace FormatterTypeRegistry {
-    let get: (key: string) => FormatterType;
-    let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
-    let reset: () => void;
-    let tryGet: (key: string) => FormatterType;
-    let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
 }
 
 interface SettingStorage {

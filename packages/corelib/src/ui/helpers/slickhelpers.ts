@@ -3,7 +3,8 @@ import { Culture, Fluent, SaveRequest, htmlEncode, isArrayLike, isPromiseLike, l
 import { Authorization, clearKeys, replaceAll, safeCast } from "../../q";
 import { Format, RemoteView } from "../../slick";
 import { Decorators } from "../../types/decorators";
-import { FormatterType, FormatterTypeRegistry } from "../../types/formattertyperegistry";
+import { FormatterType } from "../../types/formattertype";
+import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";

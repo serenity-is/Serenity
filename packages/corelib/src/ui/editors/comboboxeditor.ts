@@ -2,7 +2,8 @@
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { DialogTypeRegistry, DialogType } from "../../types/dialogtyperegistry";
+import { DialogType } from "../../types/dialogtype";
+import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
