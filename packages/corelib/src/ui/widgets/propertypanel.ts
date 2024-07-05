@@ -2,7 +2,7 @@
 import { getForm } from "../../q";
 import { FormKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
+import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
 import { BasePanel } from "./basepanel";
 import { WidgetProps } from "./widget";
 
@@ -65,8 +65,7 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
         return {
             idPrefix: this.idPrefix,
             items: this.getPropertyItems(),
-            mode: 1,
-            useCategories: false,
+            mode: PropertyGridMode.insert,
             localTextPrefix: 'Forms.' + this.getFormKey() + '.'
         };
     }

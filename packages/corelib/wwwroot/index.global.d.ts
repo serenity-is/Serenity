@@ -4762,29 +4762,63 @@ declare namespace Serenity {
         function set(target: any, options: any): void;
     }
 
+    type PropertyFieldElement = HTMLElement & {
+        editorWidget?: Widget<any>;
+        editorPromise?: PromiseLike<void>;
+        propertyItem?: PropertyItem;
+    };
+    function PropertyFieldCaption(props: {
+        item: PropertyItem;
+        idPrefix?: string;
+        localTextPrefix?: string;
+    }): HTMLLabelElement;
+    function PropertyFieldEditor(props: {
+        fieldElement: PropertyFieldElement;
+        item: PropertyItem;
+        idPrefix: string;
+        localTextPrefix: string;
+    }): void;
+    function PropertyFieldLineBreak(props: {
+        item: PropertyItem;
+    }): HTMLElement;
+    function PropertyField(props: {
+        item: PropertyItem;
+        container?: HTMLElement;
+        idPrefix?: string;
+        localTextPrefix?: string;
+    }): PropertyFieldElement;
+    function PropertyGridCategoryTitle(props: {
+        category: string;
+        localTextPrefix: string;
+    }): HTMLElement;
+    function PropertyGridCategory(props: {
+        category?: string;
+        children?: any;
+        collapsed?: boolean;
+        localTextPrefix?: string;
+    }): HTMLElement;
     class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
-        private editorPromises;
-        private editors;
-        private items;
+        private fieldElements;
         protected renderContents(): any;
         destroy(): void;
         private createItems;
-        private createCategoryDiv;
-        private determineText;
-        private createField;
         get_editors(): Widget<any>[];
         get_items(): PropertyItem[];
         get_idPrefix(): string;
+        enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
-        private static setMaxLength;
+        static loadFieldValue(source: any, fieldElement: PropertyFieldElement, mode?: PropertyGridMode): void;
         load(source: any): void;
+        static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void;
         save(target?: any): any;
         get value(): any;
         set value(val: any);
-        private canModifyItem;
+        static canModifyItem(item: PropertyItem, mode?: PropertyGridMode): boolean;
+        protected canModifyItem(item: PropertyItem): boolean;
+        static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean): void;
+        protected updateFieldElement(fieldElement: PropertyFieldElement): void;
         updateInterface(): void;
-        enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
     }
     enum PropertyGridMode {
         insert = 1,
@@ -4793,7 +4827,6 @@ declare namespace Serenity {
     interface PropertyGridOptions {
         idPrefix?: string;
         items: PropertyItem[];
-        useCategories?: boolean;
         localTextPrefix?: string;
         mode?: PropertyGridMode;
     }
