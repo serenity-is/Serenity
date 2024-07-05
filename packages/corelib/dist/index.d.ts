@@ -3481,11 +3481,8 @@ declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> 
     destroy(): void;
     private createItems;
     private createCategoryDiv;
-    private categoryLinkClick;
     private determineText;
     private createField;
-    private getCategoryOrder;
-    private createCategoryLinks;
     get_editors(): Widget<any>[];
     get_items(): PropertyItem[];
     get_idPrefix(): string;
@@ -3508,7 +3505,6 @@ interface PropertyGridOptions {
     idPrefix?: string;
     items: PropertyItem[];
     useCategories?: boolean;
-    categoryOrder?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }

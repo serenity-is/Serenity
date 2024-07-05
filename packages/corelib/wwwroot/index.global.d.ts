@@ -4770,11 +4770,8 @@ declare namespace Serenity {
         destroy(): void;
         private createItems;
         private createCategoryDiv;
-        private categoryLinkClick;
         private determineText;
         private createField;
-        private getCategoryOrder;
-        private createCategoryLinks;
         get_editors(): Widget<any>[];
         get_items(): PropertyItem[];
         get_idPrefix(): string;
@@ -4797,7 +4794,6 @@ declare namespace Serenity {
         idPrefix?: string;
         items: PropertyItem[];
         useCategories?: boolean;
-        categoryOrder?: string;
         localTextPrefix?: string;
         mode?: PropertyGridMode;
     }

@@ -1,4 +1,4 @@
-﻿import { Culture, Fluent, addClass, faIcon, getCustomAttribute, getjQuery, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Fluent, addClass, faIcon, getCustomAttribute, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -92,52 +92,22 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             this.editorPromises = null;
         }
 
-        this.domNode.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
-            Fluent.off(el, 'click.' + this.uniqueName);
-            el.remove();
-        });
-
         super.destroy();
     }
 
     private createItems(container: HTMLElement, items: PropertyItem[]) {
-        var categoryIndexes = {};
         var categoriesDiv = container;
 
-        var useCategories = this.options.useCategories !== false && items.some(x => !!x.category);
-
-        if (useCategories) {
-            var linkContainer = Fluent("div").class("category-links").getNode();
-            categoryIndexes = this.createCategoryLinks(linkContainer, items);
-            if (Object.keys(categoryIndexes).length > 1) {
-                container.appendChild(linkContainer);
-            }
-            else {
-                linkContainer.querySelectorAll<HTMLAnchorElement>('a.category-link').forEach(el => {
-                    Fluent.off(el, "click." + this.uniqueName);
-                    el.remove();
-                });
-            }
-        }
-
         categoriesDiv = Fluent("div").class("categories").appendTo(container).getNode();
-        var fieldContainer: HTMLElement;
-        if (useCategories) {
-            fieldContainer = categoriesDiv;
-        }
-        else {
-            fieldContainer = Fluent("div").class("category").appendTo(categoriesDiv).getNode();
-        }
+        var fieldContainer: HTMLElement = null;
         var priorCategory = null;
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             var category = item.category ?? '';
 
-            if (useCategories && priorCategory !== category) {
-                var categoryDiv = this.createCategoryDiv(categoriesDiv,
-                    categoryIndexes, category,
-                    ((item.collapsible !== true) ? null :
-                        item.collapsed ?? false));
+            if (!fieldContainer || priorCategory !== category) {
+                var categoryDiv = this.createCategoryDiv(categoriesDiv, category,
+                    ((item.collapsible !== true) ? null : item.collapsed ?? false));
 
                 priorCategory = category;
                 fieldContainer = categoryDiv;
@@ -146,57 +116,40 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
-    private createCategoryDiv(categoriesDiv: HTMLElement, categoryIndexes: { [key: string]: number },
-        category: string, collapsed: boolean): HTMLElement {
+    private createCategoryDiv(categoriesDiv: HTMLElement, category: string, collapsed: boolean): HTMLElement {
 
-        var categoryDiv = Fluent("div").class("category").appendTo(categoriesDiv);
+        var categoryDiv = Fluent("div")
+            .class("category")
+            .appendTo(categoriesDiv);
 
-        var title = Fluent("div")
-            .class("category-title")
-            .appendTo(categoryDiv)
-            .append(Fluent("a")
-                .class("category-anchor")
-                .attr('name', this.idPrefix + 'Category' + categoryIndexes[category].toString()))
-            .append(this.determineText(category, prefix => prefix + 'Categories.' + category));
+        if (category) {
+            let key = category;
+            let idx = category.lastIndexOf('.Categories.');
+            if (idx >= 0) {
+                key = category.substring(idx + 12);
+            }
+            categoryDiv.data("category", key)
 
-        if (collapsed != null) {
-            categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
+            var title = Fluent("div")
+                .class("category-title")
+                .appendTo(categoryDiv)
+                .append(this.determineText(category, prefix => prefix + 'Categories.' + category));
 
-            var img = Fluent("i").appendTo(title).class(faIcon(collapsed ? "plus" : "minus")).getNode();
-            let categoryEl = categoryDiv.getNode();
+            if (collapsed != null) {
+                categoryDiv.addClass(["collapsible", collapsed && "collapsed"]);
 
-            title.on("click", function () {
-                categoryEl.classList.toggle('collapsed');
-                img.classList.toggle('fa-plus');
-                img.classList.toggle('fa-minus');
-            });
+                var img = Fluent("i").appendTo(title).class(faIcon(collapsed ? "plus" : "minus")).getNode();
+                let categoryEl = categoryDiv.getNode();
+
+                title.on("click", function () {
+                    categoryEl.classList.toggle('collapsed');
+                    img.classList.toggle('fa-plus');
+                    img.classList.toggle('fa-minus');
+                });
+            }
         }
 
         return categoryDiv.getNode();
-    }
-
-    private categoryLinkClick(e: Event) {
-        e.preventDefault();
-
-        var title = document.querySelector('a[name=' + (e.target as HTMLElement).getAttribute('href')
-            .toString().substring(1) + ']');
-
-        if (title?.closest('.category')?.classList.contains('collapsed'))
-            title.closest('.category').querySelector<HTMLElement>(':scope > .category-title')?.click();
-
-        var animate = function () {
-            if (getjQuery()?.fn?.fadeTo) {
-                getjQuery()(title).fadeTo(100, 0.5, function () {
-                    getjQuery()(title).fadeTo(100, 1, function () { });
-                });
-            }
-        };
-
-        let intoView = title?.closest('.category');
-        if (intoView?.scrollIntoView) {
-            intoView.scrollIntoView();
-            animate();
-        }
     }
 
     private determineText(text: string, getKey: (s: string) => string) {
@@ -365,94 +318,6 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         Fluent("div").class('clear').appendTo(fieldDiv);
     }
 
-    private getCategoryOrder(items: PropertyItem[]): any {
-        var order = 0;
-        var result = {} as any;
-        var categoryOrder = this.options.categoryOrder?.trim() || null;
-        if (categoryOrder != null) {
-            var split = categoryOrder.split(';');
-            for (var s of split) {
-                var x = s?.trim() || null;
-                if (x == null) {
-                    continue;
-                }
-                if (result[x] as any != null) {
-                    continue;
-                }
-                result[x] = order++;
-            }
-        }
-
-        for (var x1 of items) {
-            var category = x1.category ?? '';
-            if (result[category] == null) {
-                result[category] = order++;
-            }
-        }
-
-        return result;
-    }
-
-    private createCategoryLinks(container: HTMLElement, items: PropertyItem[]) {
-        var idx = 0;
-        var itemIndex: Record<string, number> = {};
-        var itemCategory: Record<string, string> = {};
-        for (var x of items) {
-            itemCategory[x.name] = x.category ?? '';
-            itemIndex[x.name] = idx++;
-        }
-
-        var categoryOrder = this.getCategoryOrder(items);
-
-        items.sort(function (x1, y) {
-            var c = 0;
-            var xcategory = itemCategory[x1.name];
-            var ycategory = itemCategory[y.name];
-            if (xcategory != ycategory) {
-                var c1 = categoryOrder[xcategory];
-                var c2 = categoryOrder[ycategory];
-                if (c1 != null && c2 != null) {
-                    c = c1 - c2;
-                }
-                else if (c1 != null) {
-                    c = -1;
-                }
-                else if (c2 != null) {
-                    c = 1;
-                }
-            }
-            if (c === 0) {
-                c = Culture.stringCompare(xcategory, ycategory);
-            }
-            if (c === 0) {
-                c = itemIndex[x1.name] < itemIndex[y.name] ? -1 : (itemIndex[x1.name] > itemIndex[y.name] ? 1 : 0)
-            }
-            return c;
-        });
-
-        var categoryIndexes: Record<string, number> = {};
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            var category = itemCategory[item.name];
-            if (categoryIndexes[category] == null) {
-                var index = Object.keys(categoryIndexes).length + 1;
-                categoryIndexes[category] = index;
-                if (index > 1) {
-                    Fluent("span").class('separator').text('|').prependTo(container);
-                }
-                Fluent("a").class("category-link")
-                    .text(this.determineText(category, prefix => prefix + 'Categories.' + category))
-                    .attr('tabindex', '-1')
-                    .attr('href', `#${this.idPrefix}Category${index}`)
-                    .on("click." + this.uniqueName, this.categoryLinkClick.bind(this))
-                    .prependTo(container);
-            }
-        }
-
-        Fluent("div").class('clear').appendTo(container);
-        return categoryIndexes;
-    }
-
     get_editors(): Widget<any>[] {
         return this.editors;
     }
@@ -615,7 +480,6 @@ export interface PropertyGridOptions {
     idPrefix?: string;
     items: PropertyItem[];
     useCategories?: boolean;
-    categoryOrder?: string;
     localTextPrefix?: string;
     mode?: PropertyGridMode;
 }

@@ -119,7 +119,6 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
             idPrefix: this.idPrefix,
             items: this.getPropertyItems(),
             mode: 1,
-            useCategories: false,
             localTextPrefix: 'Forms.' + this.getFormKey() + '.'
         };
     }

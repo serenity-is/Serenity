@@ -754,8 +754,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             idPrefix: this.idPrefix,
             items: this.getPropertyItems(),
             mode: PropertyGridMode.insert,
-            localTextPrefix: 'Forms.' + this.getFormKey() + '.',
-            useCategories: true
+            localTextPrefix: 'Forms.' + this.getFormKey() + '.'
         };
     }
 
