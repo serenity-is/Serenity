@@ -4783,25 +4783,50 @@ declare namespace Serenity {
     }): HTMLElement;
     function PropertyField(props: {
         item: PropertyItem;
-        container?: HTMLElement;
+        container?: ParentNode;
         idPrefix?: string;
         localTextPrefix?: string;
     }): PropertyFieldElement;
-    function PropertyGridCategoryTitle(props: {
+    function PropertyCategoryTitle(props: {
         category: string;
         localTextPrefix: string;
     }): HTMLElement;
-    function PropertyGridCategory(props: {
+    function PropertyCategory(props: {
         category?: string;
         children?: any;
         collapsed?: boolean;
         localTextPrefix?: string;
     }): HTMLElement;
+    function PropertyTabItem(props: {
+        title: string;
+        active?: boolean;
+        paneId?: string;
+        localTextPrefix?: string;
+    }): HTMLLIElement;
+    function PropertyTabPane(props: {
+        active?: boolean;
+        id?: string;
+        children?: any;
+    }): HTMLElement;
+    function PropertyCategories(props: {
+        items: PropertyItem[];
+        container?: ParentNode;
+        fieldElements?: PropertyFieldElement[];
+        idPrefix?: string;
+        localTextPrefix?: string;
+    }): HTMLElement;
+    function PropertyTabs(props: {
+        items: PropertyItem[];
+        container?: ParentNode;
+        fieldElements?: PropertyFieldElement[];
+        idPrefix?: string;
+        localTextPrefix?: string;
+        paneIdPrefix?: string;
+    }): DocumentFragment | null;
     class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
         private fieldElements;
         protected renderContents(): any;
         destroy(): void;
-        private createItems;
         get_editors(): Widget<any>[];
         get_items(): PropertyItem[];
         get_idPrefix(): string;

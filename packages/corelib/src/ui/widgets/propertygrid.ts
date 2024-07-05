@@ -16,14 +16,14 @@ export type PropertyFieldElement = HTMLElement & {
 
 export function PropertyFieldCaption(props: { item: PropertyItem, idPrefix?: string, localTextPrefix?: string }): HTMLLabelElement {
     const { item, idPrefix, localTextPrefix } = props;
-    
+
     const label = document.createElement("label");
     label.className = "caption";
     label.htmlFor = (idPrefix ?? "") + item.name;
-    
+
     const caption = determineText(props.localTextPrefix, item.title, p => p + item.name);
     label.textContent = caption ?? "";
-    
+
     const hint = determineText(localTextPrefix, item.hint, p => p + item.name + '_Hint');
     label.title = hint ?? caption ?? "";
 
@@ -40,7 +40,7 @@ export function PropertyFieldCaption(props: { item: PropertyItem, idPrefix?: str
         const sup = document.createElement("sup");
         sup.textContent = "*";
         sup.title = localText('Controls.PropertyGrid.RequiredHint');
-        label.prepend(sup); 
+        label.prepend(sup);
     }
 
     return label;
@@ -136,7 +136,7 @@ export function PropertyFieldLineBreak(props: { item: PropertyItem }): HTMLEleme
 
 export function PropertyField(props: {
     item: PropertyItem,
-    container?: HTMLElement,
+    container?: ParentNode,
     idPrefix?: string,
     localTextPrefix?: string
 }): PropertyFieldElement {
@@ -165,7 +165,7 @@ export function PropertyField(props: {
         idPrefix,
         localTextPrefix
     }));
-    
+
     container?.appendChild(fieldElement); // editor might expect to be in the DOM for cascade links etc.
 
     PropertyFieldEditor({
@@ -181,14 +181,14 @@ export function PropertyField(props: {
     return fieldElement;
 }
 
-export function PropertyGridCategoryTitle(props: { category: string, localTextPrefix: string }): HTMLElement {
+export function PropertyCategoryTitle(props: { category: string, localTextPrefix: string }): HTMLElement {
     var title = document.createElement("div");
     title.className = "category-title";
     title.textContent = determineText(props.localTextPrefix, props.category, prefix => prefix + 'Categories.' + props.category);
     return title;
 }
 
-export function PropertyGridCategory(props: { category?: string, children?: any, collapsed?: boolean, localTextPrefix?: string }): HTMLElement {
+export function PropertyCategory(props: { category?: string, children?: any, collapsed?: boolean, localTextPrefix?: string }): HTMLElement {
 
     var categoryDiv = document.createElement("div");
     categoryDiv.className = "category";
@@ -202,7 +202,7 @@ export function PropertyGridCategory(props: { category?: string, children?: any,
         }
         categoryDiv.dataset.category = key;
 
-        const title = categoryDiv.appendChild(PropertyGridCategoryTitle({
+        const title = categoryDiv.appendChild(PropertyCategoryTitle({
             category,
             localTextPrefix
         }));
@@ -227,6 +227,138 @@ export function PropertyGridCategory(props: { category?: string, children?: any,
     return categoryDiv;
 }
 
+export function PropertyTabItem(props: { title: string, active?: boolean, paneId?: string, localTextPrefix?: string }): HTMLLIElement {
+    const { active, paneId, localTextPrefix, title } = props;
+    const bs3 = isBS3();
+    const li = document.createElement("li");
+    const a = li.appendChild(document.createElement("a"));
+    if (bs3) {
+        active && li.classList.add("active");
+    }
+    else {
+        li.className = "nav-item";
+        a.className = "nav-link";
+        active && a.classList.add("active");
+    }
+    li.role = "tab";
+    a.setAttribute("data-" + (isBS5Plus() ? "bs-" : "") + "toggle", "tab");
+    paneId && (a.href = "#" + paneId);
+    a.textContent = determineText(localTextPrefix, title, prefix => prefix + 'Tabs.' + title);
+
+    let tabKey = extractTabKey(title);
+    if (tabKey) {
+        a.dataset.tabkey = tabKey;
+    }
+
+    return li;
+}
+
+export function PropertyTabPane(props: { active?: boolean, id?: string, children?: any }): HTMLElement {
+    const { active, children, id } = props;
+    const pane = document.createElement("div");
+    pane.className = "tab-pane fade" + (active ? (isBS3() ? " in active" : " show active") : "");
+    pane.id = id;
+    pane.role = "tabpanel";
+    children && pane.append(children);
+    return pane;
+}
+
+export function PropertyCategories(props: {
+    items: PropertyItem[],
+    container?: ParentNode,
+    fieldElements?: PropertyFieldElement[],
+    idPrefix?: string,
+    localTextPrefix?: string
+}): HTMLElement {
+    let categoriesDiv = document.createElement("div");
+    categoriesDiv.className = "categories";
+    props.container && props.container.appendChild(categoriesDiv);
+
+    const { items, fieldElements, idPrefix, localTextPrefix } = props;
+    var categoryEl: HTMLElement = null;
+    var priorCategory = null;
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var category = item.category ?? '';
+
+        if (!categoryEl || priorCategory !== category) {
+            categoryEl = categoriesDiv.appendChild(PropertyCategory({
+                category,
+                collapsed: (item.collapsible !== true) ? null : item.collapsed ?? false,
+                localTextPrefix
+            }));
+
+            priorCategory = category;
+        }
+
+        const fieldElement = PropertyField({
+            item,
+            container: categoryEl,
+            idPrefix: idPrefix,
+            localTextPrefix: localTextPrefix
+        });
+
+        fieldElements?.push(fieldElement);
+    }
+
+    return categoriesDiv;
+}
+
+export function PropertyTabs(props: { items: PropertyItem[], container?: ParentNode, fieldElements?: PropertyFieldElement[], idPrefix?: string, localTextPrefix?: string, paneIdPrefix?: string }): DocumentFragment | null {
+
+    const { items, container, fieldElements, idPrefix, localTextPrefix, paneIdPrefix } = props;
+
+    const parentNode = container ?? document.createDocumentFragment();
+
+    const createItems = (container: ParentNode, items: PropertyItem[]) => PropertyCategories({
+        items,
+        container,
+        fieldElements,
+        idPrefix,
+        localTextPrefix
+    });
+
+    var itemsWithoutTab = items.filter(f => !f.tab);
+    if (itemsWithoutTab.length > 0) {
+        createItems(parentNode, itemsWithoutTab);
+        parentNode.appendChild(document.createElement("div")).className = "pad";
+    }
+
+    var itemsWithTab = items.filter(f => f.tab);
+
+    var tabs = parentNode.appendChild(document.createElement("ul"));
+    tabs.className = "nav nav-underline property-tabs";
+    tabs.role = "tablist";
+
+    var panes = parentNode.appendChild(document.createElement("div"));
+    panes.className = "tab-content property-panes";
+
+    var tabIndex = 0;
+    var i = 0;
+    while (i < itemsWithTab.length) {
+        var title = itemsWithTab[i].tab?.trim() ?? '';
+        var withSameTab = [];
+
+        var j = i;
+        do {
+            withSameTab.push(itemsWithTab[j]);
+        } while (++j < itemsWithTab.length &&
+            (itemsWithTab[j].tab?.trim() ?? '') === title);
+        i = j;
+
+        var paneId = (paneIdPrefix ?? idPrefix ?? "") + 'Tab' + tabIndex;
+
+        tabs.appendChild(PropertyTabItem({ title, active: tabIndex === 0, paneId, localTextPrefix }));
+
+        const pane = panes.appendChild(PropertyTabPane({ active: tabIndex === 0, id: paneId }));
+        createItems(pane, withSameTab);
+
+        tabIndex++;
+    }
+
+    return container ? null : parentNode as DocumentFragment;
+}
+
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
@@ -235,67 +367,24 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     protected renderContents(): any {
 
         this.domNode.classList.add('s-PropertyGrid');
-
-        if (this.options.mode == null)
-            this.options.mode = 1;
-
+        this.options.mode ??= PropertyGridMode.insert;
         this.fieldElements = [];
 
         const items = this.options.items || [];
-        const useTabs = items.some(x => !!x.tab);
-        const bs3 = isBS3();
 
-        if (useTabs) {
-            var itemsWithoutTab = items.filter(f => !f.tab);
-            if (itemsWithoutTab.length > 0) {
-                this.createItems(this.domNode, itemsWithoutTab);
-                this.domNode.appendChild(document.createElement("div")).className = "pad";
-            }
+        const commonProps = {
+            items,
+            container: this.domNode,
+            fieldElements: this.fieldElements,
+            idPrefix: this.idPrefix,
+            localTextPrefix: this.options.localTextPrefix
+        }
 
-            var itemsWithTab = items.filter(f => f.tab);
-
-            var tabs = this.domNode.appendChild(document.createElement("ul"));
-            tabs.className = "nav nav-underline property-tabs";
-            tabs.role = "tablist";
-
-            var panes = this.domNode.appendChild(document.createElement("div"));
-            panes.className = "tab-content property-panes";
-
-            var tabIndex = 0;
-            var i = 0;
-            while (i < itemsWithTab.length) {
-                var tabName = itemsWithTab[i].tab?.trim() ?? '';
-                var withSameTab = [];
-
-                var j = i;
-                do {
-                    withSameTab.push(itemsWithTab[j]);
-                } while (++j < itemsWithTab.length &&
-                    (itemsWithTab[j].tab?.trim() ?? '') === tabName);
-                i = j;
-
-                var tabId = this.uniqueName + '_Tab' + tabIndex;
-
-                Fluent("li").class([!bs3 && "nav-item", bs3 && tabIndex === 0 && "active"])
-                    .append(Fluent("a")
-                        .class([!bs3 && "nav-link", !bs3 && tabIndex === 0 && "active"])
-                        .attr("role", "tab").data((isBS5Plus() ? "bs-" : "") + "toggle", "tab")
-                        .attr("href", "#" + tabId)
-                        .text(determineText(this.options.localTextPrefix, tabName, prefix => prefix + 'Tabs.' + tabName)))
-                    .appendTo(tabs);
-
-                var pane = Fluent("div")
-                    .class(["tab-pane fade", tabIndex === 0 && (isBS3() ? "in active" : "show active")])
-                    .attr("id", tabId)
-                    .attr("role", "tabpanel")
-                    .appendTo(panes);
-
-                this.createItems(pane.getNode(), withSameTab);
-                tabIndex++;
-            }
+        if (items.some(x => !!x.tab)) {
+            PropertyTabs({ ...commonProps, paneIdPrefix: this.uniqueName + '_' });
         }
         else {
-            this.createItems(this.domNode, items);
+            PropertyCategories(commonProps);
         }
 
         this.updateInterface();
@@ -316,35 +405,6 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
 
         super.destroy();
-    }
-
-    private createItems(container: HTMLElement, items: PropertyItem[]) {
-        var categoriesDiv = container;
-
-        categoriesDiv = container.appendChild(document.createElement("div"));
-        categoriesDiv.className = "categories";
-        var fieldContainer: HTMLElement = null;
-        var priorCategory = null;
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            var category = item.category ?? '';
-
-            if (!fieldContainer || priorCategory !== category) {
-                fieldContainer = categoriesDiv.appendChild(PropertyGridCategory({
-                    category,
-                    collapsed: (item.collapsible !== true) ? null : item.collapsed ?? false,
-                    localTextPrefix: this.options.localTextPrefix
-                }));
-
-                priorCategory = category;
-            }
-            this.fieldElements.push(PropertyField({
-                item,
-                container: fieldContainer,
-                idPrefix: this.idPrefix,
-                localTextPrefix: this.options.localTextPrefix
-            }));
-        }
     }
 
     get_editors(): Widget<any>[] {
@@ -405,7 +465,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
-    static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void { 
+    static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void {
         var item = fieldElement.propertyItem;
         if (item.oneWay !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
             var editor = fieldElement.editorWidget;
@@ -440,22 +500,22 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             if (item.insertable === false) {
                 return false;
             }
-    
+
             if (item.insertPermission == null) {
                 return true;
             }
-    
+
             return Authorization.hasPermission(item.insertPermission);
         }
         else if (mode === PropertyGridMode.update) {
             if (item.updatable === false) {
                 return false;
             }
-    
+
             if (item.updatePermission == null) {
                 return true;
             }
-    
+
             return Authorization.hasPermission(item.updatePermission);
         }
         return true;
@@ -504,9 +564,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
     updateInterface() {
         for (let fieldElement of this.fieldElements) {
-           this.updateFieldElement(fieldElement);
+            this.updateFieldElement(fieldElement);
         }
-    }    
+    }
 }
 
 function determineText(localTextPrefix: string, text: string, getKey: (s: string) => string) {
@@ -530,6 +590,18 @@ function determineText(localTextPrefix: string, text: string, getKey: (s: string
     }
 
     return text;
+}
+
+function extractTabKey(title: string) {
+    if (!title)
+        return null;
+
+    let idx = title.lastIndexOf('.Tabs.');
+    if (idx >= 0) {
+        return title.substring(idx + 6);
+    }
+
+    return title;
 }
 
 function setMaxLength(widget: Widget<any>, maxLength: number) {
