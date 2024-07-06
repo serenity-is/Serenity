@@ -3239,7 +3239,6 @@ declare namespace Decorators {
         [typeInfoProperty]: any;
     }, _context?: any) => void;
     function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
-    function registerComponent(): void;
     function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
     function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
     function registerEnum(target: any, enumKey?: string, name?: string): void;
