@@ -1,4 +1,4 @@
-﻿import { Fluent, addClass, faIcon, getCustomAttribute, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -54,7 +54,7 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
 
     const editorType = (isPromiseLike(item.editorType) || typeof item.editorType === "function")
         ? item.editorType : (EditorTypeRegistry.getOrLoad(item.editorType ?? 'String'));
-    let editorSpan: HTMLSpanElement;
+    let loadingPoint: Comment;
 
     const then = (editorType: EditorType) => {
         var optionsType = null;
@@ -81,9 +81,9 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
                 if (placeHolder)
                     el.setAttribute("placeholder", placeHolder);
 
-                if (editorSpan) {
-                    editorSpan.replaceWith(el);
-                    editorSpan = null;
+                if (loadingPoint) {
+                    loadingPoint.parentElement?.replaceChild(el, loadingPoint);
+                    loadingPoint = null;
                     delete fieldElement.editorPromise;
                 }
                 else {
@@ -104,9 +104,8 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
     };
 
     if (isPromiseLike(editorType)) {
-        editorSpan = document.createElement("span");
-        editorSpan.className = "editor-loading-placeholder";
-        fieldElement.append(editorSpan);
+        loadingPoint = document.createComment("Loading editor type...");
+        fieldElement.append(loadingPoint);
         fieldElement.editorPromise = editorType.then(then);
     }
     else {
@@ -222,7 +221,7 @@ export function PropertyCategory(props: { category?: string, children?: any, col
         }
     }
 
-    children && categoryDiv.append(children);
+    appendToNode(categoryDiv, children);
 
     return categoryDiv;
 }
@@ -259,7 +258,7 @@ export function PropertyTabPane(props: { active?: boolean, id?: string, children
     pane.className = "tab-pane fade" + (active ? (isBS3() ? " in active" : " show active") : "");
     pane.id = id;
     pane.role = "tabpanel";
-    children && pane.append(children);
+    appendToNode(pane, children);
     return pane;
 }
 
@@ -304,6 +303,20 @@ export function PropertyCategories(props: {
     return categoriesDiv;
 }
 
+export function PropertyTabList(props?: { children?: any }): HTMLElement {
+    var tabs = document.createElement("ul");
+    tabs.className = "nav nav-underline property-tabs";
+    tabs.role = "tablist";
+    appendToNode(tabs, props?.children);
+    return tabs;
+}
+
+export function PropertyTabPanes(props?: {}): HTMLElement {
+    var panes = document.createElement("div");
+    panes.className = "tab-content property-panes";
+    return panes;
+}
+
 export function PropertyTabs(props: { items: PropertyItem[], container?: ParentNode, fieldElements?: PropertyFieldElement[], idPrefix?: string, localTextPrefix?: string, paneIdPrefix?: string }): DocumentFragment | null {
 
     const { items, container, fieldElements, idPrefix, localTextPrefix, paneIdPrefix } = props;
@@ -318,21 +331,16 @@ export function PropertyTabs(props: { items: PropertyItem[], container?: ParentN
         localTextPrefix
     });
 
-    var itemsWithoutTab = items.filter(f => !f.tab);
+    const itemsWithoutTab = items.filter(f => !f.tab);
     if (itemsWithoutTab.length > 0) {
         createItems(parentNode, itemsWithoutTab);
         parentNode.appendChild(document.createElement("div")).className = "pad";
     }
 
-    var itemsWithTab = items.filter(f => f.tab);
-
-    var tabs = parentNode.appendChild(document.createElement("ul"));
-    tabs.className = "nav nav-underline property-tabs";
-    tabs.role = "tablist";
-
-    var panes = parentNode.appendChild(document.createElement("div"));
-    panes.className = "tab-content property-panes";
-
+    const itemsWithTab = items.filter(f => f.tab);
+    const tabList = parentNode.appendChild(PropertyTabList());
+    const tabPanes = parentNode.appendChild(PropertyTabPanes());
+    
     var tabIndex = 0;
     var i = 0;
     while (i < itemsWithTab.length) {
@@ -348,9 +356,9 @@ export function PropertyTabs(props: { items: PropertyItem[], container?: ParentN
 
         var paneId = (paneIdPrefix ?? idPrefix ?? "") + 'Tab' + tabIndex;
 
-        tabs.appendChild(PropertyTabItem({ title, active: tabIndex === 0, paneId, localTextPrefix }));
+        tabList.appendChild(PropertyTabItem({ title, active: tabIndex === 0, paneId, localTextPrefix }));
 
-        const pane = panes.appendChild(PropertyTabPane({ active: tabIndex === 0, id: paneId }));
+        const pane = tabPanes.appendChild(PropertyTabPane({ active: tabIndex === 0, id: paneId }));
         createItems(pane, withSameTab);
 
         tabIndex++;

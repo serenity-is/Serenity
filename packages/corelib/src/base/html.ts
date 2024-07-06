@@ -1,4 +1,5 @@
-﻿
+﻿import { isArrayLike, isPromiseLike } from "./system";
+
 const esc: Record<string, string> = {
     '<': '&lt;',
     '>': '&gt;',
@@ -65,4 +66,41 @@ export function addClass(el: Element, cls: string) {
  */
 export function removeClass(el: Element, cls: string) {
     return toggleClass(el, cls, false);
+}
+
+/**
+ * Appends content like DOM nodes, string, number or an array of these to the parent node.
+ * Undefined, null, false values are ignored. Promises are awaited.
+ * @param parent Target parent element
+ * @param child The content
+ */
+export function appendToNode(parent: ParentNode, child: any) {
+
+    if (child == null || child === false)
+        return;
+
+    if (isArrayLike(child)) {
+        for (var i = 0; i < child.length; i++) {
+            appendToNode(parent, child[i]);
+        }
+    } else if (typeof child === "string") {
+        parent.appendChild(document.createTextNode(child));
+    }
+    else if (child instanceof Node) {
+        parent.appendChild(child);
+    }
+    else if (isPromiseLike(child)) {
+        const placeholder = parent.appendChild(document.createComment("Loading content..."));
+        child.then(result => {
+            const fragment = document.createDocumentFragment();
+            appendToNode(fragment, result);
+            placeholder.parentElement?.replaceChild(fragment, placeholder);
+        }, error => { 
+            placeholder.textContent = "Error loading content: " + error; 
+            throw error;
+        });
+    }
+    else {
+        parent.append(child);
+    }
 }

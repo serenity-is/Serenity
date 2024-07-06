@@ -2779,6 +2779,13 @@ declare namespace Serenity {
      * @returns A boolean indicating whether the class was successfully removed.
      */
     function removeClass(el: Element, cls: string): void;
+    /**
+     * Appends content like DOM nodes, string, number or an array of these to the parent node.
+     * Undefined, null, false values are ignored. Promises are awaited.
+     * @param parent Target parent element
+     * @param child The content
+     */
+    function appendToNode(parent: ParentNode, child: any): void;
 
     function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;
@@ -3803,13 +3810,6 @@ declare namespace Serenity {
      * Returns the outer HTML of the element.
      */
     function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
-    /**
-     * Appends child at first argument to given node at second argument.
-     * From https://github.com/alex-kinokon/jsx-dom.
-     * @param child Child element or elements
-     * @param node Target parent element
-     */
-    function appendChild(child: any, node: HTMLElement): void;
 
     function getWidgetName(type: Function): string;
     function associateWidget(widget: {
@@ -4815,6 +4815,10 @@ declare namespace Serenity {
         idPrefix?: string;
         localTextPrefix?: string;
     }): HTMLElement;
+    function PropertyTabList(props?: {
+        children?: any;
+    }): HTMLElement;
+    function PropertyTabPanes(props?: {}): HTMLElement;
     function PropertyTabs(props: {
         items: PropertyItem[];
         container?: ParentNode;

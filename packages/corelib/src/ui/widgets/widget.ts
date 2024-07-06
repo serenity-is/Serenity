@@ -1,5 +1,4 @@
-﻿import { Config, Fluent, addClass, addValidationRule, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
-import { appendChild, replaceAll } from "../../q";
+﻿import { Config, Fluent, addClass, addValidationRule, appendToNode, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
@@ -68,7 +67,7 @@ export class Widget<P = {}> {
     protected getCssClass(): string {
         var type = getInstanceType(this);
         var classList: string[] = [];
-        var fullClass = replaceAll(getTypeFullName(type), '.', '-');
+        var fullClass = getTypeFullName(type).replace(/\./g, '-');
         classList.push(fullClass);
 
         for (let k of Config.rootNamespaces) {
@@ -168,8 +167,8 @@ export class Widget<P = {}> {
             return;
         (this as any)[renderContentsCalled] = true;
         let contents = this.renderContents();
-        if (typeof contents !== "undefined" && contents !== false && this.domNode)
-            appendChild(contents, this.domNode);
+        if (this.domNode && contents)
+            appendToNode(this.domNode, contents);
     }
 
     protected renderContents(): any {
