@@ -63,7 +63,6 @@ public class PropertyItem
     [JsonPropertyName("editorType")]
     public string? EditorType { get; set; }
 
-
     /// <summary>
     /// Gets or sets the editor parameters 
     /// that should be passed to the editor while it
@@ -75,6 +74,18 @@ public class PropertyItem
     [Newtonsoft.Json.JsonProperty("editorParams")]
     [JsonPropertyName("editorParams")]
     public Dictionary<string, object>? EditorParams { get; set; }
+
+    /// <summary>
+    /// Gets or sets the editor parameters 
+    /// that should be passed to the editor while it
+    /// is being created.
+    /// </summary>
+    /// <value>
+    /// The editor parameters.
+    /// </value>
+    [Newtonsoft.Json.JsonProperty("editorAddons")]
+    [JsonPropertyName("editorAddons")]
+    public List<EditorAddonItem>? EditorAddons { get; set; }
 
     /// <summary>
     /// Gets or sets the category of the property in form.

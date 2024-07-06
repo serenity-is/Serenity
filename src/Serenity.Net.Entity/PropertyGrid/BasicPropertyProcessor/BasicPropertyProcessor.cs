@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Basic property processor
@@ -21,6 +21,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetDefaultValue(source, item);
         SetEditLink(source, item);
         SetEditing(source, item);
+        SetEditorAddons(source, item);
         SetFiltering(source, item);
         SetFormatting(source, item);
         SetFormCssClass(source, item);

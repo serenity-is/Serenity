@@ -1,4 +1,4 @@
-﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -14,7 +14,11 @@ export type PropertyFieldElement = HTMLElement & {
     propertyItem?: PropertyItem;
 }
 
-export function PropertyFieldCaption(props: { item: PropertyItem, idPrefix?: string, localTextPrefix?: string }): HTMLLabelElement {
+export function PropertyFieldCaption(props: {
+    item: Pick<PropertyItem, "name" | "hint" | "labelWidth" | "required" | "title">,
+    idPrefix?: string,
+    localTextPrefix?: string
+}): HTMLLabelElement {
     const { item, idPrefix, localTextPrefix } = props;
 
     const label = document.createElement("label");
@@ -46,7 +50,12 @@ export function PropertyFieldCaption(props: { item: PropertyItem, idPrefix?: str
     return label;
 }
 
-export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement, item: PropertyItem, idPrefix: string, localTextPrefix: string }) {
+export function PropertyFieldEditor(props: {
+    fieldElement: PropertyFieldElement,
+    item: Pick<PropertyItem, "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">,
+    idPrefix?: string,
+    localTextPrefix?: string
+}): void {
     const { fieldElement, item, idPrefix, localTextPrefix } = props;
 
     const placeHolder = determineText(localTextPrefix, item.placeholder, p => p + item.name + '_Placeholder');
@@ -57,8 +66,8 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
     let loadingPoint: Comment;
 
     const then = (editorType: EditorType) => {
-        var optionsType = null;
-        var optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
+        let optionsType = null;
+        const optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
         if (optionsAttr) {
             optionsType = optionsAttr.value as any;
         }
@@ -69,7 +78,7 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
             editorParams = extend(new Object(), item.editorParams);
         }
 
-        let editor = new editorType({
+        const editor = new editorType({
             ...editorParams,
             id: idPrefix + item.name,
             element: (el: HTMLElement) => {
@@ -81,13 +90,25 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
                 if (placeHolder)
                     el.setAttribute("placeholder", placeHolder);
 
+                let wrappedNode: Node = el;
+                if (item.editorAddons?.length) {
+                    wrappedNode = document.createDocumentFragment();
+                    wrappedNode.appendChild(el);
+                    for (var wrapper of item.editorAddons) {
+                        const wrapperComponent = (typeof wrapper.type === "function" ? wrapper.type : getType(wrapper.type)) as (props: any) => void;
+                        if (typeof wrapperComponent !== "function")
+                            throw `Invalid editor addon type: ${wrapper.type} for property: "${item.name}"`;
+                        wrapperComponent({ ...wrapper.params, propertyItem: item, editorElement: el, documentFragment: wrappedNode });
+                    }
+                }
+
                 if (loadingPoint) {
-                    loadingPoint.parentElement?.replaceChild(el, loadingPoint);
+                    loadingPoint.parentElement?.replaceChild(wrappedNode, loadingPoint);
                     loadingPoint = null;
                     delete fieldElement.editorPromise;
                 }
                 else {
-                    fieldElement.append(el);
+                    fieldElement.append(wrappedNode);
                 }
             }
         }).init();
@@ -113,7 +134,9 @@ export function PropertyFieldEditor(props: { fieldElement: PropertyFieldElement,
     }
 }
 
-export function PropertyFieldLineBreak(props: { item: PropertyItem }): HTMLElement {
+export function PropertyFieldLineBreak(props: {
+    item: Pick<PropertyItem, "formCssClass">
+}): HTMLElement {
     const klass = props?.item?.formCssClass;
     if (!klass || klass.indexOf('line-break') < 0)
         return null;
@@ -123,13 +146,13 @@ export function PropertyFieldLineBreak(props: { item: PropertyItem }): HTMLEleme
         return createLineBreak("line-break");
     }
     if (splitted.indexOf('line-break-sm') >= 0) {
-        createLineBreak("line-break hidden-xs");
+        return createLineBreak("line-break hidden-xs");
     }
     else if (splitted.indexOf('line-break-md') >= 0) {
-        createLineBreak("line-break hidden-sm");
+        return createLineBreak("line-break hidden-sm");
     }
     else if (splitted.indexOf('line-break-lg') >= 0) {
-        createLineBreak("line-break hidden-md");
+        return createLineBreak("line-break hidden-md");
     }
 }
 
@@ -293,8 +316,8 @@ export function PropertyCategories(props: {
         const fieldElement = PropertyField({
             item,
             container: categoryEl,
-            idPrefix: idPrefix,
-            localTextPrefix: localTextPrefix
+            idPrefix,
+            localTextPrefix
         });
 
         fieldElements?.push(fieldElement);
@@ -317,7 +340,14 @@ export function PropertyTabPanes(props?: {}): HTMLElement {
     return panes;
 }
 
-export function PropertyTabs(props: { items: PropertyItem[], container?: ParentNode, fieldElements?: PropertyFieldElement[], idPrefix?: string, localTextPrefix?: string, paneIdPrefix?: string }): DocumentFragment | null {
+export function PropertyTabs(props: {
+    items: PropertyItem[],
+    container?: ParentNode,
+    fieldElements?: PropertyFieldElement[],
+    idPrefix?: string,
+    localTextPrefix?: string,
+    paneIdPrefix?: string
+}): DocumentFragment | null {
 
     const { items, container, fieldElements, idPrefix, localTextPrefix, paneIdPrefix } = props;
 
@@ -340,7 +370,7 @@ export function PropertyTabs(props: { items: PropertyItem[], container?: ParentN
     const itemsWithTab = items.filter(f => f.tab);
     const tabList = parentNode.appendChild(PropertyTabList());
     const tabPanes = parentNode.appendChild(PropertyTabPanes());
-    
+
     var tabIndex = 0;
     var i = 0;
     while (i < itemsWithTab.length) {

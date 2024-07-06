@@ -2891,8 +2891,13 @@ declare namespace Serenity {
         Min = 3,
         Max = 4
     }
+    type EditorAddon = (props: {
+        propertyItem?: PropertyItem;
+        editorElement: HTMLElement;
+        documentFragment?: DocumentFragment;
+    }) => void;
     interface PropertyItem {
-        name?: string;
+        name: string;
         title?: string;
         hint?: string;
         placeholder?: string;
@@ -2902,6 +2907,10 @@ declare namespace Serenity {
             new (props?: any): any;
         }>;
         editorParams?: any;
+        editorAddons?: {
+            type: string | EditorAddon;
+            params?: any;
+        }[];
         category?: string;
         collapsible?: boolean;
         collapsed?: boolean;
@@ -4519,6 +4528,7 @@ declare namespace Serenity {
             [typeInfoProperty]: any;
         }, _context?: any) => void;
         function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+        function registerComponent(): void;
         function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
         function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
         function registerEnum(target: any, enumKey?: string, name?: string): void;
@@ -4721,6 +4731,19 @@ declare namespace Serenity {
     /** @deprecated use BasePanel */
     const TemplatedPanel: typeof BasePanel;
 
+    function inputGroupTextAddon(props: {
+        before?: boolean;
+        text: string;
+        cssClass?: string;
+        editorElement: HTMLElement;
+    }): void;
+    function formTextAddon(props: {
+        text: string;
+        before?: boolean;
+        cssClass?: string;
+        editorElement: HTMLElement;
+    }): void;
+
     type EditorProps<T> = WidgetProps<T> & {
         initialValue?: any;
         maxLength?: number;
@@ -4768,18 +4791,18 @@ declare namespace Serenity {
         propertyItem?: PropertyItem;
     };
     function PropertyFieldCaption(props: {
-        item: PropertyItem;
+        item: Pick<PropertyItem, "name" | "hint" | "labelWidth" | "required" | "title">;
         idPrefix?: string;
         localTextPrefix?: string;
     }): HTMLLabelElement;
     function PropertyFieldEditor(props: {
         fieldElement: PropertyFieldElement;
-        item: PropertyItem;
-        idPrefix: string;
-        localTextPrefix: string;
+        item: Pick<PropertyItem, "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">;
+        idPrefix?: string;
+        localTextPrefix?: string;
     }): void;
     function PropertyFieldLineBreak(props: {
-        item: PropertyItem;
+        item: Pick<PropertyItem, "formCssClass">;
     }): HTMLElement;
     function PropertyField(props: {
         item: PropertyItem;

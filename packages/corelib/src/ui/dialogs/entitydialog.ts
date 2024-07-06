@@ -516,7 +516,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             var langs = null;
 
             if (item1.localizable === true) {
-                var copy = extend({}, item1);
+                var copy = extend({} as PropertyItem, item1);
                 copy.oneWay = true;
                 copy.readOnly = true;
                 copy.required = false;
@@ -527,7 +527,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     langs = this.getLangs();
 
                 for (var lang of langs) {
-                    copy = extend({}, item1);
+                    copy = extend({} as PropertyItem, item1);
                     copy.name = lang[0] + '$' + copy.name;
                     copy.title = lang[1];
                     copy.cssClass = [copy.cssClass, 'translation'].join(' ');

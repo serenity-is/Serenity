@@ -17,7 +17,7 @@ export function commonTypeRegistry<TType = any>(props: {
         knownTypes = null;
     }
 
-    function searchSystemTypes(key: string, load?: boolean) {
+    function searchSystemTypes(key: string) {
         var type = getType(key);
         if (type != null && isMatch(type))
             return type;

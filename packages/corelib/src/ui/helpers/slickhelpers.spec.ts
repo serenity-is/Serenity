@@ -4,6 +4,7 @@ import { PropertyItemSlickConverter } from "./slickhelpers";
 describe('SlickHelpers.toSlickColumn', () => {
     it('tries to load a localText with the items name as key', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
+            name: null,
             title: 'Test.Local.Text.Key'
         });
         
@@ -12,6 +13,7 @@ describe('SlickHelpers.toSlickColumn', () => {
         addLocalText('Test.Local.Text.Key', 'translated');
 
         var converted2 = PropertyItemSlickConverter.toSlickColumn({
+            name: null,
             title: 'Test.Local.Text.Key'
         });
 
@@ -20,6 +22,7 @@ describe('SlickHelpers.toSlickColumn', () => {
 
     it('should pass date formatter to slick formatter', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
+            name: null,
             title: 'Test.Local.Text.Key',
             formatterType: 'Serenity.DateFormatter'
         });
@@ -37,6 +40,7 @@ describe('SlickHelpers.toSlickColumn', () => {
     
     it('should pass date time formatter parameters to slick formatter', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
+            name: null,
             title: 'Test.Local.Text.Key',
             formatterType: 'Serenity.DateTimeFormatter',
             formatterParams: {

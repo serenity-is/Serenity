@@ -11,13 +11,16 @@ export enum SummaryType {
 
 registerEnum(SummaryType, 'Serenity.SummaryType');
 
+export type EditorAddon = (props: { propertyItem?: PropertyItem, editorElement: HTMLElement, documentFragment?: DocumentFragment }) => void;
+
 export interface PropertyItem {
-    name?: string;
+    name: string;
     title?: string;
     hint?: string;
     placeholder?: string;
     editorType?: string | { new(props?: any): any } | PromiseLike<{ new(props?: any): any }>;
     editorParams?: any;
+    editorAddons?: { type: string | EditorAddon, params?: any }[];
     category?: string;
     collapsible?: boolean;
     collapsed?: boolean;
