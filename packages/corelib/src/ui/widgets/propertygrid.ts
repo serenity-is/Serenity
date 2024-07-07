@@ -52,7 +52,7 @@ export function PropertyFieldCaption(props: {
 
 export function PropertyFieldEditor(props: {
     fieldElement: PropertyFieldElement,
-    item: Pick<PropertyItem, "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">,
+    item: Pick<PropertyItem, "editorCssClass" | "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">,
     idPrefix?: string,
     localTextPrefix?: string
 }): void {
@@ -83,6 +83,9 @@ export function PropertyFieldEditor(props: {
             id: idPrefix + item.name,
             element: (el: HTMLElement) => {
                 el.classList.add("editor");
+
+                if (item.editorCssClass)
+                    addClass(el, item.editorCssClass);
 
                 if (Fluent.isInputLike(el))
                     el.setAttribute("name", item.name ?? "");

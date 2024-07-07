@@ -22,6 +22,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetEditLink(source, item);
         SetEditing(source, item);
         SetEditorAddons(source, item);
+        SetEditorCssClass(source, item);
         SetFiltering(source, item);
         SetFormatting(source, item);
         SetFormCssClass(source, item);

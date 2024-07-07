@@ -88,6 +88,13 @@ public class PropertyItem
     public List<EditorAddonItem>? EditorAddons { get; set; }
 
     /// <summary>
+    /// Gets or sets the CSS class to apply to the editor element.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("editorCssClass")]
+    [JsonPropertyName("editorCssClass")]
+    public string? EditorCssClass { get; set; }
+
+    /// <summary>
     /// Gets or sets the category of the property in form.
     /// Only meaningful for forms.
     /// </summary>

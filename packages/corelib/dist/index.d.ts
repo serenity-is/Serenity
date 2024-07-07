@@ -1617,6 +1617,7 @@ interface PropertyItem {
         type: string | EditorAddon;
         params?: any;
     }[];
+    editorCssClass?: string;
     category?: string;
     collapsible?: boolean;
     collapsed?: boolean;
@@ -3494,7 +3495,7 @@ declare function PropertyFieldCaption(props: {
 }): HTMLLabelElement;
 declare function PropertyFieldEditor(props: {
     fieldElement: PropertyFieldElement;
-    item: Pick<PropertyItem, "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">;
+    item: Pick<PropertyItem, "editorCssClass" | "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">;
     idPrefix?: string;
     localTextPrefix?: string;
 }): void;

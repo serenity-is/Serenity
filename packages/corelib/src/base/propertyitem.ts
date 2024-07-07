@@ -21,6 +21,7 @@ export interface PropertyItem {
     editorType?: string | { new(props?: any): any } | PromiseLike<{ new(props?: any): any }>;
     editorParams?: any;
     editorAddons?: { type: string | EditorAddon, params?: any }[];
+    editorCssClass?: string;
     category?: string;
     collapsible?: boolean;
     collapsed?: boolean;
