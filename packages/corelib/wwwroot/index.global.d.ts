@@ -4730,29 +4730,6 @@ declare namespace Serenity {
     /** @deprecated use BasePanel */
     const TemplatedPanel: typeof BasePanel;
 
-    function inputGroupButtonAddon(props: {
-        before?: boolean;
-        text: string;
-        icon?: IconClassName;
-        buttonClass?: string;
-        cssClass?: string;
-        actionKey?: string;
-        editorElement: HTMLElement;
-    }): void;
-    function inputGroupTextAddon(props: {
-        before?: boolean;
-        text: string;
-        icon?: IconClassName;
-        cssClass?: string;
-        editorElement: HTMLElement;
-    }): void;
-    function formTextAddon(props: {
-        text: string;
-        before?: boolean;
-        cssClass?: string;
-        editorElement: HTMLElement;
-    }): void;
-
     type EditorProps<T> = WidgetProps<T> & {
         initialValue?: any;
         maxLength?: number;

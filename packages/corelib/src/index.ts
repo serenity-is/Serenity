@@ -36,7 +36,6 @@ export * from "./ui/widgets/widget";
 export * from "./ui/widgets/toolbar";
 export * from "./ui/dialogs/basedialog";
 export * from "./ui/widgets/basepanel";
-export * from "./ui/widgets/editoraddons";
 export * from "./ui/editors/editorwidget";
 export * from "./ui/editors/cascadedwidgetlink";
 export * from "./ui/helpers/tabsextensions";
