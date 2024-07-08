@@ -8,29 +8,45 @@ export type ToastContainerOptions = {
 }
 
 export type ToastrOptions = ToastContainerOptions & {
-    tapToDismiss?: boolean;
-    toastClass?: string;
-    showDuration?: number;
-    onShown?: () => void;
-    hideDuration?: number;
-    onHidden?: () => void;
-    closeOnHover?: boolean;
-    extendedTimeOut?: number;
-    iconClass?: string;
-    positionClass?: string;
-    timeOut?: number; // Set timeOut and extendedTimeOut to 0 to make it sticky
-    titleClass?: string;
-    messageClass?: string;
-    escapeHtml?: boolean;
-    target?: string;
-    closeHtml?: string;
+    /** Show a close button, default is false */
+    closeButton?: boolean;
+    /** CSS class for close button */
     closeClass?: string;
+    /** Close button markup */
+    closeHtml?: string;
+    /** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
+    closeOnHover?: boolean;
+    /** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
+    extendedTimeOut?: number;
+    /** Escape message html, default is true */
+    escapeHtml?: boolean;
+    /** CSS class for icon */
+    iconClass?: string;
+    /** CSS class for message */
+    messageClass?: string;
+    /** Show newest on top */
     newestOnTop?: boolean;
+    /** CSS class for toast positioning */
+    positionClass?: string;
+    /** Prevent duplicates of the same toast, default is false */
     preventDuplicates?: boolean;
+    /** Right to left */
+    rtl?: boolean;
+    /** The container element id */
+    target?: string;
+    /** The duration for the toast to stay in the page. Set to -1 to make the toast sticky, in that case extendedTimeout is ignored. */
+    timeOut?: number;
+    /** CSS class for toast */
+    toastClass?: string;
+    /** Hides the notification when clicked, default is true */
+    tapToDismiss?: boolean;
+    /** CSS class for title */
+    titleClass?: string;
+
     onclick?: (event: MouseEvent) => void;
     onCloseClick?: (event: Event) => void;
-    closeButton?: boolean;
-    rtl?: boolean;
+    onHidden?: () => void;
+    onShown?: () => void;
 }
 
 export type NotifyMap = {
@@ -44,16 +60,13 @@ const initialOptions: ToastrOptions = {
     tapToDismiss: true,
     toastClass: 'toast',
     containerId: 'toast-container',
-    showDuration: 300,
     onShown: () => { },
-    hideDuration: 1000,
     onHidden: () => { },
-    closeEasing: false,
     closeOnHover: true,
     extendedTimeOut: 1000,
     iconClass: 'toast-info',
     positionClass: 'toast-top-right',
-    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+    timeOut: 5000, // Set timeOut to 0 to make it sticky
     titleClass: 'toast-title',
     messageClass: 'toast-message',
     escapeHtml: true,
@@ -275,22 +288,20 @@ export class Toastr {
             toastElement.setAttribute('aria-live', ariaValue);
         };
 
-        const delayedHideToast = (): void => {
-            if (opt.timeOut > 0 || opt.extendedTimeOut > 0) {
-                intervalId = setTimeout(hideToast, opt.extendedTimeOut);
-            }
-        };
-
-        const stickAround = (): void => {
-            if (intervalId) {
-                clearTimeout(intervalId);
-            }
-        };
-
         const handleEvents = (): void => {
             if (opt.closeOnHover) {
-                toastElement.addEventListener('mouseover', () => stickAround());
-                toastElement.addEventListener('mouseout', () => delayedHideToast());
+
+                toastElement.addEventListener('mouseover', () => { 
+                    if (intervalId) {
+                        clearTimeout(intervalId); 
+                    }
+                });
+
+                toastElement.addEventListener('mouseout', () => { 
+                    if (opt.timeOut >= 0 && (opt.timeOut > 0 || opt.extendedTimeOut > 0)) {
+                        intervalId = setTimeout(hideToast, opt.extendedTimeOut);
+                    }
+                });
             }
 
             if (!opt.onclick && opt.tapToDismiss) {

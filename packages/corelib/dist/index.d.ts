@@ -1530,32 +1530,44 @@ type ToastContainerOptions = {
     target?: string;
 };
 type ToastrOptions = ToastContainerOptions & {
-    tapToDismiss?: boolean;
-    toastClass?: string;
-    showDuration?: number;
-    onShown?: () => void;
-    hideDuration?: number;
-    onHidden?: () => void;
-    closeMethod?: boolean;
-    closeDuration?: number | false;
-    closeEasing?: boolean;
-    closeOnHover?: boolean;
-    extendedTimeOut?: number;
-    iconClass?: string;
-    positionClass?: string;
-    timeOut?: number;
-    titleClass?: string;
-    messageClass?: string;
-    escapeHtml?: boolean;
-    target?: string;
-    closeHtml?: string;
+    /** Show a close button, default is false */
+    closeButton?: boolean;
+    /** CSS class for close button */
     closeClass?: string;
+    /** Close button markup */
+    closeHtml?: string;
+    /** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
+    closeOnHover?: boolean;
+    /** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
+    extendedTimeOut?: number;
+    /** Escape message html, default is true */
+    escapeHtml?: boolean;
+    /** CSS class for icon */
+    iconClass?: string;
+    /** CSS class for message */
+    messageClass?: string;
+    /** Show newest on top */
     newestOnTop?: boolean;
+    /** CSS class for toast positioning */
+    positionClass?: string;
+    /** Prevent duplicates of the same toast, default is false */
     preventDuplicates?: boolean;
+    /** Right to left */
+    rtl?: boolean;
+    /** The container element id */
+    target?: string;
+    /** The duration for the toast to stay in the page. Set to -1 to make the toast sticky, in that case extendedTimeout is ignored. */
+    timeOut?: number;
+    /** CSS class for toast */
+    toastClass?: string;
+    /** Hides the notification when clicked, default is true */
+    tapToDismiss?: boolean;
+    /** CSS class for title */
+    titleClass?: string;
     onclick?: (event: MouseEvent) => void;
     onCloseClick?: (event: Event) => void;
-    closeButton?: boolean;
-    rtl?: boolean;
+    onHidden?: () => void;
+    onShown?: () => void;
 };
 type NotifyMap = {
     type: string;

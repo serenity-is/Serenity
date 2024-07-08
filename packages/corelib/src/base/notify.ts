@@ -1,11 +1,8 @@
 ﻿import toastr, { type ToastrOptions } from "./toastr2";
 
 export let defaultNotifyOptions: ToastrOptions = {
-    timeOut: 3000,
-    showDuration: 250,
-    hideDuration: 500,
+    timeOut: 5000,
     escapeHtml: true,
-    extendedTimeOut: 500,
     positionClass: 'position-toast toast-top-full-width'
 }
 

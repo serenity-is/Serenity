@@ -116,8 +116,7 @@ describe('Toastr', () => {
         const toast = toastr.info('Test Message', null, {
             closeButton: true,
             closeClass: 'my-close-button',
-            timeOut: 1000,
-            closeDuration: false
+            timeOut: 1000
         });
         expect(toast).toBeDefined();
         let closeButton = toast.querySelector('.my-close-button') as HTMLElement;
@@ -136,8 +135,7 @@ describe('Toastr', () => {
     it('can does not close if tapToDismiss is false and onClick is null', (done) => {
         const toast = toastr.info('Test Message', null, {
             tapToDismiss: false,
-            timeOut: 1000,
-            closeDuration: false
+            timeOut: 1000
         });
         expect(toast).toBeDefined();
         toast.click();
