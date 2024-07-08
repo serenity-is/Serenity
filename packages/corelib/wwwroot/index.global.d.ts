@@ -4867,6 +4867,7 @@ declare namespace Serenity {
         idPrefix?: string;
         items: PropertyItem[];
         localTextPrefix?: string;
+        value?: any;
         mode?: PropertyGridMode;
     }
 

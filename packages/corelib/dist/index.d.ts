@@ -3578,6 +3578,7 @@ interface PropertyGridOptions {
     idPrefix?: string;
     items: PropertyItem[];
     localTextPrefix?: string;
+    value?: any;
     mode?: PropertyGridMode;
 }
 

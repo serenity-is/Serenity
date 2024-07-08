@@ -428,6 +428,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             PropertyCategories(commonProps);
         }
 
+        if (this.options.value !== false) {
+            this.value = this.options.value ?? {};
+        }
         this.updateInterface();
     }
 
@@ -672,5 +675,6 @@ export interface PropertyGridOptions {
     idPrefix?: string;
     items: PropertyItem[];
     localTextPrefix?: string;
+    value?: any;
     mode?: PropertyGridMode;
 }
