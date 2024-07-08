@@ -65,4 +65,13 @@ public class EditorAddonAttribute(string type) : Attribute
     /// The type of the editor.
     /// </value>
     public string AddonType { get; private set; } = type ?? throw new ArgumentNullException(nameof(type));
+
+    /// <summary>
+    /// Gets or sets the addon key which is set as data-addonkey attribute.
+    /// </summary>
+    public string? AddonKey
+    {
+        get => GetOption<string?>("addonKey");
+        set => SetOption("addonKey", value);
+    }
 }
