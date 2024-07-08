@@ -14,9 +14,6 @@ export type ToastrOptions = ToastContainerOptions & {
     onShown?: () => void;
     hideDuration?: number;
     onHidden?: () => void;
-    closeMethod?: boolean;
-    closeDuration?: number | false;
-    closeEasing?: boolean;
     closeOnHover?: boolean;
     extendedTimeOut?: number;
     iconClass?: string;
@@ -51,8 +48,6 @@ const initialOptions: ToastrOptions = {
     onShown: () => { },
     hideDuration: 1000,
     onHidden: () => { },
-    closeMethod: false,
-    closeDuration: false,
     closeEasing: false,
     closeOnHover: true,
     extendedTimeOut: 1000,
