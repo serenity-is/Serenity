@@ -82,6 +82,7 @@ export function PropertyFieldEditor(props: {
             ...editorParams,
             id: idPrefix + item.name,
             element: (el: HTMLElement) => {
+                !el.id  && (el.id = idPrefix + item.name);
                 el.classList.add("editor");
 
                 if (item.editorCssClass)
