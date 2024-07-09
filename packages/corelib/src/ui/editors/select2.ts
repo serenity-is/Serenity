@@ -186,8 +186,8 @@ function getOffset(el: Element) {
     };
 }
 
-function txt(s: string) { 
-    return localText("Controls.SelectEditor." + s); 
+function txt(s: string) {
+    return localText("Controls.SelectEditor." + s);
 }
 
 function fmt(s: string, ...prm: any[]) {
@@ -478,7 +478,7 @@ function defaultEscapeMarkup(markup: string) {
 export class Select2 {
 
     private el: Select2Element;
-    
+
     constructor(opts?: Select2Options)
     constructor(opts?: Select2Options, create: boolean = true) {
 
@@ -570,7 +570,7 @@ export class Select2 {
     get search(): HTMLInputElement {
         return this.instance?.search;
     }
-   
+
     get val(): (string | string[]) {
         return this.instance?.val();
     }
@@ -661,7 +661,7 @@ export class Select2 {
         function match(a: string) {
             return DIACRITICS[a] || a;
         }
-    
+
         return str.replace(/[^\u0000-\u007E]/g, match);
     }
 }
@@ -801,7 +801,7 @@ function local(options: any) {
             }
         };
 
-        data().results.forEach(function(datum: any) { process(datum, filtered.results); });
+        data().results.forEach(function (datum: any) { process(datum, filtered.results); });
         query.callback(filtered);
     };
 }
@@ -1028,16 +1028,19 @@ abstract class AbstractSelect2 {
         installFilteredMouseMove(this.results);
 
         Fluent.on(this.dropdown, "mousemove-filtered", resultsSelector, this.highlightUnderEvent.bind(this));
-        
-        ["touchstart", "touchmove", "touchend"].forEach(ev => 
-            Fluent.on(this.dropdown, "touchstart touchmove touchend", resultsSelector, (event: Event) => {
-                this._touchEvent = true;
-                this.highlightUnderEvent(event);
-            })
+
+        ["touchstart", "touchmove", "touchend"].forEach(ev =>
+            this.dropdown.addEventListener(ev, (e: Event) => {
+                if ((e.target as HTMLElement).closest?.(resultsSelector)) {
+                    this._touchEvent = true;
+                }
+            }, { passive: true })
         );
 
-        Fluent.on(this.dropdown, "touchmove", resultsSelector, this.touchMoved.bind(this));
-        ["touchstart", "touchend"].forEach(ev => Fluent.on(this.dropdown, ev, resultsSelector, this.clearTouchMoved.bind(this)));
+        this.dropdown.addEventListener("touchmove", e => 
+            (e.target as HTMLElement).closest?.(resultsSelector) && this.touchMoved(), { passive: true });
+        ["touchstart", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, e => 
+            (e.target as HTMLElement).closest?.(resultsSelector) && this.clearTouchMoved(), { passive: true }));
 
         // Waiting for a click event on touch devices to select option and hide dropdown
         // otherwise click will be triggered on an underlying element
@@ -1200,7 +1203,7 @@ abstract class AbstractSelect2 {
         }
 
         opts = Object.assign({}, <Select2Options>{
-            populateResults: function(this: AbstractSelect2, container, results, query) {
+            populateResults: function (this: AbstractSelect2, container, results, query) {
                 var id = this.opts.id;
 
                 let populate = function (results: Select2Item[], container: HTMLElement, depth: number) {
@@ -1240,7 +1243,7 @@ abstract class AbstractSelect2 {
                                 Fluent.empty(label);
                                 label.appendChild(formatted);
                             }
-                            else 
+                            else
                                 label.innerHTML = formatted ?? "";
                             node.append(label);
                         }
@@ -1643,7 +1646,7 @@ abstract class AbstractSelect2 {
 
         this.clearDropdownAlignmentPreference();
 
-        var dropdownParent = (typeof this.opts.dropdownParent === "function" ? 
+        var dropdownParent = (typeof this.opts.dropdownParent === "function" ?
             this.opts.dropdownParent(this.opts.element) : null) ?? document?.body;
 
         if (dropdownParent && this.dropdown !== dropdownParent.lastElementChild) {
@@ -1658,7 +1661,7 @@ abstract class AbstractSelect2 {
             mask.setAttribute("class", "select2-drop-mask");
             mask.style.display = "none";
             document.body.appendChild(mask);
-            ["mousedown", "touchstart", "click"].forEach(ev => Fluent.on(mask, ev, function (e) {
+            ["mousedown", "touchstart", "click"].forEach(ev => mask.addEventListener(ev, function (e) {
                 // Prevent IE from generating a click event on the body
                 reinsertElement(mask);
 
@@ -1669,10 +1672,10 @@ abstract class AbstractSelect2 {
                         self.selectHighlighted({ noFocus: true });
                     }
                     self.close();
-                    e.preventDefault();
+                    e.type !== "touchstart" && e.preventDefault();
                     e.stopPropagation();
                 }
-            }));
+            }, { passive: ev === "touchstart" }));
         }
 
         // ensure the mask is always right before the dropdown
@@ -1704,10 +1707,10 @@ abstract class AbstractSelect2 {
             parent = parent.parentElement;
         }
         parents.push(window);
-        
+
         parents.forEach(parent => {
             [resize, scroll, orient].forEach(ev => {
-                Fluent.on(parent, ev, function() { 
+                Fluent.on(parent, ev, function () {
                     if (that.opened()) that.positionDropdown();
                 });
             });
@@ -2227,14 +2230,14 @@ class SingleSelect2 extends AbstractSelect2 {
     createContainer() {
         var container = document.createElement("div");
         container.classList.add("select2-container");
-        container.innerHTML = 
+        container.innerHTML =
             "<a href='javascript:void(0)' class='select2-choice' tabindex='-1'>" +
                 "<span class='select2-chosen'>&#160;</span><abbr class='select2-search-choice-close'></abbr>" +
                 "<span class='select2-arrow' role='presentation'><b role='presentation'></b></span>" +
             "</a>" +
-            "<label for='' class='select2-offscreen'></label>" + 
-            "<input class='select2-focusser select2-offscreen' type='text' aria-haspopup='true' role='button' />" + 
-            "<div class='select2-drop select2-display-none'>" + 
+            "<label for='' class='select2-offscreen'></label>" +
+            "<input class='select2-focusser select2-offscreen' type='text' aria-haspopup='true' role='button' />" +
+            "<div class='select2-drop select2-display-none'>" +
                 "<div class='select2-search'>" + 
                     "<label for='' class='select2-offscreen'></label>" + 
                     "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input' role='combobox' aria-expanded='true'" +
@@ -2474,13 +2477,13 @@ class SingleSelect2 extends AbstractSelect2 {
             }
         }));
 
-        ["mousedown", "touchstart"].forEach(ev => Fluent.on(selection, ev, "abbr", (e: Event) => {
+        Fluent.on(selection, "click", "abbr", (e: Event) => {
             if (!this.isInterfaceEnabled()) return;
             this.clear();
             killEventImmediately(e);
             this.close();
             this.selection.focus();
-        }));
+        });
 
         Fluent.on(selection, "dragstart", e => { e.preventDefault(); return false });
 
@@ -2498,11 +2501,11 @@ class SingleSelect2 extends AbstractSelect2 {
             killEvent(e);
         });
 
-        ["mousedown", "touchstart"].forEach(ev => Fluent.on(dropdown, ev, () => {
+        ["mousedown", "touchstart"].forEach(ev => dropdown.addEventListener(ev, () => {
             if (this.opts.shouldFocusInput(this)) {
                 this.search.focus();
             }
-        }));
+        }, { passive: true }));
 
         Fluent.on(selection, "focus", e => {
             killEvent(e);
@@ -2611,7 +2614,7 @@ class SingleSelect2 extends AbstractSelect2 {
                         }
                         return is_match;
                     },
-                    callback: typeof callback !== "function" ? () => {} : function () {
+                    callback: typeof callback !== "function" ? () => { } : function () {
                         callback(match);
                     }
                 });
@@ -2828,13 +2831,13 @@ class MultiSelect2 extends AbstractSelect2 {
         var container = document.createElement("div");
         container.classList.add("select2-container", "select2-container-multi");
         container.innerHTML = (
-            "<ul class='select2-choices'>" + 
+            "<ul class='select2-choices'>" +
                 "<li class='select2-search-field'>" + 
                     "<label for='' class='select2-offscreen'></label>" +
                     "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input'>" +
                 "</li>" + 
-            "</ul>" + 
-            "<div class='select2-drop select2-drop-multi select2-display-none'>" + 
+            "</ul>" +
+            "<div class='select2-drop select2-drop-multi select2-display-none'>" +
                 "<ul class='select2-results'></ul>" + 
             "</div>");
         return container;
@@ -2871,7 +2874,7 @@ class MultiSelect2 extends AbstractSelect2 {
                         }
                         return is_match;
                     },
-                    callback: typeof callback !== "function" ? () => {} : function () {
+                    callback: typeof callback !== "function" ? () => { } : function () {
                         // reorder matches based on the order they appear in the ids array because right now
                         // they are in the order in which they appear in data array
                         var ordered = [];
@@ -2949,7 +2952,7 @@ class MultiSelect2 extends AbstractSelect2 {
         this.search.previousElementSibling.textContent = document.querySelector("label[for='" + this.opts.element.getAttribute("id") + "']")?.textContent;
         this.search.previousElementSibling.setAttribute("for", this.search.getAttribute('id'));
 
-        ["input", "paste"].forEach(ev =>  Fluent.on(this.search, ev, () => {
+        ["input", "paste"].forEach(ev => Fluent.on(this.search, ev, () => {
             if (this.search.getAttribute('placeholder') && this.search.value.length === 0) return;
             if (!this.isInterfaceEnabled()) return;
             if (!this.opened()) {
@@ -3327,7 +3330,7 @@ class MultiSelect2 extends AbstractSelect2 {
                 this.close();
                 this.focusSearch();
             }));
-            
+
             Fluent.on(close, "focus", () => {
                 if (!this.isInterfaceEnabled()) return;
                 this.container.classList.add("select2-container-active");
