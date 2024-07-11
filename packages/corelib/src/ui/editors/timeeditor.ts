@@ -1,5 +1,5 @@
-﻿import { Fluent, toId } from "../../base";
-import { IDoubleValue, IReadOnly } from "../../interfaces";
+import { Fluent, toId } from "../../base";
+import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
 import { addOption } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
@@ -12,13 +12,12 @@ export interface TimeEditorOptions {
     intervalMinutes?: any;
 }
 
-@Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
-export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
+export class TimeEditorBase<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
 
     static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
     declare readonly domNode: HTMLSelectElement;
 
-    private minutes: Fluent;
+    protected minutes: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -31,17 +30,39 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         }
 
         for (var h = (this.options.startHour || 0); h <= (this.options.endHour || 23); h++) {
-            addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
+            var hour = ((h < 10) ? (`0${h}`) : h.toString());
+            addOption(input, hour, hour);
         }
 
         this.minutes = Fluent("select").class('editor s-TimeEditor minute').insertAfter(input);
         this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
-            addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
+            var minute = ((m < 10) ? (`0${m}`) : m.toString());
+            addOption(this.minutes, minute, minute);
         }
     }
 
+    get_readOnly(): boolean {
+        return this.domNode.classList.contains('readonly');
+    }
+
+    set_readOnly(value: boolean): void {
+
+        if (value !== this.get_readOnly()) {
+            if (value) {
+                this.element.addClass('readonly').attr('readonly', 'readonly');
+            }
+            else {
+                this.element.removeClass('readonly').removeAttr('readonly');
+            }
+            EditorUtils.setReadonly(this.minutes, value);
+        }
+    }
+}
+
+@Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
+export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
     public get value(): number {
         var hour = toId(this.domNode.value);
         var minute = toId(this.minutes.val());
@@ -59,6 +80,51 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         if (!value) {
             if (this.options.noEmptyOption) {
                 this.domNode.value = this.options.startHour;
+                this.minutes.val('00');
+            }
+            else {
+                this.domNode.value = '';
+                this.minutes.val('00');
+            }
+        }
+        else {
+            var hour = Math.floor(value / 60);
+            if (hour < 10)
+                this.domNode.value = `0${hour}`;
+            else
+                this.domNode.value = hour.toString();
+
+            this.minutes.val("" + (value % 60));
+        }
+    }
+
+    protected set_value(value: number): void {
+        this.value = value;
+    }
+}
+
+@Decorators.registerEditor('Serenity.TimeSpanEditor', [IStringValue, IReadOnly])
+export class TimeSpanEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+
+    protected get_value(): string {
+        return this.value;
+    }
+
+    protected set_value(value: string): void {
+        this.value = value;
+    }
+    public get value(): string {
+        var hour = toId(this.domNode.value);
+        var minute = toId(this.minutes.val());
+        if (hour == null || minute == null) {
+            return null;
+        }
+        return `${hour}:${minute}:00.00`;
+    }
+    public set value(value: string) {
+        if (!value) {
+            if (this.options.noEmptyOption) {
+                this.domNode.value = this.options.startHour;
                 this.minutes.val('0');
             }
             else {
@@ -67,29 +133,9 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
             }
         }
         else {
-            this.domNode.value = Math.floor(value / 60).toString();
-            this.minutes.val("" + (value % 60));
-        }
-    }
-
-    protected set_value(value: number): void {
-        this.value = value;
-    }
-
-    get_readOnly(): boolean {
-        return this.domNode.classList.contains('readonly');
-    }
-
-    set_readOnly(value: boolean): void {
-
-        if (value !== this.get_readOnly()) {
-            if (value) {
-                this.element.addClass('readonly').attr('readonly', 'readonly');
-            }
-            else {
-                this.element.removeClass('readonly').removeAttr('readonly');
-            }
-            EditorUtils.setReadonly(this.minutes, value);
+            var parts = value.split(':');
+            this.domNode.value = parts[0];
+            this.minutes.val(parts[1]);
         }
     }
 }

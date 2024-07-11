@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -214,6 +214,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
         else if (valueType == typeof(DateTime))
             return "Date";
+        else if (valueType == typeof(TimeSpan))
+            return "TimeSpan";
         else if (valueType == typeof(bool))
             return "Boolean";
         else if (valueType == typeof(decimal) || valueType == typeof(double) || valueType == typeof(float))
