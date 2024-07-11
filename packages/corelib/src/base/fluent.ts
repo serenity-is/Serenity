@@ -905,9 +905,12 @@ Fluent.prototype.trigger = function (this: FluentThis, type: string, args?: any)
 }
 
 Fluent.prototype.val = function (this: FluentThis<any>, value?: string) {
-    if (value === void 0 && !arguments.length)
+    if (value === void 0 && !arguments.length) {
+        if (!this.el)
+            return void 0;
         return Fluent.isInputLike(this.el) ? this.el.value : "";
-    if (Fluent.isInputLike(this.el))
+    }
+    if (this.el && Fluent.isInputLike(this.el))
         this.el.value = value ?? "";
     return this as any;
 }
