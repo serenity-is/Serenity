@@ -11,8 +11,10 @@ export namespace Router {
     let oldURL: string;
     let resolving: number = 0;
     let autoinc: number = 0;
-    let ignoreHash: number = 0;
-    let ignoreTime: number = 0;
+    let ignoreHashLock: number = 0;
+    let ignoreHashUntil: number = 0;
+    let hashAnchorClickValue: string;
+    let hashAnchorClickTime: number;
 
     export let enabled: boolean = true;
 
@@ -32,7 +34,7 @@ export namespace Router {
         if (newURL != window.location.href) {
             if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
                 if (silent)
-                    ignoreChange();
+                    ignoreHashChange();
 
                 oldURL = null;
                 window.history.back();
@@ -40,7 +42,7 @@ export namespace Router {
             }
 
             if (silent)
-                ignoreChange();
+                ignoreHashChange();
 
             oldURL = window.location.href;
             window.location.hash = newHash;
@@ -74,7 +76,7 @@ export namespace Router {
         replace(newHash, tryBack);
     }
 
-    const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .route-ignore';
+    const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
     function isIgnoredDialog(el: HTMLElement) {
         return !!(el?.closest(ignoredSelector) || Dialog.getInstance(el)?.getContentNode()?.closest(ignoredSelector));
@@ -167,20 +169,32 @@ export namespace Router {
     let resolvingPreRoute: string;
     let resolveIndex = 0;
 
+    export let mightBeRouteRegex: RegExp = /^(new$|edit\/|![0-9]+$)/
+
     export function resolve(newHash?: string) {
         resolveIndex++;
 
-        if (!enabled)
+        if (!enabled) {
             return;
+        }
+
+        const resolvingCurrent = newHash == null;
+        newHash = newHash ?? window.location.hash ?? '';
+        if (newHash.charAt(0) == '#')
+            newHash = newHash.substring(1);
+        var newParts = newHash.split("/+/");
+        if (resolvingCurrent &&
+            (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) && 
+             hashAnchorClickValue === newHash &&
+            (newHash != '' || window.location.href.indexOf('#') >= 0) &&
+            newParts.length == 1 &&
+            !newParts.some(x => mightBeRouteRegex.test(x))) {
+            return;
+        }
 
         resolving++;
         try {
-            newHash = newHash ?? window.location.hash ?? '';
-            if (newHash.charAt(0) == '#')
-                newHash = newHash.substring(1);
-
             var dialogs = getVisibleOrHiddenByDialogs();
-            var newParts = newHash.split("/+/");
             var oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
             var same = 0;
@@ -202,8 +216,8 @@ export namespace Router {
                         Dialog.getInstance(x)?.close();
                     }
                 });
-            }
-
+            }            
+            
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
                 Dialog.getInstance(d)?.close("router");
@@ -264,25 +278,25 @@ export namespace Router {
         }
     }
 
-    function hashChange(e: any, o: string) {
-        if (ignoreHash > 0) {
-            if (new Date().getTime() - ignoreTime > 1000) {
-                ignoreHash = 0;
+    function hashChange(_: Event) {
+        if (ignoreHashLock > 0) {
+            if (new Date().getTime() > ignoreHashUntil) {
+                ignoreHashLock = 0;
             }
             else {
-                ignoreHash--;
+                ignoreHashLock--;
                 return;
             }
         }
         resolve();
     }
 
-    function ignoreChange() {
-        ignoreHash++;
-        ignoreTime = new Date().getTime();
+    export function ignoreHashChange(expiration?: number) {
+        ignoreHashLock++;
+        ignoreHashUntil = Math.max(ignoreHashUntil, new Date().getTime() + (expiration ?? 1000));
     }
 
-    window.addEventListener("hashchange", hashChange as any, false);
+    window.addEventListener("hashchange", hashChange, false);
 
     let routerOrder = 1;
 
@@ -313,6 +327,16 @@ export namespace Router {
         Fluent.on(document, "dialogopen", ".ui-dialog-content", onDocumentDialogOpen);
         Fluent.on(document, "shown.bs.modal", ".modal", onDocumentDialogOpen);
         Fluent.on(document, "panelopen", ".panel-body", onDocumentDialogOpen);
+        
+        Fluent.on(document, "click", e => {
+            if (!Fluent.isDefaultPrevented(e)) {
+                const a = (e.target as HTMLElement).closest?.('a[href^="#"]') as HTMLAnchorElement;
+                if (a) {
+                    hashAnchorClickTime = new Date().getTime();
+                    hashAnchorClickValue = a.hash.substring(1);
+                }
+            }
+        });
 
         function shouldTryBack(e: Event) {
             if (isIgnoredDialog(e.target as HTMLElement))

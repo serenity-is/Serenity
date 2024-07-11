@@ -2686,7 +2686,9 @@ declare namespace Router {
     function replace(newHash: string, tryBack?: boolean): void;
     function replaceLast(newHash: string, tryBack?: boolean): void;
     function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+    let mightBeRouteRegex: RegExp;
     function resolve(newHash?: string): void;
+    function ignoreHashChange(expiration?: number): void;
 }
 
 declare namespace ScriptData {

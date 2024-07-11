@@ -931,6 +931,8 @@ declare namespace Slick {
     	private handleDrag;
     	private handleDragEnd;
     	private handleKeyDown;
+    	private getTextSelection;
+    	private setTextSelection;
     	private handleClick;
     	private handleContextMenu;
     	private handleDblClick;
@@ -3981,7 +3983,9 @@ declare namespace Serenity {
         function replace(newHash: string, tryBack?: boolean): void;
         function replaceLast(newHash: string, tryBack?: boolean): void;
         function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+        let mightBeRouteRegex: RegExp;
         function resolve(newHash?: string): void;
+        function ignoreHashChange(expiration?: number): void;
     }
 
     namespace ScriptData {
