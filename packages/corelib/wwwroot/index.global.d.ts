@@ -676,6 +676,7 @@ declare namespace Slick {
     	private _columnCssRulesR;
     	private _currentEditor;
     	private _data;
+    	private _draggableInstance;
     	private _editController;
     	private _emptyNode;
     	private _headerColumnWidthDiff;
