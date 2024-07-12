@@ -5188,17 +5188,25 @@ declare namespace Serenity {
         endHour?: any;
         intervalMinutes?: any;
     }
-    class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
+    class TimeEditorBase<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
         static createDefaultElement(): HTMLElement;
         readonly domNode: HTMLSelectElement;
-        private minutes;
+        protected minutes: Fluent;
         constructor(props: EditorProps<P>);
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+    class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
         get value(): number;
         protected get_value(): number;
         set value(value: number);
         protected set_value(value: number): void;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
+    }
+    class TimeSpanEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+        protected get_value(): string;
+        protected set_value(value: string): void;
+        get value(): string;
+        set value(value: string);
     }
 
     interface EmailEditorOptions {
