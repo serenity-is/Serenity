@@ -679,7 +679,7 @@ export class Validator {
 
     static getLength(value: ValidationValue, element: HTMLElement): number {
         if (element instanceof HTMLSelectElement)
-            return element.querySelectorAll("option:selected").length;
+            return element.querySelectorAll("option:checked").length;
 
         if (element instanceof HTMLInputElement && Validator.isCheckOrRadio(element)) {
             if (!element.name)

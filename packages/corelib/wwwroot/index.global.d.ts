@@ -635,6 +635,7 @@ declare namespace Slick {
     	multiSelect?: boolean;
     	preHeaderPanelHeight?: number;
     	renderAllCells?: boolean;
+    	renderAllRows?: boolean;
     	removeNode?: (node: Element) => void;
     	rowHeight?: number;
     	rtl?: boolean;
@@ -5182,27 +5183,48 @@ declare namespace Serenity {
         inputOnly?: boolean;
     }
 
-    interface TimeEditorOptions {
+    interface TimeEditorBaseOptions {
         noEmptyOption?: boolean;
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
     }
-    class TimeEditorBase<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
+    class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
         static createDefaultElement(): HTMLElement;
         readonly domNode: HTMLSelectElement;
         protected minutes: Fluent;
         constructor(props: EditorProps<P>);
+        get hour(): number;
+        get minute(): number;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        /** Returns value in HH:mm format */
+        get hourAndMin(): string;
+        /** Sets value in HH:mm format */
+        set hourAndMin(value: string);
     }
+    interface TimeEditorOptions extends TimeEditorBaseOptions {
+        /** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
+        multiplier?: number;
+    }
+    /** Note that this editor's value is number of minutes, e.g. for
+     * 16:30, value will be 990. If you want to use a TimeSpan field
+     * use TimeSpanEditor instead.
+     */
     class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+        constructor(props: EditorProps<P>);
         get value(): number;
         protected get_value(): number;
         set value(value: number);
         protected set_value(value: number): void;
     }
-    class TimeSpanEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+    interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
+    }
+    /**
+     * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
+     */
+    class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
+        constructor(props: EditorProps<P>);
         protected get_value(): string;
         protected set_value(value: string): void;
         get value(): string;
