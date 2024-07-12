@@ -96,32 +96,32 @@ public class DataScriptAttributeTests
     [Fact]
     public void AutoKeyFor_ReturnsCorrectKey()
     {
-        var type = typeof(MyClassWithModuleAttribute);
+        var type = typeof(MyClassWithModule);
 
         var key = DataScriptAttribute.AutoKeyFor(type);
 
-        Assert.Equal("TestModule.MyClassWithModuleAttribute", key);
+        Assert.Equal("TestModule.MyClassWithModule", key);
     }
 
     [Fact]
     public void AutoKeyFor_Returns_TypeName_When_ModuleAttribute_NotPresent()
     {
-        var type = typeof(MyClassWithoutModuleAttribute);
+        var type = typeof(MyClassWithoutModule);
         var result = DataScriptAttribute.AutoKeyFor(type);
-        Assert.Equal("MyClassWithoutModuleAttribute", result);
+        Assert.Equal("Tests.ComponentModel.MyClassWithoutModule", result);
     }
 
     [Fact]
     public void AutoKeyFor_Handles_Namespace_With_SubNamespace()
     {
-        var type = typeof(MyClassWithModuleAttribute);
-        var expectedKey = "SubNamespace.MyClassWithSubNamespace";
+        var type = typeof(MyClassWithModule);
+        var expectedKey = "TestModule.MyClassWithModule";
         var result = DataScriptAttribute.AutoKeyFor(type);
         Assert.Equal(expectedKey, result);
     }
 
     [Module("TestModule")]
-    public class MyClassWithModuleAttribute { }
+    public class MyClassWithModule{ }
 
-    public class MyClassWithoutModuleAttribute { }
+    public class MyClassWithoutModule { }
 }
