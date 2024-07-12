@@ -45,5 +45,5 @@ public sealed class ColumnsScriptAttribute : Attribute
     /// instead of the automatically calculated one from Key and
     /// Namespace
     /// </summary>
-    public string? LocalTextPrefix { get; private set; }
+    public string? LocalTextPrefix { get; set; }
 }
