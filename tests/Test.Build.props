@@ -10,7 +10,7 @@
     <UsingSerenity>true</UsingSerenity>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit" Version="2.9.0" />
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
     <Using Include="System.ComponentModel" />
@@ -42,7 +42,7 @@
     </Content>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="21.0.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -52,8 +52,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.19.0" />
-    <PackageReference Include="WebDriverManager" Version="2.17.2" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.22.0" />
+    <PackageReference Include="WebDriverManager" Version="2.17.4" />
     <Using Include="OpenQA.Selenium" />
   </ItemGroup>
 </Project>
