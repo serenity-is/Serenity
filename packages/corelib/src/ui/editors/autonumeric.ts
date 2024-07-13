@@ -97,7 +97,7 @@ function runCallbacks(input: HTMLInputElement & { autoNumeric?: AutoNumericOptio
 
 function convertKeyToNumber(settings: Record<string, any>, key: string) {
     if (typeof (settings[key]) === 'string') {
-        settings[key] *= 1;
+        (settings as any)[key] *= 1;
     }
 }
 

@@ -4594,7 +4594,7 @@ declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpt
     add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
     addDateRange(field: string, title?: string): DateEditor;
     static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-    addDateTimeRange(field: string, title?: string): DateTimeEditor<DateTimeEditorOptions>;
+    addDateTimeRange(field: string, title?: string): DateTimeEditor;
     static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
     addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
     static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;

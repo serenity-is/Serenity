@@ -7,7 +7,7 @@
     "@swc/core": "1.5.29",
     "@swc/jest": "0.2.36",
     "@types/jest": "29.5.12",
-    "esbuild": "0.21.5",
+    "esbuild": "0.23.0",
     "flatpickr": "4.6.13",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
@@ -17,7 +17,7 @@
     "swc_mut_cjs_exports": "0.90.24",
     "terser": "5.31.1",
     "tslib": "2.6.3",
-    "typescript": "5.4.5"
+    "typescript": "5.5.3"
   },
   "optionalDependencies": {
     "fsevents": "2.3.3"
