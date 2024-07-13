@@ -6105,6 +6105,7 @@ declare namespace Serenity {
     class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
         constructor();
         getOperators(): FilterOperator[];
+        getEditorText(): string;
     }
     class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
         constructor();

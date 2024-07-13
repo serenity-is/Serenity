@@ -593,6 +593,14 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
         var op = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }];
         return this.appendNullableOperators(op);
     }
+
+    getEditorText(): string {
+        if (this.useEditor()) {
+            return this.editor.text;
+        }
+
+        return super.getEditorText();
+    }
 }
 
 @Filtering('Integer')

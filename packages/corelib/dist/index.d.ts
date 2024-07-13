@@ -4812,6 +4812,7 @@ declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 declare class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
     constructor();
     getOperators(): FilterOperator[];
+    getEditorText(): string;
 }
 declare class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
     constructor();
