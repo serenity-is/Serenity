@@ -1,3 +1,33 @@
+## 8.6.0 (2024-07-13)
+
+### Features:
+- Updated esbuild to 0.23.0 in tsbuild 8.6.0 which is necessary for modern (non experimental) decorator support in TypeScript. Please remove experimentalDecorators line from tsconfig.json after updating "@serenity-is/tsbuild" to 8.6.0 or later and update Visual Studio (for TypeScript update).
+- Added experimental editor addon support, which provides ability to add content like icons, text, buttons inside and next to editors. See [Editor Addons Sample](https://demo.serenity.is/AdvancedSamples/EditorAddons) for more info.
+- New EditorCssClass attribute that adds a css class to the editor element.
+- Added value option to PropertyGrid, which if not "false", loads the given value as initial entity
+- PropertyGrid is divided into functional sub components like PropertyFieldElement, PropertyFieldCaption, PropertyGridCategory, PropertyTabs etc.
+- PropertyGrid defaultCategory and categoryOrder options which was unused
+- Remove first-category class from the property grid's first as it can be done via css
+- Add a vertical gap between categories
+- Remove category links generation in property grid (they were hidden before)
+- Aded data-category attribute to category divs in property grid
+- Allow passing editor type to the propertygrid item via its type reference instead of string
+- Removed unused toastr options like closeMethod, closeDuration, closeEasing, showDuration, hideDuration etc. which was related to animation but were not implemented.
+- By setting timeOut option to -1 for toastr, the notification can be made sticky. It required setting both timeOut and extendedTimeOut to 0 before.
+- Add ability to lazily load types via Config.lazyTypeLoader callback. For it to work getOrLoad / tryGetOrLoad functions of corresponding type registry (e.g. DialogTypeRegistry / FormatterTypeRegistry etc.) should be used instead of get/tryGet which may result in async behavior that should be handled by the caller.
+- Handle passive event listener warnings for combobox editor
+- Try to avoid Router closing dialogs when clicking a hash link that does not look like a handled route (e.g. #edit/..., #new etc.)
+- Drag drop in tree grid sample no longer requires jquery.event.drag
+- Determine the default editor type as TimeSpanEditor for TimeSpan typed properties. (#7206). Add multiplier option to legacy TimeEditor (integer value) that allows storing seconds or milliseconds instead of the minutes which was the default.
+- Avoid signal aborted without reason errors in console for service calls
+
+### Bugfixes:
+- Fix criteria DateTimeOffset and DateTime JSON parsing (#7180) caused by difference in System.Text.Json
+- DateTimeFormatter does not use the passed DisplayFormat.
+- Don't return empty string for Fluent.val on non-existing inputs, e.g. when this.el is null. Return undefined instead like it was for jQuery.
+- Fix filter display value not showing for enum editor, #7193
+- Add back css for .drag-helper which is used in drag drop in tree grid sample
+
 ## 8.5.6 (2024-06-13)
 
 ### Features:
