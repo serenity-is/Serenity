@@ -116,7 +116,18 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
                 fetchInit.body = JSON.stringify(options.request);
 
-                var fetchResponse = await fetch(url, fetchInit);
+                let fetchResponse: Response;
+                try {
+                    fetchResponse = fetchResponse = await fetch(url, fetchInit);
+                }
+                catch (ex) {
+                    if (ex.name === "AbortError") {
+                        return Promise.reject(reason(`Service fetch to '${url}' was aborted!`,
+                            "abort", { cause: ex, url }));
+                    }
+
+                    throw ex;
+                }
 
                 if (!fetchResponse.ok) {
                     await handleFetchError(fetchResponse, options);
