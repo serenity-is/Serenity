@@ -1,4 +1,4 @@
-import { addListener, disposeElement } from "./fluent-events";
+import { addListener, disposeElement, triggerEvent } from "./fluent-events";
 
 beforeEach(() => {
     jest.restoreAllMocks();
@@ -59,6 +59,84 @@ describe("disposeElement", () => {
         disposeElement(element);
         expect(disposing1).toHaveBeenCalled();
         expect(disposing2).not.toHaveBeenCalled();
+    });
+
+});
+
+describe("triggerEvent", () => {
+    it("triggers event", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test");
+        expect(test).toHaveBeenCalled();
+    });
+
+    it("adds can set custom props", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test",  { custom: 5});
+        expect(test).toHaveBeenCalled();
+        expect(test.mock.calls[0][0].custom).toBe(5);
+    });
+
+    it("bubbles true by default", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test");
+        expect(test).toHaveBeenCalled();
+        expect(test.mock.calls[0][0].bubbles).toBe(true);
+    });
+
+    it("can set bubbles", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test",  { bubbles: false });
+        expect(test).toHaveBeenCalled();
+        expect(test.mock.calls[0][0].bubbles).toBe(false);
+    });
+
+    it("cancelable true by default", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test");
+        expect(test).toHaveBeenCalled();
+        expect(test.mock.calls[0][0].cancelable).toBe(true);
+    });
+
+    it("can set cancelable", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(element, "test", test); 
+        triggerEvent(element, "test",  { cancelable: false });
+        expect(test).toHaveBeenCalled();
+        expect(test.mock.calls[0][0].cancelable).toBe(false);
+    });
+
+    it("can use event delegation", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const test = jest.fn();
+        addListener(document.body, "test", "div", test); 
+        triggerEvent(element, "test");
+        expect(test).toHaveBeenCalled();
     });
 
 });

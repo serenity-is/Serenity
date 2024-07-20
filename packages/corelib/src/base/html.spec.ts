@@ -1,4 +1,4 @@
-﻿import { addClass, htmlEncode, removeClass, toggleClass } from "./html";
+﻿import { addClass, appendToNode, htmlEncode, removeClass, toggleClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -21,7 +21,7 @@ describe("htmlEncode", () => {
 
 describe("toggleClass", () => {
     it("does nothing if class is null or empty", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, null, true);
@@ -36,7 +36,7 @@ describe("toggleClass", () => {
 
     
     it("can toggle single class", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, "test1");
@@ -50,7 +50,7 @@ describe("toggleClass", () => {
     });
 
     it("can toggle multiple classes", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, "test1 test2");
@@ -64,7 +64,7 @@ describe("toggleClass", () => {
     });
 
     it("adds classes if third parameter is true", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, "test1 test2", true);
@@ -78,7 +78,7 @@ describe("toggleClass", () => {
     });
 
     it("removes classes if third parameter is false", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, "test1 test2", false);
@@ -86,7 +86,7 @@ describe("toggleClass", () => {
     });
 
     it("ignores whitespace", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         toggleClass(el, "test1      test2", false);
@@ -96,7 +96,7 @@ describe("toggleClass", () => {
 
 describe("addClass", () => {
     it("adds class to the element", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1");
 
         addClass(el, "test2");
@@ -104,7 +104,7 @@ describe("addClass", () => {
     });
 
     it("does nothing if class is null or empty", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1");
 
         addClass(el, null);
@@ -118,7 +118,7 @@ describe("addClass", () => {
     });
 
     it("does not add duplicate classes", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1");
 
         addClass(el, "test1");
@@ -128,7 +128,7 @@ describe("addClass", () => {
 
 describe("removeClass", () => {
     it("removes class from the element", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
 
         removeClass(el, "test2");
@@ -136,7 +136,7 @@ describe("removeClass", () => {
     });
 
     it("does nothing if class is null or empty", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1");
 
         removeClass(el, null);
@@ -150,10 +150,47 @@ describe("removeClass", () => {
     });
 
     it("does not remove non-existing classes", () => {
-        var el = document.createElement("div");
+        const el = document.createElement("div");
         el.setAttribute("class", "test1");
 
         removeClass(el, "test2");
         expect(el.getAttribute("class")).toBe("test1");
     });
+});
+
+describe("appendToNode", () => {
+    it("throws on null parent", () => {
+        expect(() => appendToNode(null, document.createElement("div"))).toThrow();
+    });
+
+    it("ignores null content", () => {
+        const parent = document.createElement("div");
+        appendToNode(parent, null);
+        expect(parent.innerHTML).toBe("");
+    });
+
+    it("ignores false content", () => {
+        const parent = document.createElement("div");
+        appendToNode(parent, false);
+        expect(parent.innerHTML).toBe("");
+    });
+
+    it("ignores array with false and null content", () => {
+        const parent = document.createElement("div");
+        appendToNode(parent, [false, null]);
+        expect(parent.innerHTML).toBe("");
+    });
+
+    it("appends array elements", () => {
+        const parent = document.createElement("div");
+        const div1 = document.createElement("div");
+        div1.innerHTML = "1";
+        const div2 = document.createElement("div");
+        div2.innerHTML = "2";
+        appendToNode(parent, [div1, div2]);
+        expect(parent.innerHTML).toBe("<div>1</div><div>2</div>");
+        expect(parent.firstChild).toBe(div1);
+        expect(parent.lastChild).toBe(div2);
+    });
+
 });
