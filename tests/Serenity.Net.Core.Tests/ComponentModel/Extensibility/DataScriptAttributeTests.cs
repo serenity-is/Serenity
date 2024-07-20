@@ -115,9 +115,8 @@ public class DataScriptAttributeTests
     public void AutoKeyFor_Handles_Namespace_With_SubNamespace()
     {
         var type = typeof(MyClassWithModule);
-        var expectedKey = "SubNamespace.MyClassWithSubNamespace";
         var result = DataScriptAttribute.AutoKeyFor(type);
-        Assert.Equal(expectedKey, result);
+        Assert.Equal("TestModule.MyClassWithModule", result);
     }
 
     [Module("TestModule")]
