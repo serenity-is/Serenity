@@ -1,232 +1,231 @@
 using Serenity.Navigation;
 
 
-namespace Serenity.Tests.ComponentModel
+namespace Serenity.Tests.ComponentModel;
+
+public class NavigationItemAttributeTests
 {
-    public class NavigationItemAttributeTests
+    public class MyNavigationItemAttribute(int order, string path, string url, object permission, string icon)
+        : NavigationItemAttribute(order, path, url, permission, icon)
     {
-        public class MyNavigationItemAttribute(int order, string path, string url, object permission, string icon)
-            : NavigationItemAttribute(order, path, url, permission, icon)
+    }
+
+    [Fact]
+    public void Constructor_InitializesPropertiesCorrectly_WithPathContainingSlash()
+    {
+
+        int order = 1;
+        string path = "category/item";
+        string url = "http://example.com";
+        object permission = "read";
+        string icon = "icon-class";
+        var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
+        Assert.Equal("category", attribute.Category);
+        Assert.Equal("item", attribute.Title);
+        Assert.Equal(order, attribute.Order);
+        Assert.Equal("read", attribute.Permission);
+        Assert.Equal("icon-class", attribute.IconClass);
+        Assert.Equal(url, attribute.Url);
+    }
+
+    [Fact]
+    public void Constructor_InitializesPropertiesCorrectly_WithPathWithoutSlash()
+    {
+
+        int order = 2;
+        string path = "item";
+        string url = "http://example.com";
+        object permission = "write";
+        string icon = "icon-class";
+        var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
+        Assert.Null(attribute.Category);
+        Assert.Equal("item", attribute.Title);
+        Assert.Equal(order, attribute.Order);
+        Assert.Equal("write", attribute.Permission);
+        Assert.Equal("icon-class", attribute.IconClass);
+        Assert.Equal(url, attribute.Url);
+    }
+
+    [Fact]
+    public void Constructor_InitializesPropertiesCorrectly_WithNullPath()
+    {
+        int order = 3;
+        string path = null;
+        string url = "http://example.com";
+        object permission = null;
+        string icon = "icon-class";
+        var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
+        Assert.Null(attribute.Category);
+        Assert.Equal("", attribute.Title);
+        Assert.Equal(order, attribute.Order);
+        Assert.Null(attribute.Permission);
+        Assert.Equal("icon-class", attribute.IconClass);
+        Assert.Equal(url, attribute.Url);
+    }
+
+    [Fact]
+    public void Constructor_InitializesPropertiesCorrectly_WithEmptyPath()
+    {
+        int order = 4;
+        string path = "";
+        string url = "http://example.com";
+        object permission = null;
+        string icon = "icon-class";
+        var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
+        Assert.Null(attribute.Category);
+        Assert.Equal("", attribute.Title);
+        Assert.Equal(order, attribute.Order);
+        Assert.Null(attribute.Permission);
+        Assert.Equal("icon-class", attribute.IconClass);
+        Assert.Equal(url, attribute.Url);
+    }
+
+    [Fact]
+    public void Title_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-        }
+            Title = "sometext"
+        };
+        Assert.Equal("sometext", attribute.Title);
+    }
 
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly_WithPathContainingSlash()
+    [Fact]
+    public void Title_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
+            Title = null
+        };
+        Assert.Null(attribute.Title);
+    }
 
-            int order = 1;
-            string path = "category/item";
-            string url = "http://example.com";
-            object permission = "read";
-            string icon = "icon-class";
-            var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
-            Assert.Equal("category", attribute.Category);
-            Assert.Equal("item", attribute.Title);
-            Assert.Equal(order, attribute.Order);
-            Assert.Equal("read", attribute.Permission);
-            Assert.Equal("icon-class", attribute.IconClass);
-            Assert.Equal(url, attribute.Url);
-        }
-
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly_WithPathWithoutSlash()
+    [Fact]
+    public void FullPath_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
+            FullPath = "sometext"
+        };
+        Assert.Equal("sometext", attribute.FullPath);
+    }
 
-            int order = 2;
-            string path = "item";
-            string url = "http://example.com";
-            object permission = "write";
-            string icon = "icon-class";
-            var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
-            Assert.Null(attribute.Category);
-            Assert.Equal("item", attribute.Title);
-            Assert.Equal(order, attribute.Order);
-            Assert.Equal("write", attribute.Permission);
-            Assert.Equal("icon-class", attribute.IconClass);
-            Assert.Equal(url, attribute.Url);
-        }
-
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly_WithNullPath()
+    [Fact]
+    public void FullPath_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            int order = 3;
-            string path = null;
-            string url = "http://example.com";
-            object permission = null;
-            string icon = "icon-class";
-            var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
-            Assert.Null(attribute.Category);
-            Assert.Equal("", attribute.Title);
-            Assert.Equal(order, attribute.Order);
-            Assert.Null(attribute.Permission);
-            Assert.Equal("icon-class", attribute.IconClass);
-            Assert.Equal(url, attribute.Url);
-        }
+            FullPath = null
+        };
+        Assert.Null(attribute.FullPath);
+    }
 
-        [Fact]
-        public void Constructor_InitializesPropertiesCorrectly_WithEmptyPath()
+    [Fact]
+    public void Category_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            int order = 4;
-            string path = "";
-            string url = "http://example.com";
-            object permission = null;
-            string icon = "icon-class";
-            var attribute = new MyNavigationItemAttribute(order, path, url, permission, icon);
-            Assert.Null(attribute.Category);
-            Assert.Equal("", attribute.Title);
-            Assert.Equal(order, attribute.Order);
-            Assert.Null(attribute.Permission);
-            Assert.Equal("icon-class", attribute.IconClass);
-            Assert.Equal(url, attribute.Url);
-        }
+            Category = "sometext"
+        };
+        Assert.Equal("sometext", attribute.Category);
+    }
 
-        [Fact]
-        public void Title_CanBeSet()
+    [Fact]
+    public void Category_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Title = "sometext"
-            };
-            Assert.Equal("sometext", attribute.Title);
-        }
+            Category = null
+        };
+        Assert.Null(attribute.Category);
+    }
 
-        [Fact]
-        public void Title_CanBeSet_ToNull()
+    [Fact]
+    public void IconClass_IsNull_ByDefault()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, null);
+        Assert.Null(attribute.IconClass);
+    }
+
+    [Fact]
+    public void IconClass_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Title = null
-            };
-            Assert.Null(attribute.Title);
-        }
+            IconClass = "sometext"
+        };
+        Assert.Equal("sometext", attribute.IconClass);
+    }
 
-        [Fact]
-        public void FullPath_CanBeSet()
+    [Fact]
+    public void IconClass_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                FullPath = "sometext"
-            };
-            Assert.Equal("sometext", attribute.FullPath);
-        }
+            IconClass = null
+        };
+        Assert.Null(attribute.IconClass);
+    }
 
-        [Fact]
-        public void FullPath_CanBeSet_ToNull()
+    [Fact]
+    public void ItemClass_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                FullPath = null
-            };
-            Assert.Null(attribute.FullPath);
-        }
+            ItemClass = "sometext"
+        };
+        Assert.Equal("sometext", attribute.ItemClass);
+    }
 
-        [Fact]
-        public void Category_CanBeSet()
+    [Fact]
+    public void ItemClass_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Category = "sometext"
-            };
-            Assert.Equal("sometext", attribute.Category);
-        }
+            ItemClass = null
+        };
+        Assert.Null(attribute.ItemClass);
+    }
 
-        [Fact]
-        public void Category_CanBeSet_ToNull()
+
+    [Fact]
+    public void Url_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Category = null
-            };
-            Assert.Null(attribute.Category);
-        }
+            Url = "sometext"
+        };
+        Assert.Equal("sometext", attribute.Url);
+    }
 
-        [Fact]
-        public void IconClass_IsNull_ByDefault()
+    [Fact]
+    public void Url_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, null);
-            Assert.Null(attribute.IconClass);
-        }
+            Url = null
+        };
+        Assert.Null(attribute.Url);
+    }
 
-        [Fact]
-        public void IconClass_CanBeSet()
+    [Fact]
+    public void Target_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                IconClass = "sometext"
-            };
-            Assert.Equal("sometext", attribute.IconClass);
-        }
+            Target = "sometext"
+        };
+        Assert.Equal("sometext", attribute.Target);
+    }
 
-        [Fact]
-        public void IconClass_CanBeSet_ToNull()
+    [Fact]
+    public void Target_CanBeSet_ToNull()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
         {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                IconClass = null
-            };
-            Assert.Null(attribute.IconClass);
-        }
-
-        [Fact]
-        public void ItemClass_CanBeSet()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                ItemClass = "sometext"
-            };
-            Assert.Equal("sometext", attribute.ItemClass);
-        }
-
-        [Fact]
-        public void ItemClass_CanBeSet_ToNull()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                ItemClass = null
-            };
-            Assert.Null(attribute.ItemClass);
-        }
-
-
-        [Fact]
-        public void Url_CanBeSet()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Url = "sometext"
-            };
-            Assert.Equal("sometext", attribute.Url);
-        }
-
-        [Fact]
-        public void Url_CanBeSet_ToNull()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Url = null
-            };
-            Assert.Null(attribute.Url);
-        }
-
-        [Fact]
-        public void Target_CanBeSet()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Target = "sometext"
-            };
-            Assert.Equal("sometext", attribute.Target);
-        }
-
-        [Fact]
-        public void Target_CanBeSet_ToNull()
-        {
-            var attribute = new MyNavigationItemAttribute(1, "path", null, null, "icon")
-            {
-                Target = null
-            };
-            Assert.Null(attribute.Target);
-        }
+            Target = null
+        };
+        Assert.Null(attribute.Target);
     }
 }
 

@@ -1,14 +1,13 @@
 using Serenity.Plugins;
 
-namespace Serenity.Tests.Plugins
+namespace Serenity.Tests.Plugins;
+
+public class PrecompiledViewsAttributeTests
 {
-    public class PrecompiledViewsAttributeTests
+    [Fact]
+    public void IsSubClassOf_Attribute()
     {
-        [Fact]
-        public void IsSubClassOf_Attribute()
-        {
-            var attribute = new PrecompiledViewsAttribute();
-            Assert.IsAssignableFrom<Attribute>(attribute);
-        }
+        var attribute = new PrecompiledViewsAttribute();
+        Assert.IsAssignableFrom<Attribute>(attribute);
     }
 }
