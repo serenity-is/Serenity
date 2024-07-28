@@ -80,8 +80,8 @@ function alwaysTrue() { return true; }
 
 export class Uploader {
 
-    private opt: UploaderOptions;
-    private batch: UploaderBatch;
+    declare private opt: UploaderOptions;
+    declare private batch: UploaderBatch;
 
     constructor(opt: UploaderOptions) {
         this.opt = opt = Object.assign({}, Uploader.defaults, opt);

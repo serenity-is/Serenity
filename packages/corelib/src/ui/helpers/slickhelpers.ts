@@ -19,10 +19,10 @@ export interface GridRowSelectionMixinOptions {
 @Decorators.registerClass('Serenity.GridRowSelectionMixin')
 export class GridRowSelectionMixin {
 
-    private idField: string;
-    private include: { [key: string]: boolean }
-    private grid: IDataGrid;
-    private options: GridRowSelectionMixinOptions;
+    declare private idField: string;
+    declare private include: { [key: string]: boolean }
+    declare private grid: IDataGrid;
+    declare private options: GridRowSelectionMixinOptions;
 
     constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions) {
 
@@ -171,10 +171,10 @@ export interface GridRadioSelectionMixinOptions {
 @Decorators.registerClass('GridRadioSelectionMixin')
 export class GridRadioSelectionMixin {
 
-    private idField: string;
-    private include: { [key: string]: boolean };
-    private grid: IDataGrid;
-    private options: GridRadioSelectionMixinOptions;
+    declare private idField: string;
+    declare private include: { [key: string]: boolean };
+    declare private grid: IDataGrid;
+    declare private options: GridRadioSelectionMixinOptions;
 
     constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions) {
 

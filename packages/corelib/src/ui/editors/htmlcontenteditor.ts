@@ -17,7 +17,7 @@ export interface CKEditorConfig {
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
 
-    private _instanceReady: boolean;
+    declare private _instanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
 
     static override createDefaultElement() { return document.createElement("textarea"); }

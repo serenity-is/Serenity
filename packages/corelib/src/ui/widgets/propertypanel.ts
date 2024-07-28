@@ -9,8 +9,8 @@ import { WidgetProps } from "./widget";
 @Decorators.registerClass('Serenity.PropertyPanel')
 export class PropertyPanel<TItem, P> extends BasePanel<P> {
 
-    private _entity: TItem;
-    private _entityId: any;
+    declare private _entity: TItem;
+    declare private _entityId: any;
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -103,5 +103,5 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
         return this.validator.form();
     }
 
-    protected propertyGrid: PropertyGrid;
+    declare protected propertyGrid: PropertyGrid;
 }

@@ -224,8 +224,8 @@ class JsonResponse {
 var xhrOriginal: any;
 
 class MockXHR {
-    public _info: MockFetchInfo;
-    public _responseData: any;
+    declare public _info: MockFetchInfo;
+    declare public _responseData: any;
 
     get status() { return this._info.status ?? 200; }
     get statusText() { return this._info.statusText; }

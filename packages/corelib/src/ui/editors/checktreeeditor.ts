@@ -30,7 +30,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     static override createDefaultElement() { return document.createElement("div"); }
 
-    private itemById: { [key: string]: TItem };
+    declare private itemById: { [key: string]: TItem };
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -391,7 +391,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    private _readOnly: boolean;
+    declare private _readOnly: boolean;
 
     public get_readOnly() {
         return this._readOnly;
@@ -475,9 +475,9 @@ export interface CheckLookupEditorOptions {
 @Decorators.registerEditor("Serenity.CheckLookupEditor")
 export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
 
-    private searchText: string;
-    private enableUpdateItems: boolean;
-    private lookupChangeUnbind: any;
+    declare private searchText: string;
+    declare private enableUpdateItems: boolean;
+    declare private lookupChangeUnbind: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -600,7 +600,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return EditorUtils.getValue(parent);
     }
 
-    protected cascadeLink: CascadedWidgetLink<Widget<any>>;
+    declare protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 
     protected setCascadeFrom(value: string) {
 

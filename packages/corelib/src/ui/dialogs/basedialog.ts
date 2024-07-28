@@ -14,10 +14,10 @@ export class BaseDialog<P> extends Widget<P> {
 
     static override createDefaultElement() { return Fluent("div").class("hidden").appendTo(document.body).getNode(); }
 
-    protected tabs: Fluent<HTMLElement>;
-    protected toolbar: Toolbar;
-    protected validator: any;
-    protected dialog: Dialog;
+    declare protected tabs: Fluent<HTMLElement>;
+    declare protected toolbar: Toolbar;
+    declare protected validator: any;
+    declare protected dialog: Dialog;
 
     constructor(props?: WidgetProps<P>) {
         super(props);

@@ -45,10 +45,10 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
     static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private combobox: Combobox;
-    private _items: ComboboxItem<TItem>[];
-    private _itemById: { [key: string]: ComboboxItem<TItem> };
-    protected lastCreateTerm: string;
+    declare private combobox: Combobox;
+    declare private _items: ComboboxItem<TItem>[];
+    declare private _itemById: { [key: string]: ComboboxItem<TItem> };
+    declare protected lastCreateTerm: string;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -571,7 +571,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return EditorUtils.getValue(parent);
     }
 
-    protected cascadeLink: CascadedWidgetLink<Widget<any>>;
+    declare protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 
     protected setCascadeFrom(value: string) {
 
@@ -742,7 +742,7 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         isPromiseLike(dialogType) ? dialogType.then(then) : then(dialogType);
     }
 
-    public onInitNewEntity: (entity: TItem) => void;
+    declare public onInitNewEntity: (entity: TItem) => void;
 
     protected initNewEntity(entity: TItem) {
         if (this.get_cascadeField()) {
@@ -854,6 +854,6 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         Combobox.getInstance(this.domNode)?.openDropdown();
     }
 
-    public openDialogAsPanel: boolean;
+    declare public openDialogAsPanel: boolean;
 }
 

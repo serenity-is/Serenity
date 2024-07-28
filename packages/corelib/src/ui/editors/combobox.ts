@@ -47,7 +47,7 @@ export interface ComboboxOptions<TSource = any> {
 }
 
 export class Combobox<TItem = any> {
-    private el: HTMLInputElement | HTMLSelectElement;
+    declare private el: HTMLInputElement | HTMLSelectElement;
 
     static defaults: ComboboxOptions = {
         pageSize: 100,

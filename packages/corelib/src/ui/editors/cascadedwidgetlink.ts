@@ -18,7 +18,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         });
     }
 
-    private _parentID: string;
+    declare private _parentID: string;
 
     bind() {
 

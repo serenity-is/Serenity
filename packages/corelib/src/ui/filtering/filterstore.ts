@@ -129,11 +129,11 @@ export class FilterStore {
         return displayText;
     }
 
-    private changed: any;
-    private displayText: string;
-    private fields: PropertyItem[];
-    private fieldByName: { [key: string]: PropertyItem }
-    private items: FilterLine[];
+    declare private changed: any;
+    declare private displayText: string;
+    declare private fields: PropertyItem[];
+    declare private fieldByName: { [key: string]: PropertyItem }
+    declare private items: FilterLine[];
 
     get_fields(): PropertyItem[] {
         return this.fields;

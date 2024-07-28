@@ -80,8 +80,8 @@ export interface DialogOptions {
  */
 export class Dialog {
 
-    private el: HTMLElement;
-    private dialogResult: string;
+    declare private el: HTMLElement;
+    declare private dialogResult: string;
 
     /**
      * Creates a new dialog. The type of the dialog will be determined based on 

@@ -17,24 +17,23 @@ import { BaseDialog } from "./basedialog";
 @Decorators.panel(true)
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    private _entity: TItem;
-    private _entityId: any;
+    declare private _entity: TItem;
+    declare private _entityId: any;
+ 
+    declare protected propertyItemsData: PropertyItemsData;
+    declare protected propertyGrid: PropertyGrid;
 
-    protected propertyItemsData: PropertyItemsData;
-    protected propertyGrid: PropertyGrid;
+    declare protected saveAndCloseButton: Fluent;
+    declare protected applyChangesButton: Fluent;
+    declare protected deleteButton: Fluent;
+    declare protected undeleteButton: Fluent;
+    declare protected cloneButton: Fluent;
+    declare protected editButton: Fluent;
 
-    protected toolbar: Toolbar;
-    protected saveAndCloseButton: Fluent;
-    protected applyChangesButton: Fluent;
-    protected deleteButton: Fluent;
-    protected undeleteButton: Fluent;
-    protected cloneButton: Fluent;
-    protected editButton: Fluent;
-
-    protected localizationGrid: PropertyGrid;
-    protected localizationButton: Fluent;
-    protected localizationPendingValue: any;
-    protected localizationLastValue: any;
+    declare protected localizationGrid: PropertyGrid;
+    declare protected localizationButton: Fluent;
+    declare protected localizationPendingValue: any;
+    declare protected localizationLastValue: any;
 
     static defaultLanguageList: () => string[][];
 
@@ -203,7 +202,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return null;
     }
 
-    private _entityType: string;
+    declare private _entityType: string;
 
     protected getEntityType(): string {
 
@@ -229,7 +228,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return (this._entityType = name);
     }
 
-    private _formKey: string;
+    declare private _formKey: string;
 
     protected getFormKey(): string {
         if (this._formKey != null)
@@ -242,7 +241,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return (this._formKey = this.getEntityType());
     }
 
-    private _localTextDbPrefix: string;
+    declare private _localTextDbPrefix: string;
 
     protected getLocalTextDbPrefix(): string {
         if (this._localTextDbPrefix != null)
@@ -268,7 +267,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.getEntityType();
     }
 
-    private _entitySingular: string;
+    declare private _entitySingular: string;
 
     protected getEntitySingular(): string {
         if (this._entitySingular != null)
@@ -279,7 +278,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
     }
 
-    private _nameProperty: string;
+    declare private _nameProperty: string;
 
     protected getNameProperty(): string {
         if (this._nameProperty != null)
@@ -297,7 +296,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this._nameProperty = 'Name';
     }
 
-    private _idProperty: string;
+    declare private _idProperty: string;
 
     protected getIdProperty(): string {
         if (this._idProperty != null)
@@ -314,7 +313,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this._idProperty = 'ID';
     }
 
-    private _isActiveProperty: string;
+    declare private _isActiveProperty: string;
 
     protected getIsActiveProperty(): string {
         if (this._isActiveProperty != null)
@@ -335,7 +334,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.getRowDefinition()?.isDeletedProperty;
     }
 
-    private _service: string;
+    declare private _service: string;
 
     protected getService() {
         if (this._service != null)
@@ -1097,7 +1096,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.undeleteHandler(finalOptions, callback);
     }
 
-    private _readonly: boolean;
+    declare private _readonly: boolean;
 
     public get readOnly(): boolean {
         return this.get_readOnly();
@@ -1150,7 +1149,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.isNew() ? this.hasInsertPermission() : this.hasUpdatePermission();
     }
 
-    protected editClicked: boolean;
+    declare protected editClicked: boolean;
 
     protected isViewMode() {
         return this.useViewMode() && this.isEditMode() && !this.editClicked;

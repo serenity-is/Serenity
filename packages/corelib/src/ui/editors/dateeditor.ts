@@ -219,7 +219,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         dateInputKeyupHandler(e as any);
     };
 
-    public static useFlatpickr: boolean;
+    declare public static useFlatpickr: boolean;
 
     public getFlatpickrOptions(input: HTMLElement): any {
         var opt: any = {

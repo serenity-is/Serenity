@@ -33,11 +33,11 @@ export class BasePanel<P={}> extends Widget<P> {
         super.destroy();
     }
 
-    protected tabs: Fluent;
-    protected toolbar: Toolbar;
-    protected validator: Validator;
-    protected isPanel: boolean;
-    protected responsive: boolean;
+    declare protected tabs: Fluent;
+    declare protected toolbar: Toolbar;
+    declare protected validator: Validator;
+    declare protected isPanel: boolean;
+    declare protected responsive: boolean;
 
     public arrange(): void {
         this.element.findAll('.require-layout').forEach(el => {

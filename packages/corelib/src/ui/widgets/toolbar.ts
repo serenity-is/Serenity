@@ -126,7 +126,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         super.destroy();
     }
 
-    protected mouseTrap: any;
+    declare protected mouseTrap: any;
 
     createButton(container: Fluent, tb: ToolButton) {
 

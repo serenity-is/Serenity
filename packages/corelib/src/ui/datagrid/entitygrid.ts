@@ -99,7 +99,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return this.getEntityType();
     }
 
-    private _entityType: string;
+    declare private _entityType: string;
 
     protected getEntityType(): string {
         if (this._entityType != null)
@@ -129,7 +129,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return this._entityType;
     }
 
-    private _displayName: string;
+    declare private _displayName: string;
 
     protected getDisplayName(): string {
         if (this._displayName != null)
@@ -149,7 +149,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return this._displayName;
     }
 
-    private _itemName: string;
+    declare private _itemName: string;
 
     protected getItemName(): string {
         if (this._itemName != null)
@@ -250,7 +250,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         });
     }
 
-    private _service: string;
+    declare private _service: string;
 
     protected getService(): string {
         if (this._service != null)
@@ -369,7 +369,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return DialogTypeRegistry.getOrLoad(itemType);
     }
 
-    private _dialogType: any;
+    declare private _dialogType: any;
 
     protected getDialogType(): DialogType | PromiseLike<DialogType> {
 

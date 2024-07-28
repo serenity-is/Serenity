@@ -254,12 +254,12 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.set_value(value);
     }
 
-    protected entity: UploadedFile;
-    protected toolbar: Toolbar;
-    protected progress: Fluent;
-    protected fileSymbols: Fluent;
-    protected uploadInput: Fluent;
-    protected hiddenInput: Fluent;
+    declare protected entity: UploadedFile;
+    declare protected toolbar: Toolbar;
+    declare protected progress: Fluent;
+    declare protected fileSymbols: Fluent;
+    declare protected uploadInput: Fluent;
+    declare protected hiddenInput: Fluent;
 }
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
@@ -282,12 +282,12 @@ export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions
 export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
 
-    private entities: UploadedFile[];
-    private toolbar: Toolbar;
-    private fileSymbols: Fluent;
-    private uploadInput: Fluent;
-    protected progress: Fluent;
-    protected hiddenInput: Fluent;
+    declare private entities: UploadedFile[];
+    declare private toolbar: Toolbar;
+    declare private fileSymbols: Fluent;
+    declare private uploadInput: Fluent;
+    declare protected progress: Fluent;
+    declare protected hiddenInput: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);

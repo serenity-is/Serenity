@@ -335,9 +335,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         };
     }
 
-    public onChange: (e: Event) => void;
+    declare public onChange: (e: Event) => void;
 
-    private submitHandlers: any;
+    declare private submitHandlers: any;
 
     destroy() {
         this.submitHandlers = null;

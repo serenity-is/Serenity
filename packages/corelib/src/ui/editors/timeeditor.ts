@@ -17,7 +17,7 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
     static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
     declare readonly domNode: HTMLSelectElement;
 
-    protected minutes: Fluent;
+    declare protected minutes: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);

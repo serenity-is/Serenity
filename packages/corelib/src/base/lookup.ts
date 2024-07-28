@@ -13,13 +13,15 @@ export interface Lookup<TItem> {
 }
 
 export class Lookup<TItem> {
-    public items: TItem[] = [];
-    public itemById: { [key: string]: TItem } = {};
-    public idField: string;
-    public parentIdField: string;
-    public textField: string;
+    declare public items: TItem[];
+    declare public itemById: { [key: string]: TItem };
+    declare public idField: string;
+    declare public parentIdField: string;
+    declare public textField: string;
 
     constructor(options: LookupOptions<TItem>, items?: TItem[]) {
+        this.items = []
+        this.itemById = {};
         options = options || {};
         this.idField = options.idField;
         this.parentIdField = options.parentIdField;

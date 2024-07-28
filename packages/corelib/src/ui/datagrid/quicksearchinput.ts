@@ -20,11 +20,11 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private lastValue: string;
-    private field: QuickSearchField;
-    private fieldLink: HTMLElement;
-    private fieldChanged: boolean;
-    private timer: number;
+    declare private lastValue: string;
+    declare private field: QuickSearchField;
+    declare private fieldLink: HTMLElement;
+    declare private fieldChanged: boolean;
+    declare private timer: number;
 
     constructor(props: WidgetProps<P>) {
         super(props);

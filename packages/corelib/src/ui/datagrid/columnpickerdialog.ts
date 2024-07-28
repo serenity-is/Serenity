@@ -11,14 +11,14 @@ import { IDataGrid } from "./idatagrid";
 @Decorators.responsive()
 export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 
-    private ulVisible: Fluent;
-    private ulHidden: Fluent;
-    private colById: { [key: string]: Column };
+    declare private ulVisible: Fluent;
+    declare private ulHidden: Fluent;
+    declare private colById: { [key: string]: Column };
 
-    public allColumns: Column[];
-    public visibleColumns: string[];
-    public defaultColumns: string[];
-    public done: () => void;
+    declare public allColumns: Column[];
+    declare public visibleColumns: string[];
+    declare public defaultColumns: string[];
+    declare public done: () => void;
 
     protected renderContents(): any {
         this.dialogTitle = localText("Controls.ColumnPickerDialog.Title");

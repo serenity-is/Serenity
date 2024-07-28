@@ -84,15 +84,17 @@ const initialOptions: ToastrOptions = {
 var initialInstance: Toastr = null;
 
 export class Toastr {
-    private listener: any;
+    declare private listener: any;
 
-    private toastId = 0;
+    declare private toastId;
 
-    private previousToast: string | null = null;
+    declare private previousToast: string | null;
 
-    public options: ToastrOptions;
+    declare public options: ToastrOptions;
 
     public constructor(options?: ToastrOptions) {
+        this.toastId = 0;
+        this.previousToast = null;
         this.options = Object.assign(Object.assign({}, initialInstance?.options ?? initialOptions), options);
     }
 

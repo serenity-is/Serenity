@@ -477,7 +477,7 @@ function defaultEscapeMarkup(markup: string) {
 
 export class Select2 {
 
-    private el: Select2Element;
+    declare private el: Select2Element;
 
     constructor(opts?: Select2Options)
     constructor(opts?: Select2Options, create: boolean = true) {
@@ -932,31 +932,31 @@ function cleanupJQueryElements() {
 
 abstract class AbstractSelect2 {
 
-    private _enabled: boolean;
-    private _readonly: boolean;
-    private _sync: () => void;
-    private _touchEvent: boolean;
-    private _touchMoved: boolean;
+    declare private _enabled: boolean;
+    declare private _readonly: boolean;
+    declare private _sync: () => void;
+    declare private _touchEvent: boolean;
+    declare private _touchMoved: boolean;
 
-    protected autofocus: boolean;
-    container: HTMLElement;
-    protected containerId: string;
-    protected containerEventName: string;
-    protected context: any;
-    dropdown: HTMLElement;
-    protected elementTabIndex: string;
-    protected enabledInterface: boolean;
-    protected id: (item: any) => string;
-    protected nextSearchTerm: string;
-    protected opts: Select2Options;
-    protected propertyObserver: MutationObserver;
-    protected queryCount: number;
-    protected results: HTMLElement;
-    protected resultsPage: number;
-    search: HTMLInputElement;
-    protected selection: HTMLElement;
-    protected showSearchInput: boolean;
-
+    declare protected autofocus: boolean;
+    declare container: HTMLElement;
+    declare protected containerId: string;
+    declare protected containerEventName: string;
+    declare protected context: any;
+    declare dropdown: HTMLElement;
+    declare protected elementTabIndex: string;
+    declare protected enabledInterface: boolean;
+    declare protected id: (item: any) => string;
+    declare protected nextSearchTerm: string;
+    declare protected opts: Select2Options;
+    declare protected propertyObserver: MutationObserver;
+    declare protected queryCount: number;
+    declare protected results: HTMLElement;
+    declare protected resultsPage: number;
+    declare search: HTMLInputElement;
+    declare protected selection: HTMLElement;
+    declare protected showSearchInput: boolean;
+ 
     protected abstract createContainer(): HTMLElement;
     abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
     abstract focus(): void;
@@ -1182,7 +1182,7 @@ abstract class AbstractSelect2 {
         }
     }
 
-    protected select: HTMLSelectElement;
+    declare protected select: HTMLSelectElement;
 
     protected prepareOpts(opts: Select2Options): Select2Options {
         var element: HTMLInputElement | HTMLSelectElement, select: HTMLSelectElement, idKey: string, ajaxUrl: string, self = this;
@@ -2225,7 +2225,7 @@ abstract class AbstractSelect2 {
 
 class SingleSelect2 extends AbstractSelect2 {
 
-    protected focusser: HTMLInputElement;
+    declare protected focusser: HTMLInputElement;
 
     createContainer() {
         var container = document.createElement("div");
@@ -2928,8 +2928,8 @@ class MultiSelect2 extends AbstractSelect2 {
         );
     }
 
-    private searchContainer: HTMLElement;
-    private keydowns: number;
+    declare private searchContainer: HTMLElement;
+    declare private keydowns: number;
 
     protected override initContainer() {
 

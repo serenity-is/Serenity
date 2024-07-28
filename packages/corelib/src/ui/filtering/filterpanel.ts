@@ -68,7 +68,7 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
 @Decorators.registerClass("Serenity.FilterPanel")
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
-    private rowsDiv: HTMLElement;
+    declare private rowsDiv: HTMLElement;
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -79,7 +79,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.updateButtons();
     }
 
-    private showInitialLine: boolean;
+    declare private showInitialLine: boolean;
 
     get_showInitialLine() {
         return this.showInitialLine;
@@ -139,7 +139,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.updateParens();
     }
 
-    private showSearchButton: boolean;
+    declare private showSearchButton: boolean;
 
     get_showSearchButton(): boolean {
         return this.showSearchButton;
@@ -152,7 +152,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
-    private updateStoreOnReset: boolean;
+    declare private updateStoreOnReset: boolean;
 
     get_updateStoreOnReset() {
         return this.updateStoreOnReset;

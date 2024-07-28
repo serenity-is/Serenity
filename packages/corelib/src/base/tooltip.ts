@@ -7,7 +7,7 @@ export interface TooltipOptions {
 }
 
 export class Tooltip {
-    private el: HTMLElement;
+    declare private el: HTMLElement;
 
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions);
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions, create = true) {

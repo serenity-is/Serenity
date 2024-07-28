@@ -9,7 +9,7 @@ import { DataGrid } from "./datagrid";
  */
 export class TreeGridMixin<TItem> {
 
-    private dataGrid: DataGrid<TItem, any>;
+    declare private dataGrid: DataGrid<TItem, any>;
 
     constructor(private options: TreeGridMixinOptions<TItem>) {
         var dg = this.dataGrid = options.grid;

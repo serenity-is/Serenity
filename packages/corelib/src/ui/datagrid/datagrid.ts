@@ -62,33 +62,34 @@ export interface GridPersistanceFlags {
 @Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
-    private _isDisabled: boolean;
-    private _layoutTimer: number;
-    private _slickGridOnSort: any;
-    private _slickGridOnClick: any;
-    protected titleDiv: Fluent;
-    protected toolbar: Toolbar;
-    protected filterBar: FilterDisplayBar;
-    protected quickFiltersDiv: Fluent;
-    protected quickFiltersBar: QuickFilterBar;
-    protected slickContainer: Fluent;
-    protected allColumns: Column[];
-    protected propertyItemsData: PropertyItemsData;
-    protected initialSettings: PersistedGridSettings;
-    protected restoringSettings: number = 0;
-    public view: RemoteView<TItem>;
-    public slickGrid: Grid;
-    public openDialogsAsPanel: boolean;
+    declare private _isDisabled: boolean;
+    declare private _layoutTimer: number;
+    declare private _slickGridOnSort: any;
+    declare private _slickGridOnClick: any;
+    declare protected titleDiv: Fluent;
+    declare protected toolbar: Toolbar;
+    declare protected filterBar: FilterDisplayBar;
+    declare protected quickFiltersDiv: Fluent;
+    declare protected quickFiltersBar: QuickFilterBar;
+    declare protected slickContainer: Fluent;
+    declare protected allColumns: Column[];
+    declare protected propertyItemsData: PropertyItemsData;
+    declare protected initialSettings: PersistedGridSettings;
+    declare protected restoringSettings: number;
+    declare public view: RemoteView<TItem>;
+    declare public slickGrid: Grid;
+    declare public openDialogsAsPanel: boolean;
 
-    public static defaultRowHeight: number;
-    public static defaultHeaderHeight: number;
-    public static defaultPersistanceStorage: SettingStorage;
-    public static defaultColumnWidthScale: number;
-    public static defaultColumnWidthDelta: number;
+    declare public static defaultRowHeight: number;
+    declare public static defaultHeaderHeight: number;
+    declare public static defaultPersistanceStorage: SettingStorage;
+    declare public static defaultColumnWidthScale: number;
+    declare public static defaultColumnWidthDelta: number;
 
     constructor(props: WidgetProps<P>) {
         super(props);
 
+        this.restoringSettings = 0;
         this.domNode.classList.add('s-DataGrid');
 
         var layout = function () {
@@ -973,7 +974,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
-    private _readonly: boolean;
+    declare private _readonly: boolean;
 
     public get readOnly(): boolean {
         return this.get_readOnly();
@@ -1002,7 +1003,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return null;
     }
 
-    private _localTextDbPrefix: string;
+    declare private _localTextDbPrefix: string;
 
     protected getLocalTextDbPrefix(): string {
 
@@ -1024,7 +1025,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.getCustomAttribute(LocalTextPrefixAttribute)?.value;
     }
 
-    private _idProperty: string;
+    declare private _idProperty: string;
 
     protected getIdProperty(): string {
         if (this._idProperty != null)
@@ -1045,7 +1046,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.getRowDefinition()?.isDeletedProperty;
     }
 
-    private _isActiveProperty: string;
+    declare private _isActiveProperty: string;
 
     protected getIsActiveProperty(): string {
         if (this._isActiveProperty != null)

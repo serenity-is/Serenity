@@ -50,7 +50,7 @@ export class IQuickFiltering {
 @Decorators.registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
 export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
-    private field: PropertyItem;
+    declare private field: PropertyItem;
 
     public get_field() {
         return this.field;
@@ -60,7 +60,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         this.field = value;
     }
 
-    private container: HTMLElement;
+    declare private container: HTMLElement;
 
     get_container(): HTMLElement {
         return this.container;
@@ -70,7 +70,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         this.container = value;
     }
 
-    private operator: FilterOperator;
+    declare private operator: FilterOperator;
 
     get_operator() {
         return this.operator;
@@ -318,7 +318,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return false;
     }
 
-    protected editor: TEditor;
+    declare protected editor: TEditor;
 
     createEditor() {
         if (this.useEditor()) {

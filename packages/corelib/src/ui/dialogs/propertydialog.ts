@@ -9,10 +9,10 @@ import { BaseDialog } from "./basedialog";
 @Decorators.registerClass('Serenity.PropertyDialog')
 @Decorators.panel(false)
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
-    private _entity: TItem;
-    private _entityId: any;
+    declare private _entity: TItem;
+    declare private _entityId: any;
 
-    protected propertyItemsData: PropertyItemsData;
+    declare protected propertyItemsData: PropertyItemsData;
     protected isClosable() { return !this.isStatic(); }
     protected isStatic() { return false; }
 
@@ -190,7 +190,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
     protected updateTitle() {
     }
 
-    protected propertyGrid: PropertyGrid;
+    declare protected propertyGrid: PropertyGrid;
 
     protected renderContents(): any {
         if (this.legacyTemplateRender())

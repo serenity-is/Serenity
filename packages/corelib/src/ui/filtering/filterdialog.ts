@@ -7,7 +7,7 @@ import { FilterPanel } from "./filterpanel";
 @Decorators.registerClass('Serenity.FilterDialog')
 export class FilterDialog<P = {}> extends BaseDialog<P> {
 
-    private filterPanel: FilterPanel;
+    declare private filterPanel: FilterPanel;
 
     constructor(props: WidgetProps<P>) {
         super(props);

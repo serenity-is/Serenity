@@ -6,10 +6,10 @@ import { Widget, WidgetProps } from "../widgets/widget";
 @Decorators.registerClass("Serenity.SlickPager")
 export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
 
-    private currentPage: Fluent<HTMLInputElement>;
-    private totalPages: Fluent<HTMLSpanElement>;
-    private pageSize: Fluent<HTMLSelectElement>;
-    private stat: Fluent<HTMLSpanElement>;
+    declare private currentPage: Fluent<HTMLInputElement>;
+    declare private totalPages: Fluent<HTMLSpanElement>;
+    declare private pageSize: Fluent<HTMLSelectElement>;
+    declare private stat: Fluent<HTMLSpanElement>;
 
     constructor(props: WidgetProps<P>) {
         super(props);

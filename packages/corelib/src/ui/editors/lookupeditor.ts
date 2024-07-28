@@ -13,7 +13,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 @Decorators.registerEditor("Serenity.LookupEditorBase")
 export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
-    private lookupChangeUnbind: any;
+    declare private lookupChangeUnbind: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -56,7 +56,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return key;
     }
 
-    protected lookup: Lookup<TItem>;
+    declare protected lookup: Lookup<TItem>;
 
     protected getLookupAsync(): PromiseLike<Lookup<TItem>> {
         return getLookupAsync<TItem>(this.getLookupKey());

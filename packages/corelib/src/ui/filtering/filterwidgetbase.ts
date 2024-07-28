@@ -4,7 +4,7 @@ import { FilterStore } from "./filterstore";
 
 @Decorators.registerClass('Serenity.FilterWidgetBase')
 export class FilterWidgetBase<P = {}> extends Widget<P> {
-    private store: FilterStore;
+    declare private store: FilterStore;
 
     private onFilterStoreChanged: () => void;
 

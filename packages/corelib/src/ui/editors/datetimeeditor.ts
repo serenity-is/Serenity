@@ -13,9 +13,9 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
     declare readonly domNode: HTMLInputElement;
 
-    private time: HTMLSelectElement;
-    private lastSetValue: string;
-    private lastSetValueGet: string;
+    declare private time: HTMLSelectElement;
+    declare private lastSetValue: string;
+    declare private lastSetValueGet: string;
 
     constructor(props: EditorProps<P>) {
         super(props);

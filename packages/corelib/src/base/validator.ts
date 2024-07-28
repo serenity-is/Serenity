@@ -509,21 +509,21 @@ export class Validator {
     }
 
     readonly settings: ValidatorOptions;
-    public lastActive: ValidatableElement;
-    private cancelSubmit: boolean;
-    private currentElements: ValidatableElement[];
-    private currentForm: HTMLFormElement;
-    private errorMap: ValidationErrorMap;
-    private errorList: ValidationErrorList;
-    private formSubmitted: boolean;
-    private submitted: Record<string, boolean>;
-    private submitButton: HTMLInputElement | HTMLButtonElement;
-    private pendingRequest: number;
-    private invalid: ValidationErrorMap;
-    private pending: Record<string, (false | AbortController)>;
-    private successList: ValidatableElement[];
-    private toHide: HTMLElement[];
-    private toShow: HTMLElement[];
+    declare public lastActive: ValidatableElement;
+    declare private cancelSubmit: boolean;
+    declare private currentElements: ValidatableElement[];
+    declare private currentForm: HTMLFormElement;
+    declare private errorMap: ValidationErrorMap;
+    declare private errorList: ValidationErrorList;
+    declare private formSubmitted: boolean;
+    declare private submitted: Record<string, boolean>;
+    declare private submitButton: HTMLInputElement | HTMLButtonElement;
+    declare private pendingRequest: number;
+    declare private invalid: ValidationErrorMap;
+    declare private pending: Record<string, (false | AbortController)>;
+    declare private successList: ValidatableElement[];
+    declare private toHide: HTMLElement[];
+    declare private toShow: HTMLElement[];
 
     constructor(form: HTMLFormElement, options: ValidatorOptions) {
         if (validatorMap.get(form))

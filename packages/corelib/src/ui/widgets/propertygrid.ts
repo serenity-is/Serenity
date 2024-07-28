@@ -404,7 +404,7 @@ export function PropertyTabs(props: {
 @Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
-    private fieldElements: PropertyFieldElement[];
+    declare private fieldElements: PropertyFieldElement[];
 
     protected renderContents(): any {
 

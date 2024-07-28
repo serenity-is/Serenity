@@ -14,7 +14,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
     static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }   
     declare readonly domNode: HTMLInputElement;
-    private readonly domain: HTMLInputElement;
+    declare private readonly domain: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);

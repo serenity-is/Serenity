@@ -5503,7 +5503,6 @@ declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEdit
     private _entityId;
     protected propertyItemsData: PropertyItemsData;
     protected propertyGrid: PropertyGrid;
-    protected toolbar: Toolbar;
     protected saveAndCloseButton: Fluent;
     protected applyChangesButton: Fluent;
     protected deleteButton: Fluent;
