@@ -1,10 +1,10 @@
 namespace Serenity.TypeScript;
 
-public class ImportSpecifier(bool isTypeOnly, Identifier propertyName, Identifier name)
+public class ImportSpecifier(bool isTypeOnly, IModuleExportName propertyName, Identifier name)
     : NamedDeclaration<Identifier>(SyntaxKind.ImportSpecifier, name), IImportOrExportSpecifier, IGetRestChildren
 {
     public bool IsTypeOnly { get; } = isTypeOnly;
-    public Identifier PropertyName { get; } = propertyName;
+    public IModuleExportName PropertyName { get; } = propertyName;
 
     public override IEnumerable<INode> GetRestChildren()
     {

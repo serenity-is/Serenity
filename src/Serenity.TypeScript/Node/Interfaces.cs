@@ -221,9 +221,9 @@ public interface IVariableDeclarationList : INode, IForInitializer
     NodeArray<VariableDeclaration> Declarations { get; }
 }
 
-public interface IIntersectsChange : INode
+public interface IIntersectsIncrementalChange : INode
 {
-    bool InterectsChange { get; }
+    bool IntersectsIncrementalChange { get; }
 }
 
 
@@ -348,6 +348,10 @@ public interface IDeclarationWithTypeParameterChildren : INode, IDeclarationWith
 public interface IDeclarationWithTypeParameters : INode
 {
 }
+public interface IModuleExportName : INode, IDeclarationName
+{
+    string Text { get; }
+}
 
 public interface IModuleName : INode, IDeclarationName
 {
@@ -385,7 +389,7 @@ public interface INamedExportBindings : INode, INamedImportsOrExports
 
 public interface IImportOrExportSpecifier : INamedDeclaration
 {
-    Identifier PropertyName { get; }
+    IModuleExportName PropertyName { get; }
     bool IsTypeOnly { get; }
 }
 

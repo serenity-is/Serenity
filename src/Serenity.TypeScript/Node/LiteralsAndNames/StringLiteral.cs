@@ -3,7 +3,7 @@ namespace Serenity.TypeScript;
 public class StringLiteral(string text, bool? isSingleQuote = null, bool hasExtendedUnicodeEscape = false)
     : LiteralExpressionBase(SyntaxKind.StringLiteral, text,
         hasExtendedUnicodeEscape: hasExtendedUnicodeEscape), IPropertyName, IJsxAttributeValue, IGetRestChildren,
-    IModuleName, IStringLiteralLike
+    IModuleName, IModuleExportName, IStringLiteralLike
 {
     public bool? IsSingleQuote { get; set; } = isSingleQuote;
 

@@ -954,7 +954,7 @@ public class Parser
         if (isIdentifier)
         {
             identifierCount++;
-            var pos = GetNodePos();
+            var pos = scanner.HasPrecedingJSDocLeadingAsterisks() ? scanner.GetTokenStart() : GetNodePos();
             // Store original token kind if it is not just an Identifier so we can report appropriate error later in type checker
             var originalKeywordKind = Token();
             var text = InternIdentifier(scanner.GetTokenValue());
@@ -1016,7 +1016,8 @@ public class Parser
     {
         return TokenIsIdentifierOrKeyword(Token()) ||
             Token() == SyntaxKind.StringLiteral ||
-            Token() == SyntaxKind.NumericLiteral;
+            Token() == SyntaxKind.NumericLiteral ||
+            Token() == SyntaxKind.BigIntLiteral;
     }
 
     bool IsImportAttributeName()
@@ -1026,7 +1027,7 @@ public class Parser
 
     IPropertyName ParsePropertyNameWorker(bool allowComputedPropertyNames)
     {
-        if (Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.NumericLiteral)
+        if (Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.NumericLiteral || Token() == SyntaxKind.BigIntLiteral)
         {
             var node = ParseLiteralNode<ILiteralExpression>();
             node.Text = InternIdentifier(node.Text);
@@ -1265,6 +1266,10 @@ public class Parser
                 {
                     return false;
                 }
+                if (Token() == SyntaxKind.StringLiteral)
+                {
+                    return true; // For "arbitrary module namespace identifiers"
+                }
                 return TokenIsIdentifierOrKeyword(Token());
             case ParsingContext.JsxAttributes:
                 return TokenIsIdentifierOrKeyword(Token()) || Token() == SyntaxKind.OpenBraceToken;
@@ -1479,7 +1484,7 @@ public class Parser
         // Can't reuse a node that intersected the change range.
         // Can't reuse a node that contains a parse error.  This is necessary so that we
         // produce the same set of errors again.
-        if (NodeIsMissing(node) || node is IIntersectsChange { InterectsChange: true } || ContainsParseError(node) != null)
+        if (NodeIsMissing(node) || node is IIntersectsIncrementalChange { IntersectsIncrementalChange: true } || ContainsParseError(node) != null)
         {
             return null;
         }
@@ -6917,6 +6922,7 @@ public class Parser
             TokenIsIdentifierOrKeyword(Token()) ||
             Token() == SyntaxKind.StringLiteral ||
             Token() == SyntaxKind.NumericLiteral ||
+            Token() == SyntaxKind.BigIntLiteral ||
             Token() == SyntaxKind.AsteriskToken ||
             Token() == SyntaxKind.OpenBracketToken
         )
@@ -7278,6 +7284,17 @@ public class Parser
             return ParseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, isTypeOnly);
         }
 
+        var importClause = TryParseImportClause(identifier, afterImportPos, isTypeOnly);
+        var moduleSpecifier = ParseModuleSpecifier();
+        var attributes = TryParseImportAttributes();
+
+        ParseSemicolon();
+        var node = new ImportDeclaration(modifiers, importClause, moduleSpecifier, attributes);
+        return WithJSDoc(FinishNode(node, pos), hasJSDoc);
+    }
+
+    ImportClause TryParseImportClause(Identifier identifier, int pos, bool isTypeOnly, bool skipJsDocLeadingAsterisks = false)
+    {
         // ImportDeclaration:
         //  import ImportClause from ModuleSpecifier ;
         //  import ModuleSpecifier;
@@ -7287,20 +7304,21 @@ public class Parser
             Token() == SyntaxKind.OpenBraceToken // import {
         )
         {
-            importClause = ParseImportClause(identifier, afterImportPos, isTypeOnly);
+            importClause = ParseImportClause(identifier, pos, isTypeOnly, skipJsDocLeadingAsterisks);
             ParseExpected(SyntaxKind.FromKeyword);
         }
-        var moduleSpecifier = ParseModuleSpecifier();
+        return importClause;
+    }
+
+    ImportAttributes TryParseImportAttributes()
+    { 
         var currentToken = Token();
-        ImportAttributes attributes = null;
         if ((currentToken == SyntaxKind.WithKeyword || currentToken == SyntaxKind.AssertKeyword)
             && !scanner.HasPrecedingLineBreak())
         {
-            attributes = ParseImportAttributes(currentToken);
+            return ParseImportAttributes(currentToken);
         }
-        ParseSemicolon();
-        var node = new ImportDeclaration(modifiers, importClause, moduleSpecifier, attributes);
-        return WithJSDoc(FinishNode(node, pos), hasJSDoc);
+        return null;
     }
 
     ImportAttribute ParseImportAttribute()
@@ -7359,7 +7377,7 @@ public class Parser
         return finished;
     }
 
-    ImportClause ParseImportClause(Identifier identifier, int pos, bool isTypeOnly)
+    ImportClause ParseImportClause(Identifier identifier, int pos, bool isTypeOnly, bool skipJsDocLeadingAsterisks = false)
     {
         // ImportClause:
         //  ImportedDefaultBinding
@@ -7374,8 +7392,10 @@ public class Parser
         if (identifier == null ||
             ParseOptional(SyntaxKind.CommaToken))
         {
+            if (skipJsDocLeadingAsterisks) scanner.SetSkipJsDocLeadingAsterisks(true);
             namedBindings = Token() == SyntaxKind.AsteriskToken ? ParseNamespaceImport()
                 : (INamedImportBindings)ParseNamedImportsOrExports(SyntaxKind.NamedImports);
+            if (skipJsDocLeadingAsterisks) scanner.SetSkipJsDocLeadingAsterisks(false);
         }
 
         return FinishNode(new ImportClause(isTypeOnly, identifier, namedBindings), pos);
@@ -7426,6 +7446,17 @@ public class Parser
         return FinishNode(new NamespaceImport(name), pos);
     }
 
+    bool CanParseModuleExportName()
+    {
+        return TokenIsIdentifierOrKeyword(Token()) || 
+            Token() == SyntaxKind.StringLiteral;
+    }
+
+    IModuleExportName ParseModuleExportName(Func<Identifier> parseName)
+    {
+        return Token() == SyntaxKind.StringLiteral ? ParseLiteralNode<StringLiteral>() : parseName();
+    }
+
     INamedImportsOrExports ParseNamedImportsOrExports(SyntaxKind kind)
     {
         var pos = GetNodePos();
@@ -7462,18 +7493,18 @@ public class Parser
         var pos = GetNodePos();
         // ImportSpecifier:
         //   BindingIdentifier
-        //   IdentifierName as BindingIdentifier
+        //   ModuleExportName as BindingIdentifier
         // ExportSpecifier:
-        //   IdentifierName
-        //   IdentifierName as IdentifierName
+        //   ModuleExportName
+        //   ModuleExportName as ModuleExportName
         var checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
         var checkIdentifierStart = scanner.GetTokenStart();
         var checkIdentifierEnd = scanner.GetTokenEnd();
         var isTypeOnly = false;
-        Identifier propertyName = null;
+        IModuleExportName propertyName = null;
         var CanParseAsKeyword = true;
-        var name = ParseIdentifierName();
-        if (name.EscapedText == "type")
+        var name = ParseModuleExportName(() => ParseIdentifierName());
+        if (name is Identifier identifier && identifier.EscapedText == "type")
         {
             // If the first token of an import specifier is 'type', there are a lot of possibilities,
             // especially if we see 'as' afterwards:
@@ -7490,12 +7521,12 @@ public class Parser
                 {
                     // { type as as ...? }
                     var secondAs = ParseIdentifierName();
-                    if (TokenIsIdentifierOrKeyword(Token()))
+                    if (CanParseModuleExportName())
                     {
                         // { type as as something }
                         isTypeOnly = true;
                         propertyName = firstAs;
-                        name = parseNameWithKeywordCheck();
+                        name = ParseModuleExportName(() => parseNameWithKeywordCheck());
                         CanParseAsKeyword = false;
                     }
                     else
@@ -7506,12 +7537,12 @@ public class Parser
                         CanParseAsKeyword = false;
                     }
                 }
-                else if (TokenIsIdentifierOrKeyword(Token()))
+                else if (CanParseModuleExportName())
                 {
-                    // { type as something }
+                    // { type as "something" }
                     propertyName = name;
                     CanParseAsKeyword = false;
-                    name = parseNameWithKeywordCheck();
+                    name = ParseModuleExportName(() => parseNameWithKeywordCheck());
                 }
                 else
                 {
@@ -7520,11 +7551,11 @@ public class Parser
                     name = firstAs;
                 }
             }
-            else if (TokenIsIdentifierOrKeyword(Token()))
+            else if (CanParseModuleExportName())
             {
-                // { type something ...? }
+                // { type "something" ...? }
                 isTypeOnly = true;
-                name = parseNameWithKeywordCheck();
+                name = ParseModuleExportName(() => parseNameWithKeywordCheck());
             }
         }
 
@@ -7532,14 +7563,25 @@ public class Parser
         {
             propertyName = name;
             ParseExpected(SyntaxKind.AsKeyword);
-            name = parseNameWithKeywordCheck();
+            name = ParseModuleExportName(() => parseNameWithKeywordCheck());
         }
-        if (kind == SyntaxKind.ImportSpecifier && checkIdentifierIsKeyword)
+        if (kind == SyntaxKind.ImportSpecifier)
         {
-            ParseErrorAt(checkIdentifierStart, checkIdentifierEnd, Diagnostics.Identifier_expected);
+            if (name.Kind != SyntaxKind.Identifier)
+            {
+                // ImportSpecifier casts "name" to Identifier below, so make sure it's an identifier
+                ParseErrorAt(SkipTrivia(sourceText, name.Pos ?? 0) ?? 0, name.End ?? 0, Diagnostics.Identifier_expected);
+                var missingNode = CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ false);
+                SetTextRangePosEnd(missingNode, name.Pos ?? 0, name.Pos ?? 0);
+                name = missingNode;
+            }
+            else if (checkIdentifierIsKeyword)
+            {
+                ParseErrorAt(checkIdentifierStart, checkIdentifierEnd, Diagnostics.Identifier_expected);
+            }
         }
         IImportOrExportSpecifier node = kind == SyntaxKind.ImportSpecifier
-            ? new ImportSpecifier(isTypeOnly, propertyName, name)
+            ? new ImportSpecifier(isTypeOnly, propertyName, name as Identifier)
             : new ExportSpecifier(isTypeOnly, propertyName, name);
         return FinishNode(node, pos);
 
@@ -7554,7 +7596,7 @@ public class Parser
 
     NamespaceExport ParseNamespaceExport(int pos)
     {
-        return FinishNode(new NamespaceExport(ParseIdentifierName()), pos);
+        return FinishNode(new NamespaceExport(ParseModuleExportName(() => ParseIdentifierName())), pos);
     }
 
     ExportDeclaration ParseExportDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers)

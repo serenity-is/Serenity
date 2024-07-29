@@ -1,6 +1,6 @@
 namespace Serenity.TypeScript;
 
-public class NamespaceExport(Identifier name)
-    : NamedDeclaration<Identifier>(SyntaxKind.NamespaceExport, name), INamedExportBindings
+public class NamespaceExport(IModuleExportName name)
+    : NamedDeclaration<IModuleExportName>(SyntaxKind.NamespaceExport, name), INamedExportBindings
 {
 }

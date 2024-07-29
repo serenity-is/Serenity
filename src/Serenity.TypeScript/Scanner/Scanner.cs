@@ -54,6 +54,7 @@ public partial class Scanner
     public bool HasExtendedUnicodeEscape() => (tokenFlags & TokenFlags.ExtendedUnicodeEscape) != 0;
     public bool HasPrecedingLineBreak() => (tokenFlags & TokenFlags.PrecedingLineBreak) != 0;
     internal bool HasPrecedingJSDocComment() => (tokenFlags & TokenFlags.PrecedingJSDocComment) != 0;
+    internal bool HasPrecedingJSDocLeadingAsterisks() => (tokenFlags & TokenFlags.PrecedingJSDocLeadingAsterisks) != 0;
     public bool IsIdentifier() => token == SyntaxKind.Identifier || token > SyntaxKindMarker.LastReservedWord;
     public bool IsReservedWord() => token >= SyntaxKindMarker.FirstReservedWord && token <= SyntaxKindMarker.LastReservedWord;
     public bool IsUnterminated() => (tokenFlags & TokenFlags.Unterminated) != 0;

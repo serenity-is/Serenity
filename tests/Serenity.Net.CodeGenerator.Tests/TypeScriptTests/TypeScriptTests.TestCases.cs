@@ -102,12 +102,11 @@ public partial class TypeScriptTests
     // There are known failing cases
     static readonly HashSet<string> TypeScriptCasesToSkip =
     [
-        "bigintArbirtraryIdentifier",
-        "bigintPropertyName",
+        "bigintPropertyName", // bigint parse issues
         "dynamicImportsDeclaration", // top level await reparse issue
         "expressionWithJSDocTypeArguments", // jsdoc type parsing issue
         "identifierStartAfterNumericLiteral", // invalid syntax
-        "parseBigInt",  // bigint parse issues
+        "parseBigInt", // bigint parse issues
         "parseInvalidNonNullableTypes",  // jsdoc type parsing
         "parseInvalidNullableTypes",  // jsdoc type parsing
     ];
