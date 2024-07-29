@@ -1,4 +1,4 @@
-import { resolveServiceUrl, resolveUrl } from "./services";
+import { isSameOrigin, resolveServiceUrl, resolveUrl } from "./services";
 import { getCookie } from "./services";
 
 jest.mock("./config", () => ({
@@ -104,4 +104,34 @@ describe("getCookie", () => {
     });
 });
 
+describe("isSameOrigin", () => {
+    it("should return true if the URL has the same origin as the current page", () => {
+        const url = window.location.protocol + "//" + window.location.host + "/test";
+        const isSame = isSameOrigin(url);
+        expect(isSame).toBe(true);
+    });
 
+    it("should return false if the URL has a different origin than the current page", () => {
+        const url = "http://example.com/test";
+        const isSame = isSameOrigin(url);
+        expect(isSame).toBe(false);
+    });
+
+    it("should return false if the URL has the same origin as the current page with a different port", () => {
+        const url = window.location.protocol + "//" + window.location.hostname + ":9991/test";
+        const isSame = isSameOrigin(url);
+        expect(isSame).toBe(false);
+    });
+
+    it("should return false if the URL has the same origin as the current page with a different protocol", () => {
+        const url = "https://" + window.location.hostname + ":4431/test";
+        const isSame = isSameOrigin(url);
+        expect(isSame).toBe(false);
+    });
+
+    it("should return false if the URL has the same origin as the current page with a different subdomain", () => {
+        const url = window.location.protocol + "//" + "subdomain." + window.location.hostname + "/test";
+        const isSame = isSameOrigin(url);
+        expect(isSame).toBe(false);
+    });
+});
