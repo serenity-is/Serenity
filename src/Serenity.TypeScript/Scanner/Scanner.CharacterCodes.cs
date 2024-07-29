@@ -4,6 +4,7 @@ partial class Scanner
 {
     internal static class CharacterCodes
     {
+        internal const int EOF = -1;
         internal const int NullCharacter = 0;
         internal const int MaxAsciiCharacter = 0x7F;
 
@@ -146,6 +147,11 @@ partial class Scanner
         return code <= 0x10FFFF;
     }
 
+    private static bool IsASCIILetter(int ch)
+    {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+    }
+
     private static bool IsDigit(int ch)
     {
         return ch >= '0' && ch <= '9';
@@ -178,6 +184,11 @@ partial class Scanner
             ch == '\r' ||
             ch == CharacterCodes.LineSeparator ||
             ch == CharacterCodes.ParagraphSeparator;
+    }
+
+    private static bool IsWordCharacter(int ch)
+    {
+        return IsASCIILetter(ch) || IsDigit(ch) || ch == CharacterCodes._;
     }
 
     public static bool IsWhiteSpaceLike(int ch)

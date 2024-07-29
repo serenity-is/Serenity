@@ -29,6 +29,8 @@ public enum TokenFlags
     /** @internal */
     ContainsInvalidSeparator = 1 << 14, // e.g. `0_1`
     /** @internal */
+    PrecedingJSDocLeadingAsterisks = 1 << 15,
+    /** @internal */
     BinaryOrOctalSpecifier = BinarySpecifier | OctalSpecifier,
     /** @internal */
     WithSpecifier = HexSpecifier | BinaryOrOctalSpecifier,

@@ -4,14 +4,13 @@ partial class Scanner
 {
     private static bool IsIdentifierStart(int ch, ScriptTarget _)
     {
-        return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '$' || ch == '_' ||
+        return IsASCIILetter(ch) || ch == '$' || ch == '_' ||
             (ch > CharacterCodes.MaxAsciiCharacter && IsUnicodeIdentifierStart(ch));
     }
 
     private static bool IsIdentifierPart(int ch, ScriptTarget _, LanguageVariant identifierVariant = LanguageVariant.Standard)
     {
-        return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ||
-            (ch >= '0' && ch <= '9') || ch == '$' || ch == '_' ||
+        return IsWordCharacter(ch) || ch == '$' ||
             // "-" and ":" are valid in JSX Identifiers
             (identifierVariant == LanguageVariant.JSX && (ch == CharacterCodes.Minus || ch == CharacterCodes.Colon)) ||
             (ch > CharacterCodes.MaxAsciiCharacter && IsUnicodeIdentifierPart(ch));
@@ -23,14 +22,30 @@ partial class Scanner
         {
             return 2;
         }
+        if (ch == CharacterCodes.EOF)
+        {
+            return 0;
+        }
         return 1;
+    }
+
+    internal static int CodePointAt(string s, int pos)
+    {
+        if (pos < 0 || pos >= s.Length)
+            return CharacterCodes.EOF;
+
+        if (pos < s.Length - 1 &&
+            char.IsSurrogatePair(s, pos))
+            return char.ConvertToUtf32(s, pos);
+
+        return s[pos];
     }
 
     internal static bool IsIdentifierText(string name, ScriptTarget languageVersion, LanguageVariant identifierVariant = LanguageVariant.Standard)
     {
         if (string.IsNullOrEmpty(name)) 
             return false;
-        var ch = (int)name[0];
+        var ch = CodePointAt(name, 0);
         if (!IsIdentifierStart(ch, languageVersion))
         {
             return false;
@@ -38,7 +53,7 @@ partial class Scanner
 
         for (var i = CharSize(ch); i < name.Length; i += CharSize(ch))
         {
-            if (!IsIdentifierPart(name[i], languageVersion, identifierVariant))
+            if (!IsIdentifierPart(CodePointAt(name, i), languageVersion, identifierVariant))
             {
                 return false;
             }

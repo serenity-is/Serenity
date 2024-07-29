@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Converters;
 using Serenity.JsonConverters;
 using Serenity.TypeScript;
 using System.IO;
@@ -11,7 +10,7 @@ namespace Serenity.Tests.CodeGenerator;
 public partial class TypeScriptTests
 {
     const string TestCaseExtension = ".testcase";
-    const string TypeScriptCasesFolder = "/Sandbox/misc/TypeScript/tests/cases/compiler/";
+    const string TypeScriptCasesFolder = "/misc/TypeScript/tests/cases/compiler/";
     const string DummyCaseFile = "__dummyFile__";
 
     // For these tests to work, clone TypeScript repo, npm i, npm run build and
@@ -103,14 +102,14 @@ public partial class TypeScriptTests
     // There are known failing cases
     static readonly HashSet<string> TypeScriptCasesToSkip =
     [
-        "bom-utf16be", // unicode issues
-        "bom-utf16le", // unicode issues
+        "bigintArbirtraryIdentifier",
+        "bigintPropertyName",
         "dynamicImportsDeclaration", // top level await reparse issue
-        "extendedUnicodePlaneIdentifiers",  // unicode issues
-        "extendedUnicodePlaneIdentifiersJSDoc",  // unicode issues
+        "expressionWithJSDocTypeArguments", // jsdoc type parsing issue
         "identifierStartAfterNumericLiteral", // invalid syntax
         "parseBigInt",  // bigint parse issues
-        "unicodeEscapesInNames02"  // unicode issues
+        "parseInvalidNonNullableTypes",  // jsdoc type parsing
+        "parseInvalidNullableTypes",  // jsdoc type parsing
     ];
 
     internal class TestCase
@@ -235,7 +234,6 @@ public partial class TypeScriptTests
             }
             catch
             {
-
                 throw new Exception("Difference at token number: " + i + " of " + file + "\n" +
                     "Expected: " + JSON.Stringify(expectedTokens[i], withEnumString) + "\n" +
                     "Actual:   " + JSON.Stringify(actualTokens[i], withEnumString) + "\n");

@@ -14,50 +14,130 @@ internal static class Diagnostics
     }
 
     // scanner diagnostics
+    internal static readonly DiagnosticMessage _0_must_be_followed_by_a_Unicode_property_value_expression_enclosed_in_braces = Diag(1531, DiagnosticCategory.Error,
+        "_0_must_be_followed_by_a_Unicode_property_value_expression_enclosed_in_braces_1531", "'\\{0}' must be followed by a Unicode property value expression enclosed in braces.");
     internal static readonly DiagnosticMessage A_bigint_literal_cannot_use_exponential_notation = Diag(1352, DiagnosticCategory.Error, 
         "A_bigint_literal_cannot_use_exponential_notation_1352", "A bigint literal cannot use exponential notation.");
     internal static readonly DiagnosticMessage A_bigint_literal_must_be_an_integer = Diag(1353, DiagnosticCategory.Error, 
         "A_bigint_literal_must_be_an_integer_1353", "A bigint literal must be an integer.");
+    internal static readonly DiagnosticMessage A_character_class_must_not_contain_a_reserved_double_punctuator_Did_you_mean_to_escape_it_with_backslash = Diag(1522, DiagnosticCategory.Error,
+        "A_character_class_must_not_contain_a_reserved_double_punctuator_Did_you_mean_to_escape_it_with_backs_1522", "A character class must not contain a reserved double punctuator. Did you mean to escape it with backslash?");
+    internal static readonly DiagnosticMessage A_character_class_range_must_not_be_bounded_by_another_character_class = Diag(1516, DiagnosticCategory.Error,
+        "A_character_class_range_must_not_be_bounded_by_another_character_class_1516", "A character class range must not be bounded by another character class.");
     internal static readonly DiagnosticMessage An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive = Diag(1198, DiagnosticCategory.Error, 
         "An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive_1198", "An extended Unicode escape value must be between 0x0 and 0x10FFFF inclusive.");
     internal static readonly DiagnosticMessage An_identifier_or_keyword_cannot_immediately_follow_a_numeric_literal = Diag(1351, DiagnosticCategory.Error, 
         "An_identifier_or_keyword_cannot_immediately_follow_a_numeric_literal_1351", "An identifier or keyword cannot immediately follow a numeric literal.");
+    internal static readonly DiagnosticMessage Anything_that_would_possibly_match_more_than_a_single_character_is_invalid_inside_a_negated_character_class = Diag(1518, DiagnosticCategory.Error,
+        "Anything_that_would_possibly_match_more_than_a_single_character_is_invalid_inside_a_negated_characte_1518", "Anything that would possibly match more than a single character is invalid inside a negated character class.");
     internal static readonly DiagnosticMessage Asterisk_Slash_expected = Diag(1010, DiagnosticCategory.Error, 
         "Asterisk_Slash_expected_1010", "'*/' expected.");
+    internal static readonly DiagnosticMessage Any_Unicode_property_that_would_possibly_match_more_than_a_single_character_is_only_available_when_the_Unicode_Sets_v_flag_is_set = Diag(1528, DiagnosticCategory.Error,
+        "Any_Unicode_property_that_would_possibly_match_more_than_a_single_character_is_only_available_when_t_1528", "Any Unicode property that would possibly match more than a single character is only available when the Unicode Sets (v) flag is set.");
     internal static readonly DiagnosticMessage Binary_digit_expected = Diag(1177, DiagnosticCategory.Error, 
         "Binary_digit_expected_1177", "Binary digit expected.");
     internal static readonly DiagnosticMessage can_only_be_used_at_the_start_of_a_file = Diag(18026, DiagnosticCategory.Error, 
         "can_only_be_used_at_the_start_of_a_file_18026", "'#!' can only be used at the start of a file.");
+    internal static readonly DiagnosticMessage c_must_be_followed_by_an_ASCII_letter = Diag(1512, DiagnosticCategory.Error,
+        "c_must_be_followed_by_an_ASCII_letter_1512", "'\\c' must be followed by an ASCII letter.");
+    internal static readonly DiagnosticMessage Decimal_escape_sequences_and_backreferences_are_not_allowed_in_a_character_class = Diag(1537, DiagnosticCategory.Error,
+        "Decimal_escape_sequences_and_backreferences_are_not_allowed_in_a_character_class_1537", "Decimal escape sequences and backreferences are not allowed in a character class.");
     internal static readonly DiagnosticMessage Decimals_with_leading_zeros_are_not_allowed = Diag(1489, DiagnosticCategory.Error, 
         "Decimals_with_leading_zeros_are_not_allowed_1489", "Decimals with leading zeros are not allowed.");
     internal static readonly DiagnosticMessage Digit_expected = Diag(1124, DiagnosticCategory.Error, 
         "Digit_expected_1124", "Digit expected.");
+    internal static readonly DiagnosticMessage Duplicate_regular_expression_flag = Diag(1500, DiagnosticCategory.Error,
+        "Duplicate_regular_expression_flag_1500", "Duplicate regular expression flag.");
     internal static readonly DiagnosticMessage Escape_sequence_0_is_not_allowed = Diag(1488, DiagnosticCategory.Error, 
         "Escape_sequence_0_is_not_allowed_1488", "Escape sequence '{0}' is not allowed.");
+    internal static readonly DiagnosticMessage Expected_a_capturing_group_name = Diag(1514, DiagnosticCategory.Error,
+        "Expected_a_capturing_group_name_1514", "Expected a capturing group name.");
+    internal static readonly DiagnosticMessage Expected_a_class_set_operand = Diag(1520, DiagnosticCategory.Error,
+        "Expected_a_class_set_operand_1520", "Expected a class set operand.");
+    internal static readonly DiagnosticMessage Expected_a_Unicode_property_name = Diag(1523, DiagnosticCategory.Error,
+        "Expected_a_Unicode_property_name_1523", "Expected a Unicode property name.");
+    internal static readonly DiagnosticMessage Expected_a_Unicode_property_value = Diag(1525, DiagnosticCategory.Error,
+        "Expected_a_Unicode_property_value_1525", "Expected a Unicode property value.");
+    internal static readonly DiagnosticMessage Expected_a_Unicode_property_name_or_value = Diag(1527, DiagnosticCategory.Error,
+        "Expected_a_Unicode_property_name_or_value_1527", "Expected a Unicode property name or value.");
     internal static readonly DiagnosticMessage File_appears_to_be_binary = Diag(1490, DiagnosticCategory.Error, 
         "File_appears_to_be_binary_1490", "File appears to be binary.");
     internal static readonly DiagnosticMessage Hexadecimal_digit_expected = Diag(1125, DiagnosticCategory.Error, 
         "Hexadecimal_digit_expected_1125", "Hexadecimal digit expected.");
+    internal static readonly DiagnosticMessage Incomplete_quantifier_Digit_expected = Diag(1505, DiagnosticCategory.Error,
+        "Incomplete_quantifier_Digit_expected_1505", "Incomplete quantifier. Digit expected.");
     internal static readonly DiagnosticMessage Invalid_character = Diag(1127, DiagnosticCategory.Error, 
         "Invalid_character_1127", "Invalid character.");
+    internal static readonly DiagnosticMessage k_must_be_followed_by_a_capturing_group_name_enclosed_in_angle_brackets = Diag(1510, DiagnosticCategory.Error, 
+        "k_must_be_followed_by_a_capturing_group_name_enclosed_in_angle_brackets_1510", "'\\k' must be followed by a capturing group name enclosed in angle brackets.");
     internal static readonly DiagnosticMessage Merge_conflict_marker_encountered = Diag(1185, DiagnosticCategory.Error, 
         "Merge_conflict_marker_encountered_1185", "Merge conflict marker encountered.");
     internal static readonly DiagnosticMessage Multiple_consecutive_numeric_separators_are_not_permitted = Diag(6189, DiagnosticCategory.Error, 
         "Multiple_consecutive_numeric_separators_are_not_permitted_6189", "Multiple consecutive numeric separators are not permitted.");
+    internal static readonly DiagnosticMessage Named_capturing_groups_are_only_available_when_targeting_ES2018_or_later = Diag(1503, DiagnosticCategory.Error,
+        "Named_capturing_groups_are_only_available_when_targeting_ES2018_or_later_1503", "Named capturing groups are only available when targeting 'ES2018' or later.");
+    internal static readonly DiagnosticMessage Named_capturing_groups_with_the_same_name_must_be_mutually_exclusive_to_each_other = Diag(1515, DiagnosticCategory.Error,
+        "Named_capturing_groups_with_the_same_name_must_be_mutually_exclusive_to_each_other_1515", "Named capturing groups with the same name must be mutually exclusive to each other.");
+    internal static readonly DiagnosticMessage Numbers_out_of_order_in_quantifier = Diag(1506, DiagnosticCategory.Error, 
+        "Numbers_out_of_order_in_quantifier_1506", "Numbers out of order in quantifier.");
     internal static readonly DiagnosticMessage Numeric_separators_are_not_allowed_here = Diag(6188, DiagnosticCategory.Error, 
         "Numeric_separators_are_not_allowed_here_6188", "Numeric separators are not allowed here.");
     internal static readonly DiagnosticMessage Octal_digit_expected = Diag(1178, DiagnosticCategory.Error, 
         "Octal_digit_expected_1178", "Octal digit expected.");
     internal static readonly DiagnosticMessage Octal_escape_sequences_are_not_allowed_Use_the_syntax_0 = Diag(1487, DiagnosticCategory.Error, 
         "Octal_escape_sequences_are_not_allowed_Use_the_syntax_0_1487", "Octal escape sequences are not allowed. Use the syntax '{0}'.");
+    internal static readonly DiagnosticMessage Octal_escape_sequences_and_backreferences_are_not_allowed_in_a_character_class_If_this_was_intended_as_an_escape_sequence_use_the_syntax_0_instead = Diag(1536, DiagnosticCategory.Error,
+        "Octal_escape_sequences_and_backreferences_are_not_allowed_in_a_character_class_If_this_was_intended__1536", "Octal escape sequences and backreferences are not allowed in a character class. If this was intended as an escape sequence, use the syntax '{0}' instead.");
     internal static readonly DiagnosticMessage Octal_literals_are_not_allowed_Use_the_syntax_0 = Diag(1121, DiagnosticCategory.Error, 
         "Octal_literals_are_not_allowed_Use_the_syntax_0_1121", "Octal literals are not allowed. Use the syntax '{0}'.");
+    internal static readonly DiagnosticMessage Operators_must_not_be_mixed_within_a_character_class_Wrap_it_in_a_nested_class_instead = Diag(1519, DiagnosticCategory.Error,
+        "Operators_must_not_be_mixed_within_a_character_class_Wrap_it_in_a_nested_class_instead_1519", "Operators must not be mixed within a character class. Wrap it in a nested class instead.");
+    internal static readonly DiagnosticMessage q_is_only_available_inside_character_class = Diag(1511, DiagnosticCategory.Error,
+        "q_is_only_available_inside_character_class_1511", "'\\q' is only available inside character class.");
+    internal static readonly DiagnosticMessage q_must_be_followed_by_string_alternatives_enclosed_in_braces = Diag(1521, DiagnosticCategory.Error,
+        "q_must_be_followed_by_string_alternatives_enclosed_in_braces_1521", "'\\q' must be followed by string alternatives enclosed in braces.");
+    internal static readonly DiagnosticMessage Range_out_of_order_in_character_class = Diag(1517, DiagnosticCategory.Error,
+        "Range_out_of_order_in_character_class_1517", "Range out of order in character class.");
+    internal static readonly DiagnosticMessage Subpattern_flags_must_be_present_when_there_is_a_minus_sign = Diag(1504, DiagnosticCategory.Error,
+        "Subpattern_flags_must_be_present_when_there_is_a_minus_sign_1504", "Subpattern flags must be present when there is a minus sign.");
+    internal static readonly DiagnosticMessage There_is_no_capturing_group_named_0_in_this_regular_expression = Diag(1532, DiagnosticCategory.Error,
+        "There_is_no_capturing_group_named_0_in_this_regular_expression_1532", "There is no capturing group named '{0}' in this regular expression.");
+    internal static readonly DiagnosticMessage There_is_nothing_available_for_repetition = Diag(1507, DiagnosticCategory.Error, 
+        "There_is_nothing_available_for_repetition_1507", "There is nothing available for repetition.");
+    internal static readonly DiagnosticMessage The_Unicode_u_flag_and_the_Unicode_Sets_v_flag_cannot_be_set_simultaneously = Diag(1502, DiagnosticCategory.Error,
+        "The_Unicode_u_flag_and_the_Unicode_Sets_v_flag_cannot_be_set_simultaneously_1502", "The Unicode (u) flag and the Unicode Sets (v) flag cannot be set simultaneously.");
+    internal static readonly DiagnosticMessage This_backreference_refers_to_a_group_that_does_not_exist_There_are_only_0_capturing_groups_in_this_regular_expression = Diag(1533, DiagnosticCategory.Error,
+        "This_backreference_refers_to_a_group_that_does_not_exist_There_are_only_0_capturing_groups_in_this_r_1533", "This backreference refers to a group that does not exist. There are only {0} capturing groups in this regular expression.");
+    internal static readonly DiagnosticMessage This_backreference_refers_to_a_group_that_does_not_exist_There_are_no_capturing_groups_in_this_regular_expression = Diag(1534, DiagnosticCategory.Error,
+        "This_backreference_refers_to_a_group_that_does_not_exist_There_are_no_capturing_groups_in_this_regul_1534", "This backreference refers to a group that does not exist. There are no capturing groups in this regular expression.");
+    internal static readonly DiagnosticMessage This_character_cannot_be_escaped_in_a_regular_expression = Diag(1535, DiagnosticCategory.Error,
+        "This_character_cannot_be_escaped_in_a_regular_expression_1535", "This character cannot be escaped in a regular expression.");
+    internal static readonly DiagnosticMessage This_regular_expression_flag_is_only_available_when_targeting_0_or_later = Diag(1501, DiagnosticCategory.Error,
+        "This_regular_expression_flag_is_only_available_when_targeting_0_or_later_1501", "This regular expression flag is only available when targeting '{0}' or later.");
+    internal static readonly DiagnosticMessage This_regular_expression_flag_cannot_be_toggled_within_a_subpattern = Diag(1509, DiagnosticCategory.Error,
+        "This_regular_expression_flag_cannot_be_toggled_within_a_subpattern_1509", "This regular expression flag cannot be toggled within a subpattern.");
+    internal static readonly DiagnosticMessage Undetermined_character_escape = Diag(1513, DiagnosticCategory.Error,
+        "Undetermined_character_escape_1513", "Undetermined character escape.");
+    internal static readonly DiagnosticMessage Unexpected_0_Did_you_mean_to_escape_it_with_backslash = Diag(1508, DiagnosticCategory.Error, 
+        "Unexpected_0_Did_you_mean_to_escape_it_with_backslash_1508", "Unexpected '{0}'. Did you mean to escape it with backslash?");
     internal static readonly DiagnosticMessage Unexpected_end_of_text = Diag(1126, DiagnosticCategory.Error, 
         "Unexpected_end_of_text_1126", "Unexpected end of text.");
     internal static readonly DiagnosticMessage Unexpected_token_Did_you_mean_or_gt = Diag(1382, DiagnosticCategory.Error, 
         "Unexpected_token_Did_you_mean_or_gt_1382", "Unexpected token. Did you mean `{'>'}` or `&gt;`?");
+    internal static readonly DiagnosticMessage Unicode_escape_sequences_are_only_available_when_the_Unicode_u_flag_or_the_Unicode_Sets_v_flag_is_set = Diag(1538, DiagnosticCategory.Error,
+        "Unicode_escape_sequences_are_only_available_when_the_Unicode_u_flag_or_the_Unicode_Sets_v_flag_is_se_1538", "Unicode escape sequences are only available when the Unicode (u) flag or the Unicode Sets (v) flag is set.");
+    internal static readonly DiagnosticMessage Unicode_property_value_expressions_are_only_available_when_the_Unicode_u_flag_or_the_Unicode_Sets_v_flag_is_set = Diag(1530, DiagnosticCategory.Error,
+        "Unicode_property_value_expressions_are_only_available_when_the_Unicode_u_flag_or_the_Unicode_Sets_v__1530", "Unicode property value expressions are only available when the Unicode (u) flag or the Unicode Sets (v) flag is set.");
     internal static readonly DiagnosticMessage Unexpected_token_Did_you_mean_or_rbrace = Diag(1381, DiagnosticCategory.Error, 
         "Unexpected_token_Did_you_mean_or_rbrace_1381", "Unexpected token. Did you mean `{'}'}` or `&rbrace;`?");
+    internal static readonly DiagnosticMessage Unknown_regular_expression_flag = Diag(1499, DiagnosticCategory.Error,
+        "Unknown_regular_expression_flag_1499", "Unknown regular expression flag.");
+    internal static readonly DiagnosticMessage Unknown_Unicode_property_name = Diag(1524, DiagnosticCategory.Error,
+        "Unknown_Unicode_property_name_1524", "Unknown Unicode property name.");
+    internal static readonly DiagnosticMessage Unknown_Unicode_property_name_or_value = Diag(1529, DiagnosticCategory.Error,
+        "Unknown_Unicode_property_name_or_value_1529", "Unknown Unicode property name or value.");
+    internal static readonly DiagnosticMessage Unknown_Unicode_property_value = Diag(1526, DiagnosticCategory.Error,
+        "Unknown_Unicode_property_value_1526", "Unknown Unicode property value.");
     internal static readonly DiagnosticMessage Unterminated_regular_expression_literal = Diag(1161, DiagnosticCategory.Error, 
         "Unterminated_regular_expression_literal_1161", "Unterminated regular expression literal.");
     internal static readonly DiagnosticMessage Unterminated_string_literal = Diag(1002, DiagnosticCategory.Error, 

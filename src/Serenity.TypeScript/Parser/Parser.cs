@@ -529,7 +529,7 @@ public class Parser
 
     SyntaxKind ReScanSlashToken()
     {
-        return currentToken = scanner.ReScanSlashToken();
+        return currentToken = scanner.ReScanSlashToken(reportErrors: false);
     }
 
     SyntaxKind ReScanTemplateToken(bool isTaggedTemplate)
@@ -2231,7 +2231,7 @@ public class Parser
 
     ITypeNode ParseJSDocType()
     {
-        scanner.SetInJSDocType(true);
+        scanner.SetSkipJsDocLeadingAsterisks(true);
         var pos = GetNodePos();
         if (ParseOptional(SyntaxKind.ModuleKeyword))
         {
@@ -2254,13 +2254,13 @@ public class Parser
 
         terminateLabel:
 
-            scanner.SetInJSDocType(false);
+            scanner.SetSkipJsDocLeadingAsterisks(false);
             return FinishNode(moduleTag, pos);
         }
 
         var hasDotDotDot = ParseOptional(SyntaxKind.DotDotDotToken);
         var type = ParseTypeOrTypePredicate();
-        scanner.SetInJSDocType(false);
+        scanner.SetSkipJsDocLeadingAsterisks(false);
         if (hasDotDotDot)
         {
             type = FinishNode(new JSDocVariadicType(type), pos);
