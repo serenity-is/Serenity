@@ -193,4 +193,39 @@ describe("appendToNode", () => {
         expect(parent.lastChild).toBe(div2);
     });
 
+    it("creates text node from string", () => {
+        const parent = document.createElement("div");
+        appendToNode(parent, "test");
+        expect(parent.innerHTML).toBe("test");
+        expect(parent.firstChild?.nodeType).toBe(Node.TEXT_NODE);
+        expect(parent.firstChild.textContent).toBe("test");
+    });
+
+    it("can wait for promise to resolve", async () => {
+        const parent = document.createElement("div");
+        const div = document.createElement("div");
+        div.innerHTML = "test";
+        appendToNode(parent, Promise.resolve(div));
+        expect(parent.innerHTML).toBe("<!--Loading content...-->");
+        await Promise.resolve();
+        expect(parent.innerHTML).toBe("<div>test</div>");
+    });
+
+    it("handles rejected promise", async () => {
+        const parent = document.createElement("div");
+        const div = document.createElement("div");
+        div.innerHTML = "test";
+        appendToNode(parent, Promise.reject("some reject reason"));
+        expect(parent.innerHTML).toBe("<!--Loading content...-->");
+        await Promise.resolve();
+        expect(parent.innerHTML).toBe("<!--Error loading content: some reject reason-->");
+    });
+
+    it("calls append for other content types", () => {
+        const parent = document.createElement("div");
+        const content = { abc: 5 };
+        appendToNode(parent, content);
+        expect(parent.innerHTML).toBe("[object Object]");
+    });
+
 });
