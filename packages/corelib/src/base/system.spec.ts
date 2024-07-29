@@ -1,5 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
-import { Enum, addCustomAttribute, classTypeInfo, fieldsProxy, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, initFormType, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, typeInfoProperty } from "./system";
+import { Enum, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType, typeInfoProperty } from "./system";
 import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
 
 describe("Enum.getValues", () => {
@@ -541,6 +541,60 @@ describe("registerInterface", () => {
     });
 });
 
+describe("registerType", () => {
+    it("throws for null or undefined", () => {
+        expect(() => registerType(null)).toThrow();
+        expect(() => registerType(undefined)).toThrow();
+    });
+
+    it("throws if the class does not have a typeInfo property", () => {
+        class Test {
+        }
+
+        expect(() => registerType(Test as any)).toThrow();
+    });
+
+    it("registers type as a class for a class typeInfo", () => {
+        class Test {
+            static [typeInfoProperty] = classTypeInfo("MyTestName");
+        }
+
+        registerType(Test);
+        expect(getTypeFullName(Test)).toBe("MyTestName");
+        expect(Test[typeInfoProperty].typeKind).toBe("class");
+    });
+
+    it("registers type as interface for an interface typeInfo", () => {
+        class Test {
+            static [typeInfoProperty] = interfaceTypeInfo("MyTestName");
+        }
+
+        registerType(Test);
+        expect(getTypeFullName(Test)).toBe("MyTestName");
+        expect(Test[typeInfoProperty].typeKind).toBe("interface");
+    });
+
+    it("registers type as editor for an editor typeInfo", () => {
+        class Test {
+            static [typeInfoProperty] = editorTypeInfo("MyTestName");
+        }
+
+        registerType(Test);
+        expect(getTypeFullName(Test)).toBe("MyTestName");
+        expect(Test[typeInfoProperty].typeKind).toBe("editor");
+    });
+
+    it("registers type as formatter for a formatter typeInfo", () => {
+        class Test {
+            static [typeInfoProperty] = formatterTypeInfo("MyTestName");
+        }
+
+        registerType(Test);
+        expect(getTypeFullName(Test)).toBe("MyTestName");
+        expect(Test[typeInfoProperty].typeKind).toBe("formatter");
+    });
+});
+
 describe("isInstanceOfType", () => {
     it("returns false if instance is null or undefined", () => {
         expect(isInstanceOfType(null, String)).toBe(false);
@@ -717,5 +771,227 @@ describe("addCustomAttribute", () => {
         expect(attrs?.length).toBe(2);
         expect(attrs[0]).toBe(attr2); // returns last added one first
         expect(attrs[1]).toBe(attr1);
+    });
+});
+
+describe("getCustomAttribute", () => {
+    class MyAttribute {
+    }
+    it("returns null if type is null or undefined", () => {
+        expect(getCustomAttribute(null, MyAttribute)).toBeNull();
+        expect(getCustomAttribute(undefined, MyAttribute)).toBeNull();
+    });
+
+    it("returns null if attribute type is null or undefined", () => {
+        class MyClass {
+        }
+        addCustomAttribute(MyClass, new MyAttribute());
+        expect(getCustomAttribute(MyClass, null)).toBeNull();
+        expect(getCustomAttribute(MyClass, undefined)).toBeNull();
+    });
+
+    it("returns empty array if no custom attribute", () => {
+        class MyClass {
+        }
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([]);
+    });
+
+    it("returns the attribute if exists", () => {
+        class MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(MyClass, MyAttribute)).toBe(attr);
+    });
+
+    it("does not return another attribute type", () => {
+        class MyClass {
+        }
+        class OtherAttribute {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(MyClass, OtherAttribute)).toBeUndefined();
+    });
+
+    it("returns the last added attribute if multiple of same type of attribute is added", () => {
+        class MyClass {
+        }
+        const attr1 = new MyAttribute();
+        const attr2 = new MyAttribute();
+        addCustomAttribute(MyClass, attr1);
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttribute(MyClass, MyAttribute)).toBe(attr2);
+    });
+
+    it("returns inherited attribute types", () => {
+        class MyDerivedAttr extends MyAttribute {
+        }
+        class MyClass {
+        }
+        const attr = new MyDerivedAttr();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(MyClass, MyAttribute)).toBe(attr);
+    });
+
+    it("returns inherited attributes from subclasses", () => {
+        class MyClass {
+        }
+        class SubClass extends MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(SubClass, MyAttribute)).toBe(attr);
+    });
+
+    it("returns the subclass attribute if both the class and the subclass has same attribute", () => {
+        class MyClass {
+        }
+        class SubClass extends MyClass {
+        }
+        const attr1 = new MyAttribute();
+        addCustomAttribute(MyClass, attr1);
+        const attr2 = new MyAttribute();
+        addCustomAttribute(SubClass, attr2);
+        expect(getCustomAttribute(SubClass, MyAttribute)).toBe(attr2);
+    });
+
+
+    it("does not return inherited attributes from subclasses if inherited is false", () => {
+        class MyClass {
+        }
+        class SubClass extends MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttribute(SubClass, MyAttribute, false)).toBeUndefined();
+    });
+
+});
+
+describe("getCustomAttributes", () => {
+    class MyAttribute {
+    }
+
+    it("returns empty array if type is null or undefined", () => {
+        expect(getCustomAttributes(null, null)).toStrictEqual([]);
+        expect(getCustomAttributes(undefined, undefined)).toStrictEqual([]);
+    });
+
+    it("returns empty array if attribute type is null", () => {
+        class MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttributes(MyClass, null)).toStrictEqual([]);
+    });
+
+    it("returns all attributes if attribute type is undefined", () => {
+        class MyClass {
+        }
+        const attr1 = new MyAttribute();
+        addCustomAttribute(MyClass, attr1);
+        const attr2 = new MyAttribute();
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttributes(MyClass, void 0)).toStrictEqual([attr1, attr2]);
+    });
+
+    it("returns empty array if no custom attribute", () => {
+        class MyClass {
+        }
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([]);
+    });
+
+    it("returns array if custom attribute", () => {
+        class MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([attr]);
+    });
+
+    it("returns inherited attribute types", () => {
+        class MyDerivedAttr extends MyAttribute {
+        }
+        class MyClass {
+        }
+        const attr = new MyDerivedAttr();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([attr]);
+    });
+
+    it("returns the attributes in descending order", () => {
+        class MyClass {
+        }
+        const attr1 = new MyAttribute();
+        const attr2 = new MyAttribute();
+        addCustomAttribute(MyClass, attr1);
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([attr2, attr1]);
+    });
+
+    it("returns inherited attributes from subclasses", () => {
+        class MyClass {
+        }
+        class SubClass extends MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttributes(SubClass, MyAttribute)).toStrictEqual([attr]);
+    });
+
+    it("does not return inherited attributes from subclasses if inherited is false", () => {
+        class MyClass {
+        }
+        class SubClass extends MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(getCustomAttributes(SubClass, MyAttribute, false)).toStrictEqual([]);
+    });
+
+    it("returns the attributes in descending order", () => {
+        class MyClass {
+        }
+        const attr1 = new MyAttribute();
+        const attr2 = new MyAttribute();
+        addCustomAttribute(MyClass, attr1);
+        addCustomAttribute(MyClass, attr2);
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([attr2, attr1]);
+    });
+
+    it("returns the base class attributes last", () => {
+        class MyClass {
+        }
+        class MyDerivedClass extends MyClass {
+        }
+        const attr1 = new MyAttribute();
+        const attr2 = new MyAttribute();
+        const attr3 = new MyAttribute();
+        addCustomAttribute(MyDerivedClass, attr1);
+        addCustomAttribute(MyClass, attr2);
+        addCustomAttribute(MyDerivedClass, attr3);
+        expect(getCustomAttributes(MyDerivedClass, MyAttribute)).toStrictEqual([attr3, attr1, attr2]);
+        expect(getCustomAttributes(MyClass, MyAttribute)).toStrictEqual([attr2]);
+    });
+});
+
+describe("hasCustomAttribute", () => {
+    it("returns false if no custom attribute", () => {
+        class MyAttribute {
+        }
+        class MyClass {
+        }
+        expect(hasCustomAttribute(MyClass, MyAttribute)).toBe(false);
+    });
+
+    it("returns true if custom attribute", () => {
+        class MyAttribute {
+        }
+        class MyClass {
+        }
+        const attr = new MyAttribute();
+        addCustomAttribute(MyClass, attr);
+        expect(hasCustomAttribute(MyClass, MyAttribute)).toBe(true);
     });
 });
