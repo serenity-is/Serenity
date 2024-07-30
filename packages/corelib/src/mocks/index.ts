@@ -123,7 +123,7 @@ export function unmockBSAndJQuery() {
 export type MockFetchInfo = {
     url: string;
     init: RequestInit | BodyInit;
-    data: any;
+    requestData: any;
     status?: number;
     statusText?: string;
     aborted?: boolean;
@@ -148,8 +148,8 @@ export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo)
 
             var info: MockFetchInfo = {
                 url: url,
-                init: init,
-                data: requestData,
+                init: init, 
+                requestData,
                 status: 200,
                 aborted: false,
                 responseHeaders: {
@@ -258,7 +258,7 @@ class MockXHR {
         this._info = {
             url: url,
             init: body instanceof Document ? null : body,
-            data: requestData,
+            requestData,
             status: 200,
             aborted: false,
             responseHeaders: {

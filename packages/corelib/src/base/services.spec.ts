@@ -1,5 +1,7 @@
-import { isSameOrigin, resolveServiceUrl, resolveUrl } from "./services";
+import { mockFetch, unmockFetch } from "../mocks";
+import { isSameOrigin, resolveServiceUrl, resolveUrl, serviceCall } from "./services";
 import { getCookie } from "./services";
+import { ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
 
 jest.mock("./config", () => ({
     __esModule: true,
@@ -133,5 +135,68 @@ describe("isSameOrigin", () => {
         const url = window.location.protocol + "//" + "subdomain." + window.location.hostname + "/test";
         const isSame = isSameOrigin(url);
         expect(isSame).toBe(false);
+    });
+});
+
+describe("serviceCall", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should throw if fetch is not available", async () => {
+        const fetch = window.fetch;
+        window.fetch = null;
+        try {
+            expect(async () => serviceCall({ url: "http://localhost:1234" })).rejects.toThrow("fetch is not available");
+        }
+        finally {
+            window.fetch = fetch;
+        }
+    });
+
+    describe("serviceCall", () => {
+        it("should make a successful service call and return the response", async () => {
+            const response = { data: "Success" };
+            const options = { url: "/test" };
+
+            const mockSpy = mockFetch({ "/test": () => response });
+
+            const result = await serviceCall(options);
+
+            expect(result).toEqual(response);
+            expect(mockSpy.requests.length).toBe(1);
+            expect(mockSpy.requests[0].url).toBe("/test");
+        });
+
+        it("should handle an error response and throw an error", async () => {
+            let error: ServiceError;
+            const response: ServiceResponse = { Error: { Message: "Error" } };
+            const options: ServiceOptions<any> = { 
+                url: "/test",
+                onError: (resp, inf) => {
+                    error = resp?.Error;
+                }
+            };
+
+            const mockSpy = mockFetch({
+                "/test": (info) => {
+                    info.status = 403;
+                    info.statusText = "Some error"
+                    return response;
+                }
+            });
+
+            const promise = serviceCall(options);
+
+            await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
+            expect(mockSpy.requests.length).toBe(1);
+            expect(mockSpy.requests[0].url).toBe("/test");
+            expect(mockSpy.requests[0].status).toBe(403);
+            expect(error).toStrictEqual(response.Error);
+        });
     });
 });
