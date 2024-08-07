@@ -5,6 +5,8 @@
 - Set the default for SleekGrid useLegacyUI to false
 - Use declare for class fields to avoid them becoming properties (e.g. defineProperty) when useDefineForClassFields is true (https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#the-usedefineforclassfields-flag-and-the-declare-property-modifier)
 - Update TypeScript Scanner code to TypeScript current main (https://github.com/microsoft/TypeScript/commit/9757109cafcb771a35ad9fe09855373cdd82005a)
+- Move service implementations under StartSharp.AppServices namespace to Modules/Common/AppServices folder, and move abstractions and models to Modules/Common/AppServices/Abstractions and Modules/Common/AppServices/Models folders
+- Added Bootstrap buttons sample under UI Samples
 
 ### Bugfixes:
 - Fix frozen columns not rendered when scrolling vertically if horizontal scroll is bigger than frozen cols
