@@ -1,3 +1,14 @@
+## 8.6.1 (2024-08-07)
+
+### Features:
+- Add SleekGrid option to renderAllRows, similar to renderAllCels for columns, which effectively disables virtualization and preserves natural cell / row order when both is true, though it can be expensive for many rows / cells
+- Set the default for SleekGrid useLegacyUI to false
+- Use declare for class fields to avoid them becoming properties (e.g. defineProperty) when useDefineForClassFields is true (https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#the-usedefineforclassfields-flag-and-the-declare-property-modifier)
+- Update TypeScript Scanner code to TypeScript current main (https://github.com/microsoft/TypeScript/commit/9757109cafcb771a35ad9fe09855373cdd82005a)
+
+### Bugfixes:
+- Fix frozen columns not rendered when scrolling vertically if horizontal scroll is bigger than frozen cols
+
 ## 8.6.0 (2024-07-13)
 
 ### Features:

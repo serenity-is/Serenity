@@ -1269,7 +1269,6 @@ declare namespace Slick {
     class RowSelectionModel implements IPlugin, SelectionModel {
     	private grid;
     	private handler;
-    	private inHandler;
     	private options;
     	private ranges;
     	onSelectedRangesChanged: EventEmitter<CellRange[], IEventData>;
