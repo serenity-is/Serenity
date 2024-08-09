@@ -322,7 +322,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         var self = this;
         var columns: Column[] = [];
         columns.push({
-            field: 'text', name: 'Kayıt', width: 80, format: SlickFormatting.treeToggle(function () {
+            field: 'text', name: 'Record', width: 80, format: SlickFormatting.treeToggle(function () {
                 return self.view;
             }, function (x) {
                 return x.id;
@@ -330,7 +330,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 var cls = 'check-box';
                 var item = ctx.item;
                 if (item.hideCheckBox) {
-                    return this.getItemText(ctx);
+                    return ctx.asHtml(this.getItemText(ctx));
                 }
                 var threeState = this.isThreeStateHierarchy();
                 if (item.isSelected) {
@@ -343,7 +343,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 }
                 if (this._readOnly)
                     cls += ' readonly';
-                return '<span class="' + cls + '"></span>' + this.getItemText(ctx);
+                return ctx.asHtml('<span class="' + cls + '"></span>' + this.getItemText(ctx));
             })
         });
         return columns;

@@ -7,7 +7,7 @@ import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
-import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
+import { DateFormatter, DateTimeFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { getWidgetFrom } from "../widgets/widgetutils";
@@ -655,8 +655,12 @@ export namespace SlickFormatting {
                 text.prepend(spacer.getNode());
                 return text;
             }
-            else
-                return (spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
+            else if (ctx.isHtml ?? true) {
+                return ctx.asHtml(spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
+            }
+            else {
+                return ctx.asHtml(spacer.getNode().outerHTML + toggle.getNode().outerHTML + ctx.escape(text));
+            }
         };
     }
 
@@ -666,7 +670,7 @@ export namespace SlickFormatting {
         }
 
         return function (ctx: FormatterContext) {
-            return htmlEncode(DateFormatter.format(ctx.value, format));
+            return ctx.asText(DateFormatter.format(ctx.value, format));
         };
     }
 
@@ -675,19 +679,19 @@ export namespace SlickFormatting {
             format = Culture.dateTimeFormat;
         }
         return function (ctx: FormatterContext) {
-            return htmlEncode(DateFormatter.format(ctx.value, format));
+            return ctx.asText(DateTimeFormatter.format(ctx.value, format));
         };
     }
 
     export function checkBox(): Format {
         return function (ctx: FormatterContext) {
-            return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+            return ctx.asHtml('<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>');
         };
     }
 
     export function number(format: string): Format {
         return function (ctx: FormatterContext) {
-            return NumberFormatter.format(ctx.value, format);
+            return ctx.asText(NumberFormatter.format(ctx.value, format));
         };
     }
 

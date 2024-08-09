@@ -192,7 +192,14 @@ describe("serviceCall", () => {
 
             const promise = serviceCall(options);
 
-            await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
+            const old = window.alert;
+            window.alert = () => {};
+            try {
+                await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
+            }
+            finally {
+                window.alert = old;
+            }
             expect(mockSpy.requests.length).toBe(1);
             expect(mockSpy.requests[0].url).toBe("/test");
             expect(mockSpy.requests[0].status).toBe(403);

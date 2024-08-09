@@ -891,7 +891,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const idField = item.editLinkIdField || null;
         const linkClass = item.editLinkCssClass || null;
         column.format = this.itemLink(itemType, idField,
-            ctx => orgFormat != null ? orgFormat(ctx) : htmlEncode(ctx.value),
+            ctx => orgFormat != null ? orgFormat(ctx) : ctx.escape(),
             () => linkClass, false);
 
         if (idField) {

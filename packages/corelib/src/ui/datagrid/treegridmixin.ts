@@ -48,7 +48,7 @@ export class TreeGridMixin<TItem> {
             var col = (dg['allColumns'] || dg.slickGrid.getColumns())?.find(x => x.field == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
-                    col.format || ((ctx: FormatterContext<TItem>) => htmlEncode(ctx.value)));
+                    col.format || ((ctx: FormatterContext<TItem>) => ctx.escape()));
             }
         }
     }

@@ -5036,10 +5036,10 @@ declare class DateFormatter implements Formatter {
     constructor(props?: {
         displayFormat?: string;
     });
-    static format(value: any, format?: string): any;
+    format(ctx: FormatterContext): string;
+    static format(value: any, format?: string): string;
     get displayFormat(): string;
     set displayFormat(value: string);
-    format(ctx: FormatterContext): string;
 }
 declare class DateTimeFormatter extends DateFormatter {
     constructor(props?: {
