@@ -98,7 +98,7 @@ export class Tooltip {
 
     toggle(show: boolean): Tooltip {
         if (!this.el)
-            return;
+            return this;
 
         let instance = Tooltip.existingInstance(this.el);
         if (!instance)
