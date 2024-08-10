@@ -1,4 +1,3 @@
-import { createFormatterContext } from "@serenity-is/sleekgrid";
 import { Culture, addLocalText } from "../../base";
 import { PropertyItemSlickConverter } from "./slickhelpers";
 
@@ -34,7 +33,7 @@ describe('SlickHelpers.toSlickColumn', () => {
         Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
 
         expect(converted.format).toBeDefined();
-        var formattedDate = converted.format.call(null, createFormatterContext({ value: '2021-01-01T00:00:00' }));
+        var formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
         expect(formattedDate).toBe('01/01/2021');
     });
 
@@ -55,7 +54,7 @@ describe('SlickHelpers.toSlickColumn', () => {
         Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
 
         expect(converted.format).toBeDefined();
-        var formattedDate = converted.format.call(null, createFormatterContext({ value: '2021-01-01T00:00:00' }));
+        var formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
         expect(formattedDate).toBe('01/01/2021 00:00');
     });
 });

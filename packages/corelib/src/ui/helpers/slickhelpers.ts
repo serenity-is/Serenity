@@ -7,7 +7,7 @@ import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
-import { DateFormatter, DateTimeFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
+import { DateFormatter, EnumFormatter, IInitializeColumn, NumberFormatter } from "../formatters/formatters";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { getWidgetFrom } from "../widgets/widgetutils";
@@ -655,12 +655,8 @@ export namespace SlickFormatting {
                 text.prepend(spacer.getNode());
                 return text;
             }
-            else if (ctx.isHtml ?? true) {
-                return ctx.asHtml(spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
-            }
-            else {
-                return ctx.asHtml(spacer.getNode().outerHTML + toggle.getNode().outerHTML + ctx.escape(text));
-            }
+            else
+                return (spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
         };
     }
 
@@ -679,19 +675,19 @@ export namespace SlickFormatting {
             format = Culture.dateTimeFormat;
         }
         return function (ctx: FormatterContext) {
-            return ctx.escape(DateTimeFormatter.format(ctx.value, format));
+            return ctx.escape(DateFormatter.format(ctx.value, format));
         };
     }
 
     export function checkBox(): Format {
         return function (ctx: FormatterContext) {
-            return ctx.asHtml('<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>');
+            return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
         };
     }
 
     export function number(format: string): Format {
         return function (ctx: FormatterContext) {
-            return ctx.escape(NumberFormatter.format(ctx.value, format));
+            return NumberFormatter.format(ctx.value, format);
         };
     }
 
@@ -704,7 +700,7 @@ export namespace SlickFormatting {
         return value == null ? null : value.toString();
     }
 
-    function itemLinkText(itemType: string, id: any, text: FormatterResult,
+    export function itemLinkText(itemType: string, id: any, text: FormatterResult,
         extraClass: string, encode: boolean): FormatterResult {
         var link = Fluent("a")
             .class([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass])
@@ -733,10 +729,9 @@ export namespace SlickFormatting {
         return function (ctx: FormatterContext<TItem>) {
             var text: FormatterResult = (getText == null ? ctx.value : getText(ctx)) ?? '';
             if ((ctx.item as any)?.__nonDataRow) {
-                return text instanceof Node ? text : ctx.asHtml(encode ? htmlEncode(text) : text);
+                return text instanceof Node ? text : encode ? htmlEncode(text) : text;
             }
 
-            ctx.isHtml = true;
             return itemLinkText(itemType, (ctx.item as any)[idField], text,
                 (cssClass == null ? '' : cssClass(ctx)), encode);
         };

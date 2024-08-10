@@ -1,5 +1,5 @@
-﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
+﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
+import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { replaceAll } from "../../q";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -23,7 +23,7 @@ export class BooleanFormatter implements Formatter {
     format(ctx: FormatterContext) {
 
         if (ctx.value == null)
-            return ctx.asHtml('');
+            return '';
 
         if (!!ctx.value)
             return ctx.escape(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
@@ -54,11 +54,7 @@ export class DateFormatter implements Formatter {
         this.props.displayFormat ??= Culture.dateFormat;
     }
 
-    format(ctx: FormatterContext): string {
-        return ctx.escape(DateFormatter.format(ctx.value, this.displayFormat));
-    }
-    
-    static format(value: any, format?: string): string {
+    static format(value: any, format?: string) {
         if (value == null) {
             return '';
         }
@@ -72,18 +68,22 @@ export class DateFormatter implements Formatter {
             date = parseISODateTime(value);
 
             if (date == null || isNaN(date.valueOf())) {
-                return "" + value;
+                return htmlEncode(value);
             }
         }
         else {
             return value.toString();
         }
 
-        return formatDate(date, format);
+        return htmlEncode(formatDate(date, format));
     }
 
     public get displayFormat() { return this.props.displayFormat; }
     public set displayFormat(value) { this.props.displayFormat = value; }
+
+    format(ctx: FormatterContext): string {
+        return DateFormatter.format(ctx.value, this.displayFormat);
+    }
 }
 
 @Decorators.registerFormatter('Serenity.DateTimeFormatter')
@@ -110,7 +110,7 @@ export class EnumFormatter implements Formatter {
             });
             return node;
         }
-        return ctx.escape(EnumFormatter.format(enumType, ctx.value));
+        return EnumFormatter.format(enumType, ctx.value);
     }
 
     get enumKey() { return this.props.enumKey; }
@@ -165,8 +165,8 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
         var iconClass = iconClassName(this.iconClass ?? faIcon("download"));
 
-        return ctx.asHtml("<a class='file-download-link' target='_blank' href='" +
-            ctx.escape(downloadUrl) + "'><i class='" + ctx.escape(iconClass) + "'></i> " + ctx.escape(text) + '</a>');
+        return "<a class='file-download-link' target='_blank' href='" +
+            htmlEncode(downloadUrl) + "'><i class='" + iconClass + "'></i> " + htmlEncode(text) + '</a>';
     }
 
     static dbFileUrl(filename: string): string {
@@ -196,7 +196,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 export class MinuteFormatter implements Formatter {
 
     format(ctx: FormatterContext) {
-        return ctx.escape(MinuteFormatter.format(ctx.value));
+        return MinuteFormatter.format(ctx.value);
     }
 
     static format(value: number): string {
@@ -228,7 +228,7 @@ export class NumberFormatter {
     }
 
     format(ctx: FormatterContext): string {
-        return ctx.escape(NumberFormatter.format(ctx.value, this.displayFormat));
+        return NumberFormatter.format(ctx.value, this.displayFormat);
     }
 
     static format(value: any, format?: string): string {
@@ -240,14 +240,14 @@ export class NumberFormatter {
             if (isNaN(value))
                 return '';
 
-            return formatNumber(value, format) ?? '';
+            return htmlEncode(formatNumber(value, format));
         }
 
         var dbl = parseDecimal(value.toString());
         if (dbl == null || isNaN(dbl))
             return value?.toString() ?? '';
 
-        return formatNumber(dbl, format);
+        return htmlEncode(formatNumber(dbl, format));
     }
 
     get displayFormat() { return this.props.displayFormat; }
@@ -287,7 +287,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
 
         s += '>' + htmlEncode(display) + '</a>';
 
-        return ctx.asHtml(s);
+        return s;
     }
 
     initializeColumn(column: Column): void {

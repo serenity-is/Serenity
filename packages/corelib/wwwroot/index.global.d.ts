@@ -252,26 +252,10 @@ declare namespace Slick {
     	 */
     	addClass?: string;
     	/**
-    	 * Sets isHtml to true and returns the given markup as is.
-    	 */
-    	asHtml: (markup: string) => string;
-    	/**
-    	 * Sets isHtml to false and returns the given value as is.
-    	 * If no value argument is provided, returns ctx.value.
-    	 */
-    	asText(): TItem;
-    	asText<T>(value: T): T;
-    	/**
     	 * Returns html escaped ctx.value if called without arguments.
     	 * prefer this over ctx.value to avoid html injection attacks!
-    	 * Note that calling this function also sets isHtml to true
     	 */
     	escape(value?: any): string;
-    	/**
-    	 * True if the returned string should be considered HTML markup.
-    	 * Defaults to grid options treatFormatterOutputAsHtml
-    	 */
-    	isHtml?: boolean;
     	/**
     	 * The row index of the cell.
     	 */
@@ -318,10 +302,9 @@ declare namespace Slick {
     		[columnId: string]: string;
     	};
     };
-    function defaultColumnFormat(ctx: FormatterContext): string;
+    function defaultColumnFormat(ctx: FormatterContext): any;
     function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
-    function applyFormatterResultToCellNode(ctx: FormatterContext, html: FormatterResult, node: HTMLElement, sanitizer?: (dirtyHtml: string) => string): void;
-    function createFormatterContext(props: Partial<FormatterContext>): FormatterContext;
+    function applyFormatterResultToCellNode(ctx: FormatterContext, html: FormatterResult, node: HTMLElement): void;
     /***
      * Information about a group of rows.
      */
@@ -930,24 +913,6 @@ declare namespace Slick {
     	 * CSS class applied to the viewport container. Default is `undefined`.
     	 */
     	viewportClass?: string;
-    	/**
-    	 * When set to true (the default for compatibility), strings returned from formatters are treated as HTML markup.
-    	 * This means FormatterContext.isHtml is also set to true by default. If a formatter returns HTML, the output
-    	 * will be sanitized using the specified sanitizer function.
-    	 *
-    	 * It is recommended to set this to false, which will treat formatter output as plain text by default and encourage
-    	 * the use of text or DOM elements (e.g., via jsx-dom, Fluent) in formatters. Even when this option is set to false,
-    	 * formatters can still return HTML by explicitly setting FormatterContext.isHtml to true or calling
-    	 * FormatterContext.asHtml() to return a value.
-    	 *
-    	 * Additionally, if FormatterContext.escape() is called within a formatter, isHtml will automatically be set to true
-    	 * regardless of this setting, to mitigate issues with existing formatters when treatFormatterOutputAsHtml is false.
-    	 *
-    	 * However, when treatFormatterOutputAsHtml is set to false, legacy formatters that return HTML without using ctx.escape(),
-    	 * ctx.asHtml() or ctx.isHtml = true will not work as expected. It is important to update such formatters before
-    	 * disabling this option.
-    	 */
-    	treatFormatterOutputAsHtml?: boolean;
     }
     const gridDefaults: GridOptions;
     class Grid<TItem = any> implements EditorHost {
@@ -1376,13 +1341,13 @@ declare namespace Slick {
     function PercentCompleteBarFormatter(ctx: FormatterContext): string;
     function YesNoFormatter(ctx: FormatterContext): "Yes" | "No";
     function CheckboxFormatter(ctx: FormatterContext): string;
-    function CheckmarkFormatter(ctx: FormatterContext): string;
+    function CheckmarkFormatter(ctx: FormatterContext): "" | "<i class=\"slick-checkmark\"></i>";
     namespace Formatters {
     	function PercentComplete(_row: number, _cell: number, value: any): string;
     	function PercentCompleteBar(_row: number, _cell: number, value: any): string;
     	function YesNo(_row: number, _cell: number, value: any): "Yes" | "No";
     	function Checkbox(_row: number, _cell: number, value: any): string;
-    	function Checkmark(_row: number, _cell: number, value: any): string;
+    	function Checkmark(_row: number, _cell: number, value: any): "" | "<i class=\"slick-checkmark\"></i>";
     }
     abstract class BaseCellEdit {
     	protected _input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -6572,6 +6537,7 @@ declare namespace Serenity {
         function number(format: string): Format;
         function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
         function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
+        function itemLinkText(itemType: string, id: any, text: Slick.FormatterResult, extraClass: string, encode: boolean): Slick.FormatterResult;
         function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: Slick.FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
     }
     namespace SlickHelper {
@@ -6621,10 +6587,10 @@ declare namespace Serenity {
         constructor(props?: {
             displayFormat?: string;
         });
-        format(ctx: Slick.FormatterContext): string;
-        static format(value: any, format?: string): string;
+        static format(value: any, format?: string): any;
         get displayFormat(): string;
         set displayFormat(value: string);
+        format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {
         constructor(props?: {

@@ -330,7 +330,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 var cls = 'check-box';
                 var item = ctx.item;
                 if (item.hideCheckBox) {
-                    return ctx.asHtml(this.getItemText(ctx));
+                    return this.getItemText(ctx);
                 }
                 var threeState = this.isThreeStateHierarchy();
                 if (item.isSelected) {
@@ -343,7 +343,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 }
                 if (this._readOnly)
                     cls += ' readonly';
-                return ctx.asHtml('<span class="' + cls + '"></span>' + this.getItemText(ctx));
+                return '<span class="' + cls + '"></span>' + this.getItemText(ctx);
             })
         });
         return columns;
