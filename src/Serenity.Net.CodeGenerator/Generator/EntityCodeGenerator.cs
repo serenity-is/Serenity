@@ -94,9 +94,9 @@ public class EntityCodeGenerator
             Add(mainPrefix + "Columns.cs", "Columns");
             Add(mainPrefix + "Form.cs", "Form");
             Add(mainPrefix + "Page.cs", esModules ? "PageModular" : "Page");
-            Add(mainPrefix + "Dialog.ts", esModules ? "DialogModular" : "Dialog");
-            Add(mainPrefix + "Grid.ts", esModules ? "GridModular" : "Grid");
-            Add(mainPrefix + (esModules ? "Page.ts" : "Index.cshtml"), (esModules ? "PageModularTS" : "IndexView"));
+            Add(mainPrefix + (esModules ? "Dialog.tsx" : "Dialog.ts"), esModules ? "DialogModular" : "Dialog");
+            Add(mainPrefix + (esModules ? "Grid.tsx" : "Grid.ts"), esModules ? "GridModular" : "Grid");
+            Add(mainPrefix + (esModules ? "Page.tsx" : "Index.cshtml"), (esModules ? "PageModularTS" : "IndexView"));
             Add(typingPrefix + "Form.ts", esModules ? "FormTypingModular" : "FormTyping");
             Add(typingPrefix + "Columns.ts", esModules ? "ColumnsTypingModular" : "ColumnsTyping");
             GenerateNavigationLink();
