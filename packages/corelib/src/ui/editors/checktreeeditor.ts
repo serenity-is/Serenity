@@ -350,7 +350,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected getItemText(ctx: FormatterContext): string {
-        return htmlEncode(ctx.value);
+        return ctx.escape();
     }
 
     protected getSlickOptions(): GridOptions {
