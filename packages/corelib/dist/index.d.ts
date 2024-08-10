@@ -4986,7 +4986,6 @@ declare namespace SlickFormatting {
     function number(format: string): Format;
     function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
     function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
-    function itemLinkText(itemType: string, id: any, text: FormatterResult, extraClass: string, encode: boolean): FormatterResult;
     function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
 }
 declare namespace SlickHelper {

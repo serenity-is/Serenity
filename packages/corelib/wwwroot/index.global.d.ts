@@ -6572,7 +6572,6 @@ declare namespace Serenity {
         function number(format: string): Format;
         function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
         function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
-        function itemLinkText(itemType: string, id: any, text: Slick.FormatterResult, extraClass: string, encode: boolean): Slick.FormatterResult;
         function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: Slick.FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
     }
     namespace SlickHelper {

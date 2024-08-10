@@ -23,12 +23,12 @@ export class BooleanFormatter implements Formatter {
     format(ctx: FormatterContext) {
 
         if (ctx.value == null)
-            return ctx.asText('');
+            return ctx.asHtml('');
 
         if (!!ctx.value)
-            return ctx.asText(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
+            return ctx.escape(localText(this.trueText, this.trueText ?? DialogTexts.YesButton));
 
-        return ctx.asText(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
+        return ctx.escape(localText(this.falseText, this.falseText ?? DialogTexts.NoButton));
     }
 
     public get falseText() { return this.props.falseText; }
@@ -55,7 +55,7 @@ export class DateFormatter implements Formatter {
     }
 
     format(ctx: FormatterContext): string {
-        return ctx.asText(DateFormatter.format(ctx.value, this.displayFormat));
+        return ctx.escape(DateFormatter.format(ctx.value, this.displayFormat));
     }
     
     static format(value: any, format?: string): string {
@@ -110,7 +110,7 @@ export class EnumFormatter implements Formatter {
             });
             return node;
         }
-        return ctx.asText(EnumFormatter.format(enumType, ctx.value));
+        return ctx.escape(EnumFormatter.format(enumType, ctx.value));
     }
 
     get enumKey() { return this.props.enumKey; }
@@ -196,7 +196,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 export class MinuteFormatter implements Formatter {
 
     format(ctx: FormatterContext) {
-        return ctx.asText(MinuteFormatter.format(ctx.value));
+        return ctx.escape(MinuteFormatter.format(ctx.value));
     }
 
     static format(value: number): string {
@@ -228,7 +228,7 @@ export class NumberFormatter {
     }
 
     format(ctx: FormatterContext): string {
-        return ctx.asText(NumberFormatter.format(ctx.value, this.displayFormat));
+        return ctx.escape(NumberFormatter.format(ctx.value, this.displayFormat));
     }
 
     static format(value: any, format?: string): string {

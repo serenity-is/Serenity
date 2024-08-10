@@ -670,7 +670,7 @@ export namespace SlickFormatting {
         }
 
         return function (ctx: FormatterContext) {
-            return ctx.asText(DateFormatter.format(ctx.value, format));
+            return ctx.escape(DateFormatter.format(ctx.value, format));
         };
     }
 
@@ -679,7 +679,7 @@ export namespace SlickFormatting {
             format = Culture.dateTimeFormat;
         }
         return function (ctx: FormatterContext) {
-            return ctx.asText(DateTimeFormatter.format(ctx.value, format));
+            return ctx.escape(DateTimeFormatter.format(ctx.value, format));
         };
     }
 
@@ -691,7 +691,7 @@ export namespace SlickFormatting {
 
     export function number(format: string): Format {
         return function (ctx: FormatterContext) {
-            return ctx.asText(NumberFormatter.format(ctx.value, format));
+            return ctx.escape(NumberFormatter.format(ctx.value, format));
         };
     }
 
@@ -704,7 +704,7 @@ export namespace SlickFormatting {
         return value == null ? null : value.toString();
     }
 
-    export function itemLinkText(itemType: string, id: any, text: FormatterResult,
+    function itemLinkText(itemType: string, id: any, text: FormatterResult,
         extraClass: string, encode: boolean): FormatterResult {
         var link = Fluent("a")
             .class([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass])
@@ -733,9 +733,10 @@ export namespace SlickFormatting {
         return function (ctx: FormatterContext<TItem>) {
             var text: FormatterResult = (getText == null ? ctx.value : getText(ctx)) ?? '';
             if ((ctx.item as any)?.__nonDataRow) {
-                return text instanceof Node ? text : encode ? htmlEncode(text) : text;
+                return text instanceof Node ? text : ctx.asHtml(encode ? htmlEncode(text) : text);
             }
 
+            ctx.isHtml = true;
             return itemLinkText(itemType, (ctx.item as any)[idField], text,
                 (cssClass == null ? '' : cssClass(ctx)), encode);
         };
