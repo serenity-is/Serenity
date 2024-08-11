@@ -1,3 +1,13 @@
+## 8.6.2 (2024-08-11)
+
+### Features
+- **`[Breaking Change]`** Enhanced security against XSS attacks: HTML strings returned from formatters and format functions are now automatically sanitized by default. While formatters should already use `ctx.escape()` to handle any user-provided or dynamic content, this change adds an extra layer of protection. The default sanitizer is a basic regex-based solution, but if DOMPurify is available globally, it will be used instead. You can also specify a custom sanitizer by setting `gridDefaults.sanitizer` (in `@serenity-is/sleekgrid`) via `ScriptInit.ts`. Keep in mind that most sanitizers will strip out unsafe content, including JavaScript URLs like `javascript:void(0)`. To ensure security and compatibility, it is recommended to update existing formatters to use `jsx-dom` or `Fluent` instead of returning raw HTML strings. If necessary (though not advised), you can disable sanitization by setting `gridDefaults.sanitizer` to a pass-through function, such as `(dirtyHtml: string) => dirtyHtml`.
+- Sergen now generates files with a `.tsx` extension instead of `.ts` for `Dialog`, `Grid`, and `Page` components, simplifying the use of JSX syntax (e.g., jsx-dom) in your projects.
+
+### Bugfixes:
+- Fixed Pro.Coder ESM/MVC source generators do not operate properly with Visual Studio in some cases.
+- Fixed an issue where the tooltip toggle method did not return the instance if it was disposed.
+
 ## 8.6.1 (2024-08-07)
 
 ### Features:
