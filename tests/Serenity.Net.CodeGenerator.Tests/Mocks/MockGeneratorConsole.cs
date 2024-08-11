@@ -1,5 +1,4 @@
 using Serenity.CodeGenerator;
-using System;
 
 namespace Serenity.Tests;
 

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Serenity.TypeScript;
 
 partial class Scanner

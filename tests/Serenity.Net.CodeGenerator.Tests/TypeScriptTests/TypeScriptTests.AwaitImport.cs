@@ -1,6 +1,4 @@
 using Serenity.TypeScript;
-using System.IO;
-using Xunit.Sdk;
 
 namespace Serenity.Tests.CodeGenerator;
 

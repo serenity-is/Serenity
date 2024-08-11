@@ -1154,7 +1154,7 @@ declare namespace Slick {
     		pageNum: number;
     		totalPages: number;
     	}): void;
-    	private updateRowCount;
+    	updateRowCount(): void;
     	/**
     	 * @param viewportTop optional viewport top
     	 * @param viewportLeft optional viewport left

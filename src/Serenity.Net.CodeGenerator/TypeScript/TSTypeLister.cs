@@ -1,4 +1,3 @@
-using Serenity.TypeScript;
 using System.Threading;
 #if ISSOURCEGENERATOR
 using System.Collections.Concurrent;

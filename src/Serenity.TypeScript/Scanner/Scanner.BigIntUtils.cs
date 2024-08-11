@@ -1,5 +1,3 @@
-using Serenity.TypeScript;
-
 namespace Serenity.TypeScript;
 
 partial class Scanner

@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Serenity.Tests.CodeGenerator;
 
 public partial class RowTemplateTests
