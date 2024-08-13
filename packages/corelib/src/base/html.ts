@@ -95,12 +95,26 @@ export function appendToNode(parent: ParentNode, child: any) {
             const fragment = document.createDocumentFragment();
             appendToNode(fragment, result);
             placeholder.parentElement?.replaceChild(fragment, placeholder);
-        }, error => { 
-            placeholder.textContent = "Error loading content: " + error; 
+        }, error => {
+            placeholder.textContent = "Error loading content: " + error;
             throw error;
         });
     }
     else {
         parent.append(child);
     }
+}
+
+// From https://pragmaticwebsecurity.com/articles/spasecurity/react-xss-part1
+const SAFE_URL_PATTERN = /^(?:(?:https?|mailto|ftp|tel|file|sms):|[^&:/?#]*(?:[/?#]|$))/gi;
+
+/** A pattern that matches safe data URLs. It only matches image, video, and audio types. */
+const DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[a-z0-9+\/]+=*$/i;
+
+export function sanitizeUrl(url: string): string {
+    url = String(url).trim();
+    if (url === "null" || url.length === 0 || url === "about:blank") return "about:blank";
+    if (url.match(SAFE_URL_PATTERN) || url.match(DATA_URL_PATTERN)) return url;
+    if (url === "javascript:void(0)" || url === "javascript:;") return url;
+    return `unsafe:${url}`;
 }

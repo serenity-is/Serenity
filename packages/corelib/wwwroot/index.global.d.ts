@@ -3048,6 +3048,7 @@ declare namespace Serenity {
      * @param child The content
      */
     function appendToNode(parent: ParentNode, child: any): void;
+    function sanitizeUrl(url: string): string;
 
     function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
     function localText(key: string, defaultText?: string): string;
