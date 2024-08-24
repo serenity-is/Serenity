@@ -1,3 +1,15 @@
+## 8.6.3 (2024-08-24)
+
+### Features:
+
+- Introducing a new `ServiceEndpointModelBinderProvider` that can be added to `options.ModelMetadataDetailsProviders` in `Startup.cs` as `options.ModelMetadataDetailsProviders.Add(new ServiceEndpointBindingMetadataProvider());` instead of using `options.ModelBinderProviders.Insert(0, new ServiceEndpointModelBinderProvider());`.
+- Added a `sanitizeUrl` method that can be used with JSX `href` attributes to sanitize URLs rendered from user content.
+- Added a third optional `options` argument for extensions of `GridPage` and `PanelPage`.
+
+### Bugfixes:
+- Fixed an issue where `DateTimeEditor` couldn't be set back to `readonly=false`.
+- Corrected the text for the validation rule of lowercase characters in passwords.
+
 ## 8.6.2 (2024-08-11)
 
 ### Features
