@@ -87,6 +87,14 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             });
         }
 
+        if (isCommand(CommandKeys.Doctor))
+        {
+            return RunCommand(new DoctorCommand(project, Console)
+            {
+                Arguments = arguments
+            });
+        }
+
         bool transform = isCommand(CommandKeys.Transform, CommandAliases.Transform);
         bool mvcAndClientTypes = isCommand(CommandKeys.MvcAndClientTypes);
         bool clientTypes = transform || mvcAndClientTypes ||
@@ -188,6 +196,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
     public static class CommandKeys
     {
         public const string ClientTypes = "clienttypes";
+        public const string Doctor = "doctor";
         public const string Generate = "generate";
         public const string Mvc = "mvc";
         public const string MvcAndClientTypes = "mvct";

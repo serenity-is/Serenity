@@ -7,7 +7,8 @@ public static class Texts
         Usage: sergen [switches] [command]
 
         Commands:
-            c[lienttypes]    Imports editor and formatter types from TypeScript to C#.
+            c[lienttypes]     Imports editor and formatter types from TypeScript to C#.
+            doctor            Analyzes the project and tooling environment.
             g[enerate]        Launches the table code generator.
             m[vc]             Generates IntelliSense helpers for view locations.
             mvct              Executes client types and mvc commands simulatenously.
