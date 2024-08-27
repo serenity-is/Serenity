@@ -1,4 +1,5 @@
 using Serenity.CodeGeneration;
+using System.Diagnostics;
 
 namespace Serenity.CodeGenerator;
 
@@ -18,6 +19,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     {
         Console.Write("WARNING: ", ConsoleColor.Yellow);
         Console.WriteLine(message, ConsoleColor.Yellow);
+    }
+
+    void Error(string message)
+    {
+        Console.Write("ERROR: ", ConsoleColor.Red);
+        Console.WriteLine(message, ConsoleColor.Red);
     }
 
     public override ExitCodes Run()
@@ -56,6 +63,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         CheckRootNamespace(config.RootNamespace);
+        CheckNodeAndNpmVersions();
         
         return ExitCodes.Success;
     }
@@ -69,12 +77,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         if (projectDirectory.Contains('#'))
         {
-            Warning("Project directory must not include '#' (hash) character!");
+            Error("Project directory must not include '#' (hash) character!");
         }
 
         if (projectDirectory.Contains(';'))
         {
-            Warning("Project directory must not include ';' (semicolon) character!");
+            Error("Project directory must not include ';' (semicolon) character!");
         }
     }
 
@@ -82,7 +90,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     {
         if (!StartsWithCapitalRegex().IsMatch(projectFilename))
         {
-            Warning("Project filename should start with a capital letter!");
+            Error("Project filename should start with a capital letter!");
         }
 
         if (ContainsSpaceRegex().IsMatch(projectFilename))
@@ -102,7 +110,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         if (projectFilename.Equals("Serenity", StringComparison.OrdinalIgnoreCase))
         {
-            Warning("Project filename should not be 'Serenity'");
+            Error("Project filename should not be 'Serenity'");
         }
 
         if (projectFilename.StartsWith("Serenity.", StringComparison.Ordinal))
@@ -115,22 +123,22 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     {
         if (!StartsWithCapitalRegex().IsMatch(rootNamespace))
         {
-            Warning("Root namespace should start with a capital letter!");
+            Error("Root namespace should start with a capital letter!");
         }
 
         if (ContainsSpaceRegex().IsMatch(rootNamespace))
         {
-            Warning("Root namespace should not contain spaces!");
+            Error("Root namespace should not contain spaces!");
         }
 
         if (!ValidProjectNameCharsRegex().IsMatch(rootNamespace))
         {
-            Warning("Root namespace should only include letters, digits, underscore and dot characters!");
+            Error("Root namespace should only include letters, digits, underscore and dot characters!");
         }
 
         if (rootNamespace.EndsWith('.'))
         {
-            Warning("Root namespace should not end with a DOT!");
+            Error("Root namespace should not end with a DOT!");
         }
 
         if (rootNamespace.Equals("Serenity", StringComparison.OrdinalIgnoreCase))
@@ -141,6 +149,69 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         if (rootNamespace.StartsWith("Serenity.", StringComparison.Ordinal))
         {
             Warning("Root namespace should not start with 'Serenity.' prefix");
+        }
+    }
+
+    private static Version GetNodeOrNpmVersion(bool npm)
+    {
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "cmd",
+                Arguments = "/c " + (npm ? "npm.cmd" : "node") + " --version",
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            }
+        };
+
+        string output;
+        try
+        {
+            process.Start();
+            output = process.StandardOutput.ReadToEnd();
+            if (!process.WaitForExit(5000))
+                output = null;
+        }
+        catch (Exception)
+        {
+            output = null;
+        }
+
+        output = (output ?? "").Trim();
+
+        if (output.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+            output = output.Substring(1);
+
+        if (Version.TryParse(output, out var version))
+            return version;
+
+        return new Version(-1, 0);
+    }
+
+    private void CheckNodeAndNpmVersions()
+    {
+        var nodeVersion = GetNodeOrNpmVersion(npm: false);
+        if (nodeVersion.Major < 0)
+        {
+            Error("NodeJS is not installed or not in PATH. Please install NodeJS.");
+            return;
+        } else if (nodeVersion < new Version(20, 11, 0))
+        {
+            Warning($"Your NodeJS version ({nodeVersion}) is not up to date." +
+                "Please install latest Node LTS version (at least 20.17.0+).");
+        }
+
+        var npmVersion = GetNodeOrNpmVersion(npm: true);
+        if (npmVersion.Major < 0)
+        {
+            Error("NPM is not installed or not in PATH. Please install NPM.");
+            return;
+        }
+        else if (npmVersion < new Version(10, 8, 0))
+        {
+            Warning($"Your NPM version ({npmVersion}) is not up to date." +
+                "Please install latest NPM version (at least 10.8.2+).");
         }
     }
 
