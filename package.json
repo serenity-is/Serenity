@@ -14,7 +14,6 @@
     "jsx-dom": "8.1.4",
     "rollup": "4.18.0",
     "rollup-plugin-dts": "6.1.1",
-    "swc_mut_cjs_exports": "0.90.24",
     "terser": "5.31.1",
     "tslib": "2.6.3",
     "typescript": "5.5.3"

@@ -21,9 +21,6 @@ export default {
           tsx: true
         },
         keepClassNames: true,
-        experimental: {
-          plugins: [["swc_mut_cjs_exports", {}]]
-        },
         transform: {
           react: {
             runtime: 'automatic',
@@ -38,5 +35,8 @@ export default {
   },
   setupFiles: [
     '<rootDir>/build/jest.setup.js'
-  ]  
+  ],
+  setupFilesAfterEnv: [
+    '<rootDir>/build/jest.afterenv.js'
+  ]
 };
