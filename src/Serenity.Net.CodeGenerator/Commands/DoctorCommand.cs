@@ -6,6 +6,11 @@ namespace Serenity.CodeGenerator;
 public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole console) 
     : BaseGeneratorCommand(project, console)
 {
+    static readonly Version RecommendedNodeVersion = new(20, 11, 0);
+    static readonly Version RecommendedNpmVersion = new(10, 8, 2);
+    static readonly Version RecommendedTSBuildVersion = new(8, 6, 0);
+    static readonly Version RecommendedJsxDomVersion = new(8, 1, 5);
+
     public IArgumentReader Arguments { get; set; }
     public List<ExternalType> TsTypes { get; set; }
 
@@ -64,6 +69,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         CheckRootNamespace(config.RootNamespace);
         CheckNodeAndNpmVersions();
+        CheckPackageJson(projectDir);
         
         return ExitCodes.Success;
     }
@@ -195,24 +201,99 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         if (nodeVersion.Major < 0)
         {
             Error("NodeJS is not installed or not in PATH. Please install NodeJS.");
-            return;
-        } else if (nodeVersion < new Version(20, 11, 0))
+        } else if (nodeVersion < RecommendedNodeVersion)
         {
             Warning($"Your NodeJS version ({nodeVersion}) is not up to date." +
-                "Please install latest Node LTS version (at least 20.17.0+).");
+                $"Please install latest Node LTS version (at least {RecommendedNodeVersion}+).");
         }
 
         var npmVersion = GetNodeOrNpmVersion(npm: true);
         if (npmVersion.Major < 0)
         {
             Error("NPM is not installed or not in PATH. Please install NPM.");
-            return;
         }
-        else if (npmVersion < new Version(10, 8, 0))
+        else if (npmVersion > RecommendedNpmVersion)
         {
             Warning($"Your NPM version ({npmVersion}) is not up to date." +
-                "Please install latest NPM version (at least 10.8.2+).");
+                $"Please install latest NPM version (at least {RecommendedNpmVersion}+).");
         }
+    }
+
+    private void CheckPackageJson(string projectDir)
+    {
+        var packageJsonPath = FileSystem.Combine(projectDir, "package.json");
+        if (!FileSystem.FileExists(packageJsonPath))
+        {
+            Warning("package.json file not found at project directory!");
+            return;
+        }
+
+        PackageJson packageJson;
+        try
+        {
+            packageJson = JSON.ParseTolerant<PackageJson>(System.IO.File.ReadAllText(packageJsonPath).Trim());
+        }
+        catch (Exception ex)
+        {
+            Error($"Error reading package.json: {ex.Message}");
+            return;
+        }
+
+        CheckTSBuildVersion(packageJson);
+        CheckJsxDomVersion(packageJson);
+    }
+
+    void CheckTSBuildVersion(PackageJson packageJson)
+    { 
+        if (packageJson.devDependencies?.TryGetValue("@serenity-is/tsbuild", out var versionStr) != true &&
+            packageJson.dependencies?.TryGetValue("@serenity-is/tsbuild", out versionStr) != true)
+        {
+            Warning($"@serenity-is/tsbuild is not found in package.json devDependencies!");
+            return;
+        }
+        
+        if (!Version.TryParse(versionStr, out Version version))
+        {
+            Warning($"Can't parse @serenity-is/tsbuild dependency version from package.json!");
+            return;
+        }
+
+        if (version < RecommendedTSBuildVersion)
+        {
+            Error($"@serenity-is/tsbuild version in package.json is {version}, " +
+                $"please update to at least {RecommendedTSBuildVersion} for better support.");
+        }
+    }
+
+    void CheckJsxDomVersion(PackageJson packageJson)
+    {
+        if (packageJson.dependencies?.TryGetValue("jsx-dom", out var versionStr) != true &&
+            packageJson.devDependencies?.TryGetValue("jsx-dom", out versionStr) != true)
+        {
+            Warning($"jsx-dom package not found in package.json dependencies!");
+            return;
+        }
+
+        if (!Version.TryParse(versionStr, out Version version))
+        {
+            Warning($"Can't parse jsx-dom dependency version from package.json!");
+            return;
+        }
+
+        if (version < RecommendedJsxDomVersion)
+        {
+            Error($"jsx-dom version in package.json is {version}, " +
+                $"please update to at least {RecommendedJsxDomVersion} for better support.");
+        }
+    }
+
+    private class PackageJson
+    {
+#pragma warning disable IDE1006 // Naming Styles
+        public Dictionary<string, string> dependencies { get; set; }
+        public Dictionary<string, string> devDependencies { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+
     }
 
     [GeneratedRegex("^[A-Z]")]
