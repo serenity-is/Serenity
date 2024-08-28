@@ -46,8 +46,8 @@ importers:
         specifier: 29.7.0
         version: 29.7.0
       jsx-dom:
-        specifier: 8.1.4
-        version: 8.1.4
+        specifier: 8.1.5
+        version: 8.1.5
       rollup:
         specifier: 4.18.0
         version: 4.18.0
@@ -1412,8 +1412,8 @@ packages:
   jsonc-parser@3.2.1:
     resolution: {integrity: sha512-AilxAyFOAcK5wA1+LeaySVBrHsGQvUFCDWXKpZjzaL0PqW+xfBOttn8GNtWKFWqneyMZj41MWF9Kl6iPWLwgOA==}
 
-  jsx-dom@8.1.4:
-    resolution: {integrity: sha512-Wcv5iuOvB5SeF/tj3/sa+B0kqWb22WnlfPg8k64SmHOa/E+2M+cOruke+Dqr0GK2FY5xp0gEj4quWZM8quQN2w==}
+  jsx-dom@8.1.5:
+    resolution: {integrity: sha512-mu1/YDltqM1Qh9xO4bEKTMHU90v7IV0hdgq6LcK0LRsMtA8/6RcLwkvnxCNqMm9cWpH39xpgLa6NTJUdjTmJ6Q==}
 
   kleur@3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
@@ -3452,7 +3452,7 @@ snapshots:
 
   jsonc-parser@3.2.1: {}
 
-  jsx-dom@8.1.4:
+  jsx-dom@8.1.5:
     dependencies:
       csstype: 3.1.3
 

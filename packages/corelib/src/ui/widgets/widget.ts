@@ -1,4 +1,4 @@
-﻿import { Config, Fluent, addClass, addValidationRule, appendToNode, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
+import { Config, Fluent, addClass, addValidationRule, appendToNode, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
@@ -204,11 +204,15 @@ export class Widget<P = {}> {
     protected useIdPrefix(): IdPrefixType {
         return useIdPrefix(this.idPrefix);
     }
+
+    // jsx-dom >= 8.1.5 requires isComponent as a static property
+    static readonly isComponent = true;
 }
 
 /** @deprecated Use Widget */
 export const TemplatedWidget = Widget;
 
+// jsx-dom < 8.1.5 requires isReactComponent on prototype
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
 export interface CreateWidgetParams<TWidget extends Widget<P>, P> {

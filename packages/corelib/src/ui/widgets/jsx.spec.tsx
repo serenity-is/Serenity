@@ -4,7 +4,7 @@ import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';
 
 test('render childless element', function () {
-    const element = <br />;
+    const element = <br /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<br>');
 });
@@ -14,7 +14,7 @@ test('render div with children', function () {
         <div>
             <span />
         </div>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<div><span></span></div>');
 });
@@ -25,7 +25,7 @@ test('render div with multiple children', function () {
             <span />
             <br />
         </div>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<div><span></span><br></div>');
 });
@@ -40,13 +40,13 @@ test('render array of children', function () {
 
             <span>2</span>
         </div>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<div><span data-key="0">0</span><span data-key="1">1</span><span>2</span></div>');
 });
 
 test('render number child', function () {
-    const element = <span>7</span>;
+    const element = <span>7</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>7</span>');
 });
@@ -58,13 +58,13 @@ test('render multiple number children', function () {
             {2}
             {3}
         </span>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>123</span>');
 });
 
 test('render string child', function () {
-    const element = <span>test</span>;
+    const element = <span>test</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>test</span>');
 });
@@ -74,13 +74,13 @@ test('render multiple string children', function () {
         <span>
             {'hello'} {'world'}
         </span>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>hello world</span>');
 });
 
 test('render div with TextNode child', function () {
-    const element = <div>{document.createTextNode('Hello')}</div>;
+    const element = <div>{document.createTextNode('Hello')}</div> as HTMLElement;
 
     expect(element.outerHTML).toBe('<div>Hello</div>');
 });
@@ -91,19 +91,19 @@ test('skip boolean children', function () {
             {true}
             {false}
         </span>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<span></span>');
 });
 
 test('skip null children', function () {
-    const element = <span>{null}</span>;
+    const element = <span>{null}</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span><!----></span>');
 });
 
 test('skip undefined children', function () {
-    const element = <span>{undefined}</span>;
+    const element = <span>{undefined}</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span></span>');
 });
@@ -114,7 +114,7 @@ test('render falsey children', function () {
             {0}
             {Number.NaN}
         </span>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>0NaN</span>');
 });
@@ -127,7 +127,7 @@ test('render other elements inside', function () {
             {firstElement}
             {secondElement}
         </div>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<div><a href="#first">First</a><a href="#second">Second</a></div>');
 });
@@ -136,7 +136,7 @@ test('render document fragments inside', function () {
     const template = document.createElement('template');
     template.innerHTML = 'Hello, <strong>World!</strong> ';
     const fragment = template.content;
-    const element = <div>{fragment}</div>;
+    const element = <div>{fragment}</div> as HTMLElement;
 
     expect(element.outerHTML).toBe('<div>Hello, <strong>World!</strong> </div>');
 });
@@ -213,13 +213,13 @@ test('create svg links with xlink namespace', function () {
 });
 
 test('assign className', function () {
-    const element = <span className="a b c" />;
+    const element = <span className="a b c" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span class="a b c"></span>');
 });
 
 test('assign className via class alias', function () {
-    const element = <span class="a b c" />;
+    const element = <span class="a b c" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span class="a b c"></span>');
 });
@@ -232,7 +232,7 @@ test('assign styles', function () {
         fontSize: '12px',
     };
 
-    const element = <span {...{ style }} />;
+    const element = <span {...{ style }} /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span style="padding-top: 10px; width: 200px; height: 200px; font-size: 12px;"></span>');
 });
@@ -244,13 +244,13 @@ test('assign styles with dashed property names', function () {
     };
 
     // ts-expect-error TODO: update the types
-    const element = <span style={style} />;
+    const element = <span style={style} /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span style="padding-top: 10px; font-size: 12px;"></span>');
 });
 
 test('assign styles with css variables', function () {
-    const element = <span style="--padding-top: 10; --myCamelCaseVar: red;" />;
+    const element = <span style="--padding-top: 10; --myCamelCaseVar: red;" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span style="--padding-top: 10; --myCamelCaseVar: red;"></span>');
 });
@@ -260,20 +260,20 @@ test('assign other props', function () {
         <a href="video.mp4" id="a" referrerPolicy="no-referrer">
             Download
         </a>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<a href="video.mp4" id="a" referrerpolicy="no-referrer">Download</a>');
 });
 
 test('assign htmlFor prop', function () {
-    const element = <label htmlFor="name-input">Full name</label>;
+    const element = <label htmlFor="name-input">Full name</label> as HTMLElement;
 
     expect(element.outerHTML).toBe('<label for="name-input">Full name</label>');
 });
 
 test('assign or skip boolean props', function () {
     const input = (
-        <input disabled={false} />
+        <input disabled={false} /> as HTMLElement
     );
 
     expect(input.outerHTML).toBe('<input>');
@@ -281,7 +281,7 @@ test('assign or skip boolean props', function () {
     const link = (
         <a download contentEditable={true}>
             Download
-        </a>
+        </a> as HTMLElement
     );
 
     expect(link.outerHTML).toBe('<a download="" contenteditable="">Download</a>');
@@ -291,9 +291,9 @@ test('assign booleanish false props', function () {
     const element = (
         <span contentEditable>
             <a contentEditable={false}>Download</a>
-        </span>
+        </span> as HTMLElement
     );
-    const input = <textarea spellCheck={false} />;
+    const input = <textarea spellCheck={false} /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span contenteditable=""><a>Download</a></span>');
     expect(input.outerHTML).toBe('<textarea></textarea>');
@@ -304,27 +304,27 @@ test('skip undefined and null props', function () {
         // ts-expect-error Types don't allow it, but we need to test it
         <a href={undefined} title={null}>
             Download
-        </a>
+        </a> as HTMLElement
     );
 
     expect(element.outerHTML).toBe('<a>Download</a>');
 });
 
 test('escape props', function () {
-    const element = <a id={'"test"'}>Download</a>;
+    const element = <a id={'"test"'}>Download</a> as HTMLElement;
 
     expect(element.outerHTML).toBe('<a id="&quot;test&quot;">Download</a>');
 });
 
 test('escape children', function () {
-    const element = <div>{'<script>alert();</script>'}</div>;
+    const element = <div>{'<script>alert();</script>'}</div> as HTMLElement;
 
     expect(element.outerHTML).toBe('<div>&lt;script&gt;alert();&lt;/script&gt;</div>');
 });
 
 test('set html', function () {
     const element = (
-        <div dangerouslySetInnerHTML={{ __html: '<script>alert();</script>' }} />
+        <div dangerouslySetInnerHTML={{ __html: '<script>alert();</script>' }} /> as HTMLElement
     );
 
     expect(element.outerHTML).toBe('<div><script>alert();</script></div>');
@@ -338,7 +338,7 @@ test('attach event listeners', function () {
         <a href="#" onClick={handleClick}>
             Download
         </a>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
@@ -356,7 +356,7 @@ test('attach event listeners but drop the dash after on', function () {
         <a href="#" {...assignProps}>
             Download
         </a>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
@@ -417,7 +417,7 @@ test('div with inner fragment', function () {
             </>
             <span>outside fragment</span>
         </div>
-    );
+    ) as HTMLElement;
 
     expect(element.outerHTML).toBe('<div><h1>heading</h1> text<span>outside fragment</span></div>');
 });
@@ -425,7 +425,7 @@ test('div with inner fragment', function () {
 test('element created by function', function () {
     const Icon = () => <i />;
 
-    const element = <Icon />;
+    const element = <Icon /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<i></i>');
 });
@@ -433,7 +433,7 @@ test('element created by function', function () {
 test('element created by function with existing children and attributes', function () {
     const Icon = () => <i className="sweet">Gummy <span>bears</span></i>;
 
-    const element = <Icon />;
+    const element = <Icon /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<i class="sweet">Gummy <span>bears</span></i>');
 });
@@ -494,7 +494,7 @@ describe('jsx: intrinsic elements', () => {
     ).toBe('foo'));
 
     it('can get className and classList after class attribute assignment', () => {
-        const div = <div class="foo"></div>;
+        const div = <div class="foo"></div> as HTMLElement;
         expect(div.classList[0]).toBe('foo');
         expect(div.className).toBe('foo');
     })
@@ -583,7 +583,7 @@ describe('jsx: widget integration', () => {
 
     it('can create input directly', () => {
         var ed: StringEditor;
-        var el = <StringEditor ref={x => ed = x} readOnly={true} />;
+        var el = <StringEditor ref={x => ed = x} readOnly={true} /> as HTMLElement;
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();

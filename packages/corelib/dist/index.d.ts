@@ -2609,6 +2609,7 @@ declare class Widget<P = {}> {
     get props(): WidgetProps<P>;
     protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
     protected useIdPrefix(): IdPrefixType;
+    static readonly isComponent = true;
 }
 /** @deprecated Use Widget */
 declare const TemplatedWidget: typeof Widget;

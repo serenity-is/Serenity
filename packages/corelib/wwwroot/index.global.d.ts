@@ -4165,6 +4165,7 @@ declare namespace Serenity {
         get props(): WidgetProps<P>;
         protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
         protected useIdPrefix(): IdPrefixType;
+        static readonly isComponent = true;
     }
     /** @deprecated Use Widget */
     const TemplatedWidget: typeof Widget;
