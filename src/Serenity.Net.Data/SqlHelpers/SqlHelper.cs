@@ -138,7 +138,7 @@ public static class SqlHelper
         {
             param.Value = value;
 
-            if (value != null && value != DBNull.Value)
+            if (value != null && value != DBNull.Value && value is not System.Data.SqlTypes.SqlBinary { IsNull: true })
             {
 #pragma warning disable CS0618
                 var mappedType = Dapper.SqlMapper.LookupDbType(value.GetType(), "n/a", false, out var _); ;
@@ -675,4 +675,5 @@ public static class SqlHelper
         using IDataReader reader = ExecuteReader(connection, query, logger);
         return reader.Read();
     }
+
 }

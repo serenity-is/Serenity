@@ -179,4 +179,14 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
         else
             writer.WriteBase64StringValue(value);
     }
+
+    /// <inheritdoc/>
+    public override object AsSqlValue(IRow row)
+    {
+        var value = AsObject(row);
+        if (value == null)
+            return System.Data.SqlTypes.SqlBinary.Null;
+
+        return value;
+    }
 }
