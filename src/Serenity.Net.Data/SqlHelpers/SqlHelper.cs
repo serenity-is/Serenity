@@ -138,7 +138,9 @@ public static class SqlHelper
         {
             param.Value = value;
 
-            if (value != null && value != DBNull.Value && value is not System.Data.SqlTypes.SqlBinary { IsNull: true })
+            if (value != null && 
+                value != DBNull.Value && 
+                value is not System.Data.SqlTypes.INullable)
             {
 #pragma warning disable CS0618
                 var mappedType = Dapper.SqlMapper.LookupDbType(value.GetType(), "n/a", false, out var _); ;
