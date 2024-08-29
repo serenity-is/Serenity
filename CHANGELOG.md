@@ -1,3 +1,13 @@
+## 8.6.4 (2024-08-29)
+
+### Features:
+
+- A new `dotnet sergen doctor` command that will check a project for issues related to environment and NPM/NuGet package versions.
+- Update jsx-dom to 8.1.5
+
+### Bugfixes:
+- Fix conversion issue with Sql VarBinary columns and setting to null (Implicit conversion from data type nvarchar to varbinary(max) is not allowed. Use the CONVERT function to run this query). This could effect SqlUploadStorage.
+
 ## 8.6.3 (2024-08-24)
 
 ### Features:
