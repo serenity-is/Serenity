@@ -351,7 +351,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         if (version < recommendedVersion)
         {
             Error($"@serenity-is/tsbuild version in package.json is {version}, " +
-                $"please update to at least {recommendedVersion} for better support.");
+                $"please update to {recommendedVersion} for better support.");
         }
         else if (version > recommendedVersion)
         {
