@@ -8,8 +8,15 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 {
     static readonly Version RecommendedNodeVersion = new(20, 11, 0);
     static readonly Version RecommendedNpmVersion = new(10, 8, 2);
-    static readonly Version RecommendedTSBuildVersion = new(8, 6, 0);
-    static readonly Version RecommendedJsxDomVersion = new(8, 1, 5);
+
+    static readonly (Version, Version)[] RecommendedTSBuildVersion = [
+        (new(0, 0, 0), new(8, 6, 0))
+    ];
+
+    static readonly (Version, Version)[] RecommendedJsxDomVersion = [
+        (new(0, 0, 0), new(8, 1, 4)),
+        (new(8, 6, 4), new(8, 1, 5))
+    ];
 
     public IArgumentReader Arguments { get; set; }
     public List<ExternalType> TsTypes { get; set; }
@@ -68,8 +75,21 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         CheckRootNamespace(config.RootNamespace);
+        var sergenVersion = typeof(DoctorCommand).Assembly.GetName().Version;
+        Info("Sergen Version", sergenVersion.ToString());
+        CheckSerenityVersion(projectFile, sergenVersion, out Version serenityVersion);
+
+        if ((serenityVersion.Major != 0 || serenityVersion.Minor != 0) && 
+            (serenityVersion.Major != sergenVersion.Major ||
+             serenityVersion.Minor != sergenVersion.Minor ||
+             serenityVersion.Build != sergenVersion.Build))
+        {
+            Error($"Serenity.Net.Web version ({serenityVersion}) does not match Sergen version ({sergenVersion})!" +
+                $"Sergen and Serenity.Web versions should exactly match!");
+        }
+
         CheckNodeAndNpmVersions();
-        CheckPackageJson(projectDir);
+        CheckPackageJson(projectDir, serenityVersion);
         
         return ExitCodes.Success;
     }
@@ -158,6 +178,73 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
     }
 
+    void CheckSerenityVersion(string projectFile, Version sergenVersion, out Version serenityVersion)
+    {
+        serenityVersion = new Version(0, 0);
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"msbuild \"{projectFile}\" " +
+                        "-getItem:PackageReference " +
+                        "-getProperty:AssemblyName " +
+                        "-getProperty:OutDir " +
+                        "-getProperty:RootNamespace " +
+                        "-getProperty:TargetFramework",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        };
+
+        ProjectMetadataJson metadata;
+        try
+        {
+            string output;
+            var process = new Process() { StartInfo = startInfo };
+            process.Start();
+            output = process.StandardOutput.ReadToEnd();
+            if (!process.WaitForExit(10000))
+                output = null;
+
+            output = (output ?? "").Trim();
+
+            if (!output.StartsWith('{') ||
+                !output.EndsWith('}'))
+            {
+                Error($"Unexpected output from MSBuild for project metadata: {output}");
+                return;
+            }
+
+            metadata = JSON.ParseTolerant<ProjectMetadataJson>(output) ?? new();
+        }
+        catch (Exception ex)
+        {
+            Error($"Error while executing MSBuild to get project metadata: {ex.Message}");
+            return;
+        }
+
+        if (metadata.Items?.PackageReference == null)
+        {
+            Error("Can't read package references from project file!");
+            return;
+        }
+
+        var serenityWeb = metadata.Items.PackageReference.FirstOrDefault(x => x.Identity == "Serenity.Net.Web");
+        if (serenityWeb == null)
+        {
+            Error("Can't read Serenity.Net.Web package reference from project file!");
+            return;
+        }
+
+        if (serenityWeb.Version == null || !Version.TryParse(serenityWeb.Version, out Version serenityWebVersion))
+        {
+            Error($"Can't parse Serenity.Net.Web package version ({serenityWeb.Version}) from project file!");
+            return;
+        }
+
+        Info("Serenity.Net.Web Version", serenityWebVersion.ToString());
+
+        serenityVersion = serenityWebVersion;
+    }
+
     private static Version GetNodeOrNpmVersion(bool npm)
     {
         var process = new Process()
@@ -192,13 +279,13 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         if (Version.TryParse(output, out var version))
             return version;
 
-        return new Version(-1, 0);
+        return new Version(0, 0);
     }
 
     private void CheckNodeAndNpmVersions()
     {
         var nodeVersion = GetNodeOrNpmVersion(npm: false);
-        if (nodeVersion.Major < 0)
+        if (nodeVersion.Major == 0)
         {
             Error("NodeJS is not installed or not in PATH. Please install NodeJS.");
         } else if (nodeVersion < RecommendedNodeVersion)
@@ -208,7 +295,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         var npmVersion = GetNodeOrNpmVersion(npm: true);
-        if (npmVersion.Major < 0)
+        if (npmVersion.Major == 0)
         {
             Error("NPM is not installed or not in PATH. Please install NPM.");
         }
@@ -219,7 +306,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
     }
 
-    private void CheckPackageJson(string projectDir)
+    private void CheckPackageJson(string projectDir, Version serenityVersion)
     {
         var packageJsonPath = FileSystem.Combine(projectDir, "package.json");
         if (!FileSystem.FileExists(packageJsonPath))
@@ -239,11 +326,11 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        CheckTSBuildVersion(packageJson);
-        CheckJsxDomVersion(packageJson);
+        CheckTSBuildVersion(packageJson, serenityVersion);
+        CheckJsxDomVersion(packageJson, serenityVersion);
     }
 
-    void CheckTSBuildVersion(PackageJson packageJson)
+    void CheckTSBuildVersion(PackageJson packageJson, Version serenityVersion)
     { 
         if (packageJson.devDependencies?.TryGetValue("@serenity-is/tsbuild", out var versionStr) != true &&
             packageJson.dependencies?.TryGetValue("@serenity-is/tsbuild", out versionStr) != true)
@@ -258,14 +345,27 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        if (version < RecommendedTSBuildVersion)
+        var recommendedVersion = RecommendedTSBuildVersion.LastOrDefault(x =>
+            serenityVersion >= x.Item1).Item2;
+
+        if (version < recommendedVersion)
         {
             Error($"@serenity-is/tsbuild version in package.json is {version}, " +
-                $"please update to at least {RecommendedTSBuildVersion} for better support.");
+                $"please update to at least {recommendedVersion} for better support.");
+        }
+        else if (version > recommendedVersion)
+        {
+            Warning($"@serenity-is/tsbuild version in package.json is {version}, " +
+                $"which is newer than the recommended version {recommendedVersion} for" +
+                $"Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
+        }
+        else
+        {
+            Info("@serenity-is/tsbuild Version", version.ToString());
         }
     }
 
-    void CheckJsxDomVersion(PackageJson packageJson)
+    void CheckJsxDomVersion(PackageJson packageJson, Version serenityVersion)
     {
         if (packageJson.dependencies?.TryGetValue("jsx-dom", out var versionStr) != true &&
             packageJson.devDependencies?.TryGetValue("jsx-dom", out versionStr) != true)
@@ -280,11 +380,27 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        if (version < RecommendedJsxDomVersion)
+        var recommendedVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
+            serenityVersion >= x.Item1).Item2;
+
+        if (version < recommendedVersion)
         {
             Error($"jsx-dom version in package.json is {version}, " +
-                $"please update to at least {RecommendedJsxDomVersion} for better support.");
+                $"please update to {RecommendedJsxDomVersion} for better support.");
         }
+        else if (version > recommendedVersion)
+        {
+            Warning($"The jsx-dom version in package.json is {version}, " +
+                $"which is newer than the recommended version {recommendedVersion} " +
+                $"for Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
+        }
+        else
+        {
+            Info("jsx-dom Version", version.ToString());
+        }
+
+        var nextVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
+            serenityVersion >= x.Item1).Item2;
     }
 
     private class PackageJson
@@ -294,6 +410,23 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         public Dictionary<string, string> devDependencies { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
 
+    }
+
+    private class ProjectMetadataJson
+    {
+        public ProjectFileInfo.ProjectProperties Properties { get; set; }
+        public ProjectItems Items { get; set; }
+    }
+
+    private class ProjectItems
+    {
+        public PackageReferenceItem[] PackageReference { get; set; }
+    }
+
+    private class PackageReferenceItem
+    {
+        public string Identity { get; set; }
+        public string Version { get; set; }
     }
 
     [GeneratedRegex("^[A-Z]")]
