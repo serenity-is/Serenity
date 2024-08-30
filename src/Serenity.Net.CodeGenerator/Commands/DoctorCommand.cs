@@ -398,9 +398,6 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         {
             Info("jsx-dom Version", version.ToString());
         }
-
-        var nextVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
     }
 
     private class PackageJson
