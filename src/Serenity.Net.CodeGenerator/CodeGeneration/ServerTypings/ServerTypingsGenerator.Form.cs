@@ -240,7 +240,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         }
         else
         {
-            var moduleName = GetTypingFileNameFor(GetNamespace(enumType), enumType.Name);
+            var moduleName = GetTypingFileNameFor(ScriptNamespaceFor(enumType), enumType.Name);
             referencedTypeAliases.Add(("Enum", AddModuleImport(moduleName, enumType.Name, external: false)));
         }
     }
@@ -248,7 +248,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
         string identifier)
     {
-        var codeNamespace = GetNamespace(type);
+        var codeNamespace = ScriptNamespaceFor(type);
 
         cw.Indented("export interface ");
         sb.Append(identifier);

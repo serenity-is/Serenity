@@ -43,6 +43,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
         generator.RootNamespaces.Add(config.RootNamespace);
 
+        generator.AddBuiltinTSTypes();
         foreach (var type in TsTypes)
             generator.AddTSType(type);
 

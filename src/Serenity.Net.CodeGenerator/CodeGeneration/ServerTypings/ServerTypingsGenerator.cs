@@ -44,7 +44,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         void add(Action<TypeDefinition> action, string fileIdentifier = null)
         {
-            var typeNamespace = GetNamespace(type);
+            var typeNamespace = ScriptNamespaceFor(type);
 
             action(type);
             var fileName = GetTypingFileNameFor(typeNamespace, fileIdentifier ?? type.Name) + ".ts";

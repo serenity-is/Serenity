@@ -8,7 +8,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
     private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute)
     {
-        var codeNamespace = GetNamespace(type);
+        var codeNamespace = ScriptNamespaceFor(type);
 
         var identifier = type.Name;
         var referencedTypeKeys = new HashSet<(string group, string key)>();

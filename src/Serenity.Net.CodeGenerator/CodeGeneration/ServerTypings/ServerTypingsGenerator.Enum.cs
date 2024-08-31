@@ -15,7 +15,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     private void GenerateEnum(TypeDefinition enumType)
     {
-        var codeNamespace = GetNamespace(enumType);
+        var codeNamespace = ScriptNamespaceFor(enumType);
         var enumKey = GetEnumKeyFor(enumType);
 
         cw.Indented("export enum ");

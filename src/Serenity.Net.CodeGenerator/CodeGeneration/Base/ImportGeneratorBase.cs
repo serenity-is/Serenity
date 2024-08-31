@@ -1,14 +1,18 @@
+using Serenity.CodeGenerator;
+
 namespace Serenity.CodeGeneration;
 
 public abstract class ImportGeneratorBase : CodeGeneratorBase
 {
-    protected Dictionary<string, ExternalType> tsTypes;
+    private readonly Dictionary<string, ExternalType> tsTypes;
 
     public ImportGeneratorBase()
     {
         RootNamespaces = [ "Serenity" ];
         tsTypes = [];
     }
+
+    public IDictionary<string, ExternalType> TSTypes => tsTypes;
 
     public HashSet<string> RootNamespaces { get; private set; }
 
@@ -19,13 +23,27 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         tsTypes[type.FullName] = type;
     }
 
-    protected ExternalType GetScriptType(string fullName)
+    public void AddBuiltinTSTypes()
+    {
+        foreach (var type in BuiltinTSTypes.All)
+            AddTSType(type);
+    }
+
+    protected ExternalType GetScriptType(string fullName, bool fallback = true)
     {
         if (string.IsNullOrEmpty(fullName))
             return null;
 
         if (tsTypes.TryGetValue(fullName, out ExternalType type))
             return type;
+
+        if (fallback &&
+            fullName.StartsWith("@serenity-is/corelib:"))
+        {
+            var name = fullName[9..];
+            if (tsTypes.TryGetValue(name, out type))
+                return type;
+        }
 
         return null;
     }

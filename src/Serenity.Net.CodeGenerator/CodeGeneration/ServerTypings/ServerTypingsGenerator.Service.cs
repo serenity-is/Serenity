@@ -4,7 +4,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
     private void GenerateService(TypeDefinition type, string identifier)
     {
-        var codeNamespace = GetNamespace(type);
+        var codeNamespace = ScriptNamespaceFor(type);
 
         cw.Indented("export namespace ");
         sb.Append(identifier);
@@ -13,7 +13,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         cw.InBrace(delegate
         {
             var serviceUrl = GetServiceUrlFromRoute(type);
-            serviceUrl ??= GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
+            serviceUrl ??= ScriptNamespaceFor(type).Replace(".", "/", StringComparison.Ordinal);
 
             cw.Indented("export const baseUrl = '");
             sb.Append(serviceUrl);

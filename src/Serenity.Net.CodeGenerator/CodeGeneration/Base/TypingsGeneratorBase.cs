@@ -156,7 +156,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     protected static string GetAssemblyNameFor(TypeReference type)
     {
-        var assemblyName = 
+        var assemblyName =
 #if ISSOURCEGENERATOR
         type.ContainingAssembly?.Name;
 #else
@@ -167,7 +167,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return assemblyName;
     }
 
-    protected virtual string GetNamespace(TypeReference type)
+    protected virtual string ScriptNamespaceFor(TypeReference type)
     {
         var ns = type.NamespaceOf() ?? "";
         if (string.IsNullOrEmpty(ns) && type.IsNested())
@@ -217,7 +217,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     protected override void GenerateAll()
     {
         var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        modularEditorTypeByKey = tsTypes.Values.Select(type =>
+        modularEditorTypeByKey = TSTypes.Values.Select(type =>
         {
             if (type.IsAbstract != false &&
                 type.IsInterface != false &&
@@ -230,7 +230,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 {
                     return (key: type.Name, type);
                 }
-                
+
                 if (type.Attributes != null)
                 {
                     foreach (var attr in type.Attributes)
@@ -250,7 +250,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }).Where(x => x.key != null)
             .ToLookup(x => x.key, x => x.type);
 
-        modularFormatterTypeByKey = tsTypes.Values.Select(type =>
+        modularFormatterTypeByKey = TSTypes.Values.Select(type =>
         {
             if (type.IsAbstract != false &&
                 type.IsInterface != false &&
@@ -258,7 +258,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
             {
                 if (type.SourceFile?.EndsWith(".d.ts") == true &&
                     type.Interfaces != null &&
-                    type.Interfaces.Any(x => x == "ISlickFormatter" || 
+                    type.Interfaces.Any(x => x == "ISlickFormatter" ||
                         x?.EndsWith(".ISlickFormatter", StringComparison.Ordinal) == true))
                 {
                     return (key: type.Name, type);
@@ -283,7 +283,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }).Where(x => x.key != null)
             .ToLookup(x => x.key, x => x.type);
 
-        modularDialogTypeByKey = tsTypes.Values.Select(type =>
+        modularDialogTypeByKey = TSTypes.Values.Select(type =>
         {
             if (type.IsAbstract != false &&
                 type.IsInterface != false &&
@@ -341,7 +341,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 if (module.HasAssemblyReferences)
                 {
                     foreach (var refAsm in module.AssemblyReferences)
-                    { 
+                    {
                         if (!visitedForAnnotations.Contains(refAsm.Name))
                         {
                             visitedForAnnotations.Add(refAsm.Name);
@@ -349,13 +349,13 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                             if (SkipPackages.ForAnnotations(refAsm.Name))
                                 continue;
 
-                            if (Assemblies.Any(x => string.Equals(x.Name.Name, 
+                            if (Assemblies.Any(x => string.Equals(x.Name.Name,
                                 refAsm.Name, StringComparison.OrdinalIgnoreCase)))
                                 continue;
 
                             try
                             {
-                                
+
                                 var refDef = module.AssemblyResolver.Resolve(refAsm);
                                 if (refDef != null)
                                 {
@@ -413,7 +413,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                         lookupScripts.Add(fromType);
                 }
 #if !ISSOURCEGENERATOR
-    }
+            }
         }
 #endif
 
@@ -486,8 +486,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
                 if (TypingsUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                 {
-                    if (TypingsUtils.GetAttr(type, attr.AnnotatedType.NamespaceOf(), 
-                        attr.AnnotatedType.Name, baseClasses) == null) 
+                    if (TypingsUtils.GetAttr(type, attr.AnnotatedType.NamespaceOf(),
+                        attr.AnnotatedType.Name, baseClasses) == null)
                         continue;
                 }
                 else if (attr.Inherited ||
@@ -583,6 +583,20 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return filename;
     }
 
+    private static readonly HashSet<string> SerenityNetAssemblies = new([
+        "Serenity.Net.Core",
+        "Serenity.Net.Data",
+        "Serenity.Net.Entity",
+        "Serenity.Net.Services",
+        "Serenity.Net.Web"
+    ], StringComparer.OrdinalIgnoreCase);
+
+    private static readonly string[] CommonSerenityModulesColon = [
+        "@serenity-is/corelib:",
+        "@serenity-is/extensions:",
+        "@serenity-is/pro.extensions:",
+    ];
+
     protected ExternalType TryFindModuleType(string fullName, string containingAssembly)
     {
         var nonGeneric = fullName;
@@ -606,22 +620,40 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
             nonGeneric = nonGeneric[(dotIdx + 1)..];
         }
 
-        bool tryModule(string module)
+        if (!string.IsNullOrEmpty(containingAssembly))
         {
-            scriptType = GetScriptType(module + ":" + nonGeneric);
-            return scriptType != null;
+            if (SerenityNetAssemblies.Contains(containingAssembly))
+            {
+                if ((scriptType = GetScriptType("@serenity-is/corelib:" + nonGeneric)) != null)
+                    return scriptType;
+            }
+            else if (containingAssembly.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase))
+            {
+                if ((scriptType = GetScriptType("@serenity-is/" + containingAssembly[9..].ToLowerInvariant() + ":" + nonGeneric)) != null)
+                    return scriptType;
+            }
+            else if ((scriptType = GetScriptType(containingAssembly.ToLowerInvariant() + ":" + nonGeneric)) != null)
+                return scriptType;
         }
 
-        if ((!string.IsNullOrEmpty(containingAssembly) && tryModule(containingAssembly.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
-            (!string.IsNullOrEmpty(ns) && tryModule(ns.Replace("Serenity.", "@serenity-is/").ToLowerInvariant())) ||
-            ((ns == "Serenity" || ns?.StartsWith("Serenity.") == true) &&
-                 tryModule("@serenity-is/corelib") ||
-                (tryModule("@serenity-is/corelib/q") ||
-                 tryModule("@serenity-is/extensions") ||
-                 tryModule("@serenity-is/pro.extensions"))))
-        {
+        if (ns == null)
+            return null;
+
+        if (ns.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) &&
+            (scriptType = GetScriptType("@serenity-is/" + ns[9..].ToLowerInvariant() + ":" + nonGeneric)) != null)
             return scriptType;
+
+        if (ns.Equals("Serenity", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var moduleColon in CommonSerenityModulesColon)
+            {
+                if ((scriptType = GetScriptType(moduleColon + nonGeneric)) != null)
+                    return scriptType;
+            }
         }
+
+        if ((scriptType = GetScriptType(ns.ToLowerInvariant() + ":" + nonGeneric)) != null)
+            return scriptType;
 
         return null;
     }
@@ -731,7 +763,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
     {
-        var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, GetAssemblyNameFor(type));
+        var fullName = ShortenFullName(ScriptNamespaceFor(type), type.Name, codeNamespace, GetAssemblyNameFor(type));
 
         if (type.IsGenericInstance())
         {
@@ -1031,13 +1063,13 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                     .Select(z =>
                 {
                     var from = z.Key.From;
-                    if (!z.Key.External && !from.StartsWith("."))
+                    if (!z.Key.External && !from.StartsWith('.'))
                     {
                         if (from.StartsWith("@/") &&
                             !string.IsNullOrEmpty(ModulesPathFolder))
                             from = "/" + ModulesPathFolder + "/" + from;
 
-                        if (!from.StartsWith("/"))
+                        if (!from.StartsWith('/'))
                         {
                             if (System.IO.Path.GetDirectoryName(filename) ==
                                 System.IO.Path.GetDirectoryName(from))

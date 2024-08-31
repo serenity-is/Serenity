@@ -30,6 +30,7 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
 
         generator.RootNamespaces.Add(config.RootNamespace);
 
+        generator.AddBuiltinTSTypes();
         foreach (var type in TsTypes)
             generator.AddTSType(type);
 
