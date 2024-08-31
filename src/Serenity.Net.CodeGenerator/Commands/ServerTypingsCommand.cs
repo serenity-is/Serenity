@@ -5,7 +5,6 @@ namespace Serenity.CodeGenerator;
 public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
-    public bool Modules { get; set; }
     public List<ExternalType> TsTypes { get; set; }
 
     public override ExitCodes Run()
@@ -13,11 +12,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         var projectDir = FileSystem.GetDirectoryName(ProjectFile);
         var config = FileSystem.LoadGeneratorConfig(projectDir);
 
-        if (Modules && config.ServerTypings?.ModuleTypings == false ||
-            !Modules && config.ServerTypings?.NamespaceTypings == false)
-            return ExitCodes.Success;
-
-        var transformType = Modules ? "Modular Server Types" : "Namespace Server Typings";
+        var transformType = "Modular Server Types";
         var transformFor = FileSystem.GetFileNameWithoutExtension(ProjectFile);
         Console.WriteLine($"Transforming {transformType} for {transformFor}", ConsoleColor.Cyan);
 
@@ -34,20 +29,16 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         var generator = new ServerTypingsGenerator(FileSystem, assemblyFiles.ToArray())
         {
             LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts,
-            ModuleTypings = Modules && config?.ServerTypings?.ModuleTypings != false
+            ModuleReExports = config?.ServerTypings?.ModuleReExports != false
         };
-        generator.ModuleReExports = generator.ModuleTypings && config?.ServerTypings?.ModuleReExports != false;
-        generator.NamespaceTypings = !Modules && config?.ServerTypings?.NamespaceTypings != false;
         if (config?.ServerTypings?.PreferRelativePaths == true)
         {
             generator.ModulesPathAlias = null;
             generator.RootPathAlias = null;
         }
 
-        string outDir = Modules ? FileSystem.Combine(generator.DetermineModulesRoot(
-            FileSystem, ProjectFile, config.RootNamespace), "ServerTypes") :
-            FileSystem.Combine(projectDir, PathHelper.ToPath(
-                config.ServerTypings?.OutDir.TrimToNull() ?? "Imports/ServerTypings"));
+        string outDir = FileSystem.Combine(generator.DetermineModulesRoot(
+            FileSystem, ProjectFile, config.RootNamespace), "ServerTypes");
 
         generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
         generator.RootNamespaces.Add(config.RootNamespace);
@@ -58,8 +49,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         var generatedSources = generator.Run();
 
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
-            generatedSources.Where(x => x.Module == Modules)
-                .Select(x => (x.Filename, x.Text)),
+            generatedSources.Select(x => (x.Filename, x.Text)),
             deleteExtraPattern: ["*.ts"],
             endOfLine: config.EndOfLine);
 

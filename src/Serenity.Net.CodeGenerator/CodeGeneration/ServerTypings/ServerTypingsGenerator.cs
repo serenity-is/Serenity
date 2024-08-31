@@ -21,8 +21,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     public bool LocalTexts { get; set; }
     public bool ModuleReExports { get; set; } = true;
-    public bool ModuleTypings { get; set; } = false;
-    public bool NamespaceTypings { get; set; } = true;
 
     public readonly HashSet<string> LocalTextFilters = [];
 
@@ -33,44 +31,24 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         base.GenerateAll();
 
-        if (LocalTexts && NamespaceTypings)
-            GenerateTexts(module: false);
+        if (LocalTexts)
+            GenerateTexts();
+        
+        GenerateScriptDataKeys();
 
-        if (LocalTexts && ModuleTypings)
-            GenerateTexts(module: true);
-
-        if (ModuleTypings)
-            GenerateScriptDataKeys(module: true);
-
-        if (ModuleTypings && ModuleReExports)
+        if (ModuleReExports)
             GenerateModuleReExports();
     }
 
     protected override void GenerateCodeFor(TypeDefinition type)
     {
-        void add(Action<TypeDefinition, bool> action, string fileIdentifier = null)
+        void add(Action<TypeDefinition> action, string fileIdentifier = null)
         {
             var typeNamespace = GetNamespace(type);
 
-            if (NamespaceTypings)
-            {
-                cw.Indented("namespace ");
-                sb.Append(typeNamespace);
-                cw.InBrace(delegate
-                {
-                    action(type, false);
-                });
-
-                var fileName = GetFileNameFor(typeNamespace, fileIdentifier ?? type.Name, module: false) + ".ts";
-                AddFile(fileName, module: false);
-            }
-
-            if (ModuleTypings)
-            {
-                action(type, true);
-                var fileName = GetFileNameFor(typeNamespace, fileIdentifier ?? type.Name, module: true) + ".ts";
-                AddFile(fileName, module: true);
-            }
+            action(type);
+            var fileName = GetTypingFileNameFor(typeNamespace, fileIdentifier ?? type.Name) + ".ts";
+            AddFile(fileName);
         }
 
         if (type.IsEnum())
@@ -83,7 +61,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
         {
             var controllerIdentifier = GetControllerIdentifier(type);
-            add((t, m) => GenerateService(t, controllerIdentifier, m), controllerIdentifier);
+            add((t) => GenerateService(t, controllerIdentifier), controllerIdentifier);
             return;
         }
 
@@ -95,7 +73,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             if (formIdentifier.EndsWith(requestSuffix, StringComparison.Ordinal) && isServiceRequest)
                 formIdentifier = formIdentifier[..^requestSuffix.Length] + "Form";
 
-            add((t, m) => GenerateForm(t, formScriptAttr, formIdentifier, m), formIdentifier);
+            add((t) => GenerateForm(t, formScriptAttr, formIdentifier), formIdentifier);
 
             EnqueueTypeMembers(type);
 
@@ -108,7 +86,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         var columnsScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
         if (columnsScriptAttr != null)
         {
-            add((t, m) => GenerateColumns(t, columnsScriptAttr, m));
+            add((t) => GenerateColumns(t, columnsScriptAttr));
             EnqueueTypeMembers(type);
             return;
         }
@@ -125,10 +103,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         {
             var metadata = ExtractRowMetadata(type);
             
-            add((t, m) =>
+            add((t) =>
             {
-                GenerateRowType(t, m);
-                GenerateRowMetadata(t, metadata, m);
+                GenerateRowType(t);
+                GenerateRowMetadata(t, metadata);
             });
             
             return;

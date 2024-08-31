@@ -112,35 +112,20 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         arguments.ThrowIfRemaining();
 
-        List<ExternalType> tsTypesNamespaces = null;
-        List<ExternalType> tsTypesModules = null;
+        List<ExternalType> tsTypes = null;
 
         void ensureTSTypes()
         {
-            if (tsTypesNamespaces is null &&
-                tsTypesModules is null)
-            {
-                var fileSystem = new TSCachingFileSystem(FileSystem);
+            if (tsTypes is not null)
+                return;
 
-                TSConfigHelper.LocateTSConfigFiles(fileSystem, projectDir,
-                    out string modulesPath, out string namespacesPath);
+            var fileSystem = new TSCachingFileSystem(FileSystem);
 
-                if (modulesPath is null &&
-                    namespacesPath is null)
-                    namespacesPath = fileSystem.Combine(projectDir, "tsconfig.json");
+            var tsConfigFile = TSConfigHelper.LocateTSConfigFile(fileSystem, projectDir) ??
+                fileSystem.Combine(projectDir, "tsconfig.json");
 
-                if (namespacesPath is not null)
-                {
-                    var nsLister = new TSTypeLister(fileSystem, namespacesPath, new());
-                    tsTypesNamespaces = nsLister.List();
-                }
-
-                if (modulesPath is not null)
-                {
-                    var mdLister = new TSTypeLister(fileSystem, modulesPath, new());
-                    tsTypesModules = mdLister.List();
-                }
-            }
+            var typeLister = new TSTypeLister(fileSystem, tsConfigFile, new());
+            tsTypes = typeLister.List();
         }
 
         ExitCodes? exitCode = null;
@@ -152,7 +137,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             ensureTSTypes();
             exitCode = RunCommand(new ClientTypesCommand(project, Console)
             {
-                TsTypes = [.. (tsTypesNamespaces ?? []), .. tsTypesModules ?? []]
+                TsTypes = [.. (tsTypes ?? [])]
             }, exitCode);
         }
 
@@ -160,21 +145,11 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
         {
             ensureTSTypes();
 
-            if (tsTypesNamespaces is not null)
+            if (tsTypes is not null)
             {
                 exitCode = RunCommand(new ServerTypingsCommand(project, Console)
                 {
-                    TsTypes = tsTypesNamespaces,
-                    Modules = false
-                }, exitCode);
-            }
-
-            if (tsTypesModules is not null)
-            {
-                exitCode = RunCommand(new ServerTypingsCommand(project, Console)
-                {
-                    TsTypes = tsTypesModules,
-                    Modules = true
+                    TsTypes = tsTypes
                 }, exitCode);
             }
         }

@@ -7,19 +7,17 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    protected void GenerateRowType(TypeDefinition type, bool module)
+    protected void GenerateRowType(TypeDefinition type)
     {
-        var codeNamespace = module ? null : GetNamespace(type);
-
         cw.Indented("export interface ");
 
-        var identifier = MakeFriendlyName(type, codeNamespace, module);
+        var identifier = MakeFriendlyName(type, codeNamespace: null);
 
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: module);
+        RegisterGeneratedType(ns: null, identifier, typeOnly: true);
 
         cw.InBrace(() =>
         {
-            GenerateRowMembers(type, codeNamespace, module);
+            GenerateRowMembers(type, codeNamespace: null);
         });
     }
 
@@ -30,7 +28,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     ];
     private static readonly string[] isDeletedRowInterfaces = ["Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow"];
 
-    private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace, bool module)
+    private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace)
     {
         foreach (var property in EnumerateFieldProperties(rowType))
         {
@@ -40,11 +38,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType());
             if (enumType != null)
             {
-                HandleMemberType(enumType, codeNamespace, module);
+                HandleMemberType(enumType, codeNamespace);
             }
             else
             {
-                HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace, module);
+                HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace);
             }
 
             sb.AppendLine(";");
@@ -489,16 +487,15 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         return metadata;
     }
 
-    protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata meta, bool module)
+    protected void GenerateRowMetadata(TypeDefinition rowType, RowMetadata meta)
     {
         sb.AppendLine();
-        cw.Indented($"export {(module ? "abstract class " : "namespace ")}");
+        cw.Indented($"export abstract class ");
         sb.Append(rowType.Name);
 
-        string export = module ? "static readonly " : "export const ";
+        string export = "static readonly ";
 
         static string sq(string s) => s == null ? "null" : s.ToSingleQuoted();
-        string dq(string s) => s == null ? "null" : module ? s.ToSingleQuoted() : s.ToDoubleQuoted();
 
         cw.InBrace(delegate
         {
@@ -522,21 +519,12 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 cw.IndentedLine($"{export}lookupKey = {sq(meta.LookupKey)};");
                 sb.AppendLine();
 
-                if (module)
-                {
-                    var getLookup = ImportFromQ("getLookup");
-                    var getLookupAsync = ImportFromQ("getLookupAsync");
-                    cw.IndentedLine("/** @deprecated use getLookupAsync instead */");
-                    cw.IndentedLine($"static getLookup() {{ return {getLookup}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
-                    cw.IndentedLine($"static async getLookupAsync() {{ return {getLookupAsync}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
-                    sb.AppendLine();
-                }
-                else
-                {
-                    cw.Indented($"export function getLookup(): Q.Lookup<{rowType.Name}>");
-                    cw.InBrace(() => cw.IndentedLine(
-                        $"return Q.getLookup<{rowType.Name}>({sq(meta.LookupKey)});"));
-                }
+                var getLookup = ImportFromQ("getLookup");
+                var getLookupAsync = ImportFromQ("getLookupAsync");
+                cw.IndentedLine("/** @deprecated use getLookupAsync instead */");
+                cw.IndentedLine($"static getLookup() {{ return {getLookup}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                cw.IndentedLine($"static async getLookupAsync() {{ return {getLookupAsync}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
+                sb.AppendLine();
             }
 
             cw.IndentedLine($"{export}deletePermission = {sq(meta.DeletePermission)};");
@@ -545,31 +533,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             cw.IndentedLine($"{export}updatePermission = {sq(meta.UpdatePermission)};");
             sb.AppendLine();
 
-            if (module)
-            {
-                var fieldsProxy = ImportFromQ("fieldsProxy");
-                cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{rowType.Name}>();");
-            }
-            else
-            {
-                cw.Indented(module ? "static readonly Fields =" : "export declare const enum Fields");
-
-                cw.InBrace(delegate
-                {
-                    var inserted = 0;
-                    foreach (var property in EnumerateFieldProperties(rowType))
-                    {
-                        if (inserted > 0)
-                            sb.AppendLine(",");
-
-                        cw.Indented($"{property.Name}{(module ? ": " : " = ")}{dq(property.Name)}");
-
-                        inserted++;
-                    }
-
-                    sb.AppendLine();
-                });
-            }
+            var fieldsProxy = ImportFromQ("fieldsProxy");
+            cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{rowType.Name}>();");
         });
     }
 }

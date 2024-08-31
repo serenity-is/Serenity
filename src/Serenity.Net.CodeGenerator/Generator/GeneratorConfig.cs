@@ -423,16 +423,21 @@ public class GeneratorConfig
         /// Generate module typings. Defaults to true if you
         /// have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("This flag has no effect as only module typings are generated now.")]
         public bool? ModuleTypings { get; set; }
+
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of ModuleTypings")]
         public bool ShouldSerializeModuleTypings() => ModuleTypings != null;
 
         /// <summary>
         /// Generate namespace typings. Defaults to true if you
         /// don't have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("Namespaces mode code generation is deprecated.")]
         public bool? NamespaceTypings { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of NamespaceTypings")]
         public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
 
         /// <summary>

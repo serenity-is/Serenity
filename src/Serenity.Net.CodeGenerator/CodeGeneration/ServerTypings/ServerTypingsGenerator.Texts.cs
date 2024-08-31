@@ -58,7 +58,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             localTextKeys.Add(prefix + prop.Name);
     }
 
-    protected void GenerateTexts(bool module)
+    protected void GenerateTexts()
     {
         cw.Indented("namespace ");
         var ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
@@ -197,24 +197,16 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             jw.WriteEndObject();
 
             cw.Indented(ns);
-            if (module)
-            {
-                var proxyTexts = ImportFromQ("proxyTexts");
-                sb.Append($"['Texts'] = {proxyTexts}(Texts, '', ");
-            }
-            else
-                sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
+            var proxyTexts = ImportFromQ("proxyTexts");
+            sb.Append($"['Texts'] = {proxyTexts}(Texts, '', ");
             jw.Flush();
             sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
             sb.AppendLine(") as any;");
         });
 
-        if (module)
-        {
-            sb.AppendLine();
-            sb.AppendLine($"export const Texts = {ns}.Texts;");
-        }
+        sb.AppendLine();
+        sb.AppendLine($"export const Texts = {ns}.Texts;");
 
-        AddFile("Texts.ts", module);
+        AddFile("Texts.ts");
     }
 }

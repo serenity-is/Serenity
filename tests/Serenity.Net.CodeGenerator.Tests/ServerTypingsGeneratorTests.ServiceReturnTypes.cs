@@ -12,7 +12,7 @@ namespace Serenity.Tests.CodeGenerator
             var controllerType = typeof(ResponseTypesThatShouldBeGenerated);
             var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGenerated) + "Service.ts";
+            var filename = "ServiceReturnTypes/" + nameof(ResponseTypesThatShouldBeGenerated) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
@@ -27,7 +27,7 @@ namespace Serenity.Tests.CodeGenerator
             var controllerType = typeof(ResponseTypesThatShouldNotBeGenerated);
             var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldNotBeGenerated) + "Service.ts";
+            var filename = "ServiceReturnTypes/" + nameof(ResponseTypesThatShouldNotBeGenerated) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
@@ -41,15 +41,13 @@ namespace Serenity.Tests.CodeGenerator
         {
             var controllerType = typeof(ResponseTypesThatShouldBeGeneratedAsKeyValue);
             var generator = CreateGenerator(controllerType);
-            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGeneratedAsKeyValue) + "Service.ts";
+            var filename = "ServiceReturnTypes/" + nameof(ResponseTypesThatShouldBeGeneratedAsKeyValue) + "Service.ts";
             var result = generator.Run();
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
-                Assert.True(
-                    code.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: Q.ServiceOptions<any>)") ||
-                    code.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: Q.ServiceOptions<any>)"));
+                Assert.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: { [key: string]: any }) => void, opt?: ServiceOptions<any>)", code);
             }
         }
 
@@ -59,14 +57,12 @@ namespace Serenity.Tests.CodeGenerator
             var controllerType = typeof(ResponseTypesThatShouldBeGeneratedAsList);
             var generator = CreateGenerator(controllerType);
             var result = generator.Run();
-            var filename = "ServiceReturnTypes." + nameof(ResponseTypesThatShouldBeGeneratedAsList) + "Service.ts";
+            var filename = "ServiceReturnTypes/" + nameof(ResponseTypesThatShouldBeGeneratedAsList) + "Service.ts";
             var code = Assert.Single(result, x => x.Filename == filename).Text;
             var methods = controllerType.GetMethods().Where(x => x.DeclaringType == controllerType);
             foreach (var method in methods)
             {
-                Assert.True(
-                    code.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: any[]) => void, opt?: Q.ServiceOptions<any>)") ||
-                    code.Contains("function " + method.Name + "(request: Serenity.ListRequest, onSuccess?: (response: any[]) => void, opt?: Q.ServiceOptions<any>)"));
+                Assert.Contains("function " + method.Name + "(request: ListRequest, onSuccess?: (response: any[]) => void, opt?: ServiceOptions<any>)", code);
             }
         }
     }

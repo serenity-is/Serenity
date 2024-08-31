@@ -2,7 +2,7 @@
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    protected void GeneratePermissionKeys(TypeDefinition type, bool module)
+    protected void GeneratePermissionKeys(TypeDefinition type)
     {
         GeneratePermissionKeysFor(type);
     }

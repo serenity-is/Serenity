@@ -158,32 +158,25 @@ public static class TSConfigHelper
         }
     }
 
-    public static void LocateTSConfigFiles(IFileSystem fileSystem,
-        string projectDir, out string modulesPath, out string namespacesPath)
+    public static string LocateTSConfigFile(IFileSystem fileSystem, string projectDir)
     {
-        namespacesPath = null;
-        modulesPath = null;
-
-        foreach (var configPath in new[]
+        foreach (var path in new[]
         {
             fileSystem.Combine(projectDir, "tsconfig.json"),
-            fileSystem.Combine(projectDir, "Namespaces", "tsconfig.json"),
             fileSystem.Combine(projectDir, "Modules", "tsconfig.json")
         })
         {
-            var config = Read(fileSystem, configPath);
+            var config = Read(fileSystem, path);
             if (config is null)
                 continue;
 
             if (config.CompilerOptions?.Module?.ToLowerInvariant() is not (null or "none"))
-                modulesPath ??= configPath;
-            else
-                namespacesPath ??= configPath;
-
-            if (modulesPath is not null &&
-                namespacesPath is not null)
-                break;
+            {
+                return path;
+            }
         }
+
+        return null;
     }
 
     private static readonly char[] wildcards = ['*', '?'];

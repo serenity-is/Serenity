@@ -236,17 +236,17 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 TryFindModuleType(enumKey, containingAssembly);
 
             if (enumScriptType != null)
-                referencedTypeAliases.Add(("Enum", ReferenceScriptType(enumScriptType, codeNamespace, module: true)));
+                referencedTypeAliases.Add(("Enum", ReferenceScriptType(enumScriptType, codeNamespace)));
         }
         else
         {
-            var moduleName = GetFileNameFor(GetNamespace(enumType), enumType.Name, module: true);
+            var moduleName = GetTypingFileNameFor(GetNamespace(enumType), enumType.Name);
             referencedTypeAliases.Add(("Enum", AddModuleImport(moduleName, enumType.Name, external: false)));
         }
     }
 
     private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute,
-        string identifier, bool module)
+        string identifier)
     {
         var codeNamespace = GetNamespace(type);
 
@@ -279,22 +279,19 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
                 ExternalType editorScriptType = null;
 
-                if (module)
+                editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor", containingAssembly: null);
+
+                foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
                 {
-                    editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor", containingAssembly: null);
+                    if (!referencedTypeKeys.Add(("Dialog", typeKey)))
+                        continue;
 
-                    foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
-                    {
-                        if (!referencedTypeKeys.Add(("Dialog", typeKey)))
-                            continue;
-
-                        var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog", containingAssembly: null);
-                        if (dialogType != null)
-                            referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType, codeNamespace, module)));
-                    }
-
-                    TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
+                    var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog", containingAssembly: null);
+                    if (dialogType != null)
+                        referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType, codeNamespace)));
                 }
+
+                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
 
                 if (editorScriptType is null)
                 {
@@ -314,17 +311,14 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 if (editorScriptType == null &&
                     (editorScriptType = (GetScriptType(editorTypeKey) ?? GetScriptType(editorTypeKey + "Editor"))) == null)
                 {
-                    editorScriptType = module ? GetScriptType("@serenity-is/corelib:Widget") : GetScriptType("Serenity.Widget");
+                    editorScriptType = GetScriptType("@serenity-is/corelib:Widget");
                     if (editorScriptType is null)
                         continue;
                 }
 
-                var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace, module);
+                var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace);
                 var editorShortName = editorFullName;
                 
-                if (!module && editorFullName.StartsWith("Serenity.", StringComparison.Ordinal))
-                    editorShortName = "s." + editorFullName["Serenity.".Length..];
-
                 propertyNames.Add(item.Name);
                 propertyTypes.Add(editorShortName);
 
@@ -339,15 +333,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         cw.Indented("export class ");
         sb.Append(identifier);
 
-        if (module)
-        {
-            var prefixedContext = ImportFromCorelib("PrefixedContext");
-            sb.Append($" extends {prefixedContext}");
-        }
-        else
-        {
-            sb.Append(" extends Serenity.PrefixedContext");
-        }
+        var prefixedContext = ImportFromCorelib("PrefixedContext");
+        sb.Append($" extends {prefixedContext}");
+
         cw.InBrace(delegate
         {
             cw.Indented("static readonly formKey = '");
@@ -378,9 +366,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         sb.AppendLine(".init = true;");
                         sb.AppendLine();
 
-                        if (!module)
-                            cw.IndentedLine("var s = Serenity;");
-
                         var typeNumber = new Dictionary<string, int>();
                         foreach (var s in propertyTypes)
                         {
@@ -399,15 +384,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         }
                         sb.AppendLine();
 
-                        if (module)
-                        {
-                            var initFormType = ImportFromQ("initFormType");
-                            cw.Indented($"{initFormType}(");
-                        }
-                        else
-                        {
-                            cw.Indented("Q.initFormType(");
-                        }
+                        var initFormType = ImportFromQ("initFormType");
+                        cw.Indented($"{initFormType}(");
+
                         sb.Append(identifier);
                         sb.AppendLine(", [");
                         cw.Block(delegate
@@ -434,12 +413,12 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             }
         });
 
-        if (module && referencedTypeAliases.Count != 0)
+        if (referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
             sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");
         }
 
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
+        RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
     }
 }

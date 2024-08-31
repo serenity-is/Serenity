@@ -553,7 +553,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     }
 
 
-    protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace, bool module);
+    protected abstract void HandleMemberType(TypeReference memberType, string codeNamespace);
 
     public static bool CanHandleType(TypeDefinition memberType)
     {
@@ -573,15 +573,12 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return true;
     }
 
-    protected string GetFileNameFor(string ns, string name, bool module)
+    protected string GetTypingFileNameFor(string ns, string name)
     {
         var filename = RemoveRootNamespace(ns, name);
-        if (module)
-        {
-            var idx = filename.IndexOf('.');
-            if (idx >= 0)
-                filename = filename[..idx] + '/' + filename[(idx + 1)..];
-        }
+        var idx = filename.IndexOf('.');
+        if (idx >= 0)
+            filename = filename[..idx] + '/' + filename[(idx + 1)..];
 
         return filename;
     }
@@ -629,51 +626,24 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return null;
     }
 
-    public virtual string ShortenFullName(string ns, string name, string codeNamespace, bool module, 
+    public virtual string ShortenFullName(string ns, string name, string codeNamespace, 
         string containingAssembly)
     {
-        if (module)
+        var nonGeneric = name;
+        var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
+        if (genericIdx >= 0)
+            nonGeneric = nonGeneric[..genericIdx];
+
+        if (string.IsNullOrEmpty(containingAssembly) ||
+            !assemblyNames.Contains(containingAssembly))
         {
-            var nonGeneric = name;
-            var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
-            if (genericIdx >= 0)
-                nonGeneric = nonGeneric[..genericIdx];
-
-            if (string.IsNullOrEmpty(containingAssembly) ||
-                !assemblyNames.Contains(containingAssembly))
-            {
-                ExternalType moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
-                if (moduleType != null)
-                    return AddExternalImport(moduleType.Module, nonGeneric);
-            }
-
-            var filename = GetFileNameFor(ns, nonGeneric, module);
-            return AddModuleImport(filename, nonGeneric, external: false);
+            ExternalType moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
+            if (moduleType != null)
+                return AddExternalImport(moduleType.Module, nonGeneric);
         }
 
-        if (ns == "Serenity.Services" ||
-            ns == "Serenity.ComponentModel")
-        {
-            if (IsUsingNamespace("Serenity"))
-                ns = "";
-            else
-                ns = "Serenity";
-        }
-        
-        if ((codeNamespace != null && (ns == codeNamespace)) ||
-            (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
-            IsUsingNamespace(ns))
-        {
-            ns = "";
-        }
-        else if (codeNamespace != null)
-        {
-            var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-            if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                ns = ns[(idx + 1)..];
-        }
-
-        return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
+        var filename = GetTypingFileNameFor(ns, nonGeneric);
+        return AddModuleImport(filename, nonGeneric, external: false);
     }
 
     protected virtual bool IsUsingNamespace(string ns)
@@ -681,7 +651,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return false;
     }
 
-    protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace, bool module)
+    protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace)
     {
         if (type.IsGenericInstance())
         {
@@ -704,7 +674,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 if (i++ > 0)
                     sb.Append(", ");
 
-                HandleMemberType(argument, codeNamespace, module);
+                HandleMemberType(argument, codeNamespace);
             }
 
             sb.Append('>');
@@ -759,9 +729,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
     }
 
-    protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace, bool module)
+    protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
     {
-        var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, module, GetAssemblyNameFor(type));
+        var fullName = ShortenFullName(GetNamespace(type), type.Name, codeNamespace, GetAssemblyNameFor(type));
 
         if (type.IsGenericInstance())
         {
@@ -782,7 +752,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 if (i++ > 0)
                     sb.Append(", ");
 
-                HandleMemberType(argument, codeNamespace, module);
+                HandleMemberType(argument, codeNamespace);
             }
 
             sb.Append('>');
@@ -1041,80 +1011,77 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         moduleImports.Clear();
     }
 
-    protected override void AddFile(string filename, bool module = false)
+    protected override void AddFile(string filename)
     {
         if (moduleImports.Count != 0)
         {
-            if (module)
+            var dotTsIndex = filename.IndexOf(".ts", StringComparison.Ordinal);
+            var currentFrom = filename;
+
+            if (dotTsIndex >= 0)
+                currentFrom = filename[..dotTsIndex];
+
+            var moduleImportsLookup = moduleImports
+                .Where(x => x.From != currentFrom)
+                .ToLookup(x => (x.From, x.External));
+
+            if (moduleImportsLookup.Count != 0)
             {
-                var dotTsIndex = filename.IndexOf(".ts", StringComparison.Ordinal);
-                var currentFrom = filename;
-
-                if (dotTsIndex >= 0)
-                    currentFrom = filename[..dotTsIndex];
-
-                var moduleImportsLookup = moduleImports
-                    .Where(x => x.From != currentFrom)
-                    .ToLookup(x => (x.From, x.External));
-
-                if (moduleImportsLookup.Count != 0)
+                sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup
+                    .Select(z =>
                 {
-                    sb.Insert(0, string.Join(Environment.NewLine, moduleImportsLookup
-                        .Select(z =>
+                    var from = z.Key.From;
+                    if (!z.Key.External && !from.StartsWith("."))
                     {
-                        var from = z.Key.From;
-                        if (!z.Key.External && !from.StartsWith("."))
-                        {
-                            if (from.StartsWith("@/") &&
-                                !string.IsNullOrEmpty(ModulesPathFolder))
-                                from = "/" + ModulesPathFolder + "/" + from;
+                        if (from.StartsWith("@/") &&
+                            !string.IsNullOrEmpty(ModulesPathFolder))
+                            from = "/" + ModulesPathFolder + "/" + from;
 
-                            if (!from.StartsWith("/"))
-                            {
-                                if (System.IO.Path.GetDirectoryName(filename) ==
-                                    System.IO.Path.GetDirectoryName(from))
-                                    from = "./" + System.IO.Path.GetFileName(from);
-                                else
-                                    from = "../" + from;
-                            }
-                            else if (!string.IsNullOrEmpty(ModulesPathFolder) &&
-                                !string.IsNullOrEmpty(ModulesPathAlias) &&
-                                from.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
-                            {
-                                from = ModulesPathAlias + from[(ModulesPathFolder.Length + 2)..];
-                            }
-                            else if (!string.IsNullOrEmpty(RootPathAlias))
-                            {
-                                from = RootPathAlias + from[1..];
-                            }
+                        if (!from.StartsWith("/"))
+                        {
+                            if (System.IO.Path.GetDirectoryName(filename) ==
+                                System.IO.Path.GetDirectoryName(from))
+                                from = "./" + System.IO.Path.GetFileName(from);
                             else
-                            {
-                                var relativeTo = PathHelper.ToPath("/Modules/ServerTypes/") + 
-                                    PathHelper.ToPath(System.IO.Path.GetDirectoryName(filename));
+                                from = "../" + from;
+                        }
+                        else if (!string.IsNullOrEmpty(ModulesPathFolder) &&
+                            !string.IsNullOrEmpty(ModulesPathAlias) &&
+                            from.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
+                        {
+                            from = ModulesPathAlias + from[(ModulesPathFolder.Length + 2)..];
+                        }
+                        else if (!string.IsNullOrEmpty(RootPathAlias))
+                        {
+                            from = RootPathAlias + from[1..];
+                        }
+                        else
+                        {
+                            var relativeTo = PathHelper.ToPath("/Modules/ServerTypes/") + 
+                                PathHelper.ToPath(System.IO.Path.GetDirectoryName(filename));
 
 #if ISSOURCEGENERATOR
-                                from = PathHelper.GetRelativePath(relativeTo, from);
+                            from = PathHelper.GetRelativePath(relativeTo, from);
 #else
-                                from = System.IO.Path.GetRelativePath(relativeTo, from);
+                            from = System.IO.Path.GetRelativePath(relativeTo, from);
 #endif
-                                from = PathHelper.ToUrl(from);
-                            }
+                            from = PathHelper.ToUrl(from);
                         }
+                    }
 
-                        var importList = string.Join(", ", z.Select(p =>
-                            p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
+                    var importList = string.Join(", ", z.Select(p =>
+                        p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
-                        return (from, importList);
-                    }).OrderBy(x => FromOrderKey(x.from), StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
-                        Environment.NewLine + Environment.NewLine);
-                }
+                    return (from, importList);
+                }).OrderBy(x => FromOrderKey(x.from), StringComparer.OrdinalIgnoreCase).Select(x => $"import {{ {x.importList} }} from \"{x.from}\";")) + 
+                    Environment.NewLine + Environment.NewLine);
             }
 
             moduleImports.Clear();
             moduleImportAliases.Clear();
         }
 
-        base.AddFile(filename, module);
+        base.AddFile(filename);
     }
 
     private static string FromOrderKey(string from)
@@ -1168,13 +1135,12 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         return alias;
     }
 
-    protected void RegisterGeneratedType(string ns, string name, bool module, bool typeOnly)
+    protected void RegisterGeneratedType(string ns, string name, bool typeOnly)
     {
         generatedTypes.Add(new GeneratedTypeInfo 
         { 
             Namespace = ns, 
             Name = name, 
-            Module = module, 
             TypeOnly = typeOnly 
         });
     }
