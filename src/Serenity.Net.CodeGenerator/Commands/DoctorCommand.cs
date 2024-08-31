@@ -79,10 +79,9 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         Info("Sergen Version", sergenVersion.ToString());
         CheckSerenityVersion(projectFile, sergenVersion, out Version serenityVersion);
 
-        if ((serenityVersion.Major != 0 || serenityVersion.Minor != 0) && 
-            (serenityVersion.Major != sergenVersion.Major ||
-             serenityVersion.Minor != sergenVersion.Minor ||
-             serenityVersion.Build != sergenVersion.Build))
+        if (serenityVersion.Major != sergenVersion.Major ||
+            serenityVersion.Minor != sergenVersion.Minor ||
+            serenityVersion.Build != sergenVersion.Build)
         {
             Error($"Serenity.Net.Web version ({serenityVersion}) does not match Sergen version ({sergenVersion})!" +
                 $"Sergen and Serenity.Web versions should exactly match!");
@@ -180,7 +179,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
     void CheckSerenityVersion(string projectFile, Version sergenVersion, out Version serenityVersion)
     {
-        serenityVersion = new Version(0, 0);
+        serenityVersion = sergenVersion;
         var startInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
@@ -230,17 +229,31 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         var serenityWeb = metadata.Items.PackageReference.FirstOrDefault(x => x.Identity == "Serenity.Net.Web");
         if (serenityWeb == null)
         {
-            Error("Can't read Serenity.Net.Web package reference from project file!");
+            Error($"Can't read Serenity.Net.Web package reference from project file, assuming Sergen version ({sergenVersion})!");
             return;
         }
 
         if (serenityWeb.Version == null || !Version.TryParse(serenityWeb.Version, out Version serenityWebVersion))
         {
-            Error($"Can't parse Serenity.Net.Web package version ({serenityWeb.Version}) from project file!");
+            Error($"Can't parse Serenity.Net.Web package version ({serenityWeb.Version}) from project file, assuming Sergen version ({sergenVersion})!");
             return;
         }
 
         Info("Serenity.Net.Web Version", serenityWebVersion.ToString());
+
+        foreach (var packageRef in metadata.Items.PackageReference)
+        {
+            if (packageRef.Identity.StartsWith("Serenity.", StringComparison.Ordinal) &&
+                packageRef.Version != null &&
+                Version.TryParse(packageRef.Version, out Version packageVersion) &&
+                (packageVersion.Major != serenityVersion.Major ||
+                 packageVersion.Minor != serenityVersion.Minor ||
+                 packageVersion.Build != serenityVersion.Build))
+            {
+                Warning($"Serenity.Net.Web version ({serenityVersion}) " +
+                    $"does not match version of the package {packageRef.Identity} ({packageVersion})!");
+            }
+        }
 
         serenityVersion = serenityWebVersion;
     }
@@ -356,7 +369,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         else if (version > recommendedVersion)
         {
             Warning($"@serenity-is/tsbuild version in package.json is {version}, " +
-                $"which is newer than the recommended version {recommendedVersion} for" +
+                $"which is newer than the recommended version {recommendedVersion} for " +
                 $"Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
         }
         else
