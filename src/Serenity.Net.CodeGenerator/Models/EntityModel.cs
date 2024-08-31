@@ -97,7 +97,6 @@ public class EntityModel
     public string ViewPageNamespace => ModuleNamespaceDot + "Pages";
     public string ViewPageRoute => ModuleSlash + ClassName;
     public string ViewPageRoutePrefix => ModuleSlash + ClassName;
-    public string ViewPageIndexPath => "~/Modules/" + ModuleSlash + ClassName + "/" + ClassName + "Index.cshtml";
     public string ViewPageModulePath => "@/" + Module + "/" + ClassName + "/" + ClassName + "Page";
     public string ServiceClassName => ClassName + "Service";
     public string ServiceBaseUrl => ModuleSlash + ClassName;
