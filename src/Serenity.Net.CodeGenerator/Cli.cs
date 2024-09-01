@@ -7,7 +7,6 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
     private readonly IFileSystem FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly IGeneratorConsole Console = console ?? throw new ArgumentNullException(nameof(console));
 
-    public Func<IBuildProjectSystem> BuildSystemFactory { get; set; }
     public Func<string, Func<string, string>, IProjectFileInfo> ProjectFactory { get; set; }
     public Func<BaseGeneratorCommand, ExitCodes> RunCommandCallback { get; set; }
 
