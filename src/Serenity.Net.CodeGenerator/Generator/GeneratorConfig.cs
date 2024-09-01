@@ -142,8 +142,10 @@ public class GeneratorConfig
     /// <summary>
     /// Sergen restore command related configuration
     /// </summary>
+    [Obsolete("Sergen no longer supports restoring static content.")]
     public RestoreConfig Restore { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
+    [Obsolete("Only used for JSON serialization of Restore")]
     public bool ShouldSerializeRestore() => Restore != null &&
         (!Restore.Include.IsEmptyOrNull() ||
          !Restore.Exclude.IsEmptyOrNull());

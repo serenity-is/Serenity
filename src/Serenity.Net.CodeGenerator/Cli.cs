@@ -68,17 +68,6 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
             return args.Any(x => string.Equals(x, command, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (isCommand(CommandKeys.Restore, CommandAliases.Restore))
-        {
-            ArgumentNullException.ThrowIfNull(BuildSystemFactory);
-
-            return RunCommand(new RestoreCommand(project, Console)
-            {
-                BuildSystem = BuildSystemFactory(),
-                ProjectReferences = projectRefs
-            });
-        }
-
         if (isCommand(CommandKeys.Generate, CommandAliases.Generate))
         {
             return RunCommand(new GenerateCommand(project, Console)

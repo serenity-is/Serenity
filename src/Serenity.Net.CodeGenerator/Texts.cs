@@ -12,7 +12,6 @@ public static class Texts
             g[enerate]        Launches the table code generator.
             m[vc]             Generates IntelliSense helpers for view locations.
             mvct              Executes client types and mvc commands simulatenously.
-            r[estore]         [Obsolete] Restores content (e.g., scripts, CSS) from .nupkg.
             s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
             t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
 
