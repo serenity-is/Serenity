@@ -17,16 +17,6 @@
       ]
     },
     {
-      "library": "bootstrap-icons@1.11.1",
-      "destination": "wwwroot/bootstrap-icons/",
-      "files": [
-        "font/bootstrap-icons.css",
-        "font/bootstrap-icons.min.css",
-        "font/fonts/bootstrap-icons.woff",
-        "font/fonts/bootstrap-icons.woff2"
-      ]
-    },
-    {
       "library": "jquery@3.7.1",
       "destination": "wwwroot/jquery",
       "files": [
