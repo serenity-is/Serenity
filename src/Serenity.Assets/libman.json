@@ -41,16 +41,6 @@
         "mousetrap.js",
         "mousetrap.min.js"
       ]
-    },
-    {
-      "library": "toastr.js@2.1.4",
-      "destination": "wwwroot/toastr",
-      "files": [
-        "toastr.css",
-        "toastr.min.js",
-        "toastr.js.map",
-        "toastr.min.css"
-      ]
     }
   ]
 }
