@@ -6766,6 +6766,7 @@ declare namespace Serenity {
         protected createSlickGrid(): Slick.Grid;
         protected setInitialSortOrder(): void;
         itemAt(row: number): TItem;
+        itemId(item: TItem): any;
         rowCount(): number;
         getItems(): TItem[];
         setItems(value: TItem[]): void;

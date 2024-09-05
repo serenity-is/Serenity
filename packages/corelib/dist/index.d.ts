@@ -5215,6 +5215,7 @@ declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IR
     protected createSlickGrid(): Grid;
     protected setInitialSortOrder(): void;
     itemAt(row: number): TItem;
+    itemId(item: TItem): any;
     rowCount(): number;
     getItems(): TItem[];
     setItems(value: TItem[]): void;

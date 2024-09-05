@@ -507,6 +507,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.slickGrid.getDataItem(row);
     }
 
+    itemId(item: TItem): any {
+        return (item as any)[this.getIdProperty()];
+    }
+
     rowCount() {
         return this.slickGrid.getDataLength();
     }
