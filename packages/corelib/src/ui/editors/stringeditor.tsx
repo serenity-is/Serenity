@@ -9,7 +9,7 @@ export class StringEditor<P = {}> extends EditorWidget<P> {
 
     declare readonly domNode: HTMLInputElement;
 
-    static override createDefaultElement() { return <input type="text" /> as HTMLElement; }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
 
     public get value(): string {
         return (this.domNode as HTMLInputElement).value;
