@@ -6068,10 +6068,10 @@ declare namespace Serenity {
         setEditValue(source: any, property: PropertyItem): void;
         protected entity: UploadedFile;
         protected toolbar: Toolbar;
-        protected progress: Fluent;
-        protected fileSymbols: Fluent;
+        protected progress: HTMLElement;
+        protected fileSymbols: HTMLElement;
         protected uploadInput: Fluent;
-        protected hiddenInput: Fluent;
+        protected hiddenInput: HTMLInputElement;
     }
     class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
         constructor(props: EditorProps<P>);
@@ -6084,8 +6084,8 @@ declare namespace Serenity {
         private toolbar;
         private fileSymbols;
         private uploadInput;
-        protected progress: Fluent;
-        protected hiddenInput: Fluent;
+        protected progress: HTMLElement;
+        protected hiddenInput: HTMLInputElement;
         constructor(props: EditorProps<P>);
         protected getUploadInputOptions(): UploadInputOptions;
         protected addFileButtonText(): string;

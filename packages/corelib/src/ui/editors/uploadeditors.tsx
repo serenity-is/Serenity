@@ -2,9 +2,9 @@
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "./editorwidget";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface FileUploadEditorOptions extends FileUploadConstraints {
     displayFileName?: boolean;
@@ -36,27 +36,21 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             element: el => this.domNode.appendChild(el)
         });
 
-        this.progress = Fluent("div")
-            .class('upload-progress')
-            .append(Fluent("div"))
-            .prependTo(this.toolbar.domNode);
+        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
 
         var uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
         if (this.options.readOnly)
             this.set_readOnly(true);
 
-        this.fileSymbols = Fluent("ul").addClass("file-items").appendTo(this.domNode);
+        this.fileSymbols = this.domNode.appendChild(<ul class="file-items" /> as HTMLUListElement);
 
-        if (!this.domNode.getAttribute("id"))
-            this.domNode.setAttribute('id', this.uniqueName);
+        if (!this.domNode.id) {
+            this.domNode.id = this.uniqueName;
+        }
 
-        this.hiddenInput = Fluent("input")
-            .class("s-offscreen")
-            .attr("type", "text")
-            .attr("name", this.uniqueName + "_Validator")
-            .data("vx-highlight", this.domNode.getAttribute("id"))
-            .appendTo(this.domNode);
+        this.hiddenInput = this.domNode.appendChild(<input class="s-offscreen" type="text" name={this.uniqueName + "_Validator"} 
+            data-vx-highlight={this.domNode.id} /> as HTMLInputElement);
 
         this.updateInterface();
     }
@@ -131,7 +125,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 this.options.urlPrefix);
         }
 
-        this.hiddenInput.val(((this.get_value() || {}).Filename)?.trim() || null);
+        this.hiddenInput.value = ((this.get_value() || {}).Filename)?.trim() || null;
     }
 
     protected updateInterface(): void {
@@ -169,11 +163,11 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     }
 
     get_required(): boolean {
-        return this.hiddenInput.hasClass('required');
+        return this.hiddenInput.classList.contains("required");
     }
 
     set_required(value: boolean): void {
-        this.hiddenInput.toggleClass('required', !!value);
+        this.hiddenInput.classList.toggle("required", !!value);
     }
 
     get_value(): UploadedFile {
@@ -195,7 +189,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 var idx = stringValue.indexOf('/');
                 if (idx < 0)
                     idx = stringValue.indexOf('\\');
-                value = <UploadedFile>{
+                value = {
                     Filename: value,
                     OriginalName: stringValue.substring(idx + 1)
                 }
@@ -256,10 +250,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
     declare protected entity: UploadedFile;
     declare protected toolbar: Toolbar;
-    declare protected progress: Fluent;
-    declare protected fileSymbols: Fluent;
+    declare protected progress: HTMLElement;
+    declare protected fileSymbols: HTMLElement;
     declare protected uploadInput: Fluent;
-    declare protected hiddenInput: Fluent;
+    declare protected hiddenInput: HTMLInputElement;
 }
 
 @Decorators.registerEditor('Serenity.ImageUploadEditor')
@@ -284,10 +278,10 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
     declare private entities: UploadedFile[];
     declare private toolbar: Toolbar;
-    declare private fileSymbols: Fluent;
+    declare private fileSymbols: HTMLUListElement;
     declare private uploadInput: Fluent;
-    declare protected progress: Fluent;
-    declare protected hiddenInput: Fluent;
+    declare protected progress: HTMLElement;
+    declare protected hiddenInput: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -299,24 +293,16 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             element: el => this.domNode.append(el)
         });
 
-        this.progress = Fluent("div")
-            .append(Fluent("div"))
-            .class('upload-progress')
-            .prependTo(this.toolbar.domNode);
+        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
-        this.fileSymbols = Fluent("ul").addClass("file-items").appendTo(this.domNode);
-        if (!this.domNode.getAttribute("id")) {
-            this.domNode.setAttribute('id', this.uniqueName);
+        this.fileSymbols = this.domNode.appendChild(<ul class="file-items" /> as HTMLUListElement);
+        if (!this.domNode.id) {
+            this.domNode.id = this.uniqueName;
         }
 
-        this.hiddenInput = Fluent("input")
-            .class("s-offscreen")
-            .attr("type", "text")
-            .attr("name", this.uniqueName + "_Validator")
-            .data("vx-highlight", this.domNode.getAttribute("id"))
-            .attr("multiple", "multiple").appendTo(this.domNode);
+        this.hiddenInput = <input class="s-offscreen" type="text" name={this.uniqueName + "_Validator"} data-vx-highlight={this.domNode.id} multiple={true} /> as HTMLInputElement;
 
         this.updateInterface();
     }
@@ -365,9 +351,9 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         UploadHelper.populateFileSymbols(this.fileSymbols, this.entities,
             true, this.options.urlPrefix);
 
-        this.fileSymbols.children().forEach((e, i) => {
+        this.fileSymbols.childNodes.forEach((e, i) => {
             var x = i;
-            Fluent("a").class("delete").appendTo(Fluent(e).children().find(x => x.matches('.filename')))
+            Fluent(<a class="delete"/>).appendTo(Fluent(e).children().find(x => x.matches('.filename')))
                 .on("click", ev => {
                     ev.preventDefault();
                     this.entities.splice(x, 1);
@@ -377,13 +363,13 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
                 });
         });
 
-        this.hiddenInput.val(this.get_value()[0]?.Filename || null);
+        this.hiddenInput.value = this.get_value()[0]?.Filename || null;
     }
 
     protected updateInterface(): void {
         var addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
-        this.fileSymbols.findEach('a.delete', x => x.toggle(!this.get_readOnly()));
+        this.fileSymbols.querySelectorAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
     }
 
     get_readOnly(): boolean {
@@ -413,11 +399,11 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     }
 
     get_required(): boolean {
-        return this.hiddenInput.hasClass('required');
+        return this.hiddenInput.classList.contains('required');
     }
 
     set_required(value: boolean): void {
-        this.hiddenInput && this.hiddenInput.toggleClass('required', !!value);
+        this.hiddenInput && this.hiddenInput.classList.toggle('required', !!value);
     }
 
     get_value(): UploadedFile[] {
