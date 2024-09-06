@@ -194,10 +194,10 @@ export namespace TabsExtensions {
                     }
                 }
 
-                let container = Fluent("div").class("tab-content").appendTo(tabs);
+                const container = tabs.appendChild(<div class="tab-content"/>);
                 tabs.querySelectorAll(":scope>.tab-pane").forEach(pane => {
                     pane.classList.add("pt-3");
-                    container.append(pane);
+                    container.appendChild(pane);
                     if (activeLink && activeLink.getAttribute("href") === "#" + pane.id) {
                         pane.classList.add("show", "active");
                     }
