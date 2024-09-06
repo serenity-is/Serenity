@@ -33,7 +33,9 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
             addOption(input, "" + h, zeroPad(h, 2));
         }
 
-        this.minutes = Fluent("select").class('editor minute').insertAfter(input);
+        const select = document.createElement("select");
+        select.classList.add("editor", "minute");
+        this.minutes = Fluent(select).insertAfter(input);
         this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
