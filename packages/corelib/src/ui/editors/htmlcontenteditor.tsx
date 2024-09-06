@@ -2,8 +2,8 @@
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "./editorwidget";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface HtmlContentEditorOptions {
     cols?: number;
@@ -11,7 +11,7 @@ export interface HtmlContentEditorOptions {
 }
 
 export interface CKEditorConfig {
-}    
+}
 
 @Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
@@ -222,13 +222,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return script.addEventListener("load", then);
         }
 
-        Fluent("script").attr('type', 'text/javascript')
-            .attr('id', 'CKEditorScript')
-            .on("load", then)
-            .attr("async", "false")
-            .attr('src', resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' +
-                HtmlContentEditor.CKEditorVer))
-            .appendTo(document.head);
+        document.head.appendChild(
+            <script type="text/javascript" id="CKEditorScript" async={false} onLoad={then}
+                src={resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' + HtmlContentEditor.CKEditorVer)}>
+            </script>);
     };
 }
 
@@ -250,7 +247,7 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
 }
 
 @Decorators.registerEditor('Serenity.HtmlReportContentEditor')
-export class HtmlReportContentEditor <P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();
