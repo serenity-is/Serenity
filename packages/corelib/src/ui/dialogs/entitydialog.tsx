@@ -9,7 +9,7 @@ import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
-import { ToolButton, Toolbar } from "../widgets/toolbar";
+import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
@@ -19,7 +19,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     declare private _entity: TItem;
     declare private _entityId: any;
- 
+
     declare protected propertyItemsData: PropertyItemsData;
     declare protected propertyGrid: PropertyGrid;
 
@@ -503,10 +503,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (!pgOptions.items.some(x => x.localizable === true))
             return;
 
-        var localGridDiv = Fluent("div")
-            .attr('id', this.idPrefix + 'LocalizationGrid')
-            .hide()
-            .insertAfter(pgDiv);
+        const localGridDiv = <div id={this.idPrefix + 'LocalizationGrid'} style="display: none" /> as HTMLDivElement;
+        pgDiv.after(localGridDiv);
 
         pgOptions.idPrefix = this.idPrefix + 'Localization_';
 
@@ -544,7 +542,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         pgOptions.items = items;
 
         this.localizationGrid = (new PropertyGrid({ element: localGridDiv, ...pgOptions })).init();
-        localGridDiv.addClass('s-LocalizationGrid');
+        localGridDiv.classList.add('s-LocalizationGrid');
     }
 
     protected isLocalizationMode(): boolean {
@@ -614,7 +612,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             return;
         }
 
-        var opt = <ServiceOptions<any>>{
+        var opt: ServiceOptions<any> = {
             service: this.getService() + '/Retrieve',
             blockUI: true,
             request: {
@@ -1164,11 +1162,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             return void 0;
 
         const id = this.useIdPrefix();
-        return Fluent(document.createDocumentFragment())
-            .append(Fluent("div").attr("id", id.Toolbar))
-            .append(Fluent("div").class("s-Form")
-                .append(Fluent("form").attr("id", id.Form).attr("action", "")
-                    .append(Fluent("div").attr("id", id.PropertyGrid))))
-            .getNode();
+        return (<>
+            <div id={id.Toolbar} />
+            <div class="s-Form">
+                <form id={id.Form} action="">
+                    <div id={id.PropertyGrid} />
+                </form>
+            </div>
+        </>);
     }
 }
