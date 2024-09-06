@@ -12,7 +12,7 @@ export interface EmailEditorOptions {
 @Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }   
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
     declare private readonly domain: HTMLInputElement;
 
@@ -22,33 +22,37 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
         this.domNode.classList.add('emailuser');
 
-        var spanAt = Fluent("span").text('@').class('emailat').insertAfter(this.domNode);
+        this.domain = <input type="text" class="emaildomain" /> as HTMLInputElement;
+        this.domNode.after(<>
+            <span class="emailat">@</span>
+            {this.domain}
+        </>)
 
-        var domain = Fluent("input").attr("type", "text").class('emaildomain').insertAfter(spanAt);
-        domain.on('blur.' + this.uniqueName, function () {
+        Fluent.on(this.domain, 'blur.' + this.uniqueName, function () {
             ValidationHelper.validateElement(this.domNode);
         });
-        this.domain = domain.getNode();
 
         if (this.options.domain) {
-            domain.val(this.options.domain);
+            this.domain.value = this.options.domain;
         }
 
         if (this.options.readOnlyDomain) {
-            domain.attr('readonly', 'readonly').addClass('disabled').attr('tabindex', '-1');
+            this.domain.readOnly = true;
+            this.domain.classList.add("readonly", "disabled");
+            this.domain.tabIndex = -1;
         }
 
         this.element.on('keypress.' + this.uniqueName, (e: KeyboardEvent) => {
             if (e.key === "@") {
                 e.preventDefault();
                 if (!this.options.readOnlyDomain) {
-                    domain.getNode().focus();
-                    domain.getNode().select();
+                    this.domain.focus();
+                    this.domain.select();
                 }
             }
         });
 
-        domain.on('keypress.' + this.uniqueName, function (e: KeyboardEvent) {
+        Fluent.on(this.domain, 'keypress.' + this.uniqueName, function (e: KeyboardEvent) {
             if (e.key === "@")
                 e.preventDefault();
         });
