@@ -166,14 +166,15 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     protected renderContents(): any {
         const id = this.useIdPrefix();
-        return Fluent(document.createDocumentFragment())
-            .append(Fluent("div").attr("id", id.Rows).class("filter-lines"))
-            .append(Fluent("div").attr("id", id.Buttons).class("buttons")
-                .append(Fluent("button").attr("id", id.AddButton).attr("type", "button").class("btn btn-primary add"))
-                .append(Fluent("button").attr("id", id.SearchButton).attr("type", "button").class("btn btn-success search"))
-                .append(Fluent("button").attr("id", id.ResetButton).attr("type", "button").class("btn btn-danger reset")))
-            .append(Fluent("div").attr("style", "clear: both"))
-            .getNode();
+        return (<>
+            <div id={id.Rows} class="filter-lines" />
+            <div id={id.Buttons} class="buttons">
+                <button id={id.AddButton} type="button" class="btn btn-primary add" />
+                <button id={id.SearchButton} type="button" class="btn btn-success search" />
+                <button id={id.ResetButton} type="button" class="btn btn-danger reset" />
+            </div>
+            <div style="clear: both" />
+        </>);
     }
 
     protected initButtons(): void {
@@ -240,8 +241,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         // if an error occurred, display it, otherwise set current filters
         if (errorText != null) {
-            Fluent("span").class('error')
-                .attr('title', errorText).appendTo(row.querySelector<HTMLElement>('div.v'));
+            row.querySelector<HTMLElement>('div.v').appendChild(<span class="error" title={errorText} />)
             row.querySelector<HTMLElement>('div.v input')?.focus();
             return;
         }
@@ -385,7 +385,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (filtering == null)
             return;
 
-        var hidden = Fluent("input").attr("type", 'hidden').class('op-select').appendTo(opDiv);
+        const hidden = opDiv.appendChild(<input type="hidden" class="op-select" /> as HTMLInputElement);
 
         var operators = filtering.getOperators();
         var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
