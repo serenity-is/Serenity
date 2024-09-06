@@ -15,7 +15,7 @@ export interface DateEditorOptions {
 @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
