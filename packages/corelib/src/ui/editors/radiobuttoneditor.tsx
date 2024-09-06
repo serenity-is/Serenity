@@ -60,12 +60,8 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         }
     }
 
-    protected addRadio(value: string, text: string) {
-        var label = Fluent("label").text(text);
-        Fluent("input").attr("type", "radio").attr('name', this.uniqueName)
-            .attr('id', this.uniqueName + '_' + value)
-            .attr('value', value).prependTo(label);
-        label.appendTo(this.domNode);
+    protected addRadio(value: string, text: string): void {
+        this.domNode.appendChild(<label><input type="radio" name={this.uniqueName} id={this.uniqueName + '_' + value} value={value} />{text}</label>);
     }
 
     get_value(): string {
