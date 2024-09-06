@@ -1,8 +1,8 @@
-﻿import { Culture, Fluent, formatNumber, parseDecimal } from "../../base";
+﻿import { Culture, formatNumber, parseDecimal } from "../../base";
 import { IDoubleValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "./editorwidget";
 import { AutoNumeric, AutoNumericOptions } from "./autonumeric";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface DecimalEditorOptions {
     minValue?: string;
@@ -15,7 +15,7 @@ export interface DecimalEditorOptions {
 @Decorators.registerEditor('Serenity.DecimalEditor', [IDoubleValue])
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
