@@ -46,7 +46,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (this.options.readOnly)
             this.set_readOnly(true);
 
-        this.fileSymbols = Fluent("ul").appendTo(this.domNode);
+        this.fileSymbols = Fluent("ul").addClass("file-items").appendTo(this.domNode);
 
         if (!this.domNode.getAttribute("id"))
             this.domNode.setAttribute('id', this.uniqueName);
@@ -306,7 +306,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
-        this.fileSymbols = Fluent("ul").appendTo(this.domNode);
+        this.fileSymbols = Fluent("ul").addClass("file-items").appendTo(this.domNode);
         if (!this.domNode.getAttribute("id")) {
             this.domNode.setAttribute('id', this.uniqueName);
         }

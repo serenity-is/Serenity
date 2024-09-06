@@ -6,7 +6,6 @@ export namespace UploadHelper {
     export function addUploadInput(options: UploadInputOptions): Fluent {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
         let progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
-        //container.classList.add('fileinput-button');
         var button = container.closest(".tool-button") ?? container.closest("button") ?? container;
         button.classList.add("fileinput-button");
 
@@ -20,14 +19,8 @@ export namespace UploadHelper {
             uploadUrl += encodeURIComponent(options.uploadIntent);
         }
 
-        var uploadInput = Fluent("input").attr('type', 'file')
-            .attr('name', options.inputName + '[]')
-            .attr('data-url', resolveUrl(uploadUrl))
+        var uploadInput = Fluent(<input type="file" name={options.inputName + '[]'} data-url={resolveUrl(uploadUrl)} multiple={!!options.allowMultiple} />)
             .appendTo(container);
-
-        if (options.allowMultiple) {
-            uploadInput.attr('multiple', 'multiple');
-        }
 
         const setProgress = (percent: number) => {
             let bar = progress.children()[0];
@@ -41,7 +34,7 @@ export namespace UploadHelper {
                 if (response?.Error) {
                     notifyError(response.Error.Message);
                     return;
-                } 
+                }
                 options.fileDone?.(response, data.batch?.filePaths?.[0], data);
             },
             input: uploadInput.getNode() as HTMLInputElement,
@@ -134,7 +127,7 @@ export namespace UploadHelper {
         }
         filename = filename.toLowerCase();
         return filename.endsWith('.jpg') || filename.endsWith('.jpeg') ||
-            filename.endsWith('.gif') || filename.endsWith('.png') || 
+            filename.endsWith('.gif') || filename.endsWith('.png') ||
             filename.endsWith('.webp');
     }
 
@@ -175,40 +168,33 @@ export namespace UploadHelper {
         items = items || [];
         container.innerHTML = "";
         for (var index = 0; index < items.length; index++) {
-            var item = items[index];
-            var li = Fluent("li").class('file-item').data('index', index.toString());
-            var isImage = hasImageExtension(item.Filename);
-            if (isImage) {
-                li.addClass('file-image');
-            }
-            else {
-                li.addClass('file-binary');
-            }
-            var thumb = Fluent("a").class('thumb').appendTo(li);
-            var originalName = item.OriginalName ?? '';
-            var fileName = item.Filename;
+            const item = items[index];
+            const isImage = hasImageExtension(item.Filename);
+            const originalName = item.OriginalName ?? '';
+
+            let fileName = item.Filename;
             if (urlPrefix != null && fileName != null &&
                 !fileName.startsWith('temporary/')) {
                 fileName = urlPrefix + fileName;
             }
 
-            thumb.attr('href', dbFileUrl(fileName));
-            thumb.attr('target', '_blank');
+            const thumb = <a class="thumb" href={dbFileUrl(fileName)} target="_blank"></a> as HTMLAnchorElement;
+
             if (originalName) {
-                thumb.attr('title', originalName);
+                thumb.title = originalName;
             }
 
             if (isImage) {
-                thumb.getNode().style.backgroundImage = "url('" + dbFileUrl(thumbFileName(item.Filename)) + "')";
+                thumb.style.backgroundImage = "url('" + dbFileUrl(thumbFileName(item.Filename)) + "')";
                 colorBox(thumb, new Object());
             }
 
-            if (displayOriginalName) {
-                Fluent("div").class('filename').text(originalName)
-                    .attr('title', originalName).appendTo(li);
-            }
-
-            li.appendTo(container);
+            container.appendChild(
+                <li class={["file-item", isImage ? "file-image" : "file-binary"]} data-index={index}>
+                    {thumb}
+                    {displayOriginalName && <div class="filename" title={originalName}>{originalName}</div>}
+                </li>
+            );
         }
     }
 }
