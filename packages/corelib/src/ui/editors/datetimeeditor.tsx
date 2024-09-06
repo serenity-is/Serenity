@@ -2,15 +2,15 @@ import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODat
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, today } from "../../q";
 import { Decorators } from "../../types/decorators";
-import { EditorProps, EditorWidget } from "./editorwidget";
 import { flatPickrTrigger } from "../helpers/dateediting";
 import { DateEditor } from "./dateeditor";
 import { EditorUtils } from "./editorutils";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
 export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     declare private time: HTMLSelectElement;
@@ -54,7 +54,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 DateEditor.dateInputChange(e as any);
             });
 
-            this.time = Fluent("select").class('editor s-DateTimeEditor time').getNode();
+            this.time = <select class="editor s-DateTimeEditor time" /> as HTMLSelectElement;
             var after = this.domNode.nextElementSibling as HTMLElement;
             if (after?.classList.contains("ui-datepicker-trigger")) {
                 Fluent(this.time).insertAfter(after);
@@ -130,14 +130,15 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_sqlMinMax(true);
 
         if (!this.options.inputOnly) {
-            Fluent("i").class("inplace-button inplace-now")
-                .append(Fluent("b"))
-                .attr('title', this.getInplaceNowText())
-                .insertAfter(this.time).on("click", () => {
+            this.time.after(
+                <i class="inplace-button inplace-now" title={this.getInplaceNowText()} onClick={() => {
                     if (this.get_readOnly())
                         return;
                     this.setToNow(true);
-                });
+                }}>
+                    <b />
+                </i>
+            );
         }
     }
 
