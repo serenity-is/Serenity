@@ -20,13 +20,13 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var v = opt.view; if (!v) throw "SlickPager requires view option to be set!";
 
         const p = "slick-pg-";
-        const Group = ({ k, children }: { k: string, children: any }) => <div class={`${p}grp ${p}grp-${k}`}>{children}</div> as HTMLDivElement;
-        const Button = ({ k, onClick }: { k: string, onClick?: (e: MouseEvent) => void }) => <div class={`${p}${k} ${p}btn`} onClick={onClick}><span class={`${p}btn-span`}></span></div> as HTMLDivElement;
-        const NavButton = ({ k, onClick }: { k: string, onClick?: (e: MouseEvent) => void }) => { const b = Button({ k, onClick }); Fluent.on(b, "click", () => this._changePage(k)); return b; }
+        const Group = ({ id, children }: { id: string, children: any }) => <div class={`${p}grp ${p}grp-${id}`}>{children}</div> as HTMLDivElement;
+        const Button = ({ id, onClick }: { id: string, onClick?: (e: MouseEvent) => void }) => <div class={`${p}${id} ${p}btn`} onClick={onClick}><span class={`${p}btn-span`}></span></div> as HTMLDivElement;
+        const NavButton = ({ id, onClick }: { id: string, onClick?: (e: MouseEvent) => void }) => { const b = Button({ id, onClick }); Fluent.on(b, "click", () => this._changePage(id)); return b; }
 
         this.element.addClass("s-SlickPager slick-pg").append(
             <div class={p + "in"}>
-                {opt.showRowsPerPage && <Group k="size">
+                {opt.showRowsPerPage && <Group id="size">
                     {this.pageSize = <select class={`${p}size`} name="rp" onChange={() => {
                         if (opt.onRowsPerPageChange)
                             opt.onRowsPerPageChange(+this.pageSize.value);
@@ -41,11 +41,11 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                         {opt.rowsPerPageOptions.map(rowsPerPage => <option value={rowsPerPage} selected={v.rowsPerPage == rowsPerPage}>{rowsPerPage}</option>)}
                     </select> as HTMLSelectElement}
                 </Group>}
-                <Group k="firstprev">
-                    <NavButton k="first" />
-                    <NavButton k="prev" />
+                <Group id="firstprev">
+                    <NavButton id="first" />
+                    <NavButton id="prev" />
                 </Group>
-                <Group k="control">
+                <Group id="control">
                     <span class={`${p}control`}>
                         <span class={`${p}pagetext`}>{localText("Controls.Pager.Page")}</span>
                         {this.currentPage = <input class={`${p}current mx-1`} type="text" size={4} value="1" onKeyDown={e => { if (e.key === "Enter") this._changePage("input"); }} /> as HTMLInputElement}
@@ -53,14 +53,14 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                         {this.totalPages = <span class={`${p}total`}>1</span> as HTMLSpanElement}
                     </span>
                 </Group>
-                <Group k="nextlast">
-                    <NavButton k="next" />
-                    <NavButton k="last" />
+                <Group id="nextlast">
+                    <NavButton id="next" />
+                    <NavButton id="last" />
                 </Group>
-                <Group k="reload">
-                    <Button k="reload" onClick={() => v.populate()} />
+                <Group id="reload">
+                    <Button id="reload" onClick={() => v.populate()} />
                 </Group>
-                <Group k="stat">
+                <Group id="stat">
                     {this.stat = <span class={`${p}stat`} /> as HTMLSpanElement}
                 </Group>
             </div>);
