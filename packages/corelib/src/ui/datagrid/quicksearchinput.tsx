@@ -17,7 +17,7 @@ export interface QuickSearchInputOptions {
 
 @Decorators.registerClass('Serenity.QuickSearchInput')
 export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     declare private lastValue: string;
@@ -29,46 +29,29 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.domNode.setAttribute('title', localText('Controls.QuickSearch.Hint'));
-        this.domNode.setAttribute('placeholder', localText('Controls.QuickSearch.Placeholder'));
+        this.domNode.title = localText('Controls.QuickSearch.Hint');
+        this.domNode.placeholder = localText('Controls.QuickSearch.Placeholder');
         this.lastValue = (this.domNode.value ?? "").trim();
 
         Fluent.on(this.domNode, "keyup." + this.uniqueName, this.checkIfValueChanged.bind(this));
         Fluent.on(this.domNode, "change." + this.uniqueName, this.checkIfValueChanged.bind(this));
 
-        Fluent("span")
-            .class("quick-search-icon")
-            .append(Fluent("i"))
-            .insertBefore(this.domNode);
+        this.domNode.before(<span class="quick-search-icon"><i /></span>)
 
-        if (this.options.fields?.length > 0) {
-            var dropdown = Fluent("div")
-                .class("dropdown quick-search-field")
-                .insertBefore(this.domNode);
-
-            this.fieldLink = Fluent("a").class('.quick-search-field-toggle')
-                .attr('title', localText('Controls.QuickSearch.FieldSelection'))
-                .data("bs-toggle", "dropdown")
-                .appendTo(dropdown)
-                .getNode();
-
-            var menu = Fluent("ul").class("dropdown-menu")
-                .appendTo(dropdown);
-
-            this.options.fields.forEach(item =>
-                Fluent("li")
-                    .appendTo(menu)
-                    .append(Fluent("a")
-                        .class("dropdown-item")
-                        .attr("href", "#")
-                        .text(item.title ?? '')
-                        .on("click", e => {
+        if (this.options.fields?.length) {
+            this.domNode.before(
+                <div class="dropdown quick-search-field">
+                    <a class="quick-search-field-toggle" title={localText('Controls.QuickSearch.FieldSelection')} data-bs-toggle="dropdown" ref={el => this.fieldLink = el} />
+                    <ul class="dropdown-menu">
+                        {this.options.fields.map(item => <a class="dropdown-item" href="#" onClick={e => {
                             e.preventDefault();
                             this.fieldChanged = item !== this.field;
                             this.field = item;
                             this.updateInputPlaceHolder();
                             this.checkIfValueChanged();
-                        })));
+                        }}>{item.title ?? ''}</a>)}
+                    </ul>
+                </div>);
 
             this.field = this.options.fields[0];
             this.updateInputPlaceHolder();

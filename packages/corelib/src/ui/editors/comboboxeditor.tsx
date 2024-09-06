@@ -301,21 +301,18 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         var self = this;
         addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
         editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
-        var inplaceButton = Fluent("a")
-            .class('inplace-button inplace-create')
-            .attr('title', addTitle)
-            .append(Fluent("b"))
-            .insertAfter(this.domNode)
-            .on("click", function (e) {
-                self.inplaceCreateClick(e as any);
-            });
+        const inplaceButton = (<a class="inplace-button inplace-create" title={addTitle} onClick={e => {
+            self.inplaceCreateClick(e as any);
+        }}><b></b></a>) as HTMLElement;
+        this.domNode.after(inplaceButton);
 
         this.getComboboxContainer()?.classList.add("has-inplace-button");
         this.domNode.classList.add("has-inplace-button");
 
         this.element.on("change", () => {
             var isNew = this.isMultiple() || !this.get_value();
-            inplaceButton.attr('title', (isNew ? addTitle : editTitle)).toggleClass('edit', !isNew);
+            inplaceButton.title = (isNew ? addTitle : editTitle);
+            inplaceButton.classList.toggle('edit', !isNew);
         });
 
         this.element.on("change", (e: any) => {
