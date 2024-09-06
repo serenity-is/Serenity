@@ -418,7 +418,7 @@ export class Dialog {
             this.close(btn.result);
     }
 
-    private createBSButtons(footer: Fluent, buttons: DialogButton[]) {
+    private createBSButtons(footer: Element, buttons: DialogButton[]) {
         for (let btn of buttons) {
             Fluent(dialogButtonToBS(btn))
                 .appendTo(footer)
@@ -428,57 +428,45 @@ export class Dialog {
 
     private createBSModal(opt: DialogOptions): void {
 
-        var modal = Fluent("div")
-            .class(["modal", opt.dialogClass, opt.fade && "fade"])
-            .attr("tabindex", "-1")
-            .appendTo(document.body);
-
-        let header = Fluent("div")
-            .class("modal-header")
-            .append(Fluent("h5").class("modal-title"));
+        const header = <div class="modal-header"><h5 class="modal-title"></h5></div> as HTMLDivElement;
 
         let bs5 = isBS5Plus();
         if (opt.closeButton) {
-            let closeButton = Fluent("button")
-                .class(bs5 ? "btn-close" : "close")
-                .attr("type", "button")
-                .data(`${bs5 ? "bs-" : ""}dismiss`, "modal")
-                .attr("aria-label", DialogTexts.CloseButton);
-
-            if (!bs5) {
-                closeButton.append(Fluent("span").attr("aria-hidden", "true").text("\u2715"));
-            }
+            const closeButton = <button type="button" class={bs5 ? "btn-close" : "close"} aria-label={DialogTexts.CloseButton}>
+                {!bs5 && <span aria-hidden={true}>✕</span>}
+            </button> as HTMLButtonElement;
+            closeButton.dataset[bs5 ? "bsDismiss" : "dismiss"] = "modal";
 
             if (isBS3()) {
-                closeButton.prependTo(header);
+                header.prepend(closeButton);
             } else {
-                closeButton.appendTo(header);
+                header.appendChild(closeButton);
             }
         }
 
         this.el.classList.add("modal-body");
 
-        let footer = Fluent("div")
-            .class("modal-footer");
-
-        Fluent("div")
-            .class([
-                "modal-dialog",
-                opt.size && "modal-" + opt.size,
-                opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
-                opt.centered && "modal-dialog-centered",
-                opt.scrollable && "modal-scrollable"])
-            .append(Fluent("div")
-                .class("modal-content")
-                .append(header)
-                .append(this.el)
-                .append(footer))
-            .appendTo(modal);
-
-
+        const footer = <div class="modal-footer"></div> as HTMLDivElement;
         if (opt.buttons) {
             this.createBSButtons(footer, opt.buttons);
         }
+
+        const modal = document.body.appendChild(
+            <div class={["modal", opt.dialogClass, opt.fade && "fade"]} tabIndex={-1}>
+                <div class={[
+                    "modal-dialog",
+                    opt.size && "modal-" + opt.size,
+                    opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
+                    opt.centered && "modal-dialog-centered",
+                    opt.scrollable && "modal-scrollable"]}>
+                        <div class="modal-content">
+                            {header}
+                            {this.el}
+                            {footer}
+                        </div>
+                </div>
+            </div>
+        );
 
         let modalOpt = {
             backdrop: opt.backdrop,
@@ -489,7 +477,7 @@ export class Dialog {
             Object.assign(modalOpt, opt.providerOptions("bsmodal", opt));
 
         if (bs5 && bootstrap.Modal) {
-            var modalObj = new bootstrap.Modal(modal.getNode(), modalOpt);
+            var modalObj = new bootstrap.Modal(modal, modalOpt);
             if (modalObj && modalObj._focustrap && modalObj._focustrap._handleFocusin) {
                 var org: Function = modalObj._focustrap._handleFocusin;
                 modalObj._focustrap._handleFocusin = function (event: Event) {
@@ -501,42 +489,31 @@ export class Dialog {
             }
         }
         else {
-            getjQuery()?.(modal.getNode())?.modal?.(modalOpt);
+            getjQuery()?.(modal)?.modal?.(modalOpt);
         };
     }
 
     private createPanel(opt: DialogOptions) {
 
-        let titlebar = Fluent("div")
-            .class("panel-titlebar")
-            .append(Fluent("div")
-                .class("panel-titlebar-text"));
-
-        let panel = Fluent("div")
-            .class(["s-Panel", "hidden", opt.dialogClass])
-            .append(titlebar)
+        const panel = <div class={["s-Panel", "hidden", opt.dialogClass]}>
+            <div class="panel-titlebar">
+                <div class="panel-titlebar-text"></div>
+                {opt.closeButton && <button type="button" class="panel-titlebar-close" onClick={this.close.bind(this, null)}></button>}
+            </div>
+        </div> as HTMLDivElement;
 
         this.el.classList.add("panel-body");
 
         if (this.el.parentElement &&
             this.el.parentElement !== document.body) {
-            this.el.parentElement.insertBefore(panel.getNode(), this.el);
+            this.el.parentElement.insertBefore(panel, this.el);
         }
 
-        panel.append(this.el);
+        panel.appendChild(this.el);
 
-        if (opt.closeButton) {
-            Fluent("button")
-                .class("panel-titlebar-close")
-                .attr("type", "button")
-                .on("click", this.close.bind(this, null))
-                .appendTo(titlebar);
+        if (opt.buttons) {
+            this.createBSButtons(panel.appendChild(<div class="panel-footer"></div>) as Element, opt.buttons);
         }
-
-        opt.buttons && this.createBSButtons(Fluent("div")
-            .class("panel-footer")
-            .appendTo(panel), opt.buttons);
-
     }
 
     private createUIDialog(opt: DialogOptions): void {

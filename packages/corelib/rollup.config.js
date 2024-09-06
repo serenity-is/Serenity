@@ -210,7 +210,7 @@ const mergeReferenceTypeComments = (src) => {
 }
 
 const nodeResolvePlugin = () => nodeResolve({
-    resolveOnly: ['@serenity-is/base', '@serenity-is/base-ui']
+    resolveOnly: ['@serenity-is/base', '@serenity-is/base-ui', 'jsx-dom']
 });
 
 export default [
