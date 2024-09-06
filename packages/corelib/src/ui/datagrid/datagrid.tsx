@@ -204,13 +204,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         if (this.quickFiltersDiv == null && (filters != null ||
             ((filters = this.getQuickFilters()) && filters != null && filters.length))) {
-            this.quickFiltersDiv = Fluent("div").class('quick-filters-bar');
+            this.quickFiltersDiv = Fluent(<div class="quick-filters-bar" />);
             if (this.toolbar) {
-                Fluent("div").class('clear').appendTo(this.toolbar.domNode);
-                this.quickFiltersDiv.appendTo(this.toolbar.domNode);
+                this.toolbar.domNode.append(<div class="clear" />, this.quickFiltersDiv.getNode());
             }
             else {
-                this.quickFiltersDiv.appendTo(Fluent("div").class('s-Toolbar').insertBefore(this.slickContainer));
+                this.quickFiltersDiv.appendTo(Fluent(<div class="s-Toolbar" />).insertBefore(this.slickContainer));
             }
 
             this.quickFiltersBar = new QuickFilterBar({
@@ -706,7 +705,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createSlickContainer(): Fluent {
-        return Fluent("div").class("grid-container").appendTo(this.domNode);
+        return Fluent(<div class="grid-container" />).appendTo(this.domNode);
     }
 
     protected createView(): RemoteView<TItem> {
@@ -818,9 +817,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             }
             else {
                 if (!this.titleDiv) {
-                    this.titleDiv = Fluent("div")
-                        .class("grid-title")
-                        .append(Fluent("div").class("title-text"))
+                    this.titleDiv = Fluent(<div class="grid-title"><div class="title-text" /></div>)
                         .prependTo(this.domNode);
                 }
                 this.titleDiv.findFirst('.title-text').text(value);
