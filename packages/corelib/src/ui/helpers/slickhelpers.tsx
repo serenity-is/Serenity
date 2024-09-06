@@ -337,24 +337,16 @@ export namespace GridUtils {
     export function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string,
         callback: (p1: boolean) => void, hint: string, initial?: boolean): void {
 
-        toolDiv = isArrayLike(toolDiv) ? toolDiv[0] : toolDiv;
+        const btn = <div class={['s-ToggleButton', cssClass, initial && "pressed"]}>
+            <a href="#" title={hint ?? ''} onClick={e => {
+                e.preventDefault();
+                btn.classList.toggle('pressed');
+                const pressed = btn.classList.contains('pressed');
+                callback && callback(pressed);
+            }} />
+        </div> as HTMLDivElement;
 
-        var div = Fluent("div")
-            .class(['s-ToggleButton', cssClass])
-            .prependTo(toolDiv)
-            .append(Fluent("a")
-                .attr("href", "#")
-                .attr('title', hint ?? '')
-                .on("click", function (e) {
-                    e.preventDefault();
-                    div.toggleClass('pressed');
-                    var pressed = div.hasClass('pressed');
-                    callback && callback(pressed);
-                }));
-
-        if (initial) {
-            div.addClass('pressed');
-        }
+        (isArrayLike(toolDiv) ? toolDiv[0] : toolDiv).prepend(btn);
     }
 
     export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
@@ -437,22 +429,14 @@ export namespace GridUtils {
         onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
 
-        var input = Fluent("input").attr("type", "text");
-        var div = Fluent("div")
-            .class('s-QuickSearchBar')
-            .append(input)
-            .prependTo(isArrayLike(container) ? container[0] : container);
-
-        if (fields != null && fields.length > 0) {
-            div.addClass('has-quick-search-fields');
-        }
+        const input = <input type="text" /> as HTMLInputElement;
+        (isArrayLike(container) ? container[0] : container).prepend(<div class={["s-QuickSearchBar", fields?.length && "has-quick-search-files"]}>{input}</div>)
 
         return new QuickSearchInput({
             element: input,
             fields: fields,
             onSearch: onSearch as any
         });
-
     }
 
     export function makeOrderable(grid: Grid,
@@ -623,40 +607,39 @@ export namespace SlickFormatting {
     export function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any,
         formatter: Format): Format {
         return function (ctx: FormatterContext): FormatterResult {
-            var text = formatter(ctx);
-            var view = getView();
-            var indent = (ctx.item as any)._indent ?? 0;
-            var spacer = Fluent("span").class("s-TreeIndent");
-            spacer.getNode().style.width = (15 * indent) + 'px';
-            var toggle = Fluent("span").class("s-TreeToggle");
-            var id = getId(ctx.item);
-            var idx = view.getIdxById(id);
-            var next = view.getItemByIdx(idx + 1);
+            const text = formatter(ctx);
+            const view = getView();
+            const indent = (ctx.item as any)._indent ?? 0;
+            const spacer = <span class="s-TreeIndent" style={{ width: (15 * indent) + 'px' }} /> as HTMLSpanElement;
+            const toggle = <span class="s-TreeToggle" /> as HTMLSpanElement;
+            const id = getId(ctx.item);
+            const idx = view.getIdxById(id);
+            let next = view.getItemByIdx(idx + 1);
             if (next != null) {
                 var nextIndent = next._indent ?? 0;
                 if (nextIndent > indent) {
                     if (!!!!(ctx.item as any)._collapsed) {
-                        toggle.addClass("s-TreeExpand");
+                        toggle.classList.add("s-TreeExpand");
                     }
                     else {
-                        toggle.addClass("s-TreeCollapse");
+                        toggle.classList.add("s-TreeCollapse");
                     }
                 }
             }
 
             if (text instanceof Element) {
                 var fragment = document.createDocumentFragment();
-                fragment.appendChild(spacer.getNode());
-                fragment.appendChild(toggle.getNode());
+                fragment.appendChild(spacer);
+                fragment.appendChild(toggle);
                 return fragment;
             }
             else if (text instanceof DocumentFragment) {
-                text.prepend(toggle.getNode());
-                text.prepend(spacer.getNode());
+                text.prepend(toggle);
+                text.prepend(spacer);
                 return text;
             }
             else
-                return (spacer.getNode().outerHTML + toggle.getNode().outerHTML + (text ?? ""));
+                return (spacer.outerHTML + toggle.outerHTML + (text ?? ""));
         };
     }
 
@@ -702,26 +685,25 @@ export namespace SlickFormatting {
 
     export function itemLinkText(itemType: string, id: any, text: FormatterResult,
         extraClass: string, encode: boolean): FormatterResult {
-        var link = Fluent("a")
-            .class([`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass])
-            .attr("href", id != null ? "#" + replaceAll(itemType, '.', '-') + '/' + id : '')
-            .data("item-type", itemType)
-            .data("item-id", "" + id);
+        const link = <a class={[`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass]}
+            href={id != null ? "#" + replaceAll(itemType, '.', '-') + '/' + id : ''}
+            data-item-type={itemType} data-item-id={id} /> as HTMLAnchorElement;
 
         if (text instanceof Node) {
             link.append(text);
-            return link.getNode();
+            return link;
         }
-        else if (text == null || text === "") {
-            return link.getNode().outerHTML;
+
+        if (text != null && text !== "") {
+            if (encode) {
+                link.textContent = text;
+            }
+            else {
+                link.innerHTML = text;
+            }
         }
-        else if (encode) {
-            return link.text(text).getNode().outerHTML;
-        }
-        else {
-            link.getNode().innerHTML = text;
-            return link.getNode().outerHTML;
-        }
+
+        return link.outerHTML;
     }
 
     export function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>,
