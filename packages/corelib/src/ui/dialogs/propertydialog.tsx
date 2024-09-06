@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
+﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../q";
 import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -197,9 +197,11 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
             return void 0;
 
         const id = this.useIdPrefix();
-        return Fluent("div").class("s-Form")
-            .append(Fluent("form").attr("id", id.Form).attr("action", "")
-                .append(Fluent("div").attr("id", id.PropertyGrid)))
-            .getNode();
+        return (
+            <div class="s-Form">
+                <form id={id.Form} action="">
+                    <div id={id.PropertyGrid}></div>
+                </form>
+            </div>);
     }
 }
