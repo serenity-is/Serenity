@@ -34,7 +34,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public addSeparator(): void {
-        Fluent("hr").appendTo(this.domNode);
+        this.domNode.append(<hr />)
     }
 
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
@@ -47,9 +47,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        var quickFilter = Fluent("div").class("quick-filter-item")
-            .appendTo(this.domNode)
-            .data('qffield', opt.field)
+        const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement & {
+            qfdisplaytext?: (w: TWidget, l: string) => string;
+            qfsavestate?: (w: TWidget) => any;
+            qfloadstate?: (w: TWidget, state: any) => void;
+        }
 
         var title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
@@ -59,9 +61,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             }
         }
 
-        Fluent("span").class("quick-filter-label").text(title).appendTo(quickFilter);
-
-        var qfElement = quickFilter.getNode() as any;
+        qfElement.appendChild(<span class="quick-filter-label">{title}</span>);
 
         if (opt.displayText != null) {
             qfElement.qfdisplaytext = opt.displayText;
@@ -76,7 +76,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         }
 
         if (opt.cssClass) {
-            quickFilter.addClass(opt.cssClass);
+            qfElement.classList.add(opt.cssClass);
         }
 
         var widget = Widget.create({
@@ -86,7 +86,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     if (opt.field)
                         el.setAttribute('id', this.options.idPrefix + opt.field);
                     el.setAttribute('placeholder', ' ');
-                    quickFilter.append(el);
+                    qfElement.append(el);
                     if (opt.element != null) {
                         opt.element(Fluent(el));
                     }
@@ -98,7 +98,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         var submitHandler = (request: ListRequest) => {
 
-            if (quickFilter.hasClass('ignore')) {
+            if (qfElement.classList.contains('ignore')) {
                 return;
             }
 
@@ -116,14 +116,14 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     handled: true
                 };
                 opt.handler(args);
-                quickFilter.toggleClass('quick-filter-active', args.active);
+                qfElement.classList.toggle('quick-filter-active', !!args.active);
                 if (!args.handled) {
                     request.EqualityFilter[opt.field] = value;
                 }
             }
             else {
                 request.EqualityFilter[opt.field] = value;
-                quickFilter.toggleClass('quick-filter-active', active);
+                qfElement.classList.toggle('quick-filter-active', !!active);
             }
         };
 
@@ -135,7 +135,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         this.add_submitHandlers(submitHandler);
         Fluent.on(widget.domNode, 'cleanup.' + this.uniqueName, x => {
             this.remove_submitHandlers(submitHandler);
-    });
+        });
 
         return widget;
     }
@@ -146,14 +146,14 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     public static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions> {
         var end: DateEditor = null;
-        return <QuickFilter<DateEditor, DateTimeEditorOptions>>{
+        return {
             field: field,
             type: DateEditor,
             title: title,
             element: function (el) {
                 end = new DateEditor({ element: el2 => Fluent(el2).insertAfter(el) });
                 Fluent.on(end.domNode, "change", () => el.trigger("change"));
-                Fluent("span").class('range-separator').text('-').insertAfter(el);
+                el.after(<span class="range-separator">-</span>);
             },
             handler: function (args) {
                 var date1 = parseDate(args.widget.value);
@@ -224,7 +224,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     public static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
         var end: DateTimeEditor = null;
 
-        return <QuickFilter<DateTimeEditor, DateTimeEditorOptions>>{
+        return {
             field: field,
             type: DateTimeEditor,
             title: title,
@@ -234,7 +234,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
                 Fluent.on(end.domNode, ".change", () => el.trigger("change"));
-                Fluent("span").class('range-separator').text('-').insertAfter(el);
+                el.after(<span class="range-separator">-</span>);
             },
             init: function (w) {
                 Fluent.on(w.domNode.parentElement?.querySelector('.time'), "change", () => Fluent.trigger(w.domNode, "change"));
