@@ -26,44 +26,28 @@ export interface ToolButton extends ToolButtonProps {
 }
 
 export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
-    var cssClass = tb.cssClass ?? '';
 
-    let span = Fluent("span").class("button-inner");
-    let btn = Fluent("div")
-        .class("tool-button")
-        .append(span);
+    const btn = Fluent(
+        <div class={["tool-button", tb.cssClass, tb.icon && "icon-tool-button", !tb.title && "no-text"]}
+            title={!!tb.hint && tb.hint} onClick={e => {
+                if (tb.onClick && !(e.target as Element).classList.contains('disabled')) {
+                    tb.onClick(e);
+                }
+            }}>
+            <span class="button-inner">
+                {tb.icon && <><i class={iconClassName(tb.icon)} />{" "}</>}{!!tb.title && tb.title}
+            </span>
+        </div>
+    );
 
     if (tb.action != null)
-        btn.attr('data-action', tb.action);
-
-    if (cssClass.length > 0)
-        btn.addClass(cssClass);
-
-    if (tb.hint)
-        btn.attr('title', tb.hint);
-
-    btn.on("click", e => {
-        if (btn.hasClass('disabled'))
-            return;
-        tb.onClick(e);
-    });
-
-    if (tb.icon) {
-        btn.addClass('icon-tool-button');
-        span.append(Fluent("i").class(iconClassName(tb.icon)));
-        tb.title && span.append(" ").append(tb.title);
-    }
-    else if (tb.title)
-        span.append(tb.title);
-    
-    if (!tb.title)
-        btn.addClass('no-text');
+        btn.data("action", tb.action);
 
     if (tb.visible === false)
-        btn.getNode().style.display = "none";
+        btn.hide();
 
     if (tb.disabled != null && typeof tb.disabled !== "function")
-        btn.toggleClass('disabled', !!tb.disabled);
+        btn.toggleClass("disabled", !!tb.disabled);
 
     if (typeof tb.visible === "function" || typeof tb.disabled == "function") {
         btn.on('updateInterface', () => {
@@ -88,7 +72,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     protected renderContents(): any {
 
-        let group = Fluent("div").class("tool-group");
+        let group = <div class="tool-group" />;
 
         this.element
             .addClass("s-Toolbar clearfix")
@@ -99,16 +83,14 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         for (var i = 0; i < buttons.length; i++) {
             var button = buttons[i];
             if (button.separator && currentCount > 0) {
-                group = Fluent("div")
-                    .class("tool-group")
-                    .appendTo(group.parent());
+                group = group.parentElement.appendChild(<div class="tool-group" />);
                 currentCount = 0;
             }
             this.createButton(group, button);
             currentCount++;
         }
 
-        return group.getNode();
+        return group;
     }
 
     destroy() {
@@ -128,10 +110,10 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     declare protected mouseTrap: any;
 
-    createButton(container: Fluent, tb: ToolButton) {
+    createButton(container: ParentNode, tb: ToolButton) {
 
         if (tb.separator === 'right' || tb.separator === 'both') {
-            container.append(Fluent("div").class("separator"));
+            container.appendChild(<div class="separator" />);
         }
 
         let button = ToolbarButton(tb);
