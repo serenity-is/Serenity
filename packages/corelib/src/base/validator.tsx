@@ -573,7 +573,7 @@ export class Validator {
                 }
 
                 const handle = () => {
-                    var hidden, result;
+                    var hidden: HTMLInputElement, result;
 
                     // Insert a hidden input as a replacement for the missing submit button
                     // The hidden input is inserted in two cases:
@@ -581,10 +581,7 @@ export class Validator {
                     //   - There was a pending request due to `remote` method and `stopRequest()`
                     //     was called to submit the form in case it's valid
                     if (this.submitButton && (this.settings.submitHandler || this.formSubmitted)) {
-                        hidden = Fluent("input").attr("type", "hidden")
-                            .attr("name", this.submitButton.name)
-                            .val(Fluent(this.submitButton).val())
-                            .appendTo(this.currentForm);
+                        hidden = this.currentForm.appendChild(<input type="hidden" name={this.submitButton.name} value={this.submitButton.value} /> as HTMLInputElement)
                     }
 
                     if (this.settings.submitHandler && !this.settings.debug) {
@@ -592,7 +589,7 @@ export class Validator {
                         if (hidden) {
 
                             // And clean up afterwards; thanks to no-block-scope, hidden can be referenced
-                            hidden.remove();
+                            Fluent.remove(hidden);
                         }
                         if (result !== undefined) {
                             if (result === false)
