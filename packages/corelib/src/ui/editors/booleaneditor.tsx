@@ -1,12 +1,11 @@
-﻿import { Fluent } from "../../base";
-import { IBooleanValue } from "../../interfaces";
+﻿import { IBooleanValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorWidget } from "./editorwidget";
 
 @Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "checkbox").getNode(); }
+    static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 
     declare public readonly domNode: HTMLInputElement;
 

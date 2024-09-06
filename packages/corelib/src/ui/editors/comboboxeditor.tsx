@@ -42,7 +42,7 @@ export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxIn
 export class ComboboxEditor<P, TItem> extends Widget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "hidden").getNode(); }
+    static override createDefaultElement() { return <input type="hidden" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     declare private combobox: Combobox;

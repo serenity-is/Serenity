@@ -12,7 +12,7 @@ import { DialogExtensions } from "./dialogextensions";
 @Decorators.registerClass('Serenity.BaseDialog', [IDialog])
 export class BaseDialog<P> extends Widget<P> {
 
-    static override createDefaultElement() { return Fluent("div").class("hidden").appendTo(document.body).getNode(); }
+    static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
 
     declare protected tabs: Fluent<HTMLElement>;
     declare protected toolbar: Toolbar;
