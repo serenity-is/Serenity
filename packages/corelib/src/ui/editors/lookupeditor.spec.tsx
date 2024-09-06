@@ -1,4 +1,4 @@
-import { Fluent, Lookup } from "../../base";
+import { Fluent } from "../../base";
 import { ScriptData } from "../../q";
 import { LookupEditor } from "./lookupeditor";
 
@@ -20,7 +20,7 @@ describe("LookupEditor", () => {
 
     test('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
-        var logSpy = jest.spyOn(window.console, 'log').mockImplementation(() => {});
+        var logSpy = jest.spyOn(window.console, 'log').mockImplementation(() => { });
         var oldXHR = window.XMLHttpRequest
         try {
             window.XMLHttpRequest = class {
@@ -28,7 +28,7 @@ describe("LookupEditor", () => {
                 send() {
                     (this as any).status = 404;
                 }
-             } as any;
+            } as any;
             expect(() => new LookupEditor({
                 lookupKey: "Test"
             })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
@@ -100,14 +100,14 @@ describe("LookupEditor", () => {
     });
 
     test('inplaceAdd button has correct text depending on selection', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" }
             ]
         });
 
-        const select2Container = Fluent("div").class("select2-container");
+        const select2Container = Fluent(<div class="select2-container" />);
         document.body.appendChild(select2Container[0]);
 
         const editor = new LookupEditor({
@@ -134,7 +134,7 @@ describe("LookupEditor", () => {
     });
 
     test('can load lookup with items', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -146,7 +146,7 @@ describe("LookupEditor", () => {
     });
 
     test('can load lookup with multiple items', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [
                 { id: 1, text: "Test" },
                 { id: 2, text: "Test2" }
@@ -161,7 +161,7 @@ describe("LookupEditor", () => {
     });
 
     test('appends original lookup item to source', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -174,7 +174,7 @@ describe("LookupEditor", () => {
     });
 
     test('doesn\'t load id if idField is not set', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -187,7 +187,7 @@ describe("LookupEditor", () => {
     });
 
     test('doesn\'t load text if textField is not set', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -200,7 +200,7 @@ describe("LookupEditor", () => {
     });
 
     test('can load lookup with idField', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id"
         });
@@ -214,7 +214,7 @@ describe("LookupEditor", () => {
     });
 
     test('can load lookup with textField', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             textField: "text"
         });
@@ -228,7 +228,7 @@ describe("LookupEditor", () => {
     });
 
     test('can load lookup with idField and textField', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id",
             textField: "text"
@@ -244,7 +244,7 @@ describe("LookupEditor", () => {
     });
 
     test('can cascade lookup with cascadeField', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: [
                 { id: 1, text: "Test", parentId: 1 },
                 { id: 2, text: "Test", parentId: 2 }
@@ -261,7 +261,7 @@ describe("LookupEditor", () => {
     });
 
     test('can cascade lookup with cascadeFrom', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, parentId: 10 },
@@ -269,7 +269,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        ScriptData.set("Lookup.TestParent", <Lookup<any>>{
+        ScriptData.set("Lookup.TestParent", {
             idField: "id",
             items: [
                 { id: 10 },
@@ -297,7 +297,7 @@ describe("LookupEditor", () => {
     });
 
     test('can filter lookup', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -316,7 +316,7 @@ describe("LookupEditor", () => {
     });
 
     test('can update items when scriptData changes', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -330,7 +330,7 @@ describe("LookupEditor", () => {
 
         expect(editor.items).toHaveLength(2);
 
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -343,7 +343,7 @@ describe("LookupEditor", () => {
     });
 
     test('can update items when scriptData changes and cascadeFrom is set', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test", parentId: 1 },
@@ -351,7 +351,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        ScriptData.set("Lookup.TestParent", <Lookup<any>>{
+        ScriptData.set("Lookup.TestParent", {
             idField: "id",
             items: [
                 { id: 1 },
@@ -377,7 +377,7 @@ describe("LookupEditor", () => {
 
         expect(editor.items).toHaveLength(1);
 
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test", parentId: 1 },
@@ -389,39 +389,39 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(2);
     });
 
-//    test('can filter items when input value changes', () => {
-//        ScriptData.set("Lookup.Test", <Lookup<any>>{
-//            idField: "id",
-//            items: [
-//                { id: 1, text: "Test" },
-//                { id: 2, text: "Test2" }
-//            ]
-//        });//
+    //    test('can filter items when input value changes', () => {
+    //        ScriptData.set("Lookup.Test", {
+    //            idField: "id",
+    //            items: [
+    //                { id: 1, text: "Test" },
+    //                { id: 2, text: "Test2" }
+    //            ]
+    //        });//
 
-//        const editor = new LookupEditor({
-//            lookupKey: "Test",
-//            element: el => document.body.appendChild(el)
-//        });//
+    //        const editor = new LookupEditor({
+    //            lookupKey: "Test",
+    //            element: el => document.body.appendChild(el)
+    //        });//
 
-//        expect(editor.items).toHaveLength(2);//
+    //        expect(editor.items).toHaveLength(2);//
 
-//        Fluent.trigger(document.body.querySelector(".select2-choice"), "mousedown");
-//        
-//        let options = Array.from(document.body.querySelectorAll(".select2-results li"));
-//        expect(options).toHaveLength(2);//
+    //        Fluent.trigger(document.body.querySelector(".select2-choice"), "mousedown");
+    //        
+    //        let options = Array.from(document.body.querySelectorAll(".select2-results li"));
+    //        expect(options).toHaveLength(2);//
 
-//        const input = document.body.querySelector(".select2-input") as HTMLInputElement
-//        input.value = "Test2";
-//        Fluent(input).trigger("input");//
+    //        const input = document.body.querySelector(".select2-input") as HTMLInputElement
+    //        input.value = "Test2";
+    //        Fluent(input).trigger("input");//
 
-//        expect(document.body.querySelector(".select2-active")).toBeNull();//
+    //        expect(document.body.querySelector(".select2-active")).toBeNull();//
 
-//        options = Array.from(document.body.querySelectorAll(".select2-results li"));
-//        expect(options).toHaveLength(1);
-//    });
+    //        options = Array.from(document.body.querySelectorAll(".select2-results li"));
+    //        expect(options).toHaveLength(1);
+    //    });
 
     test('correctly unbinds from scriptData change event on destroy', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -436,7 +436,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(2);
         editor.destroy();
 
-        ScriptData.set("Lookup.Test", <Lookup<any>>{
+        ScriptData.set("Lookup.Test", {
             items: []
         });
 
@@ -444,7 +444,7 @@ describe("LookupEditor", () => {
     });
 
     test('throws error if editor is async and items getter or setter is accessed', () => {
-        ScriptData.set("Lookup.Test", <Lookup<any>>{ items: [] });
+        ScriptData.set("Lookup.Test", { items: [] });
 
         const editor = new LookupEditor({
             lookupKey: "Test",
