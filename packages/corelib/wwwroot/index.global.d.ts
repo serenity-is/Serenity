@@ -4940,7 +4940,7 @@ declare namespace Serenity {
         protected renderContents(): any;
         destroy(): void;
         protected mouseTrap: any;
-        createButton(container: Fluent, tb: ToolButton): void;
+        private createButton;
         findButton(className: string): Fluent<HTMLElement>;
         updateInterface(): void;
     }

@@ -110,7 +110,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     declare protected mouseTrap: any;
 
-    createButton(container: ParentNode, tb: ToolButton) {
+    private createButton(container: ParentNode, tb: ToolButton) {
 
         if (tb.separator === 'right' || tb.separator === 'both') {
             container.appendChild(<div class="separator" />);

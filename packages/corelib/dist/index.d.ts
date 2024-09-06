@@ -3389,7 +3389,7 @@ declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<
     protected renderContents(): any;
     destroy(): void;
     protected mouseTrap: any;
-    createButton(container: Fluent, tb: ToolButton): void;
+    private createButton;
     findButton(className: string): Fluent<HTMLElement>;
     updateInterface(): void;
 }
