@@ -121,7 +121,9 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                Fluent(this.get_container()).empty().append(Fluent("input").attr("type", "text"));
+                const input = document.createElement("input");
+                input.type = "text";
+                Fluent(this.get_container()).empty().append(input);
                 return;
             }
         }

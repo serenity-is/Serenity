@@ -25,7 +25,7 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
     }
 
     protected renderContents(): any {
-        return Fluent("div").attr("id", this.useIdPrefix().FilterPanel).getNode();
+        return <div id={this.useIdPrefix().FilterPanel} />
     }
 
     protected getDialogOptions() {
