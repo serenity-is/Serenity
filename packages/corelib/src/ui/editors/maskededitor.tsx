@@ -7,7 +7,7 @@ import { EditorProps, EditorWidget } from "./editorwidget";
 @Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 
-    static override createDefaultElement() { return Fluent("input").attr("type", "text").getNode(); }
+    static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 
     constructor(props: EditorProps<P>) {
