@@ -1,6 +1,5 @@
-import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
-import { Fluent } from "./fluent";
 import { mockJQuery, unmockBSAndJQuery } from "../mocks";
+import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
 
 afterEach(function cleanup() {
     document.body.innerHTML = "";
@@ -563,11 +562,11 @@ describe("confirmDialog", () => {
             expect(div).toBeDefined();
             expect((div as any).modalInstance).toBeDefined();
             expect((div as any).modalInstance?.show).toHaveBeenCalledTimes(1);
-            Fluent.trigger(div, "shown.bs.modal");
+            div.dispatchEvent(new Event("shown.bs.modal"));
             expect(opt.onOpen).toHaveBeenCalledTimes(1);
             expect(opt.onClose).not.toHaveBeenCalled();
             expect(opt.onOpen.mock?.contexts?.[0]).toBeDefined();
-            Fluent.trigger(div, "hidden.bs.modal");
+            div.dispatchEvent(new Event("hidden.bs.modal"));
             expect(opt.onClose).toHaveBeenCalledTimes(1);
             expect(opt.onClose.mock.calls[0][0]).toBe(void 0);
             const clickEvent = new Event("click");
@@ -769,7 +768,7 @@ describe("dialog button result handling", () => {
 
     it("closes the dialog after calling the click handler returns void", async function () {
         okButton.click();
-        
+
         expect(okClickSpy).toHaveBeenCalledTimes(1);
         expect(closeSpy).toHaveBeenCalledTimes(1);
         const okOrder = okClickSpy.mock.invocationCallOrder[0];
@@ -842,7 +841,7 @@ describe("dialog button result handling", () => {
         expect(closeSpy).not.toHaveBeenCalled();
 
         await Promise.resolve();
-        
+
         expect(closeSpy).not.toHaveBeenCalled();
     });
 });
@@ -998,8 +997,8 @@ describe("Dialog.close", () => {
         let closedPanel: any;
         const panelBeforeClose = (e: any) => closingPanel = e.target;
         const panelClose = (e: any) => closedPanel = e.target;
-        Fluent.on(window, 'panelbeforeclose', panelBeforeClose);
-        Fluent.on(window, 'panelclose', panelClose);
+        window.addEventListener('panelbeforeclose', panelBeforeClose);
+        window.addEventListener('panelclose', panelClose);
         try {
             Dialog.getInstance(jQuery(body)).close();
             expect(panel.classList.contains("hidden")).toBe(true);
@@ -1007,8 +1006,8 @@ describe("Dialog.close", () => {
             expect(closedPanel).toBe(body);
         }
         finally {
-            Fluent.off(window, 'panelbeforeclose', panelBeforeClose);
-            Fluent.off(window, 'panelclose', panelClose);
+            window.removeEventListener('panelbeforeclose', panelBeforeClose);
+            window.removeEventListener('panelclose', panelClose);
             panel.remove();
         }
     });
@@ -1022,8 +1021,8 @@ describe("Dialog.close", () => {
         let closedPanel: any;
         const panelBeforeClose = (e: any) => closingPanel = e.target;
         const panelClose = (e: any) => closedPanel = e.target;
-        Fluent.on(window, 'panelbeforeclose', panelBeforeClose);
-        Fluent.on(window, 'panelclose', panelClose);
+        window.addEventListener('panelbeforeclose', panelBeforeClose);
+        window.addEventListener('panelclose', panelClose);
         try {
             Dialog.getInstance(body).close();
             expect(panel.classList.contains("hidden")).toBe(true);
@@ -1031,8 +1030,8 @@ describe("Dialog.close", () => {
             expect(closedPanel).toBe(body);
         }
         finally {
-            Fluent.off(window, 'panelbeforeclose', panelBeforeClose);
-            Fluent.off(window, 'panelclose', panelClose);
+            window.removeEventListener('panelbeforeclose', panelBeforeClose);
+            window.removeEventListener('panelclose', panelClose);
             panel.remove();
         }
     });
@@ -1190,10 +1189,9 @@ describe("Dialog panels", () => {
         let jQuery = mockJQuery({});
 
         document.body.classList.add("panels-container");
-        var body1 = Fluent("div").addClass("panel-body 1");
-        var panel1 = Fluent("div").class("s-Panel").appendTo(document.body).append(body1);
-        var body2 = Fluent("div").addClass("panel-body 2");
-        var panel2 = Fluent("div").class("s-Panel").appendTo(document.body).append(body2);
+        const panel1 = document.body.appendChild(<div class="s-Panel"><div class="panel-body 1" /></div>) as HTMLElement;
+        const body2 = <div class="panel-body 2" />
+        const panel2 = document.body.appendChild(<div class="s-Panel">{body2}</div>) as HTMLElement;
 
         let openingPanel, openedPanel;
         const panelBeforeOpen = function (e: any) {
@@ -1207,12 +1205,12 @@ describe("Dialog panels", () => {
 
         try {
             Dialog.getInstance(panel2).open();
-            expect(openingPanel).toBe(body2.getNode());
-            expect(openedPanel).toStrictEqual(body2.getNode());
-            expect(panel1.attr("data-hiddenby")).toBeTruthy();
-            expect(panel2.attr("data-paneluniquename")).toBe(panel1.attr('data-hiddenby'));
-            expect(panel2.hasClass("hidden")).toBe(false);
-            expect(panel2.attr("data-hiddenby")).toBeFalsy();
+            expect(openingPanel).toBe(body2);
+            expect(openedPanel).toStrictEqual(body2);
+            expect(panel1.dataset.hiddenby).toBeTruthy();
+            expect(panel2.dataset.paneluniquename).toBe(panel1.dataset.hiddenby);
+            expect(panel2.classList.contains("hidden")).toBe(false);
+            expect(panel2.dataset.hiddenby).toBeFalsy();
         }
         finally {
             jQuery(window).off('panelbeforeopen', panelBeforeOpen);
@@ -1224,10 +1222,9 @@ describe("Dialog panels", () => {
 
     it("can open panel without jQuery", async function () {
         document.body.classList.add("panels-container");
-        var body1 = Fluent("div").addClass("panel-body 1");
-        var panel1 = Fluent("div").class("s-Panel").appendTo(document.body).append(body1);
-        var body2 = Fluent("div").addClass("panel-body 2");
-        var panel2 = Fluent("div").class("s-Panel").appendTo(document.body).append(body2);
+        const panel1 = document.body.appendChild(<div class="s-Panel"><div class="panel-body 1" /></div>) as HTMLElement;
+        const body2 = <div class="panel-body 2" />;
+        const panel2 = document.body.appendChild(<div class="s-Panel">{body2}</div>) as HTMLElement;
 
         let openingPanel, openedPanel;
         const panelOpening = function (e: any) {
@@ -1240,12 +1237,12 @@ describe("Dialog panels", () => {
         window.addEventListener('panelopen', panelOpened);
         try {
             Dialog.getInstance(panel2).open();
-            expect(openingPanel).toBe(body2.getNode());
-            expect(openedPanel).toBe(body2.getNode());
-            expect(panel1.data("hiddenby")).toBeTruthy();
-            expect(panel2.attr("data-paneluniquename")).toBe(panel1.data("hiddenby"));
-            expect(panel2.getNode().classList.contains("hidden")).toBe(false);
-            expect(panel2.data("hiddenby")).toBeFalsy();
+            expect(openingPanel).toBe(body2);
+            expect(openedPanel).toBe(body2);
+            expect(panel1.dataset.hiddenby).toBeTruthy();
+            expect(panel2.dataset.paneluniquename).toBe(panel1.dataset.hiddenby);
+            expect(panel2.classList.contains("hidden")).toBe(false);
+            expect(panel2.dataset.hiddenby).toBeFalsy();
         }
         finally {
             window.removeEventListener('panelbeforeopen', panelOpening);
@@ -1286,11 +1283,10 @@ describe("modal event propagation to modal-body", () => {
 
     it("installs an event propagation handler for show.bs.modal to modal body as modalbeforeopen event", () => {
         const spy = jest.fn();
-        Fluent("div")
-            .addClass("modal")
-            .append(Fluent("div").addClass("modal-body").on("modalbeforeopen", spy))
-            .appendTo(document.body)
-            .trigger("show.bs.modal");
+        const body = <div class="modal-body" /> as HTMLElement;
+        body.addEventListener("modalbeforeopen", spy);
+        const modal = document.body.appendChild(<div class="modal">{body}</div>);
+        modal.dispatchEvent(new Event("show.bs.modal", { bubbles: true }));
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -1299,12 +1295,12 @@ describe("modal event propagation to modal-body", () => {
             e.preventDefault();
         });
 
-        var modal = Fluent("div")
-            .addClass("modal")
-            .append(Fluent("div").addClass("modal-body").on("modalbeforeopen", spy))
-            .appendTo(document.body);
+        const body = <div class="modal-body" /> as HTMLElement;
+        body.addEventListener("modalbeforeopen", spy);
+        const modal = document.body.appendChild(<div class="modal">{body}</div>);
 
-        var e = Fluent.trigger(modal.getNode(), "show.bs.modal");
+        var e = new Event("show.bs.modal", { bubbles: true, cancelable: true });
+        modal.dispatchEvent(e);
         expect(spy).toHaveBeenCalledTimes(1);
         expect(e.defaultPrevented).toBeTruthy();
     });
@@ -1314,23 +1310,22 @@ describe("modal event propagation to modal-body", () => {
             e.preventDefault();
         });
 
-        var modal = Fluent("div")
-            .addClass("modal")
-            .append(Fluent("div").addClass("modal-body").on("modalbeforeclose", spy))
-            .appendTo(document.body);
+        const body = <div class="modal-body" /> as HTMLElement;
+        body.addEventListener("modalbeforeclose", spy);
+        const modal = document.body.appendChild(<div class="modal">{body}</div>) as HTMLElement;
 
-        var e = Fluent.trigger(modal.getNode(), "hide.bs.modal");
+        var e = new Event("hide.bs.modal", { bubbles: true, cancelable: true });
+        modal.dispatchEvent(e);
         expect(spy).toHaveBeenCalledTimes(1);
         expect(e.defaultPrevented).toBeTruthy();
     });
 
     it("installs an event propagation handler for shown.bs.modal to modal body as modalopen event", () => {
         const spy = jest.fn();
-        Fluent("div")
-            .addClass("modal")
-            .append(Fluent("div").addClass("modal-body").on("modalopen", spy))
-            .appendTo(document.body)
-            .trigger("shown.bs.modal");
+        const body = <div class="modal-body" /> as HTMLElement;
+        body.addEventListener("modalopen", spy);
+        const modal = document.body.appendChild(<div class="modal">{body}</div>) as HTMLElement;
+        modal.dispatchEvent(new Event("shown.bs.modal", { bubbles: true }));
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -1727,12 +1722,12 @@ describe("Static Dialog.onClose", () => {
         Dialog.onClose(el, onClose2);
         expect(onClose1).not.toHaveBeenCalled();
         expect(onClose2).not.toHaveBeenCalled();
-        Fluent.trigger(el, "panelclose");
+        el.dispatchEvent(new Event("panelclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
-        Fluent.trigger(el, "panelclose");
+        expect(onClose2).toHaveBeenCalledTimes(1);
+        el.dispatchEvent(new Event("panelclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
+        expect(onClose2).toHaveBeenCalledTimes(1);
     });
 
     it("attaches an event handler for dialogclose event", () => {
@@ -1742,12 +1737,12 @@ describe("Static Dialog.onClose", () => {
         Dialog.onClose(el, onClose2);
         expect(onClose1).not.toHaveBeenCalled();
         expect(onClose2).not.toHaveBeenCalled();
-        Fluent.trigger(el, "dialogclose");
+        el.dispatchEvent(new Event("dialogclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
-        Fluent.trigger(el, "dialogclose");
+        expect(onClose2).toHaveBeenCalledTimes(1);
+        el.dispatchEvent(new Event("dialogclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
+        expect(onClose2).toHaveBeenCalledTimes(1);
     });
 
     it("attaches an event handler for modalclose event", () => {
@@ -1758,12 +1753,12 @@ describe("Static Dialog.onClose", () => {
         expect(onClose1).not.toHaveBeenCalled();
         expect(onClose2).not.toHaveBeenCalled();
         // there is no modalclose event in bootstrap, we simulate it on modal body
-        Fluent.trigger(el, "modalclose");
+        el.dispatchEvent(new Event("modalclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
-        Fluent.trigger(el, "modalclose");
+        expect(onClose2).toHaveBeenCalledTimes(1);
+        el.dispatchEvent(new Event("modalclose"));
         expect(onClose1).toHaveBeenCalledTimes(1);
-        expect(onClose2).toHaveBeenCalledTimes(1);            
+        expect(onClose2).toHaveBeenCalledTimes(1);
     });
 });
 
