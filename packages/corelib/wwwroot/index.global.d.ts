@@ -4288,7 +4288,7 @@ declare namespace Serenity {
         target?: string;
         params: any;
     }
-    function parseQueryString(s?: string): {};
+    function parseQueryString(s?: string): Record<string, string>;
     function postToService(options: PostToServiceOptions): void;
     function postToUrl(options: PostToUrlOptions): void;
 

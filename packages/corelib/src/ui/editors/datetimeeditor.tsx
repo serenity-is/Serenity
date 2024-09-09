@@ -130,7 +130,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_sqlMinMax(true);
 
         if (!this.options.inputOnly) {
-            this.time.after(
+            (this.time ?? this.domNode).after(
                 <i class="inplace-button inplace-now" title={this.getInplaceNowText()} onClick={() => {
                     if (this.get_readOnly())
                         return;
