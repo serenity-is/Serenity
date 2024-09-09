@@ -2732,7 +2732,7 @@ interface PostToUrlOptions {
     target?: string;
     params: any;
 }
-declare function parseQueryString(s?: string): {};
+declare function parseQueryString(s?: string): Record<string, string>;
 declare function postToService(options: PostToServiceOptions): void;
 declare function postToUrl(options: PostToUrlOptions): void;
 

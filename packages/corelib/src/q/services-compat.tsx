@@ -20,7 +20,7 @@ export interface PostToUrlOptions {
     params: any;
 }
 
-export function parseQueryString(s?: string): {} {
+export function parseQueryString(s?: string): Record<string, string> {
     let qs: string;
     if (s === undefined)
         qs = location.search.substring(1, location.search.length);
