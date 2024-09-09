@@ -10,6 +10,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly string projectFile = projectFile ?? throw new ArgumentNullException(nameof(projectFile));
     private string assemblyName;
+    private string esmAssetBasePath;
     private ProjectProperties projectProperties;
     private string outDir;
     private string rootNamespace;
@@ -43,6 +44,26 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         }
 
         return string.IsNullOrEmpty(assemblyName) ? null : assemblyName;
+    }
+
+    public string GetEsmAssetBasePath()
+    {
+        if (esmAssetBasePath is null)
+        {
+            if (getPropertyArgument?.Invoke("ESMAssetBasePath") is string s)
+                esmAssetBasePath = s;
+            else
+            {
+                projectProperties ??= GetProjectProperties();
+                if (!string.IsNullOrEmpty(projectProperties.EsmAssetBasePath))
+                    return esmAssetBasePath = projectProperties.EsmAssetBasePath;
+
+                esmAssetBasePath ??= ExtractPropertyFrom(projectFile, groups =>
+                    groups.Elements("EsmAssetBasePath").LastOrDefault());
+            }
+        }
+
+        return string.IsNullOrEmpty(targetFramework) ? null : targetFramework;
     }
 
     public string GetOutDir()
@@ -158,6 +179,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     public class ProjectProperties
     {
         public string AssemblyName { get; set; }
+        public string EsmAssetBasePath { get; set; }
         public string OutDir { get; set; }
         public string RootNamespace { get; set; }
         public string TargetFramework { get; set; }
@@ -179,6 +201,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             FileName = "dotnet",
             Arguments = $"msbuild \"{projectFile}\" {configArg}" +
                 "-getProperty:AssemblyName " +
+                "-getProperty:ESMAssetBasePath " +
                 "-getProperty:OutDir " +
                 "-getProperty:RootNamespace " +
                 "-getProperty:TargetFramework",

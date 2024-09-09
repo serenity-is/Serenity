@@ -1,5 +1,3 @@
-using Serenity.CodeGenerator;
-
 namespace Serenity.CodeGeneration;
 
 public abstract class ImportGeneratorBase : CodeGeneratorBase

@@ -1,3 +1,5 @@
+using Serenity.CodeGeneration;
+
 namespace Serenity.CodeGenerator;
 
 public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console) 
@@ -140,10 +142,27 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
 
         var outDir = FileSystem.Combine(projectDir, 
             PathHelper.ToPath(config.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
-        MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir, new[]
+
+        var esmGenerator = new EsmEntryPointsGenerator();
+        var esmAssetBasePath = Project.GetEsmAssetBasePath();
+        if (!string.IsNullOrEmpty(esmAssetBasePath))
+            esmGenerator.EsmAssetBasePath = esmAssetBasePath;
+
+        var globs = config.TSBuild?.EntryPoints;
+        if (globs != null)
         {
-            ("MVC.cs", cw.ToString())
-        }, deleteExtraPattern: null, endOfLine: config.EndOfLine);
+            esmGenerator.EntryPoints.Clear();
+            esmGenerator.EntryPoints.AddRange(globs);
+        }
+
+        var esmCode = esmGenerator.Generate(FileSystem, projectDir, Project.GetRootNamespace(),
+            fileScopedNamespace: config.FileScopedNamespaces == true);
+
+        MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
+        [
+            ("MVC.cs", cw.ToString()),
+            ("ESM.cs", esmCode)
+        ], deleteExtraPattern: ["ESM.cs", "MVC.cs"], endOfLine: config.EndOfLine);
 
         return ExitCodes.Success;
     }

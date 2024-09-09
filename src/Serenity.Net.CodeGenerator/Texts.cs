@@ -10,7 +10,7 @@ public static class Texts
             c[lienttypes]     Imports editor and formatter types from TypeScript to C#.
             doctor            Analyzes the project and tooling environment.
             g[enerate]        Launches the table code generator.
-            m[vc]             Generates IntelliSense helpers for view locations.
+            m[vc]             Generates IntelliSense helpers for esm entry points and view locations.
             mvct              Executes client types and mvc commands simulatenously.
             s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
             t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
