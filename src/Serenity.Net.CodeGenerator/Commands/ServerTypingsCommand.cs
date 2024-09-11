@@ -31,7 +31,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
             LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts,
             ModuleReExports = config?.ServerTypings?.ModuleReExports != false
         };
-        if (config?.ServerTypings?.PreferRelativePaths == true)
+        if (config?.ServerTypings?.PreferRelativePaths ?? true)
         {
             generator.ModulesPathAlias = null;
             generator.RootPathAlias = null;
