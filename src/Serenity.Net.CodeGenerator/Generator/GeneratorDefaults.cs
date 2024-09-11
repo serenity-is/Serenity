@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 /// <summary>
 /// Contains list of default versions that can be used in "extends"
@@ -26,7 +26,8 @@ public class GeneratorDefaults
     ""Typings"": false
   },
   ""ServerTypings"": {
-    ""LocalTexts"": true
+    ""LocalTexts"": true,
+    ""PreferRelativePaths"": true
   }
 }";
 
