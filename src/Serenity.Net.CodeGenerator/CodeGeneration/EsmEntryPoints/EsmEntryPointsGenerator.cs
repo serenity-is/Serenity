@@ -82,18 +82,16 @@ public class EsmEntryPointsGenerator()
             cw.InBrace(() =>
             {
                 var firstParts = new HashSet<string>(files.Select(x => normalizeParts(getStrippedName(x).Split('/').First())));
-                var byShortName = files.ToLookup(x => normalizeParts(getStrippedName(x).Split('/').Last()));
-
-                var shortNames = files.ToLookup(x => getStrippedName(x).Split('/').Last())
+                var byShortName = files.ToLookup(x => normalizeParts(getStrippedName(x).Split('/').Last()))
                     .OrderBy(x => x.Key)
                     .Where(x => !firstParts.Contains(x.Key) &&
                         x.Count() == 1);
 
-                foreach (var shortName in shortNames)
+                foreach (var shortName in byShortName)
                     cw.IndentedLine("public const string " + shortName.Key + " = \"~" + EsmAssetBasePath + "/" +
                         System.IO.Path.ChangeExtension(shortName.First(), ".js").Replace('\\', '/') + "\";");
 
-                if (shortNames.Any())
+                if (byShortName.Any())
                     cw.AppendLine();
 
                 var last = Array.Empty<string>();
