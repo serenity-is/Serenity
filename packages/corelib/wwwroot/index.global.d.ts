@@ -5106,7 +5106,7 @@ declare namespace Serenity {
     function PropertyTabList(props?: {
         children?: any;
     }): HTMLElement;
-    function PropertyTabPanes(props?: {}): HTMLElement;
+    function PropertyTabPanes(_?: {}): HTMLElement;
     function PropertyTabs(props: {
         items: PropertyItem[];
         container?: ParentNode;

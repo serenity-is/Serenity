@@ -3555,7 +3555,7 @@ declare function PropertyCategories(props: {
 declare function PropertyTabList(props?: {
     children?: any;
 }): HTMLElement;
-declare function PropertyTabPanes(props?: {}): HTMLElement;
+declare function PropertyTabPanes(_?: {}): HTMLElement;
 declare function PropertyTabs(props: {
     items: PropertyItem[];
     container?: ParentNode;

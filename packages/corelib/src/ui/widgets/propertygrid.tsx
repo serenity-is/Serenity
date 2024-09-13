@@ -1,4 +1,4 @@
-﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isBS5Plus, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { Authorization, extend } from "../../q";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -19,35 +19,16 @@ export function PropertyFieldCaption(props: {
     idPrefix?: string,
     localTextPrefix?: string
 }): HTMLLabelElement {
-    const { item, idPrefix, localTextPrefix } = props;
-
-    const label = document.createElement("label");
-    label.className = "caption";
-    label.htmlFor = (idPrefix ?? "") + item.name;
-
-    const caption = determineText(props.localTextPrefix, item.title, p => p + item.name);
-    label.textContent = caption ?? "";
-
-    const hint = determineText(localTextPrefix, item.hint, p => p + item.name + '_Hint');
-    label.title = hint ?? caption ?? "";
-
-    if (item.labelWidth) {
-        if (item.labelWidth === '0') {
-            label.style.display = "none";
-        }
-        else {
-            label.style.width = item.labelWidth;
-        }
-    }
-
-    if (item.required) {
-        const sup = document.createElement("sup");
-        sup.textContent = "*";
-        sup.title = localText('Controls.PropertyGrid.RequiredHint');
-        label.prepend(sup);
-    }
-
-    return label;
+    const labelWidth = props.item.labelWidth;
+    const caption = determineText(props.localTextPrefix, props.item.title, p => p + props.item.name) ?? "";
+    return (
+        <label className="caption" htmlFor={(props.idPrefix ?? "") + props.item.name}
+            title={determineText(props.localTextPrefix, props.item.hint, p => p + props.item.name + '_Hint') ?? caption}
+            style={!!labelWidth && (labelWidth == "0" ? "display: none" : ("width: " + labelWidth))}>
+            {props.item.required && <sup title={localText('Controls.PropertyGrid.RequiredHint')}>*</sup>}
+            {caption}
+        </label>
+    ) as HTMLLabelElement;
 }
 
 export function PropertyFieldEditor(props: {
@@ -82,7 +63,7 @@ export function PropertyFieldEditor(props: {
             ...editorParams,
             id: idPrefix + item.name,
             element: (el: HTMLElement) => {
-                !el.id  && (el.id = idPrefix + item.name);
+                !el.id && (el.id = idPrefix + item.name);
                 el.classList.add("editor");
 
                 if (item.editorCssClass)
@@ -170,27 +151,17 @@ export function PropertyField(props: {
     const { item, container, localTextPrefix } = props;
     const idPrefix = props?.idPrefix ?? "";
 
-    var fieldElement: PropertyFieldElement = document.createElement("div");
-    fieldElement.className = "field";
-    fieldElement.dataset.itemname = item.name;
+    const fieldElement = (
+        <div class={["field", item.name, item.cssClass, item.formCssClass]} data-itemname={item.name}>
+            <PropertyFieldCaption item={item} idPrefix={idPrefix} localTextPrefix={localTextPrefix} />
+        </div>
+    ) as PropertyFieldElement;
     fieldElement.propertyItem = item;
 
-    addClass(fieldElement, item.name); // legacy compat
-    item.cssClass && addClass(fieldElement, item.cssClass);
-
-    if (item.formCssClass) {
-        addClass(fieldElement, item.formCssClass);
-        if (container) {
-            const lineBreak = PropertyFieldLineBreak({ item });
-            lineBreak && container.appendChild(lineBreak);
-        }
+    if (item.formCssClass && container) {
+        const lineBreak = PropertyFieldLineBreak({ item });
+        lineBreak && container.appendChild(lineBreak);
     }
-
-    fieldElement.appendChild(PropertyFieldCaption({
-        item,
-        idPrefix,
-        localTextPrefix
-    }));
 
     container?.appendChild(fieldElement); // editor might expect to be in the DOM for cascade links etc.
 
@@ -201,23 +172,23 @@ export function PropertyField(props: {
         localTextPrefix
     });
 
-    fieldElement.appendChild(document.createElement("div")).className = "vx";
-    fieldElement.appendChild(document.createElement("div")).className = "clear";
+    fieldElement.appendChild(<div class="vx" />);
+    fieldElement.appendChild(<div class="clear" />);
 
     return fieldElement;
 }
 
 export function PropertyCategoryTitle(props: { category: string, localTextPrefix: string }): HTMLElement {
-    var title = document.createElement("div");
-    title.className = "category-title";
-    title.textContent = determineText(props.localTextPrefix, props.category, prefix => prefix + 'Categories.' + props.category);
-    return title;
+    return (
+        <div className="category-title">
+            {determineText(props.localTextPrefix, props.category, prefix => prefix + 'Categories.' + props.category)}
+        </div>
+    ) as HTMLElement;
 }
 
 export function PropertyCategory(props: { category?: string, children?: any, collapsed?: boolean, localTextPrefix?: string }): HTMLElement {
 
-    var categoryDiv = document.createElement("div");
-    categoryDiv.className = "category";
+    const categoryDiv = <div class="category" /> as HTMLElement;
 
     const { category, children, collapsed, localTextPrefix } = props;
     if (category) {
@@ -228,17 +199,13 @@ export function PropertyCategory(props: { category?: string, children?: any, col
         }
         categoryDiv.dataset.category = key;
 
-        const title = categoryDiv.appendChild(PropertyCategoryTitle({
-            category,
-            localTextPrefix
-        }));
+        const title = categoryDiv.appendChild(<PropertyCategoryTitle category={category} localTextPrefix={localTextPrefix} />) as HTMLElement;
 
         if (collapsed != null) {
             categoryDiv.classList.add("collapsible");
             collapsed && categoryDiv.classList.add("collapsed");
 
-            var icon = categoryDiv.appendChild(document.createElement("i"));
-            title.appendChild(document.createElement("i")).className = faIcon(collapsed ? "plus" : "minus");
+            const icon = title.appendChild(<i class={faIcon(collapsed ? "plus" : "minus")} />) as HTMLElement;
 
             title.addEventListener("click", function () {
                 categoryDiv.classList.toggle('collapsed');
@@ -254,39 +221,25 @@ export function PropertyCategory(props: { category?: string, children?: any, col
 }
 
 export function PropertyTabItem(props: { title: string, active?: boolean, paneId?: string, localTextPrefix?: string }): HTMLLIElement {
-    const { active, paneId, localTextPrefix, title } = props;
     const bs3 = isBS3();
-    const li = document.createElement("li");
-    const a = li.appendChild(document.createElement("a"));
-    if (bs3) {
-        active && li.classList.add("active");
-    }
-    else {
-        li.className = "nav-item";
-        a.className = "nav-link";
-        active && a.classList.add("active");
-    }
-    li.role = "tab";
-    a.setAttribute("data-" + (isBS5Plus() ? "bs-" : "") + "toggle", "tab");
-    paneId && (a.href = "#" + paneId);
-    a.textContent = determineText(localTextPrefix, title, prefix => prefix + 'Tabs.' + title);
-
-    let tabKey = extractTabKey(title);
-    if (tabKey) {
-        a.dataset.tabkey = tabKey;
-    }
-
-    return li;
+    return (
+        <li role="tab" className={bs3 ? (props.active ? "active" : "") : "nav-item"}>
+            <a className={bs3 ? "" : `nav-link ${props.active ? "active" : ""}`}
+                data-bs-toggle="tab"
+                href={!!props.paneId && `#${props.paneId}`}
+                data-tabkey={extractTabKey(props.title)}>
+                {determineText(props.localTextPrefix, props.title, prefix => prefix + 'Tabs.' + props.title)}
+            </a>
+        </li>
+    ) as HTMLLIElement;
 }
 
 export function PropertyTabPane(props: { active?: boolean, id?: string, children?: any }): HTMLElement {
-    const { active, children, id } = props;
-    const pane = document.createElement("div");
-    pane.className = "tab-pane fade" + (active ? (isBS3() ? " in active" : " show active") : "");
-    pane.id = id;
-    pane.role = "tabpanel";
-    appendToNode(pane, children);
-    return pane;
+    return (
+        <div id={props.id} className={`tab-pane fade${props.active ? (isBS3() ? " in active" : " show active") : ""}`} role="tabpanel">
+            {props.children}
+        </div>
+    ) as HTMLElement;
 }
 
 export function PropertyCategories(props: {
@@ -296,8 +249,7 @@ export function PropertyCategories(props: {
     idPrefix?: string,
     localTextPrefix?: string
 }): HTMLElement {
-    let categoriesDiv = document.createElement("div");
-    categoriesDiv.className = "categories";
+    const categoriesDiv = <div class="categories" /> as HTMLElement;
     props.container && props.container.appendChild(categoriesDiv);
 
     const { items, fieldElements, idPrefix, localTextPrefix } = props;
@@ -308,40 +260,29 @@ export function PropertyCategories(props: {
         var category = item.category ?? '';
 
         if (!categoryEl || priorCategory !== category) {
-            categoryEl = categoriesDiv.appendChild(PropertyCategory({
-                category,
-                collapsed: (item.collapsible !== true) ? null : item.collapsed ?? false,
-                localTextPrefix
-            }));
-
-            priorCategory = category;
+            categoryEl = categoriesDiv.appendChild(<PropertyCategory category={category} localTextPrefix={localTextPrefix}
+                collapsed={(item.collapsible !== true) ? null : item.collapsed ?? false} />) as HTMLElement;
         }
 
-        const fieldElement = PropertyField({
-            item,
-            container: categoryEl,
-            idPrefix,
-            localTextPrefix
-        });
-
-        fieldElements?.push(fieldElement);
+        const fieldElement = <PropertyField item={item} container={categoryEl} idPrefix={idPrefix} localTextPrefix={localTextPrefix} /> as PropertyFieldElement;
+        fieldElements?.push(fieldElement);   
+        priorCategory = category;
     }
+
 
     return categoriesDiv;
 }
 
 export function PropertyTabList(props?: { children?: any }): HTMLElement {
-    var tabs = document.createElement("ul");
-    tabs.className = "nav nav-underline property-tabs";
-    tabs.role = "tablist";
-    appendToNode(tabs, props?.children);
-    return tabs;
+    return (
+        <ul className="nav nav-underline property-tabs" role="tablist">
+            {props?.children}
+        </ul>
+    ) as HTMLElement;
 }
 
-export function PropertyTabPanes(props?: {}): HTMLElement {
-    var panes = document.createElement("div");
-    panes.className = "tab-content property-panes";
-    return panes;
+export function PropertyTabPanes(_?: {}): HTMLElement {
+    return <div class="tab-content property-panes" /> as HTMLElement;
 }
 
 export function PropertyTabs(props: {
@@ -368,7 +309,7 @@ export function PropertyTabs(props: {
     const itemsWithoutTab = items.filter(f => !f.tab);
     if (itemsWithoutTab.length > 0) {
         createItems(parentNode, itemsWithoutTab);
-        parentNode.appendChild(document.createElement("div")).className = "pad";
+        parentNode.appendChild(<div class="pad" />);
     }
 
     const itemsWithTab = items.filter(f => f.tab);
@@ -661,10 +602,7 @@ function setMaxLength(widget: Widget<any>, maxLength: number) {
 }
 
 function createLineBreak(klass: string): HTMLElement {
-    const div = document.createElement("div");
-    div.className = klass;
-    div.style.width = "100%";
-    return div;
+    return <div className={klass} style="width: 100%" /> as HTMLElement;
 }
 
 export enum PropertyGridMode {
