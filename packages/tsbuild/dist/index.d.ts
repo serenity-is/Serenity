@@ -1,4 +1,4 @@
-export const defaultEntryPoints: string[];
+export const defaultEntryPointGlobs: string[];
 export const importAsGlobalsMapping: Record<string, string>;
 
 export interface TSBuildOptions {
