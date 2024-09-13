@@ -4913,7 +4913,7 @@ declare namespace Serenity {
 
     interface ToolButtonProps {
         action?: string;
-        title?: string;
+        title?: string | HTMLElement | SVGElement | DocumentFragment;
         hint?: string;
         cssClass?: string;
         icon?: IconClassName;

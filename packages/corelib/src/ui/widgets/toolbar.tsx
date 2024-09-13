@@ -4,7 +4,7 @@ import { Widget } from "./widget";
 
 export interface ToolButtonProps {
     action?: string;
-    title?: string;
+    title?: string | HTMLElement | SVGElement | DocumentFragment;
     hint?: string;
     cssClass?: string;
     icon?: IconClassName;
@@ -35,7 +35,7 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
                 }
             }}>
             <span class="button-inner">
-                {tb.icon && <><i class={iconClassName(tb.icon)} />{" "}</>}{!!tb.title && tb.title}
+                {tb.icon && <><i class={iconClassName(tb.icon)} />{" "}</>}{tb.title}
             </span>
         </div>
     );
