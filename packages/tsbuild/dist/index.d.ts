@@ -1,3 +1,4 @@
+export const defaultEntryPoints: string[];
 export const importAsGlobalsMapping: Record<string, string>;
 
 export interface TSBuildOptions {
@@ -13,8 +14,8 @@ export interface TSBuildOptions {
     /**
      * Determines the set of entry points that should be passed to the esbuild. 
      * Only use to specify full paths of entry points manually if you calculated them yourself.
-     * Prefer specifying entry point globs in sergen.json under TSBuild:EntryPoints which 
-     * defaults to ['Modules/** /*Page.ts', 'Modules/** /*Page.tsx', 'Modules/** /ScriptInit.ts'] */
+     * Prefer specifying entry point globs in sergen.json under TSBuild:EntryPoints which supports
+     * globs and defaults to ['Modules/** /*Page.ts', 'Modules/** /*Page.tsx', 'Modules/** /ScriptInit.ts'] */
     entryPoints?: string[];
 
     /**

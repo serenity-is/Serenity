@@ -4,6 +4,8 @@ import { join, relative, resolve } from "path";
 import { exit } from "process";
 import { globSync } from "glob";
 
+export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts'];
+
 export function checkIfTrigger() {
     if (process.argv.slice(2).some(x => x == "--trigger")) {
         if (existsSync('typings/serenity.corelib/_trigger.ts'))
@@ -43,9 +45,10 @@ export const esbuildOptions = (opt) => {
         delete opt.entryPointRoots;
     }
 
+
     var entryPoints = opt.entryPoints;
     if (entryPoints === void 0) {
-        var globs;
+        let globs;
         if (existsSync('sergen.json')) {
             var json = readFileSync('sergen.json', 'utf8').trim();
             var cfg = JSON.parse(json || {});
@@ -56,11 +59,14 @@ export const esbuildOptions = (opt) => {
                 json = readFileSync(cfg.Extends, 'utf8').trim();
                 cfg = JSON.parse(json || {});
                 globs = cfg?.TSBuild?.EntryPoints;
+                if (globs != null && globs[0] === '+') {
+                    globs = [...defaultEntryPointGlobs, ...globs.slice(1)];
+                }
             }
         }
 
         if (globs == null && !entryPointsRegEx) {
-            globs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts'];
+            globs = defaultEntryPointGlobs;
         }
 
         if (globs != null) {

@@ -148,10 +148,13 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
         if (!string.IsNullOrEmpty(esmAssetBasePath))
             esmGenerator.EsmAssetBasePath = esmAssetBasePath;
 
-        var globs = config.TSBuild?.EntryPoints;
+        var globs = config.TSBuild?.EntryPoints as IEnumerable<string>;
         if (globs != null)
         {
-            esmGenerator.EntryPoints.Clear();
+            if (globs.FirstOrDefault() != "+") 
+                esmGenerator.EntryPoints.Clear();
+            else
+                globs = globs.Skip(1);
             esmGenerator.EntryPoints.AddRange(globs);
         }
 
