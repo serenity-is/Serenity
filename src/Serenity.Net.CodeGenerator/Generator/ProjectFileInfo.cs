@@ -63,7 +63,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             }
         }
 
-        return string.IsNullOrEmpty(targetFramework) ? null : targetFramework;
+        return string.IsNullOrEmpty(esmAssetBasePath) ? null : esmAssetBasePath;
     }
 
     public string GetOutDir()
