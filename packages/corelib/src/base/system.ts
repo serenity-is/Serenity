@@ -208,7 +208,7 @@ export function isPromiseLike(obj: any): obj is PromiseLike<any> {
     return obj instanceof Promise || ((typeof obj === "object" && obj != null && typeof obj.then === "function" && typeof obj.catch === "function"));
 }
 
-export type NoInfer<T> = [T][T extends any ? 0 : never];
+export type SNoInfer<T> = [T][T extends any ? 0 : never];
 
 export class EditorAttribute { }
 registerClass(EditorAttribute, 'Serenity.EditorAttribute');

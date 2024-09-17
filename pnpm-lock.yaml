@@ -18,12 +18,6 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: 15.2.3
         version: 15.2.3(rollup@4.21.2)
-      '@rollup/plugin-typescript':
-        specifier: 11.1.6
-        version: 11.1.6(rollup@4.21.2)(tslib@2.7.0)(typescript@5.5.4)
-      '@rollup/pluginutils':
-        specifier: 5.1.0
-        version: 5.1.0(rollup@4.21.2)
       '@swc/core':
         specifier: 1.7.23
         version: 1.7.23
@@ -54,12 +48,6 @@ importers:
       rollup-plugin-dts:
         specifier: 6.1.1
         version: 6.1.1(rollup@4.21.2)(typescript@5.5.4)
-      terser:
-        specifier: 5.31.6
-        version: 5.31.6
-      tslib:
-        specifier: 2.7.0
-        version: 2.7.0
       typescript:
         specifier: 5.5.4
         version: 5.5.4
@@ -508,9 +496,6 @@ packages:
     resolution: {integrity: sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==}
     engines: {node: '>=6.0.0'}
 
-  '@jridgewell/source-map@0.3.6':
-    resolution: {integrity: sha512-1ZJTZebgqllO79ue2bm3rIGud/bOe0pP5BjSRCRxxYkEZS8STV7zN84UBbiYu7jy+eCKSnVIUgoWWE/tt+shMQ==}
-
   '@jridgewell/sourcemap-codec@1.4.15':
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
 
@@ -528,19 +513,6 @@ packages:
       rollup: ^2.78.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
-        optional: true
-
-  '@rollup/plugin-typescript@11.1.6':
-    resolution: {integrity: sha512-R92yOmIACgYdJ7dJ97p4K69I8gg6IEHt8M7dUBxN3W6nrO8uUxX5ixl0yU/N3aZTi8WhPuICvOHXQvF6FaykAA==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0||^4.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
         optional: true
 
   '@rollup/pluginutils@5.1.0':
@@ -773,11 +745,6 @@ packages:
   '@types/yargs@17.0.32':
     resolution: {integrity: sha512-xQ67Yc/laOG5uMfX/093MRlGGCIBzZMarVa+gfNKJxWAIgykYpVGkBdbqEzGDDfCrVUj6Hiff4mTZ5BA6TmAog==}
 
-  acorn@8.11.3:
-    resolution: {integrity: sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-
   agent-base@7.1.1:
     resolution: {integrity: sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==}
     engines: {node: '>= 14'}
@@ -934,9 +901,6 @@ packages:
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
-
-  commander@2.20.3:
-    resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -1676,9 +1640,6 @@ packages:
   source-map-support@0.5.13:
     resolution: {integrity: sha512-SHSKFHadjVA5oR4PPqhtAVdcBWwRYVd6g6cAXnIbRiIwc2EhPrTuKUBdSLvlEKyIP3GCf89fltvcZiP9MMFA1w==}
 
-  source-map-support@0.5.21:
-    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
-
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
@@ -1740,11 +1701,6 @@ packages:
 
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
-
-  terser@5.31.6:
-    resolution: {integrity: sha512-PQ4DAriWzKj+qgehQ7LK5bQqCFNMmlhjR2PFFLuqGCpuCAauxemVBWwWOxo3UIwWQx8+Pr61Df++r76wDmkQBg==}
-    engines: {node: '>=10'}
-    hasBin: true
 
   test-exclude@6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
@@ -2381,11 +2337,6 @@ snapshots:
 
   '@jridgewell/set-array@1.2.1': {}
 
-  '@jridgewell/source-map@0.3.6':
-    dependencies:
-      '@jridgewell/gen-mapping': 0.3.5
-      '@jridgewell/trace-mapping': 0.3.25
-
   '@jridgewell/sourcemap-codec@1.4.15': {}
 
   '@jridgewell/trace-mapping@0.3.25':
@@ -2406,15 +2357,6 @@ snapshots:
       resolve: 1.22.8
     optionalDependencies:
       rollup: 4.21.2
-
-  '@rollup/plugin-typescript@11.1.6(rollup@4.21.2)(tslib@2.7.0)(typescript@5.5.4)':
-    dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@4.21.2)
-      resolve: 1.22.8
-      typescript: 5.5.4
-    optionalDependencies:
-      rollup: 4.21.2
-      tslib: 2.7.0
 
   '@rollup/pluginutils@5.1.0(rollup@4.21.2)':
     dependencies:
@@ -2605,8 +2547,6 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  acorn@8.11.3: {}
-
   agent-base@7.1.1:
     dependencies:
       debug: 4.3.5
@@ -2776,8 +2716,6 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
-
-  commander@2.20.3: {}
 
   concat-map@0.0.1: {}
 
@@ -3691,11 +3629,6 @@ snapshots:
       buffer-from: 1.1.2
       source-map: 0.6.1
 
-  source-map-support@0.5.21:
-    dependencies:
-      buffer-from: 1.1.2
-      source-map: 0.6.1
-
   source-map@0.6.1: {}
 
   sprintf-js@1.0.3: {}
@@ -3750,13 +3683,6 @@ snapshots:
   supports-preserve-symlinks-flag@1.0.0: {}
 
   symbol-tree@3.2.4: {}
-
-  terser@5.31.6:
-    dependencies:
-      '@jridgewell/source-map': 0.3.6
-      acorn: 8.11.3
-      commander: 2.20.3
-      source-map-support: 0.5.21
 
   test-exclude@6.0.0:
     dependencies:

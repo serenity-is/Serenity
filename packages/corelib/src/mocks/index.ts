@@ -6,7 +6,7 @@ import { resolveServiceUrl } from "../base/services";
 
 const root = resolve('./');
 
-const nscorelibPath = "~/out/index.global.js";
+const nscorelibPath = "~/wwwroot/index.global.js";
 
 export function loadNSCorelib() {
     loadExternalScripts(nscorelibPath);

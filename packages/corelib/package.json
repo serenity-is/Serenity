@@ -41,11 +41,13 @@
   "license": "MIT",
   "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
-    "build": "rollup -c && node build/build",
-    "test": "pnpm build && jest --coverage",
+    "build": "node build/build",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src",
+    "dts": "rollup -c",
     "jest": "jest",
-    "tsc": "tsc",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src"
+    "prepublishOnly": "npm run build && npm run jest && npm run dts",
+    "test": "npm run build && jest --coverage",
+    "tsc": "tsc"
   },
   "type": "module"
 }

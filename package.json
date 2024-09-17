@@ -2,8 +2,6 @@
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "15.2.3",
-    "@rollup/plugin-typescript": "11.1.6",
-    "@rollup/pluginutils": "5.1.0",
     "@swc/core": "1.7.23",
     "@swc/jest": "0.2.36",
     "@types/jest": "29.5.12",
@@ -14,8 +12,6 @@
     "jsx-dom": "8.1.5",
     "rollup": "4.21.2",
     "rollup-plugin-dts": "6.1.1",
-    "terser": "5.31.6",
-    "tslib": "2.7.0",
     "typescript": "5.5.4"
   },
   "optionalDependencies": {
