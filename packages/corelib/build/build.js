@@ -12,6 +12,7 @@ const coreLibBase = {
     entryPoints: [
         'src/index.ts'
     ],
+    keepNames: true,
     logLevel: 'info',
     minify: false,
     outbase: 'src',
