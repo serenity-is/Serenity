@@ -43,10 +43,10 @@
   "scripts": {
     "build": "node build/build",
     "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /Sandbox/serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src",
-    "dts": "rollup -c",
+    "dts": "tsc && dts-bundle-generator --project ./tsconfig.dts.json --disable-symlinks-following --export-referenced-types=false --inline-declare-externals --no-banner out/index.d.ts -o dist/index.d.ts",
     "jest": "jest",
-    "prepublishOnly": "npm run build && npm run jest && npm run dts",
-    "test": "npm run build && jest --coverage",
+    "prepublishOnly": "node build/build && jest && npm run dts",
+    "test": "node build/build && jest --coverage",
     "tsc": "tsc"
   },
   "type": "module"
