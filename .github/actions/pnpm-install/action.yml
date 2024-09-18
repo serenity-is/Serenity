@@ -22,7 +22,7 @@ runs:
       run: |
         echo "YEAR_MONTH=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       name: Setup pnpm cache
       with:
         path: ${{ steps.pnpm-config.outputs.STORE_PATH }}
