@@ -56,7 +56,7 @@ jobs:
     - name: setup node
       uses: actions/setup-node@v4
       with:
-        node-version: '18.14.2'
+        node-version: '20'
 
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
