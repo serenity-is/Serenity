@@ -61,7 +61,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     protected void GenerateTexts()
     {
         cw.Indented("namespace ");
-        var ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+        var ns = "__" + (RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App").Replace(".", "_").ToLowerInvariant();
         sb.Append(ns + ".Texts");
         cw.InBrace(delegate
         {
