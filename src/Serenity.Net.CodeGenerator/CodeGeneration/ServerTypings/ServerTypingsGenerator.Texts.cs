@@ -60,9 +60,15 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     protected void GenerateTexts()
     {
-        cw.Indented("namespace ");
-        var ns = "__" + (RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App").Replace(".", "_").ToLowerInvariant();
-        sb.Append(ns + ".Texts");
+        var jwBuilder = new StringBuilder();
+        var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
+        {
+            QuoteName = false,
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+            Indentation = 4
+        };
+
+        cw.Indented("namespace texts");
         cw.InBrace(delegate
         {
             Regex filter = null;
@@ -100,13 +106,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
 
-            var jwBuilder = new StringBuilder();
-            var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
-            {
-                QuoteName = false,
-                Formatting = Newtonsoft.Json.Formatting.Indented,
-                Indentation = 4
-            };
             jw.WriteStartObject();
             List<string> stack = [];
             int stackCount = 0;
@@ -195,18 +194,15 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 sb.AppendLine();
             }
             jw.WriteEndObject();
-
-            cw.Indented(ns);
-            var proxyTexts = ImportFromQ("proxyTexts");
-            sb.Append($"['Texts'] = {proxyTexts}(Texts, '', ");
-            jw.Flush();
-            sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
-            sb.AppendLine(") as any;");
         });
 
         sb.AppendLine();
-        sb.AppendLine($"export const Texts = {ns}.Texts;");
+        var proxyTexts = ImportFromQ("proxyTexts");
 
+        sb.AppendLine($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+        jw.Flush();
+        sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
+        sb.AppendLine(") as any;");
         AddFile("Texts.ts");
     }
 }
