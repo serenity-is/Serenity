@@ -7,7 +7,6 @@ public class EntityCodeGenerator
     private readonly IGeneratedFileWriter writer;
     private readonly EntityModel model;
     private readonly string rootDir;
-    private readonly bool esModules;
     private readonly string mainPrefix;
     private readonly string typingPrefix;
     private static readonly char[] slashNSeparator = ['\n'];
@@ -23,17 +22,9 @@ public class EntityCodeGenerator
         this.config = config;
         this.model.CustomSettings = config.CustomSettings;
 
-        TSConfigHelper.LocateTSConfigFiles(fileSystem, rootDir, out var esmConfig, out var _);
-        esModules = esmConfig != null && config?.ServerTypings?.ModuleTypings != false;
-
         var modulesFolder = fileSystem.Combine(rootDir, "Modules");
-
-        var typingFolder = esModules ?
-            fileSystem.Combine(modulesFolder, "ServerTypes", model.Module) :
-            fileSystem.Combine(rootDir, "Imports", "ServerTypings");
-
-        typingPrefix = esModules ? fileSystem.Combine(typingFolder, model.ClassName) :
-            fileSystem.Combine(typingFolder, model.ModuleDot + model.ClassName);
+        var typingFolder = fileSystem.Combine(modulesFolder, "ServerTypes", model.Module);
+        typingPrefix = fileSystem.Combine(typingFolder, model.ClassName);
 
         var mainFolder = modulesFolder;
         if (!string.IsNullOrEmpty(model.Module))
@@ -46,7 +37,7 @@ public class EntityCodeGenerator
     {
         var content = Templates.Render(fileSystem, template, model);
         writer.WriteAllText(targetFile, content);
-        if (esModules && targetFile.StartsWith(typingPrefix) &&
+        if (targetFile.StartsWith(typingPrefix) &&
             !string.IsNullOrEmpty(model.Module) &&
             config.ServerTypings?.ModuleReExports != false)
         {
@@ -74,31 +65,31 @@ public class EntityCodeGenerator
         if (config.GenerateRow)
         {
             Add(mainPrefix + "Row.cs", "Row");
-            Add(typingPrefix + "Row.ts", esModules ? "RowTypingModular" : "RowTyping");
+            Add(typingPrefix + "Row.ts", "RowTypingModular");
         }
 
         if (config.GenerateService)
         {
             var handlerPrefix = fileSystem.Combine(fileSystem.GetDirectoryName(mainPrefix),
-                fileSystem.Combine(model.ClassName, "RequestHandlers", model.ClassName));
+                "RequestHandlers", model.ClassName);
             Add(handlerPrefix + "DeleteHandler.cs", "DeleteHandler");
             Add(handlerPrefix + "ListHandler.cs", "ListHandler");
             Add(handlerPrefix + "RetrieveHandler.cs", "RetrieveHandler");
             Add(handlerPrefix + "SaveHandler.cs", "SaveHandler");
             Add(mainPrefix + "Endpoint.cs", "Endpoint");
-            Add(typingPrefix + "Service.ts", esModules ? "ServiceTypingModular" : "ServiceTyping");
+            Add(typingPrefix + "Service.ts", "ServiceTypingModular");
         }
 
         if (config.GenerateUI)
         {
             Add(mainPrefix + "Columns.cs", "Columns");
             Add(mainPrefix + "Form.cs", "Form");
-            Add(mainPrefix + "Page.cs", esModules ? "PageModular" : "Page");
-            Add(mainPrefix + "Dialog.ts", esModules ? "DialogModular" : "Dialog");
-            Add(mainPrefix + "Grid.ts", esModules ? "GridModular" : "Grid");
-            Add(mainPrefix + (esModules ? "Page.ts" : "Index.cshtml"), (esModules ? "PageModularTS" : "IndexView"));
-            Add(typingPrefix + "Form.ts", esModules ? "FormTypingModular" : "FormTyping");
-            Add(typingPrefix + "Columns.ts", esModules ? "ColumnsTypingModular" : "ColumnsTyping");
+            Add(mainPrefix + "Page.cs", "PageModular");
+            Add(mainPrefix + "Dialog.tsx", "DialogModular");
+            Add(mainPrefix + "Grid.tsx", "GridModular");
+            Add(mainPrefix + "Page.tsx", "PageModularTS");
+            Add(typingPrefix + "Form.ts", "FormTypingModular");
+            Add(typingPrefix + "Columns.ts", "ColumnsTypingModular");
             GenerateNavigationLink();
         }
 

@@ -197,4 +197,14 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
             writer.WriteBase64StringValue(ms.ToArray());
         }
     }
+
+    /// <inheritdoc/>
+    public override object AsSqlValue(IRow row)
+    {
+        var value = AsObject(row);
+        if (value == null)
+            return System.Data.SqlTypes.SqlBinary.Null;
+
+        return value;
+    }
 }

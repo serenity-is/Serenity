@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "Lookup" editor.
@@ -18,6 +18,8 @@ public partial class LookupEditorAttribute : LookupEditorBaseAttribute
     public LookupEditorAttribute(string lookupKey)
         : base(Key)
     {
+        if (lookupKey is null)
+            throw new ArgumentNullException(nameof(lookupKey));
         SetOption("lookupKey", lookupKey);
     }
 

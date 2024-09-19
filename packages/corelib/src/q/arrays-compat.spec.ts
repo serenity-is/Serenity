@@ -1,6 +1,6 @@
 ﻿import { any, count, first, groupBy, indexOf, insert, isArray, single, toGrouping, tryFirst } from "./arrays-compat";
 
-describe("Q.any", () => {
+describe("any", () => {
     it('returns false for empty array', function () {
         expect(any([], () => true)).toBe(false);
     });
@@ -18,7 +18,7 @@ describe("Q.any", () => {
     });
 });
 
-describe("Q.count", () => {
+describe("count", () => {
     it('returns 0 for empty array', function () {
         expect(count([], () => true)).toBe(0);
     });
@@ -33,7 +33,7 @@ describe("Q.count", () => {
     });
 });
 
-describe("Q.first", () => {
+describe("first", () => {
     it('throws for empty array', function () {
         var thrown = false;
         try {
@@ -64,7 +64,7 @@ describe("Q.first", () => {
     });
 });
 
-describe("Q.groupBy", () => {
+describe("groupBy", () => {
     it('returns object with empty properties for empty array', () => {
         expect(groupBy([], x => x)).toEqual({
             byKey: {},
@@ -140,7 +140,7 @@ describe("Q.groupBy", () => {
     });
 });
 
-describe("Q.insert", () => {
+describe("insert", () => {
     it('calls obj.insert if available', function () {
         var obj = {
             insert: function () {
@@ -174,7 +174,7 @@ describe("Q.insert", () => {
 
 });
 
-describe("Q.indexOf", () => {
+describe("indexOf", () => {
     it('returns -1 for empty array', function () {
         expect(indexOf([], () => true)).toBe(-1);
     });
@@ -189,14 +189,14 @@ describe("Q.indexOf", () => {
     });
 });
 
-describe("Q.isArray", () => {
+describe("isArray", () => {
     it('is equal to Array.isArray method', function() {
         expect(isArray === Array.isArray).toBe(true);
     });
 });
 
 
-describe("Q.single", () => {
+describe("single", () => {
     it('throws for empty array', function () {
         var thrown = false;
         try {
@@ -239,7 +239,7 @@ describe("Q.single", () => {
     });
 });
 
-describe("Q.toGrouping", () => {
+describe("toGrouping", () => {
     it('returns empty object for empty array', () => {
         expect(toGrouping([], x => x)).toStrictEqual({})
     });
@@ -262,7 +262,7 @@ describe("Q.toGrouping", () => {
     });
 });
 
-describe("Q.tryFirst", () => {
+describe("tryFirst", () => {
     it('returns undefined for empty array', function () {
         expect(tryFirst([], () => true)).toBeUndefined();
     });

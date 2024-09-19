@@ -1,10 +1,9 @@
 ﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
-import sQuery from "@optionaldeps/squery";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addEmptyOption(sQuery(select));
+        addEmptyOption(select);
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("Controls.SelectEditor.EmptyItemText");
@@ -14,7 +13,7 @@ describe("addEmptyOption", () => {
 describe("addOption", () => {
     it("adds an option to the select", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), "test", "text");
+        addOption(select, "test", "text");
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("test");
         expect(select.children[0].textContent).toBe("text");
@@ -22,7 +21,7 @@ describe("addOption", () => {
 
     it("can handle null values", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), null, null);
+        addOption(select, null, null);
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("");
@@ -39,9 +38,9 @@ describe("attrEncode", () => {
 describe("clearOptions", () => {
     it("clears all options from the select", () => {
         const select = document.createElement("select");
-        addOption(sQuery(select), "test", "text");
-        addEmptyOption(sQuery(select));
-        clearOptions(sQuery(select));
+        addOption(select, "test", "text");
+        addEmptyOption(select);
+        clearOptions(select);
         expect(select.children.length).toBe(0);
     });
 });
@@ -129,14 +128,14 @@ describe("findElementWithRelativeId", () => {
         }
     });
 
-    it("may use jQuery if a jQuery object is passed", () => {
+    it("may use jQuery if a jQuery like object is passed", () => {
         var target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
         document.body.append(from);
         try {
-            expect(findElementWithRelativeId(sQuery(from), "test")?.get(0) === target).toBe(true);
+            expect(findElementWithRelativeId([from], "test") === target).toBe(true);
         }
         finally {
             target.remove();
@@ -254,7 +253,7 @@ describe("findElementWithRelativeId", () => {
         document.body.append(country);
         document.body.append(city);
         try {
-            expect(findElementWithRelativeId(sQuery(city), "Country")?.get?.(0) === country).toBe(true);
+            expect(findElementWithRelativeId([city], "Country") === country).toBe(true);
         }
         finally {
             city.remove();
@@ -280,14 +279,14 @@ describe("outerHtml", () => {
     it("returns the outer html of the element", () => {
         const div = document.createElement("div");
         div.innerHTML = "<span>test</span>";
-        expect(outerHtml(sQuery(div))).toBe("<div><span>test</span></div>");
+        expect(outerHtml([div])).toBe("<div><span>test</span></div>");
     });
 });
 
 describe("newBodyDiv", () => {
     it("creates a new div and appends it to the document body", () => {
         const div = newBodyDiv();
-        expect(div.parent().get(0) === document.body).toBe(true);
-        expect(div.get(0).tagName).toBe("DIV");
+        expect(div.parentElement === document.body).toBe(true);
+        expect(div.nodeName).toBe("DIV");
     });
 });

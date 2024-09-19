@@ -1,4 +1,4 @@
-﻿using Serenity.Web;
+using Serenity.Web;
 
 namespace Serenity.Services;
 
@@ -8,10 +8,10 @@ namespace Serenity.Services;
 /// <remarks>
 /// Creates a new instance of the class
 /// </remarks>
-/// <param name="uploadValidator">Upload validator</param>
-/// <param name="imageProcessor">Image processor</param>
 /// <param name="storage">Upload storage</param>
+/// <param name="uploadProcessor">Upload processor</param>
 [Obsolete("Use Serenity.Services.FileUploadBehavior")]
-public abstract class ImageUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor, IUploadStorage storage) : FileUploadBehavior(uploadValidator, imageProcessor, storage)
+public abstract class ImageUploadBehavior(IUploadStorage storage, IUploadProcessor uploadProcessor) 
+    : FileUploadBehavior(storage, uploadProcessor)
 {
 }

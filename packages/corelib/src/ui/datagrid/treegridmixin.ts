@@ -1,4 +1,4 @@
-﻿import { ListResponse, htmlEncode } from "@serenity-is/base";
+﻿import { Fluent, ListResponse, htmlEncode } from "../../base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
 import { toGrouping } from "../../q";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
@@ -9,16 +9,15 @@ import { DataGrid } from "./datagrid";
  */
 export class TreeGridMixin<TItem> {
 
-    private dataGrid: DataGrid<TItem, any>;
-    private getId: (item: TItem) => any;
+    declare private dataGrid: DataGrid<TItem, any>;
 
     constructor(private options: TreeGridMixinOptions<TItem>) {
         var dg = this.dataGrid = options.grid;
         var idProperty = (dg as any).getIdProperty();
-        var getId = this.getId = (item: TItem) => (item as any)[idProperty];
+        var getId = (item: TItem) => (item as any)[idProperty];
 
-        dg.element.find('.grid-container').on('click', e => {
-            if ($(e.target).hasClass('s-TreeToggle')) {
+        Fluent.on(dg.domNode.querySelector('.grid-container'), "click", (e) => {
+            if ((e.target as HTMLElement).classList.contains('s-TreeToggle')) {
                 var src = dg.slickGrid.getCellFromEvent(e);
                 if (src.cell >= 0 &&
                     src.row >= 0) {
@@ -49,7 +48,7 @@ export class TreeGridMixin<TItem> {
             var col = (dg['allColumns'] || dg.slickGrid.getColumns())?.find(x => x.field == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
-                    col.format || ((ctx: FormatterContext<TItem>) => htmlEncode(ctx.value)));
+                    col.format || ((ctx: FormatterContext<TItem>) => ctx.escape()));
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// An interface to query list of implicit behaviors registered through the dependency resolver.
@@ -8,7 +8,7 @@
 public interface IImplicitBehaviorRegistry
 {
     /// <summary>
-    /// Gets type list of implict behavior (<see cref="IImplicitBehavior"/>) types 
+    /// Gets type list of implicit behavior (<see cref="IImplicitBehavior"/>) types 
     /// </summary>
     IEnumerable<Type> GetTypes();
 }

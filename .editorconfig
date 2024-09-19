@@ -12,6 +12,10 @@ indent_size = 2
 [*.md]
 trim_trailing_whitespace = false
 
+[*.cs]
+# IDE0130:Namespace does not match folder structure
+dotnet_diagnostic.IDE0130.severity = none
+
 [*Endpoint.cs]
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none

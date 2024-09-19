@@ -161,19 +161,16 @@
 }
 
 .fa-rotate-90 {
-    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
     -webkit-transform: rotate(90deg);
     transform: rotate(90deg);
 }
 
 .fa-rotate-180 {
-    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
     -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
 }
 
 .fa-rotate-270 {
-    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
     -webkit-transform: rotate(270deg);
     transform: rotate(270deg);
 }
@@ -5835,7 +5832,7 @@ readers do not read off random characters that represent icons */
     font-style: normal;
     font-weight: normal;
     font-display: auto;
-    src: url("../fonts/la-brands-400.woff2") format("woff2"), url("../fonts/la-brands-400.woff") format("woff");
+    src: url("../fonts/la-brands-400.woff2") format("woff2");
 }
 
 .fab {
@@ -5847,7 +5844,7 @@ readers do not read off random characters that represent icons */
     font-style: normal;
     font-weight: 400;
     font-display: auto;
-    src: url("../fonts/la-regular-400.woff2") format("woff2"), url("../fonts/la-regular-400.woff") format("woff");
+    src: url("../fonts/la-regular-400.woff2") format("woff2");
 }
 
 .far {
@@ -5860,7 +5857,7 @@ readers do not read off random characters that represent icons */
     font-style: normal;
     font-weight: 900;
     font-display: auto;
-    src: url("../fonts/la-solid-900.woff2") format("woff2"), url("../fonts/la-solid-900.woff") format("woff");
+    src: url("../fonts/la-solid-900.woff2") format("woff2");
 }
 
 .fa,
@@ -6913,7 +6910,7 @@ readers do not read off random characters that represent icons */
     font-style: normal;
     font-weight: 400;
     font-display: auto;
-    src: url("../fonts/la-regular-400.woff2") format("woff2"), url("../fonts/la-regular-400.woff") format("woff");
+    src: url("../fonts/la-regular-400.woff2") format("woff2");
 }
 
 @font-face {
@@ -6921,5 +6918,5 @@ readers do not read off random characters that represent icons */
     font-style: normal;
     font-weight: 900;
     font-display: auto;
-    src: url("../fonts/la-solid-900.woff2") format("woff2"), url("../fonts/la-solid-900.woff") format("woff");
+    src: url("../fonts/la-solid-900.woff2") format("woff2");
 }

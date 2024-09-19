@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace Serenity.Reporting;
 
@@ -14,7 +14,7 @@ public class HtmlReportRenderUrl : IDisposable
     /// </summary>
     public HtmlReportRenderUrl()
     {
-        CookiesToForward = new List<Cookie>();
+        CookiesToForward = [];
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class HtmlReportRenderUrl : IDisposable
     /// </summary>
     public virtual IEnumerable<string> GetTemporaryFolders()
     {
-        return Array.Empty<string>();
+        return [];
     }
 
     /// <summary>

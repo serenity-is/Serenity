@@ -54,6 +54,7 @@ public class CssBundleRewriteTests
         container.AddCssBundling(options =>
         {
             options.Enabled = true;
+            options.Minimize = false;
             options.Bundles[bundleName] = [ cssUrl ];
         });
         var services = container.BuildServiceProvider();

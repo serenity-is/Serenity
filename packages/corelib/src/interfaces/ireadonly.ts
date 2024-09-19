@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../decorators";
+﻿import { Decorators } from "../types/decorators";
 
 export interface IReadOnly {
     get_readOnly(): boolean;

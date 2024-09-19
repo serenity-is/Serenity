@@ -1,12 +1,11 @@
 
-jest.mock("@serenity-is/base", () => ({
-    ...jest.requireActual("@serenity-is/base"),
+jest.mock("../../base", () => ({
+    ...jest.requireActual("../../base"),
     tryGetText: jest.fn().mockImplementation((key: string) => key)
 }));
 
-import { registerEnum, tryGetText } from "@serenity-is/base";
-import { EnumKeyAttribute } from "../../decorators";
-import { addAttribute } from "../../q";
+import { addCustomAttribute, registerEnum } from "../../base";
+import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
 
@@ -134,7 +133,7 @@ describe("EnumFormatter", () => {
         enum TestEnum {
             Value1 = 1
         };
-        addAttribute(TestEnum, new EnumKeyAttribute("TestEnum2"));
+        addCustomAttribute(TestEnum, new EnumKeyAttribute("TestEnum2"));
         registerEnum(TestEnum, "TestEnum");
         var formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
@@ -158,7 +157,7 @@ describe("FileDownloadFormatter", () => {
     });
 
 
-    it("replaces all backward slashes to foward", () => {
+    it("replaces all backward slashes to forward", () => {
         var formatter = new FileDownloadFormatter();
         expect(formatter.format({ value: "file\\with\\backward\\slashes", escape: (s) => s })).toContain("file/with/backward/slashes");
     });

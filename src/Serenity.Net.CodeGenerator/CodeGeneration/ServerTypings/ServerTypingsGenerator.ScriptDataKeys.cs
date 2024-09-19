@@ -52,23 +52,20 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             module + "." + name;
     }
 
-    protected void GenerateScriptDataKeys(bool module)
+    protected void GenerateScriptDataKeys()
     {
-        GenerateScriptDataKeysFor("RemoteDataKeys", "RemoteData.", module);
+        GenerateScriptDataKeysFor("RemoteDataKeys", "RemoteData.");
     }
 
-    protected void GenerateScriptDataKeysFor(string name, string startsWith, bool module)
+    protected void GenerateScriptDataKeysFor(string name, string startsWith)
     {
-        if (!module)
-            return;
-
         var list = scriptDataKeys.Keys.Where(x => !string.IsNullOrWhiteSpace(x) &&
             x.StartsWith(startsWith, StringComparison.Ordinal))
             .Select(x => x[(startsWith.Length)..])
             .Where(x => x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
                 .ToList();
 
-        if (!list.Any())
+        if (list.Count == 0)
             return;
 
         list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
@@ -156,6 +153,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             }
         });
 
-        AddFile(name + ".ts", module);
+        AddFile(name + ".ts");
     }
 }

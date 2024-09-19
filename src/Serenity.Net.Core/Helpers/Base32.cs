@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   This class is based on the Base32 class from DC# 0.31
@@ -290,7 +290,7 @@ public sealed class Base32
             bytes[offset++] = (byte)(nextByte | digit);
             //// possible end of string here with no trailing bits
         }
-        // On loop exit, discard trialing n bits.
+        // On loop exit, discard trailing n bits.
         return bytes;
     }
 }

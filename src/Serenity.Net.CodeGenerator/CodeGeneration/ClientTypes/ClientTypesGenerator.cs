@@ -73,7 +73,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         cw.IsCSharp = true;
         var generatedTypes = new HashSet<string>();
 
-        foreach (var tsType in tsTypes)
+        foreach (var tsType in TSTypes)
         {
             if (generatedTypes.Contains(tsType.Key))
                 continue;

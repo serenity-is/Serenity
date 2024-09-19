@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Không có hồ sơ",
   "Controls.Pager.Page": "Trang",
   "Controls.Pager.PageStatus": "Hiển thị từ {from} đến {to} trong tổng số {total} bản ghi",
-  "Controls.PropertyGrid.DefaultCategory": "Thuộc tính",
   "Controls.PropertyGrid.RequiredHint": "Trường này là bắt buộc",
   "Controls.QuickSearch.FieldSelection": "Chọn trường để tìm kiếm",
   "Controls.QuickSearch.Hint": "Nhập văn bản để tìm kiếm",

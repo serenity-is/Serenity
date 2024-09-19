@@ -1,4 +1,4 @@
-﻿using Serenity.Tests.Entities;
+using Serenity.Tests.Entities;
 
 namespace Serenity.Tests.Entity;
 
@@ -39,8 +39,7 @@ public class EntityConnectionExtensions_ById_Tests
         using var connection = new MockDbConnection()
             .OnExecuteReader(command =>
             {
-                Assert.Collection(command.Parameters.OfType<IDbDataParameter>(),
-                    x1 => Assert.Equal(777, x1.Value));
+                Assert.Equal(777, Assert.Single(command.Parameters.OfType<IDbDataParameter>()).Value);
 
                 Assert.Equal(@"SELECT 
 T0.ID AS [ID],

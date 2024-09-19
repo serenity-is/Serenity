@@ -10,13 +10,11 @@ namespace Serenity.Services;
 /// <remarks>
 /// Creates a new instance of the class.
 /// </remarks>
-/// <param name="uploadValidator">Upload validator</param>
-/// <param name="imageProcessor">Image processor</param>
 /// <param name="storage">Upload storage</param>
+/// <param name="uploadProcessor">Upload processor</param>
 /// <param name="formatSanitizer">Filename format sanitizer</param>
 /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
-public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcessor imageProcessor,
-    IUploadStorage storage,
+public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadProcessor,
     IFilenameFormatSanitizer formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
@@ -25,12 +23,15 @@ public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcesso
     private IUploadEditor editorAttr;
     private string fileNameFormat;
     private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
-    private readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
-    private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
+    private readonly IUploadProcessor uploadProcessor = uploadProcessor ?? throw new ArgumentNullException(nameof(uploadProcessor));
     private readonly IFilenameFormatSanitizer formatSanitizer = formatSanitizer ?? DefaultFilenameFormatSanitizer.Instance;
     private StringField originalNameField;
     private Dictionary<string, Field> replaceFields;
+    private string entityTable;
+    private string entityType;
+    private string entityProperty;
+    private string entityField;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -42,15 +43,21 @@ public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcesso
         if (editorAttr is null || editorAttr.DisableDefaultBehavior || editorAttr.IsMultiple)
             return false;
 
+        entityField = Target.Name;
+        entityProperty = Target.PropertyName ?? entityField;
+
         if (Target is not StringField)
             throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but it is not a String field!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    entityProperty, row.GetType().FullName));
 
         if (row is not IIdRow)
             throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    entityProperty, row.GetType().FullName));
+
+        entityType = row.GetType().FullName;
+        entityTable = row.Table;
 
         var originalNameProperty = (editorAttr as IUploadFileOptions)?.OriginalNameProperty;
         if (!string.IsNullOrEmpty(originalNameProperty))
@@ -286,13 +293,19 @@ public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcesso
     {
         var fileName = (StringField)Target;
         var newFilename = fileName[handler.Row] = fileName[handler.Row].TrimToNull();
-        CheckUploadedImageAndCreateThumbs(editorAttr as IUploadOptions, uploadValidator, imageProcessor, 
-            storage, ref newFilename);
+
+        UploadPathHelper.CheckFileNameSecurity(newFilename);
+        using var fs = storage.OpenFile(newFilename);
+        var uploadInfo = uploadProcessor.Process(fs, newFilename, editorAttr as IUploadOptions);
+
+        newFilename = uploadInfo.TemporaryFile;
 
         var idField = ((IIdRow)handler.Row).IdField;
         var originalName = storage.GetOriginalName(newFilename);
         if (string.IsNullOrEmpty(originalName))
             originalName = Path.GetFileName(newFilename);
+
+        var entityId = idField.AsObject(handler.Row);
 
         var copyResult = storage.CopyTemporaryFile(new CopyTemporaryFileOptions
         {
@@ -300,10 +313,19 @@ public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcesso
             PostFormat = s => ProcessReplaceFields(s, replaceFields, handler,
                 editorAttr as IFilenameFormatSanitizer ?? formatSanitizer),
             TemporaryFile = newFilename,
-            EntityId = idField.AsObject(handler.Row),
+            EntityId = entityId,
             FilesToDelete = filesToDelete,
             OriginalName = originalName 
         });
+
+        storage.SetFileMetadata(copyResult.Path, new Dictionary<string, string>
+        {
+            { FileMetadataKeys.EntityTable, entityTable },
+            { FileMetadataKeys.EntityType, entityType },
+            { FileMetadataKeys.EntityField, entityField },
+            { FileMetadataKeys.EntityProperty, entityProperty },
+            { FileMetadataKeys.EntityId, Convert.ToString(entityId, CultureInfo.InvariantCulture) }
+        }, overwriteAll: false);
 
         return copyResult;
     }
@@ -330,52 +352,5 @@ public class FileUploadBehavior(IUploadValidator uploadValidator, IImageProcesso
             .Execute(handler.UnitOfWork.Connection);
 
         filename[handler.Row] = copyResult.Path;
-    }
-
-    /// <summary>
-    /// Checks the uploaded image and creates thumbs if required based on options
-    /// </summary>
-    /// <param name="uploadOptions">Upload options</param>
-    /// <param name="validator">Upload validator</param>
-    /// <param name="imageProcessor">Image processor</param>
-    /// <param name="storage">Upload storage</param>
-    /// <param name="temporaryFile">Temporary file</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static void CheckUploadedImageAndCreateThumbs(
-        IUploadOptions uploadOptions, IUploadValidator validator, IImageProcessor imageProcessor,
-        IUploadStorage storage, ref string temporaryFile)
-    {
-        ArgumentNullException.ThrowIfNull(storage);
-
-        UploadPathHelper.CheckFileNameSecurity(temporaryFile);
-
-        using var fs = storage.OpenFile(temporaryFile);
-
-        storage.PurgeTemporaryFiles();
-
-        validator.ValidateFile(uploadOptions as IUploadFileConstraints ?? new UploadOptions(), 
-            fs, temporaryFile, out bool isImageExtension);
-
-        if (!isImageExtension)
-            return;
-
-        validator.ValidateImage(uploadOptions as IUploadImageContrains ?? new UploadOptions(),
-            fs, temporaryFile, out object image);
-
-        if (image != null)
-        {
-            try
-            {
-
-                fs.Close();
-                temporaryFile = UploadStorageExtensions.ScaleImageAndCreateAllThumbs(image, imageProcessor,
-                    uploadOptions as IUploadImageOptions ?? new UploadOptions(), 
-                    storage, temporaryFile, OverwriteOption.Overwrite);
-            }
-            finally
-            {
-                (image as IDisposable)?.Dispose();
-            }
-        }
     }
 }

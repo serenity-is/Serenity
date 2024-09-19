@@ -1,12 +1,12 @@
 {
   "name": "@serenity-is/tsbuild",
-  "version": "8.0.1",
+  "version": "8.6.6",
   "author": "Serenity (https://serenity.is)",
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity ESBuild functions",
   "dependencies": {
-    "esbuild": "0.19.9",
-    "glob": "10.3.10"
+    "esbuild": "0.23.1",
+    "glob": "11.0.0"
   },
   "exports": {
     ".": {

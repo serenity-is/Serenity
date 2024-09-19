@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Tidak ada catatan",
   "Controls.Pager.Page": "Halaman",
   "Controls.Pager.PageStatus": "Menampilkan {from} sampai {to} dari {total} total catatan",
-  "Controls.PropertyGrid.DefaultCategory": "Properti",
   "Controls.PropertyGrid.RequiredHint": "Bidang ini diperlukan",
   "Controls.QuickSearch.FieldSelection": "Pilih bidang untuk mencari",
   "Controls.QuickSearch.Hint": "Masukkan teks untuk mencari",

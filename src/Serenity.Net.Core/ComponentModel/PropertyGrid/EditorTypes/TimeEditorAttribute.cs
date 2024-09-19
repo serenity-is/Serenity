@@ -1,7 +1,11 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the target property should use a "Time" editor.
+/// Indicates that the target property should use a "Time (HH:mm)" editor. The editor does not support editing
+/// seconds or milliseconds. It is a simple dropdown editor that allows selecting a time between StartHour and EndHour
+/// Note that this editor type returns an integer value that is number of minutes from midnight.
+/// Use it only with Integer typed fields. You may use multiplier option to store seconds (60) or milliseconds (60000).
+/// Use TimeSpanEditor for TimeSpan fields.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 public partial class TimeEditorAttribute : CustomEditorAttribute
@@ -66,4 +70,14 @@ public partial class TimeEditorAttribute : CustomEditorAttribute
         get { return GetOption<int>("intervalMinutes"); }
         set { SetOption("intervalMinutes", value); }
     }
+
+    /// <summary>
+    /// Gets or sets the multiplier (default is 1 which is minutes,
+    /// 60 to store seconds, 60000 to store ms)
+    /// </summary>
+    public int Multiplier
+    {
+        get { return GetOption<int>("multiplier"); }
+        set { SetOption("multiplier", value); }
+    }    
 }

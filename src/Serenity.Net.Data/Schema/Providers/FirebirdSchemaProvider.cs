@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// Firebird metadata provider.
@@ -148,7 +148,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             if (primaryKeys.Count() == 1)
                 return primaryKeys;
 
-            return new List<string>();
+            return [];
         }
 
         return connection.Query<string>(@"

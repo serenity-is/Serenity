@@ -1,4 +1,4 @@
-﻿using Path = System.IO.Path;
+using Path = System.IO.Path;
 
 namespace Serenity.Web;
 
@@ -19,6 +19,59 @@ public static class UploadPathHelper
             return path;
 
         return Path.ChangeExtension(path, null) + thumbSuffix;
+    }
+
+    /// <summary>
+    /// Tries to parse a thumbnail filename suffix, e.g. it ends with "_t.jpg",
+    /// or "_tNxN.jpg" where N is a number
+    /// </summary>
+    /// <param name="filename">Filename</param>
+    /// <param name="baseName">Base name of the file</param>
+    /// <param name="suffix">Thumb suffix</param>
+    /// <param name="width">Thumb width</param>
+    /// <param name="height">Thumb height</param>
+    public static bool TryParseThumbSuffix(string filename,
+        out string baseName, out string suffix, out int width, out int height)
+    {
+        width = -1;
+        height = -1;
+        baseName = null;
+        suffix = null;
+
+        if (string.IsNullOrEmpty(filename))
+            return false;
+
+        if (!filename.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var tIndex = filename.LastIndexOf("_t", StringComparison.OrdinalIgnoreCase);
+        if (tIndex < 0)
+            return false;
+
+        baseName = filename[..tIndex];
+        suffix = filename[tIndex..];
+        
+        if (string.Equals(suffix, "_t.jpg", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (suffix.Length < 9 || 
+            !suffix.StartsWith("_t", StringComparison.OrdinalIgnoreCase) || 
+            !suffix.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var idx = suffix.IndexOf('x', StringComparison.OrdinalIgnoreCase);
+        if (idx < 0)
+            return false;
+
+        if (!int.TryParse(suffix[2..idx], out width) ||
+            width <= 0)
+            return false;
+
+        if (!int.TryParse(suffix[idx..^4], out height) ||
+            height <= 0)
+            return false;
+
+        return true;
     }
 
     /// <summary>

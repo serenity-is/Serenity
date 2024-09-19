@@ -1,5 +1,5 @@
-﻿import { PropertyItem } from "@serenity-is/base";
-import { Decorators } from "../decorators";
+﻿import { PropertyItem } from "../base";
+import { Decorators } from "../types/decorators";
 
 @Decorators.registerInterface("Serenity.IGetEditValue")
 export class IGetEditValue {

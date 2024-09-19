@@ -1,4 +1,4 @@
-﻿import { addLocalText, getGlobalObject, localText, tryGetText } from "@serenity-is/base";
+﻿import { addLocalText, getGlobalObject, localText, tryGetText } from "../base";
 
 /** @deprecated prefer localText for better discoverability */
 export const text = localText;

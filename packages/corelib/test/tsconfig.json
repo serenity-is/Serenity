@@ -4,8 +4,6 @@
     "noEmit": true,
     "emitDeclarationOnly": false,
     "types": [
-      "jquery",
-      "jquery.validation",
       "jest"
     ],
     "rootDir": "../",
@@ -13,19 +11,12 @@
     "paths": {
       "@/*": [
         "../src/*"
-      ],
-      "@optionaldeps/*": [
-        "./testutil/*-testmodule"
       ]
     },
     "noImplicitAny": false
   },
   "include": [
-    "../src/globals/jquery-globals.ts",
-    "../src/globals/jquery.validation-globals.ts",
-    "../src/globals/select2-globals.ts",
-    "../src/ui/widgets/jquerywidgetfn.ts",
-    "./testutil/*.ts",
+    "../src/base/globals.d.ts",
     "./**/*.spec.ts",
     "./**/*.spec.tsx"
   ],

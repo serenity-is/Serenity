@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Brak rekordów",
   "Controls.Pager.Page": "Strona",
   "Controls.Pager.PageStatus": "Pokazuję od {from} do {to} z całkowitej liczby {total} rekordów",
-  "Controls.PropertyGrid.DefaultCategory": "Właściwości",
   "Controls.PropertyGrid.RequiredHint": "To pole jest wymagane",
   "Controls.QuickSearch.FieldSelection": "Wybierz pole do wyszukiwania",
   "Controls.QuickSearch.Hint": "Wprowadź tekst do wyszukania",

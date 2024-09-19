@@ -1,15 +1,9 @@
-﻿beforeEach(() => {
+﻿
+beforeEach(() => {
     jest.resetModules();
-    jest.unmock('@optionaldeps/jquery');
 });
 
 function mockUndefinedJQuery() {
-    jest.mock('@optionaldeps/jquery', () => {
-        return {
-            __esModule: true,
-            default: undefined
-        }
-    });
 }
 
 describe('initFullHeightGridPage', () => {
@@ -33,8 +27,7 @@ describe('initFullHeightGridPage', () => {
     it('works with jQuery and jQuery wrapped element', async () => {
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
         var div = document.createElement('div');
-        const sQuery = (await import("@optionaldeps/jquery")).default as any;
-        initFullHeightGridPage(sQuery(div), { noRoute: true });
+        initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
         expect(div.classList.contains('responsive-height')).toBe(true);
     });
@@ -95,4 +88,4 @@ describe('isMobileView', () => {
     });
 });
 
-export {}
+export { };

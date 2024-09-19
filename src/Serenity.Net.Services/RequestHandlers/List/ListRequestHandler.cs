@@ -256,7 +256,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             {
                 var nameField = Row.NameField;
                 if (nameField is not null)
-                    return new Field[] { nameField };
+                    return [nameField];
             }
 
             return fields;
@@ -270,7 +270,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             throw new ArgumentOutOfRangeException("containsField");
         }
 
-        return new Field[] { field };
+        return [field];
     }
 
     /// <summary>
@@ -721,12 +721,43 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
             // if any of fields are invalid, return an empty array to avoid errors
             if (result.Any(x => x is null))
-                return new Field[0];
+                return [];
 
             return result;
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Executes the query sets values / entities and total count.
+    /// </summary>
+    protected virtual void ExecuteQuery()
+    {
+        try
+        {
+            Response.TotalCount = Query.ForEach(Connection, delegate()
+            {
+                var clone = ProcessEntity(Row.Clone());
+                if (clone == null)
+                    return;
+
+                if (DistinctFields != null)
+                {
+                    foreach (var field in DistinctFields)
+                        Response.Values.Add(field.AsObject(clone));
+                }
+                else
+                    Response.Entities.Add(clone);
+            });
+        }
+        catch (Exception exception)
+        {
+            foreach (var behavior in behaviors.Value.OfType<IListExceptionBehavior>())
+                behavior.OnException(this, exception);
+
+            throw;
+        }
     }
 
     /// <summary>
@@ -777,21 +808,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         if (DistinctFields == null || DistinctFields.Length > 0)
         {
-            Response.TotalCount = query.ForEach(Connection, delegate ()
-            {
-                var clone = ProcessEntity(Row.Clone());
-
-                if (clone != null)
-                {
-                    if (DistinctFields != null)
-                    {
-                        foreach (var field in DistinctFields)
-                            Response.Values.Add(field.AsObject(clone));
-                    }
-                    else
-                        Response.Entities.Add(clone);
-                }
-            });
+            ExecuteQuery();
         }
         else
         {
@@ -807,7 +824,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
 
         return Response;
     }
-    
+
     IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
     {
         return Process(connection, (TListRequest)request);

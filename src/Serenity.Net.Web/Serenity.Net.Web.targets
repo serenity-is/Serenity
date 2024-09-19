@@ -3,11 +3,11 @@
     <ParameterGroup>
       <FolderNames ParameterType="System.String" />
       <PatchDependencies ParameterType="System.String" />
-    </ParameterGroup>    
+    </ParameterGroup>
     <Task>
       <Using Namespace="System.Text.RegularExpressions" />
       <Code Type="Fragment" Language="cs">
-<![CDATA[
+        <![CDATA[
 try
 {
     var newDeps = new Dictionary<string, string>();
@@ -101,13 +101,11 @@ catch (Exception ex)
 ]]>
       </Code>
     </Task>
-  </UsingTask>    
+  </UsingTask>
 
   <PropertyGroup>
     <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">true</RestoreNodeTypes>
     <CompileTypeScriptDependsOn Condition="'$(RestoreNodeTypes)' != 'false'">RestoreNodeTypes;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
-    <RestoreTypings Condition="'$(RestoreTypings)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json') And (!Exists('$(MSBuildProjectDirectory)\tsbuild.js') Or Exists('$(MsBuildProjectDirectory)\Namespaces\tsconfig.json'))">true</RestoreTypings>
-    <CompileTypeScriptDependsOn Condition="'$(RestoreTypings)' != 'false'">RestoreTypings;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="texts\resources\**\*.json" />
@@ -124,37 +122,10 @@ catch (Exception ex)
       <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct())" />
     </ItemGroup>
     <Delete Files="@(_NodeTypeDeleteFiles)" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
     <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
   </Target>
-  <Target Name="RestoreTypings"
-        BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
-        DependsOnTargets="$(ResolveStaticWebAssetsConfiguration);IncludeTransitiveProjectReferences;RestoreNodeTypes"
-        Condition="'$(RestoreTypings)' != 'false' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
-    <ItemGroup>
-      <!--project reference typing, serenity.scripts -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts"
-                        Condition="'$(RestoreTypings)' == 'true' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\Serenity.CoreLib.d.ts')">
-        <TargetFile>typings\serenity.corelib\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- project reference typings all others -->
-      <_TypingToRestore Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\index.d.ts"
-                        Condition="'$(RestoreTypings)' == 'true' And '%(ProjectReference.Filename)' != '' And '%(ProjectReference.Filename)' != '$(ProjectName)' And Exists('%(ProjectReference.RootDir)%(ProjectReference.Directory)wwwroot\index.d.ts')">
-        <TargetFile>typings\%(ProjectReference.Filename)\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- nuget package typings from wwwroot -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)%(Filename).d.ts"
-                        Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Project' And '%(Extension)' == '.js' And Exists('%(RootDir)%(Directory)%(Filename).d.ts') And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('wwwroot/'))">
-        <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
-        <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
-      </_TypingToRestore>
-      <!-- nuget package typings from typings\**\index.d.ts files -->
-      <_TypingToRestore Include="%(StaticWebAsset.RootDir)%(Directory)..\typings\**\index.d.ts"
-                        Condition="'$(RestoreTypings)' == 'true' And '%(StaticWebAsset.SourceType)' == 'Package' And '%(Extension)' == '.js' And $([System.String]::Copy('%(Directory)').Replace('\','/').EndsWith('staticwebassets/'))">
-        <TargetFile Condition="'%(StaticWebAsset.SourceId)' != 'Serenity.Scripts'">typings\%(StaticWebAsset.SourceId)\index.d.ts</TargetFile>
-        <TargetFile Condition="'%(StaticWebAsset.SourceId)' == 'Serenity.Scripts'">typings\serenity.corelib\index.d.ts</TargetFile>
-      </_TypingToRestore>
-    </ItemGroup>
-    <Copy SourceFiles="@(_TypingToRestore)" DestinationFiles="@(_TypingToRestore->'%(TargetFile)'->ToLowerInvariant())" SkipUnchangedFiles="true" />
+  <Target Name="RestoreTypings">
+    <!-- we no longer support legacy namespace typings -->
   </Target>
 </Project>

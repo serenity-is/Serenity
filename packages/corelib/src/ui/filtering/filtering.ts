@@ -1,8 +1,9 @@
-﻿import { Config, Criteria, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+﻿import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "../../base";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
+import { Combobox } from "../editors/combobox";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor } from "../editors/datetimeeditor";
 import { DecimalEditor } from "../editors/decimaleditor";
@@ -23,8 +24,8 @@ export interface IFiltering {
     saveState(): any;
     get_field(): PropertyItem;
     set_field(value: PropertyItem): void;
-    get_container(): JQuery;
-    set_container(value: JQuery): void;
+    get_container(): HTMLElement;
+    set_container(value: HTMLElement): void;
     get_operator(): FilterOperator;
     set_operator(value: FilterOperator): void;
 }
@@ -49,7 +50,7 @@ export class IQuickFiltering {
 @Decorators.registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
 export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
-    private field: PropertyItem;
+    declare private field: PropertyItem;
 
     public get_field() {
         return this.field;
@@ -59,17 +60,17 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         this.field = value;
     }
 
-    private container: JQuery;
+    declare private container: HTMLElement;
 
-    get_container(): JQuery {
+    get_container(): HTMLElement {
         return this.container;
     }
 
-    set_container(value: JQuery) {
+    set_container(value: HTMLElement) {
         this.container = value;
     }
 
-    private operator: FilterOperator;
+    declare private operator: FilterOperator;
 
     get_operator() {
         return this.operator;
@@ -120,7 +121,9 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                this.get_container().html('<input type="text"/>');
+                const input = document.createElement("input");
+                input.type = "text";
+                Fluent(this.get_container()).empty().append(input);
                 return;
             }
         }
@@ -134,7 +137,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected getTitle(field: PropertyItem) {
-        return tryGetText(field.title) ??(field.title ?? field.name);
+        return tryGetText(field.title) ?? (field.title ?? field.name);
     }
 
     protected displayText(op: FilterOperator, values?: any[]) {
@@ -215,8 +218,8 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     loadState(state: any) {
-        var input = this.get_container().find(':input').first();
-        input.val(state);
+        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
+        input && (input.value = state);
     }
 
     saveState() {
@@ -229,8 +232,8 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                var input = this.get_container().find(':input').first();
-                return input.val() as string;
+                var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
+                return input?.value;
             }
         }
         return null;
@@ -248,18 +251,20 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     getEditorValue() {
-        var input = this.get_container().find(':input').not('.select2-focusser').first();
-        if (input.length !== 1) {
+        var inputs = this.get_container().querySelectorAll<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser)");
+        if (inputs.length !== 1) {
             throw new Exception(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
         }
+        let input = inputs[0];
 
         var value;
-        if (input.data('select2') != null) {
-            value = input.select2('val');
+        let combobox = Combobox.getInstance(input);
+        if (combobox) {
+            value = combobox.isMultiple ? combobox.getValues().join(",") : combobox.getValue();
         }
         else {
-            value = input.val();
+            value = input.value;
         }
 
         value = (value ?? '').trim();
@@ -268,16 +273,18 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     getEditorText(): string {
-        var input = this.get_container().find(':input').not('.select2-focusser').not('.select2-input').first();
-        if (input.length === 0) {
-            return this.get_container().text().trim();
+
+        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not(.select2-input)");
+        if (!input) {
+            return this.get_container().textContent?.trim();
         }
         var value;
-        if (input.data('select2') != null) {
-            value = (input.select2('data') ?? {}).text;
+        let combobox = Combobox.getInstance(input);
+        if (combobox) {        
+            value = combobox.getSelectedItems()?.join(", ");
         }
         else {
-            value = input.val() as string;
+            value = input.value;
         }
         return value;
     }
@@ -296,7 +303,7 @@ function Filtering(name: string) {
 
 @Filtering('BaseEditor')
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    constructor(public editorType: any) {
+    constructor(public editorTypeRef: any) {
         super();
     }
 
@@ -313,12 +320,12 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return false;
     }
 
-    protected editor: TEditor;
+    declare protected editor: TEditor;
 
     createEditor() {
         if (this.useEditor()) {
-            this.editor = new (this.editorType as typeof Widget<{}>)({
-                element: (el: HTMLElement) => {
+            this.editor = new (this.editorTypeRef as typeof Widget<{}>)({
+                element: el => {
                     this.get_container().append(el);
                 },
                 ...this.getEditorOptions()
@@ -387,7 +394,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
     initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
         super.initQuickFilter(filter);
 
-        filter.type = this.editorType;
+        filter.type = this.editorTypeRef;
         filter.options = extend(extend({}, deepClone(this.getEditorOptions())), deepClone(this.get_field().quickFilterParams));
     }
 }
@@ -494,18 +501,19 @@ export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
 @Filtering('Editor')
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 
-    constructor() {
-        super(Widget)
+    constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
+        super(Widget);
+        this.props ??= {};
     }
 
-    @Decorators.option()
-    editorType: string;
+    get editorType() { return this.props.editorType }
+    set editorType(value) { this.props.editorType = value }
 
-    @Decorators.option()
-    useRelative: boolean;
+    get useRelative() { return this.props.useRelative }
+    set useRelative(value) { this.props.useRelative = value }
 
-    @Decorators.option()
-    useLike: boolean;
+    get useLike() { return this.props.useLike }
+    set useLike(value) { this.props.useLike = value }
 
     getOperators(): FilterOperator[] {
         var list = [];
@@ -556,7 +564,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
             var editorType = EditorTypeRegistry.get(this.editorType) as typeof Widget<{}>;
 
             this.editor = new editorType({
-                element: (el: HTMLElement) => this.get_container().append(el),
+                element: el => this.get_container().append(el),
                 ...this.getEditorOptions()
             });
 
@@ -586,6 +594,14 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
     getOperators() {
         var op = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }];
         return this.appendNullableOperators(op);
+    }
+
+    getEditorText(): string {
+        if (this.useEditor()) {
+            return this.editor.text;
+        }
+
+        return super.getEditorText();
     }
 }
 
@@ -665,8 +681,8 @@ export class StringFiltering extends BaseFiltering {
 
     getOperators(): FilterOperator[] {
         var ops = [
-            { key: FilterOperators.contains }, 
-            { key: FilterOperators.startsWith }, 
+            { key: FilterOperators.contains },
+            { key: FilterOperators.startsWith },
             { key: FilterOperators.EQ },
             { key: FilterOperators.NE }
         ];
@@ -690,13 +706,13 @@ export namespace FilteringTypeRegistry {
 
         if (knownTypes != null)
             return;
-        
+
         knownTypes = {};
 
         for (var type of getTypes()) {
             if (!isAssignableFrom(IFiltering, type))
                 continue;
-                
+
             var fullName = getTypeFullName(type).toLowerCase();
 
             knownTypes[fullName] = type;
@@ -717,23 +733,23 @@ export namespace FilteringTypeRegistry {
 
     function setTypeKeysWithoutFilterHandlerSuffix() {
         var suffix = 'filtering';
-        
+
         for (var k of Object.keys(knownTypes)) {
             if (!k.endsWith(suffix))
                 continue;
-            
+
             var p = k.substring(0, k.length - suffix.length);
             if (!p)
                 continue;
 
             if (knownTypes[p] != null)
                 continue;
-            
+
             knownTypes[p] = knownTypes[k];
         }
     }
 
-    function reset(): void {
+    export function reset(): void {
         knownTypes = null;
     }
 

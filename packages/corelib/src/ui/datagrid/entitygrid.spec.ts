@@ -1,5 +1,6 @@
-import { Decorators, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../decorators";
-import { addAttribute } from "../../q/system-compat";
+import { addCustomAttribute, classTypeInfo } from "../../base";
+import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";
 
 function getIdProperty(grid: EntityGrid<any, any>): string {
@@ -11,7 +12,7 @@ describe('EntityGrid.getIdProperty', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getIdProperty(grid)).toBe("ID");
     });
 
@@ -20,16 +21,16 @@ describe('EntityGrid.getIdProperty', () => {
             getIdProperty() { return "subClassId" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid({});
         expect(getIdProperty(grid)).toBe("subClassId");
     });
 
     it('can be overridden in subclass', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
+        addCustomAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid({});
         expect(getIdProperty(grid)).toBe("attrId");
     });
 
@@ -42,7 +43,7 @@ describe('EntityGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getIdProperty(grid)).toBe("idForTestRow");
     });
 
@@ -55,7 +56,7 @@ describe('EntityGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getIdProperty(grid)).toBe("");
     });
 });
@@ -69,7 +70,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getIsActiveProperty(grid)).toBe("");
     });
 
@@ -78,16 +79,16 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getIsActiveProperty() { return "subClassIsActive" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid({});
         expect(getIsActiveProperty(grid)).toBe("subClassIsActive");
     });
 
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
+        addCustomAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid({});
         expect(getIsActiveProperty(grid)).toBe("attrIsActive");
     });
 
@@ -100,7 +101,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getIsActiveProperty(grid)).toBe("activeForTestRow");
     });
 
@@ -113,7 +114,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getIsActiveProperty(grid)).toBe("");
     });
 });
@@ -127,16 +128,16 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.Default.");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly __typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.TestModule.Default.");
     });
 
@@ -145,7 +146,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MyModule.Some.Default.");
     });
 
@@ -154,7 +155,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getLocalTextDbPrefix() { return "My.Prefix." };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("My.Prefix.");
     });
 
@@ -163,16 +164,16 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getLocalTextPrefix() { return "MySubClassPrefix" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MySubClassPrefix.");
     });
 
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
     });
 
@@ -185,7 +186,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.prefixForTestRow.");
     });
 
@@ -198,7 +199,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("");
     });
 });
@@ -212,16 +213,16 @@ describe('EntityGrid.getLocalTextPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("Default");
     });
 
-    it('returns class identifier based on typeName property', () => {
+    it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly __typeName = 'MyProject.TestModule.DefaultGrid';
+            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("TestModule.Default");
     });
 
@@ -230,7 +231,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid($('<div/>'));
+        var grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("MyModule.Some.Default");
     });
 
@@ -239,16 +240,16 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getLocalTextPrefix() { return "subClassPrefix" };
         }
 
-        var grid = new SubClassGrid($('<div/>'));
+        var grid = new SubClassGrid({});
         expect(getLocalTextPrefix(grid)).toBe("subClassPrefix");
     });
 
     it('can be set via attribute', () => {
         class AttrGrid extends EntityGrid<any, any> {
         }
-        addAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
+        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
 
-        var grid = new AttrGrid($('<div/>'));
+        var grid = new AttrGrid({});
         expect(getLocalTextPrefix(grid)).toBe("attrPrefix");
     });
 
@@ -261,7 +262,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getLocalTextPrefix(grid)).toBe("prefixForTestRow");
     });
 
@@ -274,7 +275,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid($('<div/>'));
+        var grid = new TestRowGrid({});
         expect(getLocalTextPrefix(grid)).toBeUndefined();
     });
 });

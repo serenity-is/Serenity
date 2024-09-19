@@ -9,17 +9,13 @@ namespace Serenity.ComponentModel;
 /// your files will stay in temporary directory.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
-public abstract class BaseUploadEditorAttribute : CustomEditorAttribute,
+/// <remarks>
+/// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
+/// </remarks>
+/// <param name="editorType">Type of the editor.</param>
+public abstract class BaseUploadEditorAttribute(string editorType) : CustomEditorAttribute(editorType),
     IUploadEditor, IUploadFileConstraints, IUploadFileOptions, IUploadImageContrains, IUploadImageOptions
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
-    /// </summary>
-    /// <param name="editorType">Type of the editor.</param>
-    protected BaseUploadEditorAttribute(string editorType)
-        : base(editorType)
-    {
-    }
 
     /// <inheritdoc/>
     public bool DisableDefaultBehavior { get; set; }

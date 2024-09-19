@@ -77,11 +77,12 @@ public class DistinctValuesScript<TRow> : LookupScript
     /// <inheritdoc/>
     public override string GetScript()
     {
-        return "Q.ScriptData.set(" + ("Lookup." + LookupKey).ToSingleQuoted() +
-            ", new Q.Lookup(" + 
-            JSON.Stringify(LookupParams, writeNulls: false) + ", " + 
-            JSON.Stringify(GetItems(), writeNulls: false) + 
-            ".map(function(x) { return { v: x }; })));";
+        return string.Format(DataScript.SetScriptDataFormat, 
+            ("Lookup." + LookupKey).ToSingleQuoted(),
+            string.Format(NewLookupFormat,
+                JSON.Stringify(LookupParams, writeNulls: false),
+                JSON.Stringify(GetItems(), writeNulls: false) +
+                ".map(function(x) { return { v: x }; })"));
     }
 
     /// <inheritdoc/>

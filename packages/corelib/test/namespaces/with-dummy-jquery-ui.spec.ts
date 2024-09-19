@@ -1,9 +1,8 @@
-import $ from "@optionaldeps/jquery"
-import { loadNSCorelib } from "../testutil"
+import { loadNSCorelib } from "@/mocks";
 
 test('works when a dummy jQuery ui object exists', function() {
-    ($ as any).ui = {};
-    loadNSCorelib(window);
-    const Q = (window as any).Q;
-    expect(Q.replaceAll('xyx', 'x', 'y')).toBe('yyy');
+    (window as any).jQuery = (window as any).$ = { fn: {} }
+    loadNSCorelib();
+    const Serenity = (window as any).Serenity;
+    expect(Serenity.replaceAll('xyx', 'x', 'y')).toBe('yyy');
 });

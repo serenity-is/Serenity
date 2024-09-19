@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 
 namespace Serenity.Tests;
@@ -30,9 +30,9 @@ public class NullMemoryCache : IMemoryCache
     {
         public DateTimeOffset? AbsoluteExpiration { get; set; }
         public TimeSpan? AbsoluteExpirationRelativeToNow { get; set; }
-        public IList<IChangeToken> ExpirationTokens { get; } = new List<IChangeToken>();
+        public IList<IChangeToken> ExpirationTokens { get; } = [];
         public object Key { get; set; }
-        public IList<PostEvictionCallbackRegistration> PostEvictionCallbacks { get; } = new List<PostEvictionCallbackRegistration>();
+        public IList<PostEvictionCallbackRegistration> PostEvictionCallbacks { get; } = [];
         public CacheItemPriority Priority { get; set; }
         public long? Size { get; set; }
         public TimeSpan? SlidingExpiration { get; set; }

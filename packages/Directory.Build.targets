@@ -8,9 +8,4 @@
     <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
     <ProjectCapability Include="TypeScriptNuGet" />
   </ItemGroup>
-  <Target Name="IncludeTypingsToPackage" BeforeTargets="_GetPackageFiles">
-    <ItemGroup>
-      <None Include="@(TypingsToPackage)" Pack="true" PackagePath="%(TypingsToPackage.PackagePath)" />
-    </ItemGroup>
-  </Target>
 </Project>

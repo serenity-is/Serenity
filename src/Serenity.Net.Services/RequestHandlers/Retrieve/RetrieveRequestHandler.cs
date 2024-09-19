@@ -251,6 +251,28 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     }
 
     /// <summary>
+    /// Executes the query and sets the response entity if found.
+    /// </summary>
+    /// <exception cref="ValidationError">If entity is not found</exception>
+    protected virtual void ExecuteQuery()
+    {
+        try
+        {
+            if (Query.GetFirst(Connection))
+                Response.Entity = Row;
+            else
+                throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
+        }
+        catch (Exception exception)
+        {
+            foreach (var behavior in behaviors.Value.OfType<IRetrieveExceptionBehavior>())
+                behavior.OnException(this, exception);
+
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Processes the retrieve request. This is the entry point for the handler.
     /// </summary>
     /// <param name="connection">Connection</param>
@@ -277,10 +299,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
 
         OnBeforeExecuteQuery();
 
-        if (Query.GetFirst(Connection))
-            Response.Entity = Row;
-        else
-            throw DataValidation.EntityNotFoundError(Row, request.EntityId, Localizer);
+        ExecuteQuery();
 
         OnAfterExecuteQuery();
 

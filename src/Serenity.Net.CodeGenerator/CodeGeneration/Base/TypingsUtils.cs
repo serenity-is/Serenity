@@ -544,7 +544,7 @@ public static class TypingsUtils
             yield return typeRef;
 #else
         if (typeRef is null)
-            return Array.Empty<TypeReference>();
+            return [];
 
         var key = GetCacheKey(typeRef);
         if (BaseClassCache.TryGetValue(key, out var cached))

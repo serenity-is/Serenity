@@ -1,8 +1,8 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    protected override void HandleMemberType(TypeReference memberType, string codeNamespace, bool module)
+    protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
     {
         var ns = memberType.NamespaceOf();
         bool isSystem = ns == "System";
@@ -98,7 +98,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (memberType.IsArray())
         {
-            HandleMemberType(memberType.ElementType(), codeNamespace, module);
+            HandleMemberType(memberType.ElementType(), codeNamespace);
             sb.Append("[]");
             return;
         }
@@ -114,7 +114,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     gi.ElementType().MetadataName() == "IEnumerable`1" ||
                     gi.ElementType().MetadataName() == "ISet`1")
                 {
-                    HandleMemberType(gi.GenericArguments()[0], codeNamespace, module);
+                    HandleMemberType(gi.GenericArguments()[0], codeNamespace);
                     sb.Append("[]");
                     return;
                 }
@@ -123,9 +123,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     gi.ElementType().MetadataName() == "IDictionary`2")
                 {
                     sb.Append("{ [key: ");
-                    HandleMemberType(gi.GenericArguments()[0], codeNamespace, module);
+                    HandleMemberType(gi.GenericArguments()[0], codeNamespace);
                     sb.Append("]: ");
-                    HandleMemberType(gi.GenericArguments()[1], codeNamespace, module);
+                    HandleMemberType(gi.GenericArguments()[1], codeNamespace);
                     sb.Append(" }");
                     return;
                 }
@@ -152,11 +152,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         else
         {
             EnqueueType(memberType.Resolve());
-            MakeFriendlyReference(memberType, codeNamespace, module);
+            MakeFriendlyReference(memberType, codeNamespace);
         }
     }
 
-    protected string ReferenceScriptType(ExternalType type, string codeNamespace, bool module)
+    protected string ReferenceScriptType(ExternalType type, string codeNamespace)
     {
         if (type.FullName == "Serenity.Widget")
             return "Serenity.Widget<any>";
@@ -168,35 +168,17 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         var name = type.Name;
         var sourceFile = type.SourceFile;
 
-        if (module)
+        if (!string.IsNullOrEmpty(type.Module))
         {
-            if (!string.IsNullOrEmpty(type.Module))
-            {
-                return AddModuleImport(type.Module, type.Name, external:
-                    !type.Module.StartsWith('/') &&
-                    !type.Module.StartsWith('.'));
-            }
-            else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
-            {
-                var filename = GetFileNameFor(ns, name, module);
-                name = AddModuleImport(filename, name, external: false);
-                ns = "";
-            }
+            return AddModuleImport(type.Module, type.Name, external:
+                !type.Module.StartsWith('/') &&
+                !type.Module.StartsWith('.'));
         }
-        else
+        else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
         {
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith(ns + ".", StringComparison.Ordinal)) ||
-                IsUsingNamespace(ns))
-            {
-                ns = "";
-            }
-            else if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.', StringComparison.Ordinal);
-                if (idx >= 0 && ns.StartsWith(codeNamespace[..(idx + 1)], StringComparison.Ordinal))
-                    ns = ns[(idx + 1)..];
-            }
+            var filename = GetTypingFileNameFor(ns, name);
+            name = AddModuleImport(filename, name, external: false);
+            ns = "";
         }
 
         return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;

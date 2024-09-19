@@ -1,7 +1,8 @@
-﻿import { notifyError } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
+﻿import { Fluent, notifyError } from "../../base";
 import { findElementWithRelativeId } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { Widget } from "../widgets/widget";
+import { tryGetWidget } from "../widgets/widgetutils";
 
 @Decorators.registerClass('Serenity.CascadedWidgetLink')
 export class CascadedWidgetLink<TParent extends Widget<any>> {
@@ -10,14 +11,14 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         private widget: Widget<any>,
         private parentChange: (p1: TParent) => void) {
         this.bind();
-        this.widget.element.bind('remove.' + (widget as any).uniqueName + 'cwh', e => {
+        Fluent.one(this.widget.domNode, 'disposing.' + (widget as any).uniqueName + 'cwh', () => {
             this.unbind();
             this.widget = null;
             this.parentChange = null;
         });
     }
 
-    private _parentID: string;
+    declare private _parentID: string;
 
     bind() {
 
@@ -25,10 +26,10 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
+        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
-            parent.element.bind('change.' + (this.widget as any).uniqueName, () => {
+            Fluent.on(parent.domNode, 'change.' + (this.widget as any).uniqueName, () => {
                 this.parentChange(parent);
             });
             return parent;
@@ -45,10 +46,10 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = findElementWithRelativeId(this.widget.element, this._parentID).tryGetWidget(this.parentType);
+        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
-            parent.element.unbind('.' + (this.widget as any).uniqueName);
+            Fluent.off(parent.domNode, '.' + (this.widget as any).uniqueName);
         }
 
         return parent;

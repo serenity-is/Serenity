@@ -37,6 +37,41 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     }
 
     /// <summary>
+    /// Converts the value.
+    /// </summary>
+    /// <param name="source">The source.</param>
+    /// <param name="provider">The provider.</param>
+    /// <returns></returns>
+    public override object ConvertValue(object source, IFormatProvider provider)
+    {
+        if (source is Newtonsoft.Json.Linq.JValue jValue)
+            source = jValue.Value;
+
+        if (source == null)
+            return null;
+
+        if (source is DateTime dt)
+            return dt;
+
+        if (source is DateTimeOffset dto)
+            return dto.DateTime;
+
+        if (source is string s)
+        {
+            if (DateTimeOffset.TryParse(s, provider, DateTimeStyles.None, out var dtOffset))
+                return dtOffset;
+
+            if (s.TryParseISO8601DateTime(out var dateTime))
+                return dateTime;
+
+            if (DateTime.TryParse(s, provider, DateTimeStyles.None, out dateTime))
+                return dateTime;
+        }
+
+        return Convert.ChangeType(source, typeof(DateTime), provider);
+    }
+
+    /// <summary>
     /// Gets field value from a data reader.
     /// </summary>
     /// <param name="reader">The reader.</param>
@@ -90,32 +125,6 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 _setValue(row, value);
             row.FieldAssignedValue(this);
         }
-    }
-
-    /// <summary>
-    /// Gets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <returns></returns>
-    public override object AsObject(IRow row)
-    {
-        CheckUnassignedRead(row);
-        return _getValue(row);
-    }
-
-    /// <summary>
-    /// Sets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <param name="value">The value.</param>
-    public override void AsObject(IRow row, object value)
-    {
-        if (value == null)
-            _setValue(row, null);
-        else
-            _setValue(row, (DateTimeOffset)value);
-
-        row.FieldAssignedValue(this);
     }
 
     /// <summary>

@@ -6,9 +6,9 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute, bool module)
+    private void GenerateColumns(TypeDefinition type, CustomAttribute columnsAttribute)
     {
-        var codeNamespace = GetNamespace(type);
+        var codeNamespace = ScriptNamespaceFor(type);
 
         var identifier = type.Name;
         var referencedTypeKeys = new HashSet<(string group, string key)>();
@@ -18,49 +18,43 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         var publicProperties = type.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty).ToArray();
 
-        if (module)
+        cw.Indented("export interface ");
+        sb.Append(identifier);
+
+        cw.InBrace(delegate
         {
-            cw.Indented("export interface ");
-            sb.Append(identifier);
-
-            cw.InBrace(delegate
+            if (publicProperties.Length > 0)
             {
-                if (publicProperties.Length > 0)
+                var column = AddExternalImport("@serenity-is/sleekgrid", "Column");
+
+                foreach (var item in publicProperties)
                 {
-                    var column = AddExternalImport("@serenity-is/sleekgrid", "Column");
-
-                    foreach (var item in publicProperties)
+                    cw.Indented(item.Name);
+                    sb.Append(": ");
+                    sb.Append(column);
+                    if (basedOnRow != null)
                     {
-                        cw.Indented(item.Name);
-                        sb.Append(": ");
-                        sb.Append(column);
-                        if (basedOnRow != null)
-                        {
-                            sb.Append('<');
-                            HandleMemberType(basedOnRow, codeNamespace, module);
-                            sb.Append('>');
-                        }
-                        sb.AppendLine(";");
+                        sb.Append('<');
+                        HandleMemberType(basedOnRow, codeNamespace);
+                        sb.Append('>');
                     }
-
+                    sb.AppendLine(";");
                 }
-            });
 
-            sb.AppendLine();
-        }
+            }
+        });
+
+        sb.AppendLine();
 
         cw.Indented("export class ");
         sb.Append(identifier);
-        if (module)
+        var columnsBase = ImportFromCorelib("ColumnsBase");
+        sb.Append($" extends {columnsBase}");
+        if (basedOnRow != null)
         {
-            var columnsBase = ImportFromCorelib("ColumnsBase");
-            sb.Append($" extends {columnsBase}");
-            if (basedOnRow != null)
-            {
-                sb.Append('<');
-                HandleMemberType(basedOnRow, codeNamespace, module);
-                sb.Append('>');
-            }
+            sb.Append('<');
+            HandleMemberType(basedOnRow, codeNamespace);
+            sb.Append('>');
         }
 
         cw.InBrace(delegate
@@ -73,49 +67,46 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.Append(key);
             sb.AppendLine("';");
 
-            if (module)
+            var fieldsProxy = ImportFromQ("fieldsProxy");
+            cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{type.Name}>();");
+
+            foreach (var item in publicProperties)
             {
-                var fieldsProxy = ImportFromQ("fieldsProxy");
-                cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{type.Name}>();");
+                if (!TypingsUtils.IsPublicInstanceProperty(item))
+                    continue;
 
-                foreach (var item in publicProperties)
-                {
-                    if (!TypingsUtils.IsPublicInstanceProperty(item))
-                        continue;
+                PropertyDefinition basedOnField = null;
+                if (basedOnByName != null)
+                    basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                    PropertyDefinition basedOnField = null;
-                    if (basedOnByName != null)
-                        basedOnField = basedOnByName[item.Name].FirstOrDefault();
+                if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
+                    GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                    continue;
 
-                    if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
-                        GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
-                        continue;
+                var formatterTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");
+                var formatterTypeKey = GetFormatterTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), formatterTypeAttr);
 
-                    var formatterTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");
-                    var formatterTypeKey = GetFormatterTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), formatterTypeAttr);
+                if (formatterTypeKey is null)
+                    continue;
 
-                    if (formatterTypeKey is null)
-                        continue;
+                if (!referencedTypeKeys.Add(("Formatter", formatterTypeKey)))
+                    continue;
 
-                    if (!referencedTypeKeys.Add(("Formatter", formatterTypeKey)))
-                        continue;
+                var formatterScriptType = FindTypeInLookup(modularFormatterTypeByKey, formatterTypeKey, "Formatter", containingAssembly: null);
+                if (formatterScriptType != null)
+                    referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType, codeNamespace)));
 
-                    var formatterScriptType = FindTypeInLookup(modularFormatterTypeByKey, formatterTypeKey, "Formatter", containingAssembly: null);
-                    if (formatterScriptType != null)
-                        referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType, codeNamespace, module)));
-
-                    TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
-                }
+                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
             }
         });
 
-        if (module && referencedTypeAliases.Count != 0)
+        if (referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
             sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");
         }
 
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
+        RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
     }
 
     private static string AutoDetermineFormatterType(TypeReference valueType, TypeReference basedOnFieldType)

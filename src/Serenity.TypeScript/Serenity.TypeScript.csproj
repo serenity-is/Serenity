@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Contains a scanner / parser implementation used to generate AST from TypeScript sources.</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Serenity Platform - TypeScript Parser</Title>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="Serenity.*;System.Text.Json.Serialization" />
+  </ItemGroup>
+</Project>

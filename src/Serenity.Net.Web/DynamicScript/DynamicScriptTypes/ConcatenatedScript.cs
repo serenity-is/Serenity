@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.WebUtilities;
-
 namespace Serenity.Web;
 
 /// <summary>
-/// A dynamic script that is formed from concentanation of other scripts
+/// A dynamic script that is formed from concatenation of other scripts
 /// </summary>
 /// <remarks>
 /// Creates a new instance of the class

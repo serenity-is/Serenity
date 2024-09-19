@@ -57,18 +57,16 @@ public partial class EntiyModelGeneratorTests
                 Assert.Null(customerId.Size);
                 Assert.Equal(0, customerId.Scale);
 
-                Assert.Collection(customerId.FlagList, 
-                    identity =>
-                    {
-                        Assert.Equal(AttrName<IdentityAttribute>(), identity.TypeName);
-                        Assert.Empty(identity.Arguments);
-                    });
+
+                var identity = Assert.Single(customerId.FlagList);
+                Assert.Equal(AttrName<IdentityAttribute>(), identity.TypeName);
+                Assert.Empty(identity.Arguments);
 
                 Assert.Collection(customerId.AttributeList,
                     displayName =>
                     {
                         Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
-                        Assert.Collection(displayName.Arguments, x => Assert.Equal("Customer Id", x));
+                        Assert.Equal("Customer Id", Assert.Single(displayName.Arguments));
                     },
                     identity =>
                     {
@@ -90,7 +88,7 @@ public partial class EntiyModelGeneratorTests
                     displayName =>
                     {
                         Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
-                        Assert.Collection(displayName.Arguments, x => Assert.Equal("Db.Shared.RecordId", x));
+                        Assert.Equal("Db.Shared.RecordId", Assert.Single(displayName.Arguments));
                     },
                     alignRight =>
                     {
@@ -110,23 +108,21 @@ public partial class EntiyModelGeneratorTests
                 Assert.False(customerName.OmitInForm);
                 Assert.Equal(50, customerName.Size);
 
-                Assert.Collection(customerName.FlagList,
-                    notNull =>
-                    {
-                        Assert.Equal(AttrName<NotNullAttribute>(), notNull.TypeName);
-                        Assert.Empty(notNull.Arguments);
-                    });
+
+                var notNull = Assert.Single(customerName.FlagList);
+                Assert.Equal(AttrName<NotNullAttribute>(), notNull.TypeName);
+                Assert.Empty(notNull.Arguments);
 
                 Assert.Collection(customerName.AttributeList,
                     displayName =>
                     {
                         Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
-                        Assert.Collection(displayName.Arguments, x => Assert.Equal("Customer Name", x));
+                        Assert.Equal("Customer Name", Assert.Single(displayName.Arguments));
                     },
                     size =>
                     {
                         Assert.Equal(AttrName<SizeAttribute>(), size.TypeName);
-                        Assert.Collection(size.Arguments, x => Assert.Equal(50, x));
+                        Assert.Equal(50, Assert.Single(size.Arguments));
                     },
                     notNull =>
                     {
@@ -144,12 +140,9 @@ public partial class EntiyModelGeneratorTests
                         Assert.Empty(nameProperty.Arguments);
                     });
 
-                Assert.Collection(customerName.ColAttributeList,
-                    editLink =>
-                    {
-                        Assert.Equal(AttrName<EditLinkAttribute>(), editLink.TypeName);
-                        Assert.Empty(editLink.Arguments);
-                    });
+                var editLink = Assert.Single(customerName.ColAttributeList);
+                Assert.Equal(AttrName<EditLinkAttribute>(), editLink.TypeName);
+                Assert.Empty(editLink.Arguments);
             },
             cityId =>
             {
@@ -165,24 +158,24 @@ public partial class EntiyModelGeneratorTests
         inputs.Config.DeclareJoinConstants = false;
         var model = generator.Create(inputs);
         Assert.False(model.DeclareJoinConstants);
-        
+
         var joinAttr = model.Fields.FirstOrDefault(x => x.PropertyName == CityId)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == LeftJoinAttrName);
         Assert.NotNull(joinAttr);
-        Assert.Collection(joinAttr.Arguments, x => Assert.Equal($"{jCity}", x));
+        Assert.Equal($"{jCity}", Assert.Single(joinAttr.Arguments));
 
         var cityJoin = model.Joins.FirstOrDefault(x => x.Name == City);
         Assert.NotNull(cityJoin);
-        
+
         var cityNameExpr = cityJoin.Fields.FirstOrDefault(x => x.PropertyName == CityName)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == ExpressionAttrName);
         Assert.NotNull(cityNameExpr);
-        Assert.Collection(cityNameExpr.Arguments, x => Assert.Equal($"{jCity}.[{CityName}]", x));
+        Assert.Equal($"{jCity}.[{CityName}]", Assert.Single(cityNameExpr.Arguments));
 
         var countryIdExpr = cityJoin.Fields.FirstOrDefault(x => x.PropertyName == CityCountryId)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == ExpressionAttrName);
         Assert.NotNull(countryIdExpr);
-        Assert.Collection(countryIdExpr.Arguments, x => Assert.Equal($"{jCity}.[{CountryId}]", x));
+        Assert.Equal($"{jCity}.[{CountryId}]", Assert.Single(countryIdExpr.Arguments));
     }
 
     [Fact]
@@ -197,7 +190,7 @@ public partial class EntiyModelGeneratorTests
         var joinAttr = model.Fields.FirstOrDefault(x => x.PropertyName == CityId)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == LeftJoinAttrName);
         Assert.NotNull(joinAttr);
-        Assert.Collection(joinAttr.Arguments, x => Assert.Equal(jCity, Assert.IsType<RawCode>(x).Code));
+        Assert.Equal(jCity, Assert.IsType<RawCode>(Assert.Single(joinAttr.Arguments)).Code);
 
         var cityJoin = model.Joins.FirstOrDefault(x => x.Name == City);
         Assert.NotNull(cityJoin);
@@ -205,14 +198,12 @@ public partial class EntiyModelGeneratorTests
         var cityNameExpr = cityJoin.Fields.FirstOrDefault(x => x.PropertyName == CityName)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == ExpressionAttrName);
         Assert.NotNull(cityNameExpr);
-        Assert.Collection(cityNameExpr.Arguments, 
-            x => Assert.Equal("$\"{" + jCity + "}.[" + CityName + "]\"", Assert.IsType<RawCode>(x).Code));
+        Assert.Equal("$\"{" + jCity + "}.[" + CityName + "]\"", Assert.IsType<RawCode>(Assert.Single(cityNameExpr.Arguments)).Code);
 
         var countryIdExpr = cityJoin.Fields.FirstOrDefault(x => x.PropertyName == CityCountryId)?
             .AttributeList?.FirstOrDefault(x => x.TypeName == ExpressionAttrName);
         Assert.NotNull(countryIdExpr);
-        Assert.Collection(countryIdExpr.Arguments,
-            x => Assert.Equal("$\"{" + jCity + "}.[" + CountryId + "]\"", Assert.IsType<RawCode>(x).Code));
+        Assert.Equal("$\"{" + jCity + "}.[" + CountryId + "]\"", Assert.IsType<RawCode>(Assert.Single(countryIdExpr.Arguments)).Code);
     }
 
     [Fact]
@@ -227,10 +218,7 @@ public partial class EntiyModelGeneratorTests
 
         var model = generator.Create(inputs);
 
-        Assert.Collection(model.Joins, x =>
-        {
-            Assert.Empty(x.Fields);
-        });
+        Assert.Empty(Assert.Single(model.Joins).Fields);
     }
 
     [Fact]
@@ -245,10 +233,7 @@ public partial class EntiyModelGeneratorTests
 
         var model = generator.Create(inputs);
 
-        Assert.Collection(model.Joins, x =>
-        {
-            Assert.Empty(x.Fields);
-        });
+        Assert.Empty(Assert.Single(model.Joins).Fields);
     }
 
     [Fact]
@@ -263,13 +248,7 @@ public partial class EntiyModelGeneratorTests
 
         var model = generator.Create(inputs);
 
-        Assert.Collection(model.Joins, join =>
-        {
-            Assert.Collection(join.Fields, fld =>
-            {
-                Assert.Equal(CityCountryId, fld.PropertyName);
-            });
-        });
+        Assert.Equal(CityCountryId, Assert.Single(Assert.Single(model.Joins).Fields).PropertyName);
     }
 
 }

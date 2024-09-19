@@ -604,14 +604,25 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns></returns>
-    public abstract object AsObject(IRow row);
+    public object AsObject(IRow row)
+    {
+        CheckUnassignedRead(row);
+        return AsObjectNoCheck(row);
+    }
 
     /// <summary>
-    /// Gets the value of this field in specified row as object.
+    /// Sets the value of this field in specified row as object.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
     public abstract void AsObject(IRow row, object value);
+
+    /// <summary>
+    /// Gets the value of this field in specified row as object, skipping check for assignment
+    /// even if TrackWithChecks is true. Use at your own risk!
+    /// </summary>
+    /// <param name="row">The row.</param>
+    public abstract object AsObjectNoCheck(IRow row);
 
     /// <summary>
     /// Gets if the field value is null.

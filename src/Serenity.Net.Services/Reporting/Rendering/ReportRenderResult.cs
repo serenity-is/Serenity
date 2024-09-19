@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Render result for a report
@@ -9,6 +9,11 @@ public class ReportRenderResult
     /// File content bytes
     /// </summary>
     public byte[] ContentBytes { get; set; }
+
+    /// <summary>
+    /// Suggested file name (without extension)
+    /// </summary>
+    public string FileName { get; set; }
 
     /// <summary>
     /// File extension

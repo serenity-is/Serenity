@@ -188,16 +188,6 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
     }
 
     /// <summary>
-    /// Gets the value of this field in specified row as object.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    public override object AsObject(IRow row)
-    {
-        CheckUnassignedRead(row);
-        return _getValue(row);
-    }
-
-    /// <summary>
     /// Sets the value of this field in specified row as object.
     /// </summary>
     /// <param name="row">The row.</param>

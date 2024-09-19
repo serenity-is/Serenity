@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 using Path = System.IO.Path;
 
 namespace Serenity.Web;
@@ -44,7 +44,11 @@ public static class UploadFormatting
         if (string.IsNullOrEmpty(originalName))
             throw new ArgumentNullException(nameof(originalName));
 
-        var formatted = string.Format(options.Format, identity, groupKey, 
+        var formatted = options.Format;
+        if (formatted.Contains("{3}", StringComparison.OrdinalIgnoreCase))
+            formatted = formatted.Replace("{3}", "{3:yyyyMMddhhmmss}");
+
+        formatted = string.Format(formatted, identity, groupKey, 
             TemporaryFileHelper.RandomFileCode(), DateTime.Now,
             Path.GetFileNameWithoutExtension(originalName)) + Path.GetExtension(options.OriginalName);
 

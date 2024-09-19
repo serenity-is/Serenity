@@ -99,7 +99,7 @@ public class DistinctValuesRegistration
 
             var script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
                 typeof(DistinctValuesScript<>).MakeGenericType(key.Key.Item1), 
-                new object[] { key.Key.Item2 });
+                [key.Key.Item2]);
 
             script.LookupKey = "Distinct." + row.GetFields().LocalTextPrefix + "." +
                 key.Key.Item2;

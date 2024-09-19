@@ -1,4 +1,4 @@
-import { confirmDialog, informationDialog, successDialog, warningDialog } from "@serenity-is/base";
+import { confirmDialog, informationDialog, successDialog, warningDialog } from "../base";
 
 describe("informationDialog", () => {
     it('is aliased by obsolete inform', async function () {
@@ -21,7 +21,7 @@ describe("confirmDialog", () => {
     });
 });
 
-describe("Q.successDialog", () => {
+describe("successDialog", () => {
     it('is aliased by obsolete success', async function () {
         const dialogs = (await import("./dialogs-compat"));
         expect(dialogs.success).toBe(successDialog);

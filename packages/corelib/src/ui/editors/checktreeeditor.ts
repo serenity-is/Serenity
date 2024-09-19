@@ -1,15 +1,17 @@
-﻿import { Culture, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "@serenity-is/base";
-import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Decorators } from "../../decorators";
+﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
+import { Culture, Fluent, ListResponse, htmlEncode, tryGetText, type Lookup, type PropertyItem } from "../../base";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ScriptData, getLookup } from "../../q";
+import { Decorators } from "../../types/decorators";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper, GridUtils, SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { ToolButton } from "../widgets/toolbar";
-import { EditorProps, Widget } from "../widgets/widget";
+import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
+import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
+import { EditorProps } from "./editorwidget";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;
@@ -23,11 +25,12 @@ export interface CheckTreeItem<TSource> {
 }
 
 @Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
-@Decorators.element("<div/>")
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
 
-    private byId: { [key: string]: TItem };
+    static override createDefaultElement() { return document.createElement("div"); }
+
+    declare private itemById: { [key: string]: TItem };
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -115,9 +118,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected createSlickGrid(): Grid {
-        this.element.addClass('slick-no-cell-border').addClass('slick-no-odd-even');
+        this.domNode.classList.add("slick-no-cell-border", "slick-no-odd-even", "slick-hide-header");
         var result = super.createSlickGrid();
-        this.element.addClass('slick-hide-header');
         result.resizeCanvas();
         return result;
     }
@@ -134,17 +136,17 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 return null;
             }
 
-            if (self.byId == null) {
-                self.byId = {};
+            if (self.itemById == null) {
+                self.itemById = {};
                 for (var i = 0; i < items.length; i++) {
                     var o = items[i];
                     if (o.id != null) {
-                        self.byId[o.id] = o;
+                        self.itemById[o.id] = o;
                     }
                 }
             }
 
-            return self.byId[x.parentId];
+            return self.itemById[x.parentId];
         });
     }
 
@@ -154,7 +156,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         response = super.onViewProcessData(response);
-        this.byId = null;
+        this.itemById = null;
         SlickTreeHelper.setIndents(response.Entities, function (x) {
             return x.id;
         }, function (x1) {
@@ -166,24 +168,24 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     protected onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
-        if (!(e as any).isDefaultPrevented?.() && !e.defaultPrevented) {
+        if (!Fluent.isDefaultPrevented(e)) {
             SlickTreeHelper.toggleClick(e as any, row, cell, this.view, function (x) {
                 return x.id;
             });
         }
 
-        if ((e as any).isDefaultPrevented?.() || e.defaultPrevented) {
+        if (Fluent.isDefaultPrevented(e)) {
             return;
         }
 
-        var target = $(e.target);
-        if (target.hasClass('check-box')) {
+        var target = e.target as HTMLElement;
+        if (target.classList.contains('check-box')) {
             e.preventDefault();
 
             if (this._readOnly)
                 return;
 
-            var checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
+            var checkedOrPartial = target.classList.contains('checked') || target.classList.contains('partial');
             var item = this.itemAt(row);
             var anyChanged = item.isSelected !== !checkedOrPartial;
             this.view.beginUpdate();
@@ -201,7 +203,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 this.view.endUpdate();
             }
             if (anyChanged) {
-                this.element.triggerHandler('change');
+                Fluent.trigger(this.domNode, "change");
             }
         }
     }
@@ -320,7 +322,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         var self = this;
         var columns: Column[] = [];
         columns.push({
-            field: 'text', name: 'Kayıt', width: 80, format: SlickFormatting.treeToggle(function () {
+            field: 'text', name: 'Record', width: 80, format: SlickFormatting.treeToggle(function () {
                 return self.view;
             }, function (x) {
                 return x.id;
@@ -348,7 +350,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected getItemText(ctx: FormatterContext): string {
-        return htmlEncode(ctx.value);
+        return ctx.escape();
     }
 
     protected getSlickOptions(): GridOptions {
@@ -389,7 +391,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    private _readOnly: boolean;
+    declare private _readOnly: boolean;
 
     public get_readOnly() {
         return this._readOnly;
@@ -471,11 +473,11 @@ export interface CheckLookupEditorOptions {
 }
 
 @Decorators.registerEditor("Serenity.CheckLookupEditor")
-export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
+export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
 
-    private searchText: string;
-    private enableUpdateItems: boolean;
-    private lookupChangeUnbind: any;
+    declare private searchText: string;
+    declare private enableUpdateItems: boolean;
+    declare private lookupChangeUnbind: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -511,8 +513,8 @@ export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions =
     protected createToolbarExtensions() {
         super.createToolbarExtensions();
 
-        GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
-            this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
+        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (field, text) => {
+            this.searchText = stripDiacritics(text || '').toUpperCase();
             this.view.setItems(this.view.getItems(), true);
         });
     }
@@ -578,7 +580,7 @@ export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions =
 
     protected onViewFilter(item: CheckTreeItem<TItem>) {
         return super.onViewFilter(item) &&
-            (!this.searchText || Select2.util.stripDiacritics(item.text || '')
+            (!this.searchText || stripDiacritics(item.text || '')
                 .toUpperCase().indexOf(this.searchText) >= 0);
     }
 
@@ -598,7 +600,7 @@ export class CheckLookupEditor<TItem = any, P extends CheckLookupEditorOptions =
         return EditorUtils.getValue(parent);
     }
 
-    protected cascadeLink: CascadedWidgetLink<Widget<any>>;
+    declare protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 
     protected setCascadeFrom(value: string) {
 

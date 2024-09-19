@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.CodeGenerator
+namespace Serenity.Tests.CodeGenerator
 {
     public partial class ServerTypingsGeneratorTests
     {
@@ -7,7 +7,7 @@
         {
             var generator = CreateGenerator();
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.WithNamePropertyRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/WithNamePropertyRow.ts").Text;
             Assert.Contains("nameProperty = 'WithNameProp'", code);
         }
     }

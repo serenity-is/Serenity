@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -332,7 +332,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
                     DeleteDetail(uow, id);
                 }
 
-                oldRows = new List<IRow>();
+                oldRows = [];
                 oldByItemKey = [];
             }
         }

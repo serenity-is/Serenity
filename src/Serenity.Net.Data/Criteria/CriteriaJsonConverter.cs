@@ -126,7 +126,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                         throw new ArgumentNullException("item");
 
                     if (item.ValueKind == JsonValueKind.String)
-                        list.Add(item.GetString());
+                            list.Add(item.GetString());
                     else if (item.ValueKind == JsonValueKind.Number)
                         list.Add(item.GetDouble());
                     else if (item.ValueKind == JsonValueKind.True)

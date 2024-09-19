@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Aucun enregistrement",
   "Controls.Pager.Page": "Page",
   "Controls.Pager.PageStatus": "Affichage de {from} à {to} sur {total} enregistrements au total",
-  "Controls.PropertyGrid.DefaultCategory": "Propriétés",
   "Controls.PropertyGrid.RequiredHint": "Ce champ est requis",
   "Controls.QuickSearch.FieldSelection": "Sélectionnez le champ à rechercher",
   "Controls.QuickSearch.Hint": "Entrez le texte à rechercher",

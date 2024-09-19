@@ -8,11 +8,13 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// <summary>
     /// Number of records to skip
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public int Skip { get; set; }
 
     /// <summary>
     /// Number of records to take
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public int Take { get; set; }
 
     /// <summary>
@@ -40,12 +42,13 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     [Newtonsoft.Json.JsonConverter(typeof(JsonSafeCriteriaConverter))]
     [JsonConverter(typeof(JsonConverters.SafeCriteriaJsonConverter))]
     public BaseCriteria Criteria { get; set; }
-    
+
     /// <summary>
     /// Include the deleted records. Default is false.
     /// This is only supported by services and entities
     /// that implement soft delete, e.g. IsActive etc.
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public bool IncludeDeleted { get; set; }
 
     /// <summary>
@@ -54,6 +57,7 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// parameters are passed. Otherwise, a second query will be
     /// required to get number of total records.
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public bool ExcludeTotalCount { get; set; }
 
     /// <summary>
@@ -68,6 +72,7 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// Group of columns to select. This is ColumnSelection.List,
     /// e.g. only the table fields, not view fields by default.
     /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public ColumnSelection ColumnSelection { get; set; }
 
     /// <inheritdoc/>

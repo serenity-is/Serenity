@@ -1,81 +1,58 @@
-﻿import { toId } from "@serenity-is/base";
-import { Decorators } from "../../decorators";
-import { IDoubleValue, IReadOnly } from "../../interfaces";
-import { addOption } from "../../q";
-import { EditorWidget, EditorProps } from "../widgets/widget";
+import { Fluent, toId } from "../../base";
+import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
+import { addOption, zeroPad } from "../../q";
+import { Decorators } from "../../types/decorators";
+import { EditorProps, EditorWidget } from "./editorwidget";
 import { EditorUtils } from "./editorutils";
 
-export interface TimeEditorOptions {
+export interface TimeEditorBaseOptions {
     noEmptyOption?: boolean;
     startHour?: any;
     endHour?: any;
     intervalMinutes?: any;
 }
 
-@Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
-@Decorators.element("<select />")
-export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends EditorWidget<P> {
+export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
 
-    private minutes: JQuery;
+    static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
+    declare readonly domNode: HTMLSelectElement;
+
+    declare protected minutes: Fluent;
 
     constructor(props: EditorProps<P>) {
         super(props);
-        
+
         let input = this.element;
-        input.addClass('editor s-TimeEditor hour');
+        input.addClass('editor hour');
 
         if (!this.options.noEmptyOption) {
             addOption(input, '', '--');
         }
 
-        for (var h = (this.options.startHour || 0); h <= (this.options.endHour || 23); h++) {
-            addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
+        for (let h = (this.options.startHour || 0); h <= (this.options.endHour || 23); h++) {
+            addOption(input, "" + h, zeroPad(h, 2));
         }
 
-        this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
-        this.minutes.change(() => this.element.trigger("change"));
+        const select = document.createElement("select");
+        select.classList.add("editor", "minute");
+        this.minutes = Fluent(select).insertAfter(input);
+        this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
-            addOption(this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
+            addOption(this.minutes, "" + m, zeroPad(m, 2));
         }
     }
 
-    public get value(): number {
-        var hour = toId(this.element.val());
-        var minute = toId(this.minutes.val());
-        if (hour == null || minute == null) {
-            return null;
-        }
-        return hour * 60 + minute;
+    get hour(): number {
+        return toId(this.domNode.value);
     }
 
-    protected get_value(): number {
-        return this.value;
-    }
-
-    public set value(value: number) {
-        if (!value) {
-            if (this.options.noEmptyOption) {
-                this.element.val(this.options.startHour);
-                this.minutes.val('0');
-            }
-            else {
-                this.element.val('');
-                this.minutes.val('0');
-            }
-        }
-        else {
-            this.element.val(Math.floor(value / 60).toString());
-            this.minutes.val(value % 60);
-        }
-    }
-
-    protected set_value(value: number): void {
-        this.value = value;
+    get minute(): number {
+        return toId(this.minutes.val());
     }
 
     get_readOnly(): boolean {
-        return this.element.hasClass('readonly');
+        return this.domNode.classList.contains('readonly');
     }
 
     set_readOnly(value: boolean): void {
@@ -89,5 +66,122 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
             }
             EditorUtils.setReadonly(this.minutes, value);
         }
+    }
+
+    /** Returns value in HH:mm format */
+    public get hourAndMin(): string {
+        var hour = this.hour;
+        var minute = this.minute;
+        if (hour == null || minute == null) {
+            return null;
+        }
+        return `${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`;
+    }
+
+    /** Sets value in HH:mm format */
+    public set hourAndMin(value: string) {
+        if (value == null || value === "") {
+            if (this.options.noEmptyOption) {
+                this.domNode.value = this.options.startHour;
+                this.minutes.val('0');
+            }
+            else {
+                this.domNode.value = '';
+                this.minutes.val('0');
+            }
+            return;
+        }
+
+        var parts = value.split(':');
+        this.domNode.value = "" + parseInt(parts[0], 10);
+        this.minutes.val("" + parseInt(parts[1], 10));
+    }    
+}
+
+
+export interface TimeEditorOptions extends TimeEditorBaseOptions {
+    /** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
+    multiplier?: number;
+}
+
+/** Note that this editor's value is number of minutes, e.g. for
+ * 16:30, value will be 990. If you want to use a TimeSpan field
+ * use TimeSpanEditor instead.
+ */
+@Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
+export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+    
+    constructor(props: EditorProps<P>) {
+        super(props);
+        this.domNode.classList.add("s-TimeEditor");
+        this.minutes.addClass("s-TimeEditor");
+    }
+
+    public get value(): number {
+        var hour = this.hour;
+        var minute = this.minute;
+        if (hour == null || minute == null) {
+            return null;
+        }
+        return (hour * 60 + minute) * (this.options.multiplier || 1);;
+    }
+
+    protected get_value(): number {
+        return this.value;
+    }
+
+    public set value(value: number) {
+        if (value == null || (value as any) === "" || isNaN(value)) {
+            if (this.options.noEmptyOption) {
+                this.domNode.value = this.options.startHour;
+                this.minutes.val('0');
+            }
+            else {
+                this.domNode.value = '';
+                this.minutes.val('0');
+            }
+        }
+        else {
+            value /= (this.options.multiplier || 1);
+            var hour = Math.floor(value / 60);
+            this.domNode.value = "" + hour;
+            this.minutes.val("" + (value % 60));
+        }
+    }
+
+    protected set_value(value: number): void {
+        this.value = value;
+    }
+}
+
+export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
+}
+
+/**
+ * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
+ */
+@Decorators.registerEditor('Serenity.TimeSpanEditor', [IStringValue, IReadOnly])
+export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
+
+    constructor(props: EditorProps<P>) {
+        super(props);
+        this.domNode.classList.add("s-TimeSpanEditor");
+        this.minutes.addClass("s-TimeSpanEditor");
+    }
+
+    protected get_value(): string {
+        return this.value;
+    }
+
+    protected set_value(value: string): void {
+        this.value = value;
+    }
+
+    public get value(): string {
+        return this.hourAndMin;
+    }
+
+    public set value(value: string) {
+        this.hourAndMin = value;
     }
 }

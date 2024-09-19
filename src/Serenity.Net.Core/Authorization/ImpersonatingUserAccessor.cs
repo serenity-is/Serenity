@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 
 namespace Serenity.Web;
 
@@ -13,14 +13,15 @@ namespace Serenity.Web;
 /// <param name="itemsAccessor">Request items accessor</param>
 public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextItemsAccessor itemsAccessor) : IUserAccessor, IImpersonator
 {
+    private readonly ReaderWriterLockSlim sync = new();
     private readonly IUserAccessor userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-    private readonly IHttpContextItemsAccessor requestContext = itemsAccessor ?? throw new ArgumentNullException(nameof(itemsAccessor));
-    private readonly ThreadLocal<Stack<ClaimsPrincipal>> impersonationStack = new();
+    private readonly IHttpContextItemsAccessor? requestContext = itemsAccessor;
+    private readonly AsyncLocal<Stack<ClaimsPrincipal>> impersonationStack = new();
 
     private Stack<ClaimsPrincipal>? GetImpersonationStack(bool createIfNull)
     {
         Stack<ClaimsPrincipal>? stack;
-        var requestItems = requestContext.Items;
+        var requestItems = requestContext?.Items;
 
         if (requestItems != null)
         {
@@ -45,12 +46,20 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
     {
         get
         {
-            var impersonationStack = GetImpersonationStack(false);
+            sync.EnterReadLock();
+            try
+            {
+                var impersonationStack = GetImpersonationStack(false);
 
-            if (impersonationStack != null && impersonationStack.Count > 0)
-                return impersonationStack.Peek();
+                if (impersonationStack != null && impersonationStack.Count > 0)
+                    return impersonationStack.Peek();
 
-            return userContext.User;
+                return userContext.User;
+            }
+            finally
+            {
+                sync.ExitReadLock();
+            }
         }
     }
 
@@ -63,8 +72,16 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
         if (user == null)
             throw new ArgumentNullException(nameof(user));
 
-        var impersonationStack = GetImpersonationStack(true)!;
-        impersonationStack.Push(user);
+        sync.EnterWriteLock();
+        try
+        {
+            var impersonationStack = GetImpersonationStack(true)!;
+            impersonationStack.Push(user);
+        }
+        finally
+        {
+            sync.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -73,10 +90,18 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
     /// <exception cref="InvalidOperationException">UndoImpersonate() is called while impersonation stack is empty!</exception>
     public void UndoImpersonate()
     {
-        var impersonationStack = GetImpersonationStack(false);
-        if (impersonationStack == null || impersonationStack.Count == 0)
-            throw new InvalidOperationException("UndoImpersonate() is called while impersonation stack is empty!");
+        sync.EnterWriteLock();
+        try
+        {
+            var impersonationStack = GetImpersonationStack(false);
+            if (impersonationStack == null || impersonationStack.Count == 0)
+                throw new InvalidOperationException("UndoImpersonate() is called while impersonation stack is empty!");
 
-        impersonationStack.Pop();
+            impersonationStack.Pop();
+        }
+        finally
+        {
+            sync.ExitWriteLock();
+        }
     }
 }

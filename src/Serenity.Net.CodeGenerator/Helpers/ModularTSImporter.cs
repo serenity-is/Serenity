@@ -11,7 +11,8 @@ public class ModularTSImporter(string currentModule)
 
     protected string ImportFromTypes(string name)
     {
-        return AddExternalImport("@/ServerTypes/" + currentModule, name);
+        return AddExternalImport(string.IsNullOrEmpty(currentModule) ? 
+            "../ServerTypes/" : ("../../ServerTypes/" + currentModule), name);
     }
 
     protected string ImportFromQ(string name)

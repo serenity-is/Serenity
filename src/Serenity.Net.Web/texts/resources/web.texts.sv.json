@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Inga poster",
   "Controls.Pager.Page": "Sida",
   "Controls.Pager.PageStatus": "Visar {from} till {to} av totalt {total} poster",
-  "Controls.PropertyGrid.DefaultCategory": "Egenskaper",
   "Controls.PropertyGrid.RequiredHint": "Detta fält är obligatoriskt",
   "Controls.QuickSearch.FieldSelection": "Välj fält för sökning",
   "Controls.QuickSearch.Hint": "Ange texten för att söka",

@@ -53,8 +53,7 @@ public class JsonLocalTextRegistrationTests
         var registry = new MockLocalTextRegistry();
         var dict = JSON.Parse<Dictionary<string, object>>(@"{""x"":""x"",""y"":null}");
         JsonLocalTextRegistration.AddFromNestedDictionary(dict, "Db.", "jp", registry);
-        Assert.Collection(registry.AddedList.OrderBy(x => x.key),
-            x => Assert.Equal(("jp", "Db.x", "x"), x));
+        Assert.Equal(("jp", "Db.x", "x"), Assert.Single(registry.AddedList.OrderBy(x => x.key)));
     }
 
     [Fact]
@@ -183,8 +182,7 @@ public class JsonLocalTextRegistrationTests
         var registry = new MockLocalTextRegistry();
         JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
 
-        Assert.Collection(registry.AddedList.OrderBy(x => x.key),
-            x => Assert.Equal(("jp", "x", "x"), x));
+        Assert.Equal(("jp", "x", "x"), Assert.Single(registry.AddedList.OrderBy(x => x.key)));
     }
 
     [Fact]

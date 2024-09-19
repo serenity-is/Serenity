@@ -3,15 +3,11 @@ export default {
   testMatch: ['<rootDir>/test/**/*.spec.ts*', '<rootDir>/src/**/*.spec.ts*'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@serenity-is/base$': '<rootDir>/node_modules/@serenity-is/base/src/index.ts',
-    '^@serenity-is/base-ui$': '<rootDir>/node_modules/@serenity-is/base-ui/src/index.ts',
-    '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts',
-    '^@optionaldeps/squery$': '<rootDir>/src/globals/squery-module',
-    '^@optionaldeps/(.*)$': '<rootDir>/test/testutil/$1-testmodule',
-    '^jquery$': '<rootDir>/../../src/Serenity.Assets/wwwroot/jquery/jquery.min.js',
+    '^@serenity-is/sleekgrid$': '<rootDir>/node_modules/@serenity-is/sleekgrid/src/index.ts'
   },
   "coveragePathIgnorePatterns": [
     "<rootDir>/node_modules/",
+    "<rootDir>/src/mocks/",
     "/src/Serenity.Assets/"
   ],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
@@ -25,9 +21,6 @@ export default {
           tsx: true
         },
         keepClassNames: true,
-        experimental: {
-          plugins: [["jest_workaround", {}]]
-        },
         transform: {
           react: {
             runtime: 'automatic',
@@ -39,5 +32,11 @@ export default {
         type: "commonjs"
       }
     }]
-  }
+  },
+  setupFiles: [
+    '<rootDir>/build/jest.setup.js'
+  ],
+  setupFilesAfterEnv: [
+    '<rootDir>/build/jest.afterenv.js'
+  ]
 };

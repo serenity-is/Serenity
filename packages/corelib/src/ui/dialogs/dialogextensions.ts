@@ -1,10 +1,14 @@
-﻿import { DialogTexts, faIcon } from "@serenity-is/base";
-import { Flexify } from "../widgets/flexify";
+﻿import { DialogTexts, Fluent, faIcon, getjQuery } from "../../base";
 
 export namespace DialogExtensions {
 
-    export function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery {
-        var dlg = (dialog as any)?.dialog?.();
+    export function dialogResizable(dialog: HTMLElement | ArrayLike<HTMLElement>, w?: any, h?: any, mw?: any, mh?: any): void {
+        let $ = getjQuery();
+        if (!$)
+            return;
+        var dlg = $(dialog)?.dialog?.();
+        if (!dlg)
+            return;
         dlg.dialog('option', 'resizable', true);
         if (mw != null) {
             dlg.dialog('option', 'minWidth', mw);
@@ -18,36 +22,30 @@ export namespace DialogExtensions {
         if (h != null) {
             dlg.dialog('option', 'height', h);
         }
-        return dialog;
     }
 
-    export function dialogMaximizable(dialog: JQuery): JQuery {
-        if (!dialog.length || typeof jQuery === "undefined" || !registerDialogExtendPlugin(jQuery))
-            return dialog;
-        (dialog as any).dialogExtend({
+    export function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void {
+        let $ = getjQuery();
+        if (!$)
+            return;
+        $(dialog).dialogExtend?.({
             closable: true,
             maximizable: true,
             dblclick: 'maximize',
             icons: { maximize: 'ui-icon-maximize-window' }
         });
-
-        return dialog;
-    }
-
-    export function dialogFlexify(dialog: JQuery): JQuery {
-        new Flexify(dialog.closest('.ui-dialog'), {});
-        return dialog;
     }
 }
 
-function registerDialogExtendPlugin($: JQueryStatic) {
-    if (!$ || !($ as any).widget)
+function registerDialogExtendPlugin() {
+    let $ = getjQuery();
+    if (!$ || !$.widget)
         return false;
 
-    if (($ as any).fn?.dialogExtend)
+    if ($.fn?.dialogExtend)
         return true;
 
-    ($ as any).widget("ui.dialogExtend", {
+    $.widget("ui.dialogExtend", {
         options: {
             dblclick: true,
             load: null,
@@ -64,7 +62,7 @@ function registerDialogExtendPlugin($: JQueryStatic) {
             return this._trigger("load");
         },
         _setState: function (state: any) {
-            this.element.removeClass("ui-dialog-" + this._state).addClass("ui-dialog-" + state);
+            $(this.domNode).removeClass("ui-dialog-" + this._state).addClass("ui-dialog-" + state);
             return this._state = state;
         },
         _initButtons: function () {
@@ -73,7 +71,7 @@ function registerDialogExtendPlugin($: JQueryStatic) {
             this._addButton("maximize", this.options.maximizable, DialogTexts.MaximizeHint, faIcon("window-maximize"));
             this._addButton("restore", false, DialogTexts.RestoreHint, faIcon("window-restore"));
 
-            var titlebar = this.element.closest('.ui-dialog').children('.ui-dialog-titlebar');
+            var titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
             titlebar.dblclick(function () {
                 if (_this.options.dblclick) {
                     if (_this._state !== "normal") {
@@ -89,13 +87,13 @@ function registerDialogExtendPlugin($: JQueryStatic) {
         _addButton: function (name: string, show: boolean, hint: string, icon: string) {
             var _this = this;
 
-            var titlebar = this.element.closest('.ui-dialog').children('.ui-dialog-titlebar');
+            var titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
             var closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
             var button = $('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
                 + name + '" href="javascript:;" tabindex="-1"><i class="' + icon + '"></i></a>')
                 .attr('title', hint)
                 .toggle(show)
-                .click(function (e) {
+                .click(function (e: any) {
                     e.preventDefault();
                     return _this[name]();
                 });
@@ -117,7 +115,7 @@ function registerDialogExtendPlugin($: JQueryStatic) {
                 this._restore();
             }
             this._saveSnapshot();
-            var el = $(this.element[0]) as any;
+            var el = $(this.domNode) as any;
             if (el.dialog("option", "draggable")) {
                 el.dialog("widget").draggable("option", "handle", null).find(".ui-dialog-draggable-handle").css("cursor", "text").end();
             }
@@ -137,12 +135,12 @@ function registerDialogExtendPlugin($: JQueryStatic) {
             this._toggleButtons();
 
             if (this.original_config_resizable)
-                this.element.closest('.ui-dialog').triggerHandler("resize");
+                $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
 
             return this._trigger("maximize");
         },
         _restore_maximized: function () {
-            var el = $(this.element[0]) as any;
+            var el = $(this.domNode) as any;
             var original = this._snapshot || { config: {}, size: {}, position: {}, titlebar: {} };
             el.dialog("widget").css("position", original.position.mode).find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content").dialog("option", {
                 resizable: original.config.resizable,
@@ -171,7 +169,7 @@ function registerDialogExtendPlugin($: JQueryStatic) {
             this._toggleButtons();
 
             if (this.original_config_resizable)
-                this.element.closest('.ui-dialog').triggerHandler("resize");
+                $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
 
             return this._trigger("restore");
         },
@@ -182,7 +180,7 @@ function registerDialogExtendPlugin($: JQueryStatic) {
         },
         _saveSnapshot: function () {
             if (this._state === "normal") {
-                var el = $(this.element[0]) as any;
+                var el = $(this.domNode) as any;
                 this._snapshot = {
                     config: {
                         resizable: el.dialog("option", "resizable"),
@@ -205,13 +203,11 @@ function registerDialogExtendPlugin($: JQueryStatic) {
             }
         },
         _toggleButtons: function () {
-            var uiDialog = this.element.closest('.ui-dialog');
+            var uiDialog = $(this.domNode).closest('.ui-dialog');
             uiDialog.find(".ui-dialog-titlebar-restore").toggle(this._state !== "normal");
             uiDialog.find(".ui-dialog-titlebar-maximize").toggle(this._state !== "maximized");
         }
     });
 }
 
-if (typeof jQuery !== "undefined") {
-    registerDialogExtendPlugin(jQuery) || jQuery(registerDialogExtendPlugin);
-}
+!registerDialogExtendPlugin() && Fluent.ready(registerDialogExtendPlugin);

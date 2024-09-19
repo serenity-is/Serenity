@@ -117,7 +117,7 @@ export function replaceAll(str: string, find: string, replace: string): string {
 
 /**
  * Pads the start of string to make it the specified length.
- * @param s String to pad.
+ * @param n The number to pad.
  * @param len Target length of the string.
  */
 export function zeroPad(n: number, len: number): string {

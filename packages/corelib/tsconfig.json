@@ -1,16 +1,9 @@
 ﻿{
-  "extends": "@serenity-is/base/tsconfig.base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "experimentalDecorators": true,
     "declarationDir": "./out",
     "rootDir": "./src",
     "paths": {
-      "@serenity-is/squery": [
-        "./src/globals/squery-module"
-      ],
-      "@optionaldeps/*": [
-        "./src/globals/*-module"
-      ]
     },
     "outDir": "./out",
     "target": "ES2017"

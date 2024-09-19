@@ -1,5 +1,5 @@
 #if ISSOURCEGENERATOR
-using Serenity.TypeScript.TsTypes;
+using Serenity.TypeScript;
 using System.Collections.Concurrent;
 #endif
 
@@ -104,7 +104,7 @@ public partial class TSModuleResolver
         if (string.IsNullOrEmpty(path))
             return null;
 
-        var cacheKey = TypeScript.TsParser.Core.NormalizePath(path);
+        var cacheKey = TypeScript.Utilities.NormalizePath(path);
 
         return packageJson.GetOrAdd(cacheKey, cacheKey => new(() => TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, path))).Value;
     }
@@ -312,7 +312,7 @@ public partial class TSModuleResolver
         if (allDependencies is not null)
             return allDependencies;
 
-        PackageJson packageJson = null;
+        PackageJson packageJson;
         var path = tsBasePath;
         do
         {

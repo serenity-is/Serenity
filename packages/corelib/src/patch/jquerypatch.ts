@@ -1,124 +1,108 @@
-﻿import { faIcon, getInstanceType, getTypeFullName, isAssignableFrom, notifyError, stringFormat } from "@serenity-is/base";
+﻿import { faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
 import { isMobileView } from "../q";
+import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
-function applyGetWidgetExtensions(jQuery: any, widgetType: { getWidgetName(type: any): string }) {
-    if (!widgetType || !jQuery || !jQuery.fn || jQuery.isMock)
+function applyGetWidgetExtensions($: any) {
+    if (!$ || !$.fn)
         return;
 
-    jQuery.fn.tryGetWidget = function tryGetWidget(this: JQuery, type?: any) {
-        var element = this;
-        var w;
-        type ??= widgetType;
-        if (isAssignableFrom(widgetType, type)) {
-            var widgetName = widgetType.getWidgetName(type);
-            w = element.data(widgetName);
-            if (w != null && !isAssignableFrom(type, getInstanceType(w))) {
-                w = null;
-            }
-            if (w != null) {
-                return w;
-            }
-        }
-
-        var data = element.data();
-        if (data == null) {
-            return null;
-        }
-
-        for (var key of Object.keys(data)) {
-            w = data[key];
-            if (w != null && isAssignableFrom(type, getInstanceType(w))) {
-                return w;
-            }
-        }
-
-        return null;
+    $.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
+        return tryGetWidget(this[0], type);
     }
 
-    jQuery.fn.getWidget = function getWidget<TWidget>(this: JQuery, type: { new(...args: any[]): TWidget }) {
-        if (this == null)
-            throw new Error("element argument is required for getting widgets!");
+    $.fn.getWidget = function getWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
+        if (!this?.length)
+            throw new Error(`Searching for widget of type '${getTypeFullName(type)}' on a non-existent element! (${(this as any)?.selector})`);
 
-        if (this.length === 0) {
-            throw new Error(stringFormat("Searching for widget of type '{0}' on a non-existent element! ({1})",
-                getTypeFullName(type), (this as any).selector));
-        }
-
-        var w = (this as any).tryGetWidget(type);
-        if (w == null) {
-            var message = stringFormat("Element has no widget of type '{0}'! If you have recently changed " +
-                "editor type of a property in a form class, or changed data type in row (which also changes " +
-                "editor type) your script side Form definition might be out of date. Make sure your project " +
-                "builds successfully and transform T4 templates", getTypeFullName(type));
-            notifyError(message, '', null);
-            throw new Error(message);
-        }
-        return w;
+        return getWidgetFrom(this[0], type);
     };
 }
 
-function applyJQueryUIFixes(jQuery: any): boolean {
-    if (!jQuery || !jQuery.ui || !jQuery.ui.dialog || !jQuery.ui.dialog.prototype)
+function applyJQueryUIFixes($: any): boolean {
+    if (!$ || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)
         return false;
 
-    jQuery.ui.dialog.prototype._allowInteraction = function (event: any) {
-        if (jQuery(event.target).closest(".ui-dialog").length) {
+    $.ui.dialog.prototype._allowInteraction = function (event: any) {
+        if ($(event.target).closest(".ui-dialog").length) {
             return true;
         }
-        return !!jQuery(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
+        return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
     };
 
     (function (orig) {
-        jQuery.ui.dialog.prototype._focusTabbable = function () {
+        $.ui.dialog.prototype._focusTabbable = function () {
             if (isMobileView) {
                 this.uiDialog && this.uiDialog.focus();
                 return;
             }
             orig.call(this);
         }
-    })(jQuery.ui.dialog.prototype._focusTabbable);
+    })($.ui.dialog.prototype._focusTabbable);
 
     (function (orig) {
-        jQuery.ui.dialog.prototype._createTitlebar = function () {
+        $.ui.dialog.prototype._createTitlebar = function () {
             orig.call(this);
             this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html(`<i class="${faIcon("times")}" />`);
         }
-    })(jQuery.ui.dialog.prototype._createTitlebar);
+    })($.ui.dialog.prototype._createTitlebar);
 }
 
-function applyCleanDataPatch(jQuery: any) {
-    if (!jQuery || !jQuery.fn || jQuery.isMock)
+function applyCleanDataPatch($: any) {
+    if (!$ || !$.fn || $.isMock)
         return;
 
     // for backward compatibility
-    if (!jQuery.toJSON)
-        jQuery.toJSON = JSON.stringify;
-    if (!jQuery.parseJSON)
-        jQuery.parseJSON = JSON.parse;
+    if (!$.toJSON)
+        $.toJSON = JSON.stringify;
+    if (!$.parseJSON)
+        $.parseJSON = JSON.parse;
 
-    (jQuery as any).cleanData = (function (orig) {
-        return function (elems: any[]) {
-            var events, elem, i, e;
-            var cloned = elems;
-            for (i = 0; (elem = cloned[i]) != null; i++) {
+    $.cleanData = (function (orig) {
+        return function (elements: any[]) {
+            var events, element, i;
+            var cloned = elements;
+            for (i = 0; (element = cloned[i]) != null; i++) {
                 try {
-                    events = (jQuery as any)._data(elem, "events");
-                    if (events && events.remove) {
-                        // html collection might change during remove event, so clone it!
-                        if (cloned === elems)
-                            cloned = Array.prototype.slice.call(elems);
-                        jQuery(elem).triggerHandler("remove");
-                        delete events.remove;
+                    events = ($ as any)._data(element, "events");
+                    if (events && events.disposing) {
+                        let handlers = events.disposing;
+                        delete events.disposing;
+                        for (var x of handlers) {
+                            if (x && typeof x.handler === "function") {
+                                try {
+                                    x.handler.call(element, ({ target: element }));
+                                }
+                                catch {
+                                }
+                            }
+                        }
                     }
                 } catch (e) { }
             }
-            orig(elems);
+            orig(elements);
         };
-    })((jQuery as any).cleanData);
+    })(($ as any).cleanData);
 }
 
-export function jQueryPatch(jQuery: any, widgetType: { getWidgetName(type: any): string }) {
-    !applyJQueryUIFixes(jQuery) && jQuery && jQuery(applyJQueryUIFixes);
-    applyCleanDataPatch(jQuery);
-    applyGetWidgetExtensions(jQuery, widgetType);
+function applyAjaxCSRFToken($: any) {
+    $?.ajaxSetup?.({
+        beforeSend: function (xhr: XMLHttpRequest, opt: any) {
+            if (!opt || !opt.crossDomain) {
+                var token = getCookie('CSRF-TOKEN');
+                if (token)
+                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
+            }
+        }
+    });
+}
+
+export function jQueryPatch(): boolean {
+    let $ = getjQuery();
+    if (!$)
+        return false;
+    applyJQueryUIFixes($);
+    applyCleanDataPatch($);
+    applyGetWidgetExtensions($);
+    applyAjaxCSRFToken($);
+    return true;
 }

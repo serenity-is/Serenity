@@ -111,6 +111,7 @@ export class Type1 extends StringEditor {
                 // can't resolve type refs in same module yet
                 Assert.Equal("Widget", x.BaseType);
                 Assert.True(x.IsDeclaration);
+                Assert.NotNull(x.Fields);
                 Assert.Collection(x.Fields.OrderBy(x => x.Name, StringComparer.Ordinal), 
                     x =>
                     {

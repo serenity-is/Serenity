@@ -9,7 +9,7 @@ namespace Serenity.Reporting;
 /// <remarks>
 /// Creates an instance of the class
 /// </remarks>
-/// <param name="reportRegistry">Report regitry</param>
+/// <param name="reportRegistry">Report registry</param>
 /// <param name="serviceProvider">Service provider</param>
 /// <param name="httpContextAccessor">Http context accessor</param>
 /// <exception cref="ArgumentNullException"></exception>

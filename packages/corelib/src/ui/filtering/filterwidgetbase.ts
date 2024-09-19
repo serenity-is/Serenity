@@ -1,11 +1,10 @@
-﻿import { Decorators } from "../../decorators";
-import { TemplatedWidget } from "../widgets/templatedwidget";
-import { WidgetProps } from "../widgets/widget";
+﻿import { Decorators } from "../../types/decorators";
+import { Widget, WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
 @Decorators.registerClass('Serenity.FilterWidgetBase')
-export class FilterWidgetBase<P = {}> extends TemplatedWidget<P> {
-    private store: FilterStore;
+export class FilterWidgetBase<P = {}> extends Widget<P> {
+    declare private store: FilterStore;
 
     private onFilterStoreChanged: () => void;
 

@@ -1,4 +1,4 @@
-﻿using ServerTypingsTest.DynamicPropertyType;
+using ServerTypingsTest.DynamicPropertyType;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -10,10 +10,8 @@ namespace Serenity.Tests.CodeGenerator
             var generator = CreateGenerator(typeof(TypeWithDynamicMember));
             var files = generator.Run();
             var actual = Assert.Single(files).Text;
-            Assert.Equal(NormalizeTS(@"namespace ServerTypingsTest.DynamicPropertyType {
-    export interface TypeWithDynamicMember {
-        SomeDynamic?: any;
-    }
+            Assert.Equal(NormalizeTS(@"export interface TypeWithDynamicMember {
+    SomeDynamic?: any;
 }"), NormalizeTS(actual));
         }
     }

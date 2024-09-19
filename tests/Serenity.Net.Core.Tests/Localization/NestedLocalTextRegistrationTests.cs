@@ -25,7 +25,7 @@ public class NestedLocalTextRegistrationTests
         var registry = new MockLocalTextRegistry();
         registry.AddNestedTexts(new MockTypeSource(typeof(NotNestedTexts), typeof(NestedTexts)));
 
-        Assert.Empty(registry.AddedList.Where(x => x.key == "N.N1" || x.key == "NOT5"));
+        Assert.DoesNotContain(registry.AddedList, x => x.key == "N.N1" || x.key == "NOT5");
     }
 
     [Fact]

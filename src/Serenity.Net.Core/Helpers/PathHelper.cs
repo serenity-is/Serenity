@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity;
 
@@ -47,7 +47,7 @@ public static class PathHelper
             throw new ArgumentNullException(nameof(relativePath));
 
         if (relativePath.Length > 0 && !IsSecureRelativePath(relativePath))
-            throw new ArgumentOutOfRangeException(nameof(relativePath));
+            throw new ArgumentOutOfRangeException(nameof(relativePath), "Invalid characters in path!");
 
         return Path.Combine(root, relativePath);
     }

@@ -218,7 +218,7 @@ public class ServiceAuthorizeAttributeTests
         serviceCollection.AddSingleton<ITextLocalizer, MockTextLocalizer>();
         serviceCollection.AddSingleton<IPermissionService>(new MockPermissions((perm) => permissions?.Contains(perm) == true));
 
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(Array.Empty<Claim>(), isLoggedIn ? "Authenticated" : ""));
+        var principal = new ClaimsPrincipal(new ClaimsIdentity([], isLoggedIn ? "Authenticated" : ""));
 
         var httpContext = new DefaultHttpContext()
         {

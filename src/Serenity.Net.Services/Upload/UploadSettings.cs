@@ -14,6 +14,11 @@ public class UploadSettings : IOptions<UploadSettings>
     public const string SectionKey = "UploadSettings";
 
     /// <summary>
+    /// Semicolon separated list of custom metadata keys that are allowed to be set by client
+    /// </summary>
+    public string EditableMetadataKeys { get; set; } = FileMetadataKeys.Description;
+
+    /// <summary>
     /// List of blacklisted extensions
     /// </summary>
     public string ExtensionBlacklist { get; set; } = ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;" +

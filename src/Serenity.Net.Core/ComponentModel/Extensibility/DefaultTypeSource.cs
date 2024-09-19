@@ -9,7 +9,7 @@ namespace Serenity.Abstractions;
 /// <param name="assemblies">List of assemblies</param>
 public class DefaultTypeSource(IEnumerable<Assembly> assemblies) : ITypeSource, IGetAssemblies
 {
-    private readonly IEnumerable<Assembly> assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
+    private readonly IEnumerable<Assembly> assemblies = (assemblies ?? throw new ArgumentNullException(nameof(assemblies))).Distinct().ToArray();
 
     /// <summary>
     /// Gets all attributes for assemblies with given type

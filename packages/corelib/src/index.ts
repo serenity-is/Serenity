@@ -21,26 +21,22 @@
  * @packageDocumentation
  */
 
-export * from "@serenity-is/base";
+export * from "./base";
 export * from "./q";
 export * from "./slick";
-export * from "./globals/select2-globals"
-export * from "./globals/jquery-globals"
-export * from "./globals/jquery.validation-globals"
 export * from "./interfaces";
 export * from "./types";
+export * from "./patch";
 export * from "./ui/datagrid/irowdefinition";
 export * from "./ui/datagrid/islickformatter";
-export * from "./decorators";
 export * from "./ui/helpers/lazyloadhelper";
 export * from "./ui/widgets/prefixedcontext";
+export * from "./ui/widgets/widgetutils";
 export * from "./ui/widgets/widget";
-export * from "./ui/widgets/jquerywidgetfn";
 export * from "./ui/widgets/toolbar";
-export * from "./ui/widgets/templatedwidget";
-export * from "./ui/dialogs/templateddialog";
-export * from "./ui/widgets/templatedpanel";
-export * from "./ui/helpers/validationhelper";
+export * from "./ui/dialogs/basedialog";
+export * from "./ui/widgets/basepanel";
+export * from "./ui/editors/editorwidget";
 export * from "./ui/editors/cascadedwidgetlink";
 export * from "./ui/helpers/tabsextensions";
 export * from "./ui/widgets/reflectionoptionssetter";
@@ -54,6 +50,7 @@ export * from "./ui/editors/stringeditor";
 export * from "./ui/editors/passwordeditor";
 export * from "./ui/editors/textareaeditor";
 export * from "./ui/editors/booleaneditor";
+export * from "./ui/editors/autonumeric";
 export * from "./ui/editors/decimaleditor";
 export * from "./ui/editors/integereditor";
 export * from "./ui/editors/dateeditor";
@@ -63,8 +60,10 @@ export * from "./ui/editors/emaileditor";
 export * from "./ui/editors/emailaddresseditor";
 export * from "./ui/editors/urleditor";
 export * from "./ui/editors/radiobuttoneditor";
-export * from "./ui/editors/select2editor";
+export * from "./ui/editors/combobox"
+export * from "./ui/editors/comboboxeditor";
 export * from "./ui/editors/selecteditor";
+export * from "./ui/editors/select2";
 export * from "./ui/editors/dateyeareditor";
 export * from "./ui/editors/enumeditor";
 export * from "./ui/editors/lookupeditor";
@@ -89,22 +88,11 @@ export * from "./ui/datagrid/slickpager";
 export * from "./ui/datagrid/idatagrid";
 export * from "./ui/helpers/slickhelpers";
 export * from "./ui/formatters/formatters";
-export * from "./types/formattertyperegistry";
 export * from "./ui/datagrid/datagrid";
 export * from "./ui/datagrid/columnpickerdialog";
 export * from "./ui/datagrid/treegridmixin";
 export * from "./ui/editors/checktreeeditor";
 export * from "./ui/datagrid/entitygrid";
 export * from "./ui/dialogs/entitydialog";
-export * from "./ui/widgets/jsx";
-
-// legacy
-export * from "./ui/widgets/reporting";
-export * from "./ui/widgets/scriptcontext";
-export * from "./interfaces/iasyncinit";
-export * from "./ui/widgets/wx";
-export * from "./ui/widgets/flexify";
-export * from "./ui/widgets/googlemap";
-export * from "./ui/editors/select2ajaxeditor";
 
 export type Constructor<T> = new (...args: any[]) => T;

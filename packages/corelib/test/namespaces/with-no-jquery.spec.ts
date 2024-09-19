@@ -1,7 +1,7 @@
-import { loadNSCorelib } from "../testutil"
+import { loadNSCorelib } from "@/mocks";
 
 test('works when jQuery not loaded', function() {
-    loadNSCorelib(window);
-    const Q = (window as any).Serenity;
-    expect(Q.replaceAll('xyx', 'x', 'y')).toBe('yyy');
+    loadNSCorelib();
+    const Serenity = (window as any).Serenity;
+    expect(Serenity.replaceAll('xyx', 'x', 'y')).toBe('yyy');
 });

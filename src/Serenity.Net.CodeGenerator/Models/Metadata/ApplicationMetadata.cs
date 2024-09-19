@@ -54,7 +54,7 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        protected override void HandleMemberType(TypeReference memberType, string codeNamespace, bool module)
+        protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
         {
         }
     }

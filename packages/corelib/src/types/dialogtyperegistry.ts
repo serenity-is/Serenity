@@ -1,25 +1,18 @@
-﻿import { htmlEncode, isAssignableFrom, notifyError } from "@serenity-is/base";
+﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { IDialog } from "../interfaces";
-import { ArgumentNullException, Exception } from "../q";
+import { Exception } from "../q";
 import { commonTypeRegistry } from "./commontyperegistry";
+import { DialogType } from "./dialogtype";
 
 export namespace DialogTypeRegistry {
 
-    let registry = commonTypeRegistry(
-        type => isAssignableFrom(IDialog, type),
-        null, "Dialog");
-
-    export function get(key: string): any {
-
-        if (!key)
-            throw new ArgumentNullException('key');
-
-        var type = registry.tryGet(key);
-
-        if (type)
-            return type;
-
-        var message = `"${htmlEncode(key)}" dialog class not found! 
+    const registry = commonTypeRegistry<DialogType>({
+        attrKey: null,
+        isMatch: type => isAssignableFrom(IDialog, type),
+        kind: "dialog",
+        suffix: "Dialog",
+        loadError: function (key: string) {
+            var message = `"${htmlEncode(key)}" dialog class not found! 
 Make sure there is such a dialog type under the project root namespace, 
 and its namespace parts start with capital letters like MyProject.MyModule.MyDialog.
 
@@ -35,15 +28,14 @@ Specify the DialogType property in the LookupEditor attribute if it is not.
 After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
 from the project folder.`;
 
-        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
-        throw new Exception(message);
-    }
+            notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+            throw new Exception(message);
+        }
+    });
 
-    export function reset() {
-        registry.reset();
-    }
-
-    export function tryGet(key: string) {
-        return registry.tryGet(key);
-    }
+    export let get = registry.get;
+    export let getOrLoad = registry.getOrLoad;
+    export let reset = registry.reset;
+    export let tryGet = registry.tryGet;
+    export let tryGetOrLoad = registry.tryGetOrLoad;
 }

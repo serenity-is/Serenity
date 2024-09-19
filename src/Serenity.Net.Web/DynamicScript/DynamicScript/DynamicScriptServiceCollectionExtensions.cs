@@ -80,7 +80,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
-        collection.TryAddSingleton<ICssMinifier, NuglifyMinifier>();
+        collection.AddEsBuildCssMinifier();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
     }
 
@@ -114,7 +114,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
-        collection.TryAddSingleton<IScriptMinifier, NuglifyMinifier>();
+        collection.AddEsBuildScriptMinifier();
         collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
     }
 
@@ -125,7 +125,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     /// <param name="setupAction">Action to edit options</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddScriptBundling(this IServiceCollection collection, 
+    public static void AddScriptBundling(this IServiceCollection collection,
         Action<ScriptBundlingOptions> setupAction)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -158,7 +158,6 @@ public static class DynamicScriptServiceCollectionExtensions
         UseDynamicScriptTypes(builder.ApplicationServices);
         UseCssWatching(builder.ApplicationServices);
         UseScriptWatching(builder.ApplicationServices);
-        UseTemplateScripts(builder.ApplicationServices);
 
         return UseDynamicScriptMiddleware(builder);
     }
@@ -191,11 +190,10 @@ public static class DynamicScriptServiceCollectionExtensions
             typeSource, propertyProvider, serviceProvider);
 
         scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
-            new Func<string>[]
-            {
+            [
                 () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
                     .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-            }));
+            ]));
 
         return serviceProvider;
     }
@@ -309,44 +307,24 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers template scripts
+    /// Registers the default local text initializer
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider)
+    /// <param name="collection">Service collection</param>
+    public static void AddLocalTextInitializer(this IServiceCollection collection)
     {
-        var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
-        var templateRoots = new[]
-        {
-            System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Views", "Templates"),
-            System.IO.Path.Combine(hostEnvironment.ContentRootPath, "Modules")
-        };
-        UseTemplateScripts(serviceProvider, templateRoots);
-        return serviceProvider;
+        ArgumentNullException.ThrowIfNull(collection);
+        collection.TryAddSingleton<ILocalTextInitializer, DefaultLocalTextInitializer>();
     }
 
+
     /// <summary>
-    /// Registers template scripts
+    /// Initializes local texts by calling <see cref="ILocalTextInitializer.Initialize"/>
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="templateRoots">Root paths for templates</param>
-    /// <exception cref="ArgumentNullException">Service provider or template roots is null</exception>
-    public static IServiceProvider UseTemplateScripts(this IServiceProvider serviceProvider, 
-        params string[] templateRoots)
+    public static void InitializeLocalTexts(this IApplicationBuilder app)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        if (templateRoots == null || templateRoots.Length == 0)
-            throw new ArgumentNullException(nameof(templateRoots));
-
-        var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
-
-        var templateWatchers = new TemplateScriptRegistrar()
-            .Initialize(scriptManager, templateRoots, watchForChanges: true);
-
-        foreach (var templateWatcher in templateWatchers)
-            serviceProvider.GetRequiredService<IFileWatcherFactory>()
-                .KeepAlive(templateWatcher);
-
-        return serviceProvider;
+        ArgumentNullException.ThrowIfNull(app);
+        var registry = app.ApplicationServices.GetRequiredService<ILocalTextRegistry>();
+        var initializer = app.ApplicationServices.GetRequiredService<ILocalTextInitializer>();
+        initializer.Initialize(registry);
     }
 }

@@ -1,4 +1,5 @@
 .nupkg/
+.rollup.cache/
 .swc/
 .vs/
 artifacts/
@@ -17,3 +18,4 @@ ErrorLog.db
 StyleCop.Cache
 /build/tools/Addins/
 package-lock.json
+tsconfig.tsbuildinfo

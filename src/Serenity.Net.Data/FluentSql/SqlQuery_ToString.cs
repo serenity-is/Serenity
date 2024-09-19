@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 public partial class SqlQuery
 {
@@ -20,7 +20,7 @@ public partial class SqlQuery
     string ISqlQuery.GroupBy => groupBy?.ToString();
     string ISqlQuery.Having => having?.ToString();
     bool ISqlQuery.OmitParens => omitParens;
-    IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>)orderBy ?? Array.Empty<string>();
+    IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>)orderBy ?? [];
     IQueryWithParams ISqlQuery.Parent => parent;
     int ISqlQuery.Skip => skip;
     int ISqlQuery.Take => take;

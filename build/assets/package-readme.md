@@ -44,4 +44,4 @@ Attribute-based navigation menu
 
 - Serene Application Template:
 [Download from VS Marketplace](https://marketplace.visualstudio.com/items?itemName=VolkanCeylan.SereneSerenityApplicationTemplate)
-- Serene Github Repo: https://github.com/serenity-is/Serene
+- Serene GitHub Repo: https://github.com/serenity-is/Serene

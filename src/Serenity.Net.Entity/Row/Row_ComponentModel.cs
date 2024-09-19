@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 public abstract partial class Row<TFields> : IEditableRow
 {
@@ -78,7 +78,8 @@ public abstract partial class Row<TFields> : IEditableRow
             for (int i = 0; i < fields.Count; i++)
                 fields[i].CopyNoAssignment(original, this);
 
-            assignedFields = original.assignedFields;
+            assignedFieldsMask = original.assignedFieldsMask;
+            assignedFieldsArray = original.assignedFieldsArray;
 
             ((IEditableRow)this).ClearValidationErrors();
         }

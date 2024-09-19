@@ -15,7 +15,7 @@ public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
     [Fact]
     public void Does_Not_Throw_If_TypeSource_Is_Added_To_Collection()
     {
-        var typeSource = new DefaultTypeSource(Array.Empty<Assembly>());
+        var typeSource = new DefaultTypeSource([]);
         var collection = new ServiceCollection();
         collection.AddSingleton<ITypeSource>(typeSource);
         Assert.Single(collection);

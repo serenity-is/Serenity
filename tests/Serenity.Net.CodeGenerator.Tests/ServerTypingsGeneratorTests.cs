@@ -1,4 +1,4 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Serenity.CodeGeneration;
 
 namespace Serenity.Tests.CodeGenerator;
@@ -16,6 +16,7 @@ public partial class ServerTypingsGeneratorTests
         var generator = new ServerTypingsGenerator(new MockFileSystem(),
             typeof(ServerTypingsGeneratorTests).Assembly.Location);
         generator.RootNamespaces.Add("ServerTypingsTest");
+        generator.ModuleReExports = false;
         generator.TypeFilter = type =>
         {
             return types.Length == 0 ? InTestNamespace(type) :
@@ -34,9 +35,7 @@ public partial class ServerTypingsGeneratorTests
             return types.Length == 0 ? InTestNamespace(type) :
                 types.Any(x => type.FullName == x.FullName);
         };
-        generator.ModuleTypings = true;
         generator.ModuleReExports = false;
-        generator.NamespaceTypings = false;
         return generator;
     }
 

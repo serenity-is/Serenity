@@ -1,15 +1,16 @@
-﻿import { PropertyItem, getInstanceType, getTypeFullName } from "@serenity-is/base";
-import { Decorators, FormKeyAttribute } from "../../decorators";
-import { getAttributes, getForm } from "../../q";
-import { PropertyGrid, PropertyGridOptions } from "./propertygrid";
-import { TemplatedPanel } from "./templatedpanel";
+﻿import { PropertyItem, getInstanceType, getTypeFullName } from "../../base";
+import { getForm } from "../../q";
+import { FormKeyAttribute } from "../../types/attributes";
+import { Decorators } from "../../types/decorators";
+import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
+import { BasePanel } from "./basepanel";
 import { WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')
-export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
+export class PropertyPanel<TItem, P> extends BasePanel<P> {
 
-    private _entity: TItem;
-    private _entityId: any;
+    declare private _entity: TItem;
+    declare private _entityId: any;
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -31,15 +32,11 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     }
 
     protected initPropertyGrid() {
-        var pgDiv = this.byId('PropertyGrid');
-        if (pgDiv.length <= 0) {
+        var pgDiv = this.findById('PropertyGrid');
+        if (!pgDiv)
             return;
-        }
         var pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
-        if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
-            this.propertyGrid.element.children('.categories').flexHeightOnly(1);
-        }
     }
 
     protected loadInitialEntity(): void {
@@ -49,11 +46,9 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
     }
 
     protected getFormKey(): string {
-        var attributes = getAttributes(
-            getInstanceType(this), FormKeyAttribute, true);
-
-        if (attributes.length >= 1) {
-            return attributes[0].value;
+        var attr = this.getCustomAttribute(FormKeyAttribute);
+        if (attr) {
+            return attr.value;
         }
         var name = getTypeFullName(getInstanceType(this));
         var px = name.indexOf('.');
@@ -70,8 +65,7 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         return {
             idPrefix: this.idPrefix,
             items: this.getPropertyItems(),
-            mode: 1,
-            useCategories: false,
+            mode: PropertyGridMode.insert,
             localTextPrefix: 'Forms.' + this.getFormKey() + '.'
         };
     }
@@ -89,19 +83,19 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         return entity as TItem;
     }
 
-    protected get_entity(): TItem {
+    public get entity(): TItem {
         return this._entity;
     }
 
-    protected get_entityId(): any {
+    public get entityId(): any {
         return this._entityId;
     }
-    
-    protected set_entity(value: TItem): void {
+
+    protected set entity(value: TItem) {
         this._entity = value ?? new Object() as any;
     }
 
-    protected set_entityId(value: any): void {
+    protected set entityId(value: any) {
         this._entityId = value;
     }
 
@@ -109,5 +103,5 @@ export class PropertyPanel<TItem, P> extends TemplatedPanel<P> {
         return this.validator.form();
     }
 
-    protected propertyGrid: PropertyGrid;
+    declare protected propertyGrid: PropertyGrid;
 }

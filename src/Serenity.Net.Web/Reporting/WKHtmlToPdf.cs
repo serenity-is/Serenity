@@ -1,4 +1,4 @@
-﻿using Serenity.IO;
+using Serenity.IO;
 using System.Diagnostics;
 using System.IO;
 
@@ -19,7 +19,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     /// Executes the converter process and returns the PDF bytes
     /// </summary>
     /// <exception cref="ArgumentNullException">UtilityExePath or URL is null</exception>
-    /// <exception cref="InvalidOperationException">An error occureed during process execution</exception>
+    /// <exception cref="InvalidOperationException">An error occurred during process execution</exception>
     public byte[] Execute()
     {
         var exePath = ExecutablePath ?? throw new ArgumentNullException(nameof(ExecutablePath));
@@ -187,7 +187,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
                     "PDF generator returned error code {0}!", process.ExitCode));
 
             if (!File.Exists(tempFile))
-                throw invalidOperation("Can't find generatored PDF file!");
+                throw invalidOperation("Can't find generated PDF file!");
 
             var bytes = File.ReadAllBytes(tempFile);
             if (bytes.Length == 0)
@@ -197,7 +197,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
         }
         finally
         {
-            TemporaryFileHelper.TryDelete(tempFile);
+            TemporaryFileHelper.TryDelete(tempFile, fileSystem: null);
         }
     }
 

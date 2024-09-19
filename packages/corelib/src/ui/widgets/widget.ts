@@ -1,46 +1,16 @@
-﻿import sQuery from "@optionaldeps/squery";
-import { Config, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, stringFormat, toggleClass } from "@serenity-is/base";
-import { Decorators, ElementAttribute } from "../../decorators";
-import { jQueryPatch } from "../../patch/jquerypatch";
-import { reactPatch } from "../../patch/reactpatch";
-import { Exception, addValidationRule as addValRule, appendChild, getAttributes, replaceAll } from "../../q";
-import { EditorUtils } from "../editors/editorutils";
+import { Config, Fluent, addClass, addValidationRule, appendToNode, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
+import { Decorators } from "../../types/decorators";
+import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
+import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
+export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
-export type NoInfer<T> = [T][T extends any ? 0 : never];
-
-export type WidgetProps<P> = {
-    id?: string;
-    class?: string;
-    element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
-} & NoInfer<P>
-
-export type EditorProps<T> = WidgetProps<T> & {
-    initialValue?: any;
-    maxLength?: number;
-    name?: string;
-    placeholder?: string;
-    required?: boolean;
-    readOnly?: boolean;
-}
-
-export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
-    type?: { new(options?: P): TWidget, prototype: TWidget };
-    options?: P & WidgetProps<{}>;
-    container?: HTMLElement | ArrayLike<HTMLElement>;
-    element?: (e: JQuery) => void;
-    init?: (w: TWidget) => void;
-}
-
-let initialized = Symbol();
-let isFragmentWorkaround = Symbol();
-let renderContentsCalled = Symbol();
-
-@Decorators.registerClass('Serenity.Widget')
+@Decorators.registerType()
 export class Widget<P = {}> {
+    static typeInfo = Decorators.classType("Serenity.Widget");
+
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
-    declare protected readonly widgetName: string;
-    declare protected readonly uniqueName: string;
+    declare public readonly uniqueName: string;
     declare public readonly idPrefix: string;
     declare public readonly domNode: HTMLElement;
 
@@ -55,74 +25,49 @@ export class Widget<P = {}> {
         }
 
         delete this.options.element;
-        this.setElementProps();
+        setElementProps(this, this.props as any);
 
-        this.widgetName = Widget.getWidgetName(getInstanceType(this));
-        this.uniqueName = this.widgetName + (Widget.nextWidgetNumber++).toString();
+        this.uniqueName = getWidgetName(getInstanceType(this)) + (Widget.nextWidgetNumber++).toString();
 
-        if (!jQuery.isMock) {
-            if (jQuery(this.domNode).data(this.widgetName))
-                throw new Exception(stringFormat("The element already has widget '{0}'!", this.widgetName));
+        associateWidget(this);
 
-            jQuery(this.domNode).on('remove.' + this.widgetName, e => {
-                if (e.bubbles || e.cancelable) {
-                    return;
-                }
-                this.destroy();
-            }).data(this.widgetName, this);
-        }
+        Fluent.one(this.domNode, 'disposing.' + this.uniqueName, (e) => {
+            this.destroy();
+        });
 
-        this.idPrefix = this.uniqueName + '_';
+        this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
         this.addCssClass();
         !getInstanceType(this).deferRenderContents && this.internalRenderContents();
     }
 
     public destroy(): void {
         if (this.domNode) {
+            deassociateWidget(this);
             toggleClass(this.domNode, this.getCssClass(), false);
-            !jQuery.isMock && jQuery(this.domNode).off('.' + this.widgetName).off('.' + this.uniqueName).removeData(this.widgetName);
+            Fluent.off(this.domNode, '.' + this.uniqueName);
             delete (this as any).domNode;
         }
     }
 
     static createDefaultElement(): HTMLElement {
-        var elementAttr = getAttributes(this, ElementAttribute, true);
-        if (elementAttr.length) {
-            let node: HTMLElement;
-            if (!jQuery.isMock) {
-                node = jQuery(elementAttr[0].value).get(0);
-                node.parentNode?.removeChild(node);
-                return node;
-            }
-            let wrap = document.createElement("div");
-            wrap.innerHTML = elementAttr[0].value;
-            node = wrap.children[0] as HTMLElement;
-            if (!node)
-                return document.createElement(this.defaultTagName);
-            node.parentNode?.removeChild(node);
-            return node;
-        }
-        else {
-            return document.createElement(typeof this.defaultTagName);
-        }
+        return document.createElement("div");
     }
 
     /**
-     * @deprecated
-     * Prefer domNode as this one depends on jQuery or a mock one if jQuery is not loaded
+     * Returns a Fluent(this.domNode) object
      */
-    public get element(): JQuery {
-        return jQuery(this.domNode);
+    public get element(): Fluent {
+        return Fluent(this.domNode);
     }
 
     protected addCssClass(): void {
-        toggleClass(this.domNode, this.getCssClass(), true);
+        addClass(this.domNode, this.getCssClass());
     }
 
     protected getCssClass(): string {
         var type = getInstanceType(this);
         var classList: string[] = [];
-        var fullClass = replaceAll(getTypeFullName(type), '.', '-');
+        var fullClass = getTypeFullName(type).replace(/\./g, '-');
         classList.push(fullClass);
 
         for (let k of Config.rootNamespaces) {
@@ -140,46 +85,45 @@ export class Widget<P = {}> {
     }
 
     public static getWidgetName(type: Function): string {
-        return replaceAll(getTypeFullName(type), '.', '_');
+        return getWidgetName(type);
     }
 
-    /**
-     * @deprecated Prefer WidgetType.createDefaultElement
-     */
-    public static elementFor(editorType: typeof Widget): JQuery {
-        return sQuery(editorType.createDefaultElement());
+    public addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
+    public addValidationRule(uniqueName: string, rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string): void;
+    public addValidationRule(rule: any, uniqueName: any): void {
+        addValidationRule(this.domNode, typeof rule === "function" ? rule : uniqueName,
+            typeof rule === "function" ? uniqueName ?? this.uniqueName : rule);
     }
 
-    public addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery {
-        return addValRule(sQuery(this.domNode), eventClass, rule);
+    protected byId<TElement extends HTMLElement = HTMLElement>(id: string): Fluent<TElement> {
+        return this.element.findFirst<TElement>('#' + this.idPrefix + id);
     }
 
-    public getFieldElement(): HTMLElement {
-        return this.domNode.closest('.field');
+    protected findById<TElement extends HTMLElement = HTMLElement>(id: string): TElement {
+        return this.domNode?.querySelector<TElement>('#' + this.idPrefix + id);
     }
 
-    public getGridField(): JQuery {
-        return sQuery(this.domNode).closest('.field');
+    public getGridField(): Fluent {
+        return Fluent(this.domNode.closest('.field'));
     }
 
     public change(handler: (e: Event) => void) {
-        sQuery(this.domNode).on('change.' + this.uniqueName, handler);
+        Fluent.on(this.domNode, "change." + this.uniqueName, handler);
     };
 
     public changeSelect2(handler: (e: Event) => void) {
-        sQuery(this.domNode).on('change.' + this.uniqueName, function (e, valueSet) {
-            if (valueSet !== true)
-                handler(e as any);
+        Fluent.on(this.domNode, "change." + this.uniqueName, e => {
+            if ((e.target as HTMLElement)?.dataset?.comboboxsettingvalue)
+                return;
+            handler(e);
         });
-    };
-
-    protected static defaultTagName: string = "div";
+    }
 
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
         let props: WidgetProps<P> = params.options ?? ({} as any);
         let node = handleElementProp(params.type as any, props);
-        params.container && (isArrayLike(params.container) ? sQuery(params.container).append(node) : params.container.appendChild(node));
-        params.element?.(sQuery(node));
+        params.container && (isArrayLike(params.container) ? params.container[0] : params.container)?.appendChild(node);
+        params.element?.(Fluent(node));
         props.element = node;
         let widget = new params.type(props as any);
         widget.init();
@@ -187,66 +131,12 @@ export class Widget<P = {}> {
         return widget;
     }
 
-    private setElementProps(): void {
-        let el = this.domNode;
-        let props = this.props as EditorProps<{}>;
-        if (!el || !props)
-            return;
-
-        if (typeof props.id === "string")
-            el.id = props.id;
-
-        if (typeof props.name === "string")
-            el.setAttribute("name", props.name);
-
-        if (typeof props.placeholder === "string")
-            el.setAttribute("placeholder", props.placeholder);
-
-        if (typeof props.class === "string")
-            toggleClass(el, props.class, true);
-
-        if (typeof (props as any).className === "string")
-            toggleClass(el, (props as any).className, true);
-
-        if (typeof props.maxLength === "number")
-            el.setAttribute("maxLength", (props.maxLength || 0).toString());
-        else if (typeof (props as any).maxlength === "number")
-            el.setAttribute("maxLength", ((props as any).maxlength || 0).toString());
-
-        // using try catch here as some editors might not be able
-        // to set them in the constructor if forwarding these
-        // properties to any elements created in the constructor
-        if (props.required != null)
-        {
-            try {
-                EditorUtils.setRequired(this, props.required);
-            }
-            catch {
-            }
-        }
-
-        if (props.readOnly != null) {
-            try {
-                EditorUtils.setReadOnly(this, props.readOnly);
-            }
-            catch {
-            }
-        }
-
-        if (props.initialValue != null) {
-            try {
-                EditorUtils.setValue(this, props.initialValue);            
-            }
-            catch {
-            }
-        }
+    protected getCustomAttribute<TAttr>(attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
+        return getCustomAttribute(getInstanceType(this), attrType, inherit);
     }
 
     protected internalInit() {
         getInstanceType(this).deferRenderContents && this.internalRenderContents();
-
-        if (typeof (this.options as any)?.ref === "function")
-            (this.options as any)?.ref(this);
     }
 
     public init(): this {
@@ -262,11 +152,11 @@ export class Widget<P = {}> {
      * As widgets may get their elements from props unlike regular JSX widgets, 
      * this method should not be overridden. Override renderContents() instead.
      */
-    public render(): HTMLElement | DocumentFragment {
+    public render(): any {
         let el = this.init().domNode;
         let parent = el?.parentNode;
         if (parent instanceof DocumentFragment &&
-            parent.childNodes.length > 1 && 
+            parent.childNodes.length > 1 &&
             (parent as any)[isFragmentWorkaround])
             return parent;
         return el;
@@ -277,12 +167,27 @@ export class Widget<P = {}> {
             return;
         (this as any)[renderContentsCalled] = true;
         let contents = this.renderContents();
-        if (typeof contents !== "undefined" && contents !== false && this.domNode)
-            appendChild(contents, this.domNode);
+        if (this.domNode && contents)
+            appendToNode(this.domNode, contents);
     }
 
-    protected renderContents(): any | void {
+    protected renderContents(): any {
+        if (this.legacyTemplateRender())
+            return void 0;
         return (this.options as any).children;
+    }
+
+    protected legacyTemplateRender(): boolean {
+        if (typeof (this as any).getTemplate !== "function")
+            return;
+
+        var template = (this as any).getTemplate();
+        if (typeof template !== "string")
+            return;
+
+        template = template.replace(new RegExp('~_', 'g'), this.idPrefix);
+        this.domNode.innerHTML = template;
+        return true;
     }
 
     public get props(): WidgetProps<P> {
@@ -295,47 +200,28 @@ export class Widget<P = {}> {
         else
             asyncMethod.call(this).then(then.bind(this));
     }
+
+    protected useIdPrefix(): IdPrefixType {
+        return useIdPrefix(this.idPrefix);
+    }
+
+    // jsx-dom >= 8.1.5 requires isComponent as a static property
+    static readonly isComponent = true;
 }
 
-function ensureParentOrFragment(node: HTMLElement): HTMLElement {
-    if (!node || node.parentNode)
-        return node;
-    let fragment = document.createDocumentFragment();
-    fragment.appendChild(node);
-    (fragment as any)[isFragmentWorkaround] = true;
-    return node;
-}
+/** @deprecated Use Widget */
+export const TemplatedWidget = Widget;
 
-function handleElementProp(type: typeof Widget, props: WidgetProps<{}>): HTMLElement {
-    let elementProp = props?.element;
-    let domNode: HTMLElement;
-    if (typeof elementProp == "string") {
-        domNode = document.querySelector(elementProp);
-        if (domNode == null)
-            throw `The element ${elementProp} specified for the ${getTypeFullName(type)} is not found in the DOM!`;
-    }
-    else if (isArrayLike(elementProp)) {
-        domNode = elementProp[0];
-    }
-    else if (elementProp instanceof HTMLElement) {
-        domNode = elementProp;
-    }
-    else {
-        domNode = type.createDefaultElement();
-        if (typeof elementProp === "function")
-            elementProp(domNode);
-    }
-
-    return ensureParentOrFragment(domNode);
-}
-
+// jsx-dom < 8.1.5 requires isReactComponent on prototype
 Object.defineProperties(Widget.prototype, { isReactComponent: { value: true } });
 
-export class EditorWidget<P> extends Widget<EditorProps<P>> {
-    constructor(props: EditorProps<P>) {
-        super(props);
-    }
+export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
+    type?: { new(options?: P): TWidget, prototype: TWidget };
+    options?: P & WidgetProps<{}>;
+    container?: HTMLElement | ArrayLike<HTMLElement>;
+    element?: (e: Fluent) => void;
+    init?: (w: TWidget) => void;
 }
 
-jQueryPatch(sQuery, Widget);
-reactPatch();
+const initialized = Symbol();
+const renderContentsCalled = Symbol();

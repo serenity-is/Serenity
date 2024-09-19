@@ -152,7 +152,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     public string[] GetStrings(string[] names, bool required = true)
     {
         var values = new List<string>();
-        foreach (var (name, value) in EnumerateValueArguments(names, required))
+        foreach (var (_, value) in EnumerateValueArguments(names, required))
         {
             values.Add(value);
         }

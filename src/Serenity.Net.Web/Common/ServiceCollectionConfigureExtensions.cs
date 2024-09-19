@@ -51,7 +51,7 @@ public static class ServiceCollectionConfigureExtensions
                 continue;
 
             var configureMethod = configureExtension.MakeGenericMethod(type);
-            configureMethod.Invoke(null, new object[] { services, config });
+            configureMethod.Invoke(null, [services, config]);
         }
 
         return services;

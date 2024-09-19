@@ -43,7 +43,7 @@ public class GeneratorConfig
     /// When true, enables RowTemplate class generation. This should
     /// only be used when Serenity.Pro.Coder is enabled in the project.
     /// Has no effect when EnableGenerateFields is true.
-    /// EnableGenerateFields should be preffered over this as 
+    /// EnableGenerateFields should be preferred over this as 
     /// RowTemplate might cause some issues.
     /// </summary>
     public bool? EnableRowTemplates { get; set; }
@@ -142,8 +142,10 @@ public class GeneratorConfig
     /// <summary>
     /// Sergen restore command related configuration
     /// </summary>
+    [Obsolete("Sergen no longer supports restoring static content.")]
     public RestoreConfig Restore { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
+    [Obsolete("Only used for JSON serialization of Restore")]
     public bool ShouldSerializeRestore() => Restore != null &&
         (!Restore.Include.IsEmptyOrNull() ||
          !Restore.Exclude.IsEmptyOrNull());
@@ -423,17 +425,29 @@ public class GeneratorConfig
         /// Generate module typings. Defaults to true if you
         /// have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("This flag has no effect as only module typings are generated now.")]
         public bool? ModuleTypings { get; set; }
+
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of ModuleTypings")]
         public bool ShouldSerializeModuleTypings() => ModuleTypings != null;
 
         /// <summary>
         /// Generate namespace typings. Defaults to true if you
         /// don't have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("Namespaces mode code generation is deprecated.")]
         public bool? NamespaceTypings { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of NamespaceTypings")]
         public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
+
+        /// <summary>
+        /// Prefer using relative paths like "../ServerTypes/" instead of "@/ServerTypes/"
+        /// </summary>
+        public bool? PreferRelativePaths { get; set; }
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializePreferRelativePaths() => PreferRelativePaths != null;
 
         /// <summary>
         /// Set false to disable the server typings source generator in Serenity.Pro.Coder
@@ -569,7 +583,8 @@ public class GeneratorConfig
     public class TSBuildConfig
     {
         /// <summary>
-        /// List of entry point globs, default is "**/Page.ts", "**/Page.tsx", "**/ScriptInit.ts"
+        /// List of entry point globs, default is "Modules/**/*Page.ts", "Modules/**/*Page.tsx", "Modules/**/ScriptInit.ts"
+        /// Include "+" as the first item to append to default list.
         /// </summary>
         public List<string> EntryPoints { get; set; }
 

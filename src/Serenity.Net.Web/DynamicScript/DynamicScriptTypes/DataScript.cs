@@ -47,7 +47,22 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     public override string GetScript()
     {
         var data = getData();
-        return string.Format(CultureInfo.CurrentCulture, "Q.ScriptData.set({0}, {1});", ScriptName.ToSingleQuoted(), 
+        return string.Format(CultureInfo.CurrentCulture,
+            SetScriptDataFormat,
+            ScriptName.ToSingleQuoted(),
             JSON.Stringify(data, writeNulls: false));
     }
+
+    /// <summary>
+    /// Format string for Serenity.setScriptData({0}, {1})
+    /// </summary>
+    public const string SetScriptDataFormat =
+        "((typeof Serenity!=='undefined'&&Serenity.setScriptData)||" +
+        "(function(k,v){{" +
+            "var s=Symbol.for('Serenity.scriptData');" +
+            "var g=globalThis[s];" +
+            "if(!g)g=globalThis[s]={{}};" +
+            "g[k]=v" +
+        "}})" +
+            ")({0},{1});";
 }

@@ -1,4 +1,4 @@
-﻿using Serenity.Localization;
+using Serenity.Localization;
 
 namespace Serenity.Tests.Localization;
 
@@ -42,8 +42,7 @@ public class EnumLocalTextRegistrationTests
         string expectedKey = "Enums." + typeof(EnumWithoutKey).FullName + "." +
             EnumWithoutKey.WithDescriptionNoKey.GetName();
 
-        Assert.Collection(registry.AddedList,
-            item1 => Assert.Equal((LocalText.InvariantLanguageID, expectedKey, "Description for WithDescriptionNoKey"), item1));
+        Assert.Equal((LocalText.InvariantLanguageID, expectedKey, "Description for WithDescriptionNoKey"), Assert.Single(registry.AddedList));
     }
 
     [Fact]
@@ -54,8 +53,8 @@ public class EnumLocalTextRegistrationTests
 
         string expectedKey = "Enums.My.CoolEnumKey." + EnumWithKey.WithDescriptionKey.GetName();
 
-        Assert.Collection(registry.AddedList,
-            item1 => Assert.Equal((LocalText.InvariantLanguageID, expectedKey, "Description for WithDescriptionKey"), item1));
+        Assert.Equal((LocalText.InvariantLanguageID, expectedKey, "Description for WithDescriptionKey"),
+            Assert.Single(registry.AddedList));
     }
 
     [Fact]

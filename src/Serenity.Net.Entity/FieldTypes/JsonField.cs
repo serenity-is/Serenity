@@ -164,7 +164,8 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
                     _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString(), options));
                 break;
             default:
-                throw UnexpectedJsonToken(ref reader);
+                _setValue(row, JsonSerializer.Deserialize<TValue>(ref reader, options));
+                break;
         }
 
         row.FieldAssignedValue(this);

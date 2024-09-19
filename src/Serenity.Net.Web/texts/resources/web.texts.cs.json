@@ -92,7 +92,6 @@
   "Controls.Pager.NoRowStatus": "Žádné záznamy",
   "Controls.Pager.Page": "Stránka",
   "Controls.Pager.PageStatus": "Zobrazuje se od {from} do {to} z celkového počtu {total} záznamů",
-  "Controls.PropertyGrid.DefaultCategory": "Vlastnosti",
   "Controls.PropertyGrid.RequiredHint": "Toto pole je povinné",
   "Controls.QuickSearch.FieldSelection": "Vyberte pole pro vyhledávání",
   "Controls.QuickSearch.Hint": "Zadejte text pro hledání",
