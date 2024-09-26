@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Generic validation error mostly used by services.
@@ -16,6 +16,13 @@ public class ValidationError : Exception, IIsSensitiveMessage
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     public ValidationError(string message) : base(message) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationError"/> class.
+    /// </summary>
+    /// <param name="localizer">Text localizer</param>
+    /// <param name="message">The message that describes the error.</param>
+    public ValidationError(ITextLocalizer localizer, LocalText message) : this(message.ToString(localizer)) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationError"/> class.
@@ -62,6 +69,7 @@ public class ValidationError : Exception, IIsSensitiveMessage
 
     /// <summary>
     /// Gets or sets the error code.
+    /// 
     /// </summary>
     /// <value>
     /// The error code.
