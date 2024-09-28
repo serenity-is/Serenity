@@ -1,4 +1,5 @@
-﻿import { htmlEncode, isArrayLike, isPromiseLike, localText } from "../base";
+import { Config, htmlEncode, isArrayLike, isPromiseLike, localText } from "../base";
+import { parseQueryString } from "./services-compat";
 
 /**
  * Adds an empty option to the select.
@@ -91,4 +92,21 @@ export function outerHtml(element: Element | ArrayLike<HTMLElement>) {
     var el = document.createElement('i');
     el.append((isArrayLike(element) ? element[0] : element).cloneNode(true));
     return el.innerHTML;
+}
+
+export function getReturnUrl(opt?: {
+    queryOnly?: boolean;
+    ignoreUnsafe?: boolean;
+    purpose?: string;
+}) {
+    var q = parseQueryString();
+    var returnUrl = q['returnUrl'] || q['ReturnUrl'] || q["ReturnURL"] || q["returnURL"];
+
+    if (returnUrl && (!opt?.ignoreUnsafe && !/^\//.test(returnUrl)))
+        returnUrl = null;
+
+    if (!returnUrl && !opt?.queryOnly)
+        returnUrl = Config.defaultReturnUrl(opt?.purpose);
+
+    return returnUrl;
 }

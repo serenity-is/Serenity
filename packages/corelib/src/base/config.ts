@@ -1,10 +1,16 @@
-﻿var Config = {
+const Config = {
     /**
      * This is the root path of your application. If your application resides under http://localhost/mysite/,
      * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
      * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
      */
     applicationPath: '/',
+
+    /**
+     * Gets a default return URL for the application. This is used when a return URL is not specified
+     * @param purpose Optional purpose for the return URL, for example "login" or "logout"
+     */
+    defaultReturnUrl: (purpose?: string) => Config.applicationPath,
 
     /**
      * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
