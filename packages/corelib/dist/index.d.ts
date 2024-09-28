@@ -11,13 +11,18 @@ export declare function blockUI(options?: {
  * Unblocks the page.
  */
 export declare function blockUndo(): void;
-export declare var Config: {
+export declare const Config: {
 	/**
 	 * This is the root path of your application. If your application resides under http://localhost/mysite/,
 	 * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
 	 * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
 	 */
 	applicationPath: string;
+	/**
+	 * Gets a default return URL for the application. This is used when a return URL is not specified
+	 * @param purpose Optional purpose for the return URL, for example "login" or "logout"
+	 */
+	defaultReturnUrl: (purpose?: string) => string;
 	/**
 	 * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
 	 */
@@ -2511,6 +2516,11 @@ export declare function newBodyDiv(): HTMLDivElement;
  * Returns the outer HTML of the element.
  */
 export declare function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
+export declare function getReturnUrl(opt?: {
+	queryOnly?: boolean;
+	ignoreUnsafe?: boolean;
+	purpose?: string;
+}): string;
 export declare function getWidgetName(type: Function): string;
 export declare function associateWidget(widget: {
 	domNode: HTMLElement;
