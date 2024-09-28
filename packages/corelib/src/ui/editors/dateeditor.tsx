@@ -238,7 +238,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             opt.appendTo = this.domNode.closest(".modal");
         else {
             setTimeout(() => {
-                var modal = this.domNode.closest(".modal");
+                var modal = this.domNode?.closest(".modal");
                 if (modal && !opt.static && !opt.appendTo && this.domNode &&
                     (this.domNode as any)._flatpickr &&
                     (this.domNode as any)._flatpickr.calendarContainer &&
