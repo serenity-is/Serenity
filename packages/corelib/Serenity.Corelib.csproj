@@ -6,9 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
-    <TSBuildInputs Include="..\*\src\**\*.ts;..\*\tsconfig.json;..\*\build\build.js;..\*\rollup.config.js;..\*\package.json" />
   </ItemGroup>
-  <Target Name="TSBuild" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" Inputs="@(TSBuildInputs)" DependsOnTargets="NpmInstall" Outputs="$(IdxDist)d.ts;$(IdxDist)js;$(IdxDist)js.map;$(IdxGlob)d.ts;$(IdxGlob)js;$(IdxGlob)js.map;$(IdxGlob)min.js;$(IdxGlob)min.js.map">
+  <Target Name="TSBuild" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" DependsOnTargets="NpmInstall">
     <Exec Command="pnpm -r build" WorkingDirectory="..\..\packages" />
   </Target>
 </Project>
