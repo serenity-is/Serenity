@@ -108,110 +108,117 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
             .ToList();
 
-        list.Sort(string.CompareOrdinal);
-
-        cw.Indented("namespace texts");
-        cw.InBrace(delegate
+        if (list.Count > 0)
         {
-            jw.WriteStartObject();
-            List<string> stack = [];
-            int stackCount = 0;
-            for (int i = 0; i < list.Count; i++)
+            list.Sort(string.CompareOrdinal);
+
+            cw.Indented("namespace texts");
+            cw.InBrace(delegate
             {
-                var key = list[i];
-                var parts = key.Split('.');
-
-                int same = 0;
-
-                if (stackCount > 0)
+                jw.WriteStartObject();
+                List<string> stack = [];
+                int stackCount = 0;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    while (same < stackCount && same < parts.Length && stack[same] == parts[same])
-                        same++;
+                    var key = list[i];
+                    var parts = key.Split('.');
 
-                    for (int level = same; level < stackCount; level++)
+                    int same = 0;
+
+                    if (stackCount > 0)
                     {
-                        jw.WriteEndObject();
-                        cw.EndBrace();
+                        while (same < stackCount && same < parts.Length && stack[same] == parts[same])
+                            same++;
+
+                        for (int level = same; level < stackCount; level++)
+                        {
+                            jw.WriteEndObject();
+                            cw.EndBrace();
+                        }
+
+                        stackCount = same;
                     }
 
-                    stackCount = same;
-                }
-
-                for (int level = same; level < parts.Length - 1; level++)
-                {
-                    string part = parts[level];
-                    if (stack.Count > level)
-                        stack[level] = part;
-                    else
-                        stack.Add(part);
-                    jw.WritePropertyName(part);
-                    jw.WriteStartObject();
-                    sb.AppendLine();
-                    if (level == 0)
-                        cw.Indented("export declare namespace ");
-                    else
-                        cw.Indented("namespace ");
-                    sb.Append(part);
-                    fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
-                    cw.StartBrace();
-                }
-                stackCount = parts.Length - 1;
-
-                if (same != parts.Length)
-                {
-                    string part = parts[^1];
-
-                    bool nextStartsWithThis = false;
-                    if (i + 1 < list.Count)
+                    for (int level = same; level < parts.Length - 1; level++)
                     {
-                        var next = list[i + 1];
-                        if (next.StartsWith(key, StringComparison.Ordinal) &&
-                            next.Length > key.Length &&
-                            next[key.Length] == '.')
-                            nextStartsWithThis = true;
-                    }
-
-                    if (nextStartsWithThis)
-                    {
-                        stackCount = parts.Length;
-                        if (stack.Count > stackCount - 1)
-                            stack[stackCount - 1] = part;
+                        string part = parts[level];
+                        if (stack.Count > level)
+                            stack[level] = part;
                         else
                             stack.Add(part);
-                        fullClassNames.Add(string.Join(".", stack.Take(stackCount)));
                         jw.WritePropertyName(part);
                         jw.WriteStartObject();
-                        cw.Indented("namespace ");
+                        sb.AppendLine();
+                        if (level == 0)
+                            cw.Indented("export declare namespace ");
+                        else
+                            cw.Indented("namespace ");
                         sb.Append(part);
+                        fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
                         cw.StartBrace();
-                        jw.WritePropertyName("export const __");
-                        jw.WriteValue(1);
-                        cw.IndentedLine("__: string;");
                     }
-                    else
+                    stackCount = parts.Length - 1;
+
+                    if (same != parts.Length)
                     {
-                        cw.Indented("export const ");
-                        sb.Append(part);
-                        sb.AppendLine(": string;");
+                        string part = parts[^1];
+
+                        bool nextStartsWithThis = false;
+                        if (i + 1 < list.Count)
+                        {
+                            var next = list[i + 1];
+                            if (next.StartsWith(key, StringComparison.Ordinal) &&
+                                next.Length > key.Length &&
+                                next[key.Length] == '.')
+                                nextStartsWithThis = true;
+                        }
+
+                        if (nextStartsWithThis)
+                        {
+                            stackCount = parts.Length;
+                            if (stack.Count > stackCount - 1)
+                                stack[stackCount - 1] = part;
+                            else
+                                stack.Add(part);
+                            fullClassNames.Add(string.Join(".", stack.Take(stackCount)));
+                            jw.WritePropertyName(part);
+                            jw.WriteStartObject();
+                            cw.Indented("namespace ");
+                            sb.Append(part);
+                            cw.StartBrace();
+                            jw.WritePropertyName("export const __");
+                            jw.WriteValue(1);
+                            cw.IndentedLine("__: string;");
+                        }
+                        else
+                        {
+                            cw.Indented("export const ");
+                            sb.Append(part);
+                            sb.AppendLine(": string;");
+                        }
                     }
                 }
-            }
-            for (int i = 0; i < stackCount; i++)
-            {
+                for (int i = 0; i < stackCount; i++)
+                {
+                    jw.WriteEndObject();
+                    cw.EndBrace();
+                    sb.AppendLine();
+                }
                 jw.WriteEndObject();
-                cw.EndBrace();
-                sb.AppendLine();
-            }
-            jw.WriteEndObject();
-        });
+            });
 
-        sb.AppendLine();
-        var proxyTexts = ImportFromQ("proxyTexts");
+            sb.AppendLine();
+            var proxyTexts = ImportFromQ("proxyTexts");
 
-        sb.Append($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
-        jw.Flush();
-        sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
-        sb.AppendLine(") as any;");
+            sb.Append($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+            jw.Flush();
+            sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
+            sb.AppendLine(") as any;");
+        }
+        else
+        {
+            sb.AppendLine($"export const Texts = {{}} as const;");
+        }
 
         foreach (var nested in localTextNestedClasses.OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
         {
