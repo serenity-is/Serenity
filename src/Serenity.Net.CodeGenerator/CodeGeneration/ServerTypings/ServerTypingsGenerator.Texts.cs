@@ -20,11 +20,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         AddNestedLocalTexts(fromType, prefix ?? "");
         if (fromType.Name != "Texts" &&
-            !string.IsNullOrEmpty(prefix) &&
-            prefix.EndsWith('.') &&
+            fromType.Name.EndsWith("Texts", StringComparison.Ordinal) &&
             !localTextNestedClasses.ContainsKey(fromType.Name))
         {
-            localTextNestedClasses.Add(fromType.Name, prefix[0..^1]);
+            localTextNestedClasses.Add(fromType.Name, prefix ?? "");
         }
     }
 
@@ -216,10 +215,18 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         foreach (var nested in localTextNestedClasses.OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
         {
-            if (!fullClassNames.Contains(nested.Value))
+            if (string.IsNullOrEmpty(nested.Value))
+            {
+                sb.AppendLine();
+                sb.AppendLine($"export const {nested.Key} = Texts;");
+            }
+            else if (nested.Value.EndsWith('.') &&
+                fullClassNames.Contains(nested.Value[0..^1]))
+            {
+                sb.AppendLine();
+                sb.AppendLine($"export const {nested.Key} = Texts.{nested.Value[0..^1]};");
                 continue;
-            sb.AppendLine();
-            sb.AppendLine($"export const {nested.Key} = Texts.{nested.Value};");
+            }
         }
 
         AddFile("Texts.ts");
