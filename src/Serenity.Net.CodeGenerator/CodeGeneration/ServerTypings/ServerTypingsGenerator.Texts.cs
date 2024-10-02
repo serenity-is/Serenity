@@ -19,6 +19,13 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
 
         AddNestedLocalTexts(fromType, prefix ?? "");
+        if (fromType.Name != "Texts" &&
+            !string.IsNullOrEmpty(prefix) &&
+            prefix.EndsWith('.') &&
+            !localTextNestedClasses.ContainsKey(fromType.Name))
+        {
+            localTextNestedClasses.Add(fromType.Name, prefix[0..^1]);
+        }
     }
 
     protected void AddNestedLocalTexts(TypeDefinition type, string prefix)
@@ -68,44 +75,45 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             Indentation = 4
         };
 
-        cw.Indented("namespace texts");
-        cw.InBrace(delegate
+        Regex filter = null;
+        if (LocalTextFilters.Count > 0)
         {
-            Regex filter = null;
-            if (LocalTextFilters.Count > 0)
+            var fb = new StringBuilder("^(");
+            bool append = false;
+            foreach (string item in LocalTextFilters)
             {
-                var fb = new StringBuilder("^(");
-                bool append = false;
-                foreach (string item in LocalTextFilters)
+                if (append)
+                    fb.Append('|');
+                if (!string.IsNullOrEmpty(item))
                 {
-                    if (append)
-                        fb.Append('|');
-                    if (!string.IsNullOrEmpty(item))
-                    {
-                        if (item[0] == '^' && item[^1] == '$')
-                            fb.Append(item[1..^1]);
-                        else fb.Append(item.Replace(".", "\\."
+                    if (item[0] == '^' && item[^1] == '$')
+                        fb.Append(item[1..^1]);
+                    else fb.Append(item.Replace(".", "\\."
 #if ISSOURCEGENERATOR
-                            ) + ".*");
+                        ) + ".*");
 #else
                             , StringComparison.Ordinal) + ".*");
 #endif
-                        append = true;
-                    }
+                    append = true;
                 }
-                fb.Append(")$");
-                filter = new Regex(fb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
+            fb.Append(")$");
+            filter = new Regex(fb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        }
 
-            var list = localTextKeys.Where(x =>
-                    !string.IsNullOrWhiteSpace(x) &&
-                    (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
-                     (filter == null || filter.IsMatch(x))) &&
-                    x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
-                .ToList();
+        var fullClassNames = new HashSet<string>();
+        var list = localTextKeys.Where(x =>
+                !string.IsNullOrWhiteSpace(x) &&
+                (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
+                 (filter == null || filter.IsMatch(x))) &&
+                x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
+            .ToList();
 
-            list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
+        list.Sort(string.CompareOrdinal);
 
+        cw.Indented("namespace texts");
+        cw.InBrace(delegate
+        {
             jw.WriteStartObject();
             List<string> stack = [];
             int stackCount = 0;
@@ -145,6 +153,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     else
                         cw.Indented("namespace ");
                     sb.Append(part);
+                    fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
                     cw.StartBrace();
                 }
                 stackCount = parts.Length - 1;
@@ -170,6 +179,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                             stack[stackCount - 1] = part;
                         else
                             stack.Add(part);
+                        fullClassNames.Add(string.Join(".", stack.Take(stackCount)));
                         jw.WritePropertyName(part);
                         jw.WriteStartObject();
                         cw.Indented("namespace ");
@@ -199,10 +209,19 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         sb.AppendLine();
         var proxyTexts = ImportFromQ("proxyTexts");
 
-        sb.AppendLine($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+        sb.Append($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
         jw.Flush();
-        sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
+        sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
         sb.AppendLine(") as any;");
+
+        foreach (var nested in localTextNestedClasses.OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
+        {
+            if (!fullClassNames.Contains(nested.Value))
+                continue;
+            sb.AppendLine();
+            sb.AppendLine($"export const {nested.Key} = Texts.{nested.Value};");
+        }
+
         AddFile("Texts.ts");
     }
 }

@@ -25,6 +25,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     public readonly HashSet<string> LocalTextFilters = [];
 
     protected HashSet<string> localTextKeys = [];
+    protected Dictionary<string, string> localTextNestedClasses = [];
     protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
 
     protected override void GenerateAll()
@@ -152,6 +153,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         base.Reset();
 
         localTextKeys.Clear();
+        localTextNestedClasses.Clear();
         scriptDataKeys.Clear();
 
     }
