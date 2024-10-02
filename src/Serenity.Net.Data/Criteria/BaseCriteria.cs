@@ -45,68 +45,86 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Like criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The LIKE mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria Like(string mask)
+    public BaseCriteria Like(string mask, bool upper = false)
     {
-        return new BinaryCriteria(this, CriteriaOperator.Like, new ValueCriteria(mask));
+        var left = this;
+        if (upper)
+            left = new UpperFunctionCriteria(left);
+        BaseCriteria right = new ValueCriteria(mask);
+        if (upper)
+            right = new UpperFunctionCriteria(right);
+        return new BinaryCriteria(left, CriteriaOperator.Like, right);
     }
 
     /// <summary>
     /// Creates a new binary Not Like criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The like mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria NotLike(string mask)
-    {
-        return new BinaryCriteria(this, CriteriaOperator.NotLike, new ValueCriteria(mask));
+    public BaseCriteria NotLike(string mask, bool upper = false)
+{
+        var left = this;
+        if (upper)
+            left = new UpperFunctionCriteria(left);
+        BaseCriteria right = new ValueCriteria(mask);
+        if (upper)
+            right = new UpperFunctionCriteria(right);
+        return new BinaryCriteria(left, CriteriaOperator.NotLike, right);
     }
 
     /// <summary>
     /// Creates a new binary Stars With (LIKE '...%') criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The starts with mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria StartsWith(string mask)
+    public BaseCriteria StartsWith(string mask, bool upper = false)
     {
         if (mask == null)
             throw new ArgumentNullException("mask");
 
-        return Like(mask + "%");
+        return Like(mask + "%", upper);
     }
 
     /// <summary>
     /// Creates a new binary Ends With (LIKE '%...') criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The ends with mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria EndsWith(string mask)
+    public BaseCriteria EndsWith(string mask, bool upper = false)
     {
         if (mask == null)
             throw new ArgumentNullException("mask");
 
-        return Like("%" + mask);
+        return Like("%" + mask, upper);
     }
 
     /// <summary>
     /// Creates a new binary Contains criteria (LIKE '%...%') containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The contains mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria Contains(string mask)
+    public BaseCriteria Contains(string mask, bool upper = false)
     {
-        return Like("%" + mask + "%");
+        return Like("%" + mask + "%", upper);
     }
 
     /// <summary>
     /// Creates a new binary Not Contains criteria (NOT LIKE '%...%') containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The contains mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria NotContains(string mask)
+    public BaseCriteria NotContains(string mask, bool upper = false)
     {
-        return NotLike("%" + mask + "%");
+        return NotLike("%" + mask + "%", upper);
     }
 
     /// <summary>

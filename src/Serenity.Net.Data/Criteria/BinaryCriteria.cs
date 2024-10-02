@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Binary criteria object, which has two operands and a operator.
@@ -44,34 +44,11 @@ public class BinaryCriteria : BaseCriteria
     /// <param name="query">The target query.</param>
     public override void ToString(StringBuilder sb, IQueryWithParams query)
     {
-        if (op == CriteriaOperator.Like ||
-            op == CriteriaOperator.NotLike)
-        {
-            if (query.Dialect.IsLikeCaseSensitive &&
-                right is ValueCriteria valueCriteria &&
-                valueCriteria.Value is string)
-            {
-                sb.Append("UPPER(");
-                left.ToString(sb, query);
-                sb.Append(op == CriteriaOperator.Like ? ") LIKE UPPER(" : ") NOT LIKE UPPER(");
-                right.ToString(sb, query);
-                sb.Append(")");
-            }
-            else
-            {
-                left.ToString(sb, query);
-                sb.Append(op == CriteriaOperator.Like ? " LIKE " : " NOT LIKE ");
-                right.ToString(sb, query);
-            }
-        }
-        else
-        {
-            sb.Append('(');
-            left.ToString(sb, query);
-            sb.Append(opText[(int)op - (int)CriteriaOperator.AND]);
-            right.ToString(sb, query);
-            sb.Append(')');
-        }
+        sb.Append('(');
+        left.ToString(sb, query);
+        sb.Append(opText[(int)op - (int)CriteriaOperator.AND]);
+        right.ToString(sb, query);
+        sb.Append(')');
     }
 
     private static readonly string[] opText =
@@ -86,7 +63,9 @@ public class BinaryCriteria : BaseCriteria
         " < ",
         " <= ",
         " IN ",
-        " NOT IN "
+        " NOT IN ",
+        " LIKE ",
+        " NOT LIKE "
     ];
 
     /// <summary>

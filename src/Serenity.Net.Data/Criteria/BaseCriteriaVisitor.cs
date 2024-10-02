@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// A visitor implementation for BaseCriteria object trees.
@@ -37,6 +37,9 @@ public abstract class BaseCriteriaVisitor
 
         if (criteria is ParamCriteria prm)
             return VisitParam(prm);
+
+        if (criteria is FunctionCallCriteria func)
+            return VisitFunctionCall(func);
 
         throw new InvalidProgramException(string.Format("Unhandled criteria type: '{0}'", criteria.GetType().Name));
     }
@@ -85,6 +88,15 @@ public abstract class BaseCriteriaVisitor
             return new UnaryCriteria(criteria.Operator, operand);
         }
 
+        return criteria;
+    }
+
+    /// <summary>
+    /// Visits the function call criteria.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    protected virtual BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
+    {
         return criteria;
     }
 

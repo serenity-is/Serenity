@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   An object that is used to create criterias by employing operator overloading 
@@ -23,6 +23,11 @@ public class Criteria : BaseCriteria
     public static readonly BaseCriteria True = new Criteria("1=1");
 
     private readonly string expression;
+    
+    /// <summary>
+    /// Gets a reference to the IField object passed to the constructor.
+    /// </summary>
+    public static IField Field { get; private set; }
 
     /// <summary>
     ///   Creates an empty criteria</summary>
@@ -48,9 +53,7 @@ public class Criteria : BaseCriteria
     ///   Field (required).</param>
     public Criteria(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
-
+        Field = field ?? throw new ArgumentNullException(nameof(field));
         expression = field.Expression;
     }
 
@@ -101,6 +104,7 @@ public class Criteria : BaseCriteria
     public Criteria(IAlias alias, IField field)
         : this(alias.Name, field.Name)
     {
+        Field = field;
     }
 
     /// <summary>
@@ -123,6 +127,7 @@ public class Criteria : BaseCriteria
     public Criteria(int joinNumber, IField field)
         : this(joinNumber, field.Name)
     {
+        Field = field;
     }
 
     /// <summary>
@@ -134,6 +139,7 @@ public class Criteria : BaseCriteria
     public Criteria(string join, IField field)
         : this(join, field.Name)
     {
+        Field = field;
     }
 
     /// <summary>

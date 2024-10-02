@@ -296,10 +296,14 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
             return;
         }
 
+        bool upper = field is StringField &&
+            (searchType == SearchType.Contains || searchType == SearchType.StartsWith) &&
+            Connection.GetDialect().IsLikeCaseSensitive;
+
         switch (searchType)
         {
             case SearchType.Contains:
-                criteria |= new Criteria(field).Contains(containsText);
+                criteria |= new Criteria(field).Contains(containsText, upper);
                 break;
 
             case SearchType.FullTextContains:
@@ -308,7 +312,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
                 break;
 
             case SearchType.StartsWith:
-                criteria |= new Criteria(field).StartsWith(containsText);
+                criteria |= new Criteria(field).StartsWith(containsText, upper);
                 break;
 
             case SearchType.Equals:
@@ -469,7 +473,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <returns>Processed criteria</returns>
     protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
     {
-        return new CriteriaFieldExpressionReplacer(Row, Permissions, lookupAccessMode)
+        return new CriteriaFieldExpressionReplacer(Row, Permissions, lookupAccessMode, Connection.GetDialect()) 
             .Process(criteria);
     }
 

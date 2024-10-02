@@ -23,10 +23,11 @@ public abstract partial class Field
     /// Creates a new "the Field LIKE mask" criteria
     /// </summary>
     /// <param name="mask">The mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria Like(string mask)
+    public BaseCriteria Like(string mask, bool upper = false)
     {
-        return Criteria.Like(mask);
+        return Criteria.Like(mask, upper);
     }
 
     /// <summary>
@@ -43,40 +44,41 @@ public abstract partial class Field
     /// Creates a new "the Field STARTS WITH mask" criteria
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <returns></returns>
-    public BaseCriteria StartsWith(string mask)
+    /// <param name="upper">True to use UPPER function both sides</param>
+    public BaseCriteria StartsWith(string mask, bool upper = false)
     {
-        return Criteria.StartsWith(mask);
+        return Criteria.StartsWith(mask, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field ENDS WITH mask" criteria
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <returns></returns>
-    public BaseCriteria EndsWith(string mask)
+    /// <param name="upper">True to use UPPER function both sides</param>
+    public BaseCriteria EndsWith(string mask, bool upper = false)
     {
-        return Criteria.EndsWith(mask);
+        return Criteria.EndsWith(mask, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field CONTAINS mask" criteria
     /// </summary>
     /// <param name="mask">The mask.</param>
+    /// <param name="upper">True to use UPPER function both sides</param>
     /// <returns></returns>
-    public BaseCriteria Contains(string mask)
+    public BaseCriteria Contains(string mask, bool upper = false)
     {
-        return Criteria.Contains(mask);
+        return Criteria.Contains(mask, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field NOT CONTAINS mask" criteria
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <returns></returns>
-    public BaseCriteria NotContains(string mask)
+    /// <param name="upper">True to use UPPER function both sides</param>
+    public BaseCriteria NotContains(string mask, bool upper = false)
     {
-        return criteria.NotContains(mask);
+        return criteria.NotContains(mask, upper);
     }
 
     /// <summary>
