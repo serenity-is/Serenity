@@ -104,7 +104,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         var list = localTextKeys.Where(x =>
                 !string.IsNullOrWhiteSpace(x) &&
                 (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
-                 (filter == null || filter.IsMatch(x))) &&
+                 (filter != null && filter.IsMatch(x))) &&
                 x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
             .ToList();
 
