@@ -1,5 +1,3 @@
-﻿using Microsoft.Data.SqlClient;
-
 namespace Serenity.Data;
 
 /// <summary>
@@ -12,13 +10,30 @@ public class SqlCommandDumper
     /// </summary>
     /// <param name="sqc">The SQL command.</param>
     /// <returns></returns>
-    public static string GetCommandText(SqlCommand sqc)
+    public static string GetCommandText(IDbCommand sqc)
     {
         var sbCommandText = new StringBuilder();
 
+        bool initialized = false;
+        PropertyInfo sqlDbTypeProperty = null;
+        PropertyInfo sizeProperty = null;
+
         // params
-        for (int i = 0; i < sqc.Parameters.Count; i++)
-            LogParameterToSqlBatch(sqc.Parameters[i], sbCommandText);
+        foreach (IDbDataParameter parameter in sqc.Parameters)
+        {
+            if (!initialized)
+            {
+                initialized = true;
+                var isSqlServer = parameter.GetType().FullName == "Microsoft.Data.SqlClient.SqlParameter" ||
+                    parameter.GetType().FullName == "System.Data.SqlClient.SqlParameter";
+                if (!isSqlServer)
+                {
+                    sqlDbTypeProperty = parameter.GetType().GetProperty("SqlDbType");
+                    sizeProperty = parameter.GetType().GetProperty("Size");
+                }
+            }
+            LogParameterToSqlBatch(parameter, sbCommandText, sqlDbTypeProperty, sizeProperty);
+        }
 
         sbCommandText.AppendLine("");
 
@@ -28,9 +43,9 @@ public class SqlCommandDumper
             sbCommandText.Append("EXEC ");
 
             bool hasReturnValue = false;
-            for (int i = 0; i < sqc.Parameters.Count; i++)
+            foreach (IDbDataParameter param in sqc.Parameters)
             {
-                if (sqc.Parameters[i].Direction == ParameterDirection.ReturnValue)
+                if (param.Direction == ParameterDirection.ReturnValue)
                     hasReturnValue = true;
             }
             if (hasReturnValue)
@@ -41,9 +56,8 @@ public class SqlCommandDumper
             sbCommandText.Append(sqc.CommandText);
 
             bool hasPrev = false;
-            for (int i = 0; i < sqc.Parameters.Count; i++)
+            foreach (IDataParameter cParam in sqc.Parameters)
             {
-                var cParam = sqc.Parameters[i];
                 if (cParam.Direction != ParameterDirection.ReturnValue)
                 {
                     if (hasPrev)
@@ -66,7 +80,7 @@ public class SqlCommandDumper
         }
 
         bool anyOut = false;
-        foreach (SqlParameter p in sqc.Parameters)
+        foreach (IDataParameter p in sqc.Parameters)
             if (p.Direction == ParameterDirection.ReturnValue ||
                 p.Direction == ParameterDirection.Output)
             {
@@ -78,10 +92,8 @@ public class SqlCommandDumper
         {
             sbCommandText.AppendLine("-- RESULTS");
             sbCommandText.Append("SELECT 1 as Executed");
-            for (int i = 0; i < sqc.Parameters.Count; i++)
+            foreach (IDataParameter cParam in sqc.Parameters)
             {
-                var cParam = sqc.Parameters[i];
-
                 if (cParam.Direction == ParameterDirection.ReturnValue)
                 {
                     sbCommandText.Append(", @returnValue as ReturnValue");
@@ -101,7 +113,8 @@ public class SqlCommandDumper
         return sbCommandText.ToString();
     }
 
-    private static void LogParameterToSqlBatch(SqlParameter param, StringBuilder sbCommandText)
+    private static void LogParameterToSqlBatch(IDbDataParameter param, StringBuilder sbCommandText,
+        PropertyInfo sqlDbTypeProperty, PropertyInfo sizeProperty)
     {
         sbCommandText.Append("DECLARE ");
         if (param.Direction == ParameterDirection.ReturnValue)
@@ -113,18 +126,41 @@ public class SqlCommandDumper
             sbCommandText.Append(param.ParameterName);
 
             sbCommandText.Append(' ');
-            if (param.SqlDbType != SqlDbType.Structured)
+            SqlDbType? sqlDbType = null;
+            int? size = null;
+            if (sqlDbTypeProperty != null)
             {
-                LogParameterType(param, sbCommandText);
-                sbCommandText.Append(" = ");
-                LogQuotedParameterValue(param.Value, sbCommandText);
+                try
+                {
+                    sqlDbType = sqlDbTypeProperty.GetValue(param) as SqlDbType?;
+                }
+                catch
+                {
+                }
+            }
+            if (sizeProperty != null)
+            {
+                try
+                {
+                    size = sizeProperty.GetValue(param) as int?;
+                }
+                catch
+                {
+                }
+            }
 
-                sbCommandText.AppendLine(";");
+            if (sqlDbType != null)
+            {
+                LogParamSqlDbType(sqlDbType.Value, size ?? 0, sbCommandText);
             }
             else
             {
-                throw new NotImplementedException();
+                LogParamDbType(param, sbCommandText);
             }
+
+            sbCommandText.Append(" = ");
+            LogQuotedParameterValue(param.Value, sbCommandText);
+            sbCommandText.AppendLine(";");
         }
     }
 
@@ -215,29 +251,27 @@ public class SqlCommandDumper
         }
     }
 
-    private static void LogParameterType(SqlParameter param, StringBuilder sbCommandText)
+    private static void LogParamDbType(IDataParameter param, StringBuilder sbCommandText)
     {
-        switch (param.SqlDbType)
+        sbCommandText.Append(param.DbType.ToString());
+    }
+
+    private static void LogParamSqlDbType(SqlDbType sqlDbType, int size, StringBuilder sbCommandText)
+    {
+        switch (sqlDbType)
         {
             // variable length
             case SqlDbType.Char:
             case SqlDbType.NChar:
             case SqlDbType.Binary:
-                {
-                    sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
-                    sbCommandText.Append('(');
-                    sbCommandText.Append(param.Size == 0 ? 1 : param.Size);
-                    sbCommandText.Append(')');
-                }
-                break;
             case SqlDbType.VarChar:
             case SqlDbType.NVarChar:
             case SqlDbType.VarBinary:
                 {
-                    sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
-                    sbCommandText.Append("(");
-                    sbCommandText.Append(param.Size == 0 ? 1 : param.Size);
-                    sbCommandText.Append(")");
+                    sbCommandText.Append(sqlDbType.ToString().ToUpperInvariant());
+                    sbCommandText.Append('(');
+                    sbCommandText.Append(size == 0 ? 1 : size);
+                    sbCommandText.Append(')');
                 }
                 break;
             // fixed length
@@ -260,7 +294,7 @@ public class SqlCommandDumper
             case SqlDbType.UniqueIdentifier:
             case SqlDbType.Image:
                 {
-                    sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
+                    sbCommandText.Append(sqlDbType.ToString().ToUpperInvariant());
                 }
                 break;
             // Unknown
@@ -268,9 +302,9 @@ public class SqlCommandDumper
             default:
                 {
                     sbCommandText.Append("/* UNKNOWN DATATYPE: ");
-                    sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
+                    sbCommandText.Append(sqlDbType.ToString().ToUpperInvariant());
                     sbCommandText.Append(" *" + "/ ");
-                    sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
+                    sbCommandText.Append(sqlDbType.ToString().ToUpperInvariant());
                 }
                 break;
         }

@@ -1,6 +1,4 @@
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using System.Data.Common;
 using System.IO;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
@@ -70,31 +68,7 @@ public static class SqlHelper
 
         try
         {
-            if (command is SqlCommand sqlCmd)
-            {
-                logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}", method, command.GetHashCode(), SqlCommandDumper.GetCommandText(sqlCmd));
-                return;
-            }
-
-            if (command.Parameters?.Count <= 0)
-            {
-                logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}", method, command.GetHashCode(), command.CommandText);
-                return;
-            }
-
-            StringBuilder sb = new("");
-            foreach (DbParameter p in command.Parameters)
-            {
-                sb.Append(p.ParameterName);
-                sb.Append("=");
-                if (p.Value == null || p.Value == DBNull.Value)
-                    sb.Append("<NULL>");
-                else
-                    sb.Append(p.Value.ToString());
-                sb.Append("; ");
-            }
-
-            logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}\n--PARAMS--\n{params}", method, command.GetHashCode(), command.CommandText, sb.ToString());
+            logger.LogDebug("SQL - {method}[{uid}] - START\n{sql}", method, command.GetHashCode(), SqlCommandDumper.GetCommandText(command));
         }
         catch (Exception ex)
         {
@@ -222,19 +196,25 @@ public static class SqlHelper
     /// <returns>True if exception is 10054, e.g. connection pool.</returns>
     private static bool CheckConnectionPoolException(IDbConnection connection, Exception exception)
     {
-        if (exception is SqlException ex && ex.Number == 10054)
-        {
-            if ((connection is IHasOpenedOnce hoo && hoo.OpenedOnce) ||
-                (connection is IHasCurrentTransaction hct && hct.CurrentTransaction != null))
-                return false;
+        var exceptionType = exception.GetType();
 
-            SqlConnection.ClearAllPools();
+        if ((connection is IHasOpenedOnce hoo && hoo.OpenedOnce) ||
+            (connection is IHasCurrentTransaction hct && hct.CurrentTransaction != null))
+            return false;
+
+        if (exceptionType.FullName == "Microsoft.Data.SqlException" ||
+            exceptionType.FullName == "System.Data.SqlException" &&
+            exceptionType.GetProperty("Number")?.GetValue(exception) is 10054)
+        {
+            var sqlConnectionType = exceptionType.Assembly.GetType(exceptionType.FullName.Replace("Exception", "Connection"));
+            var clearAllPools = sqlConnectionType?.GetMethod("ClearAllPools", BindingFlags.Static | BindingFlags.Public);
+            clearAllPools?.Invoke(null, null);
             connection.Close();
             connection.Open();
             return true;
         }
-        else
-            return false;
+
+        return false;
     }
 
     /// <summary>
@@ -268,7 +248,7 @@ public static class SqlHelper
 
                 result = command.ExecuteNonQuery();
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 if (CheckConnectionPoolException(command.Connection, ex))
                     return command.ExecuteNonQuery();
@@ -477,7 +457,7 @@ public static class SqlHelper
             try
             {
                 logger ??= connection.GetLogger();
-
+                 
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
                     LogCommand("ExecuteReader", command, logger);
 
@@ -489,7 +469,7 @@ public static class SqlHelper
 
                 return result;
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 if (CheckConnectionPoolException(connection, ex))
                     return command.ExecuteReader();
@@ -564,7 +544,7 @@ public static class SqlHelper
 
                 return result;
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 if (CheckConnectionPoolException(connection, ex))
                     return command.ExecuteScalar();
