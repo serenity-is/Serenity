@@ -382,7 +382,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                     PreVisitType(fromType);
                     ScanAnnotationTypeAttributes(fromType);
 
-                    if (fromType.IsAbstract ||
+                    if ((fromType.IsAbstract &&
+                         TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptIncludeAttribute") == null) ||
 #if ISSOURCEGENERATOR
                         (fromType.ContainingType != null && fromType.DeclaredAccessibility != Accessibility.Public) ||
 #endif
