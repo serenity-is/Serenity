@@ -56,7 +56,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             var propertyByName = rowType.PropertiesOf().Where(x =>
                 TypingsUtils.IsPublicInstanceProperty(x) &&
                 (!x.PropertyType().Name.EndsWith("Field", StringComparison.Ordinal) ||
-                  x.PropertyType().NamespaceOf() != "Serenity.Data")).ToLookup(x => x.Name);
+                  x.PropertyType().NamespaceOf() != "Serenity.Data"))
+                .ToLookup(x => x.Name);
 
             var fieldsType = rowType.NestedTypes().FirstOrDefault(x =>
                 TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
@@ -87,6 +88,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             {
                 foreach (var fieldName in fieldsType.FieldsOf()
                     .Where(x => x.IsPublic())
+#if ISSOURCEGENERATOR
+                    .OrderBy(p => p.DeclaringSyntaxReferences.FirstOrDefault()?.SyntaxTree?.FilePath)
+#endif
+
                     .Select(x => x.Name))
                 {
                     var property = propertyByName[fieldName].FirstOrDefault();

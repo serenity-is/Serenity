@@ -20,17 +20,18 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine("';");
             sb.AppendLine();
 
+            var methods = type.MethodsOf().Where(method => method.IsPublic() &&
+                !method.IsStatic && !method.IsAbstract)
+#if ISSOURCEGENERATOR
+                    .OrderBy(m => m.DeclaringSyntaxReferences.FirstOrDefault()?.SyntaxTree?.FilePath)
+#endif
+                    .ToList();
 
             var methodNames = new List<string>();
-            foreach (var method in type.MethodsOf())
+            foreach (var method in methods)
             {
-                if (!method.IsPublic() || method.IsStatic || method.IsAbstract)
-                    continue;
-
-                if (methodNames.Contains(method.Name))
-                    continue;
-
-                if (!IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
+                if (methodNames.Contains(method.Name) ||
+                    !IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
                     continue;
 
                 methodNames.Add(method.Name);
