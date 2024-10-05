@@ -513,9 +513,9 @@ class AutoNumericHolder {
         this.shiftKey = e.shiftKey;
         this.selection = getElementSelection(this.that); /** keypress event overwrites meaningful value of e.keyCode */
         if (e.type === 'keydown' || e.type === 'keyup') {
-            this.kdCode = e.keyCode;
+            this.kdCode = (e as any).keyCode;
         }
-        this.which = e.which;
+        this.which = (e as any).which;
         this.processed = false;
         this.formatted = false;
     }
@@ -654,7 +654,7 @@ class AutoNumericHolder {
             var parts = this.getBeforeAfter(),
                 oldParts = this.valuePartsBeforePaste;
             delete this.valuePartsBeforePaste; /** try to strip pasted value first */
-            parts[0] = parts[0].substr(0, oldParts[0].length) + autoStrip(parts[0].substr(oldParts[0].length), this.settingsClone);
+            parts[0] = parts[0].substring(0, oldParts[0].length) + autoStrip(parts[0].substring(oldParts[0].length), this.settingsClone);
             if (!this.setValueParts(parts[0], parts[1])) {
                 this.value = oldParts.join('');
                 this.setPosition(oldParts[0].length, false);
@@ -772,7 +772,7 @@ class AutoNumericHolder {
                 return true;
             }
             if (right.indexOf(settingsClone.aDec) === 0) {
-                right = right.substr(1);
+                right = right.substring(1);
             }
             this.setValueParts(left + settingsClone.aDec, right);
             return true;

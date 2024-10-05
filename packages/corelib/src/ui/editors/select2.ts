@@ -2396,18 +2396,18 @@ class SingleSelect2 extends AbstractSelect2 {
             if (!this.isInterfaceEnabled()) return;
 
             // filter 229 keyCodes (input method editor is processing key input)
-            if (229 == e.keyCode) return;
+            if (229 == (e as any).keyCode) return;
 
-            if (e.which === KEY.PAGE_UP || e.which === KEY.PAGE_DOWN) {
+            if ((e as any).which === KEY.PAGE_UP || (e as any).which === KEY.PAGE_DOWN) {
                 // prevent the page from scrolling
                 killEvent(e);
                 return;
             }
 
-            switch (e.which) {
+            switch ((e as any).which) {
                 case KEY.UP:
                 case KEY.DOWN:
-                    this.moveHighlight((e.which === KEY.UP) ? -1 : 1);
+                    this.moveHighlight(((e as any).which === KEY.UP) ? -1 : 1);
                     killEvent(e);
                     return;
                 case KEY.ENTER:
@@ -2439,17 +2439,17 @@ class SingleSelect2 extends AbstractSelect2 {
         Fluent.on(this.focusser, "keydown", e => {
             if (!this.isInterfaceEnabled()) return;
 
-            if (e.which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e) || e.which === KEY.ESC) {
+            if ((e as any).which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e) || (e as any).which === KEY.ESC) {
                 return;
             }
 
-            if (this.opts.openOnEnter === false && e.which === KEY.ENTER) {
+            if (this.opts.openOnEnter === false && (e as any).which === KEY.ENTER) {
                 killEvent(e);
                 return;
             }
 
-            if (e.which == KEY.DOWN || e.which == KEY.UP
-                || (e.which == KEY.ENTER && this.opts.openOnEnter)) {
+            if ((e as any).which == KEY.DOWN || (e as any).which == KEY.UP
+                || ((e as any).which == KEY.ENTER && this.opts.openOnEnter)) {
 
                 if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) return;
 
@@ -2458,7 +2458,7 @@ class SingleSelect2 extends AbstractSelect2 {
                 return;
             }
 
-            if (e.which == KEY.DELETE || e.which == KEY.BACKSPACE) {
+            if ((e as any).which == KEY.DELETE || (e as any).which == KEY.BACKSPACE) {
                 if (this.opts.allowClear) {
                     this.clear();
                 }
@@ -2973,25 +2973,25 @@ class MultiSelect2 extends AbstractSelect2 {
             var pos = getCursorInfo(this.search);
 
             if (selected &&
-                (e.which == KEY.LEFT || e.which == KEY.RIGHT || e.which == KEY.BACKSPACE || e.which == KEY.DELETE || e.which == KEY.ENTER)) {
+                ((e as any).which == KEY.LEFT || (e as any).which == KEY.RIGHT || (e as any).which == KEY.BACKSPACE || (e as any).which == KEY.DELETE || (e as any).which == KEY.ENTER)) {
                 var selectedChoice = selected;
-                if (e.which == KEY.LEFT && prev) {
+                if ((e as any).which == KEY.LEFT && prev) {
                     selectedChoice = prev;
                 }
-                else if (e.which == KEY.RIGHT) {
+                else if ((e as any).which == KEY.RIGHT) {
                     selectedChoice = next ? next : null;
                 }
-                else if (e.which === KEY.BACKSPACE) {
+                else if ((e as any).which === KEY.BACKSPACE) {
                     if (this.unselect(selected)) {
                         this.search.style.width = "10px";
                         selectedChoice = prev ? prev : next;
                     }
-                } else if (e.which == KEY.DELETE) {
+                } else if ((e as any).which == KEY.DELETE) {
                     if (this.unselect(selected)) {
                         this.search.style.width = "10px";
                         selectedChoice = next ? next : null;
                     }
-                } else if (e.which == KEY.ENTER) {
+                } else if ((e as any).which == KEY.ENTER) {
                     selectedChoice = null;
                 }
 
@@ -3001,8 +3001,8 @@ class MultiSelect2 extends AbstractSelect2 {
                     this.open();
                 }
                 return;
-            } else if (((e.which === KEY.BACKSPACE && this.keydowns == 1)
-                || e.which == KEY.LEFT) && (pos.offset == 0 && !pos.length)) {
+            } else if ((((e as any).which === KEY.BACKSPACE && this.keydowns == 1)
+                || (e as any).which == KEY.LEFT) && (pos.offset == 0 && !pos.length)) {
 
                 this.selectChoice(Array.from(selection.querySelectorAll<HTMLElement>(".select2-search-choice:not(.select2-locked)")).pop());
                 killEvent(e);
@@ -3012,10 +3012,10 @@ class MultiSelect2 extends AbstractSelect2 {
             }
 
             if (this.opened()) {
-                switch (e.which) {
+                switch ((e as any).which) {
                     case KEY.UP:
                     case KEY.DOWN:
-                        this.moveHighlight((e.which === KEY.UP) ? -1 : 1);
+                        this.moveHighlight(((e as any).which === KEY.UP) ? -1 : 1);
                         killEvent(e);
                         return;
                     case KEY.ENTER:
@@ -3033,12 +3033,12 @@ class MultiSelect2 extends AbstractSelect2 {
                 }
             }
 
-            if (e.which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e)
-                || e.which === KEY.BACKSPACE || e.which === KEY.ESC) {
+            if ((e as any).which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e)
+                || (e as any).which === KEY.BACKSPACE || (e as any).which === KEY.ESC) {
                 return;
             }
 
-            if (e.which === KEY.ENTER) {
+            if ((e as any).which === KEY.ENTER) {
                 if (this.opts.openOnEnter === false) {
                     return;
                 } else if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
@@ -3048,12 +3048,12 @@ class MultiSelect2 extends AbstractSelect2 {
 
             this.open();
 
-            if (e.which === KEY.PAGE_UP || e.which === KEY.PAGE_DOWN) {
+            if ((e as any).which === KEY.PAGE_UP || (e as any).which === KEY.PAGE_DOWN) {
                 // prevent the page from scrolling
                 killEvent(e);
             }
 
-            if (e.which === KEY.ENTER) {
+            if ((e as any).which === KEY.ENTER) {
                 // prevent form from being submitted
                 killEvent(e);
             }

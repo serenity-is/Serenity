@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Serenity validator implementation inspired from:
  * jQuery Validation Plugin, https://jqueryvalidation.org/) 
  * - and -
@@ -732,7 +732,7 @@ export class Validator {
                 // Unix-based path
                 var idx = val.lastIndexOf("/");
                 if (idx >= 0) {
-                    return val.substr(idx + 1);
+                    return val.substring(idx + 1);
                 }
 
                 // Windows-based path

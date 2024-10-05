@@ -47,7 +47,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
         return c >= '0' && c <= '9';
     }
 
-    if (e.which === 47 || e.which === 111) {
+    if ((e as any).which === 47 || (e as any).which === 111) {
 
         if (val.length >= 2 && val.charAt(val.length - 1) === Culture.dateSeparator &&
             val.charAt(val.length - 2) === Culture.dateSeparator) {

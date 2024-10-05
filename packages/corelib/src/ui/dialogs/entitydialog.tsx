@@ -1,4 +1,4 @@
-﻿import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
 import { DataChangeInfo } from "../../types";
@@ -654,7 +654,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.localizationGrid.enumerateItems((item1, widget1) => {
             var idx = item1.name.indexOf('$');
             if (idx >= 0 && Fluent.isInputLike(widget1.domNode)) {
-                var hint = valueByName[item1.name.substr(idx + 1)];
+                var hint = valueByName[item1.name.substring(idx + 1)];
                 if (hint != null && hint.length > 0) {
                     widget1.element.attr('title', hint).attr('placeholder', hint);
                 }
@@ -696,7 +696,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
             for (var k of Object.keys(this.localizationPendingValue)) {
                 if (k.startsWith(prefix))
-                    entity[k.substr(prefix.length)] = this.localizationPendingValue[k];
+                    entity[k.substring(prefix.length)] = this.localizationPendingValue[k];
             }
 
             result[language] = entity;

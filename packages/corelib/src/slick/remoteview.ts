@@ -1,4 +1,4 @@
-﻿import { ErrorHandling, ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
+import { ErrorHandling, ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { deepClone, extend } from "../q";
 import { AggregateFormatting } from "./aggregators";
@@ -329,7 +329,7 @@ export class RemoteView<TEntity> {
             for (var s of sorts) {
                 if (s == null)
                     continue;
-                if (s.length > 5 && s.toLowerCase().substr(s.length - 5).toLowerCase() == ' desc') {
+                if (s.length > 5 && s.toLowerCase().substring(s.length - 5).toLowerCase() == ' desc') {
                     asc.push(false);
                     cols.push(s.substr(0, s.length - 5));
                 }

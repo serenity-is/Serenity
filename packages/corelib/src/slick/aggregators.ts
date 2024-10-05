@@ -1,4 +1,4 @@
-﻿import { formatNumber, htmlEncode, tryGetText } from "../base";
+import { formatNumber, htmlEncode, tryGetText } from "../base";
 import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
 
 export { };
@@ -157,7 +157,7 @@ export namespace AggregateFormatting {
 
     export function formatValue(column: Column, value: number): string {
 
-        var formatter = column.format ?? (column.formatter ? convertCompatFormatter(column.formatter) : null);
+        var formatter = column.format ?? ((column as any).formatter ? convertCompatFormatter((column as any).formatter) : null);
 
         if (formatter != null) {
             var item = new NonDataRow();

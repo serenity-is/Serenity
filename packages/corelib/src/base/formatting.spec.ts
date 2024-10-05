@@ -110,7 +110,7 @@ describe("compareStringFactory", () => {
         try {
             var comparer = formatting.compareStringFactory("cba");
             expect(comparer("ab", "abx")).toBe(-1);
-            expect(localeCompareSpy).toBeCalledTimes(1);
+            expect(localeCompareSpy).toHaveBeenCalledTimes(1);
         }
         finally {
             localeCompareSpy.mockRestore();

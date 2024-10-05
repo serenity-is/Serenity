@@ -113,7 +113,7 @@ export namespace UploadHelper {
         var sizeParts = byteSize.toString().split(String.fromCharCode(46));
         var value;
         if (sizeParts.length > 1) {
-            value = sizeParts[0] + '.' + sizeParts[1].substr(0, 2);
+            value = sizeParts[0] + '.' + sizeParts[1].substring(0, 2);
         }
         else {
             value = sizeParts[0];
@@ -135,7 +135,7 @@ export namespace UploadHelper {
         filename = filename ?? '';
         var idx = filename.lastIndexOf('.');
         if (idx >= 0) {
-            filename = filename.substr(0, idx);
+            filename = filename.substring(0, idx);
         }
         return filename + '_t.jpg';
     }

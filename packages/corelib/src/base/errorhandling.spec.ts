@@ -132,8 +132,8 @@ describe("runtimeErrorHandler", function () {
 
         ErrorHandling.runtimeErrorHandler("test", "test.js", 1, 2, new Error("test"));
 
-        expect(notifyErrorSpy).not.toBeCalled();
-        expect(setTimeoutSpy).not.toBeCalled();
+        expect(notifyErrorSpy).not.toHaveBeenCalled();
+        expect(setTimeoutSpy).not.toHaveBeenCalled();
     });
 
     it("displayed text contains the passed error details", function () {

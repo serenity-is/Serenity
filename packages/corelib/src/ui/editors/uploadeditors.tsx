@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, getjQuery, localText } from "../../base";
+import { Fluent, PropertyItem, getjQuery, localText } from "../../base";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -234,7 +234,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 var s = (value.Filename ?? '');
                 var idx = replaceAll(s, '\\', '/').lastIndexOf('/');
                 if (idx >= 0) {
-                    value.OriginalName = s.substr(idx + 1);
+                    value.OriginalName = s.substring(idx + 1);
                 }
                 else {
                     value.OriginalName = s;
