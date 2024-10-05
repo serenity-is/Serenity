@@ -16,7 +16,8 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     private void GenerateBasicTypeMembers(ExternalType type, HashSet<string> skip)
     {
         var options = GetBasicTypeMembers(type);
-
+        
+        var index = 0;
         foreach (var option in options.Values)
         {
             if (skip != null &&
@@ -28,7 +29,8 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
             var typeName = GetMemberTypeName(option.Type);
 
-            sb.AppendLine();
+            if (index++ > 0)
+                sb.AppendLine();
             cw.Indented("public ");
             sb.Append(typeName);
             sb.Append(' ');
