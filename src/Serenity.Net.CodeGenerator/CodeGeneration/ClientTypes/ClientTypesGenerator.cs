@@ -170,7 +170,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             {
                 GenerateBasicType(type);
             });
-            AddFile(RemoveRootNamespace(ns, type.Name) + ".cs");
+            AddFile(RemoveRootNamespace(ns, type.Name) + ".generated.cs");
         }
     }
 }
