@@ -4,6 +4,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 {
     private void GenerateBasicType(ExternalType type)
     {
+        cw.IndentedLine("[System.CodeDom.Compiler.GeneratedCode(\"sergen\", null)]");
         cw.Indented("public partial class ");
         sb.AppendLine(type.Name);
         
@@ -26,12 +27,10 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             var typeName = GetMemberTypeName(option.Type);
 
             sb.AppendLine();
-            cw.IndentedLine($"[Newtonsoft.Json.JsonProperty({option.Name.ToDoubleQuoted()})]");
-            cw.IndentedLine($"[{cw.ShortTypeName("System.Text.Json.Serialization", "JsonPropertyName")}({option.Name.ToDoubleQuoted()})]");
             cw.Indented("public ");
             sb.Append(typeName);
             sb.Append(' ');
-            sb.Append(TranslateJSPropertyName(option.Name));
+            sb.Append(option.Name);
             sb.Append(" { get; set; }");
             sb.AppendLine();
         }
