@@ -1140,7 +1140,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         var key = 'GridSettings:';
         var path = window.location.pathname;
         if (path) {
-            key += path.substr(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
+            key += path.substring(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
         }
 
         key += getTypeFullName(getInstanceType(this));

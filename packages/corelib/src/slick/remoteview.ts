@@ -331,7 +331,7 @@ export class RemoteView<TEntity> {
                     continue;
                 if (s.length > 5 && s.toLowerCase().substring(s.length - 5).toLowerCase() == ' desc') {
                     asc.push(false);
-                    cols.push(s.substr(0, s.length - 5));
+                    cols.push(s.substring(0, s.length - 5));
                 }
                 else {
                     asc.push(true);

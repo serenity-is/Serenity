@@ -109,7 +109,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
         input.value = val ?? '';
     }
 
-    if (!(val.length < 6 && (e.which >= 48 && e.which <= 57 || e.which >= 96 && e.which <= 105) &&
+    if (!(val.length < 6 && ((e as any).which >= 48 && (e as any).which <= 57 || (e as any).which >= 96 && (e as any).which <= 105) &&
         isNumeric(val.charAt(val.length - 1))))
         return;
 
