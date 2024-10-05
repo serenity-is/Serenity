@@ -4,7 +4,6 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 {
     private void GenerateBasicType(ExternalType type)
     {
-        cw.IndentedLine("[System.CodeDom.Compiler.GeneratedCode(\"sergen\", null)]");
         cw.Indented("public partial class ");
         sb.AppendLine(type.Name);
         
@@ -24,12 +23,17 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                 skip.Contains(option.Name))
                 continue;
 
+            if (!CSharpSyntaxRules.IsValidIdentifier(option.Name, ignoreKeywords: true))
+                continue;
+
             var typeName = GetMemberTypeName(option.Type);
 
             sb.AppendLine();
             cw.Indented("public ");
             sb.Append(typeName);
             sb.Append(' ');
+            if (CSharpSyntaxRules.IsKeyword(option.Name))
+                sb.Append('@');
             sb.Append(option.Name);
             sb.Append(" { get; set; }");
             sb.AppendLine();
@@ -88,5 +92,4 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             dict[member.Name] = member;
         }
     }
-
 }
