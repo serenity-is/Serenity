@@ -33,9 +33,6 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
     private void GenerateOptionMembers(ExternalType type, HashSet<string> skip)
     {
-        bool preserveMemberCase = type.Attributes != null && type.Attributes.Any(x =>
-            x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
-
         var options = GetOptionMembers(type);
 
         foreach (var option in options.Values)
@@ -54,7 +51,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             string jsName = option.Name;
             string optionName = option.Name;
             if (option is ExternalProperty prop)
-                jsName = GetPropertyScriptName(prop, preserveMemberCase);
+                jsName = GetPropertyScriptName(prop);
             else 
             {
                 if (option is ExternalMethod emo && emo.Arguments?.Count == 1)

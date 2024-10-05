@@ -89,15 +89,14 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         return name;
     }
 
-    protected static string GetPropertyScriptName(ExternalProperty prop, bool preserveMemberCase)
+    protected static string GetPropertyScriptName(ExternalProperty prop)
     {
         var scriptNameAttr = prop.Attributes?.FirstOrDefault(x =>
             x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
 
         if (scriptNameAttr != null)
             return scriptNameAttr.Arguments?[0].Value as string;
-        else if (!preserveMemberCase && (prop.Attributes == null || !prop.Attributes.Any(x =>
-                x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute")))
+        else
         {
             var propField = prop.Name;
             if (propField == "ID")
@@ -106,8 +105,6 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
                 return propField[..1].ToLowerInvariant()
                     + propField[1..];
         }
-        else
-            return prop.Name;
     }
 
     protected static string GetBaseTypeName(ExternalType type)
