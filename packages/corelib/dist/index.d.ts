@@ -1816,6 +1816,8 @@ export declare function registerType(type: {
 	[typeInfoProperty]: TypeInfo<any>;
 	name: string;
 }): void;
+export interface TransformInclude {
+}
 export interface TooltipOptions {
 	title?: string;
 	trigger?: string;

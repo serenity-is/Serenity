@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator : ImportGeneratorBase
 {
-    internal static string GetOptionTypeName(string typeName)
+    internal static string GetMemberTypeName(string typeName)
     {
         if (string.IsNullOrEmpty(typeName))
             return "object";
@@ -41,7 +41,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                 skip.Contains(option.Name))
                 continue;
 
-            var typeName = GetOptionTypeName(option.Type);
+            var typeName = GetMemberTypeName(option.Type);
 
             sb.AppendLine();
             cw.Indented("public ");
@@ -50,32 +50,18 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
 
             string jsName = option.Name;
             string optionName = option.Name;
-            if (option is ExternalProperty prop)
-                jsName = GetPropertyScriptName(prop);
-            else 
+            if (option is ExternalMethod emo && emo.Arguments?.Count == 1)
             {
-                if (option is ExternalMethod emo && emo.Arguments?.Count == 1)
+                if (jsName.StartsWith("set_", StringComparison.Ordinal))
                 {
-                    if (jsName.StartsWith("set_", StringComparison.Ordinal))
-                    {
-                        jsName = jsName[4..];
-                        optionName = optionName[4..];
-                    }
-
-                    typeName = GetOptionTypeName(emo.Arguments[0].Type);
+                    jsName = jsName[4..];
+                    optionName = optionName[4..];
                 }
+
+                typeName = GetMemberTypeName(emo.Arguments[0].Type);
             }
 
-            if (char.IsLower(optionName[0]))
-            {
-                if (optionName == "id")
-                    optionName = "ID";
-                else
-                    optionName = char.ToUpperInvariant(optionName[0]) +
-                        optionName[1..];
-            }
-
-            sb.AppendLine(optionName);
+            sb.AppendLine(TranslateJSPropertyName(optionName));
 
             cw.InBrace(() =>
             {
@@ -103,7 +89,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         {
             foreach (var intersectedTypeName in optionsType.Interfaces)
             {
-                var intersectedType = GetScriptTypeFrom(fromType, intersectedTypeName);
+                var intersectedType = GetScriptTypeFrom(fromType ?? optionsType, intersectedTypeName);
                 if (intersectedType != null)
                 {
                     AddOptionMembers(dict, fromType, intersectedType, true);
@@ -122,11 +108,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
             if (dict.ContainsKey(member.Name))
                 continue;
 
-            if (member.Type?.StartsWith("System.Func`", StringComparison.Ordinal) == true ||
-                member.Type?.StartsWith("System.Action`", StringComparison.Ordinal) == true ||
-                member.Type == "System.Delegate" ||
-                member.Type?.Contains("System.TypeOption", StringComparison.Ordinal) == true ||
-                member.Type == "Function")
+            if (IsComplexMemberTypeName(member.Type))
                 continue;
 
             if (!isOptions &&
@@ -251,5 +233,14 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
         while ((type = GetBaseType(type)) != null && loop++ < 100);
 
         return result;
+    }
+
+    protected static bool IsComplexMemberTypeName(string type)
+    {
+        return (type?.StartsWith("System.Func`", StringComparison.Ordinal) == true ||
+            type?.StartsWith("System.Action`", StringComparison.Ordinal) == true ||
+            type == "System.Delegate" ||
+            type?.Contains("System.TypeOption", StringComparison.Ordinal) == true ||
+            type == "Function");
     }
 }

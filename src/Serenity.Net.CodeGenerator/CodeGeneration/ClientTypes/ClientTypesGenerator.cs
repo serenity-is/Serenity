@@ -97,64 +97,80 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
     {
         bool isEditorType = IsEditorType(type);
         bool isFormatterType = IsFormatterType(type);
+        bool isBasicType = !isEditorType && !isFormatterType && type.IsAbstract != true &&
+            (type.IsInterface == true || type.IsIntersectionType == true) &&
+            type.Interfaces != null && type.Interfaces.Any(x =>
+                x == "TransformInclude" || x == "@serenity-is/corelib:TransformInclude");
 
-        if (!isEditorType && !isFormatterType)
-            return;
-
-        foreach (var defaultUsing in new string[] {
-            "Serenity",
-            "Serenity.ComponentModel",
-            "System",
-            "System.Collections.Generic",
-            "System.ComponentModel"
-        })
+        if (isEditorType || isFormatterType)
         {
-            cw.Using(defaultUsing);
-        }
-
-        var ns = GetNamespace(type.Namespace);
-
-        var key = type.Attributes?.FirstOrDefault(x =>
-            x.Arguments?.Count > 0 &&
-            !string.IsNullOrEmpty(x.Arguments[0]?.Value as string) &&
-            (
-                string.Equals(x.Type, "registerClass", StringComparison.Ordinal) ||
-                string.Equals(x.Type, "registerEditor", StringComparison.Ordinal) ||
-                string.Equals(x.Type, "registerFormatter", StringComparison.Ordinal) ||
-                x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
-                x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
-                x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
-            )?.Arguments[0].Value as string ??
-            type.Fields?.FirstOrDefault(x =>
-                x.IsStatic == true &&
-                x.Name == "__typeName" &&
-                x.Value is string)?.Value as string;
-
-        if (string.IsNullOrEmpty(ns))
-        {
-            if (key != null)
+            foreach (var defaultUsing in new string[] {
+                "Serenity",
+                "Serenity.ComponentModel",
+                "System",
+                "System.Collections.Generic",
+                "System.ComponentModel"
+            })
             {
-                var idx = key.LastIndexOf('.');
-                if (idx > 0)
-                    ns = key[..idx];
+                cw.Using(defaultUsing);
             }
 
+            var ns = GetNamespace(type.Namespace);
+            var key = type.Attributes?.FirstOrDefault(x =>
+                x.Arguments?.Count > 0 &&
+                !string.IsNullOrEmpty(x.Arguments[0]?.Value as string) &&
+                (
+                    string.Equals(x.Type, "registerClass", StringComparison.Ordinal) ||
+                    string.Equals(x.Type, "registerEditor", StringComparison.Ordinal) ||
+                    string.Equals(x.Type, "registerFormatter", StringComparison.Ordinal) ||
+                    x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
+                    x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
+                    x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
+                )?.Arguments[0].Value as string ??
+                type.Fields?.FirstOrDefault(x =>
+                    x.IsStatic == true &&
+                    x.Name == "__typeName" &&
+                    x.Value is string)?.Value as string;
+
             if (string.IsNullOrEmpty(ns))
-                ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+            {
+                if (key != null)
+                {
+                    var idx = key.LastIndexOf('.');
+                    if (idx > 0)
+                        ns = key[..idx];
+                }
+
+                if (string.IsNullOrEmpty(ns))
+                    ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+            }
+            else
+                key = null;
+
+            string name = type.Name + "Attribute";
+
+            cw.InNamespace(ns, () =>
+            {
+                if (isEditorType)
+                    GenerateEditor(type, name, key);
+                else if (isFormatterType)
+                    GenerateFormatter(type, name, key);
+            });
+
+            AddFile(RemoveRootNamespace(ns, name) + ".cs");
         }
-        else
-            key = null;
-
-        string name = type.Name + "Attribute";
-
-        cw.InNamespace(ns, () =>
+        else if (isBasicType)
         {
-            if (isEditorType)
-                GenerateEditor(type, name, key);
-            else if (isFormatterType)
-                GenerateFormatter(type, name, key);
-        });
-
-        AddFile(RemoveRootNamespace(ns, name) + ".cs");
+            var ns = GetNamespace(type.Namespace);
+            if (string.IsNullOrEmpty(ns))
+            {
+                ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+            }
+            cw.InNamespace(ns, () =>
+            {
+                GenerateBasicType(type);
+            });
+            AddFile(RemoveRootNamespace(ns, type.Name) + ".cs");
+        }
     }
 }

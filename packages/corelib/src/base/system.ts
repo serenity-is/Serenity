@@ -1,4 +1,4 @@
-﻿import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
+import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
 import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
 export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
 
@@ -310,3 +310,5 @@ export function registerType(type: { [typeInfoProperty]: TypeInfo<any>, name: st
     if (!typeInfo.typeName)
         throw `Decorators.register is called on type "${type.name}", but it's typeInfo property does not have a typeName!`;
 }
+
+export interface TransformInclude { }

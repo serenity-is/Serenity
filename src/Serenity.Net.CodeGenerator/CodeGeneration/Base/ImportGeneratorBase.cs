@@ -89,22 +89,20 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         return name;
     }
 
-    protected static string GetPropertyScriptName(ExternalProperty prop)
+    protected static string TranslateJSPropertyName(string jsName)
     {
-        var scriptNameAttr = prop.Attributes?.FirstOrDefault(x =>
-            x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+        if (string.IsNullOrEmpty(jsName))
+            return jsName;
 
-        if (scriptNameAttr != null)
-            return scriptNameAttr.Arguments?[0].Value as string;
-        else
+        if (char.IsLower(jsName[0]))
         {
-            var propField = prop.Name;
-            if (propField == "ID")
-                return "id";
-            else
-                return propField[..1].ToLowerInvariant()
-                    + propField[1..];
+            if (jsName == "id")
+                return "ID";
+                
+            return char.ToUpperInvariant(jsName[0]) + jsName[1..];
         }
+
+        return jsName;
     }
 
     protected static string GetBaseTypeName(ExternalType type)
