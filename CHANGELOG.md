@@ -1,3 +1,70 @@
+## 8.7.0 (2024-10-07)
+
+### Features:
+
+- Completely rewritten 2FA authentication system for Email / SMS / Authenticator methods, and also other that can be registered by implementing relevant interfaces (`Serenity.Pro.Extensions`).
+- Introduced a new 2FA settings UI to configure, enable, disable 2FA methods for current user
+- Added a TwoFactorData field to the Users table. Its migration will also remove MobilePhoneVerified and TwoFactorAuth columns as they are no longer used.
+- New `Authenticator` two-factor method (`Serenity.Pro.TwoFactorAuthenticator`) that allows using Authenticator Apps (TOTP) for 2FA (only available in Business/Enterprise).
+- `~/Serenity.Extensions/common-style.css` and `~/Serenity.Extensions/common-theme.css` files are now rewritten to be as close to the premium theme as possible. As they now include slickgrid, select2 and jquery.fileupload styles, Serene users should remove `slick.grid.css`,  `jquery.fileupload.css` and `select2.css` from their appsettings.bundles.json files
+- Added an AI translation option to the Translation page. The default implementation works with any local / remote API that is compatible with OpenAI one. Others can be used by implementing an interface.
+- Include a list of built-in types from corelib and sleekgrid in code generation process (Sergen/Pro.Coder) so that if somehow they are not found under project's node_modules folder (e.g. npm install not run / failed) less errors may occur than it usually happens.
+- Continue adding more checks to `sergen doctor` command including mismatch between Serenity.Net.* and sergen versions.
+- Updated Microsoft.Data.SqlClient to 5.2.2, Microsoft.Data.Sqlite to 8.0.8, MailKit to 4.7.1.1, X.PagedList.Mvc.Core to 10.1.2, Bogus to 35.6.1
+- Update @swc/core to 1.7.23, esbuild to 0.23.1, rollup to 4.21.2, terser to 5.31.6, tslib to 2.7.0, typescript to 5.5.4, chart.js to 4.4.4, dompurify to 3.1.6, tsbuild to 8.6.6, esbuild to 0.23.1, @preact/signals to 1.3.0, preact to 10.23.2.
+- Switch to X.Web.PagedList from X.PagedList.Mvc.Core which was deprecated
+- Replaced StackExchange.Exceptional.AspNetCore with our custom fork package Serenity.Exceptional.AspNetCore (https://github.com/serenity-is/exceptional) to remove remaining System.Data.SqlClient reference. This saves us from additional platform specific assemblies under bin/runtime about 4MB.
+- Removed Microsoft.Data.Sqlite reference from StartSharp.Web. Users may optionally add reference and enable it like others. This saves us from 20MB of unused platform specific assemblies for Microsoft.Data.Sqlite.
+- Sergen now also generates ESM helper (e.g. esm entry points generator in Pro.Coder) in addition to MVC helper with the MVC command.
+- Also generate shorcut constants directly under ESM helper class for entry points that have a unique file name and does match any root folders.
+- Sergen now also processes files in `.mts` extension while parsing TypeScript code
+- Allow extending the default EntryPoints in sergen.json by specifying `"+"` as the first item.
+- Generic version of page GridPage extension for getting page title from the Row type
+- Set moduleResolution to `bundler` (supported in TypeScript 5.0.2+) as we are using esbuild/rollup to bundle code
+- Add a itemId function to DataGrid that returns id property value of the given item
+- Accept HTMLElement as title of ToolButton to make it easier rendering bootstrap dropdowns and other buttons inside toolbar
+- Converted most of the code in corelib using document.createElement / Fluent to jsx syntax
+- Defaulted ServerTypings to use PreferRelativePaths = true (defaults@6.6.0) as it causes less problems when there is no '@/*' mapping in tsconfig.json or it is in a base file in another directory and there is no baseUrl: "." configuration in tsconfig.json
+- Generate code for abstract types (like base endpoints) if it has a ScriptInclude attribute
+- Use `texts` instead of root namespace generated one for declaration texts class in Texts.ts.
+- Also generate shortcut constants to individual nested local text classes in Texts.ts. For example `ValidationTexts` in addition to just `Texts` if there is a `ValidationTexts` class with the `[NestedLocalTexts(Prefix = "Validation.")]` attribute 
+- Add a `TransformInclude` interface to corelib, that when extended by an interface allows generating client type for that type during transform. This might be useful for getting compile time checking for page props, and other script interfaces that might be referenced server side.
+- Try improving code generation class member ordering issues for source generators when a service / row class is split into partial files by ordering members by originating source file
+- Added distributed cache support to Throttler
+- Added a Config.defaultReturnUrl setting and getReturnUrl function to corelib that can be used in login page etc. to get return URL from query or fallback default. Config.defaultReturnUrl function may be overridden to apply custom logic.
+- Added a ValidationError constructor that accepts localizer and local text message arguments
+- Added DataProtectorBinaryTokenExtensions to streamline usage of IDataProtector interface along with BinaryReader/BinaryWriter and Base64UrlEncode/Base64UrlDecode to reduce repeated code where such tokens are encoded/decoded.
+- Added a new `FunctionCallCriteria` base type, and an `UpperFunctionCriteria` subclass. It is used in place of logic in BinaryCriteria.ToString as a workaround for LIKE statements in case sensitive DBs. This allows using `UPPER` automatically only for StringField types, while it can be used manually if desired.
+- Added several SleekGrid samples to Serenity.Demo.AdvancedSamples
+- Removed direct dependency from `Serenity.Data` to `Microsoft.Data.SqlClient` by using reflection where required
+- Switched to esbuild for generating corelib/wwwroot/index.global.js instead of Rollup.
+- New IconClassAttribute to specify icons for UI elements where needed. Currently only used for 2FA interface.
+- **`[Breaking Change]`** Removed legacy namespaces based server typings generation support (e.g. Imports/ServerTypings) for Sergen / Pro.Coder. Existing generated files under Imports/ServerTypings won't be deleted but it is strongly recommended to migrate to modern ESM modules style code.
+- **`[Breaking Change]`** Removed legacy namespaces mode new code generation support via Sergen. It will only generate ESM style code now even if the project still have namespaces code.
+- **`[Breaking Change]`** Legacy Open Sans font under ~/Serenity.Assets/Content/font-open-sans.css is removed. Serene users should replace its entry in appsettings.bundles.json with "~/Serenity.Assets/fonts/open-sans/open-sans.css"
+- **`[Breaking Change]`** Legacy ~/Serenity.Assets/Content/font-awesome.css is removed. Serene users should replace "~/Serenity.Assets/Content/font-awesome.css" with "~/Serenity.Assets/line-awesome/css/line-awesome-fa.min.css" to switch to Line Awesome font instead.
+- **`[Breaking Change]`** Legacy toastr.css and toastr.js files in Serenity.Assets are removed. Serene / StartSharp users should remove any references to them as they are integrated into corelib and pro-theme/common-style files already.
+- **`[Breaking Change]`** Legacy select2.css and related files in Serenity.Assets are removed. Serene / StartSharp users should remove any references to them as they are integrated into pro-theme/common-style files already.
+- **`[Breaking Change]`** Sergen no longer has a "restore" command, as all assets are delivered as static web assets or via npm, and restore for legacy namespace typings are no longer supported.
+- Removed bootstrap-icons and tabler-icons from Serenity.Assets as they are not used. If required, they can be installed via libman/npm.
+- Removed jquery.fileupload.css as it is integrated into common-style/pro-theme. Any references in bundles should be removed.
+- Removed base64 and original versions of line-awesome from Serenity.Assets as we only use line-awesome-fa.css
+- Removed jspdf.js as PdfExportHelper only uses jspdf.min.js. It can be installed with libman/npm if the non-minified version is required.
+- Removed jspdf.autotable.js as PdfExportHelper only uses jspdf.autotable.min.js. It can be installed with libman/npm if the non-minified version is required.
+- Removed preact scripts from Serenity.Assets as it is no longer used. It can be installed via libman/npm if desired.
+- Removed jquery.dialogExtendQ.js as it is already integrated into corelib
+- Removed jquery.fileupload.js as we have an integrated uploader now, it can be installed via libman/npm if desired.
+- Removed jquery.autoNumeric.js as we have an integrated version now, it can be installed via libman/npm if desired.
+- Removed jquery.validate.js as we have an integrated version now. It can be installed via libman/npm if desired.
+- Removed select2.js (3.5.1) as we have an integrated version in corelib now. It can be installed via libman/npm if desired.
+- Removed woff versions of poppins / open-sans / line-awesome fonts as woff2 is supported in all browsers we support. Also remove unused weights and base64.
+- Removed wwwroot/index.global.d.ts and its generation from corelib as we no longer support typing restore and global namespaces mode scripts
+
+### Bugfixes:
+
+- this.time can be null if DateTimeEditor use flatpickr or browser default input
+- Fix script error in BasicProgressDialog cancel
+
 ## 8.6.4 (2024-08-29)
 
 ### Features:
