@@ -10,7 +10,7 @@
     <UsingSerenity>true</UsingSerenity>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
     <Using Include="System.ComponentModel" />
@@ -52,7 +52,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.24.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.25.0" />
     <Using Include="OpenQA.Selenium" />
   </ItemGroup>
 </Project>

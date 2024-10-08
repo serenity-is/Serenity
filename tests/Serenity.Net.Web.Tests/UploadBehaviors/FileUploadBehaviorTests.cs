@@ -228,7 +228,9 @@ public partial class FileUploadBehaviorTests
         sut.OnBeforeSave(requestHandler);
         uow.Commit();
 
-        Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)); // should be a random file name
+        var newFiles = mockFileSystem.AllFiles.Where(NotMeta);
+
+        Assert.Single(newFiles); // should be a random file name
     }
 
     [Fact]
@@ -777,7 +779,8 @@ public partial class FileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)));
+        var newFiles = mockFileSystem.AllFiles.Where(NotMeta);
+        var newFile = mockFileSystem.GetFileName(Assert.Single(newFiles));
         var rowFileName = mockFileSystem.GetFileName(row.StringFieldImageUploadEditor);
 
         if (!isUpdate)
@@ -833,7 +836,8 @@ public partial class FileUploadBehaviorTests
         sut.OnAfterSave(requestHandler);
         uow.Commit();
 
-        var newFile = mockFileSystem.GetFileName(Assert.Single(mockFileSystem.AllFiles.Where(NotMeta)));
+        var newFiles = mockFileSystem.AllFiles.Where(NotMeta);
+        var newFile = mockFileSystem.GetFileName(Assert.Single(newFiles));
         
         Assert.NotNull(dbCommand);
         var updateStatement = (TSQL.Statements.TSQLUpdateStatement)Assert.Single(TSQL.TSQLStatementReader.ParseStatements(dbCommand.CommandText));
