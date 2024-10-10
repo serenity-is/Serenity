@@ -45,6 +45,29 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
+    /// Automatically includes corresponding .css file for an ES module if it exists next to
+    /// the .js file
+    /// </summary>
+    /// <param name="helper">HTML helper</param>
+    /// <param name="module">ES module</param>
+    /// <returns></returns>
+    public static HtmlString AutoIncludeModuleCss(this IHtmlHelper helper, string module)
+    {
+        if (string.IsNullOrEmpty(module))
+            return HtmlString.Empty;
+
+        if (module.EndsWith(".js", StringComparison.Ordinal) == true &&
+            module.StartsWith("~/", StringComparison.Ordinal) == true &&
+            helper.ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>()
+                .WebRootFileProvider?.GetFileInfo(module[2..^3] + ".css")?.Exists == true)
+        { 
+            return Stylesheet(helper, module);
+        }
+
+        return HtmlString.Empty;
+    }
+
+    /// <summary>
     /// Renders individual link elements for all CSS files in a bundle if bundling is disabled,
     /// and renders a single link element containing the bundle URL if it is enabled.
     /// </summary>
