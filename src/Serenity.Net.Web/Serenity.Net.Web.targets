@@ -31,7 +31,8 @@ try
     ""."": {
       ""types"": ""./dist/index.d.ts"",
       ""import"": ""./dist/index.js""
-    }
+    },
+    ""./dist/*.css"": ""./dist/*.css""
   },
   ""main"": ""dist/index.js"",
   ""import"": ""dist/index.js"",
