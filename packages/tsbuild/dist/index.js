@@ -195,7 +195,7 @@ export function cleanPlugin() {
 
                     const outputFiles = new Set(Object.keys(outputs));
                     scanDir(build.initialOptions.outdir).forEach(file => {
-                        if (!file.endsWith('.js') && !file.endsWith('.js.map'))
+                        if (!file.endsWith('.js') && !file.endsWith('.js.map') && !file.endsWith('.css') && !file.endsWith('.css.map'))
                             return;
                         if (!outputFiles.has(join(build.initialOptions.outdir, file).replace(/\\/g, '/'))) {
                             console.log('esbuild clean: deleting extra file ' + file);
