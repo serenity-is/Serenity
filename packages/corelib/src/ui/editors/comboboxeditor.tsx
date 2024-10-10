@@ -172,12 +172,13 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         if (this.hasAsyncSource()) {
             opt.search = query => this.asyncSearch(query).then(result => {
                 let items = this.mapItems(result.items || []);
-                this._itemById ??= {};
-                for (var x of items)
-                    this._itemById[x.id] = x;
-                
+
                 if (query.initSelection) {
-                    const newItems = (query.idList || []).map(id => this._itemById[id] || items.find(z => z.id == id)).filter(x => x != null);
+                    const itemById: typeof this._itemById = {};
+                    for (var x of items) {
+                        itemById[x.id] = x;
+                    }
+                    const newItems = (query.idList || []).map(id => itemById[id]).filter(x => x != null);
                     if (items.length == newItems.length) {
                         // if length is not equal, might be a case sensitivity issue, ignore ordering otherwise
                         items = newItems;
@@ -193,16 +194,18 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
                     items.length < query.idList.length) {
                     for (var v of query.idList) {
                         if (!items.some(z => z.id == v)) {
-                            var item = {
+                            items.push({
                                 id: v,
                                 text: v
-                            };
-                            items.push(item);
-                            this._itemById[x.id] = x;
+                            });
                         }
                     }
                 }
 
+                this._itemById ??= {};
+                for (var x of items)
+                    this._itemById[x.id] = x;
+                
                 return mappedResult;
             });
         }
