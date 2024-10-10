@@ -200,7 +200,12 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
             opt.search = (query) => {
                 var items;
                 if (query.initSelection) {
-                    items = this._items.filter(x => query.idList?.includes(x.id))
+                    if (query.idList) {
+                        items = query.idList.map(x => this._itemById[x] || this._items.find(z => z.id == x)).filter(x => x != null);
+                    }
+                    else {
+                        items = this._items.filter(x => query.idList?.includes(x.id))
+                    }
                 }
                 else {
                     items = ComboboxEditor.filterByText(this._items, x => x.text, query.searchTerm);
