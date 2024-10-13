@@ -5449,7 +5449,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected loadEntity(entity: TItem): void;
 	protected beforeLoadEntity(entity: TItem): void;
 	protected afterLoadEntity(): void;
-	loadByIdAndOpenDialog(entityId: any, asPanel?: boolean): void;
+	loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
 	protected onLoadingData(data: RetrieveResponse<TItem>): void;
 	protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
 	protected getLoadByIdRequest(id: any): RetrieveRequest;

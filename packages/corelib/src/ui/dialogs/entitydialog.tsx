@@ -435,13 +435,17 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.updateTitle();
     }
 
-    public loadByIdAndOpenDialog(entityId: any, asPanel?: boolean) {
+    public loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void {
         this.loadById(entityId,
-            response => window.setTimeout(() => this.dialogOpen(asPanel), 0),
+            response => window.setTimeout(() => {
+                this.dialogOpen(asPanel);
+                callback?.(response);
+            }, 0),
             () => {
                 if (!Fluent.isVisibleLike(this.domNode)) {
                     this.domNode.remove();
                 }
+                fail?.();
             });
     }
 
