@@ -416,7 +416,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         if (referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
-            sb.AppendLine($"[" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]; // referenced types");
+            sb.AppendLine($"queueMicrotask(() => [" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]); // referenced types");
         }
 
         RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
