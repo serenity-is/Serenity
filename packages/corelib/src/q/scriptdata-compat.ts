@@ -1,7 +1,7 @@
 ﻿import {
     Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, reloadLookupAsync,
     requestFinished, requestStarting,
-    resolveUrl, setScriptData, type PropertyItem, type PropertyItemsData
+    resolveUrl, scriptDataHooks, setScriptData, type PropertyItem, type PropertyItemsData
 } from "../base";
 
 export namespace ScriptData {
@@ -24,6 +24,12 @@ export namespace ScriptData {
         if (data != null)
             return data;
 
+        data = scriptDataHooks.fetchScriptData?.<TData>(name, true, dynJS);
+        if (data !== void 0) {
+            set(name, data);
+            return data;
+        }
+
         var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, false);
@@ -39,14 +45,13 @@ export namespace ScriptData {
                 script.text = xhr.responseText;
                 document.head.appendChild(script).parentNode.removeChild(script);
                 data = peekScriptData(name);
-                if (data == null)
-                    handleScriptDataError(name);
             }
-
-            data = JSON.parse(xhr.responseText);
+            else {
+                data = JSON.parse(xhr.responseText);
+            }
             if (data == null)
                 handleScriptDataError(name);
-            if (name.startsWith("Lookup."))
+            if (!dynJS && name.startsWith("Lookup."))
                 data = new Lookup(data.Params, data.Items);
             set(name, data);
             return data;

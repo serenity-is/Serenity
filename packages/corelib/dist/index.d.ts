@@ -1685,6 +1685,20 @@ export interface PropertyItemsData {
  */
 export declare function getScriptDataHash(name: string, reload?: boolean): string;
 /**
+ * Hook for script data related operations
+ */
+export declare const scriptDataHooks: {
+	/**
+	 * Provides a hook to override the default fetchScriptData implementation,
+	 * it falls back to the default implementation if undefined is returned.
+	 * It is recommended to use this hook mainly for test purposes.
+	 * If the sync parameter is true (legacy/compat), then the result should be returned synchronously.
+	 * DynJS parameter is true if the script is requested to be loaded via a dynamic script,
+	 * and not a JSON request. This parameter is only true for the legacy/compat sync mode.
+	 */
+	fetchScriptData: <TData>(name: string, sync?: boolean, dynJS?: boolean) => TData | Promise<TData>;
+};
+/**
  * Fetches a script data with given name via ~/DynamicData endpoint
  * @param name Dynamic script name
  * @returns A promise that will return data if successfull

@@ -44,6 +44,21 @@ export function getScriptDataHash(name: string, reload?: boolean): string {
     return scriptDataHash[name];
 }
 
+/**
+ * Hook for script data related operations
+ */
+export const scriptDataHooks = {
+    /**
+     * Provides a hook to override the default fetchScriptData implementation,
+     * it falls back to the default implementation if undefined is returned.
+     * It is recommended to use this hook mainly for test purposes.
+     * If the sync parameter is true (legacy/compat), then the result should be returned synchronously.
+     * DynJS parameter is true if the script is requested to be loaded via a dynamic script,
+     * and not a JSON request. This parameter is only true for the legacy/compat sync mode.
+     */
+    fetchScriptData: void 0 as <TData>(name: string, sync?: boolean, dynJS?: boolean) => TData | Promise<TData>
+}
+
 let fetchPromises: { [key: string]: Promise<any> } = {}
 
 /**
@@ -52,6 +67,12 @@ let fetchPromises: { [key: string]: Promise<any> } = {}
  * @returns A promise that will return data if successfull
  */
 export function fetchScriptData<TData>(name: string): Promise<TData> {
+
+    const hookResult = scriptDataHooks.fetchScriptData?.<TData>(name);
+    if (hookResult != void 0) {
+        return Promise.resolve(hookResult);
+    }
+
     let key = name + '?' + (getScriptDataHash(name) ?? '');
 
     var promise: Promise<TData> = fetchPromises[key];
