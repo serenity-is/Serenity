@@ -70,7 +70,11 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
 
     const hookResult = scriptDataHooks.fetchScriptData?.<TData>(name);
     if (hookResult != void 0) {
-        return Promise.resolve(hookResult);
+        return Promise.resolve(hookResult).then(data => {
+            if (name?.startsWith("Lookup.") && (data as any)?.Items && !(data as any).items && !(data as any).itemById)
+                return new Lookup((hookResult as any).Params, (hookResult as any).Items) as any;
+            return data;
+        });
     }
 
     let key = name + '?' + (getScriptDataHash(name) ?? '');

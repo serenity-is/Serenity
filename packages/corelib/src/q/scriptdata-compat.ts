@@ -1,5 +1,5 @@
 ﻿import {
-    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, reloadLookupAsync,
+    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, isPromiseLike, peekScriptData, reloadLookupAsync,
     requestFinished, requestStarting,
     resolveUrl, scriptDataHooks, setScriptData, type PropertyItem, type PropertyItemsData
 } from "../base";
@@ -26,6 +26,10 @@ export namespace ScriptData {
 
         data = scriptDataHooks.fetchScriptData?.<TData>(name, true, dynJS);
         if (data !== void 0) {
+            if (isPromiseLike(data))
+                throw new Error("fetchScriptData hook must return data synchronously when sync is true.");
+            if (name.startsWith("Lookup.") && (data as any)?.Items)
+                data = new Lookup((data as any).Params, (data as any).Items) as any;
             set(name, data);
             return data;
         }
