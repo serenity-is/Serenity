@@ -1,4 +1,4 @@
-﻿import { Fluent, IconClassName, iconClassName } from "../../base";
+﻿import { Fluent, IconClassName, iconClassName, isArrayLike } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { Widget } from "./widget";
 
@@ -110,7 +110,11 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     declare protected mouseTrap: any;
 
-    createButton(container: ParentNode, tb: ToolButton): HTMLElement {
+    createButton(container: ParentNode | ArrayLike<ParentNode>, tb: ToolButton): HTMLElement {
+
+        if (isArrayLike(container)) {
+            container = container[0];
+        }
 
         if (tb.separator === 'right' || tb.separator === 'both') {
             container.appendChild(<div class="separator" />);
