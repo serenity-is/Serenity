@@ -3346,7 +3346,7 @@ export declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends 
 	protected renderContents(): any;
 	destroy(): void;
 	protected mouseTrap: any;
-	createButton(container: ParentNode, tb: ToolButton): HTMLElement;
+	createButton(container: ParentNode | ArrayLike<ParentNode>, tb: ToolButton): HTMLElement;
 	findButton(className: string): Fluent<HTMLElement>;
 	updateInterface(): void;
 }
