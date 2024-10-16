@@ -10,7 +10,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     static readonly Version RecommendedNpmVersion = new(10, 8, 2);
 
     static readonly (Version, Version)[] RecommendedTSBuildVersion = [
-        (new(0, 0, 0), new(8, 6, 0))
+        (new(0, 0, 0), new(8, 6, 0)),
+        (new(8, 7, 1), new(8, 7, 4))
     ];
 
     static readonly (Version, Version)[] RecommendedJsxDomVersion = [
@@ -359,14 +360,14 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         var recommendedVersion = RecommendedTSBuildVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
+            serenityVersion >= x.Item1)?.Item2;
 
-        if (version < recommendedVersion)
+        if (version != null && version < recommendedVersion)
         {
             Error($"@serenity-is/tsbuild version in package.json is {version}, " +
                 $"please update to {recommendedVersion} for better support.");
         }
-        else if (version > recommendedVersion)
+        else if (version != null && version > recommendedVersion)
         {
             Warning($"@serenity-is/tsbuild version in package.json is {version}, " +
                 $"which is newer than the recommended version {recommendedVersion} for " +
@@ -394,14 +395,14 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         var recommendedVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
+            serenityVersion >= x.Item1)?.Item2;
 
-        if (version < recommendedVersion)
+        if (version != null && version < recommendedVersion)
         {
             Error($"jsx-dom version in package.json is {version}, " +
                 $"please update to {RecommendedJsxDomVersion} for better support.");
         }
-        else if (version > recommendedVersion)
+        else if (version != null && version > recommendedVersion)
         {
             Warning($"The jsx-dom version in package.json is {version}, " +
                 $"which is newer than the recommended version {recommendedVersion} " +
