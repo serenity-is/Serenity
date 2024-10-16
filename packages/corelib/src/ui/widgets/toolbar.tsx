@@ -110,7 +110,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
 
     declare protected mouseTrap: any;
 
-    private createButton(container: ParentNode, tb: ToolButton) {
+    createButton(container: ParentNode, tb: ToolButton): HTMLElement {
 
         if (tb.separator === 'right' || tb.separator === 'both') {
             container.appendChild(<div class="separator" />);
@@ -130,6 +130,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
                 return tb.hotkeyAllowDefault;
             });
         }
+        return button;
     }
 
     findButton(className: string) {
