@@ -360,7 +360,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         var recommendedVersion = RecommendedTSBuildVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1)?.Item2;
+            serenityVersion >= x.Item1).Item2;
 
         if (version != null && version < recommendedVersion)
         {
@@ -395,7 +395,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         var recommendedVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1)?.Item2;
+            serenityVersion >= x.Item1).Item2;
 
         if (version != null && version < recommendedVersion)
         {
