@@ -19,11 +19,11 @@ public static class BasicSamplesHelper
 
         string path = file.StartsWith('/') ?
             file[1..] :
-            "Serenity.Demo.BasicSamples" + GetRelativePathFor(helper, file);
+            "demo.basicsamples" + GetRelativePathFor(helper, file);
 
         return new HtmlString("<a target=\"blank\" style=\"font-weight: bold;\" href=\"" +
-            helper.Encode("https://github.com/serenity-is/common-features/" +
-                "blob/master/src/" + path) +
+            helper.Encode("https://github.com/serenity-is/Serenity/" +
+                "blob/master/common-features/src/" + path) +
             "\">" + helper.Encode(Path.GetFileName(file)) + "</a>");
     }
 
