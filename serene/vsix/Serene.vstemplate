@@ -1,0 +1,33 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="ProjectGroup">
+  <TemplateData>
+    <Name>SERENE</Name>
+	<SortOrder>10</SortOrder>
+    <Description>Serenity ASP.NET Core project template</Description>
+    <Icon>SerenityLogo.ico</Icon>
+    <DefaultName>Serene</DefaultName>
+	<ProjectType>CSharp</ProjectType>
+    <ProjectSubType>Web</ProjectSubType>	
+	<Hidden>false</Hidden>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>	
+  </TemplateData>
+  <TemplateContent>
+    <ProjectCollection>
+      <ProjectTemplateLink ProjectName="$projectname$.Web" CopyParameters="true">
+        Serene.Web\Serene.Web.vstemplate
+      </ProjectTemplateLink>
+    </ProjectCollection>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>SereneProjectWizard_v6, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=null</Assembly>
+    <FullClassName>RootProjectWizard.RootWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+	<features>
+	  <feature key="BasicSamples" title="Basic Samples">
+		<dependency feature="Northwind" />
+	  </feature>
+	  <feature key="Northwind" title="Northwind">
+	  </feature>
+    </features>
+  </WizardData>
+</VSTemplate>

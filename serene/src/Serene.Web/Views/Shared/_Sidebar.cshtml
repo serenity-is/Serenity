@@ -1,0 +1,101 @@
+@model Serenity.Navigation.INavigationModel
+@inject ITextLocalizer Localizer
+@{
+    void renderItem(Serenity.Navigation.NavigationItem item, string parentId, int index) {
+    var isActive = Model.ActivePath.Contains(item);
+    var hasChildren = item.Children.Any();
+    var klass = "s-sidebar-item" + (isActive ? " active" : "") + (hasChildren ? " has-children" : "") +
+        (!string.IsNullOrEmpty(item.ItemClass) ? (" " + item.ItemClass) : "");
+    var icon = item.IconClass ?? "";
+    var title = Localizer.TryGet("Navigation." + item.FullPath) ?? item.Title;
+    var ulId = parentId + "_" + index;
+    var url = item.Url ?? (hasChildren ? ("#" + ulId) : "javascript:;");
+    var target = Html.Raw(item.Target != null ? (" target=" + item.Target) : "");
+    var bsToggle = Html.Raw(hasChildren ? " data-bs-toggle=\"collapse\"" : "");
+    var ariaExpanded = Html.Raw(hasChildren && isActive ? " aria-expanded=\"true\"" : "");
+    <li class="@klass">
+            <a class="s-sidebar-link" href="@url"@target@bsToggle@ariaExpanded>
+                <i class="s-sidebar-icon fa @icon"></i>
+                <span class="s-sidebar-link-text">@title</span>
+                @if (hasChildren)
+            {<em class="s-sidebar-menu-toggle fa fa-angle-right"></em>}
+            </a>
+            @if (hasChildren)
+        {
+            <ul id="@ulId" class="s-sidebar-menu collapse@(isActive ? " show" : "")" data-bs-parent="#@parentId">
+                @{var idx = 0;}
+                @foreach (var child in item.Children)
+            {
+                renderItem(child, ulId, ++idx);
+            }
+                </ul>
+        }
+        </li>
+}
+}
+
+<aside class="s-sidebar" id="s-sidebar">
+    <div class="s-sidebar-pane">
+        <div id="s-sidebar-search" class="s-sidebar-search m-3">
+            <i class="fa fa-search fa-flip-horizontal s-sidebar-search-icon"></i>
+            <input type="text" class="w-100 s-sidebar-search-input" placeholder="@Localizer.Get("Controls.QuickSearch.Placeholder")">
+        </div>
+        <ul id="s-sidebar-menu" class="s-sidebar-menu">
+            @{var itm = 0;}
+            @foreach (var item in Model.Items)
+        {
+            renderItem(item, "s-sidebar-menus", ++itm);
+        }
+        </ul>
+    </div>
+</aside>
+
+<header class="navbar sticky-top s-sidebar-header">
+    <button class="s-sidebar-toggler" type="button" id="s-sidebar-toggler"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+    </button>
+    <div class="s-sidebar-header-branding">
+        <img class="s-sidebar-header-logo" src="~/Content/site/images/serenity-logo-w-128.png" />
+        <span class="s-sidebar-header-title">@Texts.Navigation.SiteTitle.ToString(Localizer)</span>
+    </div>
+    <ul class="s-sidebar-header-actions">
+        <li>
+            <div class="dropdown">
+                <a href="javascript:;" class="s-sidebar-header-link s-language-selection-link" 
+                    data-bs-toggle="dropdown" title="switch language">
+                    <i class="fa fa-language"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end s-language-selection-menu">
+                </ul>
+            </div>
+        </li>
+    @if (User.IsLoggedIn())
+    {
+    <li>
+            <div class="dropdown">
+                <a href="javascript:;" class="s-sidebar-header-link s-user-profile-link" 
+                    data-bs-toggle="dropdown" title="@User?.Identity?.Name">
+                    <i class="fa fa-user"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-md dropdown-menu-end s-user-profile-menu">
+                    <div class="s-user-card p-1 mb-2 text-center border-bottom">
+                        <h2 class="s-user-avatar fs-1 mb-0">
+                            <i class="fa fa-user"></i>
+                        </h2>
+                        <p class="s-user-info fs-6 mb-1">
+                            @Context.User?.Identity?.Name
+                        </p>
+                    </div>
+                    <a class="dropdown-item" href="~/Account/ChangePassword">
+                        <em class="icon fa fa-key"></em><span> @ExtensionsTexts.Forms.Membership.ChangePassword.FormTitle.ToString(Localizer)</span>
+                    </a>
+                    <a class="dropdown-item" href="~/Account/Signout">
+                        <em class="icon fa fa-sign-out-alt"></em><span> @Localizer.Get("Navigation.LogoutLink")</span>
+                    </a>
+                </div>
+            </div>
+        </li>
+    }
+    </ul>
+</header>

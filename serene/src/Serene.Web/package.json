@@ -1,0 +1,22 @@
+{
+  "name": "serene.web",
+  "dependencies": {
+    "@serenity-is/corelib": "./node_modules/.dotnet/serenity.corelib",
+    "@serenity-is/demo.northwind": "./node_modules/.dotnet/serenity.demo.northwind",
+    "@serenity-is/extensions": "./node_modules/.dotnet/serenity.extensions",
+    "@serenity-is/sleekgrid": "./node_modules/.dotnet/serenity.sleekgrid",
+    "jsx-dom": "8.1.5",
+    "preact": "10.23.2"
+  },
+  "devDependencies": {
+    "@serenity-is/tsbuild": "8.7.4"
+  },
+  "scripts": {
+    "build": "npm run tsbuild",
+    "preinstall": "dotnet build -target:RestoreNodeTypes",
+    "tsbuild": "node ./tsbuild.js",
+    "tsbuild:watch": "node ./tsbuild.js --watch"
+  },
+  "private": true,
+  "type": "module"
+}

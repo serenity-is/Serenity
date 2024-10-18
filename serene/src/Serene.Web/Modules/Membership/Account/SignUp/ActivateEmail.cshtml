@@ -1,0 +1,21 @@
+@model Serene.Membership.ActivateEmailModel
+
+<html>
+<head>
+    <title>Activate your Serene account</title>
+</head>
+<body>
+    <p>@Model.DisplayName,</p>
+
+    <p>We received a request to create a new account on Serene with your email address.</p>
+
+    <p>Click the link below to activate your account:</p>
+
+    <p><a href="@Model.ActivateLink">@Model.ActivateLink</a></p>
+
+    <p>If it wasn't you who requested this, you can ignore this email.</p>
+
+    Thanks,
+    The "Serene" Team
+</body>
+</html>

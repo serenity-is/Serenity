@@ -1,0 +1,33 @@
+@inject ITextLocalizer Localizer
+@{
+    ViewData["Title"] = Texts.Forms.Membership.Login.LoginToYourAccount.ToString(Localizer);
+    ViewData["PageId"] = "Login";
+    Layout = MVC.Views.Shared._LayoutNoNavigation;
+}
+
+<style>
+    a { text-decoration: none; }
+</style>
+
+@if (ViewData["Activated"] != null)
+{
+    <input type="hidden" id="Activated" value="@ViewData["Activated"]" />
+    <div class="alert alert-info alert-dismissible">
+        <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true"></button>
+        <h4><i class="icon fa fa-info"></i>@Localizer.Get("Dialogs.InformationTitle")</h4>
+        @Texts.Forms.Membership.SignUp.ActivationCompleteMessage.ToString(Localizer)
+    </div>
+}
+
+<div class="s-full-page justify-content-center">
+    <div id="LoginPanel" class="s-container-tight">
+
+    </div>
+</div>
+
+<script type="module">
+    import pageInit from '@Html.ResolveWithHash("~/esm/Modules/Membership/Account/Login/LoginPage.js")';
+    pageInit({
+        activated: @Json.Serialize(ViewData["Activated"] as string)
+    });
+</script>

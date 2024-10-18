@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "command": "dotnet",
+    "args": [],
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceRoot}\\Serene\\Serene.App\\project.json"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "_id": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}
