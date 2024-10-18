@@ -1,0 +1,9 @@
+{
+  "name": "test-utils",
+  "private": true,
+  "devDependencies": {
+    "@serenity-is/corelib": "workspace:*",
+    "@types/jest": "29.5.13"
+  },
+  "type": "module"
+}

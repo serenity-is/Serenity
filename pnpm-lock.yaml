@@ -55,6 +55,15 @@ importers:
 
   packages/sleekgrid: {}
 
+  packages/test-utils:
+    devDependencies:
+      '@serenity-is/corelib':
+        specifier: workspace:*
+        version: link:../corelib
+      '@types/jest':
+        specifier: 29.5.13
+        version: 29.5.13
+
   packages/tsbuild:
     dependencies:
       esbuild:
