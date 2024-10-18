@@ -1,0 +1,18 @@
+@model ModulePageModel
+@inject ITextLocalizer Localizer
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment 
+@{
+    if (Model.PageTitle != null)
+        ViewData["Title"] = Model.PageTitle.ToString(Localizer);
+    if (Model.PageId != null)
+        ViewData["PageId"] = Model.PageId;
+    if (Model.Layout != null)
+        Layout = Model.Layout;
+}
+@Html.AutoIncludeModuleCss(Model.Module)
+@Html.Raw(Model.HtmlMarkup)
+
+<script type="module">
+import * as imports from '@Html.ResolveWithHash(Model.Module)';
+imports.default && imports.default(@(Model.Options == null ? "" : Html.Raw(JSON.Stringify(Model.Options))));
+</script>

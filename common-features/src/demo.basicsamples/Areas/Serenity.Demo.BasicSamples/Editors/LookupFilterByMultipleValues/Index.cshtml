@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Lookup Filtering By Multiple Values (IN)";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        This sample demonstrates how to filter a lookup client side by multiple values.
+    </p>
+    <p>
+        You can normally use LookupField and LookupValue to filter a lookup editor by single value,
+        but to use multiple values with IN(...) filtering you need to define a custom editor.
+    </p>
+    <p>
+        Here we use a subclass of LookupEditor to show only Produce and Seafood in category
+        editor of product dialog. Creating custom editors in Serenity is actually simple. 
+        See ProduceSeafoodCategoyEditor.ts.
+    </p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("LookupFilterByMultipleForm.cs")
+        @Html.BasicSamplesSourceFile("LookupFilterByMultipleValuesPage.ts")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.LookupFilterByMultipleValuesPage)

@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Initial Values for Quick Filters";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        Sometimes you might want to set some initial values for quick filters on page load.
+        Here we do it for "Order Date", "Shipping State" and "Ship Via Company".
+    </p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("InitialValuesForQuickFiltersPage.ts")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.InitialValuesForQuickFiltersPage)

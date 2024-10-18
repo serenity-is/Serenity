@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <Version>8.7.1</Version>
+    <Company>Serenity Software</Company>
+    <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
+    <Product>Serenity Platform - Common Features</Product>
+    <Authors>Volkan Ceylan</Authors>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>http://github.com/serenity-is/common-features</PackageProjectUrl>
+    <PackageTags>Serenity</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <None Include="$(MSBuildThisFileDirectory)assets\package-icon.png" Pack="true" PackagePath="">
+      <Link>Properties\package-icon.png</Link>
+    </None>
+  </ItemGroup>
+</Project>

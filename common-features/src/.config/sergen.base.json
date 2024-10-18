@@ -1,0 +1,11 @@
+{
+  "Extends": "defaults@6.6.0",
+  "IncludeGlobalUsings": [
+    "Serenity",
+    "Serenity.ComponentModel",
+    "Serenity.Extensions",
+    "System",
+    "System.Collections.Generic",
+    "System.ComponentModel"
+  ]
+}

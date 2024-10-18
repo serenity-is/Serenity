@@ -1,0 +1,32 @@
+@model int?
+
+@{
+    ViewData["Title"] = "Entity Dialog as Panel";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>This sample demonstrates how to use an entity dialog as an inline panel. Try operations below:</p>
+    <br />
+    <ul>
+        <li><a href="~/BasicSamples/EntityDialogAsPanel/">Switch to new record mode by changing URL</a></li>
+        <li><a href="~/BasicSamples/EntityDialogAsPanel/11068">Load Order with ID 11068 by changing URL</a></li>
+        <li><a id="SwitchToNewRecordMode" href="javascript:;">Switch to new record mode with Javascript</a></li>
+        <li><a id="LoadEntityWithId" href="javascript:;">Load Order with ID 11048 with javascript</a></li>
+        <li><a href="~/BasicSamples/EntityDialogAsPanel/11077">Back to Order with ID 11077 by changing URL</a></li>
+    </ul>
+
+    <p class="s-sample-sources">
+        <b>Source Files:</b>
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("EntityDialogAsPanelPage.ts")
+    </p>
+</div>
+
+<div id="DialogDiv"></div>
+
+@Html.ModulePageInit(ESM.EntityDialogAsPanelPage)

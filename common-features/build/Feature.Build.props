@@ -1,0 +1,62 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(SolutionDir)Serenity\src\Serenity.Net.sln')">$(SolutionDir)Serenity\</SerenityDir>
+    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\src\Serenity.Net.sln')">$(MSBuildThisFileDirectory)..\</SerenityDir>
+    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\src\Serenity.Net.sln')">$(MSBuildThisFileDirectory)..\..\</SerenityDir>
+    <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(SerenityDir)src\</SerenitySrc>
+    <SerenityWebProj Condition="'$(SerenityWebProj)' == ''">$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj</SerenityWebProj>
+    <DotNetSergenDir>$(SerenitySrc)Serenity.Net.CodeGenerator\bin\</DotNetSergenDir>
+    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(DotNetSergenDir)sergen')">$(DotNetSergenDir)sergen</DotNetSergen>
+    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(DotNetSergenDir)sergen.exe')">$(DotNetSergenDir)sergen.exe</DotNetSergen>
+    <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
+    <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
+    <DotnetToolRestoreStamp>$(MSBuildProjectDirectory)\..\.config\.restore-stamp</DotnetToolRestoreStamp>
+    <SergenTransform>all</SergenTransform>
+    <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
+    <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <DefaultItemExcludes>node_modules\**;$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;tsconfig.base.json;libman.json;tsbuild.js;test\*.json;wwwroot\index.d.ts;wwwroot\**\*.less</DefaultItemExcludes>
+    <AddAutoRefs>true</AddAutoRefs>
+    <RestoreNodeTypes>false</RestoreNodeTypes>
+    <RestoreTypings>false</RestoreTypings>
+    <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" Condition="'$(UsingMicrosoftNETSdkWeb)' != 'true' and '$(AddAutoRefs)' == 'true'" />
+    <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
+    <ProjectReference Include="$(SerenityWebProj)" Condition="Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.6.2" Condition="Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="$(MSBuildProjectDirectory)\*.json;$(MSBuildProjectDirectory)\tsbuild*.js" />
+    <Content Include="$(MSBuildProjectDirectory)\*.json;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
+    <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.RegularExpressions" />
+    <Using Include="Serenity" />
+    <Using Include="Serenity.Abstractions" />
+    <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.Data" />
+    <Using Include="Serenity.Data.Mapping" />
+    <Using Include="Serenity.Extensions" />
+    <Using Include="Serenity.Services" />
+    <Using Include="Serenity.Web" />
+  </ItemGroup>
+</Project>

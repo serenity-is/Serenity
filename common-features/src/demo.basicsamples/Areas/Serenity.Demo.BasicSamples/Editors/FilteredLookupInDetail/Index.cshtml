@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Filtered Lookup in Detail Dialog";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>A frequently asked question is how to pass some data from master dialog to a lookup editor
+    in a detail dialog to filter items.</p>
+    <p>In this sample we have a custom Order dialog that has a Product Category selection.</p>
+    <p>When you click Add button in Order Details grid, Product editor in detail dialog will 
+    only show products in selected Category.</p>
+    <p>To achieve this, we need to flow selected category information on this route: Master Order Dialog -&gt;
+       Order Detail Grid Editor -&gt; Order Detail Dialog -&gt; Product Lookup Editor.
+    
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("FilteredLookupInDetailForm.cs")
+        @Html.BasicSamplesSourceFile("FilteredLookupInDetailPage.ts")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.FilteredLookupInDetailPage)

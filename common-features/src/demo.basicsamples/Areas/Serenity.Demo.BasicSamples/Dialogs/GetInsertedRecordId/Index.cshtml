@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Get Inserted Record Id From Dialog";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        You might need to get ID of inserted record from a dialog, show some message, 
+        or open another dialog for it. onSaveSuccess is a good place for this.
+    </p>
+    <p>
+        Insert a new category and we'll show a message about inserted record. 
+        This will do nothing for updates.
+    </p>
+
+    <p class="s-sample-sources">
+        <b>Source Files:</b>
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("GetInsertedRecordIdPage.ts")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.GetInsertedRecordIdPage)

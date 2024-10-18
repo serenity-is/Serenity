@@ -1,0 +1,22 @@
+
+.s-Demo-BasicSamples-FilteredLookupInDetailDialog > .size {
+  width: 850px;
+  height: 550px;
+}
+
+.s-Demo-BasicSamples-FilteredLookupInDetailDialog .caption {
+  width: 150px;
+}
+
+.s-Demo-BasicSamples-FilteredLookupInDetailDialog .s-PropertyGrid .categories {
+  overflow-y: auto;
+}
+
+.s-Demo-BasicSamples-FilteredLookupOrderDetailDialog > .size {
+  min-width: 450px;
+  width: 450px;
+}
+
+.s-Demo-BasicSamples-FilteredLookupOrderDetailDialog .caption {
+  width: 80px;
+}

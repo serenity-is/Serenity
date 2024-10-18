@@ -1,0 +1,15 @@
+
+.s-Demo-BasicSamples-EntityDialogAsPanel {
+  background-color: var(--s-card-bg, #fff);
+  border: 1px solid var(--s-card-border, #999);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.s-Demo-BasicSamples-EntityDialogAsPanel .caption {
+  width: 120px;
+}
+
+.s-Demo-BasicSamples-EntityDialogAsPanel .s-PropertyGrid .categories {
+  height: auto;
+}

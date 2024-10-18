@@ -1,0 +1,96 @@
+﻿@using Serenity.Extensions
+@model ReportTree
+@{
+    ViewData["Title"] = "Reports";
+}
+
+@functions 
+{
+    int categoryIdx = 0;
+
+void renderItems(ReportTree.Category category)
+{
+if (category.Reports != null)
+{
+    foreach (var x in category.Reports)
+    {
+        <li class="report-item">
+                    <i class="fa fa-file"></i>
+                    <a href="javascript:;" class="report-link" data-key="@x.Key">
+                        @x.Title
+                    </a>
+                </li>
+    }
+}
+
+if (category.SubCategories != null)
+{
+    foreach (var x in category.SubCategories)
+    {
+        renderTree(x);
+    }
+}
+}
+
+public void renderTree(ReportTree.Category category)
+{
+if (!category.SubCategories.IsEmptyOrNull() ||
+    !category.Reports.IsEmptyOrNull())
+{
+    <li class="report-category mb-4">
+                <button class="btn" data-bs-toggle="collapse"
+                    aria-expanded="true"
+                    data-bs-target="#category-@(++categoryIdx)">
+                    <i class="fa fa-chevron-right"></i> @category.Title
+                </button>
+                <ul id="category-@categoryIdx" class="list-unstyled ps-5 collapse show">
+                    @{renderItems(category);}
+                </ul>
+            </li>
+}
+}
+}
+
+<style>
+.report-list [data-bs-toggle][aria-expanded=true]>i {
+        transform: rotate(90deg);
+}
+
+.report-list a {
+    text-decoration: none;
+}
+
+.report-item > i {
+    font-size: 19px;
+    vertical-align: -2px;
+}
+
+.report-list .btn {
+    color: var(--bs-body-color);
+}
+
+.report-list li {
+    padding: 4px 0;
+}
+
+.report-list .non-match {
+    display: none !important;
+}
+</style>
+
+<div id="ReportPage" class="s-DataGrid">
+    <div class="grid-title">
+        <div class="title-text">Reports</div>
+    </div>
+    <div class="grid-toolbar s-Toolbar clearfix">
+        <div class="s-QuickSearchBar"><input /></div>
+    </div>
+    <div class="report-list">
+        <ul class="list-unstyled ps-0">
+        @{renderItems(Model.Root);}
+        </ul>
+    </div>
+</div>
+<script type="module">
+new Serenity.Extensions.ReportPage({ element: "#ReportPage" });
+</script>

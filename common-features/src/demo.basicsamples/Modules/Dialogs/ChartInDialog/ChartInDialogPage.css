@@ -1,0 +1,16 @@
+
+.s-Demo-BasicSamples-ChartInDialog svg {
+  width: 100%;
+  height: 90%;
+}
+
+.s-Demo-BasicSamples-ChartInDialog .ui-dialog-content {
+  overflow: hidden;
+}
+
+.s-Demo-BasicSamples-ChartInDialog > .size {
+  min-width: 700px;
+  width: 700px;
+  min-height: 400px;
+  height: 400px;
+}

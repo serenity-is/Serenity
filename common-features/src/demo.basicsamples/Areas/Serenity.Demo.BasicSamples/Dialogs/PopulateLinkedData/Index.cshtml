@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Populate Linked Data";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>This sample demonstrates how to refresh related fields when a joined field value changes.</p>
+    <p>Open an order record, and change the Customer. Dialog will re-populate its customer details.</p>
+    <p>This is performed with a call to Retrieve method of Customer service.</p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("PopulateLinkedDataForm.cs")
+        @Html.BasicSamplesSourceFile("PopulateLinkedDataPage.ts")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.PopulateLinkedDataPage)

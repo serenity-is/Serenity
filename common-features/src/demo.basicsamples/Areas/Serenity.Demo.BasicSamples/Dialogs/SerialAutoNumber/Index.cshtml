@@ -1,0 +1,34 @@
+@{
+    ViewData["Title"] = "Serial Auto Numbering";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        Here we demonstrate how to implement auto numbering that is commonly used with invoice numbers. 
+        First time you add a new record, Customer ID will start with C0001, next one will be C0002, etc.
+    </p>
+    <p>
+        You may also try typing other prefixes. Clear the customer ID and type X. Dialog will 
+        automatically bring next number in that series like X0001.
+    </p>
+    <p>
+        As currently, there are no numeric Customer IDs in database, so you'll need to add a few
+        to see that numbers actually gets automatically increased.
+    </p>
+
+    <p class="s-sample-sources">
+        <b>Source Files:</b>
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("SerialAutoNumberPage.ts")
+    </p>
+</div>
+
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.SerialAutoNumberPage)

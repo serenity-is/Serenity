@@ -1,0 +1,14 @@
+{
+  "name": "@serenity-is/workspace-common-features",
+  "private": true,
+  "devDependencies": {
+    "@serenity-is/corelib": "../packages/corelib",
+    "@serenity-is/sleekgrid": "../packages/sleekgrid",
+    "@serenity-is/tsbuild": "../packages/tsbuild",
+    "test-utils": "../packages/test-utils"
+  },
+  "scripts": {
+    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r dts && pnpm -r jest"
+  },
+  "type": "module"
+}

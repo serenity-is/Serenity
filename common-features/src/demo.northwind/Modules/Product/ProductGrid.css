@@ -1,0 +1,9 @@
+
+.s-Demo-Northwind-ProductGrid .slick-cell input[type=text] {
+  text-align: right;
+  width: 100%;
+}
+
+.s-Demo-Northwind-ProductGrid .slick-cell .dirty {
+  background-color: var(--s-input-dirty-bg, #ffe0e0);
+}

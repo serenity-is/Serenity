@@ -1,0 +1,30 @@
+<Project>
+  <ItemGroup>   
+    <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
+    <ProjectCapability Include="TypeScriptNuGet" />
+  </ItemGroup>
+  <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" />
+  <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
+  <Target Name="TransformInitProps">
+    <PropertyGroup>
+      <SergenTransformArgs>-p &quot;$(ProjectFileName)&quot; -prop:Configuration=$(Configuration) -prop:AssemblyName=&quot;$(AssemblyName)&quot; -prop:ESMAssetBasePath=&quot;$(ESMAssetBasePath)&quot; -prop:OutDir=&quot;$(OutDir.Trim('\'))&quot; -prop:RootNamespace=$(RootNamespace) -prop:TargetFramework=$(TargetFramework)</SergenTransformArgs>
+    </PropertyGroup>
+    <Message Importance="normal" Text="Transform Arguments: $(SergenTransformArgs)"/>
+  </Target>
+  <Target Name="TransformInitTools" BeforeTargets="BeforeBuild" Condition="!Exists('$(DotnetToolManifestFile)')">
+    <Exec Command="dotnet new tool-manifest" ContinueOnError="true" WorkingDirectory="$(MSBuildProjectDirectory)\..\" />
+    <Exec Command="dotnet tool install sergen" ContinueOnError="true" WorkingDirectory="$(MSBuildProjectDirectory)\..\" />
+  </Target>
+  <Target Name="TransformToolRestore" BeforeTargets="BeforeBuild" DependsOnTargets="TransformInitTools"
+          Inputs="$(DotnetToolManifestFile)" Outputs="$(DotnetToolRestoreStamp)"
+          Condition="'$(DotNetSergen)' == 'dotnet sergen' And ('$(SergenTransform)' != '' OR Exists('tsconfig.json'))">
+    <Exec Command="dotnet tool restore" ContinueOnError="true" />
+    <Touch Files="$(DotnetToolRestoreStamp)" AlwaysCreate="true" />
+  </Target>
+  <Target Name="CompileProjectTSConfig" AfterTargets="AfterBuild" DependsOnTargets="NpmInstall;RestoreNodeTypes"
+          Condition="Exists('tsconfig.json') And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
+    <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
+    <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
+    <Exec Command="pnpm build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
+  </Target>
+</Project>
