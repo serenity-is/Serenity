@@ -306,12 +306,6 @@
       <Folder Name="wwwroot" TargetFolderName="wwwroot">
         <Folder Name="Content" TargetFolderName="Content">
           <Folder Name="site" TargetFolderName="site">
-            <Folder Name="images" TargetFolderName="images">
-              <ProjectItem ReplaceParameters="false" TargetFileName="serenity-logo-w-128.png">serenity-logo-w-128.png</ProjectItem>
-              <ProjectItem ReplaceParameters="false" TargetFileName="tick-empty.png">tick-empty.png</ProjectItem>
-              <ProjectItem ReplaceParameters="false" TargetFileName="tick-green-partial.png">tick-green-partial.png</ProjectItem>
-              <ProjectItem ReplaceParameters="false" TargetFileName="tick-red-partial.png">tick-red-partial.png</ProjectItem>
-            </Folder>
             <ProjectItem ReplaceParameters="true" TargetFileName="site.css">site.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="site.htmlcontent.css">site.htmlcontent.css</ProjectItem>
           </Folder>
