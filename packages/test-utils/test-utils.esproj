@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.74-alpha">
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.1855422">
   <PropertyGroup>
     <StartupCommand></StartupCommand>
     <JavaScriptTestRoot>src\</JavaScriptTestRoot>
     <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
     <BuildCommand></BuildCommand>
     <ProductionBuildCommand></ProductionBuildCommand>
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
     <DefaultItemExcludes>$(DefaultItemExcludes);out\**</DefaultItemExcludes>
   </PropertyGroup>
