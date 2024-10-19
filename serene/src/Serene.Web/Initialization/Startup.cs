@@ -103,9 +103,7 @@ public partial class Startup
         services.AddSingleton<IRolePermissionService, AppServices.RolePermissionService>();
         services.AddSingleton<IUploadAVScanner, ClamAVUploadScanner>();
         services.AddSingleton<IUserPasswordValidator, AppServices.UserPasswordValidator>();
-        services.AddSingleton<IUserAccessor, AppServices.UserAccessor>();
-        services.AddSingleton<IUserClaimCreator, DefaultUserClaimCreator>();
-        services.AddSingleton<IUserRetrieveService, AppServices.UserRetrieveService>();
+        services.AddUserProvider<AppServices.UserAccessor, AppServices.UserRetrieveService>();
         services.AddServiceHandlers();
         services.AddDynamicScripts();
         services.AddCssBundling();

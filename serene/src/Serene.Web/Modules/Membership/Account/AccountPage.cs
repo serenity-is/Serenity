@@ -39,7 +39,6 @@ public partial class AccountPage : Controller
     [HttpPost, JsonRequest]
     public Result<ServiceResponse> Login(LoginRequest request,
         [FromServices] IUserPasswordValidator passwordValidator,
-        [FromServices] IUserRetrieveService userRetriever,
         [FromServices] IUserClaimCreator userClaimCreator)
     {
 
@@ -53,9 +52,6 @@ public partial class AccountPage : Controller
 
             if (passwordValidator is null)
                 throw new ArgumentNullException(nameof(passwordValidator));
-
-            if (userRetriever is null)
-                throw new ArgumentNullException(nameof(userRetriever));
 
             if (userClaimCreator is null)
                 throw new ArgumentNullException(nameof(userClaimCreator));

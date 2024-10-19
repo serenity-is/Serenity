@@ -98,11 +98,8 @@ public partial class AccountPage : Controller
 
             uow.Commit();
 
-            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
-            {
-                cacheInvalidator.InvalidateById(userId.ToInvariant());
-                cacheInvalidator.InvalidateByUsername(username);
-            }
+            userRetriever.InvalidateById(userId.ToInvariant(), Cache);
+            userRetriever.InvalidateByUsername(username, Cache);
 
             if (environmentOptions?.Value.IsPublicDemo == true)
             {

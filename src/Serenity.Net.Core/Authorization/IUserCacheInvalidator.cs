@@ -14,15 +14,15 @@ public interface IUserCacheInvalidator
     /// <summary>
     /// Invalidates cached user by its user definition
     /// </summary>
-    void InvalidateItem(IUserDefinition userDefinition);
+    void InvalidateItem(IUserDefinition? userDefinition);
 
     /// <summary>
     /// Removes cached user by user ID
     /// </summary>
-    void InvalidateById(string userId);
+    void InvalidateById(string? userId);
 
     /// <summary>
     /// Removes cached user by username
     /// </summary>
-    void InvalidateByUsername(string username);
+    void InvalidateByUsername(string? username);
 }

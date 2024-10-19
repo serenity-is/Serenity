@@ -6,11 +6,11 @@ namespace Serene.AppServices;
 public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConnections, IUserRetrieveService userRetriever,
     ILogger<UserPasswordValidator> log = null, IDirectoryService directoryService = null) : IUserPasswordValidator
 {
-    protected ITwoLevelCache Cache { get; } = cache ?? throw new ArgumentNullException(nameof(cache));
-    public ISqlConnections SqlConnections { get; } = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));
-    protected IUserRetrieveService UserRetriever { get; } = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
-    protected IDirectoryService DirectoryService { get; } = directoryService;
-    protected ILogger<UserPasswordValidator> Log { get; } = log;
+    protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    protected readonly ISqlConnections sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));
+    protected readonly IUserRetrieveService userRetriever = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
+    protected readonly IDirectoryService directoryService = directoryService;
+    protected readonly ILogger<UserPasswordValidator> Log = log;
 
     public PasswordValidationResult Validate(ref string username, string password)
     {
@@ -22,7 +22,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
         username = username.TrimToEmpty();
 
-        if (UserRetriever.ByUsername(username) is UserDefinition user)
+        if (userRetriever.ByUsername(username) is UserDefinition user)
             return ValidateExistingUser(ref username, password, user);
 
         return ValidateFirstTimeUser(ref username, password);
@@ -39,14 +39,14 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         }
 
         // prevent more than 50 invalid login attempts in 30 minutes
-        var throttler = new Throttler(Cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
         bool validatePassword() => UserHelper.CalculateHash(password, user.PasswordSalt)
             .Equals(user.PasswordHash, StringComparison.OrdinalIgnoreCase);
 
-        if (user.Source == "site" || user.Source == "sign" || DirectoryService == null)
+        if (user.Source == "site" || user.Source == "sign" || directoryService == null)
         {
             if (validatePassword())
             {
@@ -76,7 +76,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         DirectoryEntry entry;
         try
         {
-            entry = DirectoryService.Validate(username, password);
+            entry = directoryService.Validate(username, password);
             if (entry == null)
                 return PasswordValidationResult.Invalid;
 
@@ -108,7 +108,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
             var displayName = entry.FirstName + " " + entry.LastName;
             var email = entry.Email.TrimToNull() ?? user.Email ?? (username + "@yourdefaultdomain.com");
 
-            using var connection = SqlConnections.NewFor<UserRow>();
+            using var connection = sqlConnections.NewFor<UserRow>();
             using var uow = new UnitOfWork(connection);
             var fld = UserRow.Fields;
             new SqlUpdate(fld.TableName)
@@ -122,8 +122,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
             uow.Commit();
 
-            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
-                cacheInvalidator.InvalidateItem(user);
+            userRetriever.InvalidateItem(user, cache);
 
             return PasswordValidationResult.Valid;
         }
@@ -136,17 +135,17 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
     private PasswordValidationResult ValidateFirstTimeUser(ref string username, string password)
     {
-        var throttler = new Throttler(Cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
-        if (DirectoryService == null)
+        if (directoryService == null)
             return PasswordValidationResult.Invalid;
 
         DirectoryEntry entry;
         try
         {
-            entry = DirectoryService.Validate(username, password);
+            entry = directoryService.Validate(username, password);
             if (entry == null)
                 return PasswordValidationResult.Invalid;
 
@@ -166,7 +165,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
             var email = entry.Email.TrimToNull() ?? (username + "@yourdefaultdomain.com");
             username = entry.Username.TrimToNull() ?? username;
 
-            using var connection = SqlConnections.NewFor<UserRow>();
+            using var connection = sqlConnections.NewFor<UserRow>();
             using var uow = new UnitOfWork(connection);
             var userId = (int)connection.InsertAndGetID(new UserRow
             {
@@ -184,11 +183,8 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
             uow.Commit();
 
-            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
-            {
-                cacheInvalidator.InvalidateById(userId.ToInvariant());
-                cacheInvalidator.InvalidateByUsername(username);
-            }
+            userRetriever.InvalidateById(userId.ToInvariant(), cache);
+            userRetriever.InvalidateByUsername(username, cache);
 
             return PasswordValidationResult.Valid;
         }

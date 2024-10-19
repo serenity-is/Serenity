@@ -11,10 +11,9 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
     [HttpGet, PageAuthorize]
     public virtual ActionResult ChangePassword(
-        [FromServices] IUserRetrieveService userRetrieveService)
+        [FromServices] IUserRetrieveService userRetriever)
     {
-        var userDefinition = User.GetUserDefinition<IUserDefinition>(userRetrieveService);
-        if (userDefinition is IHasPassword hasPassword &&
+        if (userRetriever.GetUserDefinition(User) is IHasPassword hasPassword &&
             !hasPassword.HasPassword)
         {
             return SetPassword();
@@ -36,13 +35,13 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
     [HttpPost, ServiceAuthorize]
     public virtual ActionResult SendResetPassword(
-        [FromServices] IUserRetrieveService userRetrieveService,
+        [FromServices] IUserRetrieveService userRetriever,
         [FromServices] IEmailSender emailSender,
         [FromServices] ISiteAbsoluteUrl siteAbsoluteUrl,
         [FromServices] ITwoLevelCache cache,
         [FromServices] ITextLocalizer localizer)
     {
-        var userDefinition = User.GetUserDefinition<IUserDefinition>(userRetrieveService) ??
+        var userDefinition = userRetriever.GetUserDefinition(User) ??
             throw new ValidationError("Couldn't find user definition.");
 
 #if (IsPublicDemo)
@@ -70,7 +69,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         [FromServices] ITwoLevelCache cache,
         [FromServices] IUserPasswordValidator passwordValidator,
         [FromServices] IPasswordStrengthValidator passwordStrengthValidator,
-        [FromServices] IUserRetrieveService userRetrieveService,
+        [FromServices] IUserRetrieveService userRetriever,
         [FromServices] IOptions<MembershipSettings> membershipOptions,
         [FromServices] IOptions<EnvironmentSettings> environmentOptions,
         [FromServices] ITextLocalizer localizer)
@@ -83,7 +82,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             var username = User.Identity?.Name;
 
-            var userDefinition = User.GetUserDefinition<IUserDefinition>(userRetrieveService);
+            var userDefinition = userRetriever.GetUserDefinition(User);
 
             if (userDefinition is not IHasPassword hasPassword ||
                 hasPassword.HasPassword)

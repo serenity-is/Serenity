@@ -1,36 +1,24 @@
-using Serene.Administration.Repositories;
-
 namespace Serene.Administration;
 
 /// <summary>
 /// This declares a dynamic script with key 'UserData' that will be available from client side.
 /// </summary>
 [DataScript("UserData", CacheDuration = -1, Permission = "*")]
-public class UserDataScript : DataScript<ScriptUserDefinition>
+public class UserDataScript(ITwoLevelCache cache, IPermissionService permissions,
+    IPermissionKeyLister permissionKeyLister, IUserProvider userProvider) : DataScript<ScriptUserDefinition>
 {
-    private readonly ITwoLevelCache cache;
-    private readonly IPermissionService permissions;
-    private readonly IPermissionKeyLister permissionKeyLister;
-    private readonly IUserAccessor userAccessor;
-    private readonly IUserRetrieveService userRetriever;
-
-    public UserDataScript(ITwoLevelCache cache, IPermissionService permissions,
-        IPermissionKeyLister permissionKeyLister, IUserAccessor userAccessor, IUserRetrieveService userRetriever)
-    {
-        this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
-        this.permissionKeyLister = permissionKeyLister ?? throw new ArgumentNullException(nameof(permissionKeyLister));
-        this.userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
-        this.userRetriever = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
-    }
+    private readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+    private readonly IPermissionKeyLister permissionKeyLister = permissionKeyLister ?? throw new ArgumentNullException(nameof(permissionKeyLister));
+    private readonly IUserProvider userProvider = userProvider ?? throw new ArgumentNullException(nameof(userProvider));
 
     protected override ScriptUserDefinition GetData()
-    { 
+    {
         var result = new ScriptUserDefinition();
 
-        if (userAccessor.User?.GetUserDefinition(userRetriever) is not UserDefinition user)
+        if (userProvider.GetUserDefinition() is not UserDefinition user)
         {
-            result.Permissions = new Dictionary<string, bool>();
+            result.Permissions = [];
             return result;
         }
 

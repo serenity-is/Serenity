@@ -77,6 +77,58 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Note that it requires IUserRetrieveService, IUserAcessor to be
+    /// registered in the service collection. It also tries to register the DefaultUserClaimCreator.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider(this IServiceCollection services)
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.TryAddSingleton<IUserClaimCreator, DefaultUserClaimCreator>();
+        services.TryAddSingleton<IUserProvider, DefaultUserProvider>();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Also registers the given IUserAccessor and IUserRetrieveService implementations and
+    /// tries to register the DefaultUserClaimCreator implementation.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider<TUserAccessor, TUserRetrieveService>(this IServiceCollection services)
+        where TUserAccessor: class, IUserAccessor
+        where TUserRetrieveService : class, IUserRetrieveService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IUserAccessor, TUserAccessor>();
+        services.AddSingleton<IUserRetrieveService, TUserRetrieveService>();
+        services.AddUserProvider();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Also registers the given IUserAccessor, IUserRetrieveService and IUserClaimCreator implementations.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider<TUserAccessor, TUserRetrieveService, TUserClaimCreator>(this IServiceCollection services)
+        where TUserAccessor : class, IUserAccessor
+        where TUserRetrieveService : class, IUserRetrieveService
+        where TUserClaimCreator : class, IUserClaimCreator
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IUserClaimCreator, TUserClaimCreator>();
+        return AddUserProvider<TUserAccessor, TUserRetrieveService>(services);
+    }
+
+    /// <summary>
     /// Adds a singleton service of the type <typeparamref name="TService"/> with the
     /// implementation type <typeparamref name="TWrapper"/> that wraps the <typeparamref name="TImplementation"/>
     /// to the <see cref="IServiceCollection"/>.

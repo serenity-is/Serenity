@@ -33,7 +33,7 @@ public class RequiresElevationAttribute : Attribute, IResourceFilter
             if (string.IsNullOrEmpty(path))
                 path = "/";
                 
-            if (context.HttpContext.User.GetUserDefinition(userRetrieveService) is IHasPassword { HasPassword: false })
+            if (userRetrieveService.GetUserDefinition(context.HttpContext.User) is IHasPassword { HasPassword: false })
                 context.Result = new LocalRedirectResult("~/Account/SetPassword?reason=elevate");
             else
                 context.Result = new LocalRedirectResult("~/Account/Elevate?returnUrl=" + Uri.EscapeDataString(path));
