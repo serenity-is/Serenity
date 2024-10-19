@@ -2,47 +2,12 @@
   content: url(../../Serenity.Assets/logo/white-128.png);
 }
 
-.s-Administration-LanguageDialog > .size {
-  width: 450px;
-}
-.s-Administration-LanguageDialog .caption {
-  width: 120px;
-}
-.s-Administration-RoleDialog > .size {
-  width: 450px;
-}
-.s-Administration-RoleDialog .caption {
-  width: 120px;
-}
-.s-Administration-UserDialog > .size {
-  width: 650px;
-}
-.s-Administration-UserDialog .caption {
-  width: 150px;
-}
-.s-Administration-UserDialog .s-PropertyGrid .categories {
-  height: 450px;
-}
 .s-TranslationGrid input.custom-text {
   width: 100%;
   height: 23px;
   padding: 0 3px;
 }
-.s-UserPermissionDialog > .size,
-.s-RolePermissionDialog > .size,
-.s-UserRoleDialog > .size {
-  min-width: 670px;
-  width: 670px;
-  min-height: 450px;
-  height: 450px;
-}
 
 .s-PermissionCheckEditor {
   min-height: 450px;
-}
-
-.s-UserPermissionDialog .ui-dialog-content,
-.s-RolePermissionDialog .ui-dialog-content,
-.s-UserRoleDialog .ui-dialog-content {
-  padding: 8px;
 }
