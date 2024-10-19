@@ -1,4 +1,4 @@
-﻿@inject Serenity.Web.IDynamicScriptManager DynamicScriptManager
+@inject Serenity.Web.IDynamicScriptManager DynamicScriptManager
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -7,7 +7,6 @@
 <link rel="home" id="ApplicationPath" href="~/" />
 <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
 @Html.StyleBundle("Base")
-@Html.StyleBundle("Site")
 <script type="application/json" id="ScriptCulture">@Html.Raw(Serenity.JSON.Stringify(new ScriptCulture()))</script>
 @Html.ScriptBundle("Base")
 @Html.LocalTextScript("Site")
