@@ -23,7 +23,8 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
 
     protected virtual IEnumerable<string> GetCachedPermissionKeys(bool includeRoles)
     {
-        return cache.GetLocalStoreOnly(GetCacheKey(includeRoles), GetCacheDuration(), GetCacheGroupKey(), GetPermissionKeys());
+        return cache.GetLocalStoreOnly(GetCacheKey(includeRoles), GetCacheDuration(), GetCacheGroupKey(), 
+            () => GetPermissionKeys(includeRoles));
     }
 
     protected virtual IEnumerable<string> GetNestedPermissions(ITypeSource typeSource)
