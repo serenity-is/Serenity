@@ -3,12 +3,10 @@ using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.AppServices;
 
-public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnections) : IUserRetrieveService
+public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnections) : IUserRetrieveService, IUserCacheInvalidator
 {
-    private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
-
-    protected ITwoLevelCache Cache { get; } = cache;
-    protected ISqlConnections SqlConnections { get; } = sqlConnections;
+    protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    protected readonly ISqlConnections sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(cache));
 
     private static UserDefinition GetFirst(IDbConnection connection, BaseCriteria criteria)
     {
@@ -34,10 +32,10 @@ public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnec
 
     public IUserDefinition ById(string id)
     {
-        return Cache.Get("UserByID_" + id, TimeSpan.Zero, TimeSpan.FromDays(1), Fld.GenerationKey, () =>
+        return cache.Get("UserByID_" + id, TimeSpan.Zero, TimeSpan.FromDays(1), MyRow.Fields.GenerationKey, () =>
         {
-            using var connection = SqlConnections.NewByKey("Default");
-            return GetFirst(connection, new Criteria(Fld.UserId) == int.Parse(id, CultureInfo.InvariantCulture));
+            using var connection = sqlConnections.NewByKey("Default");
+            return GetFirst(connection, new Criteria(MyRow.Fields.UserId) == int.Parse(id, CultureInfo.InvariantCulture));
         });
     }
 
@@ -46,20 +44,38 @@ public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnec
         if (string.IsNullOrEmpty(username))
             return null;
 
-        return Cache.Get("UserByName_" + username.ToLowerInvariant(),
-            TimeSpan.Zero, TimeSpan.FromDays(1), Fld.GenerationKey, () =>
+        return cache.Get("UserByName_" + username.ToLowerInvariant(),
+            TimeSpan.Zero, TimeSpan.FromDays(1), MyRow.Fields.GenerationKey, () =>
         {
-            using var connection = SqlConnections.NewByKey("Default");
-            return GetFirst(connection, new Criteria(Fld.Username) == username);
+            using var connection = sqlConnections.NewByKey("Default");
+            return GetFirst(connection, new Criteria(MyRow.Fields.Username) == username);
         });
     }
 
-    public static void RemoveCachedUser(ITwoLevelCache cache, int? userId, string username)
+    public void InvalidateAll()
     {
-        if (userId != null)
-            cache.Remove("UserByID_" + userId);
+        cache.ExpireGroupItems(MyRow.Fields.GenerationKey);
+    }
 
+    public void InvalidateById(string userId)
+    {
+        if (userId == null ||
+            !int.TryParse(userId, CultureInfo.InvariantCulture, out int id))
+            return;
+        cache.Remove("UserByID_" + id.ToInvariant());
+    }
+
+    public void InvalidateByUsername(string username)
+    {
         if (username != null)
             cache.Remove("UserByName_" + username.ToLowerInvariant());
+    }
+
+    public void InvalidateItem(IUserDefinition user)
+    {
+        if (user is null)
+            return;
+        InvalidateById(user.Id);
+        InvalidateByUsername(user.Username);
     }
 }

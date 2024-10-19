@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
 using Serene.Administration;
-using Serene.Administration.Repositories;
 using System.IO;
 
 namespace Serene.Membership.Pages;
@@ -17,7 +16,8 @@ public partial class AccountPage : Controller
     public Result<SignUpResponse> SignUp(SignUpRequest request, 
         [FromServices] IEmailSender emailSender,
         [FromServices] IOptions<EnvironmentSettings> environmentOptions,
-        [FromServices] IPermissionKeyLister permissionKeyLister)
+        [FromServices] IPermissionKeyLister permissionKeyLister,
+        [FromServices] IUserRetrieveService userRetriever)
     {
         return this.UseConnection("Default", connection =>
         {
@@ -92,13 +92,17 @@ public partial class AccountPage : Controller
             var emailBody = TemplateHelper.RenderViewToString(HttpContext.RequestServices,
                 MVC.Views.Membership.Account.SignUp.ActivateEmail, emailModel);
 
-            if (emailSender is null)
-                throw new ArgumentNullException(nameof(emailSender));
+            ArgumentNullException.ThrowIfNull(emailSender);
 
             emailSender.Send(subject: emailSubject, body: emailBody, mailTo: email);
 
             uow.Commit();
-            AppServices.UserRetrieveService.RemoveCachedUser(Cache, userId, username);
+
+            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
+            {
+                cacheInvalidator.InvalidateById(userId.ToInvariant());
+                cacheInvalidator.InvalidateByUsername(username);
+            }
 
             if (environmentOptions?.Value.IsPublicDemo == true)
             {

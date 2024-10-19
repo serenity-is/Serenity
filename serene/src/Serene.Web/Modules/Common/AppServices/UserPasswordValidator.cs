@@ -122,7 +122,8 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
             uow.Commit();
 
-            UserRetrieveService.RemoveCachedUser(Cache, user.UserId, username);
+            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
+                cacheInvalidator.InvalidateItem(user);
 
             return PasswordValidationResult.Valid;
         }
@@ -183,7 +184,11 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
             uow.Commit();
 
-            UserRetrieveService.RemoveCachedUser(Cache, userId, username);
+            if (userRetriever is IUserCacheInvalidator cacheInvalidator)
+            {
+                cacheInvalidator.InvalidateById(userId.ToInvariant());
+                cacheInvalidator.InvalidateByUsername(username);
+            }
 
             return PasswordValidationResult.Valid;
         }
