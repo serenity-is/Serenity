@@ -9,9 +9,4 @@ public class PermissionKeyLister(ITwoLevelCache cache, ITypeSource typeSource)
     {
         return RoleRow.Fields.GenerationKey;
     }
-
-    protected override IEnumerable<string> GetRoleKeys()
-    {
-        return [];
-    }
 }
