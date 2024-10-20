@@ -23,7 +23,7 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
 
     protected virtual IEnumerable<string> GetCachedPermissionKeys(bool includeRoles)
     {
-        return cache.GetLocalStoreOnly(GetCacheKey(includeRoles), GetCacheDuration(), GetCacheGroupKey(), 
+        return cache.GetLocalStoreOnly(GetCacheKey(includeRoles), GetCacheDuration(), GetCacheGroupKey(),
             () => GetPermissionKeys(includeRoles));
     }
 
@@ -153,7 +153,7 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
         return permission.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(MemberInfo member, 
+    protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(MemberInfo member,
         Func<TAttr, string> getPermission) where TAttr : Attribute
     {
         try
@@ -170,7 +170,7 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
         }
     }
 
-    protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(Type type, 
+    protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(Type type,
         Func<TAttr, string> getPermission) where TAttr : Attribute
     {
         try
