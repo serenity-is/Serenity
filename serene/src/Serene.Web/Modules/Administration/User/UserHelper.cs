@@ -1,9 +1,6 @@
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Caching.Memory;
 using Serenity.Web.Providers;
 using System.Data;
 using System.Globalization;
-using System.IO;
 using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.Administration;
@@ -17,12 +14,6 @@ public static class UserHelper
         if (userID == 1 && environmentSettings.Value.IsPublicDemo)
             throw new ValidationError("Sorry, but no changes " +
                 "are allowed in public demo on ADMIN user!");
-    }
-
-    public static bool IsValidPhone(string number)
-    {
-        // please change this to a valid check for mobile phones in your country
-        return !number.IsNullOrEmpty() && number.Length > 7 && long.TryParse(number, out long _);
     }
 
     public static string ValidateDisplayName(string displayName, ITextLocalizer localizer)
@@ -46,6 +37,7 @@ public static class UserHelper
 
         return password;
     }
+
     public static string CalculateHash(string password, string salt)
     {
         return SiteMembershipProvider.ComputeSHA512(password + salt);
@@ -55,32 +47,6 @@ public static class UserHelper
     {
         salt ??= Serenity.IO.TemporaryFileHelper.RandomFileCode()[..5];
         return CalculateHash(password, salt);
-    }
-
-    public static string GetImpersonationToken(IMemoryCache memoryCache, IDataProtector dataProtector, 
-        byte[] clientHash, string forUsername, string username)
-    {
-        if (memoryCache is null)
-            throw new ArgumentNullException(nameof(memoryCache));
-
-        return memoryCache.Get("ImpersonationToken:" + clientHash + ":" + username,
-            TimeSpan.FromMinutes(30), () =>
-            {
-                byte[] bytes;
-                using (var ms = new MemoryStream())
-                using (var bw = new BinaryWriter(ms))
-                {
-                    bw.Write(DateTime.UtcNow.AddMinutes(60).ToBinary());
-                    bw.Write(forUsername);
-                    bw.Write(username);
-                    bw.Write(clientHash);
-                    bw.Flush();
-                    bytes = ms.ToArray();
-                }
-
-                var token = Convert.ToBase64String(dataProtector.Protect(bytes));
-                return Uri.EscapeDataString(token);
-            });
     }
 
     public static MyRow GetUser(IDbConnection connection, BaseCriteria filter)
