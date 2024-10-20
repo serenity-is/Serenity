@@ -4,7 +4,7 @@ namespace Serene.Administration;
 [DisplayName("Role Permissions"), InstanceName("Role Permission")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
-public sealed class RolePermissionRow : Row<RolePermissionRow.RowFields>, IIdRow, INameRow
+public sealed class RolePermissionRow : Row<RolePermissionRow.RowFields>, IIdRow, INameRow, IRolePermissionRow
 {
     [DisplayName("Role Permission Id"), Identity, IdProperty]
     public long? RolePermissionId { get => fields.RolePermissionId[this]; set => fields.RolePermissionId[this] = value; }
@@ -17,6 +17,9 @@ public sealed class RolePermissionRow : Row<RolePermissionRow.RowFields>, IIdRow
 
     [DisplayName("Role Role Name"), Expression("jRole.[RoleName]")]
     public string RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
+
+    public StringField RoleKeyOrNameField => fields.RoleName;
+    public StringField PermissionKeyField => fields.PermissionKey;
 
     public class RowFields : RowFieldsBase
     {
