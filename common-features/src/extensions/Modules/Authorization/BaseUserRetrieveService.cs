@@ -32,10 +32,10 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
             () => LoadById(id));
     }
 
-    protected virtual IUserDefinition GetCachedByUsername(string id)
+    protected virtual IUserDefinition GetCachedByUsername(string username)
     {
-        return cache.GetLocalStoreOnly(GetUsernameCacheKey(id), GetCacheDuration(), GetCacheGroupKey(),
-            () => LoadByUsername(id));
+        return cache.GetLocalStoreOnly(GetUsernameCacheKey(username), GetCacheDuration(), GetCacheGroupKey(),
+            () => LoadByUsername(username));
     }
 
     protected virtual bool IsValidUserId(string userId) => !string.IsNullOrEmpty(userId);
