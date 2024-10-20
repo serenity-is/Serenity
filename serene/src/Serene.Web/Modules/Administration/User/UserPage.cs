@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Serene.Administration.Pages;
+﻿namespace Serene.Administration.Pages;
 
 [PageAuthorize(typeof(UserRow))]
 public class UserPage : Controller

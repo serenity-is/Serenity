@@ -1,6 +1,4 @@
-﻿using Serenity.Extensions.Entities;
-
-namespace Serene.Administration;
+﻿namespace Serene.Administration;
 
 [ConnectionKey("Default"), Module("Administration"), TableName("Users")]
 [DisplayName("Users"), InstanceName("User")]

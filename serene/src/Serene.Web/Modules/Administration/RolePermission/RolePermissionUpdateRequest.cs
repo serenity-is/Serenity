@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace Serene.Administration;
 
 public class RolePermissionUpdateRequest : ServiceRequest

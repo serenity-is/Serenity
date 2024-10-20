@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using MyRow = Serene.Administration.UserRow;
+﻿using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.Administration.Endpoints;
 
