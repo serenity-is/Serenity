@@ -24,7 +24,7 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     protected abstract string GetCacheGroupKey();
 
     protected virtual string GetIdCacheKey(string id) => "UserByID_" + id;
-    protected virtual string GetUsernameCacheKey(string id) => "UserByName_" + id.ToLowerInvariant();
+    protected virtual string GetUsernameCacheKey(string username) => "UserByName_" + username.ToLowerInvariant();
 
     protected virtual IUserDefinition GetCachedById(string id)
     {
@@ -53,9 +53,9 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     public virtual void RemoveCachedUser(string userId, string username)
     {
         if (IsValidUserId(userId))
-            cache.Remove("UserByID_" + userId);
+            cache.Remove(GetIdCacheKey(userId));
 
         if (IsValidUsername(username))
-            cache.Remove("UserByName_" + username.ToLowerInvariant());
+            cache.Remove(GetUsernameCacheKey(username));
     }
 }
