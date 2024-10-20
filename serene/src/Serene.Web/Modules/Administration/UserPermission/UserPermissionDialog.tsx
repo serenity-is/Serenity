@@ -1,9 +1,8 @@
-import { Decorators, TemplatedDialog } from "@serenity-is/corelib";
-import { format, getRemoteData, notifySuccess, localText } from "@serenity-is/corelib";
+import { getRemoteData, localText, notifySuccess, stringFormat, BaseDialog } from "@serenity-is/corelib";
 import { UserPermissionService } from "../";
 import { PermissionCheckEditor } from "./PermissionCheckEditor";
 
-export class UserPermissionDialog extends TemplatedDialog<UserPermissionDialogOptions> {
+export class UserPermissionDialog extends BaseDialog<UserPermissionDialogOptions> {
 
     private permissions: PermissionCheckEditor;
 
@@ -27,7 +26,7 @@ export class UserPermissionDialog extends TemplatedDialog<UserPermissionDialogOp
         });
 
         this.permissions.implicitPermissions = getRemoteData('Administration.ImplicitPermissions');
-        this.dialogTitle = format(localText('Site.UserPermissionDialog.DialogTitle'),
+        this.dialogTitle = stringFormat(localText('Site.UserPermissionDialog.DialogTitle'),
             this.options.username);
     }
 
@@ -52,8 +51,9 @@ export class UserPermissionDialog extends TemplatedDialog<UserPermissionDialogOp
         ];
     }
 
-    protected getTemplate(): string {
-        return '<div id="~_Permissions"></div>';
+    protected renderContents(): any {
+        const id = this.useIdPrefix();
+        return <div id={id.Permissions} />;
     }
 }
 
