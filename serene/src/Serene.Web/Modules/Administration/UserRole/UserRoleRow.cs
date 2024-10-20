@@ -4,7 +4,7 @@ namespace Serene.Administration;
 [DisplayName("UserRoles"), InstanceName("UserRoles")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
-public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow
+public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow, IUserRoleRow
 {
     const string jRole = nameof(jRole);
     const string jUser = nameof(jUser);
@@ -26,6 +26,10 @@ public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow
 
     [DisplayName("Role"), Expression($"{jRole}.[RoleName]")]
     public string RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
+
+    public Field UserIdField => fields.UserId;
+
+    public StringField RoleKeyOrNameField => fields.RoleName;
 
     public class RowFields : RowFieldsBase
     {

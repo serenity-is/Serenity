@@ -1,10 +1,10 @@
-﻿namespace Serene.Administration;
+namespace Serene.Administration;
 
 [ConnectionKey("Default"), Module("Administration"), TableName("UserPermissions")]
 [DisplayName("UserPermissions"), InstanceName("UserPermissions")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
-public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow, INameRow
+public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow, INameRow, IUserPermissionRow
 {
     [DisplayName("User Permission Id"), Identity, IdProperty]
     public long? UserPermissionId { get => fields.UserPermissionId[this]; set => fields.UserPermissionId[this] = value; }
@@ -23,6 +23,10 @@ public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow
 
     [DisplayName("User Display Name"), Expression("jUser.[DisplayName]")]
     public string User { get => fields.User[this]; set => fields.User[this] = value; }
+
+    Field IUserPermissionRow.UserIdField => fields.UserId;
+    StringField IUserPermissionRow.PermissionKeyField => fields.PermissionKey;
+    BooleanField IUserPermissionRow.GrantedField => fields.Granted;
 
     public class RowFields : RowFieldsBase
     {
