@@ -14,7 +14,7 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
 
     public virtual IUserDefinition ByUsername(string username)
     {
-        if (!IsValidUserId(username))
+        if (!IsValidUsername(username))
             return null;
 
         return GetCachedByUsername(username);
