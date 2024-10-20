@@ -2,9 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out/test",
-    "typeRoots": [
-      "../../../../Serenity/node_modules/@types",
-    ],
+    "typeRoots": null,
     "types": [
       "jest"
     ]
