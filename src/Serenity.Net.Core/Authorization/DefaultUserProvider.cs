@@ -49,27 +49,18 @@ public class DefaultUserProvider(IUserAccessor userAccessor, IUserClaimCreator u
     }
 
     /// <inheritdoc/>
-    public void InvalidateAll()
+    public void RemoveAll()
     {
-        userRetriever.InvalidateAll(cache);
+        if (userRetriever is IRemoveAll removeAll)
+            removeAll.RemoveAll();
+        else
+            cache?.ExpireGroupItems("Default.Users");
     }
 
     /// <inheritdoc/>
-    public void InvalidateItem(IUserDefinition? user)
+    public void RemoveCachedUser(string? userId, string? username)
     {
-        userRetriever.InvalidateItem(user, cache);
-    }
-
-    /// <inheritdoc/>
-    public void InvalidateById(string? userId)
-    {
-        userRetriever.InvalidateById(userId, cache);
-    }
-
-    /// <inheritdoc/>
-    public void InvalidateByUsername(string? username)
-    {
-        userRetriever.InvalidateByUsername(username, cache);
+        userRetriever.RemoveCachedUser(userId, username, cache);
     }
 
     /// <inheritdoc/>

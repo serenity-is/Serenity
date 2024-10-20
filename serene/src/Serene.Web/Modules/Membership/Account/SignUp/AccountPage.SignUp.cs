@@ -98,8 +98,7 @@ public partial class AccountPage : Controller
 
             uow.Commit();
 
-            userRetriever.InvalidateById(userId.ToInvariant(), Cache);
-            userRetriever.InvalidateByUsername(username, Cache);
+            userRetriever.RemoveCachedUser(userId.ToInvariant(), username, Cache);
 
             if (environmentOptions?.Value.IsPublicDemo == true)
             {

@@ -136,64 +136,39 @@ public static class AuthorizationExtensions
     }
 
     /// <summary>
-    /// Tries to invalidate all users in cache if the user retrieve service implements IUserCacheInvalidator.
-    /// If not, it tries to expire all users in cache by group name "Default.Users" if cache is not null.
-    /// </summary>
-    /// <param name="userRetriever">User retrieve service</param>
-    /// <param name="cache">Optional cache</param>
-    public static void InvalidateAll(this IUserRetrieveService userRetriever, ITwoLevelCache? cache)
-    {
-        if (userRetriever is IUserCacheInvalidator invalidator)
-            invalidator.InvalidateAll();
-        else
-            cache?.ExpireGroupItems("Default.Users");
-    }
-
-    /// <summary>
     /// Tries to invalidate user in cache if the user retrieve service implements IUserCacheInvalidator.
     /// If not, and cache is not null and user is not null, it tries to remove user by id and username from cache.
     /// </summary>
     /// <param name="userRetriever">User retrieve service</param>
     /// <param name="user">User</param>
     /// <param name="cache">Cache</param>
-    public static void InvalidateItem(this IUserRetrieveService userRetriever, IUserDefinition? user, ITwoLevelCache? cache)
+    public static void RemoveCachedUser(this IUserRetrieveService userRetriever, IUserDefinition? user, ITwoLevelCache? cache)
     {
-        if (userRetriever is IUserCacheInvalidator invalidator)
-            invalidator.InvalidateItem(user);
-        else if (user != null)
-        {
-            userRetriever.InvalidateById(user.Id, cache);
-            userRetriever.InvalidateByUsername(user.Username, cache);
-        }
+        RemoveCachedUser(userRetriever, user?.Id, user?.Username, cache);
     }
 
+
     /// <summary>
-    /// Tries to invalidate user by its id if the user retrieve service implements IUserCacheInvalidator.
+    /// Tries to invalidate user by its id / name if the user retrieve service implements IUserCacheInvalidator.
     /// If not, and cache is not null, it tries to remove user by id from cache.
     /// </summary>
     /// <param name="userRetriever">User retrieve service</param>
     /// <param name="userId">UserId</param>
-    /// <param name="cache"></param>
-    public static void InvalidateById(this IUserRetrieveService userRetriever, string? userId, ITwoLevelCache? cache)
-    {
-        if (userRetriever is IUserCacheInvalidator invalidator)
-            invalidator.InvalidateById(userId);
-        else if (userId != null)
-            cache?.Remove("UserByID_" + userId);
-    }
-
-    /// <summary>
-    /// Tries to invalidate user by its usernae if the user retrieve service implements IUserCacheInvalidator.
-    /// If not, and cache is not null, it tries to remove user by id from cache.
-    /// </summary>
-    /// <param name="userRetriever">User retrieve service</param>
     /// <param name="username">Username</param>
-    /// <param name="cache">Cache</param>
-    public static void InvalidateByUsername(this IUserRetrieveService userRetriever, string? username, ITwoLevelCache? cache)
+    /// <param name="cache"></param>
+    public static void RemoveCachedUser(this IUserRetrieveService userRetriever, string? userId, string? username, ITwoLevelCache? cache)
     {
-        if (userRetriever is IUserCacheInvalidator invalidator)
-            invalidator.InvalidateByUsername(username);
-        else if (username != null)
+        if (userRetriever is IRemoveCachedUser removeCachedUser)
+        {
+            removeCachedUser.RemoveCachedUser(userId, username);
+            return;
+        }
+
+        if (userId != null)
+            cache?.Remove("UserById_" + userId);
+
+        if (username != null)
             cache?.Remove("UserByName_" + username.ToLowerInvariant());
+
     }
 }

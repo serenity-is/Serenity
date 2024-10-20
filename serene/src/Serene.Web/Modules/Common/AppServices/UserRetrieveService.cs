@@ -3,7 +3,7 @@ using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.AppServices;
 
-public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnections) : IUserRetrieveService, IUserCacheInvalidator
+public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnections) : IUserRetrieveService, IRemoveAll, IRemoveCachedUser
 {
     protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
     protected readonly ISqlConnections sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(cache));
@@ -52,30 +52,16 @@ public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnec
         });
     }
 
-    public void InvalidateAll()
+    public void RemoveAll()
     {
         cache.ExpireGroupItems(MyRow.Fields.GenerationKey);
     }
 
-    public void InvalidateById(string userId)
+    public void RemoveCachedUser(string userId, string username)
     {
-        if (userId == null ||
-            !int.TryParse(userId, CultureInfo.InvariantCulture, out int id))
-            return;
-        cache.Remove("UserByID_" + id.ToInvariant());
-    }
-
-    public void InvalidateByUsername(string username)
-    {
+        if (userId != null && int.TryParse(userId, CultureInfo.InvariantCulture, out int id))
+            cache.Remove("UserByID_" + id.ToInvariant());
         if (username != null)
             cache.Remove("UserByName_" + username.ToLowerInvariant());
-    }
-
-    public void InvalidateItem(IUserDefinition user)
-    {
-        if (user is null)
-            return;
-        InvalidateById(user.Id);
-        InvalidateByUsername(user.Username);
     }
 }
