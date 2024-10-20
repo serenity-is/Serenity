@@ -631,6 +631,7 @@ export namespace SlickFormatting {
                 var fragment = document.createDocumentFragment();
                 fragment.appendChild(spacer);
                 fragment.appendChild(toggle);
+                fragment.appendChild(text);
                 return fragment;
             }
             else if (text instanceof DocumentFragment) {
