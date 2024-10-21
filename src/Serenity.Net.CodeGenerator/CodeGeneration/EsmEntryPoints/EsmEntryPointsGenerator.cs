@@ -14,7 +14,7 @@ public class EsmEntryPointsGenerator()
     public string EsmAssetBasePath { get; set; } = "/esm";
 
     public string Generate(IFileSystem fileSystem, string projectDir, 
-        string rootNamespace, bool fileScopedNamespace = false)
+        string rootNamespace, bool fileScopedNamespace = false, bool internalAccess = false)
     {
         ArgumentExceptionHelper.ThrowIfNull(fileSystem);
         ArgumentExceptionHelper.ThrowIfNull(rootNamespace);
@@ -76,9 +76,9 @@ public class EsmEntryPointsGenerator()
             IsCSharp = true
         };
 
-        Action action = () =>
+        void action()
         {
-            cw.IndentedLine("public static partial class ESM");
+            cw.IndentedLine($"{(internalAccess ? "internal" : "public")} static partial class ESM");
             cw.InBrace(() =>
             {
                 var firstParts = new HashSet<string>(files.Select(x => normalizeParts(getStrippedName(x).Split('/').First())));
@@ -179,7 +179,7 @@ public class EsmEntryPointsGenerator()
                 for (var i = last.Length - 1; i > 0; i--)
                     cw.EndBrace();
             });
-        };
+        }
 
         if (fileScopedNamespace)
         {

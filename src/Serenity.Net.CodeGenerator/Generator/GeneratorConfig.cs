@@ -129,7 +129,7 @@ public class GeneratorConfig
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeMVC() => MVC != null &&
         (!string.IsNullOrEmpty(MVC.OutDir) ||
-         MVC.UseRootNamespace != null ||
+         MVC.InternalAccess != null ||
          MVC.SearchViewPaths?.Length > 0 ||
          MVC.StripViewPaths?.Length > 0 ||
          MVC.SourceGenerator == false);
@@ -505,9 +505,14 @@ public class GeneratorConfig
     public class MVCConfig
     {
         /// <summary>
-        /// Use project root namespace in generated file
+        /// Obsolete. Sergen will now always use the root namespace.
         /// </summary>
+        [Obsolete("Sergen will always use the root namespace to avoid class name clashes.")]
         public bool? UseRootNamespace { get; set; }
+        /// <summary>
+        /// Use internal instead of public for generated top level class (MVC/ESM).
+        /// </summary>
+        public bool? InternalAccess { get; set; }
         /// <summary>
         /// Output directory for MVC.cs
         /// </summary>
