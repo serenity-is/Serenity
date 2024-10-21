@@ -8,7 +8,7 @@ public partial class MvcCommandTests
     MvcCommand CreateCommand(string[] viewPaths, out MockFileSystem fileSystem)
     {
         fileSystem = new MockFileSystem();
-        var project = new ProjectFileInfo(fileSystem, @"C:\Repos\MyTest.Web\MyTest.Web.csproj");
+        var project = new ProjectFileInfo(fileSystem, @"/Repos/MyTest.Web/MyTest.Web.csproj");
         var directory = fileSystem.GetDirectoryName(project.ProjectFile);
         fileSystem.AddFile(project.ProjectFile, "<Project Sdk=\"Microsoft.NET.Sdk.Web\"></Project>");
         fileSystem.AddFile(fileSystem.Combine(directory, "sergen.json"),
@@ -64,7 +64,7 @@ public partial class MvcCommandTests
         var exitCode = command.Run();
         Assert.Equal(ExitCodes.Success, exitCode);
 
-        var generated = fileSystem.ReadAllText(@"C:\Repos\MyTest.Web\Imports\MVC\MVC.cs").Trim().ReplaceLineEndings();
+        var generated = fileSystem.ReadAllText(@"/Repos/MyTest.Web/Imports/MVC/MVC.cs").Trim().ReplaceLineEndings();
         Assert.Equal(expected, generated);
     }
 }
