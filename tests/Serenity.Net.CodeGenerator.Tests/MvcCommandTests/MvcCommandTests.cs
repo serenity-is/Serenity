@@ -23,28 +23,31 @@ public partial class MvcCommandTests
     public void SameSubFolderNameInDifferentParents()
     {
         var expected =
-@"namespace MyTest.MVC
+@"namespace MyTest
 {
-    public static class Views
+    public static partial class MVC
     {
-        public static class Data
+        public static partial class Views
         {
-            public static class DataReports
+            public static partial class MyModule
             {
-                public static class Viewer
+                public static partial class A
                 {
-                    public const string DataReportDashboard = ""~/Modules/Data/DataReports/Viewer/DataReportDashboard.cshtml"";
-                    public const string DataReportViewer = ""~/Modules/Data/DataReports/Viewer/DataReportViewer.cshtml"";
-                    public const string WorkbookViewer = ""~/Modules/Data/DataReports/Viewer/WorkbookViewer.cshtml"";
+                    public static partial class Same
+                    {
+                        public const string A1 = ""~/Modules/MyModule/A/Same/A1.cshtml"";
+                        public const string A2 = ""~/Modules/MyModule/A/Same/A2.cshtml"";
+                        public const string A3 = ""~/Modules/MyModule/A/Same/A3.cshtml"";
+                    }
                 }
-            }
 
-            public static class DataVisuals
-            {
-                public static class Viewer
+                public static partial class B
                 {
-                    public const string DataVisualDashboard = ""~/Modules/Data/DataVisuals/Viewer/DataVisualDashboard.cshtml"";
-                    public const string DataVisualViewer = ""~/Modules/Data/DataVisuals/Viewer/DataVisualViewer.cshtml"";
+                    public static partial class Same
+                    {
+                        public const string B1 = ""~/Modules/MyModule/B/Same/B1.cshtml"";
+                        public const string B2 = ""~/Modules/MyModule/B/Same/B2.cshtml"";
+                    }
                 }
             }
         }
@@ -52,11 +55,11 @@ public partial class MvcCommandTests
 }".ReplaceLineEndings();
 
         var command = CreateCommand([
-            @"Modules\Data\DataReports\Viewer\DataReportDashboard.cshtml",
-            @"Modules\Data\DataReports\Viewer\DataReportViewer.cshtml",
-            @"Modules\Data\DataReports\Viewer\WorkbookViewer.cshtml",
-            @"Modules\Data\DataVisuals\Viewer\DataVisualDashboard.cshtml",
-            @"Modules\Data\DataVisuals\Viewer\DataVisualViewer.cshtml"], out var fileSystem);
+            @"Modules\MyModule\A\Same\A1.cshtml",
+            @"Modules\MyModule\A\Same\A2.cshtml",
+            @"Modules\MyModule\A\Same\A3.cshtml",
+            @"Modules\MyModule\B\Same\B1.cshtml",
+            @"Modules\MyModule\B\Same\B2.cshtml"], out var fileSystem);
 
         var exitCode = command.Run();
         Assert.Equal(ExitCodes.Success, exitCode);

@@ -54,7 +54,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
 
         cw.InNamespace(rootNamespace, () =>
         {
-            cw.AppendLine($"{(internalAccess ? "internal" : "public")} static partial class MVC");
+            cw.IndentedLine($"{(internalAccess ? "internal" : "public")} static partial class MVC");
             cw.InBrace(() =>
             {
                 generator.GenerateViews(cw, files.Select(x => x[rootDir.Length..]).ToArray());
@@ -78,7 +78,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             esmGenerator.EntryPoints.AddRange(globs);
         }
 
-        var esmCode = esmGenerator.Generate(FileSystem, projectDir, Project.GetRootNamespace(),
+        var esmCode = esmGenerator.Generate(FileSystem, projectDir, rootNamespace,
             fileScopedNamespace: config.FileScopedNamespaces == true,
             internalAccess: config.MVC.InternalAccess == true);
 
