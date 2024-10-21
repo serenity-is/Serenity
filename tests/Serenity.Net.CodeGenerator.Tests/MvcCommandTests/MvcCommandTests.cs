@@ -15,7 +15,7 @@ public partial class MvcCommandTests
             "{\"MVC\": {\"UseRootNamespace\": true}}");
         var command = new MvcCommand(project, new MockGeneratorConsole());
         foreach (var viewPath in viewPaths)
-            fileSystem.AddFile(fileSystem.Combine(directory, viewPath), "");
+            fileSystem.AddFile(fileSystem.Combine(directory, PathHelper.ToPath(viewPath)), "");
         return command;
     }
 
@@ -55,11 +55,11 @@ public partial class MvcCommandTests
 }".ReplaceLineEndings();
 
         var command = CreateCommand([
-            @"Modules\MyModule\A\Same\A1.cshtml",
-            @"Modules\MyModule\A\Same\A2.cshtml",
-            @"Modules\MyModule\A\Same\A3.cshtml",
-            @"Modules\MyModule\B\Same\B1.cshtml",
-            @"Modules\MyModule\B\Same\B2.cshtml"], out var fileSystem);
+            "Modules/MyModule/A/Same/A1.cshtml",
+            "Modules/MyModule/A/Same/A2.cshtml",
+            "Modules/MyModule/A/Same/A3.cshtml",
+            "Modules/MyModule/B/Same/B1.cshtml",
+            "Modules/MyModule/B/Same/B2.cshtml"], out var fileSystem);
 
         var exitCode = command.Run();
         Assert.Equal(ExitCodes.Success, exitCode);
