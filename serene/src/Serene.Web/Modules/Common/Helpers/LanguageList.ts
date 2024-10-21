@@ -1,4 +1,4 @@
-import { LanguageRow } from "../../Administration";
+import { LanguageRow } from "@/ServerTypes/Administration/LanguageRow";
 
 export function siteLanguageList() {
     var result: string[][] = [];

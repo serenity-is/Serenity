@@ -1,7 +1,7 @@
-import { RoleRow, RoleForm, RoleService } from "../";
-import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
-import { Texts } from "../../ServerTypes/Texts"
+import { RoleForm, RoleRow, RoleService } from "@/ServerTypes/Administration";
 import { Decorators, EntityDialog } from "@serenity-is/corelib";
+import { Texts } from "../../ServerTypes/Texts";
+import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
 
 const editPermissions = "edit-permissions";
 
@@ -15,16 +15,14 @@ export class RoleDialog extends EntityDialog<RoleRow, any> {
 
     protected form = new RoleForm(this.idPrefix);
 
-    protected getToolbarButtons()
-    {
+    protected getToolbarButtons() {
         let buttons = super.getToolbarButtons();
 
         buttons.push({
             title: Texts.Site.RolePermissionDialog.EditButton,
             cssClass: editPermissions,
             icon: 'fa-lock text-green',
-            onClick: () =>
-            {
+            onClick: () => {
                 new RolePermissionDialog({
                     roleID: this.entity.RoleId,
                     title: this.entity.RoleName

@@ -1,8 +1,7 @@
-import { UserForm, UserRow, UserService } from "../";
-import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
-import { Decorators, EditorUtils, EntityDialog } from "@serenity-is/corelib"
-import { format, localText } from "@serenity-is/corelib";
+import { UserForm, UserRow, UserService } from "@/ServerTypes/Administration";
 import { Texts } from "@/ServerTypes/Texts";
+import { Decorators, EditorUtils, EntityDialog, localText, stringFormat } from "@serenity-is/corelib";
+import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
 @Decorators.registerClass()
 export class UserDialog extends EntityDialog<UserRow, any> {
@@ -24,7 +23,7 @@ export class UserDialog extends EntityDialog<UserRow, any> {
 
         this.form.Password.addValidationRule(this.uniqueName, e => {
             if (this.form.Password.value.length < 6)
-                return format(localText(Texts.Validation.MinRequiredPasswordLength), 6);
+                return stringFormat(localText(Texts.Validation.MinRequiredPasswordLength), 6);
         });
 
         this.form.PasswordConfirm.addValidationRule(this.uniqueName, e => {

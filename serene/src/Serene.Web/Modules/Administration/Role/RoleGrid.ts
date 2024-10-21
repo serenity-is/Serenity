@@ -1,5 +1,5 @@
+import { RoleRow, RoleColumns, RoleService } from "@/ServerTypes/Administration";
 import { RoleDialog } from "./RoleDialog";
-import { RoleColumns, RoleRow, RoleService } from "../";
 import { Decorators, EntityGrid } from "@serenity-is/corelib";
 
 @Decorators.registerClass('Serene.Administration.RoleGrid')

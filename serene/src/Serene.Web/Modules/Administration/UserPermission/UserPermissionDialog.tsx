@@ -1,6 +1,7 @@
 import { getRemoteData, localText, notifySuccess, stringFormat, BaseDialog } from "@serenity-is/corelib";
-import { UserPermissionService } from "../";
+import { UserPermissionService } from "../../ServerTypes/Administration/UserPermissionService";
 import { PermissionCheckEditor } from "./PermissionCheckEditor";
+import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
 
 export class UserPermissionDialog extends BaseDialog<UserPermissionDialogOptions> {
 
@@ -25,7 +26,7 @@ export class UserPermissionDialog extends BaseDialog<UserPermissionDialogOptions
             this.permissions.rolePermissions = response.Entities;
         });
 
-        this.permissions.implicitPermissions = getRemoteData('Administration.ImplicitPermissions');
+        this.permissions.implicitPermissions = getRemoteData(RemoteDataKeys.Administration.ImplicitPermissions);
         this.dialogTitle = stringFormat(localText('Site.UserPermissionDialog.DialogTitle'),
             this.options.username);
     }
@@ -39,7 +40,7 @@ export class UserPermissionDialog extends BaseDialog<UserPermissionDialogOptions
                     UserPermissionService.Update({
                         UserID: this.options.userID,
                         Permissions: this.permissions.value
-                    }, response => {
+                    }, () => {
                         this.dialogClose();
                         window.setTimeout(() => notifySuccess(localText('Site.UserPermissionDialog.SaveSuccess')), 0);
                     });

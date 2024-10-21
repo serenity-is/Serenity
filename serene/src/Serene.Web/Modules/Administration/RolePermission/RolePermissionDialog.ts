@@ -1,9 +1,9 @@
-import { Decorators, TemplatedDialog } from "@serenity-is/corelib";
-import { format, getRemoteData, notifySuccess, localText } from "@serenity-is/corelib";
-import { RolePermissionService, UserPermissionRow } from "../";
+import { BaseDialog, stringFormat, getRemoteData, localText, notifySuccess } from "@serenity-is/corelib";
 import { PermissionCheckEditor } from "../UserPermission/PermissionCheckEditor";
+import { RolePermissionService, UserPermissionRow } from "@/ServerTypes/Administration";
+import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
 
-export class RolePermissionDialog extends TemplatedDialog<RolePermissionDialogOptions> {
+export class RolePermissionDialog extends BaseDialog<RolePermissionDialogOptions> {
 
     private permissions: PermissionCheckEditor;
 
@@ -20,7 +20,7 @@ export class RolePermissionDialog extends TemplatedDialog<RolePermissionDialogOp
             this.permissions.value = response.Entities.map(x => (<UserPermissionRow>{ PermissionKey: x }));
         });
 
-        this.permissions.implicitPermissions = getRemoteData('Administration.ImplicitPermissions');
+        this.permissions.implicitPermissions = getRemoteData(RemoteDataKeys.Administration.ImplicitPermissions);
     }
 
     protected getDialogOptions()  {
@@ -43,7 +43,7 @@ export class RolePermissionDialog extends TemplatedDialog<RolePermissionDialogOp
                 click: () => this.dialogClose()
             }];
 
-        opt.title = format(localText('Site.RolePermissionDialog.DialogTitle'),
+        opt.title = stringFormat(localText('Site.RolePermissionDialog.DialogTitle'),
             this.options.title);
 
         return opt;

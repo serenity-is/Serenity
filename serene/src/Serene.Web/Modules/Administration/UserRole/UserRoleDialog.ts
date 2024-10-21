@@ -1,10 +1,9 @@
-import { Decorators, TemplatedDialog } from "@serenity-is/corelib";
-import { DialogButton, format, notifySuccess, serviceRequest, localText } from "@serenity-is/corelib";
-import { UserRoleService } from "../";
+import { UserRoleService } from "@/ServerTypes/Administration/UserRoleService";
+import { BaseDialog, Decorators, DialogButton, localText, notifySuccess, serviceRequest, stringFormat } from "@serenity-is/corelib";
 import { RoleCheckEditor } from "./RoleCheckEditor";
 
 @Decorators.registerClass()
-export class UserRoleDialog extends TemplatedDialog<UserRoleDialogOptions> {
+export class UserRoleDialog extends BaseDialog<UserRoleDialogOptions> {
 
     private permissions: RoleCheckEditor;
 
@@ -19,7 +18,7 @@ export class UserRoleDialog extends TemplatedDialog<UserRoleDialogOptions> {
             this.permissions.value = response.Entities.map(x => x.toString());
         });
 
-        this.dialogTitle = format(localText('Site.UserRoleDialog.DialogTitle'), this.options.username);
+        this.dialogTitle = stringFormat(localText('Site.UserRoleDialog.DialogTitle'), this.options.username);
     }
 
     protected getDialogButtons(): DialogButton[] {

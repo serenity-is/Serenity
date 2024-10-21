@@ -1,6 +1,7 @@
+import { TranslationService } from "@/ServerTypes/Administration";
 import { confirmDialog, Decorators, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, localText, LookupEditor, LookupEditorOptions, notifySuccess, outerHtml, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
+import { TranslationItem } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
-import { TranslationItem, TranslationService } from "../";
 
 @Decorators.registerClass()
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {
@@ -10,7 +11,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
     private hasChanges: boolean;
     private searchText: string;
-    private sourceLanguage: LookupEditor; 
+    private sourceLanguage: LookupEditor;
     private targetLanguage: LookupEditor;
     private targetLanguageKey: string;
 
@@ -41,7 +42,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
         if (Fluent(e.target).hasClass('source-text')) {
             e.preventDefault();
-                
+
             done = () => {
                 item.CustomText = item.SourceText;
                 this.view.updateItem(item.Key, item);
@@ -183,7 +184,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         this.hasChanges = false;
         return super.onViewSubmit();
     }
-    
+
     protected getButtons(): ToolButton[] {
         return [{
             title: localText('Db.Administration.Translation.SaveChangesButton'),
