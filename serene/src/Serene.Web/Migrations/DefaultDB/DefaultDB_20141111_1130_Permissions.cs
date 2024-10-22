@@ -7,11 +7,12 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
 {
     public override void Up()
     {
-        this.CreateTableWithId64("UserPermissions", "UserPermissionId", s => s
+        Create.Table("UserPermissions")
+            .WithColumn("UserPermissionId").AsInt64().IdentityKey(this)
             .WithColumn("UserId").AsInt32().NotNullable()
                 .ForeignKey("FK_UserPermissions_UserId", "Users", "UserId")
             .WithColumn("PermissionKey").AsString(100).NotNullable()
-            .WithColumn("Granted").AsBoolean().NotNullable().WithDefaultValue(true));
+            .WithColumn("Granted").AsBoolean().NotNullable().WithDefaultValue(true);
 
         Create.Index("UQ_UserPerm_UserId_PermKey")
             .OnTable("UserPermissions")
@@ -19,10 +20,12 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
             .OnColumn("PermissionKey").Ascending()
             .WithOptions().Unique();
 
-        this.CreateTableWithId32("Roles", "RoleId", s => s
-            .WithColumn("RoleName").AsString(100).NotNullable());
+        Create.Table("Roles")
+            .WithColumn("RoleId").AsInt32().IdentityKey(this)
+            .WithColumn("RoleName").AsString(100).NotNullable();
 
-        this.CreateTableWithId64("RolePermissions", "RolePermissionId", s => s
+        Create.Table("RolePermissions")
+            .WithColumn("RolePermissionId").AsInt64().IdentityKey(this)
             .WithColumn("RoleId").AsInt32().NotNullable()
                 .ForeignKey("FK_RolePermissions_RoleId", "Roles", "RoleId")
             .WithColumn("PermissionKey").AsString(100).NotNullable());
@@ -33,11 +36,12 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
             .OnColumn("PermissionKey").Ascending()
             .WithOptions().Unique();
 
-        this.CreateTableWithId64("UserRoles", "UserRoleId", s => s
+        Create.Table("UserRoles")
+            .WithColumn("UserRoleId").AsInt64().IdentityKey(this)
             .WithColumn("UserId").AsInt32().NotNullable()
                 .ForeignKey("FK_UserRoles_UserId", "Users", "UserId")
             .WithColumn("RoleId").AsInt32().NotNullable()
-                .ForeignKey("FK_UserRoles_RoleId", "Roles", "RoleId"));
+                .ForeignKey("FK_UserRoles_RoleId", "Roles", "RoleId");
 
         Create.Index("UQ_UserRoles_UserId_RoleId")
             .OnTable("UserRoles")

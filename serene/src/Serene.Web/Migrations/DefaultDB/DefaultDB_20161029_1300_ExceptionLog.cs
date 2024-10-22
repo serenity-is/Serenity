@@ -7,7 +7,8 @@ public class DefaultDB_20161029_1300_ExceptionLog : AutoReversingMigration
 {
     public override void Up()
     {
-        this.CreateTableWithId64("Exceptions", "Id", s => s
+        Create.Table("Exceptions")
+            .WithColumn("Id").AsInt64().IdentityKey(this)
             .WithColumn("GUID").AsGuid().NotNullable()
             .WithColumn("ApplicationName").AsString(50).NotNullable()
             .WithColumn("MachineName").AsString(50).NotNullable()
@@ -26,7 +27,7 @@ public class DefaultDB_20161029_1300_ExceptionLog : AutoReversingMigration
             .WithColumn("DeletionDate").AsDateTime().Nullable()
             .WithColumn("FullJson").AsString(int.MaxValue).Nullable()
             .WithColumn("ErrorHash").AsInt32().Nullable()
-            .WithColumn("DuplicateCount").AsInt32().NotNullable().WithDefaultValue(1));
+            .WithColumn("DuplicateCount").AsInt32().NotNullable().WithDefaultValue(1);
 
         Create.Index("IX_Exceptions_GUID_App_Del_Cre")
             .OnTable("Exceptions")

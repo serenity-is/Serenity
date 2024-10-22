@@ -52,8 +52,6 @@ public class DataMigrations(ITypeSource typeSource,
         bool isOracle = serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase);
         bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
 
-        string databaseType = isOracle ? "OracleManaged" : serverType;
-
         var conventionSet = new DefaultConventionSet(defaultSchemaName: null,
             Path.GetDirectoryName(typeof(DataMigrations).Assembly.Location));
 
@@ -72,15 +70,15 @@ public class DataMigrations(ITypeSource typeSource,
             })
             .ConfigureRunner(builder =>
             {
-                if (databaseType == OracleDialect.Instance.ServerType)
+                if (serverType == OracleDialect.Instance.ServerType)
                     builder.AddOracleManaged();
-                else if (databaseType == SqliteDialect.Instance.ServerType)
+                else if (serverType == SqliteDialect.Instance.ServerType)
                     builder.AddSQLite();
-                else if (databaseType == FirebirdDialect.Instance.ServerType)
+                else if (serverType == FirebirdDialect.Instance.ServerType)
                     builder.AddFirebird();
-                else if (databaseType == MySqlDialect.Instance.ServerType)
+                else if (serverType == MySqlDialect.Instance.ServerType)
                     builder.AddMySql5();
-                else if (databaseType == PostgresDialect.Instance.ServerType)
+                else if (serverType == PostgresDialect.Instance.ServerType)
                     builder.AddPostgres();
                 else
                     builder.AddSqlServer();

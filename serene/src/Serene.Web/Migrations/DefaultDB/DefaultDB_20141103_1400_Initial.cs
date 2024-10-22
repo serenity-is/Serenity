@@ -7,7 +7,8 @@ public class DefaultDB_20141103_1400_Initial : AutoReversingMigration
 {
     public override void Up()
     {
-        this.CreateTableWithId32("Users", "UserId", s => s
+        Create.Table("Users")
+            .WithColumn("UserId").AsInt32().IdentityKey(this)
             .WithColumn("Username").AsString(100).NotNullable().Unique("IX_Users_Username")
             .WithColumn("DisplayName").AsString(100).NotNullable()
             .WithColumn("Email").AsString(100).Nullable()
@@ -35,9 +36,10 @@ public class DefaultDB_20141103_1400_Initial : AutoReversingMigration
             IsActive = 1
         });
 
-        this.CreateTableWithId32("Languages", "Id", s => s
+        Create.Table("Languages")
+            .WithColumn("Id").AsInt32().IdentityKey(this)
             .WithColumn("LanguageId").AsString(10).NotNullable().Unique("IX_Languages_LanguageId")
-            .WithColumn("LanguageName").AsString(50).NotNullable());
+            .WithColumn("LanguageName").AsString(50);
 
         Insert.IntoTable("Languages").Row(new
         {
