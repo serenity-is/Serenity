@@ -129,4 +129,10 @@ catch (Exception ex)
   <Target Name="RestoreTypings">
     <!-- we no longer support legacy namespace typings -->
   </Target>
+  <Target Name="SetSergenTransformArgs">
+    <PropertyGroup>
+      <SergenTransformArgs>-p &quot;$(ProjectFileName)&quot; -prop:Configuration=$(Configuration) -prop:AssemblyName=&quot;$(AssemblyName)&quot; -prop:ESMAssetBasePath=&quot;$(ESMAssetBasePath)&quot; -prop:OutDir=&quot;$(OutDir.Trim('\'))&quot; -prop:RootNamespace=$(RootNamespace) -prop:TargetFramework=$(TargetFramework)</SergenTransformArgs>
+    </PropertyGroup>
+    <Message Importance="high" Text="Transform Arguments: $(SergenTransformArgs)"/>
+  </Target>
 </Project>

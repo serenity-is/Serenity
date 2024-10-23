@@ -50,7 +50,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     {
         if (esmAssetBasePath is null)
         {
-            if (getPropertyArgument?.Invoke("ESMAssetBasePath") is string s)
+            if (getPropertyArgument?.Invoke("ESMAssetBasePath") is string s && !string.IsNullOrEmpty(s))
                 esmAssetBasePath = s;
             else
             {
