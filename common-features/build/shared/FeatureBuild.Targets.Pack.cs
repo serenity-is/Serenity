@@ -150,7 +150,7 @@ public static partial class Shared
             var xeCFPackageVersion = xe.Descendants("CFPackageVersion").FirstOrDefault();
             if (xeCFPackageVersion?.Value != null)
             {
-                var cfPackageBuildProps = Path.Combine(Root, "..", "common-features", "build", "Package.Build.props");
+                var cfPackageBuildProps = Path.Combine(SerenityDir, "common-features", "build", "Package.Build.props");
                 var xeCF = XElement.Parse(File.ReadAllText(cfPackageBuildProps));
                 var cfPackageVersion = xeCF.Descendants("Version").FirstOrDefault()?.Value;
                 if (cfPackageVersion != null &&
