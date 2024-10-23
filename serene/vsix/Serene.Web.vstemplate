@@ -53,7 +53,6 @@
         <Folder Name="Administration" TargetFolderName="Administration">
           <ProjectItem ReplaceParameters="true" TargetFileName="AdministrationNavigation.cs">AdministrationNavigation.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="AdministrationPermissionKeys.cs">AdministrationPermissionKeys.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="index.ts">index.ts</ProjectItem>
           <Folder Name="Language" TargetFolderName="Language">
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageColumns.cs">LanguageColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageDialog.ts">LanguageDialog.ts</ProjectItem>
@@ -132,9 +131,9 @@
           </Folder>
           <Folder Name="UserPermission" TargetFolderName="UserPermission">
             <ProjectItem ReplaceParameters="true" TargetFileName="ImplicitPermissionsDataScript.cs">ImplicitPermissionsDataScript.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="PermissionCheckEditor.ts">PermissionCheckEditor.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="PermissionCheckEditor.tsx">PermissionCheckEditor.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeysDataScript.cs">PermissionKeysDataScript.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionDialog.ts">UserPermissionDialog.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionDialog.tsx">UserPermissionDialog.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionEndpoint.cs">UserPermissionEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionListRequest.cs">UserPermissionListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionRepository.cs">UserPermissionRepository.cs</ProjectItem>
@@ -313,10 +312,11 @@
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-7V7WNOD5.js">chunk-7V7WNOD5.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-OCONEL2A.js">chunk-OCONEL2A.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-T5LBPAZU.js">chunk-T5LBPAZU.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VJTRQGCC.js">chunk-VJTRQGCC.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-XIQQ2G2N.js">chunk-XIQQ2G2N.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-F7ASLS5R.js">chunk-F7ASLS5R.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-IHLQ5LPA.js">chunk-IHLQ5LPA.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RNLKRUWJ.js">chunk-RNLKRUWJ.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VYJLGJ67.js">chunk-VYJLGJ67.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WMAR3PB6.js">chunk-WMAR3PB6.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
