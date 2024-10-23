@@ -28,7 +28,7 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
             .WithColumn("RolePermissionId").AsInt64().IdentityKey(this)
             .WithColumn("RoleId").AsInt32().NotNullable()
                 .ForeignKey("FK_RolePermissions_RoleId", "Roles", "RoleId")
-            .WithColumn("PermissionKey").AsString(100).NotNullable());
+            .WithColumn("PermissionKey").AsString(100).NotNullable();
 
         Create.Index("UQ_RolePerm_RoleId_PermKey")
             .OnTable("RolePermissions")

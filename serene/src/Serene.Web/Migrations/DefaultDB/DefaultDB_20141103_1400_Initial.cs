@@ -21,7 +21,7 @@ public class DefaultDB_20141103_1400_Initial : AutoReversingMigration
             .WithColumn("InsertUserId").AsInt32().NotNullable()
             .WithColumn("UpdateDate").AsDateTime().Nullable()
             .WithColumn("UpdateUserId").AsInt32().Nullable()
-            .WithColumn("IsActive").AsInt16().NotNullable().WithDefaultValue(1));
+            .WithColumn("IsActive").AsInt16().NotNullable().WithDefaultValue(1);
 
         Insert.IntoTable("Users").Row(new
         {
