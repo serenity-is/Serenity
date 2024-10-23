@@ -21,7 +21,6 @@
     <DefaultItemExcludes>node_modules\**;$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;tsconfig.base.json;libman.json;tsbuild.js;test\*.json;wwwroot\index.d.ts;wwwroot\**\*.less</DefaultItemExcludes>
     <AddAutoRefs>true</AddAutoRefs>
     <RestoreNodeTypes>false</RestoreNodeTypes>
-    <RestoreTypings>false</RestoreTypings>
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
