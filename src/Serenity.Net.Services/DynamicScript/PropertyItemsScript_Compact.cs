@@ -85,9 +85,14 @@ public abstract partial class PropertyItemsScript
         "yield"
     ];
 
-    internal static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
+    /// <summary>
+    /// Generates a compact version of the scripts
+    /// </summary>
+    /// <param name="inputs">Inputs</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
     {
-        ArgumentNullException.ThrowIfNull(inputs);
+        if (inputs is null) throw new ArgumentNullException(nameof(inputs));
         Dictionary<string, string> strMap = [];
         int strMapCount = 0;
 
@@ -165,7 +170,7 @@ public abstract partial class PropertyItemsScript
             if (s.Length < 4)
             {
                 if ((s[0] == '_' || char.IsLetter(s[0])) &&
-                    s.All(x => char.IsLetter(x) || x == '_' || x == '$' || char.IsAsciiDigit(x)))
+                    s.All(x => char.IsLetter(x) || x == '_' || x == '$' || (x >= 0 && x <= 9)))
                     return s;
                 return StringHelper.ToSingleQuoted(s);
             }
