@@ -1,6 +1,3 @@
-using Serenity.Localization;
-using System.Reflection;
-
 namespace Serene.AppServices;
 
 public class TypeSource : DefaultTypeSource
@@ -10,23 +7,23 @@ public class TypeSource : DefaultTypeSource
     {
     }
 
-    private static Assembly[] GetAssemblyList()
+    private static System.Reflection.Assembly[] GetAssemblyList()
     {
         return
         [
-            typeof(LocalTextRegistry).Assembly,
-            typeof(ISqlConnections).Assembly,
-            typeof(IRow).Assembly,
-            typeof(SaveRequestHandler<>).Assembly,
-            typeof(IDynamicScriptManager).Assembly,
-            typeof(EnvironmentSettings).Assembly,
+            typeof(Serenity.Localization.ILocalText).Assembly, // Serenity.Core
+            typeof(DefaultSqlConnections).Assembly, // Serenity.Net.Data
+            typeof(Row<>).Assembly, // Serenity.Net.Entity
+            typeof(SaveRequestHandler<>).Assembly, // Serenity.Net.Services
+            typeof(HttpContextItemsAccessor).Assembly, // Serenity.Net.Web
+            typeof(Serenity.Reporting.ExcelExporter).Assembly, // Serenity.Extensions
 #if (Northwind)
-            typeof(Serenity.Demo.Northwind.CustomerPage).Assembly,
+            typeof(Serenity.Demo.Northwind.CustomerPage).Assembly, // Serenity.Demo.Northwind
 #endif
 #if (BasicSamples)
-            typeof(Serenity.Demo.BasicSamples.BasicSamplesPage).Assembly,
+            typeof(Serenity.Demo.BasicSamples.BasicSamplesPage).Assembly, // Serenity.Demo.BasicSamples
 #endif
-            typeof(Startup).Assembly
+            typeof(Startup).Assembly // Serene.Web
         ];
     }
 }
