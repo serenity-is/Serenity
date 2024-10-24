@@ -102,6 +102,10 @@ Action myPush = delegate() {
         NuGetPush(package, new NuGetPushSettings {
             Source = "https://api.nuget.org/v3/index.json"
         });
+        
+        NuGetPush(package, new NuGetPushSettings {
+            Source = "serenity.is"
+        });       
     }       
 };
 
