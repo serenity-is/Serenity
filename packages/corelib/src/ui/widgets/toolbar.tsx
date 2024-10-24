@@ -30,7 +30,7 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
     const btn = Fluent(
         <div class={["tool-button", tb.cssClass, tb.icon && "icon-tool-button", !tb.title && "no-text"]}
             title={!!tb.hint && tb.hint} onClick={e => {
-                if (tb.onClick && !(e.target as Element).classList.contains('disabled')) {
+                if (tb.onClick && !(e.target as Element)?.closest(".tool-button").classList.contains('disabled')) {
                     tb.onClick(e);
                 }
             }}>
