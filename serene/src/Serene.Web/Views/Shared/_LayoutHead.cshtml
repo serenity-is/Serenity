@@ -11,5 +11,7 @@
 @Html.ScriptBundle("Base")
 @Html.LocalTextScript("Site")
 <script type="module" src=@Html.ResolveWithHash("~/esm/Modules/Common/ScriptInit.js")></script>
-<script type="text/javascript">@Html.Raw(DynamicScriptManager.GetScriptText("Lookup.Administration.Language"))</script>
+<script type="text/javascript">
+    @Html.Raw(DynamicScriptManager.GetScriptText("Lookup.Administration.Language"))
+</script>
 <script type="application/json" id="RegisteredScripts">@Html.Raw(Serenity.JSON.Stringify(DynamicScriptManager.GetRegisteredScripts()))</script>
