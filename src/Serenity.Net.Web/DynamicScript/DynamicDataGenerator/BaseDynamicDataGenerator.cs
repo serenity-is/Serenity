@@ -140,6 +140,19 @@ public abstract class BaseDynamicDataGenerator
     {
         return [];
     }
+
+    /// <summary>
+    /// Checks the arguments, if it is "dynamic-data" runs the generator and exits
+    /// </summary>
+    /// <param name="args">Arguments</param>
+    public virtual void RunAndExitIf(string[] args)
+    {
+        if (args?.Length == 1 && args[0] == "dynamic-data")
+        {
+            Run();
+            Environment.Exit(0);
+        }
+    }
 }
 
 internal class NullPermissionService : IPermissionService

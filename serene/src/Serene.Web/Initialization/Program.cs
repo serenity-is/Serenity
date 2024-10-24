@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -8,6 +8,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        new AppServices.DynamicDataGenerator().RunAndExitIf(args);
+
         CreateHostBuilder(args).Build().Run();
     }
 
