@@ -12,7 +12,10 @@ partial class Program
 
             foreach (var nupkg in Directory.GetFiles(Shared.PackageOutDir, "*.nupkg"))
                 if (!Shared.IsProPackage(Path.GetFileName(nupkg)))
+                {
                     Shared.PushToRemoteSource(nupkg, Shared.NugetOrgPushSource);
+                    Shared.PushToRemoteSource(nupkg, Shared.SerenityIsPackageSource.Source);
+                }
         }
     }
 }
