@@ -24,7 +24,7 @@ export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
     }
 
     protected getTreeItems() {
-        return RoleRow.getLookup().items.map(role => <CheckTreeItem<any>>{
+        return (RoleRow as any).getLookup().items.map(role => <CheckTreeItem<any>>{
             id: role.RoleId.toString(),
             text: role.RoleName
         });

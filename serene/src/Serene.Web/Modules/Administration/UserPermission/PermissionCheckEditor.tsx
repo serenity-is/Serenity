@@ -189,7 +189,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
             key = key.substring(0, key.length - 1);
 
         const idx = key.lastIndexOf(':');
-        return idx >= 0 ? key.substr(0, idx + 1) : null;
+        return idx >= 0 ? key.substring(0, idx + 1) : null;
     }
 
     protected getButtons(): ToolButton[] {

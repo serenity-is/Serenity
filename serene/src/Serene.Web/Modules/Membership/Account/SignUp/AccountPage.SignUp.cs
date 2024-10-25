@@ -21,17 +21,12 @@ public partial class AccountPage : Controller
     {
         return this.UseConnection("Default", connection =>
         {
-            if (request is null)
-                throw new ArgumentNullException(nameof(request));
-
-            if (string.IsNullOrWhiteSpace(request.Email))
-                throw new ArgumentNullException(nameof(request.Email));
-            if (string.IsNullOrEmpty(request.Password))
-                throw new ArgumentNullException(nameof(request.Password));
+            ArgumentNullException.ThrowIfNull(request);
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
+            ArgumentException.ThrowIfNullOrEmpty(request.Password);
 
             UserHelper.ValidatePassword(request.Password, Localizer);
-            if (string.IsNullOrWhiteSpace(request.DisplayName))
-                throw new ArgumentNullException(nameof(request.DisplayName));
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.DisplayName);
 
             if (connection.Exists<UserRow>(
                     UserRow.Fields.Username == request.Email |
@@ -141,8 +136,7 @@ public partial class AccountPage : Controller
     [HttpGet]
     public ActionResult Activate(string t, [FromServices] ISqlConnections sqlConnections)
     {
-        if (sqlConnections is null)
-            throw new ArgumentNullException(nameof(sqlConnections));
+        ArgumentNullException.ThrowIfNull(sqlConnections);
 
         using var connection = sqlConnections.NewByKey("Default");
         using var uow = new UnitOfWork(connection);
