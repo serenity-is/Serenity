@@ -1,3 +1,17 @@
+## 8.7.3 (2024-10-26)
+
+### Features
+
+- Use better marker types in TypeSource.cs that are less likely to move between assemblies in the future
+- Removed .sln files and use .slnf files (solution filters) generated from a single Serenity.sln at root for partial builds. Use Serenity.sln instead of Serene.sln.
+- Add a BaseDynamicDataGenerator that may be used in other projects to create dynamic-data folder for javascript tests
+- Moved dynamic script abstractions up to Serenity.Core and base types to Serenity.Services
+- Added a SetSergenTransformArgs target to Serenity.Net.Web.targets and use that instead of setting SergenTransformArgs in Feature.Build.targets and template .csproj files
+
+### Bugfixes
+
+- Fixed toolbar button with disabled class still clickable via its .button-inner element (#7272)
+
 ## 8.7.2 (2024-10-23)
 
 ### Features
