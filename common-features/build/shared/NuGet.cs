@@ -127,12 +127,16 @@ public static partial class Shared
             return GetLatestVersionOf(SerenityIsPackageSource, SerenityIsSourceKey, packageId);
 
         var version = GetLatestVersionOf(null, NugetOrgReadSource, packageId);
+        var serenityIsVersion = GetLatestVersionOf(SerenityIsPackageSource, SerenityIsSourceKey, packageId);
+        if (serenityIsVersion != null && (version == null || serenityIsVersion > version))
+            version = serenityIsVersion;
         var localSource = GetLocalNugetFeed(create: false);
+
         if (localSource != null && Directory.Exists(localSource.Source))
         {
             var localVersion = GetLatestVersionOf(localSource, null, packageId);
             if (localVersion != null && (version == null || localVersion > version))
-                return localVersion;
+                version = localVersion;
         }
         return version;
     }
