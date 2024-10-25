@@ -1,4 +1,13 @@
 @echo off
-dotnet tool restore --verbosity quiet
-dotnet dotnet-cake %~dp0\_build.cake -target=%1 %2 %3 %4 %5
+dotnet run --project %~dp0\_build.csproj -- %*%
+if "%~1"=="push" goto :cfpush
 pause
+goto :eof
+
+:cfpush
+echo.
+CHOICE /M "Run common-features\build-cf.cmd %*%"
+If %ERRORLEVEL% EQU 1 (
+    cd %~dp0\..\common-features
+    call build-cf.cmd %*%
+)
