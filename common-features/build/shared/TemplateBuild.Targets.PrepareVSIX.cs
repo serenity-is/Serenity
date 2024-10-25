@@ -15,10 +15,13 @@ public static partial class Shared
             UpdateSerenityPackages();
             UpdateCommonAndProPackages();
 
-            if (StartProcess("dotnet", "restore", Root) != 0)
-                ExitWithError("Error while restoring " + ProjectFile);
+            if (!File.Exists(SolutionFile))
+                ExitWithError("Solution file not found: " + SolutionFile);
 
-            if (StartProcess("dotnet", "build -v minimal -c Release " + ProjectId + ".sln", Root) != 0)
+            if (StartProcess("dotnet", $"restore {SolutionFile}", Path.GetDirectoryName(SolutionFile)) != 0)
+                ExitWithError("Error while restoring " + SolutionFile);
+
+            if (StartProcess("dotnet", $"build -v minimal -c Release \"{SolutionFile}\"", Path.GetDirectoryName(SolutionFile)) != 0)
                 ExitWithError("Error while building solution!");
 
             var projectPackages = ParsePackages(ProjectFile);

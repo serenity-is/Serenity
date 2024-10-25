@@ -7,6 +7,8 @@ var target = Argument("target", "Pack");
 if (target == "")
     target = "Pack";
     
+var localPush = Argument("localpush", false);
+    
 var configuration = Argument("configuration", "Release");
 var nupkgDir = System.IO.Path.Combine(System.IO.Path.GetFullPath("."), ".nupkg");
 var root = System.IO.Path.GetFullPath(@"..");
@@ -89,7 +91,7 @@ Action fixNugetCache = delegate() {
             if (System.IO.Directory.Exists(dir))
                 System.IO.Directory.Delete(dir, true);
         }
-    
+           
         NuGetPush(package, new NuGetPushSettings {
             Source = myPackagesDir
         });
@@ -100,11 +102,13 @@ Action myPush = delegate() {
     foreach (var package in System.IO.Directory.GetFiles(nupkgDir, "*.nupkg"))
     {
         NuGetPush(package, new NuGetPushSettings {
-            Source = "https://api.nuget.org/v3/index.json"
+            Source = "https://api.nuget.org/v3/index.json",
+            SkipDuplicate = true
         });
         
         NuGetPush(package, new NuGetPushSettings {
-            Source = "serenity.is"
+            Source = "serenity.is",
+            SkipDuplicate = true
         });       
     }       
 };
@@ -126,6 +130,35 @@ Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
 
 };
 
+Action pack = () => {
+    // https://github.com/NuGet/Home/issues/7001
+    var dateTime = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+    foreach (var fileInfo in new System.IO.DirectoryInfo(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget")).GetFiles("*.*", System.IO.SearchOption.AllDirectories)) {
+        if (fileInfo.Exists && fileInfo.LastWriteTimeUtc < dateTime)
+        {
+            try
+            {
+                fileInfo.LastWriteTimeUtc = dateTime;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
+                    nameof(fileInfo.LastWriteTimeUtc),
+                    fileInfo.FullName));
+            }
+        }
+    }
+        
+    myPack("Serenity.Net.Core", null, null);
+    myPack("Serenity.Net.Data", null, null);
+    myPack("Serenity.Net.Entity", null, null);
+    myPack("Serenity.Net.Services", null, null);
+    myPack("Serenity.Net.Web", null, null);
+    myPack("Serenity.Net.CodeGenerator", "sergen", null);
+    myPack("Serenity.Assets", null, null);
+    myPack("../packages/corelib", "Serenity.Corelib", "Serenity.Corelib");
+};
+
 Task("Clean")
     .Does(() =>
 {
@@ -140,7 +173,7 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-    var dotnetSln = System.IO.Path.Combine(src, "Serenity.Net.sln");
+    var dotnetSln = System.IO.Path.Combine(src, "Serenity.Net.slnf");
     writeHeader("dotnet restore " + dotnetSln);
     var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
     if (exitCode > 0)
@@ -151,8 +184,8 @@ Task("Compile")
     .IsDependentOn("Restore")
     .Does(context => 
 {
-    writeHeader("Building Serenity.Net.sln");
-    MSBuild(System.IO.Path.Combine(src, "Serenity.Net.sln"), s => {
+    writeHeader("Building Serenity.Net.slnf");
+    MSBuild(System.IO.Path.Combine(src, "Serenity.Net.slnf"), s => {
         s.SetConfiguration(configuration);
         s.ToolPath = msBuildPath;
         s.Verbosity = Verbosity.Minimal;
@@ -183,42 +216,40 @@ Task("Test")
 
 });
 
+Task("PackOnly")
+    .Does(() => {
+        pack();
+    });
+
 Task("Pack")
     .IsDependentOn("Test")
     .Does(() =>
 {   
-    // https://github.com/NuGet/Home/issues/7001
-    var dateTime = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-    foreach (var fileInfo in new System.IO.DirectoryInfo(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget")).GetFiles("*.*", System.IO.SearchOption.AllDirectories)) {
-        if (fileInfo.Exists && fileInfo.LastWriteTimeUtc < dateTime)
-        {
-            try
-            {
-                fileInfo.LastWriteTimeUtc = dateTime;
-            }
-            catch (Exception)
-            {
-                Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
-                    nameof(fileInfo.LastWriteTimeUtc),
-                    fileInfo.FullName));
-            }
-        }
-    }
-        
-    myPack("Serenity.Net.Core", null, null);
-    myPack("Serenity.Net.Data", null, null);
-    myPack("Serenity.Net.Entity", null, null);
-    myPack("Serenity.Net.Services", null, null);
-    myPack("Serenity.Net.Web", null, null);
-    myPack("Serenity.Net.CodeGenerator", "sergen", null);
-    myPack("Serenity.Assets", null, null);
-    myPack("../packages/corelib", "Serenity.Corelib", "Serenity.Corelib");
-    
-    fixNugetCache();
+    pack();
 });
 
+Task("LocalPushOnly") 
+    .Does(() => 
+    {
+        fixNugetCache();
+    });
+
+Task("LocalPush")
+    .IsDependentOn("Pack")
+    .WithCriteria(localPush)
+    .Does(() => {
+        fixNugetCache();
+    });
+
+Task("PushOnly") 
+    .Does(() => 
+    {
+        myPush();
+    });
+    
 Task("Push")
     .IsDependentOn("Pack")
+    .IsDependentOn("LocalPush")
     .Does(() => 
     {
         myPush();

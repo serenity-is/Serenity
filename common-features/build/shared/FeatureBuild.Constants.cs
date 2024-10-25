@@ -9,7 +9,8 @@ public static partial class Shared
     public static string PackageOutDir => Path.Combine(Root, "build", ".nupkg");
     public static string SerenityDir => Path.Combine(Root, "..", "Serenity");
     public static string NugetExePath => Path.Combine(SerenityDir, "build", "tools", "NuGet", "NuGet.exe");
-    public static string SolutionFile => Path.Combine(Src, Path.GetFileName(Root) + ".sln");
+    private static string SolutionFileBase => Path.Combine(Src, Path.GetFileName(Root));
+    public static string SolutionFile => File.Exists(SolutionFileBase + ".slnf") ? SolutionFileBase + ".slnf" : SolutionFileBase + ".sln";
     public static string PackageBuildProps => Path.Combine(Root, "build", "Package.Build.props");
     public static string SerenityPackageBuildProps => Path.Combine(SerenityDir, "build", "Package.Build.props");
     public static string DirectoryBuildProps => Path.Combine(Src, "Directory.Build.props");
@@ -23,7 +24,7 @@ public static partial class Shared
     {
         Shared.SerenityVersion = arguments.GetString(["serenity-version", "sv"]);
         Shared.PackageVersion = arguments.GetString(["version", "v"]);
-        Shared.LocalPush = arguments.GetBoolean(["local-push", "localpush", "lp"]) ?? true;
+        Shared.LocalPush = arguments.GetBoolean(["local-push", "localpush", "lp"]) ?? false;
         Shared.IsPatch = arguments.GetBoolean(["patch"]) ?? false;
         return arguments.GetCommand() ?? "pack";
     }

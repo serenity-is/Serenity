@@ -70,7 +70,7 @@ public static partial class Shared
     public static void PushToRemoteSource(string nupkg, string pushSource)
     {
         if (StartProcess("dotnet", $"nuget push \"{nupkg}\"" +
-                " --source \"" + pushSource + "\"", Path.GetDirectoryName(nupkg)) != 0)
+                " --source \"" + pushSource + "\" --skip-duplicate", Path.GetDirectoryName(nupkg)) != 0)
         {
             Console.Error.WriteLine("Error while pushing " + Path.GetFileName(nupkg));
             Environment.Exit(1);

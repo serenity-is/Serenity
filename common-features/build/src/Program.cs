@@ -7,10 +7,10 @@ namespace Build
             Shared.DetermineRoot();
             
             var target = Shared.GetTarget(new(args));
-            if (target == "pack")
-                Shared.Targets.Pack();
-            else if (target == "push")
-                Targets.Push();
+            if (target == "pack" || target == "packonly")
+                Shared.Targets.Pack(packOnly: target == "packonly");
+            else if (target == "push" || target == "pushonly")
+                Targets.Push(pushOnly: target == "pushonly");
         }
     }
 }

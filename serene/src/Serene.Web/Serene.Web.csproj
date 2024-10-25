@@ -12,7 +12,7 @@
     <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen')">$(DotNetSergenDir)sergen</DotNetSergen>
     <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen.exe')">$(DotNetSergenDir)sergen.exe</DotNetSergen>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
-    <UseProjectRefs Condition="!Exists('$(SerenitySrc)Serenity.Net.sln')">false</UseProjectRefs>
+    <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
     <!--#endif-->
   </PropertyGroup>
   <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />

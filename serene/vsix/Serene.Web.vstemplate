@@ -158,6 +158,7 @@
               <ProjectItem ReplaceParameters="true" TargetFileName="IDirectoryService.cs">IDirectoryService.cs</ProjectItem>
             </Folder>
             <ProjectItem ReplaceParameters="true" TargetFileName="DataMigrations.cs">DataMigrations.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="DynamicDataGenerator.cs">DynamicDataGenerator.cs</ProjectItem>
             <Folder Name="Models" TargetFolderName="Models">
               <ProjectItem ReplaceParameters="true" TargetFileName="DirectoryEntry.cs">DirectoryEntry.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="ScriptUserDefinition.cs">ScriptUserDefinition.cs</ProjectItem>
@@ -314,7 +315,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-7V7WNOD5.js">chunk-7V7WNOD5.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-F7ASLS5R.js">chunk-F7ASLS5R.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-IHLQ5LPA.js">chunk-IHLQ5LPA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RNLKRUWJ.js">chunk-RNLKRUWJ.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-NBZXMVJR.js">chunk-NBZXMVJR.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VYJLGJ67.js">chunk-VYJLGJ67.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WMAR3PB6.js">chunk-WMAR3PB6.js</ProjectItem>
           </Folder>

@@ -33,30 +33,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
 
-    - name: Restore Dependencies
-      run: dotnet restore
-      working-directory: "src"
-
-    - name: dotnet build
-      run: dotnet build --no-restore /p:SkipNodeScripts=true
-      working-directory: "src"
-
-    - name: dotnet test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: "src"
-
-  js-tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-
     - name: setup node
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+
+    - name: dotnet build Serenity.sln
+      run: dotnet build /p:SkipNodeScripts=true
+
+    - name: dotnet test
+      run: dotnet test --no-build --verbosity normal
 
     - name: pnpm install
       uses: ./.github/actions/pnpm-install

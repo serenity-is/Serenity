@@ -10,27 +10,30 @@ public static partial class Shared
 {
     public static partial class Targets
     {
-        public static void Pack()
+        public static void Pack(bool packOnly = false)
         {
-            PatchPackageBuildProps();
+            if (!packOnly)
+            {
+                PatchPackageBuildProps();
 
-            UpdateSergen(Src, SerenityVersion);
+                UpdateSergen(Src, SerenityVersion);
 
-            PatchDirectoryBuildProps();
+                PatchDirectoryBuildProps();
 
-            CleanDirectory(PackageOutDir, true);
+                CleanDirectory(PackageOutDir, true);
 
-            if (StartProcess("pnpm", "all", Src) != 0)
-                ExitWithError("Error while pnpm all " + Src);
+                if (StartProcess("pnpm", "all", Src) != 0)
+                    ExitWithError("Error while pnpm all " + Src);
 
-            if (StartProcess("dotnet", "restore", Src) != 0)
-                ExitWithError("Error while restoring " + SolutionFile);
+                if (StartProcess("dotnet", $"restore \"{SolutionFile}\"", Src) != 0)
+                    ExitWithError("Error while restoring " + SolutionFile);
+            }
 
-            if (StartProcess("dotnet", "pack -v minimal " +
+            if (StartProcess("dotnet", $"pack \"{SolutionFile}\" -v minimal " +
                 $"-c Release -p:ContinuousIntegrationBuild=true -o \"{PackageOutDir}\"", Src) != 0)
                 ExitWithError("Error while building solution!");
 
-            if (LocalPush)
+            if (!packOnly && LocalPush)
             try
             {
                 var localFeed = GetLocalNugetFeed(create: true);

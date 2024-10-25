@@ -1,0 +1,25 @@
+{
+  "solution": {
+    "path": "..\\Serenity.sln",
+    "projects": [
+      "packages\\corelib\\Serenity.Corelib.csproj",
+      "packages\\sleekgrid\\Serenity.SleekGrid.csproj",
+      "packages\\test-utils\\test-utils.esproj",
+      "packages\\tsbuild\\tsbuild.esproj",
+      "src\\Serenity.Assets\\Serenity.Assets.csproj",
+      "src\\Serenity.Net.CodeGenerator\\Serenity.Net.CodeGenerator.csproj",
+      "src\\Serenity.Net.Core\\Serenity.Net.Core.csproj",
+      "src\\Serenity.Net.Data\\Serenity.Net.Data.csproj",
+      "src\\Serenity.Net.Entity\\Serenity.Net.Entity.csproj",
+      "src\\Serenity.Net.Services\\Serenity.Net.Services.csproj",
+      "src\\Serenity.Net.Web\\Serenity.Net.Web.csproj",
+      "src\\Serenity.TypeScript\\Serenity.TypeScript.csproj",
+      "tests\\Serenity.Net.CodeGenerator.Tests\\Serenity.Net.CodeGenerator.Tests.csproj",
+      "tests\\Serenity.Net.Core.Tests\\Serenity.Net.Core.Tests.csproj",
+      "tests\\Serenity.Net.Data.Tests\\Serenity.Net.Data.Tests.csproj",
+      "tests\\Serenity.Net.Entity.Tests\\Serenity.Net.Entity.Tests.csproj",
+      "tests\\Serenity.Net.Services.Tests\\Serenity.Net.Services.Tests.csproj",
+      "tests\\Serenity.Net.Web.Tests\\Serenity.Net.Web.Tests.csproj"
+    ]
+  }
+}
