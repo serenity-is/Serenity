@@ -1,7 +1,7 @@
-﻿#if IsFeatureBuild || IsTemplateBuild
+#if IsFeatureBuild || IsTemplateBuild
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Build;
 
@@ -10,18 +10,13 @@ public static partial class Shared
     public static string Root { get; set; }
     public static bool IsStartSharp { get; set; }
 
+    private static readonly HashSet<string> skipFolders = new(StringComparer.OrdinalIgnoreCase) { "artifacts", "debug", "release", "bin", "obj", "build" };
+
     public static void DetermineRoot()
     {
         Root = Environment.CurrentDirectory;
 
-        if (new[] { "debug", "release" }.Contains(
-                Path.GetFileName(Root).ToLowerInvariant()))
-            Root = Path.GetDirectoryName(Root);
-
-        if (Path.GetFileName(Root).ToLowerInvariant() == "bin")
-            Root = Path.GetDirectoryName(Root);
-
-        if (Path.GetFileName(Root).ToLowerInvariant() == "build")
+        while (skipFolders.Contains(Path.GetFileName(Root)))
             Root = Path.GetDirectoryName(Root);
 
 #if IsTemplateBuild

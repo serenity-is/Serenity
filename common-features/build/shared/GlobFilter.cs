@@ -1,4 +1,4 @@
-﻿#if IsFeatureBuild || IsTemplateBuild
+#if IsFeatureBuild || IsTemplateBuild
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +23,10 @@ public class GlobFilter
     private readonly bool isActive;
     private readonly List<Func<string, bool>> matchers;
 
-    private readonly char[] DotAsteriskSlashBackQue = new char[] { '.', '*', '/', '\\', '?' };
-    private readonly char[] AsteriskSlashBackQue = new char[] { '*', '/', '\\', '?' };
-    private readonly char[] AsteriskQue = new char[] { '*', '?' };
-    private readonly char[] FolderSeps = new char[] { '\\', '/' };
+    private readonly char[] DotAsteriskSlashBackQue = ['.', '*', '/', '\\', '?'];
+    private readonly char[] AsteriskSlashBackQue = ['*', '/', '\\', '?'];
+    private readonly char[] AsteriskQue = ['*', '?'];
+    private readonly char[] FolderSeps = ['\\', '/'];
 
     /// <summary>
     /// Creates a new GlobFilter, containing both include and exclude patterns.
@@ -53,7 +53,7 @@ public class GlobFilter
     /// <param name="globs">List of patterns</param>
     public GlobFilter(IEnumerable<string> globs)
     {
-        matchers = new List<Func<string, bool>>();
+        matchers = [];
 
         if (globs == null)
             return;
@@ -89,7 +89,7 @@ public class GlobFilter
             if (starDotIndex == 0 &&
                 s.IndexOfAny(DotAsteriskSlashBackQue, 2) < 0)
             {
-                extensions ??= new HashSet<string>();
+                extensions ??= [];
 
                 extensions.Add(s[1..]);
                 continue;
@@ -99,7 +99,7 @@ public class GlobFilter
             if (starDotIndex == 0 &&
                 s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
             {
-                endsWith ??= new List<string>();
+                endsWith ??= [];
 
                 endsWith.Add(s[1..]);
                 continue;
@@ -112,7 +112,7 @@ public class GlobFilter
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0 &&
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 1) < 0)
             {
-                startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
+                startsWithAndEndsWith ??= [];
 
                 startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
                     s[1..starDotIndex], false, s[(starDotIndex + 1)..]));
@@ -125,7 +125,7 @@ public class GlobFilter
                 s[0] == sep &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
-                startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
+                startsWithAndEndsWith ??= [];
 
                 startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[(starDotIndex + 1)..]));
                 continue;
@@ -136,9 +136,9 @@ public class GlobFilter
                 s[0] != sep &&
                 s.IndexOfAny(AsteriskQue, 1) < 0)
             {
-                contains ??= new List<string>();
+                contains ??= [];
 
-                startsWith ??= new List<string>();
+                startsWith ??= [];
 
                 contains.Add(sep.ToString() + s);
                 startsWith.Add(s);
@@ -151,7 +151,7 @@ public class GlobFilter
                 s[0] == sep &&
                 s.IndexOfAny(AsteriskQue) < 0)
             {
-                startsWith ??= new List<string>();
+                startsWith ??= [];
 
                 startsWith.Add(s[1..]);
                 continue;
@@ -166,7 +166,7 @@ public class GlobFilter
                 s.LastIndexOfAny(AsteriskQue, starDotIndex - 5) < 0 &&
                 s.IndexOfAny(AsteriskSlashBackQue, starDotIndex + 2) < 0)
             {
-                startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
+                startsWithAndEndsWith ??= [];
 
                 if (s[0] == sep)
                 {
@@ -175,7 +175,7 @@ public class GlobFilter
                 }
                 else
                 {
-                    containsAndEndsWith ??= new List<Tuple<string, bool, string>>();
+                    containsAndEndsWith ??= [];
 
                     startsWithAndEndsWith.Add(new Tuple<string, bool, string>(
                         s[..(starDotIndex - 3)], true, s[(starDotIndex + 1)..]));
@@ -199,7 +199,7 @@ public class GlobFilter
                 {
                     exactMatch.Add(s[..]);
 
-                    endsWith ??= new List<string>();
+                    endsWith ??= [];
 
                     endsWith.Add(sep + s[..]);
                 }
@@ -209,7 +209,7 @@ public class GlobFilter
 
             if (s[0] == '*' && s.IndexOfAny(AsteriskSlashBackQue, 1) < 0)
             {
-                endsWith ??= new List<string>();
+                endsWith ??= [];
 
                 endsWith.Add(s[1..]);
                 continue;
@@ -220,7 +220,7 @@ public class GlobFilter
                 s[1] == '*' &&
                 s.IndexOfAny(AsteriskSlashBackQue, 2) < 0)
             {
-                startsWithAndEndsWith ??= new List<Tuple<string, bool, string>>();
+                startsWithAndEndsWith ??= [];
 
                 startsWithAndEndsWith.Add(new Tuple<string, bool, string>(null, false, s[2..]));
                 continue;
@@ -394,14 +394,14 @@ public class GlobFilter
         if (string.IsNullOrEmpty(glob))
             return glob;
 
-        if (glob.StartsWith("/") ||
-            glob.StartsWith("\\"))
+        if (glob.StartsWith('/') ||
+            glob.StartsWith('\\'))
             glob = glob[1..];
         else if (!glob.StartsWith("**", StringComparison.Ordinal))
             glob = "**/" + glob;
 
-        if (glob.EndsWith("/") ||
-            glob.EndsWith("\\"))
+        if (glob.EndsWith('/') ||
+            glob.EndsWith('\\'))
             glob += "**/*";
 
         return glob;

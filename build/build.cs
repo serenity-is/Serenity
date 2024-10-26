@@ -55,7 +55,7 @@ public class BuildContext : FrostingContext
         }
 
         SerenityDir = tryPath(".") ?? tryPath("Serenity") ?? tryPath("..") ??
-            throw new Exception("Could locate Serenity.sln from current directory!");
+            throw new Exception("Couldn't locate Serenity.sln from current directory!");
 
         context.Environment.WorkingDirectory = SerenityDir;
     }
