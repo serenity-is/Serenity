@@ -6,12 +6,10 @@ using Cake.Common.Tools.NuGet;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 
 namespace build;
 
@@ -61,38 +59,7 @@ public static partial class Utilities
         return reader.ReadToEnd();
     }
 
-    public static string WriteAllText(this ICakeContext context, FilePath path, string content)
-    {
-        var file = context.FileSystem.GetFile(path);
-        using var stream = file.OpenWrite();
-        using var reader = new System.IO.StreamReader(stream, Encoding.UTF8);
-        return reader.ReadToEnd();
-    }
-
-    public static XElement LoadCsProj(this ICakeContext context, FilePath csproj)
-    {
-        return XElement.Parse(context.ReadAllText(csproj));
-    }
-
-    public static JObject LoadJson(this ICakeContext context, FilePath path)
-    {
-        return JObject.Parse(context.ReadAllText(path));
-    }
-
-    static void PathProjectversion(this ICakeContext context, FilePath csproj, string version)
-    {
-        var csprojElement = context.LoadCsProj(csproj);
-        var versionElement = csprojElement.Descendants("VersionPrefix").First();
-        var current = versionElement.Value;
-
-        if (current != version)
-        {
-            versionElement.Value = version;
-            context.WriteAllText(csproj, csprojElement.ToString(SaveOptions.OmitDuplicateNamespaces));
-        }
-    }
-
-    public static void WriteHeader(this ICakeContext context, string header)
+    public static void WriteHeader(string header)
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("*** " + header + " ***");
@@ -110,7 +77,7 @@ public static partial class Utilities
             Environment.Exit(1);
         }
 
-        context.WriteHeader("dotnet pack " + csproj);
+        WriteHeader("dotnet pack " + csproj);
         context.DotNetPack(csproj.FullPath, new DotNetPackSettings
         {
             Configuration = context.Config,
@@ -135,7 +102,7 @@ public static partial class Utilities
             if (match != null && match.Groups.Count >= 2)
             {
                 var id = match.Groups[1].Value;
-                var version = match.Groups[2].Value.Substring(1);
+                var version = match.Groups[2].Value[1..];
                 var dir = System.IO.Path.Combine(myPackagesDir, id, version);
                 if (System.IO.Directory.Exists(dir))
                     System.IO.Directory.Delete(dir, true);
@@ -166,25 +133,6 @@ public static partial class Utilities
         }
     }
 
-    public static void AddDependencies(Dictionary<string, string> p, JObject deps, string fw)
-    {
-        if (deps == null)
-            return;
-
-        foreach (var pair in deps)
-        {
-            if (pair.Value is JObject obj)
-            {
-                if (obj["version"] is JValue o && o.Value != null)
-                    p[fw + ":" + pair.Key] = o.Value.ToString();
-            }
-            else if (pair.Value is JValue val && val.Value != null)
-            {
-                p[fw + ":" + pair.Key] = (pair.Value as JValue).Value.ToString();
-            }
-        }
-    }
-
     public static void PackAllProjects(this Context context)
     {
         // https://github.com/NuGet/Home/issues/7001
@@ -201,9 +149,7 @@ public static partial class Utilities
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine(String.Format("Could not reset {LastWriteTime} {File} in nuspec",
-                        nameof(fileInfo.LastWriteTimeUtc),
-                        fileInfo.FullName));
+                    Console.WriteLine($"Could not reset {nameof(fileInfo.LastWriteTimeUtc)} {fileInfo.FullName} in nuspec");
                 }
             }
         }
@@ -240,7 +186,7 @@ public sealed class Compile : FrostingTask<Context>
 {
     public override void Run(Context context)
     {
-        context.WriteHeader($"Building {context.SerenityNetSln}");
+        Utilities.WriteHeader($"Building {context.SerenityNetSln}");
         context.DotNetBuild(context.SerenityNetSln.FullPath, new()
         {
             Configuration = context.Config,
