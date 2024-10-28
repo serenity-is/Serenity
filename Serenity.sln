@@ -89,6 +89,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common-features-tests", "co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Extensions.Tests", "common-features\tests\Serenity.Extensions.Tests\Serenity.Extensions.Tests.csproj", "{91AC695B-AF0F-4226-97AD-4AC14C9C03C7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "serene-tests", "serene-tests", "{A809A613-DADC-4C33-B2BD-0F80E8EACFD8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serene.Tests.Unit", "serene\tests\Serene.Tests.Unit\Serene.Tests.Unit.csproj", "{24C790C0-0494-4B88-A8A9-17AB7BC294B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +187,10 @@ Global
 		{91AC695B-AF0F-4226-97AD-4AC14C9C03C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91AC695B-AF0F-4226-97AD-4AC14C9C03C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91AC695B-AF0F-4226-97AD-4AC14C9C03C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +222,8 @@ Global
 		{EE167232-372C-4036-AF27-AA3C586EC020} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
 		{BB7F4970-E88E-4963-BC28-E6B441BCC885} = {CAD84B81-0B9D-4252-ADD0-5771F0B367AD}
 		{91AC695B-AF0F-4226-97AD-4AC14C9C03C7} = {BB7F4970-E88E-4963-BC28-E6B441BCC885}
+		{A809A613-DADC-4C33-B2BD-0F80E8EACFD8} = {CAD84B81-0B9D-4252-ADD0-5771F0B367AD}
+		{24C790C0-0494-4B88-A8A9-17AB7BC294B2} = {A809A613-DADC-4C33-B2BD-0F80E8EACFD8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2545865-7A32-47F4-A186-EDEBDCEF9EEF}
