@@ -24,6 +24,12 @@ public static class ServiceCollectionConfigureExtensions
                 throw new ArgumentOutOfRangeException(nameof(TOptions))));
     }
 
+    private static T GetServiceFromCollection<T>(IServiceCollection services)
+        where T : class
+    {
+        return (T)services.LastOrDefault(d =>
+            d.ServiceType == typeof(T))?.ImplementationInstance;
+    }
 
     /// <summary>
     /// Calls `Configure&lt;TOptionsType&gt;` for all setting classes with DefaultSectionKeyAttribute.
@@ -34,16 +40,20 @@ public static class ServiceCollectionConfigureExtensions
     /// <param name="predicate">Optional predicate for type filtering</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
     public static IServiceCollection ConfigureSections(this IServiceCollection services,
-        IConfiguration config, ITypeSource typeSource, Func<Type, bool> predicate = null)
+        IConfiguration config, ITypeSource typeSource = null, Func<Type, bool> predicate = null)
     {
+        ArgumentNullException.ThrowIfNull(config);
+        typeSource ??= GetServiceFromCollection<ITypeSource>(services) ??
+            throw new ArgumentNullException(nameof(typeSource));
+
         var configureExtension = typeof(ServiceCollectionConfigureExtensions)
-          .GetMethods(BindingFlags.Static | BindingFlags.Public)
-          .Where(x => x.Name == nameof(ConfigureSection) && x.IsGenericMethodDefinition)
-          .Where(x => x.GetGenericArguments().Length == 1)
-          .Where(x => x.GetParameters().Length == 2)
-          .Where(x => x.GetParameters()[0].ParameterType == typeof(IServiceCollection))
-          .Where(x => x.GetParameters()[1].ParameterType == typeof(IConfiguration))
-          .Single();
+              .GetMethods(BindingFlags.Static | BindingFlags.Public)
+              .Where(x => x.Name == nameof(ConfigureSection) && x.IsGenericMethodDefinition)
+              .Where(x => x.GetGenericArguments().Length == 1)
+              .Where(x => x.GetParameters().Length == 2)
+              .Where(x => x.GetParameters()[0].ParameterType == typeof(IServiceCollection))
+              .Where(x => x.GetParameters()[1].ParameterType == typeof(IConfiguration))
+              .Single();
 
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(DefaultSectionKeyAttribute)))
         {

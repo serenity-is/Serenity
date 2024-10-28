@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Builder;
+
 namespace Serene.Tests;
 
 public class TypeSourceTests
@@ -5,7 +7,10 @@ public class TypeSourceTests
     [Fact]
     public void IncludesCorrectAssemblyList()
     {
-        var typeSource = new AppServices.TypeSource();
+        var typeSource = WebApplication.CreateBuilder(new WebApplicationOptions()
+        {
+            ApplicationName = typeof(Startup).Assembly.GetName().Name
+        }).Services.AddApplicationPartsTypeSource();
         var assemblies = typeSource.GetAssemblies()
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,

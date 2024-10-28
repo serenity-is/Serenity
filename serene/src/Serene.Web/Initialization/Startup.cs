@@ -33,9 +33,8 @@ public partial class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var typeSource = new AppServices.TypeSource();
-        services.AddSingleton<ITypeSource>(typeSource);
-        services.ConfigureSections(Configuration, typeSource);
+        services.AddApplicationPartsTypeSource();
+        services.ConfigureSections(Configuration);
 
         services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders =
             ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);

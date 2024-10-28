@@ -5,32 +5,12 @@ namespace Serenity.Extensions;
 /// </summary>
 /// <param name="assemblies">Additional assemblies to include</param>
 public class ExtensionsTypeSource(IEnumerable<Assembly> assemblies)
-    : DefaultTypeSource([..SerenityExtensionsAssemblyChain, ..assemblies])
+    : WebTypeSource([])
 {
-    /// <summary>
-    /// Reference to Serenity.Net.Core assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetCoreAssembly = typeof(Localization.ILocalText).Assembly;
-
-    /// <summary>
-    /// Reference to Serenity.Net.Data assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetDataAssembly = typeof(DefaultSqlConnections).Assembly;
-
-    /// <summary>
-    /// Reference to Serenity.Net.Entity assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetEntityAssembly = typeof(Row<>).Assembly;
-
-    /// <summary>
-    /// Reference to Serenity.Net.Services assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetServicesAssembly = typeof(SaveRequestHandler<>).Assembly;
-
-    /// <summary>
-    /// Reference to Serenity.Net.Web assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetWebAssembly = typeof(HttpContextItemsAccessor).Assembly;
+    public override IEnumerable<Assembly> GetAssemblies()
+    {
+        return SerenityExtensionsAssemblyChain.Concat(assemblies);
+    }
 
     /// <summary>
     /// Reference to Serenity.Extensions assembly
@@ -42,11 +22,7 @@ public class ExtensionsTypeSource(IEnumerable<Assembly> assemblies)
     /// </summary>
     public static readonly Assembly[] SerenityExtensionsAssemblyChain =
     [
-        SerenityNetCoreAssembly,
-        SerenityNetDataAssembly,
-        SerenityNetEntityAssembly,
-        SerenityNetServicesAssembly,
-        SerenityNetWebAssembly,
+        ..SerenityNetWebAssemblyChain,
         SerenityExtensionsAssembly
     ];
 }

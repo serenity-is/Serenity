@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.PropertyGrid;
 using Serenity.Reflection;
 using System.IO;
@@ -16,7 +18,7 @@ public abstract class BaseDynamicDataGenerator
     public virtual void Run()
     {
         var collection = new ServiceCollection();
-        collection.AddSingleton(GetTypeSource());
+        collection.TryAddSingleton(GetTypeSource());
         AddServices(collection);
 
         var services = collection.BuildServiceProvider();
@@ -129,16 +131,12 @@ public abstract class BaseDynamicDataGenerator
     /// </summary>
     protected virtual ITypeSource GetTypeSource()
     {
-        return new DefaultTypeSource(GetAssemblies());
-    }
-
-    /// <summary>
-    /// Gets list of assemblies. Either this or GetTypeSource should be overriden
-    /// </summary>
-    /// <returns></returns>
-    protected virtual IEnumerable<Assembly> GetAssemblies()
-    {
-        return [];
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+        {
+            EnvironmentName = "Development",
+            ApplicationName = GetType().Assembly.GetName().Name
+        });
+        return builder.Services.AddApplicationPartsTypeSource();
     }
 
     /// <summary>
