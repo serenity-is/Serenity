@@ -29,6 +29,7 @@ export namespace UploadHelper {
 
         new Uploader({
             batchSize: 1,
+            multiple: options.allowMultiple,
             batchSuccess: data => {
                 const response: UploadResponse = data.response ?? {};
                 if (response?.Error) {
