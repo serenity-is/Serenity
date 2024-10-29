@@ -306,6 +306,7 @@ section.content>.s-DataGrid {
 @media (min-width: 768px) {
   .full-height-page section.content {
     height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
   }
 }
 
@@ -315,7 +316,8 @@ section.content>.s-DataGrid {
   }
 
   .full-height-page section.content {
-    height: 100vh;
+    height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
   }
 }
 
@@ -4303,5 +4305,6 @@ button.toast-close-button {
 @media (min-width: 768px) {
   .full-height-page section.content {
     height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
   }
 }
