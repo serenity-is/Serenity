@@ -27,7 +27,7 @@ export namespace UploadHelper {
             bar && (bar.style.width = (percent ?? 0).toString() + '%');
         }
 
-        new Uploader({
+        var uploader = new Uploader({
             batchSize: 1,
             batchSuccess: data => {
                 const response: UploadResponse = data.response ?? {};
@@ -56,6 +56,8 @@ export namespace UploadHelper {
                 }
             }
         });
+
+        uploadInput.getNode()?.uploader = uploader;
 
         return uploadInput;
     }
