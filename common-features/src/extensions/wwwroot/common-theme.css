@@ -303,22 +303,6 @@ section.content>.s-DataGrid {
   box-shadow: none;
 }
 
-@media (min-width: 768px) {
-  .full-height-page section.content {
-    height: calc(100vh - 48px);
-  }
-}
-
-@media (min-width: 1200px) {
-  section.content {
-    min-height: 100vh;
-  }
-
-  .full-height-page section.content {
-    height: 100vh;
-  }
-}
-
 section.content-header>h1 {
   font-size: 1.75rem;
 }
