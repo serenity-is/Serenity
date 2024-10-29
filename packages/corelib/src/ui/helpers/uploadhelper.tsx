@@ -57,8 +57,6 @@ export namespace UploadHelper {
             }
         });
 
-        uploadInput.getNode()?.uploader = uploader;
-
         return uploadInput;
     }
 
