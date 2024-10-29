@@ -103,7 +103,13 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         if (referencedTypeAliases.Count != 0)
         {
             sb.AppendLine();
-            sb.AppendLine($"queueMicrotask(() => [" + string.Join(", ", referencedTypeAliases.Select(x => x.alias)) + "]); // referenced types");
+            var otherTypes = referencedTypeAliases.Where(x => x.group != "Dialog");
+            if (otherTypes.Any())
+                sb.AppendLine($"[" + string.Join(", ", otherTypes.Select(x => x.alias)) + "]; // referenced types");
+
+            var dialogTypes = referencedTypeAliases.Where(x => x.group == "Dialog");
+            if (dialogTypes.Any())
+                sb.AppendLine($"queueMicrotask(() => [" + string.Join(", ", dialogTypes.Select(x => x.alias)) + "]); // referenced dialogs");
         }
 
         RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);

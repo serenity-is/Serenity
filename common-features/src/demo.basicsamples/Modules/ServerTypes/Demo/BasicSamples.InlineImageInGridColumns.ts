@@ -15,4 +15,4 @@ export class InlineImageInGridColumns extends ColumnsBase<ProductRow> {
     static readonly Fields = fieldsProxy<InlineImageInGridColumns>();
 }
 
-queueMicrotask(() => [InlineImageFormatter]); // referenced types
+[InlineImageFormatter]; // referenced types
