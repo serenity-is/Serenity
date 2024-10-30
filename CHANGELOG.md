@@ -1,3 +1,17 @@
+## 8.7.4 (2024-10-30)
+
+### Features
+
+- Introduce a new ApplicationPartsTypeSource which gets list of assemblies from ApplicationPartManager and concats Serenity.Net assemblies. This will make manually written type source implementations obsolete and will allow dynamically including assemblies by adding to application parts. Note that even though it sorts assemblies topologically, the order of assemblies might not exactly match a manually written type source, which may have some side effects for code that expects a specific order, for example service behaviors.
+- Add ExtensionsTypeSource and ProExtensionsTypeSource that may be used in Serene/StartSharp typeSource. They also include Serenity.Net.* and Serenity.Extensions assembly reference properties. ApplicationPartsTypeSource is preferred over them, but you may subclass them in your TypeSource if you want to preserve previous assembly order.
+- Use queueMicrotask only for dialog types, as only they may have circular dependencies via forms causing swc to fail in tests.
+
+### Bugfixes
+
+- Fix auto column tooltip plugin not working without jQuery
+- Fix uploader not reading multiple property from the input element properly (#7276)
+- Fix scroll bar for full-height pages in Serene (#7277)
+
 ## 8.7.3 (2024-10-26)
 
 ### Features
