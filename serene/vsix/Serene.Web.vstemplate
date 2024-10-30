@@ -167,7 +167,6 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeyLister.cs">PermissionKeyLister.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionService.cs">PermissionService.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionService.cs">RolePermissionService.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="TypeSource.cs">TypeSource.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserAccessor.cs">UserAccessor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserCultureProvider.cs">UserCultureProvider.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPasswordValidator.cs">UserPasswordValidator.cs</ProjectItem>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageVersion>8.7.2.0</PackageVersion>
+    <PackageVersion>8.7.4.0</PackageVersion>
     <PackageId>Serene.Templates</PackageId>
     <PackageOutputPath>..\.nupkg</PackageOutputPath>
     <Title>Serene Project Templates</Title>
