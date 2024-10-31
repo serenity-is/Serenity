@@ -166,6 +166,10 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         serviceCall(options);
     }
 
+    protected getDeleteServiceMethod() {
+        return this.getService() + '/Delete';
+    }
+
     protected doDelete(callback: (response: DeleteResponse) => void): void {
         var self = this;
 
@@ -174,7 +178,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         };
 
         var baseOptions: ServiceOptions<DeleteResponse> = {
-            service: this.getService() + '/Delete',
+            service: this.getDeleteServiceMethod(),
             request: request,
             onSuccess: response => {
                 self.onDeleteSuccess(response);
@@ -466,9 +470,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.loadById(this.entityId);
     }
 
+    protected getRetrieveServiceMethod() {
+        return this.getService() + '/Retrieve';
+    }
+
     loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
         var baseOptions: ServiceOptions<RetrieveResponse<TItem>> = {
-            service: this.getService() + '/Retrieve',
+            service: this.getRetrieveServiceMethod(),
             blockUI: true,
             request: this.getLoadByIdRequest(id),
             onSuccess: response => {
@@ -617,7 +625,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         }
 
         var opt: ServiceOptions<any> = {
-            service: this.getService() + '/Retrieve',
+            service: this.getRetrieveServiceMethod(),
             blockUI: true,
             request: {
                 EntityId: this.entityId,
@@ -763,11 +771,19 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return true;
     }
 
+    protected getCreateServiceMethod() {
+        return this.getService() + '/Create';
+    }
+
+    protected getUpdateServiceMethod() {
+        return this.getService() + '/Update';
+    }
+
     protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse> {
 
         var opt: ServiceOptions<SaveResponse> = {};
 
-        opt.service = this.getService() + '/' + (this.isEditMode() ? 'Update' : 'Create'),
+        opt.service = this.isEditMode() ? this.getUpdateServiceMethod() : this.getCreateServiceMethod();
 
             opt.onSuccess = response => {
                 this.onSaveSuccess(response);
@@ -1076,9 +1092,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         serviceCall(options);
     }
 
+    protected getUndeleteServiceMethod() {
+        return this.getService() + '/Undelete';
+    }
+
     protected undelete(callback?: (response: UndeleteResponse) => void): void {
         var baseOptions: ServiceOptions<UndeleteResponse> = {};
-        baseOptions.service = this.getService() + '/Undelete';
+        baseOptions.service = this.getUndeleteServiceMethod();
 
         var request: UndeleteRequest = {};
         request.EntityId = this.entityId;
