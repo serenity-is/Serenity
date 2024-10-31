@@ -1,3 +1,9 @@
+## 8.7.5 (2024-10-31)
+
+### Bugfixes
+
+- Fix element returned from format function gets prepended to inner html of slick cell if the formatter also returns one of addClass, addAttrs, or tooltip properties.
+
 ## 8.7.4 (2024-10-30)
 
 ### Features
