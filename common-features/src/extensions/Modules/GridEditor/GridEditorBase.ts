@@ -1,4 +1,4 @@
-import { Decorators, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, indexOf } from "@serenity-is/corelib";
+import { Decorators, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf } from "@serenity-is/corelib";
 import { GridEditorDialog } from "./GridEditorDialog";
 
 @Decorators.registerClass("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue])
@@ -8,6 +8,11 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
     implements IGetEditValue, ISetEditValue {
 
     protected getIdProperty() { return "__id"; }
+
+    protected getDialogType(): DialogType | PromiseLike<DialogType> {
+        throw new Error(`Please override getDialogType method in the grid editor class (${getTypeFullName(getInstanceType(this))}),` + 
+            ` and return the correct dialog type which derives from GridEditorDialog!`);
+    }
 
     protected nextId = 1;
 
@@ -76,7 +81,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         if (addButton) {
             addButton.onClick = () => {
                 this.createEntityDialog(this.getItemType(), dlg => {
-                    var dialog = dlg as GridEditorDialog<TEntity>;
+                    var dialog = this.checkDialogType(dlg);
                     dialog.onSave = (opt, callback) => this.save(opt, callback);
                     this.transferDialogReadOnly(dialog);
                     dialog.loadEntityAndOpenDialog(this.getNewEntity());
@@ -87,13 +92,29 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         return buttons.filter(x => x.action !== "refresh");
     }
 
+    protected checkDialogType(dlg: any): GridEditorDialog<TEntity> {
+        if (!(dlg instanceof GridEditorDialog)) {
+            throw new Error(`The dialog type (${getTypeFullName(getInstanceType(dlg))}) returned from getDialogType` + 
+                ` method of ${getTypeFullName(getInstanceType(this))} must be a subclass of GridEditorDialog!`);
+        }
+
+        if (dlg["getIdProperty"]() !== this.getIdProperty()) {
+            throw new Error(`The id property (${dlg["getIdProperty"]()}) returned from ${getTypeFullName(getInstanceType(dlg))}`
+                + ` does not match the id property (${this.getIdProperty()}) its grid editor type ${getTypeFullName(getInstanceType(this))} returns!`
+                + ` Please remove getIdProperty() method from the dialog class, or make them both return the same property name!`);
+        }
+
+        return dlg as GridEditorDialog<TEntity>;
+    }
+
     protected editItem(entityOrId: any): void {
 
         var id = entityOrId;
         var item = this.view.getItemById(id);
+
         this.createEntityDialog(this.getItemType(), dlg => {
-            var dialog = dlg as GridEditorDialog<TEntity>;
-            dialog.onDelete = (opt, callback) => {
+            var dialog = this.checkDialogType(dlg);
+            dialog.onDelete = (_, callback) => {
                 if (!this.deleteEntity(id)) {
                     return;
                 }
