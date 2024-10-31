@@ -11,7 +11,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
 
     protected getDialogType(): DialogType | PromiseLike<DialogType> {
         throw new Error(`Please override getDialogType method in the grid editor class (${getTypeFullName(getInstanceType(this))}),` + 
-            ` and return the correct dialog type which derives from GridEditorDialog!`);
+            ` and return the correct dialog type which extends GridEditorDialog!`);
     }
 
     protected nextId = 1;
