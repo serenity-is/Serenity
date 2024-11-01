@@ -445,6 +445,7 @@ export declare class OrderDetailColumns extends ColumnsBase<OrderDetailRow> {
 	static readonly Fields: Readonly<Record<keyof OrderDetailColumns, string>>;
 }
 export interface OrderDetailForm {
+	OrderID: IntegerEditor;
 	ProductID: LookupEditor;
 	UnitPrice: DecimalEditor;
 	Quantity: IntegerEditor;
@@ -457,9 +458,15 @@ export declare class OrderDetailForm extends PrefixedContext {
 }
 export declare namespace OrderDetailService {
 	const baseUrl = "Serenity.Demo.Northwind/OrderDetail";
+	function Create(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+	function Update(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderDetailRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderDetailRow>>;
 	const Methods: {
+		readonly Create: "Serenity.Demo.Northwind/OrderDetail/Create";
+		readonly Update: "Serenity.Demo.Northwind/OrderDetail/Update";
+		readonly Delete: "Serenity.Demo.Northwind/OrderDetail/Delete";
 		readonly Retrieve: "Serenity.Demo.Northwind/OrderDetail/Retrieve";
 		readonly List: "Serenity.Demo.Northwind/OrderDetail/List";
 	};
@@ -471,15 +478,24 @@ export declare class CustomerEditor<P extends LookupEditorOptions = LookupEditor
 }
 export declare class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
 	protected getFormKey(): string;
-	protected getLocalTextPrefix(): string;
+	protected getRowDefinition(): typeof OrderDetailRow;
+	protected getService(): string;
 	protected form: OrderDetailForm;
 	constructor(props: WidgetProps<any>);
 }
 export declare class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
 	protected getColumnsKey(): string;
 	protected getDialogType(): typeof OrderDetailDialog;
-	protected getLocalTextPrefix(): string;
-	validateEntity(row: any, id: any): boolean;
+	protected getRowDefinition(): typeof OrderDetailRow;
+	protected getService(): string;
+	protected validateEntity(row: OrderDetailRow, id: any): Promise<boolean>;
+	protected getGridCanLoad(): boolean;
+	protected getNewEntity(): {
+		OrderID: number;
+	};
+	private _orderId;
+	get orderId(): number;
+	set orderId(value: number);
 }
 export interface OrderForm {
 	CustomerID: CustomerEditor;
@@ -982,6 +998,7 @@ export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
 	protected form: OrderForm;
 	getToolbarButtons(): import("@serenity-is/corelib").ToolButton[];
 	protected updateInterface(): void;
+	protected afterLoadEntity(): void;
 }
 export declare class CustomerOrderDialog extends OrderDialog {
 	updateInterface(): void;

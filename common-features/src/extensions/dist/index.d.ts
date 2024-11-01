@@ -474,9 +474,10 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	protected id(entity: TEntity): any;
 	protected getNextId(): string;
 	protected setNewId(entity: TEntity): void;
-	protected save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): void;
-	protected deleteEntity(id: number): boolean;
-	protected validateEntity(row: TEntity, id: number): boolean;
+	protected save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
+	protected delete(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
+	protected deleteEntity(id: any): (boolean | Promise<boolean>);
+	protected validateEntity(row: TEntity, id: any): (boolean | Promise<boolean>);
 	protected setEntities(items: TEntity[]): void;
 	protected getNewEntity(): TEntity;
 	protected getButtons(): ToolButton[];
@@ -499,7 +500,8 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	 * Sets the connected mode of the grid editor. By default it is false, e.g. in-memory editing mode.
 	 * Connected mode should only be enabled when the dialog containing grid editor is in edit mode, e.g.
 	 * a master entity ID is available. In connected mode, the grid editor will load and save data from/to
-	 * services directly, instead of in-memory editing.
+	 * services directly, instead of in-memory editing, and validateEntity, deleteEntity, save, delete methods
+	 * will still be called but they should check the connectedMode property before trying to perform in-memory logic.
 	 */
 	set connectedMode(value: boolean);
 }

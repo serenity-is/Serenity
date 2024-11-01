@@ -1,4 +1,4 @@
-import { DataChangeInfo, Decorators, DialogType, EditorProps, EntityDialog, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf } from "@serenity-is/corelib";
+import { DataChangeInfo, Decorators, DeleteResponse, DialogType, EditorProps, EntityDialog, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, SaveResponse, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
 import { GridEditorDialog } from "./GridEditorDialog";
 
 @Decorators.registerClass("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue])
@@ -32,43 +32,82 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         entity[this.getIdProperty()] = this.getNextId();
     }
 
-    protected save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void) {
-        var request = opt.request as SaveRequest<TEntity>;
-        var row = deepClone(request.Entity);
+    protected async save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void) {
+        const request = opt.request as SaveRequest<TEntity>;
+        let row = request.Entity;
+        let id = this.id(row);
 
-        var id = this.id(row);
-        if (id == null) {
-            (row as any)[this.getIdProperty()] = this.getNextId();
-        }
-
-        if (!this.validateEntity(row, id)) {
-            return;
-        }
-
-        var items = this.view.getItems().slice();
-        if (id == null) {
-            items.push(row);
+        if (this.connectedMode) {
+            if (!(await this.validateEntity(row, request?.EntityId)))
+                return;
+    
+            const response = await serviceCall(opt);
+            id = response?.EntityId ?? id;
         }
         else {
-            var index = indexOf(items, x => this.id(x) === id);
-            items[index] = row = deepClone({} as TEntity, items[index], row);
+
+            row = deepClone(row);
+
+            if (id == null) {
+                (row as any)[this.getIdProperty()] = this.getNextId();
+            }
+
+            if (!(await this.validateEntity(row, request?.EntityId)))
+                return;
+
+            var items = this.view.getItems().slice();
+            if (id == null) {
+                items.push(row);
+            }
+            else {
+                var index = indexOf(items, x => this.id(x) === id);
+                items[index] = row = deepClone({} as TEntity, items[index], row);
+            }
+
+            this.setEntities(items);
+            callback?.({});
         }
 
-        this.setEntities(items);
-        callback({});
         this.element.trigger("change", { 
             operationType: id == null ? "create" : "update", 
-            entityId: id, 
-            entity: row  
+            entityId: id,
+            entity: row
         } satisfies Partial<DataChangeInfo>);
     }
 
-    protected deleteEntity(id: number) {
-        this.view.deleteItem(id);
+    protected async delete(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void) {
+        const id = opt?.request?.EntityId;
+        const row = this.view.getItemById(id);
+
+        if (!(await this.deleteEntity(id)))
+            return;
+
+        if (this.connectedMode) {
+            await serviceCall(opt);
+            this.element.trigger("change", { 
+                operationType: "delete", 
+                entityId: id,
+                entity: row
+            } satisfies Partial<DataChangeInfo>);
+        }
+        else {
+            callback?.({});
+        }
+
+        this.element.trigger("change", { 
+            operationType: "delete",
+            entityId: id,
+            entity: row
+        } satisfies Partial<DataChangeInfo>);
+    }
+
+    protected deleteEntity(id: any): (boolean | Promise<boolean>) {
+        if (!this.connectedMode)
+            this.view.deleteItem(id);
         return true;
     }
 
-    protected validateEntity(row: TEntity, id: number) {
+    protected validateEntity(row: TEntity, id: any): (boolean | Promise<boolean>) {
         return true;
     }
 
@@ -87,10 +126,8 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             addButton.onClick = () => {
                 this.createEntityDialog(this.getItemType(), dlg => {
                     var dialog = this.checkDialogType(dlg);
-                    if (!this.connectedMode) {
-                        dialog.onSave = (opt, callback) => this.save(opt, callback);
-                    }
                     this.transferDialogReadOnly(dialog);
+                    dialog.onSave = (opt, callback) => this.save(opt, callback);
                     dialog.loadEntityAndOpenDialog(this.getNewEntity());
                 });
             }
@@ -101,28 +138,32 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
 
     protected editItem(entityOrId: any): void {
 
-        var id = entityOrId;
-        var item = this.view.getItemById(id);
+        var scriptType = typeof (entityOrId);
+        let id: any;
+        const byId = scriptType === 'string' || scriptType === 'number';
+        if (byId)
+            id = entityOrId;
+        else if (entityOrId != null)
+            id = this.id(entityOrId);
 
         this.createEntityDialog(this.getItemType(), dlg => {
             var dialog = this.checkDialogType(dlg);
-
-            if (!this.connectedMode) {
-                dialog.onDelete = (_, callback) => {
-                    var row = this.view.getItemById(id);
-                    if (!this.deleteEntity(id)) {
-                        return;
-                    }
-                    callback({});
-                    this.element.trigger("change", { 
-                        entityId: id,
-                        entity: row
-                    } satisfies Partial<DataChangeInfo>);
-                };
-                dialog.onSave = (opt, callback) => this.save(opt, callback);
-            }
             this.transferDialogReadOnly(dialog);
-            dialog.loadEntityAndOpenDialog(item);
+            dialog.onDelete = this.delete.bind(this);
+            dialog.onSave = this.save.bind(this);
+
+            if (this.connectedMode) {
+                if (byId) {
+                    dialog.loadByIdAndOpenDialog(id);
+                }
+                else {
+                    dialog.loadEntityAndOpenDialog(entityOrId);
+                }
+            }
+            else {
+                var item = (byId ? this.view.getItemById(id) : entityOrId) ?? entityOrId;
+                dialog.loadEntityAndOpenDialog(item);
+            }
         });
     }
 
@@ -231,8 +272,8 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * Sets the connected mode of the grid editor. By default it is false, e.g. in-memory editing mode.
      * Connected mode should only be enabled when the dialog containing grid editor is in edit mode, e.g. 
      * a master entity ID is available. In connected mode, the grid editor will load and save data from/to 
-     * services directly, instead of in-memory editing, and none of validateEntity, save, deleteEntity methods
-     * will be called.
+     * services directly, instead of in-memory editing, and validateEntity, deleteEntity, save, delete methods
+     * will still be called but they should check the connectedMode property before trying to perform in-memory logic.
      */
     set connectedMode(value) {
         if (!!value !== !!this._connectedMode) {

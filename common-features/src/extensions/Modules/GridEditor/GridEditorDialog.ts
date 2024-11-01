@@ -21,28 +21,16 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
         super.updateInterface();
 
         // apply changes button doesn't work properly with in-memory grids yet
-        if (this.applyChangesButton && this.onSave) {
-            this.applyChangesButton.hide();
-        }
+        this.applyChangesButton.hide();
     }
 
     protected override saveHandler(options: ServiceOptions<SaveResponse>,
         callback: (response: SaveResponse) => void): void {
-        if (this.onSave) {
-            this.onSave(options, callback);
-        }
-        else {
-            super.saveHandler(options, callback);
-        }
+        this.onSave?.(options, callback);
     }
 
     protected override deleteHandler(options: ServiceOptions<DeleteResponse>,
         callback: (response: DeleteResponse) => void): void {
-        if (this.onDelete) {
-            this.onDelete(options, callback);
-        }
-        else {
-            super.deleteHandler(options, callback);
-        }
+        this.onDelete?.(options, callback);
     }
 }

@@ -10,7 +10,7 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
     protected getRowDefinition() { return OrderDetailRow; }
     protected getService() { return OrderDetailService.baseUrl; }
 
-    protected override validateEntity(row: OrderDetailRow, id: any) {
+    protected override async validateEntity(row: OrderDetailRow, id: any) {
         row.ProductID = toId(row.ProductID);
 
         var sameProduct = this.view.getItems().find(x => x.ProductID === row.ProductID);
@@ -19,16 +19,11 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
             return false;
         }
 
-        id ??= row[this.getIdProperty()];
+        if (this.connectedMode)
+            return true;
 
-        ProductRow.getLookupAsync().then(lookup => {
-            var item = this.view?.getItemById?.(id);
-            if (item) {
-                item.ProductName = lookup.itemById[row.ProductID].ProductName;
-                this.view.updateItem(id, item);
-            }
-        });
-
+        const lookup = await ProductRow.getLookupAsync();
+        row.ProductName = lookup.itemById[row.ProductID].ProductName;
         row.LineTotal = (row.Quantity || 0) * (row.UnitPrice || 0) - (row.Discount || 0);
         return true;
     }
