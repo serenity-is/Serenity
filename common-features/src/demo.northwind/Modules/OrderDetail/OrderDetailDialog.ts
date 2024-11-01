@@ -1,14 +1,15 @@
 import { Decorators, WidgetProps } from "@serenity-is/corelib";
 import { toId } from "@serenity-is/corelib";
 import { GridEditorDialog } from "@serenity-is/extensions";
-import { OrderDetailForm, OrderDetailRow, ProductRow } from "../ServerTypes/Demo";
+import { OrderDetailForm, OrderDetailRow, OrderDetailService, ProductRow } from "../ServerTypes/Demo";
 
 import "./OrderDetailDialog.css";
 
 @Decorators.registerClass("Serenity.Demo.Northwind.OrderDetailDialog")
 export class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
     protected getFormKey() { return OrderDetailForm.formKey; }
-    protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }
+    protected getRowDefinition() { return OrderDetailRow; }
+    protected getService() { return OrderDetailService.baseUrl; }
 
     declare protected form: OrderDetailForm;
 

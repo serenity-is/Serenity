@@ -93,6 +93,7 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     public string ShipViaCompanyName { get => fields.ShipViaCompanyName[this]; set => fields.ShipViaCompanyName[this] = value; }
 
     [DisplayName("Details"), MasterDetailRelation(foreignKey: nameof(OrderDetailRow.OrderID)), NotMapped]
+    [MinSelectLevel(SelectLevel.Explicit)] // set SelectLevel to explict to use connected mode for details while editing an order
     public List<OrderDetailRow> DetailList { get => fields.DetailList[this]; set => fields.DetailList[this] = value; }
 
     public class RowFields : RowFieldsBase

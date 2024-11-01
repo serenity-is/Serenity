@@ -31,4 +31,9 @@ export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
 
         this.toolbar.findButton('export-pdf-button').toggle(this.isEditMode());
     }
+
+    protected afterLoadEntity() {
+        super.afterLoadEntity();
+        this.form.DetailList.orderId = this.entityId;
+    }
 }

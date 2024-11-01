@@ -1,4 +1,4 @@
-import { BaseDialog, DataGrid, DeleteResponse, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
@@ -457,8 +457,18 @@ export declare class SingleLineTextFormatter implements Formatter {
 	format(ctx: FormatterContext): string;
 	static formatValue(value: string): string;
 }
+export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
+	protected getIdProperty(): string;
+	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void) => void;
+	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => void;
+	destroy(): void;
+	protected updateInterface(): void;
+	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+}
 export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P> implements IGetEditValue, ISetEditValue {
 	protected getIdProperty(): string;
+	protected getDialogType(): DialogType | PromiseLike<DialogType>;
 	protected nextId: number;
 	constructor(props: EditorProps<P>);
 	protected id(entity: TEntity): any;
@@ -471,23 +481,27 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	protected getNewEntity(): TEntity;
 	protected getButtons(): ToolButton[];
 	protected editItem(entityOrId: any): void;
-	getEditValue(property: any, target: any): void;
-	setEditValue(source: any, property: any): void;
+	getEditValue(property: PropertyItem, target: any): void;
+	setEditValue(source: any, property: PropertyItem): void;
 	get value(): TEntity[];
 	set value(value: TEntity[]);
 	protected getGridCanLoad(): boolean;
 	protected usePager(): boolean;
 	protected getInitialTitle(): any;
 	protected createQuickSearchInput(): void;
-}
-export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-	protected getIdProperty(): string;
-	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void) => void;
-	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => void;
-	destroy(): void;
-	protected updateInterface(): void;
-	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
-	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+	private _connectedMode;
+	get connectedMode(): boolean;
+	protected connectedModeChanged(): void;
+	updateInterface(): void;
+	protected checkConnectedModeSupport(): void;
+	protected checkDialogType(dlg: any): GridEditorDialog<TEntity>;
+	/**
+	 * Sets the connected mode of the grid editor. By default it is false, e.g. in-memory editing mode.
+	 * Connected mode should only be enabled when the dialog containing grid editor is in edit mode, e.g.
+	 * a master entity ID is available. In connected mode, the grid editor will load and save data from/to
+	 * services directly, instead of in-memory editing.
+	 */
+	set connectedMode(value: boolean);
 }
 export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
 	private report;

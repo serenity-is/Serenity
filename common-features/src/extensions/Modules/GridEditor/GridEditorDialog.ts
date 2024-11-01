@@ -3,7 +3,7 @@ import { Decorators, DeleteResponse, EntityDialog, SaveResponse, ServiceOptions 
 @Decorators.registerClass("Serenity.Extensions.GridEditorDialog")
 @Decorators.panel(false)
 export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-    protected getIdProperty() { return "__id"; }
+    protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     public onSave: (options: ServiceOptions<SaveResponse>,
         callback: (response: SaveResponse) => void) => void;
@@ -21,18 +21,28 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
         super.updateInterface();
 
         // apply changes button doesn't work properly with in-memory grids yet
-        if (this.applyChangesButton) {
+        if (this.applyChangesButton && this.onSave) {
             this.applyChangesButton.hide();
         }
     }
 
-    protected saveHandler(options: ServiceOptions<SaveResponse>,
+    protected override saveHandler(options: ServiceOptions<SaveResponse>,
         callback: (response: SaveResponse) => void): void {
-        this.onSave && this.onSave(options, callback);
+        if (this.onSave) {
+            this.onSave(options, callback);
+        }
+        else {
+            super.saveHandler(options, callback);
+        }
     }
 
-    protected deleteHandler(options: ServiceOptions<DeleteResponse>,
+    protected override deleteHandler(options: ServiceOptions<DeleteResponse>,
         callback: (response: DeleteResponse) => void): void {
-        this.onDelete && this.onDelete(options, callback);
+        if (this.onDelete) {
+            this.onDelete(options, callback);
+        }
+        else {
+            super.deleteHandler(options, callback);
+        }
     }
 }
