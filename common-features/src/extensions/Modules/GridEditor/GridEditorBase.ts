@@ -345,7 +345,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
     /**
      * Validates the dialog type returned from getDialogType method of the grid editor.
      * It must be a subclass of GridEditorDialog<TEntity>, its id property must match with the grid editor's id property, and
-     * its getServiceUrl() method must return the same service URL with the grid editor's getServiceUrl() method.
+     * its getService() method must return the same service URL with the grid editor's getService() method.
      * 
      * @param dlg Dialog
      */
@@ -363,7 +363,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         }
 
         
-        if (this.connectedMode && dlg["getServiceUrl"]?.() !== this.getServiceUrl?.()) {
+        if (this.connectedMode && dlg["getService"]?.() !== this.getService?.()) {
             throw new Error(`To use connected mode, getService method of the grid editor dialog class (${getTypeFullName(getInstanceType(dlg))})` + 
              ` must return the same service URL with the grid editor from its getService() method.`);
         }
