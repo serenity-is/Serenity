@@ -489,12 +489,12 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	/**
 	 * Gets next id value for in-memory editing mode. It is a number prefixed with a backtick.
 	 */
-	protected getNextId(): string;
+	getNextId(): string;
 	/**
 	 * Sets the id value of the entity for in-memory editing mode.
 	 * @param entity Entity to set the id value
 	 */
-	protected setNewId(entity: TEntity): void;
+	setNewId(entity: TEntity): TEntity;
 	/**
 	 * This is called from the editor dialog's save handler to save the entity.
 	 * @param opt Save options
@@ -587,7 +587,7 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	/**
 	 * Validates the dialog type returned from getDialogType method of the grid editor.
 	 * It must be a subclass of GridEditorDialog<TEntity>, its id property must match with the grid editor's id property, and
-	 * its getServiceUrl() method must return the same service URL with the grid editor's getServiceUrl() method.
+	 * its getService() method must return the same service URL with the grid editor's getService() method.
 	 *
 	 * @param dlg Dialog
 	 */

@@ -41,7 +41,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
     /**
      * Gets next id value for in-memory editing mode. It is a number prefixed with a backtick.
      */
-    protected getNextId() {
+    getNextId() {
         return "`" + this.nextId++;
     }
 
@@ -49,8 +49,9 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * Sets the id value of the entity for in-memory editing mode.
      * @param entity Entity to set the id value
      */
-    protected setNewId(entity: TEntity) {
+    setNewId(entity: TEntity): TEntity {
         entity[this.getIdProperty()] = this.getNextId();
+        return entity;
     }
 
     /**
