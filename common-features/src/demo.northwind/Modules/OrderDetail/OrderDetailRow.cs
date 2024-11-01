@@ -42,7 +42,7 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     [Origin(jOrder, nameof(OrderRow.OrderDate))]
     public DateTime? OrderDate { get => fields.OrderDate[this]; set => fields.OrderDate[this] = value; }
 
-    [Origin(jProduct, nameof(ProductRow.ProductName)), MinSelectLevel(SelectLevel.List)]
+    [Origin(jProduct, nameof(ProductRow.ProductName)), MinSelectLevel(SelectLevel.List), QuickSearch]
     public string ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
 
     public class RowFields : RowFieldsBase
