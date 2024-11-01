@@ -5383,6 +5383,8 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	protected editItemOfType(itemType: string, entityOrId: any): void;
 	private _service;
 	protected getService(): string;
+	protected getServiceMethod(): string;
+	protected getServiceUrl(): string;
 	protected getViewOptions(): RemoteViewOptions;
 	protected getItemType(): string;
 	protected routeDialog(itemType: string, dialog: Widget<any>): void;
@@ -5435,6 +5437,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected isNewOrDeleted(): boolean;
 	protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
 	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+	protected getDeleteServiceMethod(): string;
 	protected doDelete(callback: (response: DeleteResponse) => void): void;
 	protected onDeleteSuccess(response: DeleteResponse): void;
 	protected getRowDefinition(): IRowDefinition;
@@ -5468,6 +5471,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
 	protected getLoadByIdRequest(id: any): RetrieveRequest;
 	protected reloadById(): void;
+	protected getRetrieveServiceMethod(): string;
 	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
 	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
 	protected initLocalizationGrid(): void;
@@ -5487,6 +5491,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
 	protected getPropertyGridOptions(): PropertyGridOptions;
 	protected validateBeforeSave(): boolean;
+	protected getCreateServiceMethod(): string;
+	protected getUpdateServiceMethod(): string;
 	protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
 	protected getSaveEntity(): TItem;
 	protected getSaveRequest(): SaveRequest<TItem>;
@@ -5501,6 +5507,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected updateInterface(): void;
 	protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
 	protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
+	protected getUndeleteServiceMethod(): string;
 	protected undelete(callback?: (response: UndeleteResponse) => void): void;
 	private _readonly;
 	get readOnly(): boolean;

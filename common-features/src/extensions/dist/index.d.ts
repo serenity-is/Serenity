@@ -467,43 +467,131 @@ export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDi
 	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
 }
 export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P> implements IGetEditValue, ISetEditValue {
+	/** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.
+	 * For connected mode, this should be the actual id property name of the entity, or getRowDefinition
+	 * should be implemented.
+	 */
 	protected getIdProperty(): string;
+	/**
+	 * Gets the dialog type to be used for editing entities. This method must be overridden in the grid editor class to return
+	 * the dialog type that extends GridEditorDialog<TEntity> and has the same TEntity type with the grid editor.
+	 */
 	protected getDialogType(): DialogType | PromiseLike<DialogType>;
+	/** Next ID value for in memory editing mode */
 	protected nextId: number;
 	constructor(props: EditorProps<P>);
+	/**
+	 * Gets the id value of the entity. If the entity is null, returns null.
+	 * @param entity
+	 * @deprecated Use itemId method instead
+	 */
 	protected id(entity: TEntity): any;
+	/**
+	 * Gets next id value for in-memory editing mode. It is a number prefixed with a backtick.
+	 */
 	protected getNextId(): string;
+	/**
+	 * Sets the id value of the entity for in-memory editing mode.
+	 * @param entity Entity to set the id value
+	 */
 	protected setNewId(entity: TEntity): void;
+	/**
+	 * This is called from the editor dialog's save handler to save the entity.
+	 * @param opt Save options
+	 * @param callback An optional callback to call after the entity is saved, usually same with the opt.onSuccess
+	 */
 	protected save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
+	/**
+	 * This is called from the editor dialog's delete handler to delete the entity.
+	 * @param opt Delete service call options
+	 * @param callback An optional callback to call after the entity is deleted, usually same with the opt.onSuccess
+	 * @returns
+	 */
 	protected delete(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
 	protected deleteEntity(id: any): (boolean | Promise<boolean>);
+	/**
+	 * Called before saving an entity from the dialog. If the function returns false,
+	 * the entity will not be saved. Row is the entity to be saved and id is the id of the entity.
+	 * If the id is null, it is a new entity (insert mode), otherwise it is an existing entity (update mode).
+	 */
 	protected validateEntity(row: TEntity, id: any): (boolean | Promise<boolean>);
-	protected setEntities(items: TEntity[]): void;
+	/**
+	 * Gets a new entity instance to be used for creating new entities.
+	 */
 	protected getNewEntity(): TEntity;
 	protected getButtons(): ToolButton[];
+	/**
+	 * This method is overridden to intercept the dialog creation and pass the handlers for save/delete operations.
+	 * @param entityOrId Entity or id of the entity to be edited
+	 */
 	protected editItem(entityOrId: any): void;
+	/**
+	 * Sets the editor value in target object. If connected mode is on the value is not set.
+	 * @param property Property item
+	 * @param target Target object
+	 */
 	getEditValue(property: PropertyItem, target: any): void;
+	/**
+	 * Gets the editor value from source object. If connected mode is on the value is not read.
+	 */
 	setEditValue(source: any, property: PropertyItem): void;
+	/**
+	 * Gets the value of the grid editor. Unlike getEditValue, this method returns the actual array of entities
+	 * whether connected mode is on or off.
+	 */
 	get value(): TEntity[];
+	/**
+	 * Sets the value of the grid editor. Unlike setEditValue, this method sets entities
+	 * whether connected mode is on or off.
+	 */
 	set value(value: TEntity[]);
+	/**
+	 * Returns true only in connected mode, otherwise false.
+	 */
 	protected getGridCanLoad(): boolean;
+	/**
+	 * As grid editor works in memory editing mode by default, it does not use pager.
+	 */
 	protected usePager(): boolean;
+	/**
+	 * No title by default for grid editors
+	 */
 	protected getInitialTitle(): any;
-	protected createQuickSearchInput(): void;
 	private _connectedMode;
 	get connectedMode(): boolean;
-	protected connectedModeChanged(): void;
-	updateInterface(): void;
-	protected checkConnectedModeSupport(): void;
-	protected checkDialogType(dlg: any): GridEditorDialog<TEntity>;
 	/**
-	 * Sets the connected mode of the grid editor. By default it is false, e.g. in-memory editing mode.
+	 * Sets the connected mode of the grid editor. By default it is false, e.g. it is disconnected/in-memory editing mode.
 	 * Connected mode should only be enabled when the dialog containing grid editor is in edit mode, e.g.
 	 * a master entity ID is available. In connected mode, the grid editor will load and save data from/to
 	 * services directly, instead of in-memory editing, and validateEntity, deleteEntity, save, delete methods
 	 * will still be called but they should check the connectedMode property before trying to perform in-memory logic.
+	 * In the form, set [MinSelectLevel(SelectLevel.Explicit)] attribute to the grid editor property so that it is not
+	 * loaded by MasterDetailRelation behavior when the master dialog is in edit mode.
 	 */
 	set connectedMode(value: boolean);
+	/**
+	 * Override this method to perform additional operations when connected mode is switched on/off.
+	 * By default it sets the items to empty array when connected mode is switched on/off.
+	 */
+	protected connectedModeChanged(): void;
+	/**
+	 * Update UI elements based on the connected mode. In connected mode, quick search and refresh buttons are visible,
+	 * and the grid editor has "connected-mode" css class.
+	 */
+	updateInterface(): void;
+	/**
+	 * Validates the connected mode support for the grid editor. Checks that the id property is not "__id" and
+	 * one of getService, getServiceMethod, getServiceUrl methods are overridden to return the service URL of the entity.
+	 */
+	protected checkConnectedModeSupport(): void;
+	/**
+	 * Validates the dialog type returned from getDialogType method of the grid editor.
+	 * It must be a subclass of GridEditorDialog<TEntity>, its id property must match with the grid editor's id property, and
+	 * its getServiceUrl() method must return the same service URL with the grid editor's getServiceUrl() method.
+	 *
+	 * @param dlg Dialog
+	 */
+	protected checkDialogType(dlg: any): GridEditorDialog<TEntity>;
 }
 export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
 	private report;
