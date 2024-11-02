@@ -108,8 +108,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             .ToList();
 
         bool exportTexts = localTextNestedClasses.ContainsKey("Texts") ||
-            (!localTextNestedClasses.ContainsKey("Texts") &&
-              !localTextNestedClasses.Any(x => string.IsNullOrEmpty(x.Value)));
+            localTextNestedClasses.Count == 0;
 
         if (list.Count > 0)
         {
