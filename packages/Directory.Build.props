@@ -4,14 +4,11 @@
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <DefaultItemExcludes>node_modules\**;out\**;coverage\**;$(DefaultItemExcludes);**\package*.json;**\tsconfig.json;**\*.orig;**\*.bak</DefaultItemExcludes>
+    <DefaultItemExcludes>node_modules\**;out\**;</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" />
-    <None Remove="$(MSBuildProjectDirectory)\*.json" />
-    <Content Include="$(MSBuildProjectDirectory)\*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
-    <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
 </Project>
