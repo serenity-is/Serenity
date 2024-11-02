@@ -88,7 +88,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
                 outDir = fileSystem.Combine(fileSystem.GetDirectoryName(projectFile), outDir);
         }
 
-        return string.IsNullOrEmpty(outDir) ? null : outDir;
+        return string.IsNullOrEmpty(outDir) ? null : PathHelper.ToUrl(outDir);
     }
 
     public string GetRootNamespace()

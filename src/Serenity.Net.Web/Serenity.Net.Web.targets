@@ -132,7 +132,7 @@ catch (Exception ex)
   </Target>
   <Target Name="SetSergenTransformArgs">
     <PropertyGroup>
-      <SergenTransformArgs>-p &quot;$(ProjectFileName)&quot; -prop:Configuration=$(Configuration) -prop:AssemblyName=&quot;$(AssemblyName)&quot; -prop:ESMAssetBasePath=&quot;$(ESMAssetBasePath)&quot; -prop:OutDir=&quot;$(OutDir.Trim('\'))&quot; -prop:RootNamespace=$(RootNamespace) -prop:TargetFramework=$(TargetFramework)</SergenTransformArgs>
+      <SergenTransformArgs>-p &quot;$(ProjectFileName)&quot; -prop:Configuration=$(Configuration) -prop:AssemblyName=&quot;$(AssemblyName)&quot; -prop:ESMAssetBasePath=&quot;$(ESMAssetBasePath)&quot; -prop:OutDir=&quot;$(OutDir.Trim('\').Replace("\", "/"))&quot; -prop:RootNamespace=$(RootNamespace) -prop:TargetFramework=$(TargetFramework)</SergenTransformArgs>
     </PropertyGroup>
     <Message Importance="normal" Text="Transform Arguments: $(SergenTransformArgs)"/>
   </Target>

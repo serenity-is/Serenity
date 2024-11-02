@@ -38,22 +38,8 @@ jobs:
       with:
         node-version: '20'
 
-    - name: dotnet build Serenity.sln
-      run: dotnet build /p:SkipNodeScripts=true
-
-    - name: dotnet test
-      run: dotnet test --no-build --verbosity normal
-
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
-
-    - name: pnpm install common-features
-      run: pnpm install --frozen-lockfile --prefer-offline
-      working-directory: "./common-features"
-
-    - name: npm install serene
-      run: npm install
-      working-directory: "./serene/src/Serene.Web"
 
     - name: sleekgrid tests
       run: pnpm test
@@ -62,6 +48,36 @@ jobs:
     - name: corelib tests
       run: pnpm test
       working-directory: "./packages/corelib"
+
+    - name: pnpm install common-features
+      run: pnpm install --frozen-lockfile --prefer-offline
+      working-directory: "./common-features"
+
+    - name: pnpm build common-features
+      run: pnpm -r build
+      working-directory: "./common-features/src"
+
+    - name: npm install serene
+      run: npm install
+      working-directory: "./serene/src/Serene.Web"
+
+    - name: dotnet build Serenity.Net.CodeGenerator
+      run: dotnet build 
+      working-directory: "./src/Serenity.Net.CodeGenerator"
+
+    - name: dotnet tool restore commmon-features
+      run: dotnet tool restore
+      working-directory: "./common-features/src"
+
+    - name: dotnet tool restore Serene
+      run: dotnet tool restore
+      working-directory: "./serene/src/Serene.Web"
+
+    - name: dotnet build Serenity.sln
+      run: dotnet build /p:SkipNodeScripts=true
+
+    - name: dotnet test
+      run: dotnet test --no-build --verbosity normal
 
     - name: generate dynamic-data under test-utils
       run: dotnet ../../serene/src/Serene.Web/bin/Debug/net8.0/Serene.Web.dll dynamic-data
