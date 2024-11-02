@@ -1,7 +1,7 @@
 import { Decorators, EditorUtils, EntityDialog, localText, stringFormat } from "@serenity-is/corelib";
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 import { UserRow, UserForm, UserService } from "../../ServerTypes/Administration";
-import { Texts } from "../../ServerTypes/Texts";
+import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Texts";
 
 @Decorators.registerClass()
 export class UserDialog extends EntityDialog<UserRow, any> {
@@ -23,12 +23,12 @@ export class UserDialog extends EntityDialog<UserRow, any> {
 
         this.form.Password.addValidationRule(this.uniqueName, e => {
             if (this.form.Password.value.length < 6)
-                return stringFormat(localText(Texts.Validation.MinRequiredPasswordLength), 6);
+                return stringFormat(localText(MembershipValidationTexts.MinRequiredPasswordLength), 6);
         });
 
         this.form.PasswordConfirm.addValidationRule(this.uniqueName, e => {
             if (this.form.Password.value != this.form.PasswordConfirm.value)
-                return localText(Texts.Validation.PasswordConfirmMismatch);
+                return localText(MembershipValidationTexts.PasswordConfirmMismatch);
         });
     }
 
@@ -37,7 +37,7 @@ export class UserDialog extends EntityDialog<UserRow, any> {
         let buttons = super.getToolbarButtons();
 
         buttons.push({
-            title: localText(Texts.Site.UserDialog.EditPermissionsButton),
+            title: localText(UserDialogTexts.EditPermissionsButton),
             cssClass: 'edit-permissions-button',
             icon: 'fa-lock text-green',
             onClick: () =>

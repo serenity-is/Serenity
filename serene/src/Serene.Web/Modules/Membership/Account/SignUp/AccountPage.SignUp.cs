@@ -32,7 +32,7 @@ public partial class AccountPage : Controller
                     UserRow.Fields.Username == request.Email |
                     UserRow.Fields.Email == request.Email))
             {
-                throw new ValidationError("EmailInUse", Texts.Validation.EmailInUse.ToString(Localizer));
+                throw new ValidationError("EmailInUse", MembershipValidationTexts.EmailInUse.ToString(Localizer));
             }
 
             using var uow = new UnitOfWork(connection);
@@ -83,7 +83,7 @@ public partial class AccountPage : Controller
                 ActivateLink = activateLink
             };
 
-            var emailSubject = Texts.Forms.Membership.SignUp.ActivateEmailSubject.ToString(Localizer);
+            var emailSubject = SignUpFormTexts.ActivateEmailSubject.ToString(Localizer);
             var emailBody = TemplateHelper.RenderViewToString(HttpContext.RequestServices,
                 MVC.Views.Membership.Account.SignUp.ActivateEmail, emailModel);
 
@@ -150,18 +150,18 @@ public partial class AccountPage : Controller
             using var br = new BinaryReader(ms);
             var dt = DateTime.FromBinary(br.ReadInt64());
             if (dt < DateTime.UtcNow)
-                return Error(Texts.Validation.InvalidActivateToken.ToString(Localizer));
+                return Error(MembershipValidationTexts.InvalidActivateToken.ToString(Localizer));
 
             userId = br.ReadInt32();
         }
         catch (Exception)
         {
-            return Error(Texts.Validation.InvalidActivateToken.ToString(Localizer));
+            return Error(MembershipValidationTexts.InvalidActivateToken.ToString(Localizer));
         }
 
         var user = uow.Connection.TryById<UserRow>(userId);
         if (user == null || user.IsActive != 0)
-            return Error(Texts.Validation.InvalidActivateToken.ToString(Localizer));
+            return Error(MembershipValidationTexts.InvalidActivateToken.ToString(Localizer));
 
         uow.Connection.UpdateById(new UserRow
         {

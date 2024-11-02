@@ -1,14 +1,11 @@
-import { PropertyPanel } from "@serenity-is/corelib";
-import { informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { informationDialog, PropertyPanel, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { SignUpForm, SignUpRequest, SignUpResponse } from "../../../ServerTypes/Membership";
+import { MembershipValidationTexts, SignUpFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
-import { SignUpRequest, SignUpForm, SignUpResponse } from "../../../ServerTypes/Membership";
-import { Texts } from "../../../ServerTypes/Texts";
 
 export default function pageInit(opt: any) {
     new SignUpPanel({ element: '#SignUpPanel', ...opt});
 }
-
-const myTexts = Texts.Forms.Membership.SignUp;
 
 class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
 
@@ -26,13 +23,13 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
 
         this.form.ConfirmEmail.addValidationRule(this.uniqueName, e => {
             if (this.form.ConfirmEmail.value !== this.form.Email.value) {
-                return Texts.Validation.EmailConfirm;
+                return MembershipValidationTexts.EmailConfirm;
             }
         });
 
         this.form.ConfirmPassword.addValidationRule(this.uniqueName, e => {
             if (this.form.ConfirmPassword.value !== this.form.Password.value) {
-                return Texts.Validation.PasswordConfirmMismatch;
+                return MembershipValidationTexts.PasswordConfirmMismatch;
             }
         });
     }
@@ -50,7 +47,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
             url: resolveUrl('~/Account/SignUp'),
             request: request,
             onSuccess: (response: SignUpResponse) => {
-                informationDialog(myTexts.Success, () => {
+                informationDialog(SignUpFormTexts.Success, () => {
                     window.location.href = resolveUrl('~/');
                 });
             }
@@ -63,8 +60,8 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
             <AccountPanelTitle />
 
             <div class="s-Panel p-4">
-                <h5 class="text-center my-4">{myTexts.FormTitle}</h5>
-                <p id={id.FormInfo} class="text-center">{myTexts.FormInfo}</p>
+                <h5 class="text-center my-4">{SignUpFormTexts.FormTitle}</h5>
+                <p id={id.FormInfo} class="text-center">{SignUpFormTexts.FormInfo}</p>
 
                 <form id={id.Form} action="" autoComplete="off">
                     <input autoComplete="false" name="hidden" type="text" style="display:none;" />
@@ -72,7 +69,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
                     <div class="px-field">
                         <button id={id.SubmitButton} type="submit" class="btn btn-primary my-4 w-100"
                             onClick={e => { e.preventDefault(); this.submitClick(); }}>
-                            {myTexts.SubmitButton}
+                            {SignUpFormTexts.SubmitButton}
                         </button>
                     </div>
                 </form>

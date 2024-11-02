@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Globalization;
 
-namespace Serene;
+namespace Serene.Common;
 
 public class ForeignKeyExceptionInfo
 {
@@ -18,13 +18,13 @@ public static class SqlExceptionHelper
     public static void HandleDeleteForeignKeyException(Exception e, ITextLocalizer localizer)
     {
         if (IsForeignKeyException(e, out ForeignKeyExceptionInfo fk))
-            throw new ValidationError(string.Format(CultureInfo.CurrentCulture, Texts.Validation.DeleteForeignKeyError.ToString(localizer), fk.TableName));
+            throw new ValidationError(string.Format(CultureInfo.CurrentCulture, SqlExceptionHelperTexts.DeleteForeignKeyError.ToString(localizer), fk.TableName));
     }
 
     public static void HandleSavePrimaryKeyException(Exception e, ITextLocalizer localizer, string fieldName = "ID")
     {
         if (IsPrimaryKeyException(e, out PrimaryKeyExceptionInfo fk))
-            throw new ValidationError(string.Format(CultureInfo.CurrentCulture, Texts.Validation.SavePrimaryKeyError.ToString(localizer), fk.TableName, fieldName));
+            throw new ValidationError(string.Format(CultureInfo.CurrentCulture, SqlExceptionHelperTexts.SavePrimaryKeyError.ToString(localizer), fk.TableName, fieldName));
     }
 
     public static bool IsForeignKeyException(Exception e, out ForeignKeyExceptionInfo fk)

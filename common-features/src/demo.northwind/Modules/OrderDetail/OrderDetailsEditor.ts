@@ -14,7 +14,7 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
         row.ProductID = toId(row.ProductID);
 
         var sameProduct = this.view.getItems().find(x => x.ProductID === row.ProductID);
-        if (sameProduct && this.id(sameProduct) !== id) {
+        if (sameProduct && this.itemId(sameProduct) !== id) {
             alertDialog('This product is already in order details!');
             return false;
         }

@@ -1,7 +1,7 @@
 import { ErrorHandling, PropertyPanel, WidgetProps, notifyError, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { LoginForm, LoginRequest } from "../../../ServerTypes/Membership";
+import { LoginFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
-import { LoginRequest, LoginForm } from "../../../ServerTypes/Membership";
-import { Texts } from "../../../ServerTypes/Texts";
 
 export default function pageInit(opt?: { activated: string }) {
     var loginPanel = new LoginPanel({ element: '#LoginPanel' });
@@ -74,16 +74,15 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
 
     protected renderContents() {
         const id = this.useIdPrefix();
-        const myTexts = Texts.Forms.Membership.Login;
         this.element.empty().append(<>
             <AccountPanelTitle />
             <div class="s-Panel p-4">
-                <h5 class="text-center my-4">{myTexts.LoginToYourAccount}</h5>
+                <h5 class="text-center my-4">{LoginFormTexts.LoginToYourAccount}</h5>
                 <form id={id.Form} action="">
                     <div id={id.PropertyGrid}></div>
                     <div class="px-field">
                         <a class="float-end text-decoration-none" href={resolveUrl('~/Account/ForgotPassword')}>
-                            {myTexts.ForgotPassword}
+                            {LoginFormTexts.ForgotPassword}
                         </a>
                     </div>
                     <div class="px-field">
@@ -92,13 +91,13 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
                                 e.preventDefault();
                                 this.loginClick();
                             }}>
-                            {myTexts.SignInButton}
+                            {LoginFormTexts.SignInButton}
                         </button>
                     </div>
                 </form>
             </div>
             <div class="text-center mt-2">
-                <a class="text-decoration-none" href={resolveUrl('~/Account/SignUp')}>{myTexts.SignUpButton}</a>
+                <a class="text-decoration-none" href={resolveUrl('~/Account/SignUp')}>{LoginFormTexts.SignUpButton}</a>
             </div>
         </>);
     }

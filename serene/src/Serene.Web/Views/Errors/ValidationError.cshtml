@@ -1,7 +1,8 @@
-﻿@model Serenity.Services.ValidationError
+@model Serenity.Services.ValidationError
 @inject ITextLocalizer Localizer
+@using Serene.Common
 @{
-    ViewData["Title"] = Texts.Site.ValidationError.Title.ToString(Localizer);
+    ViewData["Title"] = ValidationErrorViewTexts.Title.ToString(Localizer);
 ViewData["PageId"] = "ValidationError";
 Layout = User.IsLoggedIn() ? MVC.Views.Shared._Layout : MVC.Views.Shared._LayoutNoNavigation;
 }
@@ -49,7 +50,7 @@ Layout = User.IsLoggedIn() ? MVC.Views.Shared._Layout : MVC.Views.Shared._Layout
 
 <div class="page-content">
     <div class="message">
-        <h1>@Texts.Site.ValidationError.Title.ToString(Localizer)</h1>
+        <h1>@ValidationErrorViewTexts.Title.ToString(Localizer)</h1>
         <h3>@Model.Message</h3>
         <div class="date-time">
             @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")

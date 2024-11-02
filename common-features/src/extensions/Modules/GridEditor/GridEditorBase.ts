@@ -87,7 +87,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
                 items.push(row);
             }
             else {
-                const index = indexOf(items, x => this.id(x) === id);
+                const index = indexOf(items, x => this.itemId(x) === id);
                 items[index] = row = deepClone({} as TEntity, items[index], row);
             }
 
@@ -184,7 +184,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         if (byId)
             id = entityOrId;
         else if (entityOrId != null)
-            id = this.id(entityOrId);
+            id = this.itemId(entityOrId);
 
         this.createEntityDialog(this.getItemType(), dlg => {
             const dialog = this.checkDialogType(dlg);

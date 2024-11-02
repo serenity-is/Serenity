@@ -3,8 +3,8 @@ import {
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
-import { Texts } from "../../ServerTypes/Texts";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
+import { UserPermissionDialogTexts } from "../../ServerTypes/Texts";
 
 export interface PermissionCheckEditorOptions {
     showRevoke?: boolean;
@@ -87,13 +87,13 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
 
     protected getColumns(): Column[] {
         let columns: Column[] = [{
-            name: Texts.Site.UserPermissionDialog.Permission,
+            name: UserPermissionDialogTexts.Permission,
             field: 'Title',
             format: SlickFormatting.treeToggle(() => this.view, x => x.Key, ctx => <span class={["effective-permission", this.getItemEffectiveClass(ctx.item)]}>{ctx.value}</span>),
             width: 495,
             sortable: false
         }, {
-            name: Texts.Site.UserPermissionDialog.Grant,
+            name: UserPermissionDialogTexts.Grant,
             field: 'Grant',
             format: ctx => <span class={["check-box grant no-float ", this.getItemGrantRevokeClass(ctx.item, true)]} />,
             width: 65,
@@ -104,7 +104,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
 
         if (this.options.showRevoke) {
             columns.push({
-                name: Texts.Site.UserPermissionDialog.Revoke,
+                name: UserPermissionDialogTexts.Revoke,
                 field: 'Revoke',
                 format: ctx => <span class={["check-box revoke no-float", this.getItemGrantRevokeClass(ctx.item, false)]} />,
                 width: 65,

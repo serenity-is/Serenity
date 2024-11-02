@@ -76,13 +76,6 @@ namespace texts {
                 export const SignUpButton: string;
             }
 
-            namespace SendActivation {
-                export const FormInfo: string;
-                export const FormTitle: string;
-                export const SubmitButton: string;
-                export const Success: string;
-            }
-
             namespace SignUp {
                 export const ActivateEmailSubject: string;
                 export const ActivationCompleteMessage: string;
@@ -154,7 +147,7 @@ namespace texts {
 
 }
 
-export const Texts: typeof texts = proxyTexts({}, '', {
+const Texts: typeof texts = proxyTexts({}, '', {
     Db: {
         Administration: {
             Language: {},
@@ -168,7 +161,6 @@ export const Texts: typeof texts = proxyTexts({}, '', {
     Forms: {
         Membership: {
             Login: {},
-            SendActivation: {},
             SignUp: {}
         }
     },
@@ -182,3 +174,25 @@ export const Texts: typeof texts = proxyTexts({}, '', {
     },
     Validation: {}
 }) as any;
+
+export const AccessDeniedViewTexts = Texts.Site.AccessDenied;
+
+export const LoginFormTexts = Texts.Forms.Membership.Login;
+
+export const MembershipValidationTexts = Texts.Validation;
+
+export const RolePermissionDialogTexts = Texts.Site.RolePermissionDialog;
+
+export const SignUpFormTexts = Texts.Forms.Membership.SignUp;
+
+export const SiteFormTexts = Texts.Forms;
+
+export const SiteLayoutTexts = Texts.Site.Layout;
+
+export const SqlExceptionHelperTexts = Texts.Validation;
+
+export const UserDialogTexts = Texts.Site.UserDialog;
+
+export const UserPermissionDialogTexts = Texts.Site.UserPermissionDialog;
+
+export const ValidationErrorViewTexts = Texts.Site.ValidationError;

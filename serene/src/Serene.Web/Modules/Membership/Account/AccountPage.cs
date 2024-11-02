@@ -67,10 +67,10 @@ public partial class AccountPage : Controller
 
             if (result == PasswordValidationResult.InactiveUser)
             {
-                throw new ValidationError("InactivatedAccount", Texts.Validation.AuthenticationError.ToString(Localizer));
+                throw new ValidationError("InactivatedAccount", MembershipValidationTexts.AuthenticationError.ToString(Localizer));
             }
 
-            throw new ValidationError("AuthenticationError", Texts.Validation.AuthenticationError.ToString(Localizer));
+            throw new ValidationError("AuthenticationError", MembershipValidationTexts.AuthenticationError.ToString(Localizer));
         });
     }
 

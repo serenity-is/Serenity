@@ -1,6 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
-namespace Serene;
+namespace Serene.Common;
 
 public class HumanizeSqlExceptionBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
 {
