@@ -256,7 +256,7 @@ namespace texts {
 
 }
 
-export const Texts: typeof texts = proxyTexts({}, '', {
+const Texts: typeof texts = proxyTexts({}, '', {
     Db: {
         Northwind: {
             Category: {},

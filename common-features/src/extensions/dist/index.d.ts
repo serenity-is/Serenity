@@ -254,7 +254,6 @@ declare namespace texts {
 		const PasswordStrengthRequireUppercase: string;
 	}
 }
-export declare const Texts: typeof texts;
 export declare const BasicProgressDialogTexts: typeof texts.Site.BasicProgressDialog;
 export declare const BulkServiceActionTexts: typeof texts.Site.BulkServiceAction;
 export declare const ChangePasswordFormTexts: typeof texts.Forms.Membership.ChangePassword;

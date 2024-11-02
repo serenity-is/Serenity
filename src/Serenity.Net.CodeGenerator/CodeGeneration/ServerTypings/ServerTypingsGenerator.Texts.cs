@@ -19,8 +19,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
 
         AddNestedLocalTexts(fromType, prefix ?? "");
-        if (fromType.Name != "Texts" &&
-            fromType.Name.EndsWith("Texts", StringComparison.Ordinal) &&
+        if (fromType.Name.EndsWith("Texts", StringComparison.Ordinal) &&
             !localTextNestedClasses.ContainsKey(fromType.Name))
         {
             localTextNestedClasses.Add(fromType.Name, prefix ?? "");
@@ -107,6 +106,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                  (filter != null && filter.IsMatch(x))) &&
                 x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
             .ToList();
+
+        bool exportTexts = localTextNestedClasses.ContainsKey("Texts") ||
+            (!localTextNestedClasses.ContainsKey("Texts") &&
+              !localTextNestedClasses.Any(x => string.IsNullOrEmpty(x.Value)));
 
         if (list.Count > 0)
         {
@@ -210,17 +213,19 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine();
             var proxyTexts = ImportFromQ("proxyTexts");
 
-            sb.Append($"export const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+            sb.Append($"{(exportTexts ? "export ": "")}const Texts: typeof texts = {proxyTexts}({{}}, '', ");
             jw.Flush();
             sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
             sb.AppendLine(") as any;");
         }
         else
         {
-            sb.AppendLine($"export const Texts = {{}} as const;");
+            sb.AppendLine($"{(exportTexts ? "export " : "")}const Texts = {{}} as const;");
         }
 
-        foreach (var nested in localTextNestedClasses.OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
+        foreach (var nested in localTextNestedClasses
+            .Where(x => x.Key != "Texts")
+            .OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
         {
             if (string.IsNullOrEmpty(nested.Value))
             {
