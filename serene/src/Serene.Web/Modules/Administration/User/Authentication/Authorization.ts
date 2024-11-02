@@ -1,5 +1,5 @@
-import { ScriptUserDefinition } from "@/ServerTypes/ScriptUserDefinition";
 import { getRemoteData } from "@serenity-is/corelib";
+import { ScriptUserDefinition } from "../../../ServerTypes/ScriptUserDefinition";
 
 export function userDefinition() {
     return getRemoteData('UserData') as ScriptUserDefinition;

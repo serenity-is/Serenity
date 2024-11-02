@@ -1,7 +1,7 @@
 import { BaseDialog, stringFormat, getRemoteData, localText, notifySuccess } from "@serenity-is/corelib";
 import { PermissionCheckEditor } from "../UserPermission/PermissionCheckEditor";
-import { RolePermissionService, UserPermissionRow } from "@/ServerTypes/Administration";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
+import { RolePermissionService, UserPermissionRow } from "../../ServerTypes/Administration";
 
 export class RolePermissionDialog extends BaseDialog<RolePermissionDialogOptions> {
 

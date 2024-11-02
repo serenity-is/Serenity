@@ -1,10 +1,10 @@
-import { RemoteDataKeys } from "@/ServerTypes/RemoteDataKeys";
-import { Texts } from "@/ServerTypes/Texts";
 import {
     DataGrid, Decorators, Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper, ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText, turkishLocaleCompare
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
+import { Texts } from "../../ServerTypes/Texts";
+import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
 
 export interface PermissionCheckEditorOptions {
     showRevoke?: boolean;

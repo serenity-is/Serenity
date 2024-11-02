@@ -1,9 +1,8 @@
-import { SignUpForm, SignUpRequest } from "@/ServerTypes/Membership";
-import { SignUpResponse } from "@/ServerTypes/Membership/SignUpResponse";
-import { Texts } from "@/ServerTypes/Texts";
 import { PropertyPanel } from "@serenity-is/corelib";
 import { informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { AccountPanelTitle } from "../AccountPanelTitle";
+import { SignUpRequest, SignUpForm, SignUpResponse } from "../../../ServerTypes/Membership";
+import { Texts } from "../../../ServerTypes/Texts";
 
 export default function pageInit(opt: any) {
     new SignUpPanel({ element: '#SignUpPanel', ...opt});

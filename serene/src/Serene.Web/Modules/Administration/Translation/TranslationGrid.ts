@@ -1,7 +1,7 @@
-import { TranslationService } from "@/ServerTypes/Administration";
 import { confirmDialog, Decorators, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, localText, LookupEditor, LookupEditorOptions, notifySuccess, outerHtml, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
 import { TranslationItem } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
+import { TranslationService } from "../../ServerTypes/Administration";
 
 @Decorators.registerClass()
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {

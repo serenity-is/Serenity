@@ -1,7 +1,7 @@
-import { RoleForm, RoleRow, RoleService } from "@/ServerTypes/Administration";
 import { Decorators, EntityDialog } from "@serenity-is/corelib";
 import { Texts } from "../../ServerTypes/Texts";
 import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
+import { RoleRow, RoleForm, RoleService } from "../../ServerTypes/Administration";
 
 const editPermissions = "edit-permissions";
 

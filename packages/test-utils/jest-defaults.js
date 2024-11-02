@@ -11,7 +11,8 @@ export default () => ({
     ],
     extensionsToTreatAsEsm: ['.ts', '.tsx'],
     moduleNameMapper: {
-        "^@serenity-is/(.*)$": ["<rootDir>/node_modules/@serenity-is/$1", "<rootDir>/../node_modules/@serenity-is/$1", "<rootDir>/../../node_modules/@serenity-is/$1"]
+        "^@serenity-is/(.*)$": ["<rootDir>/node_modules/@serenity-is/$1", "<rootDir>/../node_modules/@serenity-is/$1", "<rootDir>/../../node_modules/@serenity-is/$1"],
+        "^dynamic-data/(.*)$": ["<rootDir>/dynamic-data/$1", `${testUtils}/dynamic-data/$1`]
     },
     setupFiles: [
         `${testUtils}/jest-setup.js`,

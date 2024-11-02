@@ -10,7 +10,7 @@ export function mockDynamicData() {
     orgFetchScriptData = scriptDataHooks.fetchScriptData ?? null;
     scriptDataHooks.fetchScriptData = <TData>(name: string) => {
         try {
-            return jest.requireActual("./dynamic-data/" + name + ".json");
+            return jest.requireActual("dynamic-data/" + name + ".json");
         }
         catch (e) {
             console.warn("Failed to load mock dynamic data for: " + name);

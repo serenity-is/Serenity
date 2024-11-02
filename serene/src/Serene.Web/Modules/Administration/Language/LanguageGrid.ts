@@ -1,4 +1,4 @@
-import { LanguageRow, LanguageColumns, LanguageService } from "@/ServerTypes/Administration";
+import { LanguageRow, LanguageColumns, LanguageService } from "../../ServerTypes/Administration";
 import { LanguageDialog } from "./LanguageDialog";
 import { Decorators, EntityGrid } from "@serenity-is/corelib"
 

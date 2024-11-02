@@ -1,4 +1,4 @@
-import { Texts } from "@/ServerTypes/Texts";
+import { Texts } from "../../ServerTypes/Texts";
 
 export const AccountPanelTitle = () =>
     <h2 class="text-center p-4">

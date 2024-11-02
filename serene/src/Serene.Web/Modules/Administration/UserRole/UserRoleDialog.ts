@@ -1,5 +1,5 @@
-import { UserRoleService } from "@/ServerTypes/Administration/UserRoleService";
 import { BaseDialog, Decorators, DialogButton, localText, notifySuccess, serviceRequest, stringFormat } from "@serenity-is/corelib";
+import { UserRoleService } from "../../ServerTypes/Administration/UserRoleService";
 import { RoleCheckEditor } from "./RoleCheckEditor";
 
 @Decorators.registerClass()

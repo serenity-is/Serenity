@@ -1,7 +1,7 @@
-import { UserForm, UserRow, UserService } from "@/ServerTypes/Administration";
-import { Texts } from "@/ServerTypes/Texts";
 import { Decorators, EditorUtils, EntityDialog, localText, stringFormat } from "@serenity-is/corelib";
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
+import { UserRow, UserForm, UserService } from "../../ServerTypes/Administration";
+import { Texts } from "../../ServerTypes/Texts";
 
 @Decorators.registerClass()
 export class UserDialog extends EntityDialog<UserRow, any> {

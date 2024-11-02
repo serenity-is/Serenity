@@ -1,7 +1,7 @@
-import { LoginForm, LoginRequest } from "@/ServerTypes/Membership";
-import { Texts } from "@/ServerTypes/Texts";
 import { ErrorHandling, PropertyPanel, WidgetProps, notifyError, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { AccountPanelTitle } from "../AccountPanelTitle";
+import { LoginRequest, LoginForm } from "../../../ServerTypes/Membership";
+import { Texts } from "../../../ServerTypes/Texts";
 
 export default function pageInit(opt?: { activated: string }) {
     var loginPanel = new LoginPanel({ element: '#LoginPanel' });

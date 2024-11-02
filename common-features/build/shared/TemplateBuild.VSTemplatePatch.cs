@@ -1,4 +1,4 @@
-﻿#if IsTemplateBuild
+#if IsTemplateBuild
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +12,10 @@ public static partial class Shared
     private static readonly GlobFilter ExcludeFilesGlob = new(new[] {
         "App_Data/",
         "bin/",
+        "coverage/",
+        "dynamic-data/",
         "obj/",
+        "test/",
         "node_modules/",
         "packages/",
         "PublishProfiles/",
@@ -39,6 +42,7 @@ public static partial class Shared
         "appsettings*.machine.json",
         "Thumbs.db",
         "ErrorLog.db",
+        "jest.config.js",
         "StyleCop.Cache",
         "Serene.Web.js.map",
         "StartSharp.Web.js.map",

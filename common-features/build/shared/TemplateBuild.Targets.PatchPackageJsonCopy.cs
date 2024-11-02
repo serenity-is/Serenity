@@ -18,6 +18,7 @@ public static partial class Shared
             var root = JObject.Parse(content);
             var dependencies = (JObject)root["dependencies"];
             var devDependencies = (JObject)root["devDependencies"];
+            var scripts = (JObject)root["scripts"];
 
             static string patchVersion(string package, string dependency = null)
             {
@@ -33,12 +34,17 @@ public static partial class Shared
             foreach (var property in dependencies.Properties().ToList())
             {
                 if (!property.Name.StartsWith("@serenity-is/") ||
+                    property.Name != "test-utils" &&
                     (property.Value.Value<string>()?.StartsWith("file:") != true &&
                      property.Value.Value<string>()?.StartsWith("../") != true))
                     continue;
 
                 dependencies[property.Name] = "./node_modules/.dotnet/" + GetPossibleNuGetPackageId(property.Name);
             }
+
+            devDependencies.Remove("test-utils");
+            scripts.Remove("jest");
+            scripts.Remove("test");
 
             content = root.ToString().Replace("\r", "");
             File.WriteAllText(PackageJsonCopy, content);

@@ -1,4 +1,4 @@
-import { RoleRow, RoleColumns, RoleService } from "@/ServerTypes/Administration";
+import { RoleRow, RoleColumns, RoleService } from "../../ServerTypes/Administration";
 import { RoleDialog } from "./RoleDialog";
 import { Decorators, EntityGrid } from "@serenity-is/corelib";
 
