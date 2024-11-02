@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  dotnet-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -47,6 +47,14 @@ jobs:
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
 
+    - name: pnpm install common-features
+      run: pnpm install --frozen-lockfile --prefer-offline
+      working-directory: "./common-features"
+
+    - name: pnpm install serene
+      run: pnpm install --frozen-lockfile --prefer-offline
+      working-directory: "serene/src/Serene.Web"
+
     - name: sleekgrid tests
       run: pnpm test
       working-directory: "packages/sleekgrid"
@@ -54,3 +62,20 @@ jobs:
     - name: corelib tests
       run: pnpm test
       working-directory: "packages/corelib"
+
+    - name: generate dynamic-data under test-utils
+      run: dotnet ../../serene/src/Serene.Web/bin/Debug/net8.0/Serene.Web.dll dynamic-data
+      working-directory: "./packages/test-utils"
+
+    - name: jest tests common-features
+      run: pnpm -r test
+      working-directory: "common-features"
+
+    - name: generate dynamic-data under Serene.Web
+      run: dotnet ./bin/Debug/net8.0/Serene.Web.dll dynamic-data
+      working-directory: "serene/src/Serene.Web"
+
+    - name: jest tests Serene.Web
+      run: pnpm -r test
+      working-directory: "serene/src/Serene.Web"
+

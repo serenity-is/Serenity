@@ -1,1 +1,1 @@
-﻿export const Texts = {} as const;
+﻿const Texts = {} as const;
