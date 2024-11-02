@@ -51,17 +51,17 @@ jobs:
       run: pnpm install --frozen-lockfile --prefer-offline
       working-directory: "./common-features"
 
-    - name: pnpm install serene
-      run: pnpm install --frozen-lockfile --prefer-offline
-      working-directory: "serene/src/Serene.Web"
+    - name: npm install serene
+      run: npm install
+      working-directory: "./serene/src/Serene.Web"
 
     - name: sleekgrid tests
       run: pnpm test
-      working-directory: "packages/sleekgrid"
+      working-directory: "./packages/sleekgrid"
 
     - name: corelib tests
       run: pnpm test
-      working-directory: "packages/corelib"
+      working-directory: "./packages/corelib"
 
     - name: generate dynamic-data under test-utils
       run: dotnet ../../serene/src/Serene.Web/bin/Debug/net8.0/Serene.Web.dll dynamic-data
@@ -73,9 +73,9 @@ jobs:
 
     - name: generate dynamic-data under Serene.Web
       run: dotnet ./bin/Debug/net8.0/Serene.Web.dll dynamic-data
-      working-directory: "serene/src/Serene.Web"
+      working-directory: "./serene/src/Serene.Web"
 
     - name: jest tests Serene.Web
-      run: pnpm -r test
-      working-directory: "serene/src/Serene.Web"
+      run: npm run test
+      working-directory: "./serene/src/Serene.Web"
 
