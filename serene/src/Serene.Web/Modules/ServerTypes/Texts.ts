@@ -24,18 +24,6 @@ namespace texts {
                 export const RolePermissionId: string;
             }
 
-            namespace Translation {
-                export const CustomText: string;
-                export const EntityPlural: string;
-                export const Key: string;
-                export const OverrideConfirmation: string;
-                export const SaveChangesButton: string;
-                export const SourceLanguage: string;
-                export const SourceText: string;
-                export const TargetLanguage: string;
-                export const TargetText: string;
-            }
-
             namespace User {
                 export const DisplayName: string;
                 export const Email: string;
@@ -172,7 +160,6 @@ export const Texts: typeof texts = proxyTexts({}, '', {
             Language: {},
             Role: {},
             RolePermission: {},
-            Translation: {},
             User: {},
             UserPermission: {},
             UserRole: {}

@@ -1,5 +1,5 @@
-import { confirmDialog, Decorators, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, localText, LookupEditor, LookupEditorOptions, notifySuccess, outerHtml, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
-import { TranslationItem } from "@serenity-is/extensions";
+import { confirmDialog, Decorators, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, LookupEditor, LookupEditorOptions, notifySuccess, outerHtml, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
+import { TranslationItem, TranslationTexts } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
 import { TranslationService } from "../../ServerTypes/Administration";
 
@@ -55,7 +55,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
                 return;
             }
 
-            confirmDialog(localText('Db.Administration.Translation.OverrideConfirmation'), done);
+            confirmDialog(TranslationTexts.OverrideConfirmation, done);
             return;
         }
 
@@ -74,7 +74,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
                 return;
             }
 
-            confirmDialog(localText('Db.Administration.Translation.OverrideConfirmation'), done);
+            confirmDialog(TranslationTexts.OverrideConfirmation, done);
             return;
         }
     }
@@ -82,10 +82,16 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
     protected getColumns(): Column[] {
 
         var columns: Column[] = [];
-        columns.push({ field: 'Key', width: 300, sortable: false });
+        columns.push({
+            field: 'Key',
+            name: TranslationTexts.Key,
+            width: 300,
+            sortable: false
+        });
 
         columns.push({
             field: 'SourceText',
+            name: TranslationTexts.SourceText,
             width: 300,
             sortable: false,
             format: ctx => {
@@ -97,22 +103,15 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
         columns.push({
             field: 'CustomText',
+            name: TranslationTexts.CustomText,
             width: 300,
             sortable: false,
             format: ctx => outerHtml(Fluent('input')
                 .addClass('custom-text')
                 .attr('value', ctx.value)
                 .attr('type', 'text')
+                .attr('placeholder', ctx.item.TargetText)
                 .attr('data-key', ctx.item.Key))
-        });
-
-        columns.push({
-            field: 'TargetText',
-            width: 300,
-            sortable: false,
-            format: ctx => outerHtml(Fluent('a')
-                .addClass('target-text')
-                .text(ctx.value || ''))
         });
 
         return columns;
@@ -128,7 +127,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         this.sourceLanguage = Widget.create({
             type: LookupEditor,
             element: el => el.appendTo(this.toolbar.element).attr('placeholder', '--- ' +
-                localText('Db.Administration.Translation.SourceLanguage') + ' ---'),
+                TranslationTexts.SourceLanguage + ' ---'),
             options: opt
         });
 
@@ -144,7 +143,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         this.targetLanguage = Widget.create({
             type: LookupEditor,
             element: el => el.appendTo(this.toolbar.element).attr('placeholder', '--- ' +
-                localText('Db.Administration.Translation.TargetLanguage') + ' ---'),
+                TranslationTexts.TargetLanguage + ' ---'),
             options: opt
         });
 
@@ -187,7 +186,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
     protected getButtons(): ToolButton[] {
         return [{
-            title: localText('Db.Administration.Translation.SaveChangesButton'),
+            title: TranslationTexts.SaveChangesButton,
             onClick: e => this.saveChanges(this.targetLanguageKey).then(() => this.refresh()),
             cssClass: 'apply-changes-button'
         }];

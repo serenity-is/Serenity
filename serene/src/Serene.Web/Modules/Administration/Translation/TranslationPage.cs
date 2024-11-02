@@ -1,4 +1,4 @@
-﻿namespace Serene.Administration.Pages;
+namespace Serene.Administration.Pages;
 
 [PageAuthorize(PermissionKeys.Translation)]
 public class TranslationPage : Controller
@@ -6,7 +6,6 @@ public class TranslationPage : Controller
     [Route("Administration/Translation")]
     public ActionResult Index()
     {
-        return this.GridPage("@/Administration/Translation/TranslationPage",
-            Texts.Db.Administration.Translation.EntityPlural.Key);
+        return this.GridPage(ESM.TranslationPage, TranslationTexts.EntityPlural.Key);
     }
 }
