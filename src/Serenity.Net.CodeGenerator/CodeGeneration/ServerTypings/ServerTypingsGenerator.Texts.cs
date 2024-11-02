@@ -107,8 +107,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
             .ToList();
 
-        bool exportTexts = localTextNestedClasses.ContainsKey("Texts") ||
-            localTextNestedClasses.Count == 0;
+        bool exportTexts = localTextNestedClasses.ContainsKey("Texts");
 
         if (list.Count > 0)
         {
