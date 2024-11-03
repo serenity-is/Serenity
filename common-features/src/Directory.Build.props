@@ -3,6 +3,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.props" />
   <PropertyGroup>
     <SerenityVersion Condition="'$(SerenityVersion)' == ''">8.7.5</SerenityVersion>
+    <SergenTransform>all</SergenTransform>
     <TargetFramework>net8.0</TargetFramework>
     <TransformDependsOn>SetSergenTransformArgs;TransformToolRestore</TransformDependsOn>
   </PropertyGroup>

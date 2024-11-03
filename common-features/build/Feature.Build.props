@@ -13,7 +13,7 @@
     <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
     <DotnetToolRestoreStamp>$(MSBuildProjectDirectory)\..\.config\.restore-stamp</DotnetToolRestoreStamp>
-    <SergenTransform>all</SergenTransform>
+    <SergenTransform Condition="'$(SergenTransform)' == ''">none</SergenTransform>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
     <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
