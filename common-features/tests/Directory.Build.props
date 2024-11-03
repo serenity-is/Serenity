@@ -1,6 +1,0 @@
-<Project>
-  <Import Project="$(MSBuildThisFileDirectory)..\..\tests\Test.Build.props" />
-  <PropertyGroup>
-    <RootNamespace>Serenity.Tests</RootNamespace>
-  </PropertyGroup>
-</Project>

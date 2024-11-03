@@ -1,6 +1,6 @@
 using Serenity.Extensions;
 
-namespace Serenity.Tests;
+namespace Serenity.Tests.Extensions;
 
 public class ExtensionsTypeSourceTests
 {
@@ -46,36 +46,6 @@ public class ExtensionsTypeSourceTests
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x));
-    }
-
-    [Fact]
-    public void CoreAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Core", ExtensionsTypeSource.SerenityNetCoreAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void DataAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Data", ExtensionsTypeSource.SerenityNetDataAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void EntityAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Entity", ExtensionsTypeSource.SerenityNetEntityAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void ServicesAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Services", ExtensionsTypeSource.SerenityNetServicesAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void WebAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Web", ExtensionsTypeSource.SerenityNetWebAssembly.GetName().Name);
     }
 
     [Fact]
