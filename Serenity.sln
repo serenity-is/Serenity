@@ -91,7 +91,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Extensions.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "serene-tests", "serene-tests", "{A809A613-DADC-4C33-B2BD-0F80E8EACFD8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serene.Tests.Unit", "serene\tests\Serene.Tests.Unit\Serene.Tests.Unit.csproj", "{24C790C0-0494-4B88-A8A9-17AB7BC294B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serene.Tests", "serene\tests\Serene.Tests\Serene.Tests.csproj", "{24C790C0-0494-4B88-A8A9-17AB7BC294B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
