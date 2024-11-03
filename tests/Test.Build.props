@@ -28,7 +28,7 @@
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
     <Using Include="Serenity.Data" />
-    <Using Include="Serenity.Data.Mapping" Condition="'$(ProjectName)' != 'Serenity.Net.Core.Tests'" />
+    <Using Include="Serenity.Data.Mapping" />
     <Using Include="Serenity.Extensions.DependencyInjection" />
     <Using Include="Serenity.Services" />
     <Using Include="Serenity.Web" />
