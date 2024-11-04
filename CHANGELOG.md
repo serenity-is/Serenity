@@ -1,3 +1,18 @@
+## 8.7.6 (2024-11-04)
+
+### Features
+
+- Add checks for common issues encountered while developing an in-memory grid editor. Throw an error from GridEditorBase.getDialogType() method if it is not overridden. Check if the dialog type returned from getDialogType() is a subclass of GridEditorDialog, not EntityDialog.  Ensure that id property name returned from getIdProperty() methods of the GridEditorDialog and GridEditorBase are same.
+- Add ability to use connected mode (e.g. calling services) for in-memory grid editors by setting connectedMode to true. This may be used with some grid editors so that if the parent dialog is in edit mode (e.g. the master id is available) the grid editor directly loads and updates the records directly via the service (without waiting for the main dialog to save). For this to work, the grid editor and its dialog must both return the actual ID property from their getIdProperty method or use getRowDefinition. Also, the grid editor should have a masterId property that in its setter should set itself to connectedMode if the masterId is assigned. See changes in Northwind OrderRow, Order Dialog / OrderDetailsEditor and its OrderDetailDialog for a sample.
+- Add getCreateServiceMethod, getUpdateServiceMethod, getDeleteServiceMethod, getRetrieveServiceMethod functions to entity dialog to override individual services if required.
+- Add protected getServiceMethod and getServiceUrl methods to entitygrid to customize List service url without having to override getViewOptions.
+- Split Serene/StartSharp Texts class into small targeted classes
+- Only export generic `Texts` constant from `Texts.ts` if there is a class with name "Texts" is available. This should prevent mixing up Texts classes from other packages.
+
+### Bugfixes
+
+- Fix missing user.GetIdentifier() causing cached roles to mixed up in BasePermissionService<T> implementation
+
 ## 8.7.5 (2024-10-31)
 
 ### Bugfixes

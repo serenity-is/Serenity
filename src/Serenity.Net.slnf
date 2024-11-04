@@ -13,7 +13,6 @@
       "src\\Serenity.Net.Entity\\Serenity.Net.Entity.csproj",
       "src\\Serenity.Net.Services\\Serenity.Net.Services.csproj",
       "src\\Serenity.Net.Web\\Serenity.Net.Web.csproj",
-      "src\\Serenity.TypeScript\\Serenity.TypeScript.csproj",
       "tests\\Serenity.Net.CodeGenerator.Tests\\Serenity.Net.CodeGenerator.Tests.csproj",
       "tests\\Serenity.Net.Tests\\Serenity.Net.Tests.csproj"
     ]
