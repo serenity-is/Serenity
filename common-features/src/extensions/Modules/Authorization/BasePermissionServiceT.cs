@@ -146,7 +146,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     /// <param name="user">User</param>
     protected virtual string GetUserRolesCacheKey(ClaimsPrincipal user)
     {
-        return "UserRoles:" + user;
+        return "UserRoles:" + user.GetIdentifier();
     }
 
     /// <summary>
