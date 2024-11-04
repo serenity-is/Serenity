@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="..\..\common-features\src\extensions\Serenity.Extensions.csproj" />
     <PackageReference Include="TSQL.Parser" Version="2.6.0" />
     <Using Include="Microsoft.AspNetCore.Hosting" />
     <Using Include="Microsoft.AspNetCore.Http" />

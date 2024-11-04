@@ -1,9 +1,8 @@
 
-namespace Serenity.Extensions;
-
 using Microsoft.Extensions.Caching.Memory;
-using System.Reflection;
 using System.Security.Claims;
+
+namespace Serenity.Extensions;
 
 /// <summary>
 /// Base permission service that provides common functionality for permission services.

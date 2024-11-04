@@ -1,4 +1,4 @@
-﻿using System.Security.Principal;
+using System.Security.Principal;
 
 namespace Serenity.Tests;
 
@@ -11,6 +11,11 @@ public class MockUserAccessor : IUserAccessor
         this.getUser = getUser ?? throw new ArgumentNullException(nameof(getUser));
     }
 
+    public static string MockUserId(string username)
+    {
+        return username.GetHashCode().ToString();
+    }
+
     public MockUserAccessor(Func<string> getUsername)
     {
         ArgumentNullException.ThrowIfNull(getUsername);
@@ -21,7 +26,9 @@ public class MockUserAccessor : IUserAccessor
             if (username == null)
                 return null;
 
-            return new ClaimsPrincipal(new GenericIdentity(username, "Test"));
+            var identity = new GenericIdentity(username, "Testing");
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, username.GetHashCode().ToString()));
+            return new ClaimsPrincipal(identity);
         };
     }
 
