@@ -79,17 +79,17 @@ jobs:
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
 
-    - name: generate dynamic-data under test-utils
-      run: dotnet ../../serene/src/Serene.Web/bin/Debug/net8.0/Serene.Web.dll dynamic-data
-      working-directory: "./packages/test-utils"
+    #- name: generate dynamic-data under test-utils
+    #  run: dotnet ../../serene/src/Serene.Web/bin/Debug/net8.0/Serene.Web.dll dynamic-data
+    #  working-directory: "./packages/test-utils"
 
     - name: jest tests common-features
       run: pnpm -r test
       working-directory: "common-features"
 
-    - name: generate dynamic-data under Serene.Web
-      run: dotnet ./bin/Debug/net8.0/Serene.Web.dll dynamic-data
-      working-directory: "./serene/src/Serene.Web"
+    #- name: generate dynamic-data under Serene.Web
+    #  run: dotnet ./bin/Debug/net8.0/Serene.Web.dll dynamic-data
+    #  working-directory: "./serene/src/Serene.Web"
 
     - name: jest tests Serene.Web
       run: npm run test
