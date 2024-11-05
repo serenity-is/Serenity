@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Abstraction for SQL dialect, e.g. syntax for different SQL server types and connection settings.
@@ -76,6 +76,15 @@ public interface ISqlDialect
     ///   <c>true</c> if the LIKE operator is sensitive; otherwise, <c>false</c>.
     /// </value>
     bool IsLikeCaseSensitive { get; }
+
+    /// <summary>
+    /// Returns true if the specified identifier is a SQL keyword.
+    /// </summary>
+    /// <param name="keyword"></param>
+    bool IsReservedKeyword(string keyword)
+    {
+        return SqlSyntax.IsReservedKeywordForAny(keyword);
+    }
 
     /// <summary>
     /// Gets a value indicating whether the server supports multiple resultsets.

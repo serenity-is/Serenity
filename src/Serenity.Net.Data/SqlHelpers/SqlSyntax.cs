@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains SQL syntax helpers.
@@ -72,6 +72,28 @@ public static class SqlSyntax
             return _tableAliasDot[joinIndex];
         else
             return "T" + joinIndex.ToString(_invariant) + ".";
+    }
+
+    private static readonly HashSet<string> ReservedKeywordForAny =
+        new([
+            ..FirebirdDialect.ReservedKeywords,
+            ..MySqlDialect.ReservedKeywords,
+            ..OracleDialect.ReservedKeywords,
+            ..PostgresDialect.ReservedKeywords,
+            ..SqliteDialect.ReservedKeywords,
+            ..SqlServer2000Dialect.ReservedKeywords
+        ], StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Returns true if the specified identifier is a common SQL keyword.
+    /// </summary>
+    /// <param name="identifier">Identifier</param>
+    public static bool IsReservedKeywordForAny(string identifier)
+    {
+        if (string.IsNullOrEmpty(identifier))
+            return false;
+
+        return ReservedKeywordForAny.Contains(identifier);
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Oracle dialect
@@ -6,8 +6,7 @@
 /// <seealso cref="ISqlDialect" />
 public class OracleDialect : ISqlDialect
 {
-    private static readonly HashSet<string> keywords = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly HashSet<string> keywords = new([
         "ACCESS", "ACCOUNT", "ACTIVATE", "ADD", "ADMIN", "ADVISE", "AFTER", "ALL", "ALL_ROWS", "ALLOCATE", "ALTER", "ANALYZE", "AND", "ANY", "ARCHIVE", "ARCHIVELOG", "ARRAY", "AS", "ASC", "AT", "AUDIT", "AUTHENTICATED", "AUTHORIZATION", "AUTOEXTEND", "AUTOMATIC",
         "BACKUP", "BECOME", "BEFORE", "BEGIN", "BETWEEN", "BFILE", "BITMAP", "BLOB", "BLOCK", "BODY", "BY",
         "CACHE", "CACHE_INSTANCES", "CANCEL", "CASCADE", "CAST", "CFILE", "CHAINED", "CHANGE", "CHAR", "CHAR_CS", "CHARACTER", "CHECK", "CHECKPOINT", "CHOOSE", "CHUNK", "CLEAR", "CLOB", "CLONE", "CLOSE", "CLOSE_CACHED_OPEN_CURSORS", "CLUSTER", "COALESCE", "COLUMN", "COLUMNS", "COMMENT", "COMMIT", "COMMITTED", "COMPATIBILITY", "COMPILE", "COMPLETE", "COMPOSITE_LIMIT", "COMPRESS",
@@ -23,7 +22,7 @@ public class OracleDialect : ISqlDialect
         "RESTRICTED", "RETURN", "RETURNING", "REUSE", "REVERSE", "REVOKE", "ROLE", "ROLES", "ROLLBACK", "ROW", "ROWID", "ROWNUM", "ROWS", "RULE", "SAMPLE", "SAVEPOINT", "SB4", "SCAN_INSTANCES", "SCHEMA", "SCN", "SCOPE", "SD_ALL", "SD_INHIBIT", "SD_SHOW", "SEGMENT", "SEG_BLOCK", "SEG_FILE", "SELECT", "SEQUENCE", "SERIALIZABLE", "SESSION", "SESSION_CACHED_CURSORS", "SESSIONS_PER_USER", "SET", "SHARE", "SHARED", "SHARED_POOL", "SHRINK", "SIZE", "SKIP",
         "SKIP_UNUSABLE_INDEXES", "SMALLINT", "SNAPSHOT", "SOME", "SORT", "SPECIFICATION", "SPLIT", "SQL_TRACE", "STANDBY", "START", "STATEMENT_ID", "STATISTICS", "STOP", "STORAGE", "STORE", "STRUCTURE", "SUCCESSFUL", "SWITCH", "SYS_OP_ENFORCE_NOT_NULL$", "SYS_OP_NTCIMG$", "SYNONYM", "SYSDATE", "SYSDBA", "SYSOPER", "SYSTEM", "TABLE", "TABLES", "TABLESPACE", "TABLESPACE_NO", "TABNO", "TEMPORARY", "THAN", "THE", "THEN", "THREAD", "TIMESTAMP", "TIME", "TO", "TOPLEVEL",
         "TRACE", "TRACING", "TRANSACTION", "TRANSITIONAL", "TRIGGER", "TRIGGERS", "TRUE", "TRUNCATE", "TX", "TYPE", "UB2", "UBA", "UID", "UNARCHIVED", "UNDO", "UNION", "UNIQUE", "UNLIMITED", "UNLOCK", "UNRECOVERABLE", "UNTIL", "UNUSABLE", "UNUSED", "UPDATABLE", "UPDATE", "USAGE", "USE", "USER", "USING", "VALIDATE", "VALIDATION", "VALUE", "VALUES", "VARCHAR", "VARCHAR2", "VARYING", "VIEW", "WHEN", "WHENEVER", "WHERE", "WITH", "WITHOUT", "WORK", "WRITE", "WRITEDOWN", "WRITEUP", "XID", "YEAR", "ZONE"
-    };
+    ], StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// The shared instance of OracleDialect.
@@ -313,4 +312,141 @@ public class OracleDialect : ISqlDialect
     /// The parameter prefix character.
     /// </value>
     public virtual char ParameterPrefix => ':';
+
+    /// <inheritdoc />
+    public virtual bool IsReservedKeyword(string s)
+    {
+        return ReservedKeywords.Contains(s);
+    }
+
+    internal static readonly HashSet<string> ReservedKeywords = new([
+        "ACCESS",
+        "ADD",
+        "ALL",
+        "ALTER",
+        "AND",
+        "ANY",
+        "AS",
+        "ASC",
+        "AT",
+        "AUDIT",
+        "BEGIN",
+        "BETWEEN",
+        "BY",
+        "CASE",
+        "CHAR",
+        "CHECK",
+        "CLUSTER",
+        "CLUSTERS",
+        "COLAUTH",
+        "COLUMN",
+        "COLUMNS",
+        "COMMENT",
+        "COMPRESS",
+        "CONNECT",
+        "CRASH",
+        "CREATE",
+        "CURRENT",
+        "DATE",
+        "DECIMAL",
+        "DECLARE",
+        "DEFAULT",
+        "DELETE",
+        "DESC",
+        "DISTINCT",
+        "DROP",
+        "ELSE",
+        "END",
+        "EXCEPTION",
+        "EXCLUSIVE",
+        "EXISTS",
+        "FETCH",
+        "FILE",
+        "FLOAT",
+        "FOR",
+        "FROM",
+        "GOTO",
+        "GRANT",
+        "GROUP",
+        "HAVING",
+        "IDENTIFIED",
+        "IF",
+        "IMMEDIATE",
+        "IN",
+        "INCREMENT",
+        "INDEX",
+        "INITIAL",
+        "INSERT",
+        "INTEGER",
+        "INTERSECT",
+        "INTO",
+        "IS",
+        "LEVEL",
+        "LIKE",
+        "LOCK",
+        "LONG",
+        "MAXEXTENTS",
+        "MINUS",
+        "MLSLABEL",
+        "MODE",
+        "MODIFY",
+        "NOAUDIT",
+        "NOCOMPRESS",
+        "NOT",
+        "NOWAIT",
+        "NULL",
+        "NUMBER",
+        "OF",
+        "OFFLINE",
+        "ON",
+        "ONLINE",
+        "OPTION",
+        "OR",
+        "ORDER",
+        "OVERLAPS",
+        "PCTFREE",
+        "PRIOR",
+        "PRIVILEGES",
+        "PROCEDURE",
+        "PUBLIC",
+        "RAW",
+        "RENAME",
+        "RESOURCE",
+        "REVOKE",
+        "ROW",
+        "ROWID",
+        "ROWNUM",
+        "ROWS",
+        "SELECT",
+        "SESSION",
+        "SET",
+        "SHARE",
+        "SIZE",
+        "SMALLINT",
+        "SQL",
+        "START",
+        "SUCCESSFUL",
+        "SYNONYM",
+        "SYSDATE",
+        "TABAUTH",
+        "TABLE",
+        "THEN",
+        "TO",
+        "TRIGGER",
+        "UID",
+        "UNION",
+        "UNIQUE",
+        "UPDATE",
+        "USER",
+        "VALIDATE",
+        "VALUES",
+        "VARCHAR",
+        "VARCHAR2",
+        "VIEW",
+        "VIEWS",
+        "WHEN",
+        "WHENEVER",
+        "WHERE",
+        "WITH",
+    ], StringComparer.OrdinalIgnoreCase);
 }
