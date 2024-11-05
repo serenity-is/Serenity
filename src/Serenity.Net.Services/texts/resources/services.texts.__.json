@@ -1,5 +1,5 @@
 {
-  "__comment__": "Auto generated template, don't modify!",
+  "__comment__": "Auto generated from the assembly to use as a template for translation. Don't modify. This file is ignored at runtime.",
   "Controls.ImageUpload.ExtensionBlacklisted": "Uploaded file extension '{0}' is not allowed!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Uploaded file extension '{0}' is not in the list of allowed extensions: '{1}'!",
   "Controls.ImageUpload.FailedScan": "An error occurred while scanning the uploaded file for viruses! For more information, visit https://serenity.is/docs/av",

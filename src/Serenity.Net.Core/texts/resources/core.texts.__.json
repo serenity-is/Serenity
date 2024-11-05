@@ -1,5 +1,5 @@
 {
-  "__comment__": "Auto generated template, don't modify!",
+  "__comment__": "Auto generated from the assembly to use as a template for translation. Don't modify. This file is ignored at runtime.",
   "Authorization.AccessDenied": "Authorization has been denied for this request!",
   "Authorization.NotLoggedIn": "Authorization is required for this request!",
   "Db.Shared.RecordId": "ID",
