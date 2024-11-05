@@ -138,7 +138,7 @@
   "Validation.MaxLength": "Please enter no more than {0} characters.",
   "Validation.MinDate": "Please enter a date after '{0}'.",
   "Validation.MinLength": "Please enter no less than {0} characters.",
-  "Validation.PasswordConfirm": "Password entered don't match.",
+  "Validation.PasswordConfirm": "Passwords entered don't match.",
   "Validation.Range": "Please enter a value between {0} and {1}.",
   "Validation.Required": "This field is required.",
   "Validation.UniqueConstraint": "Another record with the same '{0}' value(s) exists!",

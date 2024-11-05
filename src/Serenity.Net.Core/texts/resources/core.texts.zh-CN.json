@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "此请求已被拒绝！",
   "Authorization.NotLoggedIn": "此请求需要授权！",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "处理您的请求时出错。"
+  "Services.GenericErrorMessage": "处理您的请求时出错。",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

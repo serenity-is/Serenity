@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "Этот запрос был отклонен!",
   "Authorization.NotLoggedIn": "Для этого запроса требуется авторизация!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "При обработке вашего запроса произошла ошибка"
+  "Services.GenericErrorMessage": "При обработке вашего запроса произошла ошибка",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

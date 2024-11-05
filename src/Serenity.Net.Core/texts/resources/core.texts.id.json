@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "Permintaan ini telah ditolak!",
   "Authorization.NotLoggedIn": "Autorisasi diperlukan untuk permintaan ini!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Sedang memproses permintaan Anda, terjadi kesalahan"
+  "Services.GenericErrorMessage": "Sedang memproses permintaan Anda, terjadi kesalahan",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

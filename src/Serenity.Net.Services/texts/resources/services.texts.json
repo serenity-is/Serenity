@@ -5,7 +5,7 @@
   "Controls.ImageUpload.FailedScan": "An error occurred while scanning the uploaded file for viruses! For more information, visit https://serenity.is/docs/av",
   "Controls.ImageUpload.ImageExtensionMismatch": "Uploaded image extension ({0}) does not match its format ({1})!",
   "Controls.ImageUpload.InfectedFile": "Uploaded file may contain a virus!",
-  "Controls.ImageUpload.InfectedFileOrError": "Uploaded file may contain a virus or an error occured during the AV scan!",
+  "Controls.ImageUpload.InfectedFileOrError": "Uploaded file may contain a virus or an error occurred during the AV scan!",
   "Controls.ImageUpload.MaxHeight": "Uploaded image should be under {0} pixels in height!",
   "Controls.ImageUpload.MaxWidth": "Uploaded image should be under {0} pixels in width!",
   "Controls.ImageUpload.MinHeight": "Uploaded image should be at least {0} pixels in height!",

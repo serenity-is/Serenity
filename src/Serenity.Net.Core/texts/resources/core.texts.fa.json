@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "دسترسی به این درخواست منفی شده است!",
   "Authorization.NotLoggedIn": "این درخواست برای اجازه یافتن مورد نیاز است!",
   "Db.Shared.RecordId": "شناسه",
-  "Services.GenericErrorMessage": "در هنگام پردازش درخواست شما خطایی رخ داده است"
+  "Services.GenericErrorMessage": "در هنگام پردازش درخواست شما خطایی رخ داده است",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

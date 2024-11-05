@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "La demande a été refusée!",
   "Authorization.NotLoggedIn": "Une autorisation est nécessaire pour cette demande !",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Une erreur s'est produite lors du traitement de votre demande"
+  "Services.GenericErrorMessage": "Une erreur s'est produite lors du traitement de votre demande",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

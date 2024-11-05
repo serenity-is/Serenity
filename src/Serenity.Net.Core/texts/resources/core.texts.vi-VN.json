@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "Yêu cầu này đã bị từ chối!",
   "Authorization.NotLoggedIn": "Yêu cầu này cần phải được cấp phép!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Khi xử lý yêu cầu của bạn, xảy ra lỗi"
+  "Services.GenericErrorMessage": "Khi xử lý yêu cầu của bạn, xảy ra lỗi",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }

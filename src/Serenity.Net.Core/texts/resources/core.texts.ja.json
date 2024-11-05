@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "このリクエストは拒否されました！",
   "Authorization.NotLoggedIn": "このリクエストには承認が必要です！",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "要求の処理中にエラーが発生しました。"
+  "Services.GenericErrorMessage": "要求の処理中にエラーが発生しました。",
+  "Services.HttpError": null,
+  "Services.InternalServerError": null,
+  "Services.SeeBrowserConsole": null,
+  "Services.UnknownConnectionError": null
 }
