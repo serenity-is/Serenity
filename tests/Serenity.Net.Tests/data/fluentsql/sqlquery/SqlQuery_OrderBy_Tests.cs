@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public partial class SqlQuery_OrderBy_Tests
 {
@@ -23,7 +23,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable ORDER BY TestColumn, TestColumn2"),
+                "SELECT TestColumn FROM [TestTable] ORDER BY TestColumn, TestColumn2"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -39,7 +39,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT u.TestColumn FROM TestTable u ORDER BY u.TestColumn, u.TestColumn2"),
+                "SELECT u.TestColumn FROM [TestTable] u ORDER BY u.TestColumn, u.TestColumn2"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -55,7 +55,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT u.TestColumn FROM TestTable u ORDER BY u.TestColumn DESC, TestColumn2 DESC"),
+                "SELECT u.TestColumn FROM [TestTable] u ORDER BY u.TestColumn DESC, TestColumn2 DESC"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -81,7 +81,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT a FROM TestTable ORDER BY c, a, b"),
+                "SELECT a FROM [TestTable] ORDER BY c, a, b"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -99,7 +99,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT a FROM TestTable ORDER BY b, a, c"),
+                "SELECT a FROM [TestTable] ORDER BY b, a, c"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -117,7 +117,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT a FROM TestTable ORDER BY b, a, c"),
+                "SELECT a FROM [TestTable] ORDER BY b, a, c"),
             Normalize.Sql(
                 query1.ToString()));
 
@@ -131,7 +131,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT a FROM TestTable ORDER BY b DESC, a, c"),
+                "SELECT a FROM [TestTable] ORDER BY b DESC, a, c"),
             Normalize.Sql(
                 query2.ToString()));
     }
@@ -147,7 +147,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT u.TestColumn FROM TestTable u ORDER BY TestColumn2 DESC, u.TestColumn DESC"),
+                "SELECT u.TestColumn FROM [TestTable] u ORDER BY TestColumn2 DESC, u.TestColumn DESC"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -163,7 +163,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable ORDER BY TestColumn, SecondColumn"),
+                "SELECT TestColumn FROM [TestTable] ORDER BY TestColumn, SecondColumn"),
             Normalize.Sql(
                 query.ToString()));
     }

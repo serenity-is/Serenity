@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_From_Tests
 {
@@ -12,7 +12,7 @@ public class SqlQuery_From_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable1, TestTable2"),
+                "SELECT TestColumn FROM [TestTable1], [TestTable2]"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -28,7 +28,7 @@ public class SqlQuery_From_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable1 x1, TestTable2 x2, TestTable3"),
+                "SELECT TestColumn FROM [TestTable1] x1, [TestTable2] x2, [TestTable3]"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -64,7 +64,7 @@ public class SqlQuery_From_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable TestAlias"),
+                "SELECT TestColumn FROM [TestTable] TestAlias"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -89,7 +89,7 @@ public class SqlQuery_From_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable TestAlias"),
+                "SELECT TestColumn FROM [TestTable] TestAlias"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -105,7 +105,7 @@ public class SqlQuery_From_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT SubColumn FROM (SELECT SubColumn FROM SubTable) sub"),
+                "SELECT SubColumn FROM (SELECT SubColumn FROM [SubTable]) sub"),
             Normalize.Sql(
                 query.ToString()));
     }

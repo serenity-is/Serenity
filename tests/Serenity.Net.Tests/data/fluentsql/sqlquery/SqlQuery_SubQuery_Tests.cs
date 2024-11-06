@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_SubQuery_Tests
 {
@@ -11,7 +11,7 @@ public class SqlQuery_SubQuery_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "(SELECT TestColumn FROM TestTable)"),
+                "(SELECT TestColumn FROM [TestTable])"),
             Normalize.Sql(
                 sub.ToString()));
     }
@@ -42,8 +42,8 @@ public class SqlQuery_SubQuery_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT ParentColumn FROM ParentTable WHERE " +
-                    "((SELECT TOP 1 SubColumn FROM SubTable) >= @p1)"),
+                "SELECT ParentColumn FROM [ParentTable] WHERE " +
+                    "((SELECT TOP 1 SubColumn FROM [SubTable]) >= @p1)"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -61,8 +61,8 @@ public class SqlQuery_SubQuery_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT ParentColumn FROM ParentTable WHERE " +
-                    "((SELECT TOP 1 SubColumn FROM SubTable) >= @p1)"),
+                "SELECT ParentColumn FROM [ParentTable] WHERE " +
+                    "((SELECT TOP 1 SubColumn FROM [SubTable]) >= @p1)"),
             Normalize.Sql(
                 query.ToString()));
     }

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_GroupBy_Having_Tests
 {
@@ -13,7 +13,7 @@ public class SqlQuery_GroupBy_Having_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable GROUP BY TestColumn, TestColumn2"),
+                "SELECT TestColumn FROM [TestTable] GROUP BY TestColumn, TestColumn2"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -52,7 +52,7 @@ public class SqlQuery_GroupBy_Having_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable GROUP BY TestColumn HAVING Count(*) > 5"),
+                "SELECT TestColumn FROM [TestTable] GROUP BY TestColumn HAVING Count(*) > 5"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -69,7 +69,7 @@ public class SqlQuery_GroupBy_Having_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t GROUP BY c HAVING count(*) > 2 AND sum(y) < 1000"),
+                "SELECT c FROM [t] GROUP BY c HAVING count(*) > 2 AND sum(y) < 1000"),
             Normalize.Sql(
                 query.ToString())
         );

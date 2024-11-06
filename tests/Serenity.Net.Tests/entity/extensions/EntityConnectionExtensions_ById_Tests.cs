@@ -42,10 +42,10 @@ public class EntityConnectionExtensions_ById_Tests
                 Assert.Equal(777, Assert.Single(command.Parameters.OfType<IDbDataParameter>()).Value);
 
                 Assert.Equal(@"SELECT 
-T0.ID AS [ID],
-T0.Name AS [Name] 
-FROM IdName T0 
-WHERE (T0.ID = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+T0.[ID] AS [ID],
+T0.[Name] AS [Name] 
+FROM [IdName] T0 
+WHERE (T0.[ID] = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                 return new MockDbDataReader(new
                 {
@@ -64,11 +64,11 @@ WHERE (T0.ID = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
             .OnExecuteReader(command =>
             {
                 Assert.Equal(@"SELECT 
-T0.CityId AS [CityId],
-T0.CityName AS [CityName],
-T0.CountryId AS [CountryId]
-FROM Cities T0 
-WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+T0.[CityId] AS [CityId],
+T0.[CityName] AS [CityName],
+T0.[CountryId] AS [CountryId]
+FROM [Cities] T0 
+WHERE (T0.[CityId] = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                 return new MockDbDataReader(new
                 {
@@ -94,9 +94,9 @@ WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
             {
                 Assert.Equal(@"SELECT 
 jCountry.CountryName AS [CountryName]
-FROM Cities T0 
-LEFT JOIN Countries jCountry ON (jCountry.CountryId = T0.CountryId)
-WHERE (T0.CityId = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
+FROM [Cities] T0 
+LEFT JOIN [Countries] jCountry ON (jCountry.[CountryId] = T0.[CountryId])
+WHERE (T0.[CityId] = @p1)".NormalizeSql(), command.CommandText.NormalizeSql());
 
                 return new MockDbDataReader(new
                 {

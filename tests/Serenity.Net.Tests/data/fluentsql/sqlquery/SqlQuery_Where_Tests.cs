@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_Where_Tests
 {
@@ -8,7 +8,7 @@ public class SqlQuery_Where_Tests
         var query = new SqlQuery().From("t").Select("c").Where("x > 5").Where("y < 4");
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t WHERE x > 5 AND y < 4"),
+                "SELECT c FROM [t] WHERE x > 5 AND y < 4"),
             Normalize.Sql(
                 query.ToString())
         );

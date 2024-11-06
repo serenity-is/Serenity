@@ -846,12 +846,12 @@ public partial class FileUploadBehaviorTests
         Assert.Equal(".", updateStatement.Update.Tokens[2].Text);
         Assert.Equal("[Test]", updateStatement.Update.Tokens[3].Text);
         
-        Assert.Equal(nameof(TestIIdRow.StringFieldImageUploadEditor), updateStatement.Set.Tokens[1].Text);
+        Assert.Equal($"[{nameof(TestIIdRow.StringFieldImageUploadEditor)}]", updateStatement.Set.Tokens[1].Text);
         Assert.Equal("=", updateStatement.Set.Tokens[2].Text);
         Assert.Equal("@p1", updateStatement.Set.Tokens[3].Text);
         Assert.Equal(newFile, mockFileSystem.GetFileName(((IDbDataParameter)dbCommand.Parameters[0]!).Value as string));
         
-        Assert.Equal("Id", updateStatement.Where.Tokens[2].Text);
+        Assert.Equal("[Id]", updateStatement.Where.Tokens[2].Text);
         Assert.Equal("=", updateStatement.Where.Tokens[3].Text);
         Assert.Equal("@p2", updateStatement.Where.Tokens[4].Text);
         Assert.Equal(row.Id, ((IDbDataParameter)dbCommand.Parameters[1]!).Value);

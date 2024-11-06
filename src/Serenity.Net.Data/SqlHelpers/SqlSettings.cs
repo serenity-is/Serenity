@@ -19,12 +19,12 @@ public static class SqlSettings
     /// <summary>
     /// Gets or sets a value indicating whether to automatically quote identifiers.
     /// This is used as a fallback if the dialect and SqlSettings.DefaultDialect does 
-    /// not provide a value.
+    /// not provide a value. Default is true.
     /// </summary>
     /// <value>
     ///   <c>true</c> if should automatically quote identifiers; otherwise, <c>false</c>.
     /// </value>
-    public static bool AutoQuotedIdentifiers { get; set; }
+    public static bool AutoQuotedIdentifiers { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the default command timeout.

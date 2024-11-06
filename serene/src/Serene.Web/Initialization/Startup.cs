@@ -24,7 +24,6 @@ public partial class Startup
     {
         Configuration = configuration;
         HostEnvironment = hostEnvironment;
-        SqlSettings.AutoQuotedIdentifiers = true;
         RegisterDataProviders();
     }
 

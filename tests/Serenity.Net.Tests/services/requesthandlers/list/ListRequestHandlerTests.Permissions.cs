@@ -93,9 +93,9 @@ public partial class ListRequestHandlerTests
             foreach (var field in TestRow.Fields)
             {
                 if (enumerable.Contains(field.Name))
-                    Assert.Contains("T0." + field.Name, command.CommandText);
+                    Assert.Contains($"T0.[{field.Name}]", command.CommandText);
                 else
-                    Assert.DoesNotContain("T0." + field.Name, command.CommandText);
+                    Assert.DoesNotContain($"T0.[{field.Name}]", command.CommandText);
             }
 
             return new MockDbDataReader();

@@ -72,7 +72,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("y", fields.Joins);
         Assert.Equal("a", join.Table);
-        Assert.Equal("(y.x = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(y.[x] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("z", fields.Joins);
         Assert.Equal("a", join.Table);
-        Assert.Equal("(z.x = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(z.[x] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("y", fields.Joins);
         Assert.Equal("a", join.Table);
-        Assert.Equal("(y.x = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(y.[x] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("q", fields.Joins);
         Assert.Equal("w", join.Table);
-        Assert.Equal("(q.x = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(q.[x] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("q", fields.Joins);
         Assert.Equal("z", join.Table);
-        Assert.Equal("(q.y = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(q.[y] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("e", fields.Joins);
         Assert.Equal("z", join.Table);
-        Assert.Equal("(e.y = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(e.[y] = T0.[Test])", join.OnCriteria?.ToString());
     }
 
     [Fact]
@@ -203,6 +203,6 @@ public class RowDialectExpressionTests
 
         var join = Assert.Contains("w", fields.Joins);
         Assert.Equal("w", join.Table);
-        Assert.Equal("(w.x = T0.Test)", join.OnCriteria?.ToString());
+        Assert.Equal("(w.[x] = T0.[Test])", join.OnCriteria?.ToString());
     }
 }

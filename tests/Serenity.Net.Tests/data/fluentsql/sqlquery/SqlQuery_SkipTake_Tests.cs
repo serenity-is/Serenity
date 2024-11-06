@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_SkipTake_Tests
 {
@@ -30,8 +30,8 @@ public class SqlQuery_SkipTake_Tests
         Assert.Equal(
             Normalize.Sql(
                 "DECLARE @Value0 SQL_VARIANT;" +
-                "SELECT TOP 10 @Value0 = x FROM t ORDER BY x;" +
-                "SELECT c FROM t WHERE ((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0)))) ORDER BY x"),
+                "SELECT TOP 10 @Value0 = x FROM [t] ORDER BY x;" +
+                "SELECT c FROM [t] WHERE ((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0)))) ORDER BY x"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -54,8 +54,8 @@ public class SqlQuery_SkipTake_Tests
             Normalize.Sql(
                 "DECLARE @Value0 SQL_VARIANT;" +
                 "DECLARE @Value1 SQL_VARIANT;" +
-                "SELECT TOP 100 @Value0 = x,@Value1 = y FROM t WHERE c > 2 ORDER BY x, y;" +
-                "SELECT TOP 50 c FROM t WHERE c > 2 AND " +
+                "SELECT TOP 100 @Value0 = x,@Value1 = y FROM [t] WHERE c > 2 ORDER BY x, y;" +
+                "SELECT TOP 50 c FROM [t] WHERE c > 2 AND " +
                     "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " +
                         "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " +
                         "AND ((y IS NOT NULL AND @Value1 IS NULL) OR (y > @Value1)))) ORDER BY x, y"),
@@ -77,7 +77,7 @@ public class SqlQuery_SkipTake_Tests
         Assert.Equal(
             Normalize.Sql(
                 "SELECT * FROM (\n" +
-                    "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS x__num__ FROM t ORDER BY x) x__results__ " +
+                    "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS x__num__ FROM [t] ORDER BY x) x__results__ " +
                 "WHERE x__num__ > 10"),
             Normalize.Sql(
                 query.ToString()));
@@ -94,7 +94,7 @@ public class SqlQuery_SkipTake_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t LIMIT 10"),
+                "SELECT c FROM [t] LIMIT 10"),
             Normalize.Sql(
                 query.ToString()));
 
@@ -112,7 +112,7 @@ public class SqlQuery_SkipTake_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM t) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
+                "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM [t]) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -130,7 +130,7 @@ public class SqlQuery_SkipTake_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS x__rownum__ FROM t ORDER BY x) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
+                "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS x__rownum__ FROM [t] ORDER BY x) WHERE x__rownum__ > 50 AND ROWNUM <= 20"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -146,7 +146,7 @@ public class SqlQuery_SkipTake_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM t) WHERE x__rownum__ > 0 AND ROWNUM <= 10"),
+                "SELECT * FROM ( SELECT c, ROWNUM AS x__rownum__ FROM [t]) WHERE x__rownum__ > 0 AND ROWNUM <= 10"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -161,7 +161,7 @@ public class SqlQuery_SkipTake_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t"),
+                "SELECT c FROM [t]"),
             Normalize.Sql(
                 query.ToString()));
     }

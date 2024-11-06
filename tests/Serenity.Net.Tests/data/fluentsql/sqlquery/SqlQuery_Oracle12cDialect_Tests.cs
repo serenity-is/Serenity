@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_Oracle12cDialect_Tests
 {
@@ -14,7 +14,7 @@ public class SqlQuery_Oracle12cDialect_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
+                "SELECT c FROM [t] OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -32,7 +32,7 @@ public class SqlQuery_Oracle12cDialect_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t ORDER BY x OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
+                "SELECT c FROM [t] ORDER BY x OFFSET 50 ROWS FETCH NEXT 20 ROWS ONLY"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -46,7 +46,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .From("t")
             .Take(10);
 
-        var a = Normalize.Sql(@"SELECT c FROM t OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+        var a = Normalize.Sql(@"SELECT c FROM [t] OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -61,7 +61,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .OrderBy("c")
             .Take(10);
 
-        var a = Normalize.Sql(@"SELECT c FROM t ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+        var a = Normalize.Sql(@"SELECT c FROM [t] ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -77,7 +77,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .OrderBy("c")
             .Take(10);
 
-        var a = Normalize.Sql(@"SELECT c FROM t WHERE c = 1 ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+        var a = Normalize.Sql(@"SELECT c FROM [t] WHERE c = 1 ORDER BY c OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -92,7 +92,7 @@ public class SqlQuery_Oracle12cDialect_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c FROM t"),
+                "SELECT c FROM [t]"),
             Normalize.Sql(
                 query.ToString()));
 
@@ -119,7 +119,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .Select("W")
             .OrderBy("A");
 
-        var a = Normalize.Sql(@"SELECT A, B FROM T UNION SELECT U, W FROM X ORDER BY A");
+        var a = Normalize.Sql(@"SELECT A, B FROM [T] UNION SELECT U, W FROM [X] ORDER BY A");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -141,7 +141,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .Select("W")
             .OrderBy("AliasA");
 
-        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T ORDER BY C OFFSET 4 ROWS FETCH NEXT 3 ROWS ONLY UNION SELECT U, W FROM X ORDER BY AliasA");
+        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM [T] ORDER BY C OFFSET 4 ROWS FETCH NEXT 3 ROWS ONLY UNION SELECT U, W FROM [X] ORDER BY AliasA");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -160,7 +160,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .Select("W")
             .OrderBy("1");
 
-        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T INTERSECT SELECT U, W FROM X ORDER BY 1");
+        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM [T] INTERSECT SELECT U, W FROM [X] ORDER BY 1");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }
@@ -179,7 +179,7 @@ public class SqlQuery_Oracle12cDialect_Tests
             .Select("W")
             .OrderBy("2");
 
-        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM T MINUS SELECT U, W FROM X ORDER BY 2");
+        var a = Normalize.Sql(@"SELECT A AS ""ALIASA"", B AS ""ALIASB"" FROM [T] MINUS SELECT U, W FROM [X] ORDER BY 2");
         var b = Normalize.Sql(query.ToString());
         Assert.Equal(a, b);
     }

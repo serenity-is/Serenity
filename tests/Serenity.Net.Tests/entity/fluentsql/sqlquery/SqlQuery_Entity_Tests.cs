@@ -82,7 +82,7 @@ public partial class SqlQuery_Entity_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT c.Name AS [CountryName] FROM ComplexTable T0 LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
+                "SELECT c.Name AS [CountryName] FROM [ComplexTable] T0 LEFT JOIN [TheCountryTable] c ON (c.[TheCountryID] = T0.[CountryID])"),
             Normalize.Sql(
                 query.ToString()));
 
@@ -103,7 +103,7 @@ public partial class SqlQuery_Entity_Tests
         });
 
         Assert.Contains("already has a join 'c'", exception.Message);
-        Assert.Contains("LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)", exception.Message);
-        Assert.Contains("Attempted join expression is 'LEFT JOIN City c ON (c.CityID = T0.CountryID)", exception.Message);
+        Assert.Contains("LEFT JOIN [TheCountryTable] c ON (c.[TheCountryID] = T0.[CountryID])", exception.Message);
+        Assert.Contains("Attempted join expression is 'LEFT JOIN [City] c ON (c.[CityID] = T0.[CountryID])", exception.Message);
     }
 }

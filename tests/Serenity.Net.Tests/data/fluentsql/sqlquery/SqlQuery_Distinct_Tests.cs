@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Tests.Data;
 
 public class SqlQuery_Distinct_Tests
 {
@@ -12,7 +12,7 @@ public class SqlQuery_Distinct_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT DISTINCT TestColumn FROM TestTable"),
+                "SELECT DISTINCT TestColumn FROM [TestTable]"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -28,7 +28,7 @@ public class SqlQuery_Distinct_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT TestColumn FROM TestTable"),
+                "SELECT TestColumn FROM [TestTable]"),
             Normalize.Sql(
                 query.ToString()));
     }
