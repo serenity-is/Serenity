@@ -118,7 +118,7 @@ public partial class FileUploadBehaviorTests
 
         sut.OnPrepareQuery(default(ISaveRequestHandler), query);
 
-        Assert.Equal("select field,(select 'test') as [stringfieldexpression] from table", Normalize(query.DebugText));
+        Assert.Equal("select field,(select 'test') as [stringfieldexpression] from [table]", Normalize(query.DebugText));
     }
 
     // [InlineData(0)]
@@ -158,7 +158,7 @@ public partial class FileUploadBehaviorTests
         if (previousSelectTexts.Count > 0)
             joinedSelects += ",";
 
-        Assert.Equal("select " + joinedSelects + "(select 'test') as [stringfieldexpression],field from table", Normalize(query.DebugText));
+        Assert.Equal("select " + joinedSelects + "(select 'test') as [stringfieldexpression],field from [table]", Normalize(query.DebugText));
     }
 
     [Fact]
