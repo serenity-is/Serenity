@@ -55,7 +55,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT u.TestColumn FROM [TestTable] u ORDER BY u.TestColumn DESC, TestColumn2 DESC"),
+                "SELECT u.TestColumn FROM TestTable u ORDER BY u.TestColumn DESC, TestColumn2 DESC"),
             Normalize.Sql(
                 query.ToString()));
     }
@@ -147,7 +147,7 @@ public partial class SqlQuery_OrderBy_Tests
 
         Assert.Equal(
             Normalize.Sql(
-                "SELECT u.TestColumn FROM [TestTable] u ORDER BY TestColumn2 DESC, u.TestColumn DESC"),
+                "SELECT u.TestColumn FROM TestTable u ORDER BY TestColumn2 DESC, u.TestColumn DESC"),
             Normalize.Sql(
                 query.ToString()));
     }
