@@ -1,4 +1,4 @@
-﻿using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data;
 
@@ -265,22 +265,19 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   String representation.</returns>
     public override string ToString()
     {
-        return Format(_tableName, _where.ToString(), _nameValuePairs);
+        return Format(_tableName, _where.ToString(), _nameValuePairs, dialect);
     }
 
     /// <summary>
-    ///   Formats an SQL UPDATE statement.</summary>
-    /// <param name="tableName">
-    ///   Table name (required).</param>
-    /// <param name="nameValuePairs">
-    ///   Field name and values. Should have structure of <c>[field1, value1, field2, value2, ...., fieldN, valueN]</c>.
-    ///   This array is required and must have even number of elements.</param>
-    /// <param name="where">
-    ///   WHERE clause (can be null).</param>
-    /// <returns>
-    ///   Formatted UPDATE query.</returns>
+    /// Formats an SQL UPDATE statement.</summary>
+    /// <param name="tableName">Table name (required).</param>
+    /// <param name="nameValuePairs">Field name and values. Should have structure of <c>[field1, value1, field2, value2, ...., fieldN, valueN]</c>.
+    /// This array is required and must have even number of elements.</param>
+    /// <param name="where">WHERE clause (can be null).</param>
+    /// <param name="dialect">Target dialect</param>
+    /// <returns>Formatted UPDATE query.</returns>
     public static string Format(string tableName, string where,
-        List<string> nameValuePairs)
+        List<string> nameValuePairs, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
@@ -293,13 +290,13 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 
         StringBuilder sb = new("UPDATE ", 64 + where.Length +
             nameValuePairs.Count * 16);
-        sb.Append(SqlSyntax.AutoBracketValid(tableName));
+        sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" SET ");
         for (int i = 0; i < nameValuePairs.Count - 1; i += 2)
         {
             if (i > 0)
                 sb.Append(", ");
-            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i]));
+            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i], dialect));
             sb.Append(" = ");
             sb.Append(nameValuePairs[i + 1]);
         }

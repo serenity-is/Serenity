@@ -85,7 +85,8 @@ public static class SqlSyntax
         ], StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Returns true if the specified identifier is a common SQL keyword.
+    /// Returns true if the specified identifier is a SQL keyword in any of the
+    /// known dialects.
     /// </summary>
     /// <param name="identifier">Identifier</param>
     public static bool IsReservedKeywordForAny(string identifier)
@@ -176,32 +177,47 @@ public static class SqlSyntax
     }
 
     /// <summary>
-    /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting.
+    /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting
+    /// and keywords for the passed dialect.
     /// </summary>
     /// <param name="s">The string.</param>
+    /// <param name="dialect">The dialect</param>
     /// <returns></returns>
-    public static string AutoBracket(string s)
+    public static string AutoBracket(string s, ISqlDialect dialect = null)
     {
-        if (!SqlSettings.AutoQuotedIdentifiers)
-            return s;
-
         if (string.IsNullOrEmpty(s))
             return s;
 
         if (IsQuoted(s))
             return s;
 
+        if (!ShouldAutoQuote(dialect) &&
+            !IsKeywordFor(s, dialect))
+            return s;
+
         return '[' + s + ']';
     }
 
+    private static bool ShouldAutoQuote(ISqlDialect dialect)
+    {
+        return (dialect?.AutoQuotedIdentifiers ?? SqlSettings.DefaultDialect?.AutoQuotedIdentifiers ?? SqlSettings.AutoQuotedIdentifiers);
+    }
+
+    private static bool IsKeywordFor(string s, ISqlDialect dialect)
+    { 
+        return dialect?.IsReservedKeyword(s) ?? IsReservedKeywordForAny(s);
+    }
+
     /// <summary>
-    /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting, only if the identifier is valid.
+    /// Automatically brackets the string based on dialect.AutoQuotedIdentifier setting, only if the identifier is valid.
     /// </summary>
     /// <param name="s">The string.</param>
+    /// <param name="dialect">Target dialect, SqlSettings.DefaultDialect is used if null.</param>
     /// <returns></returns>
-    public static string AutoBracketValid(string s)
+    public static string AutoBracketValid(string s, ISqlDialect dialect = null)
     {
-        if (!SqlSettings.AutoQuotedIdentifiers)
+        if (!ShouldAutoQuote(dialect) &&
+            !IsKeywordFor(s, dialect))
             return s;
 
         if (!IsValidIdentifier(s))

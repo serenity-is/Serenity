@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Class to generate queries of the form <c>INSERT INTO tablename (field1, field2..fieldN) 
@@ -155,7 +155,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (cachedQuery != null)
             return cachedQuery;
 
-        cachedQuery = Format(tableName, nameValuePairs);
+        cachedQuery = Format(tableName, nameValuePairs, dialect);
 
         return cachedQuery;
     }
@@ -167,9 +167,10 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="nameValuePairs">
     ///   Field names and values. Must be passed in the order of <c>[field1, value1, field2, 
     ///   value2, ...., fieldN, valueN]</c>. It must have even number of elements.</param>
+    /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    public static string Format(string tableName, List<string> nameValuePairs)
+    public static string Format(string tableName, List<string> nameValuePairs, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
@@ -181,13 +182,13 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentOutOfRangeException("nameValuePairs");
 
         StringBuilder sb = new("INSERT INTO ", 64 + nameValuePairs.Count * 16);
-        sb.Append(SqlSyntax.AutoBracketValid(tableName));
+        sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" (");
         for (int i = 0; i < nameValuePairs.Count; i += 2)
         {
             if (i > 0)
                 sb.Append(", ");
-            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i]));
+            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i], dialect));
         }
         sb.Append(") VALUES (");
         for (int i = 1; i < nameValuePairs.Count; i += 2)

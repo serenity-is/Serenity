@@ -73,7 +73,7 @@ public class Criteria : BaseCriteria
 
         if (string.IsNullOrEmpty(alias))
             throw new ArgumentNullException("alias");
-        expression = alias + "." + SqlSyntax.AutoBracketValid(field);
+        expression = alias + "." + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class Criteria : BaseCriteria
         if (joinNumber < 0)
             throw new ArgumentOutOfRangeException("joinNumber");
 
-        expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field);
+        expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
 
     /// <summary>

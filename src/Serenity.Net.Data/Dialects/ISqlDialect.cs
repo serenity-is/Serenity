@@ -6,6 +6,13 @@ namespace Serenity.Data;
 public interface ISqlDialect
 {
     /// <summary>
+    /// Gets a value indicating whether to automatically quote identifiers.
+    /// Default is null, e.g. SqlSettings.AutoQuotedIdentifiers is used, which itself is false by default,
+    /// but usually set to true in applications.
+    /// </summary>
+    public bool? AutoQuotedIdentifiers => null;
+
+    /// <summary>
     /// Gets a value indicating whether the server supports CONCAT.
     /// </summary>
     /// <value>

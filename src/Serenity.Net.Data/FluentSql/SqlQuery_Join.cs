@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
 {
@@ -6,7 +6,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     {
         sb.Append(join.GetKeyword());
         sb.Append(' ');
-        sb.Append(SqlSyntax.AutoBracketValid(join.Table));
+        sb.Append(SqlSyntax.AutoBracketValid(join.Table, dialect));
 
         // append if joinAlias is defined
         if (!string.IsNullOrEmpty(join.Name))

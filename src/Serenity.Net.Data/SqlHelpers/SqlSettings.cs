@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 
 namespace Serenity.Data;
 
@@ -18,6 +18,8 @@ public static class SqlSettings
 
     /// <summary>
     /// Gets or sets a value indicating whether to automatically quote identifiers.
+    /// This is used as a fallback if the dialect and SqlSettings.DefaultDialect does 
+    /// not provide a value.
     /// </summary>
     /// <value>
     ///   <c>true</c> if should automatically quote identifiers; otherwise, <c>false</c>.

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Extensions for SqlQuery.</summary>
@@ -161,7 +161,7 @@ public static class EntitySqlQueryExtensions
         if (columnName == null)
             throw new ArgumentNullException("columnName");
 
-        return query.Select(alias.NameDot + SqlSyntax.AutoBracket(field.Name), columnName);
+        return query.Select(alias.NameDot + SqlSyntax.AutoBracket(field.Name, query.Dialect()), columnName);
     }
 
     /// <summary>

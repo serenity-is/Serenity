@@ -923,13 +923,13 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             if (sortOrders == null)
             {
                 var list = new List<Tuple<Field, int>>();
-                foreach (var field in this)
+                foreach (var @field in this)
                 {
-                    var sortAttr = field.CustomAttributes
+                    var sortAttr = @field.CustomAttributes
                         .OfType<SortOrderAttribute>().FirstOrDefault();
 
                     if (sortAttr != null)
-                        list.Add(new Tuple<Field, int>(field, sortAttr.SortOrder));
+                        list.Add(new Tuple<Field, int>(@field, sortAttr.SortOrder));
                 }
 
                 sortOrders = list.OrderBy(x => Math.Abs(x.Item2))

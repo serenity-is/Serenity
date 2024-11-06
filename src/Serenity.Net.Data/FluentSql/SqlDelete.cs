@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Class to generate queries of form <c>DELETE FROM tablename WHERE [conditions]</c>.</summary>
@@ -77,7 +77,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     ///   String representation of the query.</returns>
     public override string ToString()
     {
-        return Format(_tableName, _where.ToString());
+        return Format(_tableName, _where.ToString(), dialect);
     }
 
     /// <summary>
@@ -86,15 +86,16 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     ///   Table name.</param>
     /// <param name="where">
     ///   Where part of the query.</param>
+    /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    public static string Format(string tableName, string where)
+    public static string Format(string tableName, string where, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
         StringBuilder sb = new("DELETE FROM ", 24 + where.Length);
-        sb.Append(SqlSyntax.AutoBracketValid(tableName));
+        sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
 
         if (!string.IsNullOrEmpty(where))
         {

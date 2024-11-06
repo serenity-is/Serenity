@@ -314,7 +314,7 @@ public static class SqlHelper
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
             string identityColumn = query.IdentityColumn() ?? throw new ArgumentNullException("query.IdentityColumn");
-            queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
+            queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn, dialect);
 
             if (dialect.UseReturningIntoVar)
                 queryText += " INTO " + dialect.ParameterPrefix + identityColumn;

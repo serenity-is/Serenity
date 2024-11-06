@@ -87,7 +87,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (from.Length > 0)
             from.Append(", ");
 
-        from.Append(SqlSyntax.AutoBracketValid(table));
+        from.Append(SqlSyntax.AutoBracketValid(table, dialect));
 
         return this;
     }

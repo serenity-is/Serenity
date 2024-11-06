@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 internal class OriginPropertyDictionary
 {
@@ -233,7 +233,7 @@ internal class OriginPropertyDictionary
 
         var columnAttr = originProperty.GetCustomAttribute<ColumnAttribute>();
         if (columnAttr != null)
-            return aliasPrefix + "." + SqlSyntax.AutoBracket(columnAttr.Name);
+            return aliasPrefix + "." + SqlSyntax.AutoBracket(columnAttr.Name, expressionSelector.Dialect);
         else
         {
             var originDictionary = GetPropertyDictionary(org.Item2);
@@ -255,7 +255,7 @@ internal class OriginPropertyDictionary
                     return originDictionary.OriginExpression(originProperty.Name, originOrigin, expressionSelector, aliasPrefix, extraJoins);
                 }
                 else
-                    return aliasPrefix + "." + SqlSyntax.AutoBracket(originProperty.Name);
+                    return aliasPrefix + "." + SqlSyntax.AutoBracket(originProperty.Name, expressionSelector.Dialect);
             }
         }
     }
@@ -376,7 +376,7 @@ internal class OriginPropertyDictionary
                 var newAlias = aliasPrefix + x;
                 var columnAttr = propertyInfo.GetCustomAttribute<ColumnAttribute>();
                 if (columnAttr != null)
-                    leftExpression = alias + "." + SqlSyntax.AutoBracket(columnAttr.Name);
+                    leftExpression = alias + "." + SqlSyntax.AutoBracket(columnAttr.Name, expressionSelector.Dialect);
                 else
                 {
                     var expressionAttr = propertyInfo.GetCustomAttributes<BaseExpressionAttribute>();
@@ -390,13 +390,13 @@ internal class OriginPropertyDictionary
                         if (origin != null)
                             leftExpression = OriginExpression(propertyInfo.Name, origin, expressionSelector, alias, extraJoins);
                         else
-                            leftExpression = alias + "." + SqlSyntax.AutoBracket(propertyInfo.Name);
+                            leftExpression = alias + "." + SqlSyntax.AutoBracket(propertyInfo.Name, expressionSelector.Dialect);
                     }
                 }
 
                 ISqlJoin srcJoin = propJoin.join;
                 var fkAttr = expressionSelector.GetBestMatch(propJoin.foreignKeys, x => x.Dialect);
-                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr.Field);
+                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr.Field, expressionSelector.Dialect);
 
                 var frgTable = fkAttr.Table ??
                     expressionSelector.GetBestMatch(fkAttr.RowType

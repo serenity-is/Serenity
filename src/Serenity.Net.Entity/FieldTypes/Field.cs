@@ -44,7 +44,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
     {
         this.name = name;
-        expression = "T0." + SqlSyntax.AutoBracket(name);
+        expression = "T0." + SqlSyntax.AutoBracket(name, (fields as RowFieldsBase)?.dialect);
         Size = size;
         this.flags = flags;
         this.type = type;
