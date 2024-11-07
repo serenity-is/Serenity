@@ -10,7 +10,7 @@ import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { Combobox, ComboboxItem, ComboboxOptions, ComboboxSearchQuery, ComboboxSearchResult, stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
-import { EditorProps } from "./editorwidget";
+import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface ComboboxCommonOptions {
     allowClear?: boolean;
@@ -39,7 +39,7 @@ export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxIn
 
 @Decorators.registerClass('Serenity.ComboboxEditor',
     [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
-export class ComboboxEditor<P, TItem> extends Widget<P> implements
+export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 
     static override createDefaultElement() { return <input type="hidden" /> as HTMLInputElement; }
@@ -551,10 +551,6 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
         return this.domNode.getAttribute("readonly") != null;
     }
 
-    get readOnly(): boolean {
-        return this.get_readOnly();
-    }
-
     private updateInplaceReadOnly(): void {
         var readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
@@ -571,10 +567,6 @@ export class ComboboxEditor<P, TItem> extends Widget<P> implements
             value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
             this.updateInplaceReadOnly();
         }
-    }
-
-    set readOnly(value: boolean) {
-        this.set_readOnly(value);
     }
 
     protected getCascadeFromValue(parent: Widget<any>) {

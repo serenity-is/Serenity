@@ -55,8 +55,6 @@ export class ReadOnlyDialog extends SupplierDialog {
         super.updateInterface();
 
         // finding all editor elements and setting their readonly attribute
-        // note that this helper method only works with basic inputs, 
-        // some editors require widget based set readonly overload (setReadOnly)
         EditorUtils.setReadonly(this.domNode.querySelectorAll('.editor'), true);
 
         // remove required asterisk (*)

@@ -7,6 +7,6 @@ export class CustomerOrderDialog extends OrderDialog {
     updateInterface() {
         super.updateInterface();
 
-        EditorUtils.setReadOnly(this.form.CustomerID, true);
+        this.form.CustomerID.readOnly = true;
     }
 }

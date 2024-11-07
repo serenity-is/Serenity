@@ -1,5 +1,5 @@
-﻿import { Fluent, PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, tryGetText } from "../../base";
-import { IBooleanValue, IDoubleValue, IGetEditValue, IReadOnly, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
+﻿import { Fluent, PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, setElementReadOnly, tryGetText } from "../../base";
+import { IBooleanValue, IDoubleValue, IGetEditValue, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { cast, isTrimmedEmpty, safeCast } from "../../q";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
@@ -146,43 +146,46 @@ export namespace EditorUtils {
         }
     }
 
-    export function setReadonly(elements: Element | ArrayLike<Element>, isReadOnly: boolean) {
+    /**
+     * This functions sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given elements
+     * or widgets. If a widget is passed and it has set_readOnly method it is called instead of setting readonly class or attributes.
+     * Note that if an element, instead of the widget attached to it is passed directly, this searchs for a widget attached to it.
+     * If you don't want this behavior, use setElementReadOnly method.
+     * @param elements 
+     * @param value 
+     */
+    export function setReadonly(elements: Element | Widget<any> | ArrayLike<Element | Widget>, value: boolean) {
         elements = isArrayLike(elements) ? elements : [elements];
         for (var i = 0; i < elements.length; i++) {
             let el = elements[i];
-            var type = el.getAttribute('type');
-            if (el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox') {
-                if (isReadOnly) {
-                    el.classList.add('readonly');
-                    el.setAttribute('disabled', 'disabled');
+            if (el == null)
+                continue;
+
+            if (!(el instanceof Node)) {
+                if (typeof (el as any).set_readOnly === "function") {
+                    (el as any).set_readOnly(!!value);
+                    continue;
                 }
-                else {
-                    el.classList.remove('readonly');
-                    el.removeAttribute('disabled');
-                }
-            }
-            else if (isReadOnly) {
-                el.classList.add('readonly');
-                el.setAttribute('readonly', 'readonly');
+                el = el.domNode;
+                if (!el)
+                    continue;
             }
             else {
-                el.classList.remove('readonly');
-                el.removeAttribute('readonly');
+                const widget = tryGetWidget(el);
+                if (widget != null && typeof (widget as any).set_readOnly === "function") {
+                    (widget as any).set_readOnly(!!value);
+                    continue;
+                }
             }
+
+            setElementReadOnly(el, value);
         }
     }
 
-    export function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void {
-
-        var readOnly = safeCast(widget, IReadOnly);
-
-        if (readOnly != null) {
-            readOnly.set_readOnly(isReadOnly);
-        }
-        else if (Fluent.isInputLike(widget.domNode)) {
-            setReadonly(widget.domNode, isReadOnly);
-        }
-    }
+    /**
+     * Legacy alias for setReadonly
+     */
+    export const setReadOnly = setReadonly;
 
     export function setRequired(widget: Widget<any>, isRequired: boolean): void {
         var req = safeCast(widget, IValidateRequired);
@@ -214,11 +217,7 @@ export namespace EditorUtils {
             container.classList.remove('readonly-container');
             container.querySelectorAll(".editor.container-readonly").forEach(el => {
                 el.classList.remove('container-readonly');
-                var w = tryGetWidget(el) as any;
-                if (w != null)
-                    EditorUtils.setReadOnly(w, false);
-                else
-                    EditorUtils.setReadonly(el, false);
+                EditorUtils.setReadOnly(el, false);
             });
 
             return;
@@ -237,14 +236,13 @@ export namespace EditorUtils {
 
                 el.classList.add('container-readonly');
                 EditorUtils.setReadOnly(w, true);
-
             }
             else {
                 if (el.matches('[readonly]') || el.matches('[disabled]') || el.matches('.readonly') || el.matches('.disabled'))
                     return;
 
                 el.classList.add('container-readonly');
-                EditorUtils.setReadonly(el, true);
+                setElementReadOnly(el, true);
             }
         });
     }

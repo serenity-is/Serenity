@@ -118,3 +118,44 @@ export function sanitizeUrl(url: string): string {
     if (url === "javascript:void(0)" || url === "javascript:;") return url;
     return `unsafe:${url}`;
 }
+
+/**
+ * Gets readonly state of an element. If the element is null, returns null.
+ * It does not check for attached widgets. It returns true if the element has readonly class,
+ * disabled attribute (select, radio, checkbox) or readonly attribute (other inputs).
+ * @param el element
+ */
+export function getElementReadOnly(el: Element): boolean | null {
+    if (el == null)
+        return null;
+
+    if (el.classList.contains('readonly'))
+        return true;
+
+    const type = el.getAttribute('type');        
+    if (el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox') 
+        return el.hasAttribute('disabled');
+
+    return el.hasAttribute('readonly');
+}
+
+/**
+ * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
+ * It does not check for attached widgets.
+ * @param el Element
+ * @param value Readonly state
+ */
+export function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean) {
+    if (!elements)
+        return;
+    elements = isArrayLike(elements) ? elements : [elements];
+    for (var i = 0; i < elements.length; i++) {
+        let el = elements[i];
+        if (!el)
+            continue;
+        var type = el.getAttribute('type');
+        el.classList.toggle('readonly', !!value);
+        const attr = el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox' ? 'disabled' : 'readonly';
+        value ? el.setAttribute(attr, attr) : el.removeAttribute(attr);
+    }
+}

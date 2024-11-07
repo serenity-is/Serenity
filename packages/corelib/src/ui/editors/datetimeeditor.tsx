@@ -1,4 +1,4 @@
-import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, stringFormat, trunc, tryGetText } from "../../base";
+import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, setElementReadOnly, stringFormat, trunc, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, today } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -355,7 +355,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             let now = this.element.nextSibling(".inplace-now").getNode();
             now && ((now as HTMLElement).style.opacity = value ? "0.1" : "1");
 
-            this.time && EditorUtils.setReadonly(this.time, value);
+            this.time && setElementReadOnly(this.time, value);
         }
     }
 
