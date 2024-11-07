@@ -1487,6 +1487,20 @@ export declare function removeClass(el: Element, cls: string): void;
  */
 export declare function appendToNode(parent: ParentNode, child: any): void;
 export declare function sanitizeUrl(url: string): string;
+/**
+ * Gets readonly state of an element. If the element is null, returns null.
+ * It does not check for attached widgets. It returns true if the element has readonly class,
+ * disabled attribute (select, radio, checkbox) or readonly attribute (other inputs).
+ * @param el element
+ */
+export declare function getElementReadOnly(el: Element): boolean | null;
+/**
+ * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
+ * It does not check for attached widgets.
+ * @param el Element
+ * @param value Readonly state
+ */
+export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
 export declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 export declare function localText(key: string, defaultText?: string): string;
 export declare function tryGetText(key: string): string;
@@ -3423,6 +3437,8 @@ export type EditorProps<T> = WidgetProps<T> & {
 export declare class EditorWidget<P> extends Widget<EditorProps<P>> {
 	static typeInfo: ClassTypeInfo<"Serenity.EditorWidget">;
 	constructor(props: EditorProps<P>);
+	get readOnly(): boolean;
+	set readOnly(value: boolean);
 }
 export declare class CascadedWidgetLink<TParent extends Widget<any>> {
 	private parentType;
@@ -3618,8 +3634,19 @@ export declare namespace EditorUtils {
 	function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
 	function setValue(editor: Widget<any>, value: any): void;
 	function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
-	function setReadonly(elements: Element | ArrayLike<Element>, isReadOnly: boolean): void;
-	function setReadOnly(widget: Widget<any>, isReadOnly: boolean): void;
+	/**
+	 * This functions sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given elements
+	 * or widgets. If a widget is passed and it has set_readOnly method it is called instead of setting readonly class or attributes.
+	 * Note that if an element, instead of the widget attached to it is passed directly, this searchs for a widget attached to it.
+	 * If you don't want this behavior, use setElementReadOnly method.
+	 * @param elements
+	 * @param value
+	 */
+	function setReadonly(elements: Element | Widget<any> | ArrayLike<Element | Widget>, value: boolean): void;
+	/**
+	 * Legacy alias for setReadonly
+	 */
+	const setReadOnly: typeof setReadonly;
 	function setRequired(widget: Widget<any>, isRequired: boolean): void;
 	function setContainerReadOnly(container: ArrayLike<HTMLElement> | HTMLElement, readOnly: boolean): void;
 }
@@ -3996,7 +4023,7 @@ export interface ComboboxInplaceAddOptions {
 }
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
-export declare class ComboboxEditor<P, TItem> extends Widget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	private combobox;
@@ -4061,10 +4088,8 @@ export declare class ComboboxEditor<P, TItem> extends Widget<P> implements ISetE
 	protected get_text(): string;
 	get text(): string;
 	get_readOnly(): boolean;
-	get readOnly(): boolean;
 	private updateInplaceReadOnly;
 	set_readOnly(value: boolean): void;
-	set readOnly(value: boolean);
 	protected getCascadeFromValue(parent: Widget<any>): any;
 	protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 	protected setCascadeFrom(value: string): void;
