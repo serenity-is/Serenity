@@ -346,8 +346,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
-            this.domNode.classList.toggle('readonly', !!value);
-            value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
+            setElementReadOnly(this.domNode, value);
 
             let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
             trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");

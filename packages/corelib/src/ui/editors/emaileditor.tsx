@@ -1,4 +1,4 @@
-﻿import { Fluent, ValidatableElement, Validator, tryGetText } from "../../base";
+﻿import { Fluent, ValidatableElement, Validator, setElementReadOnly, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { ValidationHelper } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -135,21 +135,9 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     }
 
     set_readOnly(value: boolean): void {
-        if (value) {
-            this.domNode.setAttribute('readonly', 'readonly');
-            this.domNode.classList.add('readonly');
-            if (!this.options.readOnlyDomain) {
-                this.domain.setAttribute('readonly', 'readonly');
-                this.domain.classList.add('readonly');
-            }
-        }
-        else {
-            this.domNode.removeAttribute('readonly');
-            this.domNode.classList.remove('readonly');
-            if (!this.options.readOnlyDomain) {
-                this.domain.removeAttribute('readonly');
-                this.domain.classList.remove('readonly');
-            }
+        setElementReadOnly(this.domNode, value);
+        if (!this.options.readOnlyDomain) {
+            setElementReadOnly(this.domain, value)
         }
     }
 }

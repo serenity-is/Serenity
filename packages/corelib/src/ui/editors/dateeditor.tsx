@@ -1,4 +1,4 @@
-import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, stringFormat } from "../../base";
+import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { today } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -157,8 +157,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     set_readOnly(value: boolean): void {
 
         if (value !== this.get_readOnly()) {
-            this.domNode.classList.toggle('readonly', !!value);
-            value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
+            setElementReadOnly(this.domNode, value);
             let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
             trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
         }

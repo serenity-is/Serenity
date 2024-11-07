@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, isPromiseLike, localText } from "../../base";
+﻿import { Fluent, PropertyItem, isPromiseLike, localText, setElementReadOnly } from "../../base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
 import { Decorators } from "../../types/decorators";
@@ -564,7 +564,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
     set_readOnly(value: boolean) {
         if (value !== this.get_readOnly()) {
-            value ? this.domNode.setAttribute("readonly", "readonly") : this.domNode.removeAttribute("readonly");
+            setElementReadOnly(this.domNode, value);
             this.updateInplaceReadOnly();
         }
     }
