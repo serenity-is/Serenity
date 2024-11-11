@@ -12,7 +12,7 @@ public partial class TimeSpanEditorAttribute : CustomEditorAttribute
     /// <summary>
     /// Editor type key
     /// </summary>
-    public const string Key = "Time";
+    public const string Key = "TimeSpan";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TimeSpanEditorAttribute"/> class.
