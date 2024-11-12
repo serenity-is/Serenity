@@ -1,3 +1,19 @@
+## 8.7.7 (2024-11-12)
+
+### Features
+
+- Use texts.__.json as a file name for template texts, instead of texts.json, and change the comment to clarify intent.
+- Prefix field name with @ if the generated private field member name is a C# reserved keyword, e.g. for properties like `return`, `int` etc.
+- Add IsReservedKeyword method to `ISqlDialect`, and implement it for dialects. There is also an `SqlSyntax.IsReservedKeywordForAny` method that returns if an identifier is reserved in any of the known dialects. 
+- Add AutoQuotedIdentifiers to the ISqlDialect interface which is null by default. If null, its value is determined from SqlSettings.DefaultDialect.AutoQuotedIdentifiers or SqlSettings.AutoQuotedIdentifiers. This will make changing this setting per connection / dialect possible by subclassing one of the dialects. Regardless of this setting, keywords will always be quoted by `SqlSyntax.AutoBracket` and `SqlSyntax.AutoBracketValid` methods. If this is not desired for some reason, dialect might return false for its IsReservedKeyword method.
+- Set `SqlSettings.AutoQuotedIdentifiers` to `true` by default. This had been set to true in both the templates for years and running Serenity tests in the same context should be better for consistency. The setting was originally introduced as a workaround for Postgres, and the way FluentMigrator quotes identifiers in migrations by default, so probably it may even be no longer necessary.
+- Modify EditorUtils.setReadonly so that it supports both widgets and elements. It also auto searches for an attached widget if an element is passed in. EditorUtils.setReadOnly and EditorUtils.setReadonly now point to the same function. There is also corelib's getElementReadOnly and setElementReadOnly functions but they only accept elements and don't search for widgets. All widgets deriving from EditorWidget now also has a readOnly property that is directly settable instead of using EditorUtils.
+- Sort OrganizationEditor items by their display texts
+
+### Bugfixes
+
+- Fix TimeSpanEditorAttribute having wrong key so it is generated as TimeEditor
+
 ## 8.7.6 (2024-11-04)
 
 ### Features
