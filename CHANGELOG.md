@@ -1,3 +1,9 @@
+## 8.7.9 (2024-11-12)
+
+### Bugfixes
+
+- Fix records cannot be added to the grid editor for in-memory mode
+
 ## 8.7.8 (2024-11-12)
 
 ### Bugfixes
