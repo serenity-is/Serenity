@@ -1,5 +1,6 @@
 import {
-    DataGrid, Decorators, Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper, ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText, turkishLocaleCompare
+    Culture, DataGrid, Decorators, Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
+    ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText,
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
@@ -238,7 +239,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
             }
 
             keys = Object.keys(titleByKey);
-            keys = keys.sort((x, y) => turkishLocaleCompare(titleWithGroup[x], titleWithGroup[y]));
+            keys = keys.sort((x, y) => Culture.stringCompare(titleWithGroup[x], titleWithGroup[y]));
             then(keys);
         });
     }
