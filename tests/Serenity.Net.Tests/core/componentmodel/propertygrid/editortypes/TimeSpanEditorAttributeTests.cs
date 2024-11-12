@@ -3,10 +3,10 @@ namespace Serenity.Tests.ComponentModel;
 public class TimeSpanEditorAttributeTests
 {
     [Fact]
-    public void EditorType_ShouldBe_Time()
+    public void EditorType_ShouldBe_TimeSpan()
     {
-        var attributee = new TimeSpanEditorAttribute();
-        Assert.Equal("Time", attributee.EditorType);
+        var attribute = new TimeSpanEditorAttribute();
+        Assert.Equal("TimeSpan", attribute.EditorType);
     }
 
     [Fact]
