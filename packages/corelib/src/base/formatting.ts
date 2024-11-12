@@ -103,7 +103,17 @@ export let Culture: Locale = {
 };
 
 (function () {
-    const lang = typeof document !== "undefined" ? document.documentElement?.lang : undefined;
+    let lang = typeof document !== "undefined" ? document.documentElement?.lang : undefined;
+    if (lang == "")
+        lang = void 0;
+    if (lang !== void 0) {
+        try {
+            "a".localeCompare("b", lang);
+        }
+        catch {
+            lang = undefined;
+        }
+    }
     Culture.stringCompare = (a, b) => a == null ? (b == null ? 0 : -1) : (b == null ? 1 : a.localeCompare(b, lang));
 
     let k: string;

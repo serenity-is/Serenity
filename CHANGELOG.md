@@ -1,3 +1,9 @@
+## 8.7.8 (2024-11-12)
+
+### Bugfixes
+
+- Fix issue when document.documentElement.lang is empty string
+
 ## 8.7.7 (2024-11-12)
 
 ### Features
