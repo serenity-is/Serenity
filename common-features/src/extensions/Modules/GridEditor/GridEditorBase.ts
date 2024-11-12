@@ -92,6 +92,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             }
 
             callback?.({});
+            this.view.setItems(items, true);
         }
 
         this.element.trigger("change", { 
