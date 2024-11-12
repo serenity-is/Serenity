@@ -77,68 +77,6 @@ describe("Invariant.stringCompare", () => {
     });
 });
 
-describe("compareStringFactory", () => {
-    it("when order is not specified uses localeCompare", async function () {
-        var formatting = (await import("./formatting"));
-        var localeCompareSpy = jest.spyOn(String.prototype, "localeCompare");
-        try {
-            var comparer = formatting.compareStringFactory("");
-            expect(comparer("a", "b")).toBe(-1);
-            expect(localeCompareSpy).toHaveBeenCalledTimes(1);
-        }
-        finally {
-            localeCompareSpy.mockRestore();
-        }
-    });
-
-    it("when order is specified uses the character order", async function () {
-        var formatting = (await import("./formatting"));
-        var localeCompareSpy = jest.spyOn(String.prototype, "localeCompare");
-        try {
-            var comparer = formatting.compareStringFactory("cba");
-            expect(comparer("a", "b")).toBe(1);
-            expect(localeCompareSpy).not.toHaveBeenCalled();
-        }
-        finally {
-            localeCompareSpy.mockRestore();
-        }
-    });
-
-    it("calls localeCompare for strings of different length", async function () {
-        var formatting = (await import("./formatting"));
-        var localeCompareSpy = jest.spyOn(String.prototype, "localeCompare");
-        try {
-            var comparer = formatting.compareStringFactory("cba");
-            expect(comparer("ab", "abx")).toBe(-1);
-            expect(localeCompareSpy).toHaveBeenCalledTimes(1);
-        }
-        finally {
-            localeCompareSpy.mockRestore();
-        }
-    });
-
-    it("returns 0 for same strings", async function () {
-        var formatting = (await import("./formatting"));
-        var localeCompareSpy = jest.spyOn(String.prototype, "localeCompare");
-        try {
-            var comparer = formatting.compareStringFactory("");
-            expect(comparer("d", "d")).toBe(0);
-            expect(localeCompareSpy).not.toHaveBeenCalled();
-            expect(comparer("dx", "dx")).toBe(0);
-            expect(localeCompareSpy).not.toHaveBeenCalled();
-
-            comparer = formatting.compareStringFactory("yz");
-            expect(comparer("dxy", "dxz")).toBe(-1);
-            expect(localeCompareSpy).not.toHaveBeenCalled();
-            expect(comparer("dyz", "dzz")).toBe(-1);
-            expect(localeCompareSpy).not.toHaveBeenCalled();
-        }
-        finally {
-            localeCompareSpy.mockRestore();
-        }
-    });
-});
-
 describe("splitDateString", () => {
     it("returns null for null, undefined and empty string", async function () {
         var formatting = (await import("./formatting"));

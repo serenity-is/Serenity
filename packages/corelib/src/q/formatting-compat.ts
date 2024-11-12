@@ -21,6 +21,7 @@ export function turkishLocaleToUpper(a: string): string {
 
 /**
  * This is an alias for Culture.stringCompare, left in for compatibility reasons.
+ * @deprecated Use Culture.stringCompare
  */
 export let turkishLocaleCompare = Culture.stringCompare;
 

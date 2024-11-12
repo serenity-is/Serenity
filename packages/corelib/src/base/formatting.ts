@@ -83,42 +83,7 @@ export let Invariant: Locale = {
     stringCompare: (a, b) => a < b ? -1 : (a > b ? 1 : 0)
 }
 
-/** 
- * Factory for a function that compares two strings, based on a character order 
- * passed in the `order` argument.
- */
-export function compareStringFactory(order: string): ((a: string, b: string) => number) {
 
-    var o: { [key: string]: number } = {};
-    for (let z = 0; z < order.length; z++) {
-        o[order.charAt(z)] = z + 1;
-    }
-
-    return function (a: string, b: string) {
-        a = a || "";
-        b = b || "";
-        if (a == b)
-            return 0;
-
-        let c: number;
-        for (let i = 0, _len = Math.min(a.length, b.length); i < _len; i++) {
-            let x = a.charAt(i), y = b.charAt(i);
-            if (x === y) {
-                continue;
-            }
-            let ix = o[x], iy = o[y];
-            if (ix != null && iy != null)
-                return ix < iy ? -1 : 1;
-            c = x.localeCompare(y);
-            if (c == 0)
-                continue;
-            return c;
-        }
-        if (c != null)
-            return c;
-        return a.localeCompare(b);
-    }
-}
 
 /**
  * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
@@ -134,10 +99,13 @@ export let Culture: Locale = {
     dateOrder: 'dmy',
     dateFormat: 'dd/MM/yyyy',
     dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
-    stringCompare: compareStringFactory("AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz")
+    stringCompare: Invariant.stringCompare
 };
 
 (function () {
+    const lang = typeof document !== "undefined" ? document.documentElement?.lang : undefined;
+    Culture.stringCompare = (a, b) => a == null ? (b == null ? 0 : -1) : (b == null ? 1 : a.localeCompare(b, lang));
+
     let k: string;
     for (k in Invariant)
         if ((Culture as any)[k] === undefined && Object.prototype.hasOwnProperty.call(Invariant, k))

@@ -1334,11 +1334,6 @@ export interface Locale extends NumberFormat, DateFormat {
 /** Invariant locale (e.g. CultureInfo.InvariantCulture) */
 export declare let Invariant: Locale;
 /**
- * Factory for a function that compares two strings, based on a character order
- * passed in the `order` argument.
- */
-export declare function compareStringFactory(order: string): ((a: string, b: string) => number);
-/**
  * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
  * settings passed from a `<script>` element in the page with id `ScriptCulture`
  * containing a JSON object if available. This element is generally created in
@@ -2492,6 +2487,7 @@ export declare function turkishLocaleToLower(a: string): string;
 export declare function turkishLocaleToUpper(a: string): string;
 /**
  * This is an alias for Culture.stringCompare, left in for compatibility reasons.
+ * @deprecated Use Culture.stringCompare
  */
 export declare let turkishLocaleCompare: (a: string, b: string) => number;
 /** @deprecated Use stringFormat */
