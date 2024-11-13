@@ -18,10 +18,10 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
 
     constructor(props?: WidgetProps<P>) {
         super(props);
-        this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
+        this.afterRender(() => this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
             this.propertyItemsReady(itemsData);
             this.afterInit();
-        });
+        }));
     }
 
     protected propertyItemsReady(itemsData: PropertyItemsData) {

@@ -64,7 +64,7 @@ export class BasePanel<P={}> extends Widget<P> {
         var toolbarDiv = this.findById('Toolbar');
         if (!toolbarDiv)
             return;
-        this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv });
+        this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv }).init();
     }
 
     protected initValidator(): void {

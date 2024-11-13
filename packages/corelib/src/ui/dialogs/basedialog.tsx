@@ -23,9 +23,11 @@ export class BaseDialog<P> extends Widget<P> {
         super(props);
 
         this.domNode.setAttribute("id", this.domNode.getAttribute("id") || this.uniqueName);
-        this.initValidator();
-        this.initTabs();
-        this.initToolbar();
+        this.afterRender(() => {
+            this.initValidator();
+            this.initTabs();
+            this.initToolbar();
+        });
     }
 
     public destroy(): void {
@@ -157,7 +159,7 @@ export class BaseDialog<P> extends Widget<P> {
         var hotkeyContext = this.domNode.closest('.ui-dialog') ??
             this.domNode.closest('.modal') ?? this.domNode;
 
-        this.toolbar = new Toolbar({ element: toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext });
+        this.toolbar = new Toolbar({ element: toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext }).init();
     }
 
     protected getValidatorOptions(): any {

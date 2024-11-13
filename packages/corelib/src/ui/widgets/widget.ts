@@ -4,6 +4,8 @@ import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setEle
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
+const afterRenderSymbol = Symbol();
+
 @Decorators.registerType()
 export class Widget<P = {}> {
     static typeInfo = Decorators.classType("Serenity.Widget");
@@ -36,8 +38,11 @@ export class Widget<P = {}> {
         });
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
+
+        (this as any)[afterRenderSymbol] = [];        
         this.addCssClass();
-        !getInstanceType(this).deferRenderContents && this.internalRenderContents();
+        !this.deferRender() && this.internalRender();
+        queueMicrotask(() => this.init());
     }
 
     public destroy(): void {
@@ -62,6 +67,10 @@ export class Widget<P = {}> {
 
     protected addCssClass(): void {
         addClass(this.domNode, this.getCssClass());
+    }
+
+    protected deferRender() {
+        return false;
     }
 
     protected getCssClass(): string {
@@ -135,15 +144,19 @@ export class Widget<P = {}> {
         return getCustomAttribute(getInstanceType(this), attrType, inherit);
     }
 
-    protected internalInit() {
-        getInstanceType(this).deferRenderContents && this.internalRenderContents();
+    protected afterRender(callback: () => void) {
+        if (!callback)
+            return;
+
+        const queue = (this as any)[afterRenderSymbol];
+        if (!queue)
+            callback();
+        else 
+            queue.push(callback);
     }
 
     public init(): this {
-        if (!(this as any)[initialized]) {
-            (this as any)[initialized] = true;
-            this.internalInit();
-        }
+        this.deferRender() && this.internalRender();
         return this;
     }
 
@@ -162,13 +175,15 @@ export class Widget<P = {}> {
         return el;
     }
 
-    protected internalRenderContents() {
-        if ((this as any)[renderContentsCalled])
-            return;
-        (this as any)[renderContentsCalled] = true;
-        let contents = this.renderContents();
-        if (this.domNode && contents)
-            appendToNode(this.domNode, contents);
+    protected internalRender() {
+        const queue = (this as any)[afterRenderSymbol];
+        if (queue) {
+            let contents = this.renderContents();
+            if (this.domNode && contents)
+                appendToNode(this.domNode, contents);
+            delete (this as any)[afterRenderSymbol];
+            for (var callback of queue) callback();
+        }
     }
 
     protected renderContents(): any {
@@ -222,6 +237,3 @@ export interface CreateWidgetParams<TWidget extends Widget<P>, P> {
     element?: (e: Fluent) => void;
     init?: (w: TWidget) => void;
 }
-
-const initialized = Symbol();
-const renderContentsCalled = Symbol();

@@ -34,7 +34,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
             element: el => this.domNode.appendChild(el)
-        });
+        }).init();
 
         this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
 
@@ -291,7 +291,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.toolbar = new Toolbar({
             buttons: this.getToolButtons(),
             element: el => this.domNode.append(el)
-        });
+        }).init();
 
         this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
 

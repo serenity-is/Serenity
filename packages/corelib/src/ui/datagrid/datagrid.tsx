@@ -796,7 +796,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             buttons: buttons,
             hotkeyContext: this.domNode,
             element: el => this.domNode.appendChild(el).classList.add("grid-toolbar")
-        });
+        }).init();
     }
 
     getTitle(): string {

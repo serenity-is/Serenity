@@ -2588,6 +2588,7 @@ export declare class Widget<P = {}> {
 	 */
 	get element(): Fluent;
 	protected addCssClass(): void;
+	protected deferRender(): boolean;
 	protected getCssClass(): string;
 	static getWidgetName(type: Function): string;
 	addValidationRule(rule: (input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => string, uniqueName?: string): void;
@@ -2601,7 +2602,7 @@ export declare class Widget<P = {}> {
 	protected getCustomAttribute<TAttr>(attrType: {
 		new (...args: any[]): TAttr;
 	}, inherit?: boolean): TAttr;
-	protected internalInit(): void;
+	protected afterRender(callback: () => void): void;
 	init(): this;
 	/**
 	 * Returns the main element for this widget or the document fragment.
@@ -2609,7 +2610,7 @@ export declare class Widget<P = {}> {
 	 * this method should not be overridden. Override renderContents() instead.
 	 */
 	render(): any;
-	protected internalRenderContents(): void;
+	protected internalRender(): void;
 	protected renderContents(): any;
 	protected legacyTemplateRender(): boolean;
 	get props(): WidgetProps<P>;

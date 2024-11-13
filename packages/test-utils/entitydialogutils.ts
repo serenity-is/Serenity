@@ -3,6 +3,7 @@ import { waitForAjaxRequests } from "./waitutils";
 
 export class EntityDialogWrapper<TDialog extends EntityDialog<any, any>> {
     constructor(public readonly actual: TDialog) {
+        this.actual.init();
     }
 
     clickDeleteButton(): Promise<void> {

@@ -40,10 +40,10 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
+        this.afterRender(() => this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
             this.propertyItemsReady(itemsData);
             this.afterInit();
-        });
+        }));
     }
 
     protected propertyItemsReady(itemsData: PropertyItemsData) {
@@ -405,6 +405,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected loadResponse(data: any): void {
+        this.init();
         data = data || {};
         this.onLoadingData(data);
         var entity = data.Entity || new Object();
