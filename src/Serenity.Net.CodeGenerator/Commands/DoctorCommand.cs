@@ -313,7 +313,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         {
             Error("NPM is not installed or not in PATH. Please install NPM.");
         }
-        else if (npmVersion > RecommendedNpmVersion)
+        else if (npmVersion < RecommendedNpmVersion)
         {
             Warning($"Your NPM version ({npmVersion}) is not up to date." +
                 $"Please install latest NPM version (at least {RecommendedNpmVersion}+).");
