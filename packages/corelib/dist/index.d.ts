@@ -2574,7 +2574,6 @@ export type WidgetProps<P> = {
 	element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
 } & SNoInfer<P>;
 export declare class Widget<P = {}> {
-	#private;
 	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 	private static nextWidgetNumber;
 	protected readonly options: WidgetProps<P>;
@@ -2611,6 +2610,7 @@ export declare class Widget<P = {}> {
 	 * this method should not be overridden. Override renderContents() instead.
 	 */
 	render(): any;
+	internalRenderContents(): void;
 	protected renderContents(): any;
 	protected legacyTemplateRender(): boolean;
 	get props(): WidgetProps<P>;
