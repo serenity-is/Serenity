@@ -41,8 +41,7 @@ export class Widget<P = {}> {
 
         (this as any)[afterRenderSymbol] = [];        
         this.addCssClass();
-        !this.deferRender() && this.internalRender();
-        queueMicrotask(() => this.init());
+        !this.deferRender() && this.#internalRender();
     }
 
     public destroy(): void {
@@ -156,7 +155,7 @@ export class Widget<P = {}> {
     }
 
     public init(): this {
-        this.deferRender() && this.internalRender();
+        this.deferRender() && this.#internalRender();
         return this;
     }
 
@@ -175,7 +174,7 @@ export class Widget<P = {}> {
         return el;
     }
 
-    protected internalRender() {
+    #internalRender() {
         const queue = (this as any)[afterRenderSymbol];
         if (queue) {
             let contents = this.renderContents();
