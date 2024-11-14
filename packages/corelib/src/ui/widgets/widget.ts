@@ -41,7 +41,7 @@ export class Widget<P = {}> {
 
         (this as any)[afterRenderSymbol] = [];        
         this.addCssClass();
-        !this.deferRender() && this.#internalRender();
+        !this.deferRender() && this.internalRenderContents();
     }
 
     public destroy(): void {
@@ -155,7 +155,7 @@ export class Widget<P = {}> {
     }
 
     public init(): this {
-        this.deferRender() && this.#internalRender();
+        this.deferRender() && this.internalRenderContents();
         return this;
     }
 
@@ -174,7 +174,7 @@ export class Widget<P = {}> {
         return el;
     }
 
-    #internalRender() {
+    internalRenderContents() {
         const queue = (this as any)[afterRenderSymbol];
         if (queue) {
             let contents = this.renderContents();
