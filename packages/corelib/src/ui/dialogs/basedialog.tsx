@@ -23,11 +23,9 @@ export class BaseDialog<P> extends Widget<P> {
         super(props);
 
         this.domNode.setAttribute("id", this.domNode.getAttribute("id") || this.uniqueName);
-        this.afterRender(() => {
-            this.initValidator();
-            this.initTabs();
-            this.initToolbar();
-        });
+        this.initValidator();
+        this.initTabs();
+        this.initToolbar();
     }
 
     public destroy(): void {
