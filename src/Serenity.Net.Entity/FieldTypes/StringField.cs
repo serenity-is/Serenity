@@ -119,6 +119,20 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
             case Newtonsoft.Json.JsonToken.Boolean:
                 _setValue(row, Convert.ToString(reader.Value, CultureInfo.InvariantCulture));
                 break;
+            case Newtonsoft.Json.JsonToken.Date:
+                var val = reader.Value is DateTimeOffset dto ? dto.DateTime : (DateTime)reader.Value!;
+
+                var style = serializer.DateFormatString ?? "o";
+
+                if (val.TimeOfDay == TimeSpan.Zero)
+                    style = style.Contains('T') ? style.Split('T')[0] : "yyyy-MM-dd";
+
+                if (style.Contains('\''))
+                    style = style.Replace("'", "");
+
+                _setValue(row, val.ToString(style, CultureInfo.InvariantCulture));
+
+                break;
             default:
                 throw JsonUnexpectedToken(reader);
         }
