@@ -3,10 +3,11 @@ namespace Serenity.Abstractions;
 /// <summary>
 /// Base type source implementation that accepts a list of assemblies
 /// </summary>
+/// <param name="featureToggles">Feature toggles service used to filter types</param>
 /// <remarks>
 /// Creates a new instance
 /// </remarks>
-public abstract class BaseAssemblyTypeSource() : ITypeSource, IGetAssemblies
+public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = null) : ITypeSource, IGetAssemblies
 {
     /// <summary>
     /// Gets all attributes for assemblies with given type
@@ -14,7 +15,29 @@ public abstract class BaseAssemblyTypeSource() : ITypeSource, IGetAssemblies
     /// <returns>List of attributes for assemblies</returns>
     public virtual IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType)
     {
-        return GetAssemblies().SelectMany(x => x.GetCustomAttributes(attributeType));
+        return GetAssemblies().Where(Include).SelectMany(x => x.GetCustomAttributes(attributeType));
+    }
+
+    /// <summary>
+    /// Used to filter assemblies based on feature toggles
+    /// </summary>
+    /// <param name="assembly">Assembly to filter</param>
+    protected virtual bool Include(Assembly assembly)
+    {
+        return featureToggles == null ||
+            assembly.GetCustomAttribute<RequiresFeatureAttribute>() is not { } attr ||
+            featureToggles.IsEnabled(attr.Features, attr.RequireAny);
+    }
+
+    /// <summary>
+    /// Used to filter types based on feature toggles
+    /// </summary>
+    /// <param name="type">Type to filter</param>
+    protected virtual bool Include(Type type)
+    {
+        return featureToggles == null ||
+            type.GetAttribute<RequiresFeatureAttribute>() is not { } attr ||
+            featureToggles.IsEnabled(attr.Features, attr.RequireAny);
     }
 
     /// <summary>
@@ -23,7 +46,7 @@ public abstract class BaseAssemblyTypeSource() : ITypeSource, IGetAssemblies
     /// <returns></returns>
     public virtual IEnumerable<Type> GetTypes()
     {
-        return GetAssemblies().SelectMany(x => x.GetTypes());
+        return GetAssemblies().Where(Include).SelectMany(x => x.GetTypes().Where(Include));
     }
 
     /// <summary>
@@ -33,7 +56,7 @@ public abstract class BaseAssemblyTypeSource() : ITypeSource, IGetAssemblies
     /// <returns>Types with that interface type</returns>
     public virtual IEnumerable<Type> GetTypesWithInterface(Type interfaceType)
     {
-        return GetAssemblies().SelectMany(asm => asm.GetTypes().Where(interfaceType.IsAssignableFrom));
+        return GetTypes().Where(interfaceType.IsAssignableFrom);
     }
 
     /// <summary>
@@ -43,8 +66,7 @@ public abstract class BaseAssemblyTypeSource() : ITypeSource, IGetAssemblies
     /// <returns>Types with that attribute type</returns>
     public virtual IEnumerable<Type> GetTypesWithAttribute(Type attributeType)
     {
-        return GetAssemblies().SelectMany(asm => asm.GetTypes()
-            .Where(type => type.GetCustomAttribute(attributeType) != null));
+        return GetTypes().Where(type => type.GetCustomAttribute(attributeType) != null);
     }
 
     /// <inheritdoc/>

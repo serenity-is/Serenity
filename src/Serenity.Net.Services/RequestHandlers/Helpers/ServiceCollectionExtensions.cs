@@ -186,6 +186,7 @@ public static class ServiceCollectionExtensions
 
         collection.AddCaching();
         collection.AddEntities();
+        collection.AddFeatureToggles();
         collection.AddTextRegistry();
         collection.AddServiceBehaviors();
         collection.AddServiceHandlerFactory();

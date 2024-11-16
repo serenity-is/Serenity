@@ -34,6 +34,11 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         : this(order, path, GetUrlFromController(controller, action), 
               GetPermissionFromController(controller, action), icon)
     {
+        if (GetFeaturesFromController(controller, action, out var requireAny) is string[] features)
+        {
+            RequireFeatures = features;
+            RequireAnyFeature = requireAny;
+        }
     }
 
     /// <summary>
@@ -59,6 +64,11 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         : base(int.MaxValue, path, GetUrlFromController(controller, action), 
             GetPermissionFromController(controller, action), icon)
     {
+        if (GetFeaturesFromController(controller, action, out var requireAny) is string[] features)
+        {
+            RequireFeatures = features;
+            RequireAnyFeature = requireAny;
+        }
     }
 
     /// <summary>
@@ -159,5 +169,35 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         var pageAuthorize = actionMethod.GetCustomAttribute<PageAuthorizeAttribute>() 
             ?? controller.GetCustomAttribute<PageAuthorizeAttribute>();
         return pageAuthorize?.Permission;
+    }
+
+    /// <summary>
+    /// Tries to extract features from a controller action
+    /// </summary>
+    /// <param name="controller">Controller</param>
+    /// <param name="action">Action</param>
+    /// <param name="requireAny">If any of features are required</param>
+    /// <exception cref="ArgumentNullException">Controller or action is null</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
+    public static string[] GetFeaturesFromController(Type controller, string action, out bool requireAny)
+    {
+        ArgumentNullException.ThrowIfNull(controller);
+
+        if (string.IsNullOrEmpty(action))
+            throw new ArgumentNullException(nameof(action));
+
+        requireAny = false;
+        var actionMethod = controller.GetMethod(action, BindingFlags.Public | BindingFlags.Instance)
+            ?? throw new ArgumentOutOfRangeException(nameof(action));
+        var barrier = actionMethod.GetCustomAttribute<FeatureBarrierAttribute>()
+            ?? controller.GetCustomAttribute<FeatureBarrierAttribute>();
+
+        if (barrier != null && barrier.Features?.Any() == true)
+        {
+            requireAny = barrier.RequireAny;
+            return barrier.Features.ToArray();
+        }
+
+        return null;
     }
 }

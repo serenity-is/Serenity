@@ -8,7 +8,8 @@ namespace Serenity.Abstractions;
 /// Creates a new instance
 /// </remarks>
 /// <param name="assemblies">List of assemblies</param>
-public class DefaultTypeSource(IEnumerable<Assembly> assemblies) : BaseAssemblyTypeSource
+/// <param name="featureToggles">Feature toggles service used to filter types</param>
+public class DefaultTypeSource(IEnumerable<Assembly> assemblies, IFeatureToggles? featureToggles = null) : BaseAssemblyTypeSource(featureToggles)
 {
     private readonly IEnumerable<Assembly> assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
 

@@ -7,8 +7,8 @@ namespace Serenity.Web;
 /// Implementation for a type source that uses ApplicationPartsTypeSource
 /// </summary>
 public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
-    bool topologicalSort = true)
-    : BaseAssemblyTypeSource
+    bool topologicalSort = true, IFeatureToggles featureToggles = null)
+    : BaseAssemblyTypeSource(featureToggles)
 {
     /// <summary>
     /// Gets the application part manager

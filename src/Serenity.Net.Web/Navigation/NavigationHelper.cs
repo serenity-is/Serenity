@@ -75,14 +75,21 @@ public class NavigationHelper
     }
 
     private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes(
-        ITypeSource typeSource, IServiceProvider serviceProvider, 
+        ITypeSource typeSource, IServiceProvider serviceProvider,
         Func<NavigationItemAttribute, bool> filter)
     {
         var list = new List<NavigationItemAttribute>();
+        var featureToggles = serviceProvider?.GetService<IFeatureToggles>();
 
         foreach (NavigationItemAttribute attr in typeSource
             .GetAssemblyAttributes<NavigationItemAttribute>())
         {
+            if (featureToggles != null &&
+                attr.RequireFeatures != null &&
+                attr.RequireFeatures.Length > 0 &&
+                !featureToggles.IsEnabled(attr.RequireFeatures, attr.RequireAnyFeature))
+                continue;
+
             if (filter == null || filter(attr))
                 list.Add(attr);
         }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Localization;
@@ -56,12 +57,13 @@ public static class CoreServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="assemblies">List of assembles</param>
-    public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies)
+    /// <param name="featureToggles">Feature toggles</param>
+    public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies, IFeatureToggles? featureToggles = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
 
-        services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies));
+        services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies, featureToggles));
     }
 
     /// <summary>
@@ -74,6 +76,37 @@ public static class CoreServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
 
         services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
+    }
+
+    private static T? GetServiceFromCollection<T>(IServiceCollection services)
+        where T : class
+    {
+        return (T?)services.LastOrDefault(d =>
+            d.ServiceType == typeof(T))?.ImplementationInstance;
+    }
+
+    /// <summary>
+    /// Adds feature togglesservice to the registry.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <param name="configuration">Configuration source</param>
+    public static IServiceCollection AddFeatureToggles(this IServiceCollection services, IConfiguration? configuration = null)
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        configuration ??= GetServiceFromCollection<IConfiguration>(services);
+
+        if (configuration != null)
+        {
+            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration));
+        }
+        else
+        {
+            services.TryAddSingleton<IFeatureToggles, ConfigurationFeatureToggles>();
+        }
+
+        return services;
     }
 
     /// <summary>

@@ -15,9 +15,10 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// </summary>
     /// <param name="collection">Collection</param>
     /// <param name="partManager">ApplicationPartManager instance.</param>
+    /// <param name="featureToggles">Feature toggles</param>
     /// <param name="topologicalSort">Whether to sort assemblies topologically by references</param>
     public static ApplicationPartsTypeSource AddApplicationPartsTypeSource(this IServiceCollection collection,
-        ApplicationPartManager partManager = null, bool topologicalSort = true)
+        ApplicationPartManager partManager = null, IFeatureToggles featureToggles = null, bool topologicalSort = true)
     {
         ArgumentNullException.ThrowIfNull(collection);
         if (GetServiceFromCollection<ITypeSource>(collection) != null)
@@ -26,7 +27,9 @@ public static class ApplicationPartsServiceCollectionExtensions
         partManager ??= GetServiceFromCollection<ApplicationPartManager>(collection)
             ?? collection.AddMvcCore().PartManager;
 
-        var typeSource = new ApplicationPartsTypeSource(partManager, topologicalSort);
+        featureToggles ??= GetServiceFromCollection<IFeatureToggles>(collection);
+
+        var typeSource = new ApplicationPartsTypeSource(partManager, topologicalSort, featureToggles);
         collection.AddSingleton<ITypeSource>(typeSource);
         return typeSource;
     }
