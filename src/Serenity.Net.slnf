@@ -9,8 +9,6 @@
       "src\\Serenity.Assets\\Serenity.Assets.csproj",
       "src\\Serenity.Net.CodeGenerator\\Serenity.Net.CodeGenerator.csproj",
       "src\\Serenity.Net.Core\\Serenity.Net.Core.csproj",
-      "src\\Serenity.Net.Data\\Serenity.Net.Data.csproj",
-      "src\\Serenity.Net.Entity\\Serenity.Net.Entity.csproj",
       "src\\Serenity.Net.Services\\Serenity.Net.Services.csproj",
       "src\\Serenity.Net.Web\\Serenity.Net.Web.csproj",
       "tests\\Serenity.Net.CodeGenerator.Tests\\Serenity.Net.CodeGenerator.Tests.csproj",

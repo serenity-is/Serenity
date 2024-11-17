@@ -6,7 +6,7 @@ public class SchemaHelper
 {
     public static ISchemaProvider GetSchemaProvider(string serverType)
     {
-        var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Net.Data") ??
+        var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Net.Services") ??
             Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, SerenityData");
         if (providerType == null || !typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
             throw new ArgumentOutOfRangeException(nameof(serverType), serverType, "Unknown server type");

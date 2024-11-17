@@ -15,8 +15,6 @@ public class TypeSourceTests
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x),

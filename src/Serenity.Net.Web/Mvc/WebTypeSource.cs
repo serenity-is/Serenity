@@ -20,16 +20,6 @@ public class WebTypeSource(IEnumerable<Assembly> assemblies) : BaseAssemblyTypeS
     public static readonly Assembly SerenityNetCoreAssembly = typeof(Localization.ILocalText).Assembly;
 
     /// <summary>
-    /// Reference to Serenity.Net.Data assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetDataAssembly = typeof(DefaultSqlConnections).Assembly;
-
-    /// <summary>
-    /// Reference to Serenity.Net.Entity assembly
-    /// </summary>
-    public static readonly Assembly SerenityNetEntityAssembly = typeof(Row<>).Assembly;
-
-    /// <summary>
     /// Reference to Serenity.Net.Services assembly
     /// </summary>
     public static readonly Assembly SerenityNetServicesAssembly = typeof(SaveRequestHandler<>).Assembly;
@@ -45,8 +35,6 @@ public class WebTypeSource(IEnumerable<Assembly> assemblies) : BaseAssemblyTypeS
     public static readonly Assembly[] SerenityNetWebAssemblyChain =
     [
         SerenityNetCoreAssembly,
-        SerenityNetDataAssembly,
-        SerenityNetEntityAssembly,
         SerenityNetServicesAssembly,
         SerenityNetWebAssembly
     ];

@@ -586,8 +586,6 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     private static readonly HashSet<string> SerenityNetAssemblies = new([
         "Serenity.Net.Core",
-        "Serenity.Net.Data",
-        "Serenity.Net.Entity",
         "Serenity.Net.Services",
         "Serenity.Net.Web"
     ], StringComparer.OrdinalIgnoreCase);

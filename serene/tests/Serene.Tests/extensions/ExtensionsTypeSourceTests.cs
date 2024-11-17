@@ -12,8 +12,6 @@ public class ExtensionsTypeSourceTests
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x));
@@ -27,8 +25,6 @@ public class ExtensionsTypeSourceTests
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x),
@@ -41,8 +37,6 @@ public class ExtensionsTypeSourceTests
         Assert.Collection(ExtensionsTypeSource.SerenityExtensionsAssemblyChain
             .Select(x => x.GetName().Name),
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal("Serenity.Extensions", x));

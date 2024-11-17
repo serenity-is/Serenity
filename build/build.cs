@@ -211,8 +211,6 @@ public sealed class Pack : FrostingTask<BuildContext>
     {
         var packer = new DotNetPacker(context, context.SerenitySrc, context.SerenityNupkg);
         packer.Pack("Serenity.Net.Core/Serenity.Net.Core.csproj");
-        packer.Pack("Serenity.Net.Data/Serenity.Net.Data.csproj");
-        packer.Pack("Serenity.Net.Entity/Serenity.Net.Entity.csproj");
         packer.Pack("Serenity.Net.Services/Serenity.Net.Services.csproj");
         packer.Pack("Serenity.Net.Web/Serenity.Net.Web.csproj");
         packer.Pack("Serenity.Net.CodeGenerator/Serenity.Net.CodeGenerator.csproj");

@@ -1983,7 +1983,6 @@ Features:
   - Move DynamicDataReport to Serenity.Services but rename to TabularDataReport as the public interface has changed
   - Add an IExcelExporter interface to abstract exporting data from List services to Excel
   - Add ISqlExceptionHumanizer interface abstraction for producing user friendly exceptions from sql exceptions like FK, PK etc.
-  - Move DataAuditLogAttribute to Serenity.Net.Data
   - Start splitting more features into Razor class libraries, like Northwind, Basic Samples etc.
   - Improved Sergen to better work with razor class libraries
   - Add restore option to control file patterns to include/exclude in restore

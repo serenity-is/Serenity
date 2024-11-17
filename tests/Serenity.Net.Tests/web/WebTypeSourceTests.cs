@@ -10,8 +10,6 @@ public class WebTypeSourceTests
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x));
     }
@@ -24,8 +22,6 @@ public class WebTypeSourceTests
             .Select(x => x.GetName().Name);
         Assert.Collection(assemblies,
             x => Assert.Equal("Serenity.Net.Core", x),
-            x => Assert.Equal("Serenity.Net.Data", x),
-            x => Assert.Equal("Serenity.Net.Entity", x),
             x => Assert.Equal("Serenity.Net.Services", x),
             x => Assert.Equal("Serenity.Net.Web", x),
             x => Assert.Equal(typeof(WebTypeSourceTests).Assembly.GetName().Name, x));
@@ -35,18 +31,6 @@ public class WebTypeSourceTests
     public void CoreAssemblyIsCorrect()
     {
         Assert.Equal("Serenity.Net.Core", WebTypeSource.SerenityNetCoreAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void DataAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Data", WebTypeSource.SerenityNetDataAssembly.GetName().Name);
-    }
-
-    [Fact]
-    public void EntityAssemblyIsCorrect()
-    {
-        Assert.Equal("Serenity.Net.Entity", WebTypeSource.SerenityNetEntityAssembly.GetName().Name);
     }
 
     [Fact]

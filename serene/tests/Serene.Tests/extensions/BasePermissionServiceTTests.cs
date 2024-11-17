@@ -2,7 +2,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Serenity.Extensions;
-using System.Linq;
 
 namespace Serenity.Tests.Extensions;
 
