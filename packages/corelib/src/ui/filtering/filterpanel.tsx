@@ -69,25 +69,26 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     declare private rowsDiv: HTMLElement;
+    declare private resetButton: HTMLButtonElement;
+    declare private searchButton: HTMLButtonElement;
 
     constructor(props: WidgetProps<P>) {
         super(props);
 
         this.domNode.classList.add("s-FilterPanel'")
         this.rowsDiv = this.findById('Rows');
-        this.initButtons();
         this.updateButtons();
     }
 
-    declare private showInitialLine: boolean;
+    declare private _showInitialLine: boolean;
 
-    get_showInitialLine() {
-        return this.showInitialLine;
+    get showInitialLine() {
+        return this._showInitialLine;
     }
 
-    set_showInitialLine(value: boolean) {
-        if (this.showInitialLine !== value) {
-            this.showInitialLine = value;
+    set showInitialLine(value: boolean) {
+        if (this._showInitialLine !== value) {
+            this._showInitialLine = value;
             if (this.showInitialLine && !this.rowsDiv.lastElementChild) {
                 this.addEmptyRow(false);
             }
@@ -132,60 +133,44 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             }
         }
 
-        if (this.get_showInitialLine() && !this.rowsDiv.childElementCount) {
+        if (this.showInitialLine && !this.rowsDiv.childElementCount) {
             this.addEmptyRow(false);
         }
 
         this.updateParens();
     }
 
-    declare private showSearchButton: boolean;
+    declare private _showSearchButton: boolean;
 
-    get_showSearchButton(): boolean {
-        return this.showSearchButton;
+    get showSearchButton(): boolean {
+        return this._showSearchButton;
     }
 
-    set_showSearchButton(value: boolean): void {
-        if (this.showSearchButton !== value) {
-            this.showSearchButton = value;
+    set showSearchButton(value: boolean) {
+        if (this._showSearchButton !== value) {
+            this._showSearchButton = value;
             this.updateButtons();
         }
     }
 
-    declare private updateStoreOnReset: boolean;
+    declare updateStoreOnReset: boolean;
 
-    get_updateStoreOnReset() {
-        return this.updateStoreOnReset;
-    }
-
-    set_updateStoreOnReset(value: boolean): void {
-        if (this.updateStoreOnReset !== value) {
-            this.updateStoreOnReset = value;
-        }
-    }
-
-    protected renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (<>
             <div id={id.Rows} class="filter-lines" />
             <div id={id.Buttons} class="buttons">
-                <button id={id.AddButton} type="button" class="btn btn-primary add" />
-                <button id={id.SearchButton} type="button" class="btn btn-success search" />
-                <button id={id.ResetButton} type="button" class="btn btn-danger reset" />
+                <button id={id.AddButton} type="button" class="btn btn-primary add" onClick={e => this.addButtonClick(e)}>
+                    {localText('Controls.FilterPanel.AddFilter')}
+                </button>
+                <button id={id.SearchButton} type="button" class="btn btn-success search" onClick={e => this.searchButtonClick(e)} ref={el => this.searchButton = el}>
+                    {localText('Controls.FilterPanel.SearchButton')}</button>
+                <button id={id.ResetButton} type="button" class="btn btn-danger reset" onClick={e => this.resetButtonClick(e)} ref={el => this.resetButton = el}>
+                    {localText('Controls.FilterPanel.ResetButton')}
+                </button>
             </div>
             <div style="clear: both" />
         </>);
-    }
-
-    protected initButtons(): void {
-        this.byId('AddButton').text(localText('Controls.FilterPanel.AddFilter'))
-            .on("click", (e) => this.addButtonClick(e as any));
-
-        this.byId('SearchButton').text(localText('Controls.FilterPanel.SearchButton'))
-            .on("click", (e) => this.searchButtonClick(e as any));
-
-        this.byId('ResetButton').text(localText('Controls.FilterPanel.ResetButton'))
-            .on("click", (e) => this.resetButtonClick(e as any));
     }
 
     protected searchButtonClick(e: Event) {
@@ -260,7 +245,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     protected resetButtonClick(e: Event) {
         e.preventDefault();
 
-        if (this.get_updateStoreOnReset()) {
+        if (this.updateStoreOnReset) {
             if (this.get_store().get_items().length > 0) {
                 this.get_store().get_items().length = 0;
                 this.get_store().raiseChanged();
@@ -269,7 +254,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         Fluent(this.rowsDiv).empty();
         this.updateButtons();
-        if (this.get_showInitialLine()) {
+        if (this.showInitialLine) {
             this.addEmptyRow(false);
         }
     }
@@ -482,10 +467,8 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     }
 
     protected updateButtons(): void {
-        this.byId('SearchButton').toggle(
-            this.rowsDiv.childElementCount >= 1 && this.showSearchButton);
-        this.byId('ResetButton').toggle(
-            this.rowsDiv.childElementCount >= 1);
+        Fluent.toggle(this.searchButton, this.rowsDiv.childElementCount >= 1 && this.showSearchButton);
+        Fluent.toggle(this.resetButton, this.rowsDiv.childElementCount >= 1);
     }
 
     protected andOrClick(e: Event): void {

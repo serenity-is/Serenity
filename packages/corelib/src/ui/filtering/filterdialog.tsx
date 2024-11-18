@@ -13,9 +13,9 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
         super(props);
 
         this.filterPanel = new FilterPanel({ element: this.findById('FilterPanel') });
-        this.filterPanel.set_showInitialLine(true);
-        this.filterPanel.set_showSearchButton(false);
-        this.filterPanel.set_updateStoreOnReset(false);
+        this.filterPanel.showInitialLine = true;
+        this.filterPanel.showSearchButton = false;
+        this.filterPanel.updateStoreOnReset = false;
 
         this.dialogTitle = localText('Controls.FilterPanel.DialogTitle');
     }
