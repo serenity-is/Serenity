@@ -5520,9 +5520,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected save_submitHandler(callback: (response: SaveResponse) => void): void;
 	protected save(callback?: (response: SaveResponse) => void): void | boolean;
 	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
-	protected saveSuccess(response: SaveResponse, action: "save-and-close" | "apply-changes" | "manual"): void;
-	protected showSaveSuccessFor(action: "save-and-close" | "apply-changes" | "manual"): boolean;
-	protected showSaveSuccessMessage(response: SaveResponse): void;
+	protected saveSuccess(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void;
+	protected showSaveSuccessMessage(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void;
 	protected getToolbarButtons(): ToolButton[];
 	protected getCloningEntity(): TItem;
 	protected updateInterface(): void;
