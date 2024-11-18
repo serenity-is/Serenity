@@ -3336,10 +3336,6 @@ export interface ToolButtonProps {
 	icon?: IconClassName;
 	onClick?: any;
 	ref?: (el: HTMLElement) => void;
-	hotkey?: string;
-	hotkeyAllowDefault?: boolean;
-	hotkeyContext?: any;
-	separator?: (false | true | "left" | "right" | "both");
 	visible?: boolean | (() => boolean);
 	disabled?: boolean | (() => boolean);
 }
