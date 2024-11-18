@@ -42,10 +42,10 @@ export class UserDialog extends EntityDialog<UserRow, any> {
             icon: 'fa-lock text-green',
             onClick: () =>
             {
-                new UserPermissionDialog({
+                UserPermissionDialog({
                     userID: this.entity.UserId,
                     username: this.entity.Username
-                }).dialogOpen();
+                });
             }
         });
 

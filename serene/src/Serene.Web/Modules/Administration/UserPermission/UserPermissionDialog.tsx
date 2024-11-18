@@ -1,64 +1,34 @@
-import { getRemoteData, localText, notifySuccess, stringFormat, BaseDialog } from "@serenity-is/corelib";
-import { UserPermissionService } from "../../ServerTypes/Administration/UserPermissionService";
-import { PermissionCheckEditor } from "./PermissionCheckEditor";
+import { Dialog, cancelDialogButton, getRemoteDataAsync, notifySuccess, okDialogButton, stringFormat } from "@serenity-is/corelib";
+import { UserPermissionService } from "../../ServerTypes/Administration";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
+import { UserPermissionDialogTexts } from "../../ServerTypes/Texts";
+import { PermissionCheckEditor } from "../UserPermission/PermissionCheckEditor";
 
-export class UserPermissionDialog extends BaseDialog<UserPermissionDialogOptions> {
+export async function UserPermissionDialog(props: { userID: number, username: string }) {
 
-    private permissions: PermissionCheckEditor;
+    const permissions = (await UserPermissionService.List({ UserID: props.userID })).Entities;
+    const rolePermissions = (await UserPermissionService.ListRolePermissions({ UserID: props.userID })).Entities;
 
-    constructor(opt: UserPermissionDialogOptions) {
-        super(opt);
+    let implicitPermissions = await getRemoteDataAsync<Record<string, string[]>>(RemoteDataKeys.Administration.ImplicitPermissions);
 
-        this.permissions = new PermissionCheckEditor({ element: this.byId('Permissions'), ... {
-            showRevoke: true
-        }});
-
-        UserPermissionService.List({
-            UserID: this.options.userID
-        }, response => {
-            this.permissions.value = response.Entities;
-        });
-
-        UserPermissionService.ListRolePermissions({
-            UserID: this.options.userID
-        }, response => {
-            this.permissions.rolePermissions = response.Entities;
-        });
-
-        this.permissions.implicitPermissions = getRemoteData(RemoteDataKeys.Administration.ImplicitPermissions);
-        this.dialogTitle = stringFormat(localText('Site.UserPermissionDialog.DialogTitle'),
-            this.options.username);
-    }
-
-    protected getDialogButtons() {
-        return [
-            {
-                text: localText('Dialogs.OkButton'),
-                cssClass: 'btn btn-primary',
-                click: e => {
-                    UserPermissionService.Update({
-                        UserID: this.options.userID,
-                        Permissions: this.permissions.value
-                    }, () => {
-                        this.dialogClose();
-                        window.setTimeout(() => notifySuccess(localText('Site.UserPermissionDialog.SaveSuccess')), 0);
+    var checkEditor: PermissionCheckEditor;
+    new Dialog({
+        dialogClass: "s-UserPermissionDialog",
+        title: stringFormat(UserPermissionDialogTexts.DialogTitle, props.username),
+        buttons: [
+            okDialogButton({
+                click: async () => {
+                    await UserPermissionService.Update({
+                        UserID: props.userID,
+                        Permissions: checkEditor.value
                     });
+                    notifySuccess(UserPermissionDialogTexts.SaveSuccess);
                 }
-            }, {
-                text: localText('Dialogs.CancelButton'),
-                click: () => this.dialogClose()
-            }
-        ];
-    }
-
-    protected renderContents(): any {
-        const id = this.useIdPrefix();
-        return <div id={id.Permissions} />;
-    }
+            }),
+            cancelDialogButton()
+        ],
+        element: el => el.appendChild(<PermissionCheckEditor ref={w => checkEditor = w}
+            showRevoke={true} value={permissions} implicitPermissions={implicitPermissions} rolePermissions={rolePermissions} />)
+    });
 }
 
-export interface UserPermissionDialogOptions {
-    userID?: number;
-    username?: string;
-}

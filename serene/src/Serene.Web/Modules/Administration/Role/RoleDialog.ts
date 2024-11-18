@@ -23,10 +23,10 @@ export class RoleDialog extends EntityDialog<RoleRow, any> {
             cssClass: editPermissions,
             icon: 'fa-lock text-green',
             onClick: () => {
-                new RolePermissionDialog({
+                RolePermissionDialog({
                     roleID: this.entity.RoleId,
-                    title: this.entity.RoleName
-                }).dialogOpen();
+                    roleName: this.entity.RoleName
+                });
             }
         });
 
