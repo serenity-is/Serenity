@@ -12,7 +12,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/
 import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
-import { applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveToolButton, undeleteToolButton } from "./entitytoolbuttons";
+import { applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveAndCloseToolButton, undeleteToolButton } from "./entitytoolbuttons";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 @Decorators.panel(true)
@@ -883,7 +883,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     protected getToolbarButtons(): ToolButton[] {
         return [
-            saveToolButton({
+            saveAndCloseToolButton({
                 onClick: () => this.save(response => {
                     this.saveSuccess(response, "save-and-close");
                     this.dialogClose("save-and-close");

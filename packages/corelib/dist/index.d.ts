@@ -5420,7 +5420,7 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	private _dialogType;
 	protected getDialogType(): DialogType | PromiseLike<DialogType>;
 }
-export declare function saveToolButton(opt?: ToolButton): ToolButton;
+export declare function saveAndCloseToolButton(opt?: ToolButton): ToolButton;
 export declare function applyChangesToolButton(opt?: ToolButton): ToolButton;
 export declare function deleteToolButton(opt?: ToolButton): ToolButton;
 export declare function undeleteToolButton(opt?: ToolButton): ToolButton;

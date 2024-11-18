@@ -1,7 +1,7 @@
 import { faIcon, localText } from "../../base";
 import { ToolButton } from "../widgets/toolbar";
 
-export function saveToolButton(opt?: ToolButton): ToolButton {
+export function saveAndCloseToolButton(opt?: ToolButton): ToolButton {
     return {
         title: localText('Controls.EntityDialog.SaveButton'),
         action: 'save-and-close',
