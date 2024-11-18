@@ -1,4 +1,4 @@
-import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
@@ -265,6 +265,7 @@ export declare const ResetPasswordFormTexts: typeof texts.Forms.Membership.Reset
 export declare const SetPasswordFormTexts: typeof texts.Forms.Membership.SetPassword;
 export declare const TranslationTexts: typeof texts.Site.Translation;
 export declare class BasicProgressDialog<P = {}> extends BaseDialog<P> {
+	private progressBar;
 	constructor(props?: WidgetProps<P>);
 	cancelled: boolean;
 	get max(): number;
@@ -274,14 +275,14 @@ export declare class BasicProgressDialog<P = {}> extends BaseDialog<P> {
 	get title(): string;
 	set title(value: string);
 	cancelTitle: string;
-	getDialogButtons(): {
+	protected getDialogButtons(): {
 		text: string;
 		class: string;
 		click: () => void;
 	}[];
-	getDialogOptions(): import("@serenity-is/corelib").DialogOptions;
-	initDialog(): void;
-	renderContents(): any;
+	protected getDialogOptions(): import("@serenity-is/corelib").DialogOptions;
+	protected initDialog(): void;
+	protected renderContents(): any;
 }
 export declare class BulkServiceAction {
 	protected keys: string[];
@@ -458,11 +459,11 @@ export declare class SingleLineTextFormatter implements Formatter {
 }
 export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
 	protected getIdProperty(): string;
-	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void) => void;
+	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
 	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => void;
 	destroy(): void;
 	protected updateInterface(): void;
-	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
 	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
 }
 export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P> implements IGetEditValue, ISetEditValue {

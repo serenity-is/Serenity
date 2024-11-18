@@ -5420,6 +5420,7 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	private _dialogType;
 	protected getDialogType(): DialogType | PromiseLike<DialogType>;
 }
+export type SaveInitiator = "save-and-close" | "apply-changes";
 export declare function saveAndCloseToolButton(opt?: ToolButton): ToolButton;
 export declare function applyChangesToolButton(opt?: ToolButton): ToolButton;
 export declare function deleteToolButton(opt?: ToolButton): ToolButton;
@@ -5520,15 +5521,14 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected validateBeforeSave(): boolean;
 	protected getCreateServiceMethod(): string;
 	protected getUpdateServiceMethod(): string;
-	protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
+	protected getSaveOptions(callback: (response: SaveResponse) => void, initiator?: SaveInitiator): ServiceOptions<SaveResponse>;
 	protected getSaveEntity(): TItem;
 	protected getSaveRequest(): SaveRequest<TItem>;
-	protected onSaveSuccess(response: SaveResponse): void;
-	protected save_submitHandler(callback: (response: SaveResponse) => void): void;
-	protected save(callback?: (response: SaveResponse) => void): void | boolean;
-	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
-	protected saveSuccess(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void;
-	protected showSaveSuccessMessage(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void;
+	protected onSaveSuccess(response: SaveResponse, initiator?: SaveInitiator): void;
+	protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
+	protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): void | boolean;
+	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
+	protected showSaveSuccessMessage(response: SaveResponse, initiator?: SaveInitiator): void;
 	protected getToolbarButtons(): ToolButton[];
 	protected getCloningEntity(): TItem;
 	protected updateInterface(): void;

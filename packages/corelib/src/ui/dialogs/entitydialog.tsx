@@ -1,4 +1,4 @@
-import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, faIcon, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
 import { DataChangeInfo } from "../../types";
@@ -12,7 +12,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/
 import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
-import { applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveAndCloseToolButton, undeleteToolButton } from "./entitytoolbuttons";
+import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveAndCloseToolButton, undeleteToolButton } from "./entitytoolbuttons";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 @Decorators.panel(true)
@@ -781,14 +781,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.getService() + '/Update';
     }
 
-    protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse> {
+    protected getSaveOptions(callback: (response: SaveResponse) => void, initiator?: SaveInitiator): ServiceOptions<SaveResponse> {
 
         var opt: ServiceOptions<SaveResponse> = {};
 
         opt.service = this.isEditMode() ? this.getUpdateServiceMethod() : this.getCreateServiceMethod();
 
         opt.onSuccess = response => {
-            this.onSaveSuccess(response);
+            this.onSaveSuccess(response, initiator);
 
             callback && callback(response);
 
@@ -854,49 +854,39 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return req;
     }
 
-    protected onSaveSuccess(response: SaveResponse): void {
-    }
-
-    protected save_submitHandler(callback: (response: SaveResponse) => void): void {
-        var options = this.getSaveOptions(callback);
-        this.saveHandler(options, callback);
-    }
-
-    protected save(callback?: (response: SaveResponse) => void): void | boolean {
-        return ValidationHelper.submit(this.byId('Form'),
-            () => this.validateBeforeSave(),
-            () => this.save_submitHandler(callback));
-    }
-
-    protected saveHandler(options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void): void {
-        serviceCall(options);
-    }
-
-    protected saveSuccess(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void {
+    protected onSaveSuccess(response: SaveResponse, initiator?: SaveInitiator): void {
         initiator !== "save-and-close" && this.showSaveSuccessMessage(response, initiator);
     }
 
-    protected showSaveSuccessMessage(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void {
+    protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
+        var options = this.getSaveOptions(callback, initiator);
+        this.saveHandler(options, callback, initiator);
+    }
+
+    protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): void | boolean {
+        return ValidationHelper.submit(this.byId('Form'),
+            () => this.validateBeforeSave(),
+            () => this.save_submitHandler(callback, initiator));
+    }
+
+    protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
+        serviceCall(options);
+    }
+
+    protected showSaveSuccessMessage(response: SaveResponse, initiator?: SaveInitiator): void {
         notifySuccess(localText('Controls.EntityDialog.SaveSuccessMessage'), '', null);
     }
 
     protected getToolbarButtons(): ToolButton[] {
         return [
             saveAndCloseToolButton({
-                onClick: () => this.save(response => {
-                    this.saveSuccess(response, "save-and-close");
-                    this.dialogClose("save-and-close");
-                }),
+                onClick: () => this.save(() => this.dialogClose("save-and-close"), "save-and-close"),
                 visible: () => !this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasSavePermission() || this.readOnly,
                 ref: el => this.saveAndCloseButton = Fluent(el)
             }),
             applyChangesToolButton({
-                onClick: () => this.save(response => {
-                    this.saveSuccess(response, "apply-changes");
-                    this.loadById(this.isEditMode() ? (response?.EntityId ?? this.entityId) : response?.EntityId);
-                }),
+                onClick: () => this.save(response => this.loadById(this.isEditMode() ? (response?.EntityId ?? this.entityId) : response?.EntityId), "apply-changes"),
                 visible: () => !this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasSavePermission() || this.readOnly,
                 ref: el => this.applyChangesButton = Fluent(el)

@@ -164,7 +164,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
                 this.createEntityDialog(this.getItemType(), dlg => {
                     const dialog = this.checkDialogType(dlg);
                     this.transferDialogReadOnly(dialog);
-                    dialog.onSave = (opt, callback) => this.save(opt, callback);
+                    dialog.onSave = (opt, callback, initiator) => this.save(opt, callback);
                     dialog.loadEntityAndOpenDialog(this.getNewEntity());
                 });
             }

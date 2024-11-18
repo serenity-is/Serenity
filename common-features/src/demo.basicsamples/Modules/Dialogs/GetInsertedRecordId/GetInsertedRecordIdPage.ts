@@ -1,4 +1,4 @@
-import { Decorators, gridPageInit, notifyInfo, notifySuccess, SaveResponse } from "@serenity-is/corelib";
+import { Decorators, gridPageInit, notifyInfo, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { CategoryDialog, CategoryGrid, CategoryService } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(GetInsertedRecordIdGrid);
@@ -20,7 +20,7 @@ export class GetInsertedRecordIdDialog extends CategoryDialog {
      *
      * @param response Response that is returned from server
      */
-    protected override onSaveSuccess(response: SaveResponse): void {
+    protected override onSaveSuccess(response: SaveResponse, initiator: SaveInitiator): void {
 
         // check that this is an insert
         if (this.isNew()) {

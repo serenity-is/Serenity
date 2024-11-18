@@ -1,4 +1,4 @@
-import { Decorators, DeleteResponse, EntityDialog, SaveResponse, ServiceOptions } from "@serenity-is/corelib";
+import { Decorators, DeleteResponse, EntityDialog, SaveInitiator, SaveResponse, ServiceOptions } from "@serenity-is/corelib";
 
 @Decorators.registerClass("Serenity.Extensions.GridEditorDialog")
 @Decorators.panel(false)
@@ -6,7 +6,7 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
     protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     public onSave: (options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void) => void;
+        callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
 
     public onDelete: (options: ServiceOptions<DeleteResponse>,
         callback: (response: DeleteResponse) => void) => void;
@@ -25,8 +25,8 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
     }
 
     protected override saveHandler(options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void): void {
-        this.onSave?.(options, callback);
+        callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
+        this.onSave?.(options, callback, initiator);
     }
 
     protected override deleteHandler(options: ServiceOptions<DeleteResponse>,

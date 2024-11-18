@@ -1,8 +1,8 @@
-import { CustomerForm, CustomerRow, CustomerService } from "../ServerTypes/Demo";
-import { Decorators, EntityDialog, TabsExtensions, WidgetProps, htmlEncode, localText, reloadLookup } from "@serenity-is/corelib";
+import { Decorators, EntityDialog, SaveInitiator, SaveResponse, TabsExtensions, WidgetProps, localText, reloadLookup } from "@serenity-is/corelib";
 import { DialogUtils } from "@serenity-is/extensions";
-import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
+import { CustomerForm, CustomerRow, CustomerService } from "../ServerTypes/Demo";
 import "./CustomerDialog.css";
+import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
 
 @Decorators.registerClass('Serenity.Demo.Northwind.CustomerDialog')
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
@@ -49,8 +49,8 @@ export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
         this.ordersGrid.customerID = entity.CustomerID;
     }
 
-    onSaveSuccess(response) {
-        super.onSaveSuccess(response);
+    protected override onSaveSuccess(response: SaveResponse, initiator: SaveInitiator) {
+        super.onSaveSuccess(response, initiator);
 
         reloadLookup('Northwind.Customer');
     }

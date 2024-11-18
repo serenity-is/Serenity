@@ -1,4 +1,4 @@
-import { Decorators, notifySuccess, SaveResponse } from "@serenity-is/corelib";
+import { Decorators, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { OrderDialog } from "@serenity-is/demo.northwind";
 import "./EntityDialogAsPanelPage.css";
 
@@ -39,7 +39,7 @@ export class EntityDialogAsPanel extends OrderDialog {
         this.applyChangesButton.hide();
     }
 
-    protected onSaveSuccess(response: SaveResponse) {
-        this.showSaveSuccessMessage(response);
+    protected onSaveSuccess(response: SaveResponse, initiator: SaveInitiator) {
+        this.showSaveSuccessMessage(response, initiator);
     }
 }
