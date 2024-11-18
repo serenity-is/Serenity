@@ -36,4 +36,19 @@ describe("ToolButton", () => {
         inner.click();
         expect(onClick).not.toHaveBeenCalled();
     });
+
+    it("can use ref with jsx", function () {
+        const ref = jest.fn();
+        var btn = <ToolbarButton ref={ref}></ToolbarButton> as HTMLElement;
+        expect(ref).toHaveBeenCalledTimes(1);
+        expect(ref).toHaveBeenCalledWith(btn);
+    });
+
+    it("can use ref without jsx", function () {
+        const ref = jest.fn();
+        var btn = ToolbarButton({ ref }) as HTMLElement;
+        expect(ref).toHaveBeenCalledTimes(1);
+        expect(ref).toHaveBeenCalledWith(btn);
+    });
+
 });

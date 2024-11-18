@@ -3335,6 +3335,7 @@ export interface ToolButtonProps {
 	cssClass?: string;
 	icon?: IconClassName;
 	onClick?: any;
+	ref?: (el: HTMLElement) => void;
 	hotkey?: string;
 	hotkeyAllowDefault?: boolean;
 	hotkeyContext?: any;
@@ -4789,20 +4790,19 @@ export interface FilterFieldSelectOptions {
 }
 export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 	private rowsDiv;
+	private resetButton;
+	private searchButton;
 	constructor(props: WidgetProps<P>);
-	private showInitialLine;
-	get_showInitialLine(): boolean;
-	set_showInitialLine(value: boolean): void;
+	private _showInitialLine;
+	get showInitialLine(): boolean;
+	set showInitialLine(value: boolean);
 	protected filterStoreChanged(): void;
 	updateRowsFromStore(): void;
-	private showSearchButton;
-	get_showSearchButton(): boolean;
-	set_showSearchButton(value: boolean): void;
-	private updateStoreOnReset;
-	get_updateStoreOnReset(): boolean;
-	set_updateStoreOnReset(value: boolean): void;
+	private _showSearchButton;
+	get showSearchButton(): boolean;
+	set showSearchButton(value: boolean);
+	updateStoreOnReset: boolean;
 	protected renderContents(): any;
-	protected initButtons(): void;
 	protected searchButtonClick(e: Event): void;
 	get_hasErrors(): boolean;
 	search(): void;
@@ -5522,7 +5522,6 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected save_submitHandler(callback: (response: SaveResponse) => void): void;
 	protected save(callback?: (response: SaveResponse) => void): void | boolean;
 	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
-	protected initToolbar(): void;
 	protected showSaveSuccessMessage(response: SaveResponse): void;
 	protected getToolbarButtons(): ToolButton[];
 	protected getCloningEntity(): TItem;

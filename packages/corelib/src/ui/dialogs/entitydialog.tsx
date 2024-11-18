@@ -872,22 +872,6 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         serviceCall(options);
     }
 
-    protected initToolbar(): void {
-
-        super.initToolbar();
-
-        if (!this.toolbar)
-            return;
-
-        this.saveAndCloseButton = this.toolbar.findButton('save-and-close-button');
-        this.applyChangesButton = this.toolbar.findButton('apply-changes-button');
-        this.deleteButton = this.toolbar.findButton('delete-button');
-        this.undeleteButton = this.toolbar.findButton('undo-delete-button');
-        this.editButton = this.toolbar.findButton('edit-button');
-        this.cloneButton = this.toolbar.findButton('clone-button');
-        this.localizationButton = this.toolbar.findButton('localization-button');
-    }
-
     protected showSaveSuccessMessage(response: SaveResponse): void {
         notifySuccess(localText('Controls.EntityDialog.SaveSuccessMessage'), '', null);
     }
@@ -907,7 +891,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 });
             },
             visible: () => !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasSavePermission() || this.readOnly
+            disabled: () => !this.hasSavePermission() || this.readOnly,
+            ref: el => this.saveAndCloseButton = Fluent(el)
         });
 
         list.push({
@@ -935,7 +920,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 });
             },
             visible: () => !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasSavePermission() || this.readOnly
+            disabled: () => !this.hasSavePermission() || this.readOnly,
+            ref: el => this.applyChangesButton = Fluent(el)
         });
 
         list.push({
@@ -950,7 +936,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 });
             },
             visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasDeletePermission() || this.readOnly
+            disabled: () => !this.hasDeletePermission() || this.readOnly,
+            ref: el => this.deleteButton = Fluent(el)
         });
 
         list.push({
@@ -965,7 +952,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 }
             },
             visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasDeletePermission() || this.readOnly
+            disabled: () => !this.hasDeletePermission() || this.readOnly,
+            ref: el => this.undeleteButton = Fluent(el)
         });
 
         if (this.useViewMode()) {
@@ -983,7 +971,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     this.updateTitle();
                 },
                 visible: () => this.isViewMode(),
-                disabled: () => !this.hasSavePermission() || this.readOnly
+                disabled: () => !this.hasSavePermission() || this.readOnly,
+                ref: el => this.editButton = Fluent(el)
             });
         }
 
@@ -991,7 +980,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             title: localText('Controls.EntityDialog.LocalizationButton'),
             action: 'localization',
             cssClass: 'localization-button',
-            onClick: () => this.localizationButtonClick()
+            onClick: () => this.localizationButtonClick(),
+            ref: el => this.localizationButton = Fluent(el)
         });
 
         list.push({
@@ -1009,7 +999,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
             },
             visible: () => false,
-            disabled: () => !this.hasInsertPermission() || this.readOnly
+            disabled: () => !this.hasInsertPermission() || this.readOnly,
+            ref: el => this.cloneButton = Fluent(el)
         });
 
         return list;
@@ -1071,7 +1062,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
             if (this.toolbar != null)
                 this.toolbar.findButton('tool-button:not(.localization-hidden)')
-                    .addClass('.localization-hidden').hide();
+                    .addClass('localization-hidden').hide();
 
             this.localizationButton && this.localizationButton.show();
 

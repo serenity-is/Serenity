@@ -9,6 +9,7 @@ export interface ToolButtonProps {
     cssClass?: string;
     icon?: IconClassName;
     onClick?: any;
+    ref?: (el: HTMLElement) => void;
     hotkey?: string;
     hotkeyAllowDefault?: boolean;
     hotkeyContext?: any;
@@ -59,7 +60,12 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
         });
     }
 
-    return btn.getNode();
+    const node = btn.getNode();
+    if (tb.ref) {
+        tb.ref(node);
+        delete tb.ref;
+    }
+    return node;
 }
 
 export interface ToolbarOptions {
