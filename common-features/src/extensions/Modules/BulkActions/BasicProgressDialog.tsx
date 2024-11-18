@@ -3,6 +3,8 @@ import { Decorators, DialogTexts, BaseDialog, WidgetProps, localText, Dialog } f
 @Decorators.registerClass("Serenity.Extensions.BasicProgressDialog")
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
 
+    declare private progressBar: HTMLElement;
+
     constructor(props?: WidgetProps<P>) {
         super(props);
 
@@ -12,21 +14,21 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     declare public cancelled: boolean;
 
     public get max(): number {
-        return parseInt(this.byId('ProgressBar').attr('aria-valuemax'), 10);
+        return parseInt(this.progressBar.ariaValueMax, 10);
     }
 
     public set max(value: number) {
-        this.byId('ProgressBar').attr('aria-valuemax', (value || 100).toString());
+        this.progressBar.ariaValueMax = (value || 100).toString();
     }
 
     public get value(): number {
-        return parseInt(this.byId('ProgressBar').attr('aria-valuenow'), 10);
+        return parseInt(this.progressBar.ariaValueNow, 10);
     }
 
     public set value(value: number) {
-        this.byId('ProgressBar').attr('aria-valuenow', (value || 0).toString())
-            .text(value + ' / ' + this.max)
-            .getNode().style.width = (((value || 0) / (this.max || 100)) * 100) + '%';
+        this.progressBar.ariaValueNow = (value || 0).toString();
+        this.progressBar.textContent = value + ' / ' + this.max;
+        this.progressBar.style.width = (((value || 0) / (this.max || 100)) * 100) + '%';
     }
 
     public get title(): string {
@@ -39,7 +41,7 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
 
     declare public cancelTitle: string;
 
-    getDialogButtons() {
+    protected override getDialogButtons() {
         return [{
             text: DialogTexts.CancelButton,
             class: 'btn btn-danger',
@@ -55,25 +57,25 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
         }];
     }
 
-    getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.width = 600;
         return opt;
     }
 
-    initDialog() {
+    protected override initDialog() {
         super.initDialog();
         var close = this.domNode.closest('.ui-dialog')?.querySelector('.ui-dialog-titlebar-close') as HTMLElement;
         close && (close.style.display = 'none');
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div class="s-DialogContent s-BasicProgressDialogContent">
                 <div id={id.StatusText} class="status-text" ></div>
                 <div id={id.Progress} class="progress" style="height: 1.5rem">
-                    <div id={id.ProgressBar} class="progress-bar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100}></div>
+                    <div id={id.ProgressBar} class="progress-bar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100} ref={el => this.progressBar = el}></div>
                 </div>
             </div>
         );
