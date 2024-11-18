@@ -12,6 +12,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/
 import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
+import { applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveToolButton, undeleteToolButton } from "./entitytoolbuttons";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
 @Decorators.panel(true)
@@ -786,25 +787,25 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
         opt.service = this.isEditMode() ? this.getUpdateServiceMethod() : this.getCreateServiceMethod();
 
-            opt.onSuccess = response => {
-                this.onSaveSuccess(response);
+        opt.onSuccess = response => {
+            this.onSaveSuccess(response);
 
-                callback && callback(response);
+            callback && callback(response);
 
-                var typ = (this.isEditMode() ? 'update' : 'create');
+            var typ = (this.isEditMode() ? 'update' : 'create');
 
-                var ent = opt.request == null ? null : opt.request.Entity;
-                var eid: any = this.isEditMode() ? this.entityId :
-                    (response == null ? null : response.EntityId);
+            var ent = opt.request == null ? null : opt.request.Entity;
+            var eid: any = this.isEditMode() ? this.entityId :
+                (response == null ? null : response.EntityId);
 
-                var dci = {
-                    operationType: typ,
-                    entity: ent,
-                    entityId: eid
-                } satisfies Partial<DataChangeInfo>;
+            var dci = {
+                operationType: typ,
+                entity: ent,
+                entityId: eid
+            } satisfies Partial<DataChangeInfo>;
 
-                Fluent.trigger(this.domNode, "ondatachange", dci);
-            };
+            Fluent.trigger(this.domNode, "ondatachange", dci);
+        };
 
         opt.onCleanup = () => {
             this.validator && validatorAbortHandler(this.validator);
@@ -872,100 +873,52 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         serviceCall(options);
     }
 
-    protected showSaveSuccessMessage(response: SaveResponse): void {
+    protected saveSuccess(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void {
+        initiator !== "save-and-close" && this.showSaveSuccessMessage(response, initiator);
+    }
+
+    protected showSaveSuccessMessage(response: SaveResponse, initiator: "save-and-close" | "apply-changes" | "manual"): void {
         notifySuccess(localText('Controls.EntityDialog.SaveSuccessMessage'), '', null);
     }
 
     protected getToolbarButtons(): ToolButton[] {
-        var list: ToolButton[] = [];
-
-        list.push({
-            title: localText('Controls.EntityDialog.SaveButton'),
-            action: 'save-and-close',
-            cssClass: 'save-and-close-button',
-            icon: faIcon("check-circle", "purple"),
-            hotkey: 'alt+s',
-            onClick: () => {
-                this.save(() => {
+        return [
+            saveToolButton({
+                onClick: () => this.save(response => {
+                    this.saveSuccess(response, "save-and-close");
                     this.dialogClose("save-and-close");
-                });
-            },
-            visible: () => !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasSavePermission() || this.readOnly,
-            ref: el => this.saveAndCloseButton = Fluent(el)
-        });
-
-        list.push({
-            title: '',
-            hint: localText('Controls.EntityDialog.ApplyChangesButton'),
-            action: 'apply-changes',
-            cssClass: 'apply-changes-button',
-            icon: faIcon("clipboard-check", "purple"),
-            hotkey: 'alt+a',
-            onClick: () => {
-                this.save(response1 => {
-
-                    if (this.isEditMode()) {
-                        var id1 = response1.EntityId;
-                        if (id1 == null) {
-                            id1 = this.entityId;
-                        }
-                        this.loadById(id1);
-                    }
-                    else {
-                        this.loadById(response1.EntityId);
-                    }
-
-                    this.showSaveSuccessMessage(response1);
-                });
-            },
-            visible: () => !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasSavePermission() || this.readOnly,
-            ref: el => this.applyChangesButton = Fluent(el)
-        });
-
-        list.push({
-            title: localText('Controls.EntityDialog.DeleteButton'),
-            action: "delete",
-            cssClass: 'delete-button',
-            icon: faIcon("trash-o", "danger"),
-            hotkey: 'alt+x',
-            onClick: () => {
-                confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'), () => {
-                    this.doDelete(() => this.dialogClose("delete"));
-                });
-            },
-            visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasDeletePermission() || this.readOnly,
-            ref: el => this.deleteButton = Fluent(el)
-        });
-
-        list.push({
-            title: localText('Controls.EntityDialog.UndeleteButton'),
-            action: 'undo-delete',
-            cssClass: 'undo-delete-button',
-            onClick: () => {
-                if (this.isDeleted()) {
-                    confirmDialog(localText('Controls.EntityDialog.UndeleteConfirmation'), () => {
-                        this.undelete(() => this.loadById(this.entityId));
-                    });
-                }
-            },
-            visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
-            disabled: () => !this.hasDeletePermission() || this.readOnly,
-            ref: el => this.undeleteButton = Fluent(el)
-        });
-
-        if (this.useViewMode()) {
-            list.push({
-                title: localText('Controls.EntityDialog.EditButton'),
-                action: 'edit',
-                cssClass: 'edit-button',
-                icon: faIcon("edit"),
+                }),
+                visible: () => !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasSavePermission() || this.readOnly,
+                ref: el => this.saveAndCloseButton = Fluent(el)
+            }),
+            applyChangesToolButton({
+                onClick: () => this.save(response => {
+                    this.saveSuccess(response, "apply-changes");
+                    this.loadById(this.isEditMode() ? (response?.EntityId ?? this.entityId) : response?.EntityId);
+                }),
+                visible: () => !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasSavePermission() || this.readOnly,
+                ref: el => this.applyChangesButton = Fluent(el)
+            }),
+            deleteToolButton({
+                onClick: () => confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'),
+                    () => this.doDelete(() => this.dialogClose("delete"))),
+                visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasDeletePermission() || this.readOnly,
+                ref: el => this.deleteButton = Fluent(el)
+            }),
+            undeleteToolButton({
+                onClick: () => this.isDeleted() && confirmDialog(localText('Controls.EntityDialog.UndeleteConfirmation'), () =>
+                    this.undelete(() => this.loadById(this.entityId))),
+                visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
+                disabled: () => !this.hasDeletePermission() || this.readOnly,
+                ref: el => this.undeleteButton = Fluent(el)
+            }),
+            editToolButton({
                 onClick: () => {
                     if (!this.isEditMode())
                         return;
-
                     this.editClicked = true;
                     this.updateInterface();
                     this.updateTitle();
@@ -973,37 +926,25 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 visible: () => this.isViewMode(),
                 disabled: () => !this.hasSavePermission() || this.readOnly,
                 ref: el => this.editButton = Fluent(el)
-            });
-        }
-
-        list.push({
-            title: localText('Controls.EntityDialog.LocalizationButton'),
-            action: 'localization',
-            cssClass: 'localization-button',
-            onClick: () => this.localizationButtonClick(),
-            ref: el => this.localizationButton = Fluent(el)
-        });
-
-        list.push({
-            title: localText('Controls.EntityDialog.CloneButton'),
-            action: 'clone',
-            cssClass: 'clone-button',
-            icon: faIcon("clone"),
-            onClick: () => {
-                if (!this.isEditMode())
-                    return;
-
-                var cloneEntity = this.getCloningEntity();
-                var cloneDialog = Widget.create({ type: getInstanceType(this) })
-                SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.domNode), this, true);
-                (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
-            },
-            visible: () => false,
-            disabled: () => !this.hasInsertPermission() || this.readOnly,
-            ref: el => this.cloneButton = Fluent(el)
-        });
-
-        return list;
+            }),
+            localizationToolButton({
+                onClick: () => this.localizationButtonClick(),
+                ref: el => this.localizationButton = Fluent(el)
+            }),
+            cloneToolButton({
+                onClick: () => {
+                    if (!this.isEditMode())
+                        return;
+                    var cloneEntity = this.getCloningEntity();
+                    var cloneDialog = Widget.create({ type: getInstanceType(this) })
+                    SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.domNode), this, true);
+                    (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
+                },
+                visible: () => false,
+                disabled: () => !this.hasInsertPermission() || this.readOnly,
+                ref: el => this.cloneButton = Fluent(el)
+            })
+        ];
     }
 
     protected getCloningEntity(): TItem {

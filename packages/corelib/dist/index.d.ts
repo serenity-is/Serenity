@@ -3334,7 +3334,9 @@ export interface ToolButtonProps {
 	hint?: string;
 	cssClass?: string;
 	icon?: IconClassName;
-	onClick?: any;
+	onClick?: (e: MouseEvent & {
+		currentTarget: EventTarget & HTMLElement;
+	}) => void;
 	ref?: (el: HTMLElement) => void;
 	visible?: boolean | (() => boolean);
 	disabled?: boolean | (() => boolean);
@@ -5518,6 +5520,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected save_submitHandler(callback: (response: SaveResponse) => void): void;
 	protected save(callback?: (response: SaveResponse) => void): void | boolean;
 	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+	protected saveSuccess(response: SaveResponse, action: "save-and-close" | "apply-changes" | "manual"): void;
+	protected showSaveSuccessFor(action: "save-and-close" | "apply-changes" | "manual"): boolean;
 	protected showSaveSuccessMessage(response: SaveResponse): void;
 	protected getToolbarButtons(): ToolButton[];
 	protected getCloningEntity(): TItem;

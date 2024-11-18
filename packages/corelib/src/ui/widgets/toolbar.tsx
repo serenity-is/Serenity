@@ -8,7 +8,7 @@ export interface ToolButtonProps {
     hint?: string;
     cssClass?: string;
     icon?: IconClassName;
-    onClick?: any;
+    onClick?: (e: MouseEvent & { currentTarget: EventTarget & HTMLElement }) => void;
     ref?: (el: HTMLElement) => void;
     visible?: boolean | (() => boolean);
     disabled?: boolean | (() => boolean);
