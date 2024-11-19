@@ -94,6 +94,7 @@ export * from "./ui/datagrid/treegridmixin";
 export * from "./ui/editors/checktreeeditor";
 export * from "./ui/datagrid/entitygrid";
 export * from "./ui/dialogs/entitytoolbuttons";
+export * from "./ui/dialogs/entitylocalizer";
 export * from "./ui/dialogs/entitydialog";
 
 export type Constructor<T> = new (...args: any[]) => T;

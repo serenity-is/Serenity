@@ -1,6 +1,6 @@
 import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { IEditDialog, IReadOnly } from "../../interfaces";
-import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, safeCast, validatorAbortHandler } from "../../q";
+import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../q";
 import { DataChangeInfo } from "../../types";
 import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -12,6 +12,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/
 import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
+import { EntityLocalizer, EntityLocalizerOptions } from "./entitylocalizer";
 import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButton, editToolButton, localizationToolButton, saveAndCloseToolButton, undeleteToolButton } from "./entitytoolbuttons";
 
 @Decorators.registerClass('Serenity.EntityDialog', [IEditDialog, IReadOnly])
@@ -31,10 +32,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     declare protected cloneButton: Fluent;
     declare protected editButton: Fluent;
 
-    declare protected localizationGrid: PropertyGrid;
-    declare protected localizationButton: Fluent;
-    declare protected localizationPendingValue: any;
-    declare protected localizationLastValue: any;
+    declare protected localizer: EntityLocalizer;
+    declare protected localizerButton: Fluent;
 
     static defaultLanguageList: () => string[][];
 
@@ -50,7 +49,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     protected propertyItemsReady(itemsData: PropertyItemsData) {
         this.propertyItemsData = itemsData;
         this.initPropertyGrid();
-        this.initLocalizationGrid();
+        this.initLocalizer();
     }
 
     protected afterInit() {
@@ -67,9 +66,9 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             this.propertyGrid = null;
         }
 
-        if (this.localizationGrid) {
-            this.localizationGrid.destroy();
-            this.localizationGrid = null;
+        if (this.localizer) {
+            this.localizer.destroy();
+            this.localizer = null;
         }
 
         this.undeleteButton = null;
@@ -432,8 +431,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected beforeLoadEntity(entity: TItem): void {
-        this.localizationPendingValue = null;
-        this.localizationLastValue = null;
+        this.localizer?.clearValue();
     }
 
     protected afterLoadEntity(): void {
@@ -502,92 +500,30 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         fail && ((request as any)?.fail ? (request as any).fail(fail) : request.then(null, fail));
     }
 
-    protected initLocalizationGrid(): void {
-        var pgDiv = this.findById('PropertyGrid');
-        if (!pgDiv) {
+    protected getLocalizerOptions(): EntityLocalizerOptions {
+        return {
+            idPrefix: this.idPrefix,
+            getButton: () => this.localizerButton,
+            getEntity: () => this.entity,
+            getEntityId: () => this.entityId,
+            getIdProperty: () => this.getIdProperty(),
+            getLanguages: () => this.getLanguages(),
+            getRetrieveServiceMethod: () => this.getRetrieveServiceMethod(),
+            getToolButtons: () => this.toolbar.element.findAll(".tool-button"),
+            isNew: () => this.isNew(),
+            validateForm: () => this.validateForm(),
+            byId: s => this.byId(s),
+            getPropertyGrid: () => this.byId("PropertyGrid"),
+            pgOptions: this.getPropertyGridOptions()
+        };
+    }
+
+    protected initLocalizer(): void {
+        const pgDiv = this.findById('PropertyGrid');
+        if (!pgDiv)
             return;
-        }
-        var pgOptions = this.getPropertyGridOptions();
-        this.initLocalizationGridCommon(pgOptions);
-    }
 
-    protected initLocalizationGridCommon(pgOptions: PropertyGridOptions) {
-        var pgDiv = this.findById('PropertyGrid');
-
-        if (!pgOptions.items.some(x => x.localizable === true))
-            return;
-
-        const localGridDiv = <div id={this.idPrefix + 'LocalizationGrid'} style="display: none" /> as HTMLDivElement;
-        pgDiv.after(localGridDiv);
-
-        pgOptions.idPrefix = this.idPrefix + 'Localization_';
-
-        var items: PropertyItem[] = [];
-        for (var item1 of pgOptions.items) {
-            var langs = null;
-
-            if (item1.localizable === true) {
-                var copy = extend({} as PropertyItem, item1);
-                copy.oneWay = true;
-                copy.readOnly = true;
-                copy.required = false;
-                copy.defaultValue = null;
-                items.push(copy);
-
-                if (langs == null)
-                    langs = this.getLangs();
-
-                for (var lang of langs) {
-                    copy = extend({} as PropertyItem, item1);
-                    copy.name = lang[0] + '$' + copy.name;
-                    copy.title = lang[1];
-                    copy.cssClass = [copy.cssClass, 'translation'].join(' ');
-                    copy.insertable = true;
-                    copy.updatable = true;
-                    copy.oneWay = false;
-                    copy.required = false;
-                    copy.localizable = false;
-                    copy.defaultValue = null;
-                    items.push(copy);
-                }
-            }
-        }
-
-        pgOptions.items = items;
-
-        this.localizationGrid = (new PropertyGrid({ element: localGridDiv, ...pgOptions })).init();
-        localGridDiv.classList.add('s-LocalizationGrid');
-    }
-
-    protected isLocalizationMode(): boolean {
-        return this.localizationButton != null && this.localizationButton.hasClass('pressed');
-    }
-
-    protected isLocalizationModeAndChanged(): boolean {
-        if (!this.isLocalizationMode()) {
-            return false;
-        }
-
-        var newValue = this.getLocalizationGridValue();
-        return JSON.stringify(this.localizationLastValue) != JSON.stringify(newValue);
-    }
-
-    protected localizationButtonClick(): void {
-        if (this.isLocalizationMode() && !this.validateForm()) {
-            return;
-        }
-
-        if (this.isLocalizationModeAndChanged()) {
-            var newValue = this.getLocalizationGridValue();
-            this.localizationLastValue = newValue;
-            this.localizationPendingValue = newValue;
-        }
-
-        this.localizationButton.toggleClass('pressed');
-        this.updateInterface();
-        if (this.isLocalizationMode()) {
-            this.loadLocalization();
-        }
+        this.localizer = new EntityLocalizer(this.getLocalizerOptions());
     }
 
     protected getLanguages(): any[] {
@@ -595,128 +531,6 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             return EntityDialog.defaultLanguageList() || [];
 
         return [];
-    }
-
-    // for compatibility with older getLanguages methods written in Saltaralle
-    private getLangs(): any {
-
-        var langsTuple = this.getLanguages();
-        var langs = safeCast(langsTuple, Array);
-        if (langs == null || langs.length === 0 ||
-            langs[0] == null || !Array.isArray(langs[0])) {
-            langs = Array.prototype.slice.call(langsTuple.map(function (x: any) {
-                return [x.item1, x.item2];
-            }));
-        }
-
-        return langs;
-    }
-
-    protected loadLocalization(): void {
-        if (this.localizationLastValue == null && this.isNew()) {
-            this.localizationGrid.load({});
-            this.setLocalizationGridCurrentValues();
-            this.localizationLastValue = this.getLocalizationGridValue();
-            return;
-        }
-
-        if (this.localizationLastValue != null) {
-            this.localizationGrid.load(this.localizationLastValue);
-            this.setLocalizationGridCurrentValues();
-            return;
-        }
-
-        var opt: ServiceOptions<any> = {
-            service: this.getRetrieveServiceMethod(),
-            blockUI: true,
-            request: {
-                EntityId: this.entityId,
-                ColumnSelection: 'keyOnly',
-                IncludeColumns: ['Localizations']
-            },
-            onSuccess: response => {
-                var copy = extend(new Object(), this.entity);
-                if (response.Localizations) {
-                    for (var language of Object.keys(response.Localizations)) {
-                        var entity = response.Localizations[language];
-                        for (var key of Object.keys(entity)) {
-                            (copy as any)[language + '$' + key] = entity[key];
-                        }
-                    }
-                }
-
-                this.localizationGrid.load(copy);
-                this.setLocalizationGridCurrentValues();
-                this.localizationPendingValue = null;
-                this.localizationLastValue = this.getLocalizationGridValue();
-            }
-        };
-
-        serviceCall(opt);
-    }
-
-    protected setLocalizationGridCurrentValues(): void {
-        var valueByName: Record<string, any> = {};
-
-        this.localizationGrid.enumerateItems((item, widget) => {
-            if (item.name.indexOf('$') < 0 && Fluent.isInputLike(widget.domNode)) {
-                valueByName[item.name] = this.byId(item.name).val();
-                widget.element.val(valueByName[item.name]);
-            }
-        });
-
-        this.localizationGrid.enumerateItems((item1, widget1) => {
-            var idx = item1.name.indexOf('$');
-            if (idx >= 0 && Fluent.isInputLike(widget1.domNode)) {
-                var hint = valueByName[item1.name.substring(idx + 1)];
-                if (hint != null && hint.length > 0) {
-                    widget1.element.attr('title', hint).attr('placeholder', hint);
-                }
-            }
-        });
-    }
-
-    protected getLocalizationGridValue(): any {
-        var value: any = {};
-        this.localizationGrid.save(value);
-
-        for (var k of Object.keys(value)) {
-            if (k.indexOf('$') < 0) {
-                delete value[k];
-            }
-        }
-
-        return value;
-    }
-
-    protected getPendingLocalizations(): any {
-        if (this.localizationPendingValue == null) {
-            return null;
-        }
-
-        var result: { [key: string]: any } = {};
-        var idField = this.getIdProperty();
-        var langs = this.getLangs();
-
-        for (var pair of langs) {
-            var language = pair[0];
-            var entity: any = {};
-
-            if (idField != null) {
-                entity[idField] = this.entityId;
-            }
-
-            var prefix = language + '$';
-
-            for (var k of Object.keys(this.localizationPendingValue)) {
-                if (k.startsWith(prefix))
-                    entity[k.substring(prefix.length)] = this.localizationPendingValue[k];
-            }
-
-            result[language] = entity;
-        }
-
-        return result;
     }
 
     protected initPropertyGrid(): void {
@@ -847,10 +661,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             }
         }
 
-        if (this.localizationPendingValue != null) {
-            req.Localizations = this.getPendingLocalizations();
-        }
-
+        this.localizer?.adjustSaveRequest(req);
         return req;
     }
 
@@ -918,8 +729,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 ref: el => this.editButton = Fluent(el)
             }),
             localizationToolButton({
-                onClick: () => this.localizationButtonClick(),
-                ref: el => this.localizationButton = Fluent(el)
+                onClick: () => this.localizer?.buttonClick(),
+                ref: el => this.localizerButton = Fluent(el)
             }),
             cloneToolButton({
                 onClick: () => {
@@ -964,7 +775,6 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
         EditorUtils.setContainerReadOnly(this.byId('Form'), false);
 
-        var isLocalizationMode = this.isLocalizationMode();
         var hasSavePermission = this.hasSavePermission();
         var viewMode = this.isViewMode();
         var readOnly = this.readOnly;
@@ -973,35 +783,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
         TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
 
-        if (this.propertyGrid != null) {
-            Fluent(this.propertyGrid.domNode).toggle(!isLocalizationMode);
-        }
-
-        if (this.localizationGrid != null) {
-            Fluent(this.localizationGrid.domNode).toggle(isLocalizationMode);
-        }
-
-        if (this.localizationButton != null) {
-            this.localizationButton.toggle(this.localizationGrid != null);
-            this.localizationButton.findFirst('.button-inner')
-                .text((this.isLocalizationMode() ?
-                    localText('Controls.EntityDialog.LocalizationBack') :
-                    localText('Controls.EntityDialog.LocalizationButton')));
-        }
-
-        if (isLocalizationMode) {
-
-            if (this.toolbar != null)
-                this.toolbar.findButton('tool-button:not(.localization-hidden)')
-                    .addClass('localization-hidden').hide();
-
-            this.localizationButton && this.localizationButton.show();
-
-            return;
-        }
-
-        this.toolbar.findButton('localization-hidden')
-            .removeClass('localization-hidden').show();
+        this.localizer?.updateInterface();
 
         if (!hasSavePermission || viewMode || readOnly)
             EditorUtils.setContainerReadOnly(this.byId("Form"), true);

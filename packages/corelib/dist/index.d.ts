@@ -5428,6 +5428,40 @@ export declare function undeleteToolButton(opt?: ToolButton): ToolButton;
 export declare function editToolButton(opt?: ToolButton): ToolButton;
 export declare function localizationToolButton(opt?: ToolButton): ToolButton;
 export declare function cloneToolButton(opt?: ToolButton): ToolButton;
+export interface EntityLocalizerOptions {
+	validateForm: () => boolean;
+	byId: (id: string) => Fluent;
+	idPrefix: string;
+	isNew: () => boolean;
+	getButton: () => Fluent;
+	getEntity: () => any;
+	getEntityId: () => any;
+	getIdProperty: () => string;
+	getLanguages: () => any[];
+	getRetrieveServiceMethod: () => string;
+	getPropertyGrid: () => HTMLElement;
+	pgOptions: PropertyGridOptions;
+	getToolButtons: () => HTMLElement[];
+}
+export declare class EntityLocalizer {
+	grid: PropertyGrid;
+	protected pendingValue: any;
+	protected lastValue: any;
+	private options;
+	constructor(opt: EntityLocalizerOptions);
+	destroy(): void;
+	clearValue(): void;
+	protected isLocalizationMode(): boolean;
+	protected isLocalizationModeAndChanged(): boolean;
+	buttonClick(): void;
+	private getLangs;
+	protected loadLocalization(): void;
+	protected setLocalizationGridCurrentValues(): void;
+	protected getLocalizationGridValue(): any;
+	adjustSaveRequest(req: SaveRequest<any>): void;
+	protected getPendingLocalizations(): any;
+	updateInterface(): void;
+}
 export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 	private _entity;
 	private _entityId;
@@ -5439,10 +5473,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected undeleteButton: Fluent;
 	protected cloneButton: Fluent;
 	protected editButton: Fluent;
-	protected localizationGrid: PropertyGrid;
-	protected localizationButton: Fluent;
-	protected localizationPendingValue: any;
-	protected localizationLastValue: any;
+	protected localizer: EntityLocalizer;
+	protected localizerButton: Fluent;
 	static defaultLanguageList: () => string[][];
 	constructor(props?: WidgetProps<P>);
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
@@ -5502,17 +5534,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getRetrieveServiceMethod(): string;
 	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
 	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
-	protected initLocalizationGrid(): void;
-	protected initLocalizationGridCommon(pgOptions: PropertyGridOptions): void;
-	protected isLocalizationMode(): boolean;
-	protected isLocalizationModeAndChanged(): boolean;
-	protected localizationButtonClick(): void;
+	protected initLocalizer(): void;
 	protected getLanguages(): any[];
-	private getLangs;
-	protected loadLocalization(): void;
-	protected setLocalizationGridCurrentValues(): void;
-	protected getLocalizationGridValue(): any;
-	protected getPendingLocalizations(): any;
 	protected initPropertyGrid(): void;
 	protected getPropertyItems(): PropertyItem[];
 	protected getPropertyItemsData(): PropertyItemsData;
