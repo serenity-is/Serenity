@@ -730,6 +730,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             }),
             localizationToolButton({
                 onClick: () => this.localizer?.buttonClick(),
+                visible: () => this.localizer?.isEnabled(),
                 ref: el => this.localizerButton = Fluent(el)
             }),
             cloneToolButton({

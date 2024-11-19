@@ -105,7 +105,7 @@ export class EntityLocalizer {
         this.lastValue = null;
     }
 
-    protected isEnabled(): boolean {
+    public isEnabled(): boolean {
         return !!this.grid;
     }
 
@@ -270,20 +270,21 @@ export class EntityLocalizer {
 
     public updateInterface(): void {
 
-        const button = this.options.getButton()?.toggle(this.isEnabled());
         if (!this.isEnabled())
             return;
 
-
+        const button = this.options.getButton()?.getNode();
         const locMode = this.isLocalizationMode();
         Fluent.toggle(this.targetLanguage, locMode);
-        button?.findFirst('.button-inner').text((locMode ? localText('Controls.EntityDialog.LocalizationBack') :
-            localText('Controls.EntityDialog.LocalizationButton')));
+        const inner = button?.querySelector('.button-inner');
+        inner && (inner.textContent = ((locMode ? localText('Controls.EntityDialog.LocalizationBack') :
+            localText('Controls.EntityDialog.LocalizationButton'))));
 
         this.options.getPropertyGrid()?.toggle(!locMode);
         Fluent.toggle(this.grid?.domNode, locMode);
+        Fluent.toggle(this.targetLanguage, locMode);
 
-        const buttons = this.options.getToolButtons().filter(x => x != button?.getNode());
+        const buttons = this.options.getToolButtons().filter(x => x !== button);
         if (locMode) {
             buttons?.filter(x => !x.classList.contains("localization-hidden")).forEach(el => {
                 el.classList.add('localization-hidden', 'hidden');
