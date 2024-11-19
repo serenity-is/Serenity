@@ -312,3 +312,43 @@ describe('EntityDialog.getLocalTextPrefix', () => {
         expect(getLocalTextPrefix(dialog)).toBeUndefined();
     });
 });
+
+describe("EntityDialog.destroy", () => {
+
+    class MockDialog extends EntityDialog<any, any> {
+        getPropertyItemsData() { return mockPropertyItemsData() };
+    }
+
+    it("calls destroy on propertyGrid", () => {
+        const dialog = new MockDialog();
+        const destroy = jest.fn();
+        dialog["propertyGrid"] = { destroy } as any;
+        dialog.destroy();
+        expect(destroy).toHaveBeenCalledTimes(1);
+        expect(dialog["propertyGrid"] == null).toBe(true);
+    });
+
+    it("calls destroy on localizer", () => {
+        const dialog = new MockDialog();
+        const destroy = jest.fn();
+        dialog["localizer"] = { destroy } as any;
+        dialog.destroy();
+        expect(destroy).toHaveBeenCalledTimes(1);
+        expect(dialog["localizer"] == null).toBe(true);
+    });
+
+    it("clears toolbar and button references", () => {
+        const dialog = new MockDialog();
+        const props = ["toolbar", "editButton", "cloneButton", "saveAndCloseButton", "applyChangesButton", "deleteButton", "undeleteButton"];
+        props.forEach(p => (dialog as any)[p] = "test" as any);
+        dialog.destroy();
+        props.forEach(p => expect((dialog as any)[p] == null).toBe(true));
+    });
+
+    it("calls super.destroy", () => {
+        const dialog = new MockDialog();
+        dialog.destroy();
+        expect(dialog.domNode == null).toBe(true);
+    });
+
+});
