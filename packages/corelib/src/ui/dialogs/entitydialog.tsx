@@ -60,25 +60,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     destroy(): void {
-
-        if (this.propertyGrid) {
-            this.propertyGrid.destroy();
-            this.propertyGrid = null;
-        }
-
-        if (this.localizer) {
-            this.localizer.destroy();
-            this.localizer = null;
-        }
-
-        this.undeleteButton = null;
-        this.applyChangesButton = null;
-        this.deleteButton = null;
-        this.saveAndCloseButton = null;
-        this.editButton = null;
-        this.cloneButton = null;
-        this.toolbar = null;
-
+        this.propertyGrid?.destroy();
+        delete this.propertyGrid;
+        this.localizer?.destroy();
+        delete this.localizer;
+        delete this.toolbar;
+        Object.keys(this).filter(k => Object.prototype.hasOwnProperty.call(this, k) && k.endsWith("Button")).forEach(k => delete (this as any)[k]);
         super.destroy();
     }
 
@@ -108,16 +95,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getEntityTitle(): string {
-        if (!this.isEditMode()) {
+        if (!this.isEditMode())
             return stringFormat(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
-        }
-        else {
-            var titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
-                localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
-            var title = this.getEntityNameFieldValue() ?? '';
-            return stringFormat(titleFormat,
-                this.getEntitySingular(), !title ? '' : (' (' + title + ')'));
-        }
+        const titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
+            localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
+        const title = this.getEntityNameFieldValue() ?? '';
+        return stringFormat(titleFormat, this.getEntitySingular(), !title ? '' : (' (' + title + ')'));
     }
 
     protected updateTitle(): void {
@@ -133,19 +116,16 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected isDeleted(): boolean {
-        if (this.entityId == null) {
+        if (this.entityId == null)
             return false;
-        }
 
-        var isDeletedProperty = this.getIsDeletedProperty();
-        if (isDeletedProperty) {
+        const isDeletedProperty = this.getIsDeletedProperty();
+        if (isDeletedProperty)
             return !!(this.entity as any)[isDeletedProperty];
-        }
 
-        var value = (this.entity as any)[this.getIsActiveProperty()];
-        if (value == null) {
+        const value = (this.entity as any)[this.getIsActiveProperty()];
+        if (value == null)
             return false;
-        }
 
         return value < 0;
     }
@@ -171,32 +151,25 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected doDelete(callback: (response: DeleteResponse) => void): void {
-        var self = this;
-
-        var request: DeleteRequest = {
+        const request: DeleteRequest = {
             EntityId: this.entityId
         };
 
-        var baseOptions: ServiceOptions<DeleteResponse> = {
+        const options: ServiceOptions<DeleteResponse> = extend({
             service: this.getDeleteServiceMethod(),
             request: request,
             onSuccess: response => {
-                self.onDeleteSuccess(response);
-                if (callback != null) {
-                    callback(response);
-                }
+                this.onDeleteSuccess(response);
+                callback?.(response);
                 Fluent.trigger(this.domNode, "ondatachange", {
                     entityId: request.EntityId,
                     entity: this.entity,
                     operationType: 'delete'
                 } satisfies Partial<DataChangeInfo>);
             }
-        };
+        }, this.getDeleteOptions(callback));
 
-        var thisOptions = this.getDeleteOptions(callback);
-        var finalOptions = extend(baseOptions, thisOptions);
-
-        this.deleteHandler(finalOptions, callback);
+        this.deleteHandler(options, callback);
     }
 
     protected onDeleteSuccess(response: DeleteResponse): void {
@@ -213,13 +186,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._entityType != null)
             return this._entityType;
 
-        var attr = this.getCustomAttribute(EntityTypeAttribute);
+        const attr = this.getCustomAttribute(EntityTypeAttribute);
         if (attr)
             return (this._entityType = attr.value);
 
-        // remove global namespace
-        var name = getTypeFullName(getInstanceType(this));
-        var px = name.indexOf('.');
+        let name = getTypeFullName(getInstanceType(this));
+        const px = name.indexOf('.');
         if (px >= 0)
             name = name.substring(px + 1);
 
@@ -238,11 +210,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._formKey != null)
             return this._formKey;
 
-        var attr = this.getCustomAttribute(FormKeyAttribute);
-        if (attr)
-            return (this._formKey = attr.value);
-
-        return (this._formKey = this.getEntityType());
+        const attr = this.getCustomAttribute(FormKeyAttribute);
+        return this._formKey = attr ? attr.value : this.getEntityType();
     }
 
     declare private _localTextDbPrefix: string;
@@ -260,15 +229,11 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getLocalTextPrefix(): string {
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
-
-        var attr = this.getCustomAttribute(LocalTextPrefixAttribute);
-        if (attr)
-            return attr.value;
-
-        return this.getEntityType();
+        const attr = this.getCustomAttribute(LocalTextPrefixAttribute);
+        return attr ? attr.value : this.getEntityType();
     }
 
     declare private _entitySingular: string;
@@ -277,7 +242,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._entitySingular != null)
             return this._entitySingular;
 
-        var attr = this.getCustomAttribute(ItemNameAttribute);
+        const attr = this.getCustomAttribute(ItemNameAttribute);
         return (this._entitySingular = attr ? localText(attr.value, attr.value) :
             tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
     }
@@ -288,16 +253,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._nameProperty != null)
             return this._nameProperty;
 
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._nameProperty = rowDefinition.nameProperty ?? '';
 
-        var attr = this.getCustomAttribute(NamePropertyAttribute);
-
-        if (attr)
-            return this._nameProperty = attr.value ?? '';
-
-        return this._nameProperty = 'Name';
+        const attr = this.getCustomAttribute(NamePropertyAttribute);
+        return this._nameProperty = attr ? (attr.value ?? "") : 'Name';
     }
 
     declare private _idProperty: string;
@@ -306,15 +267,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._idProperty != null)
             return this._idProperty;
 
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
 
-        var attr = this.getCustomAttribute(IdPropertyAttribute);
-        if (attr)
-            return this._idProperty = attr.value ?? '';
-
-        return this._idProperty = 'ID';
+        const attr = this.getCustomAttribute(IdPropertyAttribute);
+        return this._idProperty = attr ? (attr.value ?? '') : 'ID';
     }
 
     declare private _isActiveProperty: string;
@@ -323,15 +281,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._isActiveProperty != null)
             return this._isActiveProperty;
 
-        var rowDefinition = this.getRowDefinition();
-        if (rowDefinition)
-            return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
-
-        var attr = this.getCustomAttribute(IsActivePropertyAttribute);
-        if (attr)
-            return this._isActiveProperty = attr.value ?? '';
-
-        return this._isActiveProperty = '';
+        const rowDefinition = this.getRowDefinition();
+        return this._isActiveProperty = rowDefinition ? (rowDefinition.isActiveProperty ?? '') : this.getCustomAttribute(IsActivePropertyAttribute)?.value ?? '';
     }
 
     protected getIsDeletedProperty(): string {
@@ -344,39 +295,29 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._service != null)
             return this._service;
 
-        var attr = this.getCustomAttribute(ServiceAttribute);
-        if (attr)
-            this._service = attr.value;
-        else
-            this._service = replaceAll(this.getEntityType(), '.', '/');
-
-        return this._service;
+        const attr = this.getCustomAttribute(ServiceAttribute);
+        return this._service = attr ? attr.value : replaceAll(this.getEntityType(), '.', '/');
     }
 
     load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void {
 
-        var action = () => {
+        const action = () => {
 
             if (entityOrId == null) {
                 this.loadResponse({});
-                done && done();
+                done?.();
                 return;
             }
 
-            var scriptType = typeof (entityOrId);
+            const scriptType = typeof (entityOrId);
             if (scriptType === 'string' || scriptType === 'number') {
-                var entityId = entityOrId;
-
-                this.loadById(entityId, function (response) {
-                    if (done)
-                        window.setTimeout(done, 0);
+                this.loadById(entityOrId, () => {
+                    done && window.setTimeout(done, 0);
                 }, null);
-
                 return;
             }
 
-            var entity = entityOrId || new Object();
-            this.loadResponse({ Entity: entity });
+            this.loadResponse({ Entity: entityOrId || new Object() });
             done && done();
         };
 
@@ -389,7 +330,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             action();
         }
         catch (ex1) {
-            var ex = (Exception as any).wrap(ex1);
+            const ex = (Exception as any).wrap(ex1);
             fail(ex);
         }
     }
@@ -408,7 +349,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.init();
         data = data || {};
         this.onLoadingData(data);
-        var entity = data.Entity || new Object();
+        const entity = data.Entity || new Object();
         this.beforeLoadEntity(entity);
         this.loadEntity(entity);
         this.entity = entity;
@@ -416,18 +357,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected loadEntity(entity: TItem): void {
-        var idField = this.getIdProperty();
-
+        const idField = this.getIdProperty();
         if (idField != null)
             this.entityId = ((entity as any)[idField]);
 
         this.entity = entity;
-
-        if (this.propertyGrid != null) {
-            this.propertyGrid.set_mode((this.isEditMode() ?
-                PropertyGridMode.update : PropertyGridMode.insert));
-            this.propertyGrid.load(entity);
-        }
+        this.propertyGrid?.set_mode((this.isEditMode() ? PropertyGridMode.update : PropertyGridMode.insert));
+        this.propertyGrid?.load(entity);
     }
 
     protected beforeLoadEntity(entity: TItem): void {
@@ -461,9 +397,9 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getLoadByIdRequest(id: any): RetrieveRequest {
-        var request: RetrieveRequest = {};
-        request.EntityId = id;
-        return request;
+        return {
+            EntityId: id
+        };
     }
 
     protected reloadById(): void {
@@ -475,28 +411,21 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
-        var baseOptions: ServiceOptions<RetrieveResponse<TItem>> = {
+        const options: ServiceOptions<RetrieveResponse<TItem>> = extend({
             service: this.getRetrieveServiceMethod(),
             blockUI: true,
             request: this.getLoadByIdRequest(id),
             onSuccess: response => {
                 this.loadResponse(response);
-                callback && callback(response);
+                callback?.(response);
             },
-            onCleanup: () => {
-                if (this.validator != null) {
-                    validatorAbortHandler(this.validator);
-                }
-            }
-        };
-
-        var thisOptions = this.getLoadByIdOptions(id, callback);
-        var finalOptions = extend(baseOptions, thisOptions);
-        this.loadByIdHandler(finalOptions, callback, fail);
+            onCleanup: () => this.validator != null && validatorAbortHandler(this.validator)
+        }, this.getLoadByIdOptions(id, callback));
+        this.loadByIdHandler(options, callback, fail);
     }
 
     protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
-        var request = serviceCall(options);
+        const request = serviceCall(options);
         fail && ((request as any)?.fail ? (request as any).fail(fail) : request.then(null, fail));
     }
 
@@ -519,26 +448,19 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected initLocalizer(): void {
-        const pgDiv = this.findById('PropertyGrid');
-        if (!pgDiv)
-            return;
-
-        this.localizer = new EntityLocalizer(this.getLocalizerOptions());
+        if (this.findById('PropertyGrid'))
+            this.localizer = new EntityLocalizer(this.getLocalizerOptions());
     }
 
     protected getLanguages(): any[] {
-        if (EntityDialog.defaultLanguageList != null)
-            return EntityDialog.defaultLanguageList() || [];
-
-        return [];
+        return EntityDialog.defaultLanguageList?.() || [];
     }
 
     protected initPropertyGrid(): void {
-        var pgDiv = this.byId('PropertyGrid');
-        if (pgDiv.length <= 0) {
+        const pgDiv = this.findById('PropertyGrid');
+        if (!pgDiv)
             return;
-        }
-        var pgOptions = this.getPropertyGridOptions();
+        const pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
     }
 
@@ -547,7 +469,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getPropertyItemsData(): PropertyItemsData {
-        var formKey = this.getFormKey();
+        const formKey = this.getFormKey();
 
         if (this.getFormKey === EntityDialog.prototype.getFormKey &&
             this.getPropertyItems !== EntityDialog.prototype.getPropertyItems &&
@@ -558,20 +480,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             }
         }
 
-        if (formKey) {
-            return getFormData(formKey);
-        }
-
-        return { items: [], additionalItems: [] };
+        return formKey ? getFormData(formKey) : { items: [], additionalItems: [] };
     }
 
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
-        var formKey = this.getFormKey();
-        if (formKey) {
-            return await getFormDataAsync(formKey);
-        }
-
-        return { items: [], additionalItems: [] };
+        const formKey = this.getFormKey();
+        return formKey ? await getFormDataAsync(formKey) : { items: [], additionalItems: [] };
     }
 
     protected getPropertyGridOptions(): PropertyGridOptions {
@@ -596,72 +510,43 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getSaveOptions(callback: (response: SaveResponse) => void, initiator?: SaveInitiator): ServiceOptions<SaveResponse> {
-
-        var opt: ServiceOptions<SaveResponse> = {};
-
+        const opt: ServiceOptions<SaveResponse> = {};
         opt.service = this.isEditMode() ? this.getUpdateServiceMethod() : this.getCreateServiceMethod();
-
         opt.onSuccess = response => {
             this.onSaveSuccess(response, initiator);
-
-            callback && callback(response);
-
-            var typ = (this.isEditMode() ? 'update' : 'create');
-
-            var ent = opt.request == null ? null : opt.request.Entity;
-            var eid: any = this.isEditMode() ? this.entityId :
-                (response == null ? null : response.EntityId);
-
-            var dci = {
-                operationType: typ,
-                entity: ent,
-                entityId: eid
-            } satisfies Partial<DataChangeInfo>;
-
-            Fluent.trigger(this.domNode, "ondatachange", dci);
+            callback?.(response);
+            Fluent.trigger(this.domNode, "ondatachange", {
+                operationType: this.isEditMode() ? 'update' : 'create',
+                entity: opt.request == null ? null : opt.request.Entity,
+                entityId: this.isEditMode() ? this.entityId : (response == null ? null : response.EntityId)
+            } satisfies Partial<DataChangeInfo>);
         };
-
-        opt.onCleanup = () => {
-            this.validator && validatorAbortHandler(this.validator);
-        };
-
+        opt.onCleanup = () => this.validator && validatorAbortHandler(this.validator);
         opt.request = this.getSaveRequest();
-
         return opt;
     }
 
     protected getSaveEntity(): TItem {
-
-        var entity: TItem = new Object() as any;
-
-        if (this.propertyGrid != null) {
-            this.propertyGrid.save(entity);
-        }
+        const entity: TItem = new Object() as any;
+        this.propertyGrid?.save(entity);
 
         if (this.isEditMode()) {
-            var idField = this.getIdProperty();
-            if (idField != null && (entity as any)[idField] == null) {
+            const idField = this.getIdProperty();
+            if (idField != null && (entity as any)[idField] == null)
                 (entity as any)[idField] = this.entityId;
-            }
         }
 
         return entity;
     }
 
     protected getSaveRequest(): SaveRequest<TItem> {
+        const entity = this.getSaveEntity();
+        const req: SaveRequest<TItem> = { Entity: entity };
 
-        var entity = this.getSaveEntity();
-        var req: SaveRequest<TItem> = {};
-        req.Entity = entity;
+        if (this.isEditMode() && this.getIdProperty() != null)
+            req.EntityId = this.entityId;
 
-        if (this.isEditMode()) {
-            var idField = this.getIdProperty();
-            if (idField != null) {
-                req.EntityId = this.entityId;
-            }
-        }
-
-        this.localizer?.adjustSaveRequest(req);
+        this.localizer?.editSaveRequest(req);
         return req;
     }
 
@@ -670,7 +555,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
-        var options = this.getSaveOptions(callback, initiator);
+        const options = this.getSaveOptions(callback, initiator);
         this.saveHandler(options, callback, initiator);
     }
 
@@ -737,8 +622,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 onClick: () => {
                     if (!this.isEditMode())
                         return;
-                    var cloneEntity = this.getCloningEntity();
-                    var cloneDialog = Widget.create({ type: getInstanceType(this) })
+                    const cloneEntity = this.getCloningEntity();
+                    const cloneDialog = Widget.create({ type: getInstanceType(this) })
                     SubDialogHelper.bubbleDataChange(SubDialogHelper.cascade(cloneDialog, this.domNode), this, true);
                     (cloneDialog as typeof this).loadEntityAndOpenDialog(cloneEntity, null);
                 },
@@ -751,42 +636,29 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     protected getCloningEntity(): TItem {
 
-        var clone: any = new Object();
-        clone = extend(clone, this.entity);
+        const clone: any = extend(new Object(), this.entity);
 
-        var idField = this.getIdProperty();
-        if (idField) {
+        const idField = this.getIdProperty();
+        if (idField)
             delete clone[idField];
-        }
 
-        var isActiveField = this.getIsActiveProperty();
-        if (isActiveField) {
+        const isActiveField = this.getIsActiveProperty();
+        if (isActiveField)
             delete clone[isActiveField];
-        }
 
-        var isDeletedField = this.getIsDeletedProperty();
-        if (isDeletedField) {
+        const isDeletedField = this.getIsDeletedProperty();
+        if (isDeletedField)
             delete clone[isDeletedField];
-        }
 
         return clone;
     }
 
     protected updateInterface(): void {
-
         EditorUtils.setContainerReadOnly(this.byId('Form'), false);
-
-        var hasSavePermission = this.hasSavePermission();
-        var viewMode = this.isViewMode();
-        var readOnly = this.readOnly;
-
         this.toolbar.updateInterface();
-
         TabsExtensions.setDisabled(this.tabs, 'Log', this.isNewOrDeleted());
-
         this.localizer?.updateInterface();
-
-        if (!hasSavePermission || viewMode || readOnly)
+        if (!this.hasSavePermission() || this.isViewMode() || this.readOnly)
             EditorUtils.setContainerReadOnly(this.byId("Form"), true);
     }
 
@@ -803,25 +675,21 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected undelete(callback?: (response: UndeleteResponse) => void): void {
-        var baseOptions: ServiceOptions<UndeleteResponse> = {};
-        baseOptions.service = this.getUndeleteServiceMethod();
+        const request: UndeleteRequest = { EntityId: this.entityId };
+        const options: ServiceOptions<UndeleteResponse> = extend({
+            service: this.getUndeleteServiceMethod(),
+            request,
+            onSuccess: response => {
+                callback && callback(response);
+                Fluent.trigger(this.domNode, "ondatachange", {
+                    entityId: this.entityId,
+                    entity: this.entity,
+                    operationType: 'undelete'
+                });
+            }
+        }, this.getUndeleteOptions(callback));
 
-        var request: UndeleteRequest = {};
-        request.EntityId = this.entityId;
-
-        baseOptions.request = request;
-        baseOptions.onSuccess = response => {
-            callback && callback(response);
-            Fluent.trigger(this.domNode, "ondatachange", {
-                entityId: this.entityId,
-                entity: this.entity,
-                operationType: 'undelete'
-            });
-        };
-
-        var thisOptions = this.getUndeleteOptions(callback);
-        var finalOptions = extend(baseOptions, thisOptions);
-        this.undeleteHandler(finalOptions, callback);
+        this.undeleteHandler(options, callback);
     }
 
     declare private _readonly: boolean;
@@ -859,17 +727,17 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected hasDeletePermission() {
-        var deletePermission = this.getDeletePermission();
+        const deletePermission = this.getDeletePermission();
         return deletePermission == null || Authorization.hasPermission(deletePermission);
     }
 
     protected hasInsertPermission() {
-        var insertPermission = this.getInsertPermission();
+        const insertPermission = this.getInsertPermission();
         return insertPermission == null || Authorization.hasPermission(insertPermission);
     }
 
     protected hasUpdatePermission() {
-        var updatePermission = this.getUpdatePermission();
+        const updatePermission = this.getUpdatePermission();
         return updatePermission == null || Authorization.hasPermission(updatePermission);
     }
 

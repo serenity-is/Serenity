@@ -232,7 +232,7 @@ export class EntityLocalizer {
         return value;
     }
 
-    public adjustSaveRequest(req: SaveRequest<any>) {
+    public editSaveRequest(req: SaveRequest<any>) {
         if (this.pendingValue != null) {
             req.Localizations = this.getPendingLocalizations();
         }
