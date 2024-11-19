@@ -5439,18 +5439,20 @@ export interface EntityLocalizerOptions {
 	getIdProperty: () => string;
 	getLanguages: () => any[];
 	getRetrieveServiceMethod: () => string;
-	getPropertyGrid: () => HTMLElement;
+	getPropertyGrid: () => Fluent;
 	pgOptions: PropertyGridOptions;
 	getToolButtons: () => HTMLElement[];
 }
 export declare class EntityLocalizer {
-	grid: PropertyGrid;
+	protected grid: PropertyGrid;
 	protected pendingValue: any;
 	protected lastValue: any;
+	protected targetLanguage: HTMLSelectElement;
 	private options;
 	constructor(opt: EntityLocalizerOptions);
 	destroy(): void;
 	clearValue(): void;
+	isEnabled(): boolean;
 	protected isLocalizationMode(): boolean;
 	protected isLocalizationModeAndChanged(): boolean;
 	buttonClick(): void;
@@ -5458,7 +5460,7 @@ export declare class EntityLocalizer {
 	protected loadLocalization(): void;
 	protected setLocalizationGridCurrentValues(): void;
 	protected getLocalizationGridValue(): any;
-	adjustSaveRequest(req: SaveRequest<any>): void;
+	editSaveRequest(req: SaveRequest<any>): void;
 	protected getPendingLocalizations(): any;
 	updateInterface(): void;
 }
@@ -5534,6 +5536,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getRetrieveServiceMethod(): string;
 	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
 	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
+	protected getLocalizerOptions(): EntityLocalizerOptions;
 	protected initLocalizer(): void;
 	protected getLanguages(): any[];
 	protected initPropertyGrid(): void;
