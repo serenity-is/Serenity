@@ -69,6 +69,35 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     }
 
     /// <summary>
+    /// Maps a field using IListFieldMappingBehavior's if any
+    /// </summary>
+    /// <param name="field">Field</param>
+    /// <param name="query">Query</param>
+    /// <returns>Field itself or mapped field</returns>
+    protected virtual string MapFieldExpression(IField field, SqlQuery query)
+    {
+        foreach (var behavior in behaviors.Value)
+        {
+            if (behavior is IListMapFieldExpressionBehavior mapper &&
+                mapper.MapFieldExpression(this, query, field) is string expression)
+                return expression;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Converts the field to criteria, using IListFieldMappingBehavior's if any
+    /// </summary>
+    /// <param name="field">Field</param>
+    protected virtual BaseCriteria ToCriteria(IField field)
+    {
+        if (MapFieldExpression(field, Query) is string expression)
+            return new Criteria(field, expression);
+
+        return new Criteria(field);
+    }
+
+    /// <summary>
     /// Returns true if the field should be allowed to be selected,
     /// based on is read permission, selectlevel.never flag, and lookup
     /// access mode
@@ -186,7 +215,13 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <param name="field">field</param>
     protected virtual void SelectField(SqlQuery query, Field field)
     {
-        query.Select(field);
+        if (MapFieldExpression(field, query) is string expression)
+        {
+            query.EnsureJoinsInExpression(expression);
+            query.SelectAs(expression, field);
+        }
+        else
+            query.Select(field);
     }
 
     /// <summary>
@@ -303,16 +338,16 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
         switch (searchType)
         {
             case SearchType.Contains:
-                criteria |= new Criteria(field).Contains(containsText, upper);
+                criteria |= ToCriteria(field).Contains(containsText, upper);
                 break;
 
             case SearchType.FullTextContains:
-                criteria |= new Criteria("CONTAINS(" + field.Expression + ", " + 
+                criteria |= new Criteria("CONTAINS(" + (MapFieldExpression(field, Query) ?? field.Expression) + ", " +
                     containsText.ToSql(Connection.GetDialect()) + ")");
                 break;
 
             case SearchType.StartsWith:
-                criteria |= new Criteria(field).StartsWith(containsText, upper);
+                criteria |= ToCriteria(field).StartsWith(containsText, upper);
                 break;
 
             case SearchType.Equals:
@@ -324,7 +359,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
                         return;
                     }
 
-                    criteria |= new Criteria(field) == (int)id;
+                    criteria |= ToCriteria(field) == (int)id;
                 }
                 else if (field is Int16Field)
                 {
@@ -334,7 +369,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
                         return;
                     }
 
-                    criteria |= new Criteria(field) == (short)id;
+                    criteria |= ToCriteria(field) == (short)id;
                 }
                 else if (field is Int64Field)
                 {
@@ -344,11 +379,11 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
                         return;
                     }
 
-                    criteria |= new Criteria(field) == id.Value;
+                    criteria |= ToCriteria(field) == id.Value;
                 }
                 else
                 {
-                    criteria |= new Criteria(field) == containsText;
+                    criteria |= ToCriteria(field) == containsText;
                 }
                 break;
 
@@ -473,8 +508,12 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <returns>Processed criteria</returns>
     protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
     {
-        return new CriteriaFieldExpressionReplacer(Row, Permissions, lookupAccessMode, Connection.GetDialect()) 
-            .Process(criteria);
+        return new CriteriaFieldExpressionReplacer(Row,
+            permissions: Permissions,
+            lookupAccessMode: lookupAccessMode,
+            dialect: Connection.GetDialect(),
+            toCriteria: ToCriteria)
+                .Process(criteria);
     }
 
     /// <summary>
@@ -740,7 +779,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     {
         try
         {
-            Response.TotalCount = Query.ForEach(Connection, delegate()
+            Response.TotalCount = Query.ForEach(Connection, delegate ()
             {
                 var clone = ProcessEntity(Row.Clone());
                 if (clone == null)
