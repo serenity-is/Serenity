@@ -143,31 +143,21 @@ public class LocalTextRegistryTests
         registry.TryGet("tr-TR", "Test", false);
         registry.TryGet("en-GB", "Test", false);
         registry.TryGet("en-US", "Test", false);
-        Assert.Collection(registry.GetLanguageFallbacks().OrderBy(x => x.Key),
-            x =>
-            {
-                Assert.Equal("en", x.Key);
-                Assert.Equal("", x.Value);
-            }, 
-            x =>
-            {
-                Assert.Equal("en-GB", x.Key);
-                Assert.Equal("en", x.Value);
-            },
-            x =>
-            {
-                Assert.Equal("en-US", x.Key);
-                Assert.Equal("en", x.Value);
-            },
-            x =>
-            {
-                Assert.Equal("tr", x.Key);
-                Assert.Equal("", x.Value);
-            },
-            x =>
-            {
-                Assert.Equal("tr-TR", x.Key);
-                Assert.Equal("tr", x.Value);
-            });
+
+        Assert.Equal(LocalText.InvariantLanguageID, Assert.Single(registry.GetLanguageFallbacks("en")));
+
+        Assert.Collection(registry.GetLanguageFallbacks("en-GB"),
+            x => Assert.Equal("en", x),
+            x => Assert.Equal(LocalText.InvariantLanguageID, x));
+
+        Assert.Collection(registry.GetLanguageFallbacks("en-US"),
+            x => Assert.Equal("en", x),
+            x => Assert.Equal(LocalText.InvariantLanguageID, x));
+
+        Assert.Equal(LocalText.InvariantLanguageID, Assert.Single(registry.GetLanguageFallbacks("tr")));
+
+        Assert.Collection(registry.GetLanguageFallbacks("tr-TR"),
+            x => Assert.Equal("tr", x),
+            x => Assert.Equal(LocalText.InvariantLanguageID, x));
     }
 }

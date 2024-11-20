@@ -102,10 +102,23 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         return null;
     }
 
+
+
     /// <inheritdoc/>
-    public IDictionary<string, string> GetLanguageFallbacks()
+    public IEnumerable<string> GetLanguageFallbacks(string languageID)
     {
-        return languageFallbacks;
+        if (string.IsNullOrEmpty(languageID))
+            yield break;
+
+        var circularCheck = 0;
+        do
+        {
+            if (languageID == LocalText.InvariantLanguageID)
+                yield break;
+
+            yield return languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
+        }
+        while (circularCheck++ < 10);
     }
 
     /// <inheritdoc/>
