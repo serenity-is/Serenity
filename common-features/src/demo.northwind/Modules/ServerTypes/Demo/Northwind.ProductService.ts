@@ -2,7 +2,7 @@
 import { ProductRow } from "./Northwind.ProductRow";
 
 export namespace ProductService {
-    export const baseUrl = 'Serenity.Demo.Northwind/Product';
+    export const baseUrl = 'Northwind/Product';
 
     export declare function Create(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
     export declare function Update(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
@@ -11,11 +11,11 @@ export namespace ProductService {
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductRow>>;
 
     export const Methods = {
-        Create: "Serenity.Demo.Northwind/Product/Create",
-        Update: "Serenity.Demo.Northwind/Product/Update",
-        Delete: "Serenity.Demo.Northwind/Product/Delete",
-        Retrieve: "Serenity.Demo.Northwind/Product/Retrieve",
-        List: "Serenity.Demo.Northwind/Product/List"
+        Create: "Northwind/Product/Create",
+        Update: "Northwind/Product/Update",
+        Delete: "Northwind/Product/Delete",
+        Retrieve: "Northwind/Product/Retrieve",
+        List: "Northwind/Product/List"
     } as const;
 
     [

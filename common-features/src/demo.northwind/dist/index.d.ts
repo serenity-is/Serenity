@@ -1,4 +1,4 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
@@ -43,7 +43,7 @@ export declare class CategoryForm extends PrefixedContext {
 export interface CategoryLangRow {
 	Id?: number;
 	CategoryId?: number;
-	LanguageId?: number;
+	LanguageId?: string;
 	CategoryName?: string;
 	Description?: string;
 }
@@ -58,33 +58,33 @@ export declare abstract class CategoryLangRow {
 	static readonly Fields: Readonly<Record<keyof CategoryLangRow, string>>;
 }
 export declare namespace CategoryLangService {
-	const baseUrl = "Serenity.Demo.Northwind/CategoryLang";
+	const baseUrl = "Northwind/CategoryLang";
 	function Create(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryLangRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryLangRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/CategoryLang/Create";
-		readonly Update: "Serenity.Demo.Northwind/CategoryLang/Update";
-		readonly Delete: "Serenity.Demo.Northwind/CategoryLang/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/CategoryLang/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/CategoryLang/List";
+		readonly Create: "Northwind/CategoryLang/Create";
+		readonly Update: "Northwind/CategoryLang/Update";
+		readonly Delete: "Northwind/CategoryLang/Delete";
+		readonly Retrieve: "Northwind/CategoryLang/Retrieve";
+		readonly List: "Northwind/CategoryLang/List";
 	};
 }
 export declare namespace CategoryService {
-	const baseUrl = "Serenity.Demo.Northwind/Category";
+	const baseUrl = "Northwind/Category";
 	function Create(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Category/Create";
-		readonly Update: "Serenity.Demo.Northwind/Category/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Category/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Category/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Category/List";
+		readonly Create: "Northwind/Category/Create";
+		readonly Update: "Northwind/Category/Update";
+		readonly Delete: "Northwind/Category/Delete";
+		readonly Retrieve: "Northwind/Category/Retrieve";
+		readonly List: "Northwind/Category/List";
 	};
 }
 export interface NoteRow {
@@ -278,7 +278,7 @@ export declare abstract class CustomerRepresentativesRow {
 	static readonly Fields: Readonly<Record<keyof CustomerRepresentativesRow, string>>;
 }
 export declare namespace CustomerService {
-	const baseUrl = "Serenity.Demo.Northwind/Customer";
+	const baseUrl = "Northwind/Customer";
 	function Create(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
@@ -286,12 +286,12 @@ export declare namespace CustomerService {
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CustomerRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CustomerRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Customer/Create";
-		readonly Update: "Serenity.Demo.Northwind/Customer/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Customer/Delete";
-		readonly GetNextNumber: "Serenity.Demo.Northwind/Customer/GetNextNumber";
-		readonly Retrieve: "Serenity.Demo.Northwind/Customer/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Customer/List";
+		readonly Create: "Northwind/Customer/Create";
+		readonly Update: "Northwind/Customer/Update";
+		readonly Delete: "Northwind/Customer/Delete";
+		readonly GetNextNumber: "Northwind/Customer/GetNextNumber";
+		readonly Retrieve: "Northwind/Customer/Retrieve";
+		readonly List: "Northwind/Customer/List";
 	};
 }
 export declare enum Gender {
@@ -457,18 +457,18 @@ export declare class OrderDetailForm extends PrefixedContext {
 	constructor(prefix: string);
 }
 export declare namespace OrderDetailService {
-	const baseUrl = "Serenity.Demo.Northwind/OrderDetail";
+	const baseUrl = "Northwind/OrderDetail";
 	function Create(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderDetailRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderDetailRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/OrderDetail/Create";
-		readonly Update: "Serenity.Demo.Northwind/OrderDetail/Update";
-		readonly Delete: "Serenity.Demo.Northwind/OrderDetail/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/OrderDetail/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/OrderDetail/List";
+		readonly Create: "Northwind/OrderDetail/Create";
+		readonly Update: "Northwind/OrderDetail/Update";
+		readonly Delete: "Northwind/OrderDetail/Delete";
+		readonly Retrieve: "Northwind/OrderDetail/Retrieve";
+		readonly List: "Northwind/OrderDetail/List";
 	};
 }
 export declare class CustomerEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, CustomerRow> {
@@ -522,18 +522,18 @@ export interface OrderListRequest extends ListRequest {
 	ProductID?: number;
 }
 export declare namespace OrderService {
-	const baseUrl = "Serenity.Demo.Northwind/Order";
+	const baseUrl = "Northwind/Order";
 	function Create(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderRow>>;
 	function List(request: OrderListRequest, onSuccess?: (response: ListResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Order/Create";
-		readonly Update: "Serenity.Demo.Northwind/Order/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Order/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Order/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Order/List";
+		readonly Create: "Northwind/Order/Create";
+		readonly Update: "Northwind/Order/Update";
+		readonly Delete: "Northwind/Order/Delete";
+		readonly Retrieve: "Northwind/Order/Retrieve";
+		readonly List: "Northwind/Order/List";
 	};
 }
 export declare namespace PermissionKeys {
@@ -595,7 +595,7 @@ export interface ProductForm {
 	ProductImage: ImageUploadEditor;
 	Discontinued: BooleanEditor;
 	SupplierID: LookupEditor;
-	CategoryID: LookupEditor;
+	CategoryID: ServiceLookupEditor;
 	QuantityPerUnit: StringEditor;
 	UnitPrice: DecimalEditor;
 	UnitsInStock: IntegerEditor;
@@ -610,7 +610,7 @@ export declare class ProductForm extends PrefixedContext {
 export interface ProductLangRow {
 	Id?: number;
 	ProductId?: number;
-	LanguageId?: number;
+	LanguageId?: string;
 	ProductName?: string;
 }
 export declare abstract class ProductLangRow {
@@ -624,18 +624,18 @@ export declare abstract class ProductLangRow {
 	static readonly Fields: Readonly<Record<keyof ProductLangRow, string>>;
 }
 export declare namespace ProductLangService {
-	const baseUrl = "Serenity.Demo.Northwind/ProductLang";
+	const baseUrl = "Northwind/ProductLang";
 	function Create(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductLangRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductLangRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/ProductLang/Create";
-		readonly Update: "Serenity.Demo.Northwind/ProductLang/Update";
-		readonly Delete: "Serenity.Demo.Northwind/ProductLang/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/ProductLang/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/ProductLang/List";
+		readonly Create: "Northwind/ProductLang/Create";
+		readonly Update: "Northwind/ProductLang/Update";
+		readonly Delete: "Northwind/ProductLang/Delete";
+		readonly Retrieve: "Northwind/ProductLang/Retrieve";
+		readonly List: "Northwind/ProductLang/List";
 	};
 }
 export interface ProductLogRow {
@@ -666,18 +666,18 @@ export declare abstract class ProductLogRow {
 	static readonly Fields: Readonly<Record<keyof ProductLogRow, string>>;
 }
 export declare namespace ProductService {
-	const baseUrl = "Serenity.Demo.Northwind/Product";
+	const baseUrl = "Northwind/Product";
 	function Create(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Product/Create";
-		readonly Update: "Serenity.Demo.Northwind/Product/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Product/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Product/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Product/List";
+		readonly Create: "Northwind/Product/Create";
+		readonly Update: "Northwind/Product/Update";
+		readonly Delete: "Northwind/Product/Delete";
+		readonly Retrieve: "Northwind/Product/Retrieve";
+		readonly List: "Northwind/Product/List";
 	};
 }
 export interface RegionRow {
@@ -716,18 +716,18 @@ export declare class RegionForm extends PrefixedContext {
 	constructor(prefix: string);
 }
 export declare namespace RegionService {
-	const baseUrl = "Serenity.Demo.Northwind/Region";
+	const baseUrl = "Northwind/Region";
 	function Create(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<RegionRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<RegionRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Region/Create";
-		readonly Update: "Serenity.Demo.Northwind/Region/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Region/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Region/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Region/List";
+		readonly Create: "Northwind/Region/Create";
+		readonly Update: "Northwind/Region/Update";
+		readonly Delete: "Northwind/Region/Delete";
+		readonly Retrieve: "Northwind/Region/Retrieve";
+		readonly List: "Northwind/Region/List";
 	};
 }
 export interface SalesByCategoryRow {
@@ -755,10 +755,10 @@ export declare class SalesByCategoryColumns extends ColumnsBase<SalesByCategoryR
 	static readonly Fields: Readonly<Record<keyof SalesByCategoryColumns, string>>;
 }
 export declare namespace SalesByCategoryService {
-	const baseUrl = "Serenity.Demo.Northwind/SalesByCategory";
+	const baseUrl = "Northwind/SalesByCategory";
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<SalesByCategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SalesByCategoryRow>>;
 	const Methods: {
-		readonly List: "Serenity.Demo.Northwind/SalesByCategory/List";
+		readonly List: "Northwind/SalesByCategory/List";
 	};
 }
 export interface ShipperRow {
@@ -814,18 +814,18 @@ export declare class ShipperForm extends PrefixedContext {
 	constructor(prefix: string);
 }
 export declare namespace ShipperService {
-	const baseUrl = "Serenity.Demo.Northwind/Shipper";
+	const baseUrl = "Northwind/Shipper";
 	function Create(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ShipperRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ShipperRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Shipper/Create";
-		readonly Update: "Serenity.Demo.Northwind/Shipper/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Shipper/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Shipper/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Shipper/List";
+		readonly Create: "Northwind/Shipper/Create";
+		readonly Update: "Northwind/Shipper/Update";
+		readonly Delete: "Northwind/Shipper/Delete";
+		readonly Retrieve: "Northwind/Shipper/Retrieve";
+		readonly List: "Northwind/Shipper/List";
 	};
 }
 export interface SupplierRow {
@@ -889,18 +889,18 @@ export declare class SupplierForm extends PrefixedContext {
 	constructor(prefix: string);
 }
 export declare namespace SupplierService {
-	const baseUrl = "Serenity.Demo.Northwind/Supplier";
+	const baseUrl = "Northwind/Supplier";
 	function Create(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<SupplierRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SupplierRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Supplier/Create";
-		readonly Update: "Serenity.Demo.Northwind/Supplier/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Supplier/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Supplier/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Supplier/List";
+		readonly Create: "Northwind/Supplier/Create";
+		readonly Update: "Northwind/Supplier/Update";
+		readonly Delete: "Northwind/Supplier/Delete";
+		readonly Retrieve: "Northwind/Supplier/Retrieve";
+		readonly List: "Northwind/Supplier/List";
 	};
 }
 export interface TerritoryRow {
@@ -944,18 +944,18 @@ export declare class TerritoryForm extends PrefixedContext {
 	constructor(prefix: string);
 }
 export declare namespace TerritoryService {
-	const baseUrl = "Serenity.Demo.Northwind/Territory";
+	const baseUrl = "Northwind/Territory";
 	function Create(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Update(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
 	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<TerritoryRow>>;
 	function List(request: ListRequest, onSuccess?: (response: ListResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<TerritoryRow>>;
 	const Methods: {
-		readonly Create: "Serenity.Demo.Northwind/Territory/Create";
-		readonly Update: "Serenity.Demo.Northwind/Territory/Update";
-		readonly Delete: "Serenity.Demo.Northwind/Territory/Delete";
-		readonly Retrieve: "Serenity.Demo.Northwind/Territory/Retrieve";
-		readonly List: "Serenity.Demo.Northwind/Territory/List";
+		readonly Create: "Northwind/Territory/Create";
+		readonly Update: "Northwind/Territory/Update";
+		readonly Delete: "Northwind/Territory/Delete";
+		readonly Retrieve: "Northwind/Territory/Retrieve";
+		readonly List: "Northwind/Territory/List";
 	};
 }
 export declare class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {

@@ -2,7 +2,7 @@
 import { TerritoryRow } from "./Northwind.TerritoryRow";
 
 export namespace TerritoryService {
-    export const baseUrl = 'Serenity.Demo.Northwind/Territory';
+    export const baseUrl = 'Northwind/Territory';
 
     export declare function Create(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
     export declare function Update(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
@@ -11,11 +11,11 @@ export namespace TerritoryService {
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<TerritoryRow>>;
 
     export const Methods = {
-        Create: "Serenity.Demo.Northwind/Territory/Create",
-        Update: "Serenity.Demo.Northwind/Territory/Update",
-        Delete: "Serenity.Demo.Northwind/Territory/Delete",
-        Retrieve: "Serenity.Demo.Northwind/Territory/Retrieve",
-        List: "Serenity.Demo.Northwind/Territory/List"
+        Create: "Northwind/Territory/Create",
+        Update: "Northwind/Territory/Update",
+        Delete: "Northwind/Territory/Delete",
+        Retrieve: "Northwind/Territory/Retrieve",
+        List: "Northwind/Territory/List"
     } as const;
 
     [

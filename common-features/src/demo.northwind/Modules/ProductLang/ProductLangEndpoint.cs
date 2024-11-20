@@ -4,7 +4,7 @@ using MyRow = Serenity.Demo.Northwind.ProductLangRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;
 
-[Route("Services/Serenity.Demo.Northwind/ProductLang/[action]")]
+[Route("Services/Northwind/ProductLang/[action]")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class ProductLangEndpoint : ServiceEndpoint
 {

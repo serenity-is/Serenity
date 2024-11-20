@@ -2,7 +2,7 @@
 import { CategoryRow } from "./Northwind.CategoryRow";
 
 export namespace CategoryService {
-    export const baseUrl = 'Serenity.Demo.Northwind/Category';
+    export const baseUrl = 'Northwind/Category';
 
     export declare function Create(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
     export declare function Update(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
@@ -11,11 +11,11 @@ export namespace CategoryService {
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryRow>>;
 
     export const Methods = {
-        Create: "Serenity.Demo.Northwind/Category/Create",
-        Update: "Serenity.Demo.Northwind/Category/Update",
-        Delete: "Serenity.Demo.Northwind/Category/Delete",
-        Retrieve: "Serenity.Demo.Northwind/Category/Retrieve",
-        List: "Serenity.Demo.Northwind/Category/List"
+        Create: "Northwind/Category/Create",
+        Update: "Northwind/Category/Update",
+        Delete: "Northwind/Category/Delete",
+        Retrieve: "Northwind/Category/Retrieve",
+        List: "Northwind/Category/List"
     } as const;
 
     [

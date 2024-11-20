@@ -1,4 +1,4 @@
-﻿import { StringEditor, ImageUploadEditor, BooleanEditor, LookupEditor, DecimalEditor, IntegerEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { StringEditor, ImageUploadEditor, BooleanEditor, LookupEditor, ServiceLookupEditor, DecimalEditor, IntegerEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
 import { CategoryDialog } from "../../Category/CategoryDialog";
 import { SupplierDialog } from "../../Supplier/SupplierDialog";
 
@@ -7,7 +7,7 @@ export interface ProductForm {
     ProductImage: ImageUploadEditor;
     Discontinued: BooleanEditor;
     SupplierID: LookupEditor;
-    CategoryID: LookupEditor;
+    CategoryID: ServiceLookupEditor;
     QuantityPerUnit: StringEditor;
     UnitPrice: DecimalEditor;
     UnitsInStock: IntegerEditor;
@@ -29,20 +29,21 @@ export class ProductForm extends PrefixedContext {
             var w1 = ImageUploadEditor;
             var w2 = BooleanEditor;
             var w3 = LookupEditor;
-            var w4 = DecimalEditor;
-            var w5 = IntegerEditor;
+            var w4 = ServiceLookupEditor;
+            var w5 = DecimalEditor;
+            var w6 = IntegerEditor;
 
             initFormType(ProductForm, [
                 'ProductName', w0,
                 'ProductImage', w1,
                 'Discontinued', w2,
                 'SupplierID', w3,
-                'CategoryID', w3,
+                'CategoryID', w4,
                 'QuantityPerUnit', w0,
-                'UnitPrice', w4,
-                'UnitsInStock', w5,
-                'UnitsOnOrder', w5,
-                'ReorderLevel', w5
+                'UnitPrice', w5,
+                'UnitsInStock', w6,
+                'UnitsOnOrder', w6,
+                'ReorderLevel', w6
             ]);
         }
     }

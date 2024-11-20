@@ -3,7 +3,7 @@ import { GetNextNumberRequest, GetNextNumberResponse } from "@serenity-is/extens
 import { CustomerRow } from "./Northwind.CustomerRow";
 
 export namespace CustomerService {
-    export const baseUrl = 'Serenity.Demo.Northwind/Customer';
+    export const baseUrl = 'Northwind/Customer';
 
     export declare function Create(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
     export declare function Update(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
@@ -13,12 +13,12 @@ export namespace CustomerService {
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CustomerRow>>;
 
     export const Methods = {
-        Create: "Serenity.Demo.Northwind/Customer/Create",
-        Update: "Serenity.Demo.Northwind/Customer/Update",
-        Delete: "Serenity.Demo.Northwind/Customer/Delete",
-        GetNextNumber: "Serenity.Demo.Northwind/Customer/GetNextNumber",
-        Retrieve: "Serenity.Demo.Northwind/Customer/Retrieve",
-        List: "Serenity.Demo.Northwind/Customer/List"
+        Create: "Northwind/Customer/Create",
+        Update: "Northwind/Customer/Update",
+        Delete: "Northwind/Customer/Delete",
+        GetNextNumber: "Northwind/Customer/GetNextNumber",
+        Retrieve: "Northwind/Customer/Retrieve",
+        List: "Northwind/Customer/List"
     } as const;
 
     [

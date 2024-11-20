@@ -4,7 +4,7 @@ using MyRow = Serenity.Demo.Northwind.TerritoryRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;
 
-[Route("Services/Serenity.Demo.Northwind/Territory/[action]")]
+[Route("Services/Northwind/Territory/[action]")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class TerritoryEndpoint : ServiceEndpoint
 {

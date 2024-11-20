@@ -4,7 +4,7 @@ using MyRow = Serenity.Demo.Northwind.SalesByCategoryRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;
 
-[Route("Services/Serenity.Demo.Northwind/SalesByCategory/[action]")]
+[Route("Services/Northwind/SalesByCategory/[action]")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class SalesByCategoryEndpoint : ServiceEndpoint
 {

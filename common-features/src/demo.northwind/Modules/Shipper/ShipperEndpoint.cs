@@ -4,7 +4,7 @@ using MyRow = Serenity.Demo.Northwind.ShipperRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;
 
-[Route("Services/Serenity.Demo.Northwind/Shipper/[action]")]
+[Route("Services/Northwind/Shipper/[action]")]
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class ShipperEndpoint : ServiceEndpoint
 {

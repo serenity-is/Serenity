@@ -2,7 +2,7 @@
 import { ShipperRow } from "./Northwind.ShipperRow";
 
 export namespace ShipperService {
-    export const baseUrl = 'Serenity.Demo.Northwind/Shipper';
+    export const baseUrl = 'Northwind/Shipper';
 
     export declare function Create(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
     export declare function Update(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
@@ -11,11 +11,11 @@ export namespace ShipperService {
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ShipperRow>>;
 
     export const Methods = {
-        Create: "Serenity.Demo.Northwind/Shipper/Create",
-        Update: "Serenity.Demo.Northwind/Shipper/Update",
-        Delete: "Serenity.Demo.Northwind/Shipper/Delete",
-        Retrieve: "Serenity.Demo.Northwind/Shipper/Retrieve",
-        List: "Serenity.Demo.Northwind/Shipper/List"
+        Create: "Northwind/Shipper/Create",
+        Update: "Northwind/Shipper/Update",
+        Delete: "Northwind/Shipper/Delete",
+        Retrieve: "Northwind/Shipper/Retrieve",
+        List: "Northwind/Shipper/List"
     } as const;
 
     [
