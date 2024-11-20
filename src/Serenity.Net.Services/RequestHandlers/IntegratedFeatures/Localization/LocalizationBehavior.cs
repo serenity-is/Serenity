@@ -109,7 +109,10 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         if (!field.IsTableField())
             return null;
 
-        if (field.GetAttribute<LocalizableAttribute>()?.IsLocalizable != true)
+        if (field.GetAttribute<LocalizableAttribute>()?.IsLocalizable == false)
+            return null;
+
+        if (ReferenceEquals(field, field.Fields.IdField))
             return null;
 
         var searchName = field.Name;
@@ -127,6 +130,9 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             return null;
 
         if (!match.IsTableField())
+            return null;
+
+        if (match.GetAttribute<LocalizableAttribute>()?.IsLocalizable == false)
             return null;
 
         if (ReferenceEquals(match, localRowInstance.IdField) ||
