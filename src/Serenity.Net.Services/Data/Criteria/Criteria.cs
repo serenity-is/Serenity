@@ -144,6 +144,18 @@ public class Criteria : BaseCriteria
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Criteria"/> class containing
+    /// a custom expression while keeping reference to the provided field.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    /// <param name="expression">Custom expression</param>
+    public Criteria(IField field, string expression)
+        : this(expression)
+    {
+        Field = field ?? throw new ArgumentNullException(nameof(field));
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Criteria"/> class containing
     /// a query's string representation.
     /// </summary>
     /// <param name="query">The query.</param>
