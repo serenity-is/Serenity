@@ -129,7 +129,6 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         var klass = 'edit';
         var item = ctx.item as ProductRow;
         var pending = this.pendingChanges[item.ProductID];
-        var column = ctx.column as Column;
 
         if (pending && pending[idField] !== undefined) {
             klass += ' dirty';

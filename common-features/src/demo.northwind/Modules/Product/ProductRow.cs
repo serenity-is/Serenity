@@ -27,7 +27,7 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     public int? SupplierID { get => fields.SupplierID[this]; set => fields.SupplierID[this] = value; }
 
     [DisplayName("Category"), ForeignKey(typeof(CategoryRow)), LeftJoin("cat"), LookupInclude]
-    [LookupEditor(typeof(CategoryRow), InplaceAdd = true, DialogType = "Demo.Northwind.CategoryDialog", Async = true)]
+    [ServiceLookupEditor(typeof(CategoryRow), InplaceAdd = true, DialogType = "Demo.Northwind.CategoryDialog")]
     public int? CategoryID { get => fields.CategoryID[this]; set => fields.CategoryID[this] = value; }
     
     [DisplayName("Quantity Per Unit"), Size(20)]

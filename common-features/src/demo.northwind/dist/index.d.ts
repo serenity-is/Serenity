@@ -446,7 +446,7 @@ export declare class OrderDetailColumns extends ColumnsBase<OrderDetailRow> {
 }
 export interface OrderDetailForm {
 	OrderID: IntegerEditor;
-	ProductID: LookupEditor;
+	ProductID: ServiceLookupEditor;
 	UnitPrice: DecimalEditor;
 	Quantity: IntegerEditor;
 	Discount: DecimalEditor;

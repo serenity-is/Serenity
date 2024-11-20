@@ -17,7 +17,7 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     public int? OrderID { get => fields.OrderID[this]; set => fields.OrderID[this] = value; }
 
     [DisplayName("Product"), PrimaryKey, NotNull, ForeignKey(typeof(ProductRow)), LeftJoin(jProduct)]
-    [AsyncLookupEditor(typeof(ProductRow))]
+    [ServiceLookupEditor(typeof(ProductRow))]
     public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
 
     [DisplayName("Unit Price"), Scale(4), NotNull, AlignRight, DisplayFormat("#,##0.00")]
