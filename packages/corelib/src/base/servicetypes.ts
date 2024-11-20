@@ -1,4 +1,4 @@
-﻿export interface ServiceError {
+export interface ServiceError {
     Code?: string;
     Arguments?: string;
     Message?: string;
@@ -78,6 +78,7 @@ export interface ListRequest extends ServiceRequest {
     ExcludeColumns?: string[];
     ExportColumns?: string[];
     DistinctFields?: string[];
+    Localize?: string;
 }
     
 export interface ListResponse<TEntity> extends ServiceResponse {

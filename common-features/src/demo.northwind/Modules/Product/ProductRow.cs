@@ -6,7 +6,7 @@ namespace Serenity.Demo.Northwind;
 [ModifyPermission(PermissionKeys.General)]
 [LookupScript]
 [CaptureLog(typeof(ProductLogRow))]
-[LocalizationRow(typeof(ProductLangRow))]
+[LocalizationRow(typeof(ProductLangRow), LocalizeListByDefault = true)]
 public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
 {
     [DisplayName("Product Id"), Identity, LookupInclude, IdProperty]

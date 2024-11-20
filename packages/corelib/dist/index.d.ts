@@ -702,6 +702,7 @@ export interface ListRequest extends ServiceRequest {
 	ExcludeColumns?: string[];
 	ExportColumns?: string[];
 	DistinctFields?: string[];
+	Localize?: string;
 }
 export interface ListResponse<TEntity> extends ServiceResponse {
 	Entities?: TEntity[];

@@ -98,4 +98,12 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// for contexts like Excel export etc.
     /// </summary>
     public List<string> ExportColumns { get; set; }
+
+    /// <summary>
+    /// Set to "true" to localize fields with the Localize attribute.
+    /// Note that this will also affect filtering and sorting as the field's
+    /// expression will be changed to a COALESCE one. To get a localized
+    /// version in a specific language, pass the language code as the value.
+    /// </summary>
+    public string Localize { get; set; }
 }
