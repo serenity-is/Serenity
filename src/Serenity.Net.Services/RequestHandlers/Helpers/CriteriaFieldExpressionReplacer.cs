@@ -15,9 +15,10 @@ namespace Serenity.Data;
 /// In the lookup access mode only the lookup fields can be
 /// used in the filter. Default is false.</param>
 /// <param name="dialect">Optional dialect</param>
+/// <param name="toCriteria">Optional field to criteria converter</param>
 /// <exception cref="ArgumentNullException">row or permissions is null</exception>
 public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions,
-    bool lookupAccessMode = false, ISqlDialect dialect = null) : SafeCriteriaValidator
+    bool lookupAccessMode = false, ISqlDialect dialect = null, Func<IField, BaseCriteria> toCriteria = null) : SafeCriteriaValidator
 {
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
     private readonly bool lookupAccessMode = lookupAccessMode;
@@ -77,6 +78,15 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         return Row.FindFieldByPropertyName(expression) ?? Row.FindField(expression);
     }
 
+    /// <summary>
+    /// Converts field to criteria
+    /// </summary>
+    /// <param name="field">Field</param>
+    protected virtual BaseCriteria ToCriteria(IField field)
+    {
+        return toCriteria != null ? toCriteria(field) : new Criteria(field);
+    }
+
     /// <inheritdoc/>
     protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
@@ -94,7 +104,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
                     string.Format("Can't filter on field '{0}'!", criteria.Expression));
             }
 
-            return new Criteria(field);
+            return ToCriteria(field);
         }
 
         return result;
@@ -134,7 +144,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
             (criteria.Operator == CriteriaOperator.Like ||
              criteria.Operator == CriteriaOperator.NotLike) &&
              criteria.RightOperand is ValueCriteria right &&
-             right.Value is string s &&
+             right.Value is string &&
              criteria.LeftOperand is Criteria left &&
              FindField(left.Expression) is StringField;
     }
@@ -158,13 +168,13 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
                     foreach (var v in value as IEnumerable)
                         values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
 
-                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(values));
+                    return new BinaryCriteria(ToCriteria(field), criteria.Operator, new ValueCriteria(values));
                 }
 
                 if (str == null || str.Length != 0)
                 {
                     value = field.ConvertValue(value, CultureInfo.InvariantCulture);
-                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(value));
+                    return new BinaryCriteria(ToCriteria(field), criteria.Operator, new ValueCriteria(value));
                 }
             }
             catch
