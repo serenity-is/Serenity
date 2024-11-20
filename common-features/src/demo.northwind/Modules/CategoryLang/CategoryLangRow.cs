@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind;
+namespace Serenity.Demo.Northwind;
 
 [ConnectionKey("Northwind"), Module("Northwind"), TableName("CategoryLang")]
 [DisplayName("CategoryLang"), InstanceName("CategoryLang")]
@@ -13,7 +13,7 @@ public sealed class CategoryLangRow : Row<CategoryLangRow.RowFields>, IIdRow, IN
     public int? CategoryId { get => fields.CategoryId[this]; set => fields.CategoryId[this] = value; }
 
     [DisplayName("Language Id"), Column("LanguageID"), NotNull]
-    public int? LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
+    public string LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
 
     [DisplayName("Category Name"), Size(15), QuickSearch, NameProperty]
     public string CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
@@ -21,13 +21,13 @@ public sealed class CategoryLangRow : Row<CategoryLangRow.RowFields>, IIdRow, IN
     [DisplayName("Description")]
     public string Description { get => fields.Description[this]; set => fields.Description[this] = value; }
 
-    public Field CultureIdField => fields.LanguageId;
+    public StringField CultureIdField => fields.LanguageId;
 
     public class RowFields : RowFieldsBase
     {
         public Int32Field Id;
         public Int32Field CategoryId;
-        public Int32Field LanguageId;
+        public StringField LanguageId;
         public StringField CategoryName;
         public StringField Description;
     }

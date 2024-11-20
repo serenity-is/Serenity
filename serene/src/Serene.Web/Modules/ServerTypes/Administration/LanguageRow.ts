@@ -1,13 +1,12 @@
 ﻿import { getLookup, getLookupAsync, fieldsProxy } from "@serenity-is/corelib";
 
 export interface LanguageRow {
-    Id?: number;
     LanguageId?: string;
     LanguageName?: string;
 }
 
 export abstract class LanguageRow {
-    static readonly idProperty = 'Id';
+    static readonly idProperty = 'LanguageId';
     static readonly nameProperty = 'LanguageName';
     static readonly localTextPrefix = 'Administration.Language';
     static readonly lookupKey = 'Administration.Language';

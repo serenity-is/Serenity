@@ -7,7 +7,6 @@ namespace texts {
         namespace Administration {
 
             namespace Language {
-                export const Id: string;
                 export const LanguageId: string;
                 export const LanguageName: string;
             }

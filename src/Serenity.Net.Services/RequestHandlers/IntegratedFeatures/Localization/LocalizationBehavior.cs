@@ -21,7 +21,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private int localRowPrefixLength;
     private Field foreignKeyField;
     private Field localRowIdField;
-    private Field cultureIdField;
+    private StringField cultureIdField;
     private ILocalizationRow localRowInstance;
     private BaseCriteria foreignKeyCriteria;
     private Func<IDictionary> dictionaryFactory;
@@ -139,7 +139,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return match;
     }
 
-    private object GetOldLocalizationRowId(IDbConnection connection, object recordId, object cultureId)
+    private object GetOldLocalizationRowId(IDbConnection connection, object recordId, string cultureId)
     {
         var row = localRowInstance.CreateNew();
         if (new SqlQuery()
@@ -211,7 +211,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                 }
             }
 
-            var culture = cultureIdField.AsObject(localRow);
+            var culture = cultureIdField[localRow];
             dictionary[culture == null ? "" : culture.ToString()] = row;
         }
 
@@ -251,12 +251,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
         foreach (DictionaryEntry pair in localizations)
         {
-            var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture);
+            var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture)?.ToString();
             var oldId = handler.IsCreate ? null : GetOldLocalizationRowId(handler.UnitOfWork.Connection, masterId, cultureId);
             var localRow = localRowFactory();
             localRow.TrackAssignments = true;
             if (oldId == null)
-                cultureIdField.AsObject(localRow, cultureId);
+                cultureIdField[localRow] = cultureId;
 
             var row = pair.Value as IRow;
 

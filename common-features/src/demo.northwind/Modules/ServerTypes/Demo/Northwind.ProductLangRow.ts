@@ -3,7 +3,7 @@
 export interface ProductLangRow {
     Id?: number;
     ProductId?: number;
-    LanguageId?: number;
+    LanguageId?: string;
     ProductName?: string;
 }
 

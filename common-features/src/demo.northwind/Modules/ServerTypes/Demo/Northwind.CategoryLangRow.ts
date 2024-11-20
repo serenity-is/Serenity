@@ -3,7 +3,7 @@
 export interface CategoryLangRow {
     Id?: number;
     CategoryId?: number;
-    LanguageId?: number;
+    LanguageId?: string;
     CategoryName?: string;
     Description?: string;
 }
