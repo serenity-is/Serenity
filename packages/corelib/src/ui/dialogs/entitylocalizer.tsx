@@ -52,12 +52,6 @@ export class EntityLocalizer {
             this.targetLanguage.value = targetLang;
         }
 
-        Fluent.on(this.targetLanguage, "change", () => {
-            const val = this.targetLanguage?.value;
-            this.grid.element.findAll('.translation').forEach(x => x.closest(".field")?.classList.toggle('hidden', !!val && !x.classList.contains('language-' + val)));
-            localStorage.setItem("EntityLocalizer.TargetLanguage", val);
-        });
-
         pgOptions.idPrefix = idPrefix + 'Localization_';
 
         var items: PropertyItem[] = [];
@@ -91,6 +85,17 @@ export class EntityLocalizer {
 
         this.grid = (new PropertyGrid({ element: localGridDiv, ...pgOptions })).init();
         localGridDiv.classList.add('s-LocalizationGrid');
+
+        const targetLanguageUpdate = () => {
+            const val = this.targetLanguage?.value;
+            this.grid.element.findAll('.translation').forEach(x => x.closest(".field")?.classList.toggle('hidden', !!val && !x.classList.contains('language-' + val)));
+        }
+        targetLanguageUpdate();
+
+        Fluent.on(this.targetLanguage, "change", () => {
+            targetLanguageUpdate();
+            localStorage.setItem("EntityLocalizer.TargetLanguage", this.targetLanguage?.value);
+        });        
     }
 
     destroy() {
