@@ -96,15 +96,30 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return GetLocalizationMatch(field, localRowInstance, localRowPrefixLength, rowPrefixLength);
     }
 
-    internal static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
-        int localRowPrefixLength, int rowPrefixLength)
+    /// <summary>
+    /// Gets localization match for a field
+    /// </summary>
+    /// <param name="field">Field</param>
+    /// <param name="localRowInstance">Local row instance</param>
+    /// <param name="localRowPrefixLength">Local row field name prefix length</param>
+    /// <param name="rowPrefixLength">Row field name prefix length</param>
+    public static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
+        int localRowPrefixLength = 0, int rowPrefixLength = 0)
     {
         if (!field.IsTableField())
             return null;
 
-        var name = field.Name[rowPrefixLength..];
-        name = localRowInstance.IdField.Name[..localRowPrefixLength] + name;
-        var match = localRowInstance.FindField(name);
+        if (field.GetAttribute<LocalizableAttribute>()?.IsLocalizable != true)
+            return null;
+
+        var searchName = field.Name;
+        if (rowPrefixLength > 0)
+            searchName = searchName[rowPrefixLength..];
+
+        if (localRowPrefixLength > 0)
+            searchName = localRowInstance.IdField.Name[..localRowPrefixLength] + searchName;
+
+        var match = localRowInstance.FindField(searchName);
         if (match is null && field.PropertyName != null)
             match = localRowInstance.FindFieldByPropertyName(field.PropertyName);
 
