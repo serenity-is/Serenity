@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <DefaultItemExcludes>node_modules\**;out\**;</DefaultItemExcludes>
+    <DefaultItemExcludes>node_modules\**;coverage\**;out\**;</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>

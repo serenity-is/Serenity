@@ -18,7 +18,7 @@
     <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <DefaultItemExcludes>node_modules\**;$(DefaultItemExcludes)</DefaultItemExcludes>
+    <DefaultItemExcludes>node_modules\**;coverage\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <AddAutoRefs>true</AddAutoRefs>
     <RestoreNodeTypes>false</RestoreNodeTypes>
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
