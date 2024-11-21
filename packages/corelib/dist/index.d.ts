@@ -1501,6 +1501,29 @@ export declare function addLocalText(obj: string | Record<string, string | Recor
 export declare function localText(key: string, defaultText?: string): string;
 export declare function tryGetText(key: string): string;
 export declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
+export type LanguageList = {
+	id: string;
+	text: string;
+}[];
+export type TranslateTextsOptions = {
+	SourceLanguageID?: string;
+	Inputs: {
+		TextKey?: string;
+		TargetLanguageID?: string;
+		SourceText?: string;
+	}[];
+};
+export type TranslateTextsResult = {
+	Translations?: {
+		TextKey?: string;
+		TargetLanguageID?: string;
+		TranslatedText?: string;
+	}[];
+};
+export declare const TranslationConfig: {
+	getLanguageList: () => LanguageList;
+	translateTexts: (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>;
+};
 export interface LookupOptions<TItem> {
 	idField?: string;
 	parentIdField?: string;
@@ -5438,7 +5461,7 @@ export interface EntityLocalizerOptions {
 	getEntity: () => any;
 	getEntityId: () => any;
 	getIdProperty: () => string;
-	getLanguages: () => any[];
+	getLanguages: () => LanguageList;
 	getRetrieveServiceMethod: () => string;
 	getPropertyGrid: () => Fluent;
 	pgOptions: PropertyGridOptions;
@@ -5457,7 +5480,6 @@ export declare class EntityLocalizer {
 	protected isLocalizationMode(): boolean;
 	protected isLocalizationModeAndChanged(): boolean;
 	buttonClick(): void;
-	private getLangs;
 	protected loadLocalization(): void;
 	protected setLocalizationGridCurrentValues(): void;
 	protected getLocalizationGridValue(): any;
@@ -5478,7 +5500,6 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected editButton: Fluent;
 	protected localizer: EntityLocalizer;
 	protected localizerButton: Fluent;
-	static defaultLanguageList: () => string[][];
 	constructor(props?: WidgetProps<P>);
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
 	protected afterInit(): void;
@@ -5539,7 +5560,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
 	protected getLocalizerOptions(): EntityLocalizerOptions;
 	protected initLocalizer(): void;
-	protected getLanguages(): any[];
+	protected getLanguages(): LanguageList;
 	protected initPropertyGrid(): void;
 	protected getPropertyItems(): PropertyItem[];
 	protected getPropertyItemsData(): PropertyItemsData;
@@ -5579,6 +5600,8 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected isViewMode(): boolean;
 	protected useViewMode(): boolean;
 	protected renderContents(): any;
+	static get defaultLanguageList(): string[][];
+	static set defaultLanguageList(value: string[][]);
 }
 export type Constructor<T> = new (...args: any[]) => T;
 

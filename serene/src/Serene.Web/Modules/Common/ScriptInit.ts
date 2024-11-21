@@ -1,9 +1,9 @@
-import { Config, EntityDialog, ErrorHandling, HtmlContentEditor, getjQuery } from "@serenity-is/corelib";
+import { Config, ErrorHandling, HtmlContentEditor, TranslationConfig, getjQuery } from "@serenity-is/corelib";
 import { gridDefaults } from "@serenity-is/sleekgrid";
-import { siteLanguageList } from "./Helpers/LanguageList";
+import { getLanguageList } from "./Helpers/LanguageList";
 
 Config.rootNamespaces.push('Serene');
-EntityDialog.defaultLanguageList = siteLanguageList;
+TranslationConfig.getLanguageList = getLanguageList;
 HtmlContentEditor.CKEditorBasePath = "~/Serenity.Assets/Scripts/ckeditor/";
 gridDefaults.useCssVars = false;
 

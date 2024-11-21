@@ -1,4 +1,4 @@
-import { DeleteRequest, DeleteResponse, Fluent, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { DeleteRequest, DeleteResponse, Fluent, LanguageList, TranslationConfig, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../q";
 import { DataChangeInfo } from "../../types";
@@ -34,8 +34,6 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     declare protected localizer: EntityLocalizer;
     declare protected localizerButton: Fluent;
-
-    static defaultLanguageList: () => string[][];
 
     constructor(props?: WidgetProps<P>) {
         super(props);
@@ -452,8 +450,8 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             this.localizer = new EntityLocalizer(this.getLocalizerOptions());
     }
 
-    protected getLanguages(): any[] {
-        return EntityDialog.defaultLanguageList?.() || [];
+    protected getLanguages(): LanguageList {
+        return TranslationConfig.getLanguageList?.() || [];
     }
 
     protected initPropertyGrid(): void {
@@ -768,5 +766,13 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 </form>
             </div>
         </>);
+    }
+
+    static get defaultLanguageList(): string[][] {
+        return TranslationConfig.getLanguageList?.().map(x => [x.id, x.text]);
+    }
+
+    static set defaultLanguageList(value: string[][]) {
+        TranslationConfig.getLanguageList = () => value?.map(x => ({ id: x[0], text: x[1] }));
     }
 }

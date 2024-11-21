@@ -60,5 +60,14 @@ export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, 
     });
 }
 
+export type LanguageList = { id: string, text: string }[];
+export type TranslateTextsOptions = { SourceLanguageID?: string, Inputs: { TextKey?: string, TargetLanguageID?: string, SourceText?: string }[] };
+export type TranslateTextsResult = { Translations?: { TextKey?: string, TargetLanguageID?: string, TranslatedText?: string }[] };
+
+export const TranslationConfig = {
+    getLanguageList: null as () => LanguageList,
+    translateTexts: null as (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>
+}
+
 let global = getGlobalObject();
 (global.Serenity || (global.Serenity = {})).addLocalText = addLocalText;

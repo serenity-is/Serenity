@@ -1,7 +1,6 @@
-import { Fluent, localText, PropertyItem, SaveRequest, serviceCall, ServiceOptions } from "../../base";
-import { extend, safeCast } from "../../q/system-compat";
+import { faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, serviceCall, ServiceOptions, TranslationConfig } from "../../base";
+import { extend } from "../../q/system-compat";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
-import { Toolbar } from "../widgets/toolbar";
 
 export interface EntityLocalizerOptions {
     validateForm: () => boolean,
@@ -12,7 +11,7 @@ export interface EntityLocalizerOptions {
     getEntity: () => any;
     getEntityId: () => any,
     getIdProperty: () => string,
-    getLanguages: () => any[],
+    getLanguages: () => LanguageList,
     getRetrieveServiceMethod: () => string,
     getPropertyGrid: () => Fluent,
     pgOptions: PropertyGridOptions,
@@ -39,16 +38,16 @@ export class EntityLocalizer {
 
         const localGridDiv = <div id={idPrefix + 'LocalizationGrid'} style="display: none" /> as HTMLDivElement;
         pgDiv.after(localGridDiv);
-        const langs = this.getLangs();
+        const langs = this.options.getLanguages() || [];
 
         this.targetLanguage = <select class="target-language ms-2" style="display: none">
             <option value="">--{localText("Site.Translation.TargetLanguage")}--</option>
-            {langs.map(x => <option value={x[0]}>{x[1]}</option>)}
+            {langs.map(x => <option value={x.id}>{x.text}</option>)}
         </select> as HTMLSelectElement;
         this.options.getButton()?.after(this.targetLanguage);
 
         const targetLang = localStorage.getItem("EntityLocalizer.TargetLanguage");
-        if (langs.some(x => x[0] == targetLang)) {
+        if (langs.some(x => x.id == targetLang)) {
             this.targetLanguage.value = targetLang;
         }
 
@@ -67,9 +66,9 @@ export class EntityLocalizer {
 
                 for (var lang of langs) {
                     items.push(Object.assign({} as PropertyItem, item, {
-                        name: lang[0] + '$' + item.name,
-                        title: lang[1],
-                        cssClass: Fluent.toClassName([item.cssClass, 'translation', 'language-' + lang[0]]),
+                        name: lang.id + '$' + item.name,
+                        title: lang.text,
+                        cssClass: Fluent.toClassName([item.cssClass, 'translation', 'language-' + lang.id]),
                         insertable: true,
                         updatable: true,
                         oneWay: false,
@@ -85,6 +84,30 @@ export class EntityLocalizer {
 
         this.grid = (new PropertyGrid({ element: localGridDiv, ...pgOptions })).init();
         localGridDiv.classList.add('s-LocalizationGrid');
+
+        if (TranslationConfig.translateTexts) {
+            this.grid.element.findAll<HTMLInputElement>("input[type=text].editor").forEach(input => {
+                const div = <div class="input-group w-100" /> as HTMLElement;
+                Fluent(div).insertBefore(input);
+                input.classList.add("form-control");
+                div.append(input);
+                div.append(
+                    <button class="btn btn-primary btn-sm" title={localText("Site.Translation.TranslateText")} onClick={() => {
+                        TranslationConfig.translateTexts({
+                            Inputs: [{
+                                SourceText: this.grid.element.findFirst("[name=" + CSS.escape(input.name.split('$')[1]) + "]").val() || input.placeholder,
+                                TargetLanguageID: input.name.split('$')[0],
+                            }]
+                        }).then(result => {
+                            if (result.Translations && result.Translations.length > 0) {
+                                input.value = result.Translations[0].TranslatedText;
+                            }
+                        });
+                    }}>
+                        <span class={faIcon("language")} />
+                    </button>);
+            });
+        }
 
         const targetLanguageUpdate = () => {
             const val = this.targetLanguage?.value;
@@ -143,21 +166,6 @@ export class EntityLocalizer {
         if (this.isLocalizationMode()) {
             this.loadLocalization();
         }
-    }
-
-    // for compatibility with older getLanguages methods written in Saltaralle
-    private getLangs(): string[][] {
-
-        var langsTuple = this.options.getLanguages();
-        var langs = safeCast(langsTuple, Array);
-        if (langs == null || langs.length === 0 ||
-            langs[0] == null || !Array.isArray(langs[0])) {
-            langs = Array.prototype.slice.call(langsTuple.map(function (x: any) {
-                return [x.item1, x.item2];
-            }));
-        }
-
-        return langs;
     }
 
     protected loadLocalization(): void {
@@ -250,24 +258,23 @@ export class EntityLocalizer {
 
         var result: { [key: string]: any } = {};
         var idField = this.options.getIdProperty();
-        var langs = this.getLangs();
+        var langs = this.options.getLanguages();
 
-        for (var pair of langs) {
-            var language = pair[0];
+        for (var lang of langs) {
             var entity: any = {};
 
             if (idField != null) {
                 entity[idField] = this.options.getEntityId();
             }
 
-            var prefix = language + '$';
+            var prefix = lang.id + '$';
 
             for (var k of Object.keys(this.pendingValue)) {
                 if (k.startsWith(prefix))
                     entity[k.substring(prefix.length)] = this.pendingValue[k];
             }
 
-            result[language] = entity;
+            result[lang.id] = entity;
         }
 
         return result;
