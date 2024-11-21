@@ -1,21 +1,19 @@
-import { faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, serviceCall, ServiceOptions, TranslationConfig } from "../../base";
+import { faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
 import { extend } from "../../q/system-compat";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
 export interface EntityLocalizerOptions {
-    validateForm: () => boolean,
     byId: (id: string) => Fluent,
     idPrefix: string,
     isNew: () => boolean,
     getButton: () => Fluent;
     getEntity: () => any;
-    getEntityId: () => any,
-    getIdProperty: () => string,
     getLanguages: () => LanguageList,
-    getRetrieveServiceMethod: () => string,
     getPropertyGrid: () => Fluent,
-    pgOptions: PropertyGridOptions,
     getToolButtons: () => HTMLElement[]
+    pgOptions: PropertyGridOptions,
+    retrieveLocalizations: () => PromiseLike<{ [ languageId: string ]: any}>,
+    validateForm: () => boolean,
 }
 
 export class EntityLocalizer {
@@ -184,37 +182,21 @@ export class EntityLocalizer {
             return;
         }
 
-        var opt: ServiceOptions<any> = {
-            service: this.options.getRetrieveServiceMethod(),
-            blockUI: true,
-            request: {
-                EntityId: this.options.getEntityId(),
-                ColumnSelection: 'keyOnly',
-                IncludeColumns: ['Localizations']
-            },
-            onSuccess: response => {
-                var copy = extend(new Object(), this.options.getEntity());
-                if (response.Localizations) {
-                    for (var language of Object.keys(response.Localizations)) {
-                        var entity = response.Localizations[language];
-                        for (var key of Object.keys(entity)) {
-                            (copy as any)[language + '$' + key] = entity[key];
-                        }
-                    }
-                }
+        this.options.retrieveLocalizations().then(localizations => {
+            const copy = extend(new Object(), this.options.getEntity());
+            Object.entries(localizations ?? {}).forEach(([language, entity]) => 
+                Object.entries(entity ?? {}).forEach(([field, value]) =>
+                    copy[language + '$' + field] = value));
 
-                this.grid.load(copy);
-                this.setLocalizationGridCurrentValues();
-                this.pendingValue = null;
-                this.lastValue = this.getLocalizationGridValue();
-            }
-        };
-
-        serviceCall(opt);
+            this.grid.load(copy);
+            this.setLocalizationGridCurrentValues();
+            this.pendingValue = null;
+            this.lastValue = this.getLocalizationGridValue();
+        });
     }
 
     protected setLocalizationGridCurrentValues(): void {
-        var valueByName: Record<string, any> = {};
+        const valueByName: Record<string, any> = {};
 
         this.grid.enumerateItems((item, widget) => {
             if (item.name.indexOf('$') < 0 && Fluent.isInputLike(widget.domNode)) {
@@ -259,16 +241,10 @@ export class EntityLocalizer {
         }
 
         var result: { [key: string]: any } = {};
-        var idField = this.options.getIdProperty();
         var langs = this.options.getLanguages();
 
         for (var lang of langs) {
             var entity: any = {};
-
-            if (idField != null) {
-                entity[idField] = this.options.getEntityId();
-            }
-
             var prefix = lang.id + '$';
 
             for (var k of Object.keys(this.pendingValue)) {

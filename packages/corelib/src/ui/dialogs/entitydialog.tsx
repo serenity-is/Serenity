@@ -1,4 +1,4 @@
-import { DeleteRequest, DeleteResponse, Fluent, LanguageList, TranslationConfig, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { Authorization, Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../q";
 import { DataChangeInfo } from "../../types";
@@ -391,7 +391,16 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>> {
-        return {};
+        return {
+            blockUI: true,
+            service: this.getRetrieveServiceMethod(),
+            request: this.getLoadByIdRequest(id),
+            onSuccess: response => {
+                this.loadResponse(response);
+                callback?.(response);
+            },
+            onCleanup: () => this.validator != null && validatorAbortHandler(this.validator)
+        };
     }
 
     protected getLoadByIdRequest(id: any): RetrieveRequest {
@@ -409,17 +418,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
-        const options: ServiceOptions<RetrieveResponse<TItem>> = extend({
-            service: this.getRetrieveServiceMethod(),
-            blockUI: true,
-            request: this.getLoadByIdRequest(id),
-            onSuccess: response => {
-                this.loadResponse(response);
-                callback?.(response);
-            },
-            onCleanup: () => this.validator != null && validatorAbortHandler(this.validator)
-        }, this.getLoadByIdOptions(id, callback));
-        this.loadByIdHandler(options, callback, fail);
+        this.loadByIdHandler(this.getLoadByIdOptions(id, callback), callback, fail);
     }
 
     protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
@@ -427,21 +426,34 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         fail && ((request as any)?.fail ? (request as any).fail(fail) : request.then(null, fail));
     }
 
+    protected async retrieveLocalizations(): Promise<Record<string, Partial<TItem>>> {
+        const opt: ServiceOptions<RetrieveResponse<TItem>> = {
+            ...this.getLoadByIdOptions(this.entityId, null),
+            onSuccess: void 0,
+            onCleanup: void 0
+        };
+
+        opt.request = {
+            ...opt.request,
+            ColumnSelection: RetrieveColumnSelection.keyOnly,
+            IncludeColumns: ['Localizations']
+        };
+        return (await serviceCall(opt)).Localizations;
+    }
+
     protected getLocalizerOptions(): EntityLocalizerOptions {
         return {
+            byId: id => this.byId(id),
             idPrefix: this.idPrefix,
             getButton: () => this.localizerButton,
             getEntity: () => this.entity,
-            getEntityId: () => this.entityId,
-            getIdProperty: () => this.getIdProperty(),
             getLanguages: () => this.getLanguages(),
-            getRetrieveServiceMethod: () => this.getRetrieveServiceMethod(),
+            getPropertyGrid: () => this.byId("PropertyGrid"),
             getToolButtons: () => this.toolbar.element.findAll(".tool-button"),
             isNew: () => this.isNew(),
-            validateForm: () => this.validateForm(),
-            byId: s => this.byId(s),
-            getPropertyGrid: () => this.byId("PropertyGrid"),
-            pgOptions: this.getPropertyGridOptions()
+            pgOptions: this.getPropertyGridOptions(),
+            retrieveLocalizations: () => this.retrieveLocalizations(),
+            validateForm: () => this.validateForm()
         };
     }
 
