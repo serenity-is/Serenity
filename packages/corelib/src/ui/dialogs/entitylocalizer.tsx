@@ -87,6 +87,8 @@ export class EntityLocalizer {
 
         if (TranslationConfig.translateTexts) {
             this.grid.element.findAll<HTMLInputElement>("input[type=text].editor").forEach(input => {
+                if (!input.name || input.name.indexOf('$') < 0)
+                    return;
                 const div = <div class="input-group w-100" /> as HTMLElement;
                 Fluent(div).insertBefore(input);
                 input.classList.add("form-control");
