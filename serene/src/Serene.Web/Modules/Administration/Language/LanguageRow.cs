@@ -15,7 +15,6 @@ public sealed class LanguageRow : Row<LanguageRow.RowFields>, IIdRow, INameRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field Id;
         public StringField LanguageId;
         public StringField LanguageName;
     }
