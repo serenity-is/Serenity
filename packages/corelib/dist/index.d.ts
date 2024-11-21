@@ -648,18 +648,12 @@ export interface ServiceRequest {
 export interface SaveRequest<TEntity> extends ServiceRequest {
 	EntityId?: any;
 	Entity?: TEntity;
-	Localizations?: any;
-}
-export interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-	Attachments?: any[];
+	Localizations?: {
+		[languageId: string]: Partial<TEntity>;
+	};
 }
 export interface SaveResponse extends ServiceResponse {
 	EntityId?: any;
-}
-export interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
-	Localizations?: {
-		[key: string]: TEntity;
-	};
 }
 export interface DeleteRequest extends ServiceRequest {
 	EntityId?: any;
@@ -719,12 +713,8 @@ export interface RetrieveRequest extends ServiceRequest {
 }
 export interface RetrieveResponse<TEntity> extends ServiceResponse {
 	Entity?: TEntity;
-}
-export interface RetrieveLocalizationRequest extends RetrieveRequest {
-}
-export interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
-	Entities?: {
-		[key: string]: TEntity;
+	Localizations?: {
+		[languageId: string]: Partial<TEntity>;
 	};
 }
 export interface RequestErrorInfo {
@@ -5453,19 +5443,19 @@ export declare function editToolButton(opt?: ToolButton): ToolButton;
 export declare function localizationToolButton(opt?: ToolButton): ToolButton;
 export declare function cloneToolButton(opt?: ToolButton): ToolButton;
 export interface EntityLocalizerOptions {
-	validateForm: () => boolean;
 	byId: (id: string) => Fluent;
 	idPrefix: string;
 	isNew: () => boolean;
 	getButton: () => Fluent;
 	getEntity: () => any;
-	getEntityId: () => any;
-	getIdProperty: () => string;
 	getLanguages: () => LanguageList;
-	getRetrieveServiceMethod: () => string;
 	getPropertyGrid: () => Fluent;
-	pgOptions: PropertyGridOptions;
 	getToolButtons: () => HTMLElement[];
+	pgOptions: PropertyGridOptions;
+	retrieveLocalizations: () => PromiseLike<{
+		[languageId: string]: any;
+	}>;
+	validateForm: () => boolean;
 }
 export declare class EntityLocalizer {
 	protected grid: PropertyGrid;
@@ -5558,6 +5548,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getRetrieveServiceMethod(): string;
 	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
 	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
+	protected retrieveLocalizations(): Promise<Record<string, Partial<TItem>>>;
 	protected getLocalizerOptions(): EntityLocalizerOptions;
 	protected initLocalizer(): void;
 	protected getLanguages(): LanguageList;
