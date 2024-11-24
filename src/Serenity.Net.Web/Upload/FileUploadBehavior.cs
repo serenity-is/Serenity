@@ -445,6 +445,15 @@ public abstract class MultipleFileUploadBehavior() : FileUploadBehavior(null, nu
 /// Obsolete. Use <see cref="FileUploadBehavior"/> instead.
 /// </summary>
 [Obsolete("Use Serenity.Services.FileUploadBehavior")]
+public abstract class ImageUploadBehavior(IUploadStorage storage, IUploadProcessor uploadProcessor) 
+    : FileUploadBehavior(storage, uploadProcessor)
+{
+}
+
+/// <summary>
+/// Obsolete. Use <see cref="FileUploadBehavior"/> instead.
+/// </summary>
+[Obsolete("Use Serenity.Services.FileUploadBehavior")]
 public abstract class MultipleImageUploadBehavior() : MultipleFileUploadBehavior()
 {
 }
