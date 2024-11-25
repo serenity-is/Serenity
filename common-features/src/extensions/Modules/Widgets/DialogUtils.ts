@@ -31,10 +31,12 @@ export namespace DialogUtils {
                 });
         }, { before: true });
 
-        function beforeUnload() {
+        function beforeUnload(e: BeforeUnloadEvent) {
             if (!Fluent.isVisibleLike(el) || !hasPendingChanges())
                 return;
 
+            e.preventDefault();
+            (e as any).returnValue = localText("Site.Dialogs.PendingChangesUnloadWarning");
             return localText("Site.Dialogs.PendingChangesUnloadWarning");
         }
 
