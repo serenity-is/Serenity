@@ -39,7 +39,7 @@ public static class EntitySqlHelper
         using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
         if (reader.Read())
         {
-            query.GetFromReader(reader, new IEntity[] { row });
+            query.GetFromReader(reader, [row]);
             return true;
         }
         else
@@ -84,7 +84,7 @@ public static class EntitySqlHelper
         using IDataReader reader = SqlHelper.ExecuteReader(connection, query, param);
         if (reader.Read())
         {
-            query.GetFromReader(reader, new IRow[] { row });
+            query.GetFromReader(reader, [row]);
 
             if (reader.Read())
                 throw new InvalidOperationException("Query returned more than one result!");

@@ -8,8 +8,8 @@ namespace Build;
 
 public static partial class Shared
 {
-    public static readonly (string prefix, string suffix, string eelse, string ending)[] ConditionalPatterns = new[]
-    {
+    public static readonly (string prefix, string suffix, string eelse, string ending)[] ConditionalPatterns =
+    [
         ("//<if:", "//>", "//<else>", "//</if:{0}>"),
         ("//#if(", ")", "//#else", "//#endif"),
         ("//#if (", ")", "//#else", "//#endif"),
@@ -18,7 +18,7 @@ public static partial class Shared
         ("<!--<if:", ">-->", "<!--<else>-->", "<!--<endif:{0}>-->"),
         ("<!--#if(", ")-->", "<!--#else-->", "<!--#endif-->"),
         ("<!--#if (", ")-->", "<!--#else-->", "<!--#endif-->")
-    };
+    ];
 
     public static bool HasConditionals(string content)
     {

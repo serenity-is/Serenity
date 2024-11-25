@@ -35,7 +35,7 @@ public class UserCultureProvider : RequestCultureProvider
     };
 
     private static List<CultureInfo> supportedCultures;
-    private static readonly string[] supportedCultureIdentifiers = new string[] {
+    private static readonly string[] supportedCultureIdentifiers = [
         "de-DE",
         "en-US",
         "en-GB",
@@ -48,7 +48,7 @@ public class UserCultureProvider : RequestCultureProvider
         "tr-TR",
         "vi-VN",
         "zh-CN"
-    };
+    ];
 
     public static IList<CultureInfo> SupportedCultures
     {

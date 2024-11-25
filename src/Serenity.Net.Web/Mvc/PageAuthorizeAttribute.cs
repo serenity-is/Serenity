@@ -17,7 +17,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     public PageAuthorizeAttribute()
         : base(typeof(PageAuthorizeFilter))
     {
-        Arguments = new[] { this };
+        Arguments = [this];
     }
 
     private class PageAuthorizeFilter(PageAuthorizeAttribute attr) : IResourceFilter

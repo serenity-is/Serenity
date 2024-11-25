@@ -41,7 +41,7 @@ public class NavigationGroupAttributeTests
     public void IncludeProperty_CanBeSetAndRetrieved()
     {
         var attribute = new NavigationGroupAttribute("Title");
-        string[] includePaths = { "B/", "C/" };
+        string[] includePaths = ["B/", "C/"];
         attribute.Include = includePaths;
         Assert.Equal(includePaths, attribute.Include);
     }

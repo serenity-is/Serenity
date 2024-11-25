@@ -255,8 +255,8 @@ END;", table, id, seq));
             using var fbConnection = sqlConnections.New(cb.ConnectionString,
                 cs.ProviderName, cs.Dialect);
             ((WrappedConnection)fbConnection).ActualConnection.GetType()
-                .GetMethod("CreateDatabase", new Type[] { typeof(string), typeof(bool) })
-                .Invoke(null, new object[] { fbConnection.ConnectionString, false });
+                .GetMethod("CreateDatabase", [typeof(string), typeof(bool)])
+                .Invoke(null, [fbConnection.ConnectionString, false]);
 
             return;
         }

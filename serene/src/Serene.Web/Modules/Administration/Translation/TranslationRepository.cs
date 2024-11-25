@@ -61,12 +61,12 @@ public class TranslationRepository : BaseRepository
             if (key.StartsWith("Navigation.", StringComparison.Ordinal))
             {
                 key = key["Navigation.".Length..];
-                return key.Split(new char[] { '/' }).Last();
+                return key.Split(['/']).Last();
             }
             else if (key.StartsWith("Forms.", StringComparison.Ordinal) &&
                 key.Contains(".Categories.", StringComparison.Ordinal))
             {
-                return key.Split(new char[] { '.' }).Last().TrimToNull();
+                return key.Split(['.']).Last().TrimToNull();
             }
 
             return key;

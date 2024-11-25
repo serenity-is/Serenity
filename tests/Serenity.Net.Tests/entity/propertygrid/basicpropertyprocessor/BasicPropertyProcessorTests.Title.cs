@@ -219,7 +219,7 @@ public partial class BasicPropertyProcessorTests
         var processor = new BasicPropertyProcessor();
 
         var registry = new LocalTextRegistry();
-        EntityLocalTexts.AddRowTexts(registry, new[] { new DisplayWithRowRow() });
+        EntityLocalTexts.AddRowTexts(registry, [new DisplayWithRowRow()]);
 
         var item = new PropertyItem();
         var property = typeof(DisplayWithRowForm).GetProperty(propertyName);
