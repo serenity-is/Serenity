@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "このリクエストには承認が必要です！",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "要求の処理中にエラーが発生しました。",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTPエラー {0}.",
+  "Services.InternalServerError": "内部サーバーエラー (500)．",
+  "Services.SeeBrowserConsole": "詳細についてはブラウザコンソール (F12) を参照してください．",
+  "Services.UnknownConnectionError": "サーバーへの接続中にエラーが発生しました."
 }

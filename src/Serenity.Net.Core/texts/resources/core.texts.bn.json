@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "এই অনুরোধটির জন্য অনুমোদনকারীর প্রয়োজন!",
   "Db.Shared.RecordId": "আইডি",
   "Services.GenericErrorMessage": "আপনার অনুরোধটি প্রক্রিয়াকরণের সময় ত্রুটি ঘটেছে।",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "এইচটিটি পি ত্রুটি {0}.",
+  "Services.InternalServerError": "অভ্যন্তরীণ সার্ভার ত্রুটি (500)।",
+  "Services.SeeBrowserConsole": "আরও তথ্যের জন্য ব্রাউজার কনসোল (F12) দেখুন।",
+  "Services.UnknownConnectionError": "সার্ভারের সাথে সংযোগ করার সময় একটি ত্রুটি ঘটেছে।"
 }

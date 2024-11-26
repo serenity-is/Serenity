@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "此请求需要授权！",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "处理您的请求时出错。",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP 错误 {0}.",
+  "Services.InternalServerError": "内部服务器错误 (500)．",
+  "Services.SeeBrowserConsole": "请查看浏览器控制台 (F12) 以获取更多信息．",
+  "Services.UnknownConnectionError": "连接到服务器时发生错误。"
 }

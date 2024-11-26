@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "الترخيص مطلوب لهذا الطلب!",
   "Db.Shared.RecordId": "معرف",
   "Services.GenericErrorMessage": "حدث خطأ أثناء معالجة طلبك",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "خطأ HTTP {0}.",
+  "Services.InternalServerError": "خطأ في الخادم الداخلي (500).",
+  "Services.SeeBrowserConsole": "راجع وحدة تحكم المتصفح (F12) لمزيد من المعلومات.",
+  "Services.UnknownConnectionError": "حدث خطأ أثناء الاتصال بالخادم."
 }

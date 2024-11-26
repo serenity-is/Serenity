@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "Do tego żądania wymagane jest upoważnienie!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Podczas przetwarzania żądania wystąpił błąd",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "Błąd HTTP {0}.",
+  "Services.InternalServerError": "Błąd serwera wewnętrznego (500).",
+  "Services.SeeBrowserConsole": "Sprawdź konsolę przeglądarki (F12), aby uzyskać więcej informacji.",
+  "Services.UnknownConnectionError": "Wystąpił błąd podczas łączenia z serwerem."
 }

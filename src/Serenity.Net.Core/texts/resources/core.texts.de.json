@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "Für diese Anfrage ist eine Autorisierung erforderlich!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP-Fehler {0}.",
+  "Services.InternalServerError": "Interner Serverfehler (500).",
+  "Services.SeeBrowserConsole": "Siehe Browser-Konsole (F12) für weitere Informationen.",
+  "Services.UnknownConnectionError": "Beim Verbinden mit dem Server ist ein Fehler aufgetreten."
 }

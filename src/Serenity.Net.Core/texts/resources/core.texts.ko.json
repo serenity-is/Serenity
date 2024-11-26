@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "이 요청에는 승인이 필요합니다!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "요청 처리 중 오류가 발생했습니다",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP 오류 {0}.",
+  "Services.InternalServerError": "내부 서버 오류 (500).",
+  "Services.SeeBrowserConsole": "더 많은 정보를 보려면 브라우저 콘솔(F12)을 참조하세요.",
+  "Services.UnknownConnectionError": "서버에 연결하는 도중 오류가 발생했습니다."
 }

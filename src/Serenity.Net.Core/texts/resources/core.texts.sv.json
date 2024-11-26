@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "För denna begäran krävs auktorisation!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Ett fel uppstod när din begäran bearbetades",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP-fel {0}.",
+  "Services.InternalServerError": "Internt serverfel (500).",
+  "Services.SeeBrowserConsole": "Se webbläsarkonsolen (F12) för mer information.",
+  "Services.UnknownConnectionError": "Ett fel inträffade vid anslutning till servern."
 }

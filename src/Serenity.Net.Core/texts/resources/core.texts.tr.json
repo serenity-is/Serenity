@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "İsteğiniz işlenirken bir hata oluştu.",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP Hatası {0}.",
+  "Services.InternalServerError": "Sunucu Hatası (500).",
+  "Services.SeeBrowserConsole": "Daha fazla bilgi için tarayıcı konsolunu (F12) görüntüleyin.",
+  "Services.UnknownConnectionError": "Sunucuya bağlanırken bir hata oluştu."
 }

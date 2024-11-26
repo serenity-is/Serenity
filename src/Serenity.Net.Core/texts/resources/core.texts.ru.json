@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "Для этого запроса требуется авторизация!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "При обработке вашего запроса произошла ошибка",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP ошибка {0}.",
+  "Services.InternalServerError": "Ошибка сервера (500).",
+  "Services.SeeBrowserConsole": "См. консоль браузера (F12) для получения дополнительной информации.",
+  "Services.UnknownConnectionError": "Произошла ошибка при подключении к серверу."
 }

@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "此請求需要授權！",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "處理您的請求時發生錯誤。",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP 錯誤 {0}.",
+  "Services.InternalServerError": "內部伺服器錯誤 (500)。",
+  "Services.SeeBrowserConsole": "請查看瀏覽器控制台 (F12) 以獲取更多資訊。",
+  "Services.UnknownConnectionError": "連接到伺服器時發生錯誤。"
 }

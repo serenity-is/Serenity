@@ -96,7 +96,7 @@
   "Controls.QuickSearch.FieldSelection": "arama yapılacak alanı seç",
   "Controls.QuickSearch.Hint": "aranacak kelimeyi giriniz",
   "Controls.QuickSearch.Placeholder": "hızlı arama",
-  "Controls.SelectEditor.AjaxError": null,
+  "Controls.SelectEditor.AjaxError": "Yükleme başarısız oldu",
   "Controls.SelectEditor.ClickToDefine": "*** Yeni tanımlamak için tıklayınız ***",
   "Controls.SelectEditor.EmptyItemText": "--seçiniz--",
   "Controls.SelectEditor.InplaceAdd": "Yeni Tanımla",

@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "این درخواست برای اجازه یافتن مورد نیاز است!",
   "Db.Shared.RecordId": "شناسه",
   "Services.GenericErrorMessage": "در هنگام پردازش درخواست شما خطایی رخ داده است",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "خطای HTTP {0}.",
+  "Services.InternalServerError": "خطای داخلی سرور (500).",
+  "Services.SeeBrowserConsole": "برای اطلاعات بیشتر به کنسول مرورگر (F12) مراجعه کنید.",
+  "Services.UnknownConnectionError": "خطایی در حین اتصال به سرور رخ داد."
 }

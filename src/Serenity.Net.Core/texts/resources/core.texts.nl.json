@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "Voor deze aanvraag is autorisatie vereist!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Er is een fout opgetreden bij het verwerken van uw verzoek",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "HTTP-fout {0}.",
+  "Services.InternalServerError": "Interne serverfout (500).",
+  "Services.SeeBrowserConsole": "Zie browserconsole (F12) voor meer informatie.",
+  "Services.UnknownConnectionError": "Er is een fout opgetreden bij het verbinden met de server."
 }

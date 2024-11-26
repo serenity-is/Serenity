@@ -3,8 +3,8 @@
   "Authorization.NotLoggedIn": "¡Se requiere autorización para esta solicitud!",
   "Db.Shared.RecordId": "ID",
   "Services.GenericErrorMessage": "Se ha producido un error al procesar su solicitud",
-  "Services.HttpError": null,
-  "Services.InternalServerError": null,
-  "Services.SeeBrowserConsole": null,
-  "Services.UnknownConnectionError": null
+  "Services.HttpError": "Error HTTP {0}.",
+  "Services.InternalServerError": "Error interno del servidor (500).",
+  "Services.SeeBrowserConsole": "Consulta la consola del navegador (F12) para más información.",
+  "Services.UnknownConnectionError": "Se produjo un error al conectar con el servidor."
 }
